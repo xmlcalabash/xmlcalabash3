@@ -425,7 +425,7 @@ class UrifyNonWindowsSpec extends AnyFlatSpec with BeforeAndAfter {
     } catch {
       case ex: XProcException =>
         assert(ex.code.getLocalName == "XD0077")
-      case _ => fail()
+      case _: Throwable => fail()
     }
   }
 
@@ -497,7 +497,7 @@ class UrifyNonWindowsSpec extends AnyFlatSpec with BeforeAndAfter {
     } catch {
       case ex: XProcException =>
         assert(ex.code.getLocalName == "XD0077")
-      case _ => fail()
+      case _: Throwable => fail()
     }
   }
 
@@ -533,7 +533,7 @@ class UrifyNonWindowsSpec extends AnyFlatSpec with BeforeAndAfter {
     } catch {
       case ex: XProcException =>
         assert(ex.code.getLocalName == "XD0077")
-      case _ => fail()
+      case _: Throwable => fail()
     }
   }
 
@@ -587,7 +587,7 @@ class UrifyNonWindowsSpec extends AnyFlatSpec with BeforeAndAfter {
     } catch {
       case ex: XProcException =>
         assert(ex.code.getLocalName == "XD0077")
-      case _ => fail()
+      case _: Throwable => fail()
     }
   }
 
@@ -605,7 +605,7 @@ class UrifyNonWindowsSpec extends AnyFlatSpec with BeforeAndAfter {
     } catch {
       case ex: XProcException =>
         assert(ex.code.getLocalName == "XD0077")
-      case _ => fail()
+      case _: Throwable => fail()
     }
   }
 
@@ -623,7 +623,7 @@ class UrifyNonWindowsSpec extends AnyFlatSpec with BeforeAndAfter {
     } catch {
       case ex: XProcException =>
         assert(ex.code.getLocalName == "XD0077")
-      case _ => fail()
+      case _: Throwable => fail()
     }
   }
 
@@ -653,7 +653,7 @@ class UrifyNonWindowsSpec extends AnyFlatSpec with BeforeAndAfter {
     } catch {
       case ex: XProcException =>
         assert(ex.code.getLocalName == "XD0077")
-      case _ => fail()
+      case _: Throwable => fail()
     }
   }
 
@@ -665,7 +665,7 @@ class UrifyNonWindowsSpec extends AnyFlatSpec with BeforeAndAfter {
     } catch {
       case ex: XProcException =>
         assert(ex.code.getLocalName == "XD0077")
-      case _ => fail()
+      case _: Throwable => fail()
     }
   }
 
@@ -677,7 +677,7 @@ class UrifyNonWindowsSpec extends AnyFlatSpec with BeforeAndAfter {
     } catch {
       case ex: XProcException =>
         assert(ex.code.getLocalName == "XD0077")
-      case _ => fail()
+      case _: Throwable => fail()
     }
   }
 
@@ -689,7 +689,7 @@ class UrifyNonWindowsSpec extends AnyFlatSpec with BeforeAndAfter {
     } catch {
       case ex: XProcException =>
         assert(ex.code.getLocalName == "XD0077")
-      case _ => fail()
+      case _: Throwable => fail()
     }
   }
 
@@ -725,7 +725,7 @@ class UrifyNonWindowsSpec extends AnyFlatSpec with BeforeAndAfter {
     } catch {
       case ex: XProcException =>
         assert(ex.code.getLocalName == "XD0077")
-      case _ => fail()
+      case _: Throwable => fail()
     }
   }
 
@@ -737,7 +737,7 @@ class UrifyNonWindowsSpec extends AnyFlatSpec with BeforeAndAfter {
     } catch {
       case ex: XProcException =>
         assert(ex.code.getLocalName == "XD0080")
-      case _ => fail()
+      case _: Throwable => fail()
     }
   }
 
@@ -749,7 +749,7 @@ class UrifyNonWindowsSpec extends AnyFlatSpec with BeforeAndAfter {
     } catch {
       case ex: XProcException =>
         assert(ex.code.getLocalName == "XD0080")
-      case _ => fail()
+      case _: Throwable => fail()
     }
   }
 
@@ -761,7 +761,7 @@ class UrifyNonWindowsSpec extends AnyFlatSpec with BeforeAndAfter {
     } catch {
       case ex: XProcException =>
         assert(ex.code.getLocalName == "XD0080")
-      case _ => fail()
+      case _: Throwable => fail()
     }
   }
 
@@ -773,7 +773,7 @@ class UrifyNonWindowsSpec extends AnyFlatSpec with BeforeAndAfter {
     } catch {
       case ex: XProcException =>
         assert(ex.code.getLocalName == "XD0080")
-      case _ => fail()
+      case _: Throwable => fail()
     }
   }
 
@@ -785,7 +785,7 @@ class UrifyNonWindowsSpec extends AnyFlatSpec with BeforeAndAfter {
     } catch {
       case ex: XProcException =>
         assert(ex.code.getLocalName == "XD0080")
-      case _ => fail()
+      case _: Throwable => fail()
     }
   }
 
@@ -797,7 +797,7 @@ class UrifyNonWindowsSpec extends AnyFlatSpec with BeforeAndAfter {
     } catch {
       case ex: XProcException =>
         assert(ex.code.getLocalName == "XD0080")
-      case _ => fail()
+      case _: Throwable => fail()
     }
   }
 
@@ -815,7 +815,7 @@ class UrifyNonWindowsSpec extends AnyFlatSpec with BeforeAndAfter {
     } catch {
       case ex: XProcException =>
         assert(ex.code.getLocalName == "XD0080")
-      case _ => fail()
+      case _: Throwable => fail()
     }
   }
 
@@ -827,7 +827,7 @@ class UrifyNonWindowsSpec extends AnyFlatSpec with BeforeAndAfter {
     } catch {
       case ex: XProcException =>
         assert(ex.code.getLocalName == "XD0080")
-      case _ => fail()
+      case _: Throwable => fail()
     }
   }
 
@@ -839,7 +839,7 @@ class UrifyNonWindowsSpec extends AnyFlatSpec with BeforeAndAfter {
     } catch {
       case ex: XProcException =>
         assert(ex.code.getLocalName == "XD0080")
-      case _ => fail()
+      case _: Throwable => fail()
     }
   }
 
@@ -857,7 +857,7 @@ class UrifyNonWindowsSpec extends AnyFlatSpec with BeforeAndAfter {
     } catch {
       case ex: XProcException =>
         assert(ex.code.getLocalName == "XD0080")
-      case _ => fail()
+      case _: Throwable => fail()
     }
   }
 
@@ -887,7 +887,7 @@ class UrifyNonWindowsSpec extends AnyFlatSpec with BeforeAndAfter {
     } catch {
       case ex: XProcException =>
         assert(ex.code.getLocalName == "XD0080")
-      case _ => fail()
+      case _: Throwable => fail()
     }
   }
 
@@ -899,7 +899,7 @@ class UrifyNonWindowsSpec extends AnyFlatSpec with BeforeAndAfter {
     } catch {
       case ex: XProcException =>
         assert(ex.code.getLocalName == "XD0080")
-      case _ => fail()
+      case _: Throwable => fail()
     }
   }
 
@@ -911,7 +911,7 @@ class UrifyNonWindowsSpec extends AnyFlatSpec with BeforeAndAfter {
     } catch {
       case ex: XProcException =>
         assert(ex.code.getLocalName == "XD0080")
-      case _ => fail()
+      case _: Throwable => fail()
     }
   }
 
@@ -923,7 +923,7 @@ class UrifyNonWindowsSpec extends AnyFlatSpec with BeforeAndAfter {
     } catch {
       case ex: XProcException =>
         assert(ex.code.getLocalName == "XD0080")
-      case _ => fail()
+      case _: Throwable => fail()
     }
   }
 
@@ -953,7 +953,7 @@ class UrifyNonWindowsSpec extends AnyFlatSpec with BeforeAndAfter {
     } catch {
       case ex: XProcException =>
         assert(ex.code.getLocalName == "XD0080")
-      case _ => fail()
+      case _: Throwable => fail()
     }
   }
 
@@ -965,7 +965,7 @@ class UrifyNonWindowsSpec extends AnyFlatSpec with BeforeAndAfter {
     } catch {
       case ex: XProcException =>
         assert(ex.code.getLocalName == "XD0080")
-      case _ => fail()
+      case _: Throwable => fail()
     }
   }
 
@@ -1019,7 +1019,7 @@ class UrifyNonWindowsSpec extends AnyFlatSpec with BeforeAndAfter {
     } catch {
       case ex: XProcException =>
         assert(ex.code.getLocalName == "XD0077")
-      case _ => fail()
+      case _: Throwable => fail()
     }
   }
 
@@ -1091,7 +1091,7 @@ class UrifyNonWindowsSpec extends AnyFlatSpec with BeforeAndAfter {
     } catch {
       case ex: XProcException =>
         assert(ex.code.getLocalName == "XD0077")
-      case _ => fail()
+      case _: Throwable => fail()
     }
   }
 
@@ -1127,7 +1127,7 @@ class UrifyNonWindowsSpec extends AnyFlatSpec with BeforeAndAfter {
     } catch {
       case ex: XProcException =>
         assert(ex.code.getLocalName == "XD0077")
-      case _ => fail()
+      case _: Throwable => fail()
     }
   }
 
@@ -1139,7 +1139,7 @@ class UrifyNonWindowsSpec extends AnyFlatSpec with BeforeAndAfter {
     } catch {
       case ex: XProcException =>
         assert(ex.code.getLocalName == "XD0074")
-      case _ => fail()
+      case _: Throwable => fail()
     }
   }
 
@@ -1151,7 +1151,7 @@ class UrifyNonWindowsSpec extends AnyFlatSpec with BeforeAndAfter {
     } catch {
       case ex: XProcException =>
         assert(ex.code.getLocalName == "XD0074")
-      case _ => fail()
+      case _: Throwable => fail()
     }
   }
 
@@ -1163,7 +1163,7 @@ class UrifyNonWindowsSpec extends AnyFlatSpec with BeforeAndAfter {
     } catch {
       case ex: XProcException =>
         assert(ex.code.getLocalName == "XD0074")
-      case _ => fail()
+      case _: Throwable => fail()
     }
   }
 
@@ -1175,7 +1175,7 @@ class UrifyNonWindowsSpec extends AnyFlatSpec with BeforeAndAfter {
     } catch {
       case ex: XProcException =>
         assert(ex.code.getLocalName == "XD0074")
-      case _ => fail()
+      case _: Throwable => fail()
     }
   }
 
@@ -1187,7 +1187,7 @@ class UrifyNonWindowsSpec extends AnyFlatSpec with BeforeAndAfter {
     } catch {
       case ex: XProcException =>
         assert(ex.code.getLocalName == "XD0074")
-      case _ => fail()
+      case _: Throwable => fail()
     }
   }
 
@@ -1199,7 +1199,7 @@ class UrifyNonWindowsSpec extends AnyFlatSpec with BeforeAndAfter {
     } catch {
       case ex: XProcException =>
         assert(ex.code.getLocalName == "XD0074")
-      case _ => fail()
+      case _: Throwable => fail()
     }
   }
 
@@ -1217,7 +1217,7 @@ class UrifyNonWindowsSpec extends AnyFlatSpec with BeforeAndAfter {
     } catch {
       case ex: XProcException =>
         assert(ex.code.getLocalName == "XD0074")
-      case _ => fail()
+      case _: Throwable => fail()
     }
   }
 
@@ -1229,7 +1229,7 @@ class UrifyNonWindowsSpec extends AnyFlatSpec with BeforeAndAfter {
     } catch {
       case ex: XProcException =>
         assert(ex.code.getLocalName == "XD0074")
-      case _ => fail()
+      case _: Throwable => fail()
     }
   }
 
@@ -1241,7 +1241,7 @@ class UrifyNonWindowsSpec extends AnyFlatSpec with BeforeAndAfter {
     } catch {
       case ex: XProcException =>
         assert(ex.code.getLocalName == "XD0074")
-      case _ => fail()
+      case _: Throwable => fail()
     }
   }
 
@@ -1259,7 +1259,7 @@ class UrifyNonWindowsSpec extends AnyFlatSpec with BeforeAndAfter {
     } catch {
       case ex: XProcException =>
         assert(ex.code.getLocalName == "XD0074")
-      case _ => fail()
+      case _: Throwable => fail()
     }
   }
 
@@ -1289,7 +1289,7 @@ class UrifyNonWindowsSpec extends AnyFlatSpec with BeforeAndAfter {
     } catch {
       case ex: XProcException =>
         assert(ex.code.getLocalName == "XD0074")
-      case _ => fail()
+      case _: Throwable => fail()
     }
   }
 
@@ -1301,7 +1301,7 @@ class UrifyNonWindowsSpec extends AnyFlatSpec with BeforeAndAfter {
     } catch {
       case ex: XProcException =>
         assert(ex.code.getLocalName == "XD0074")
-      case _ => fail()
+      case _: Throwable => fail()
     }
   }
 
@@ -1313,7 +1313,7 @@ class UrifyNonWindowsSpec extends AnyFlatSpec with BeforeAndAfter {
     } catch {
       case ex: XProcException =>
         assert(ex.code.getLocalName == "XD0074")
-      case _ => fail()
+      case _: Throwable => fail()
     }
   }
 
@@ -1325,7 +1325,7 @@ class UrifyNonWindowsSpec extends AnyFlatSpec with BeforeAndAfter {
     } catch {
       case ex: XProcException =>
         assert(ex.code.getLocalName == "XD0074")
-      case _ => fail()
+      case _: Throwable => fail()
     }
   }
 
@@ -1355,7 +1355,7 @@ class UrifyNonWindowsSpec extends AnyFlatSpec with BeforeAndAfter {
     } catch {
       case ex: XProcException =>
         assert(ex.code.getLocalName == "XD0074")
-      case _ => fail()
+      case _: Throwable => fail()
     }
   }
 
@@ -1367,10 +1367,7 @@ class UrifyNonWindowsSpec extends AnyFlatSpec with BeforeAndAfter {
     } catch {
       case ex: XProcException =>
         assert(ex.code.getLocalName == "XD0074")
-      case _ => fail()
+      case _: Throwable => fail()
     }
   }
-
-
-
 }

@@ -178,7 +178,7 @@
   <xsl:text>  }} catch {{&#10;</xsl:text>
   <xsl:text>  case ex: XProcException =>&#10;</xsl:text>
   <xsl:text>      assert(ex.code.getLocalName == "{substring-after(@error, 'err:')}")&#10;</xsl:text>
-  <xsl:text>  case _ => fail()&#10;</xsl:text>
+  <xsl:text>  case _: Throwable => fail()&#10;</xsl:text>
   <xsl:text>  }}&#10;</xsl:text>
   <xsl:text>}}&#10;&#10;</xsl:text>
 </xsl:template>

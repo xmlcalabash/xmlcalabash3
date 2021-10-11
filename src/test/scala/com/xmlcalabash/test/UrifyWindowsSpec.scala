@@ -64,6 +64,322 @@ class UrifyWindowsSpec extends AnyFlatSpec with BeforeAndAfter {
 
   // =======================================================================================================
 
+  "///path/to/thing " should " parse" in {
+    val path = new Urify("///path/to/thing")
+    assert(path.scheme.isEmpty)
+    assert(!path.explicit)
+    assert(path.hierarchical)
+    assert(path.authority.isEmpty)
+    assert(path.driveLetter.isEmpty)
+    assert(path.absolute)
+    assert(!path.relative)
+    assert(path.path == "/path/to/thing")
+  }
+
+  "//authority " should " parse" in {
+    val path = new Urify("//authority")
+    assert(path.scheme.isEmpty)
+    assert(!path.explicit)
+    assert(path.hierarchical)
+    assert(path.authority.isDefined)
+    assert(path.authority.get == "authority")
+    assert(path.driveLetter.isEmpty)
+    assert(!path.absolute)
+    assert(path.relative)
+    assert(path.path == "")
+  }
+
+  "//authority/ " should " parse" in {
+    val path = new Urify("//authority/")
+    assert(path.scheme.isEmpty)
+    assert(!path.explicit)
+    assert(path.hierarchical)
+    assert(path.authority.isDefined)
+    assert(path.authority.get == "authority")
+    assert(path.driveLetter.isEmpty)
+    assert(path.absolute)
+    assert(!path.relative)
+    assert(path.path == "/")
+  }
+
+  "//authority/path/to/thing " should " parse" in {
+    val path = new Urify("//authority/path/to/thing")
+    assert(path.scheme.isEmpty)
+    assert(!path.explicit)
+    assert(path.hierarchical)
+    assert(path.authority.isDefined)
+    assert(path.authority.get == "authority")
+    assert(path.driveLetter.isEmpty)
+    assert(path.absolute)
+    assert(!path.relative)
+    assert(path.path == "/path/to/thing")
+  }
+
+  "/Documents and Files/thing " should " parse" in {
+    val path = new Urify("/Documents and Files/thing")
+    assert(path.scheme.isEmpty)
+    assert(!path.explicit)
+    assert(path.hierarchical)
+    assert(path.authority.isEmpty)
+    assert(path.driveLetter.isEmpty)
+    assert(path.absolute)
+    assert(!path.relative)
+    assert(path.path == "/Documents and Files/thing")
+  }
+
+  "/path/to/thing " should " parse" in {
+    val path = new Urify("/path/to/thing")
+    assert(path.scheme.isEmpty)
+    assert(!path.explicit)
+    assert(path.hierarchical)
+    assert(path.authority.isEmpty)
+    assert(path.driveLetter.isEmpty)
+    assert(path.absolute)
+    assert(!path.relative)
+    assert(path.path == "/path/to/thing")
+  }
+
+  "C:/Users/Jane/Documents and Files/Thing " should " parse" in {
+    val path = new Urify("C:/Users/Jane/Documents and Files/Thing")
+    assert(path.scheme.isDefined)
+    assert(path.scheme.get == "file")
+    assert(!path.explicit)
+    assert(path.hierarchical)
+    assert(path.authority.isEmpty)
+    assert(path.driveLetter.isDefined)
+    assert(path.driveLetter.get == "C")
+    assert(path.absolute)
+    assert(!path.relative)
+    assert(path.path == "/Users/Jane/Documents and Files/Thing")
+  }
+
+  "C:Users/Jane/Documents and Files/Thing " should " parse" in {
+    val path = new Urify("C:Users/Jane/Documents and Files/Thing")
+    assert(path.scheme.isDefined)
+    assert(path.scheme.get == "file")
+    assert(!path.explicit)
+    assert(path.hierarchical)
+    assert(path.authority.isEmpty)
+    assert(path.driveLetter.isDefined)
+    assert(path.driveLetter.get == "C")
+    assert(!path.absolute)
+    assert(path.relative)
+    assert(path.path == "Users/Jane/Documents and Files/Thing")
+  }
+
+  "Documents and Files/thing " should " parse" in {
+    val path = new Urify("Documents and Files/thing")
+    assert(path.scheme.isEmpty)
+    assert(!path.explicit)
+    assert(path.hierarchical)
+    assert(path.authority.isEmpty)
+    assert(path.driveLetter.isEmpty)
+    assert(!path.absolute)
+    assert(path.relative)
+    assert(path.path == "Documents and Files/thing")
+  }
+
+  "file: " should " parse" in {
+    val path = new Urify("file:")
+    assert(path.scheme.isDefined)
+    assert(path.scheme.get == "file")
+    assert(path.explicit)
+    assert(path.hierarchical)
+    assert(path.authority.isEmpty)
+    assert(path.driveLetter.isEmpty)
+    assert(!path.absolute)
+    assert(path.relative)
+    assert(path.path == "")
+  }
+
+  "file:///path/to/thing " should " parse" in {
+    val path = new Urify("file:///path/to/thing")
+    assert(path.scheme.isDefined)
+    assert(path.scheme.get == "file")
+    assert(path.explicit)
+    assert(path.hierarchical)
+    assert(path.authority.isEmpty)
+    assert(path.driveLetter.isEmpty)
+    assert(path.absolute)
+    assert(!path.relative)
+    assert(path.path == "/path/to/thing")
+  }
+
+  "file://authority.com " should " parse" in {
+    val path = new Urify("file://authority.com")
+    assert(path.scheme.isDefined)
+    assert(path.scheme.get == "file")
+    assert(path.explicit)
+    assert(path.hierarchical)
+    assert(path.authority.isDefined)
+    assert(path.authority.get == "authority.com")
+    assert(path.driveLetter.isEmpty)
+    assert(!path.absolute)
+    assert(path.relative)
+    assert(path.path == "")
+  }
+
+  "file://authority.com/ " should " parse" in {
+    val path = new Urify("file://authority.com/")
+    assert(path.scheme.isDefined)
+    assert(path.scheme.get == "file")
+    assert(path.explicit)
+    assert(path.hierarchical)
+    assert(path.authority.isDefined)
+    assert(path.authority.get == "authority.com")
+    assert(path.driveLetter.isEmpty)
+    assert(path.absolute)
+    assert(!path.relative)
+    assert(path.path == "/")
+  }
+
+  "file://authority.com/path/to/thing " should " parse" in {
+    val path = new Urify("file://authority.com/path/to/thing")
+    assert(path.scheme.isDefined)
+    assert(path.scheme.get == "file")
+    assert(path.explicit)
+    assert(path.hierarchical)
+    assert(path.authority.isDefined)
+    assert(path.authority.get == "authority.com")
+    assert(path.driveLetter.isEmpty)
+    assert(path.absolute)
+    assert(!path.relative)
+    assert(path.path == "/path/to/thing")
+  }
+
+  "file:/path/to/thing " should " parse" in {
+    val path = new Urify("file:/path/to/thing")
+    assert(path.scheme.isDefined)
+    assert(path.scheme.get == "file")
+    assert(path.explicit)
+    assert(path.hierarchical)
+    assert(path.authority.isEmpty)
+    assert(path.driveLetter.isEmpty)
+    assert(path.absolute)
+    assert(!path.relative)
+    assert(path.path == "/path/to/thing")
+  }
+
+  "file:C:/Users/Jane/Documents and Files/Thing " should " parse" in {
+    val path = new Urify("file:C:/Users/Jane/Documents and Files/Thing")
+    assert(path.scheme.isDefined)
+    assert(path.scheme.get == "file")
+    assert(path.explicit)
+    assert(path.hierarchical)
+    assert(path.authority.isEmpty)
+    assert(path.driveLetter.isDefined)
+    assert(path.driveLetter.get == "C")
+    assert(path.absolute)
+    assert(!path.relative)
+    assert(path.path == "/Users/Jane/Documents and Files/Thing")
+  }
+
+  "file:C:Users/Jane/Documents and Files/Thing " should " parse" in {
+    val path = new Urify("file:C:Users/Jane/Documents and Files/Thing")
+    assert(path.scheme.isDefined)
+    assert(path.scheme.get == "file")
+    assert(path.explicit)
+    assert(path.hierarchical)
+    assert(path.authority.isEmpty)
+    assert(path.driveLetter.isDefined)
+    assert(path.driveLetter.get == "C")
+    assert(!path.absolute)
+    assert(path.relative)
+    assert(path.path == "Users/Jane/Documents and Files/Thing")
+  }
+
+  "file:path/to/thing " should " parse" in {
+    val path = new Urify("file:path/to/thing")
+    assert(path.scheme.isDefined)
+    assert(path.scheme.get == "file")
+    assert(path.explicit)
+    assert(path.hierarchical)
+    assert(path.authority.isEmpty)
+    assert(path.driveLetter.isEmpty)
+    assert(!path.absolute)
+    assert(path.relative)
+    assert(path.path == "path/to/thing")
+  }
+
+  "https: " should " parse" in {
+    val path = new Urify("https:")
+    assert(path.scheme.isDefined)
+    assert(path.scheme.get == "https")
+    assert(path.explicit)
+    assert(path.hierarchical)
+    assert(path.authority.isEmpty)
+    assert(path.driveLetter.isEmpty)
+    assert(!path.absolute)
+    assert(path.relative)
+    assert(path.path == "")
+  }
+
+  "https://example.com " should " parse" in {
+    val path = new Urify("https://example.com")
+    assert(path.scheme.isDefined)
+    assert(path.scheme.get == "https")
+    assert(path.explicit)
+    assert(path.hierarchical)
+    assert(path.authority.isEmpty)
+    assert(path.driveLetter.isEmpty)
+    assert(path.absolute)
+    assert(!path.relative)
+    assert(path.path == "//example.com")
+  }
+
+  "https://example.com/ " should " parse" in {
+    val path = new Urify("https://example.com/")
+    assert(path.scheme.isDefined)
+    assert(path.scheme.get == "https")
+    assert(path.explicit)
+    assert(path.hierarchical)
+    assert(path.authority.isEmpty)
+    assert(path.driveLetter.isEmpty)
+    assert(path.absolute)
+    assert(!path.relative)
+    assert(path.path == "//example.com/")
+  }
+
+  "https://example.com/path/to/thing " should " parse" in {
+    val path = new Urify("https://example.com/path/to/thing")
+    assert(path.scheme.isDefined)
+    assert(path.scheme.get == "https")
+    assert(path.explicit)
+    assert(path.hierarchical)
+    assert(path.authority.isEmpty)
+    assert(path.driveLetter.isEmpty)
+    assert(path.absolute)
+    assert(!path.relative)
+    assert(path.path == "//example.com/path/to/thing")
+  }
+
+  "path/to/thing " should " parse" in {
+    val path = new Urify("path/to/thing")
+    assert(path.scheme.isEmpty)
+    assert(!path.explicit)
+    assert(path.hierarchical)
+    assert(path.authority.isEmpty)
+    assert(path.driveLetter.isEmpty)
+    assert(!path.absolute)
+    assert(path.relative)
+    assert(path.path == "path/to/thing")
+  }
+
+  "urn:publicid:ISO+8879%3A1986:ENTITIES+Added+Latin+1:EN " should " parse" in {
+    val path = new Urify("urn:publicid:ISO+8879%3A1986:ENTITIES+Added+Latin+1:EN")
+    assert(path.scheme.isDefined)
+    assert(path.scheme.get == "urn")
+    assert(path.explicit)
+    assert(!path.hierarchical)
+    assert(path.authority.isEmpty)
+    assert(path.driveLetter.isEmpty)
+    assert(!path.absolute)
+    assert(path.relative)
+    assert(path.path == "publicid:ISO+8879%3A1986:ENTITIES+Added+Latin+1:EN")
+  }
+
+  // =======================================================================================================
+
   "///path/to/thing " should " resolve against file:///C:/Users/Jane%20Doe/Documents/" in {
     val basepath = new Urify("file:///C:/Users/Jane%20Doe/Documents/")
     val path = basepath.resolve("///path/to/thing")
@@ -78,7 +394,7 @@ class UrifyWindowsSpec extends AnyFlatSpec with BeforeAndAfter {
     } catch {
       case ex: XProcException =>
         assert(ex.code.getLocalName == "XD0076")
-      case _ => fail()
+      case _: Throwable => fail()
     }
   }
 
@@ -90,7 +406,7 @@ class UrifyWindowsSpec extends AnyFlatSpec with BeforeAndAfter {
     } catch {
       case ex: XProcException =>
         assert(ex.code.getLocalName == "XD0076")
-      case _ => fail()
+      case _: Throwable => fail()
     }
   }
 
@@ -102,7 +418,7 @@ class UrifyWindowsSpec extends AnyFlatSpec with BeforeAndAfter {
     } catch {
       case ex: XProcException =>
         assert(ex.code.getLocalName == "XD0076")
-      case _ => fail()
+      case _: Throwable => fail()
     }
   }
 
@@ -156,7 +472,7 @@ class UrifyWindowsSpec extends AnyFlatSpec with BeforeAndAfter {
     } catch {
       case ex: XProcException =>
         assert(ex.code.getLocalName == "XD0076")
-      case _ => fail()
+      case _: Throwable => fail()
     }
   }
 
@@ -204,7 +520,7 @@ class UrifyWindowsSpec extends AnyFlatSpec with BeforeAndAfter {
     } catch {
       case ex: XProcException =>
         assert(ex.code.getLocalName == "XD0077")
-      case _ => fail()
+      case _: Throwable => fail()
     }
   }
 
@@ -240,7 +556,7 @@ class UrifyWindowsSpec extends AnyFlatSpec with BeforeAndAfter {
     } catch {
       case ex: XProcException =>
         assert(ex.code.getLocalName == "XD0077")
-      case _ => fail()
+      case _: Throwable => fail()
     }
   }
 
@@ -258,7 +574,7 @@ class UrifyWindowsSpec extends AnyFlatSpec with BeforeAndAfter {
     } catch {
       case ex: XProcException =>
         assert(ex.code.getLocalName == "XD0076")
-      case _ => fail()
+      case _: Throwable => fail()
     }
   }
 
@@ -270,7 +586,7 @@ class UrifyWindowsSpec extends AnyFlatSpec with BeforeAndAfter {
     } catch {
       case ex: XProcException =>
         assert(ex.code.getLocalName == "XD0076")
-      case _ => fail()
+      case _: Throwable => fail()
     }
   }
 
@@ -282,7 +598,7 @@ class UrifyWindowsSpec extends AnyFlatSpec with BeforeAndAfter {
     } catch {
       case ex: XProcException =>
         assert(ex.code.getLocalName == "XD0076")
-      case _ => fail()
+      case _: Throwable => fail()
     }
   }
 
@@ -312,7 +628,7 @@ class UrifyWindowsSpec extends AnyFlatSpec with BeforeAndAfter {
     } catch {
       case ex: XProcException =>
         assert(ex.code.getLocalName == "XD0075")
-      case _ => fail()
+      case _: Throwable => fail()
     }
   }
 
@@ -342,7 +658,7 @@ class UrifyWindowsSpec extends AnyFlatSpec with BeforeAndAfter {
     } catch {
       case ex: XProcException =>
         assert(ex.code.getLocalName == "XD0076")
-      case _ => fail()
+      case _: Throwable => fail()
     }
   }
 
@@ -378,7 +694,7 @@ class UrifyWindowsSpec extends AnyFlatSpec with BeforeAndAfter {
     } catch {
       case ex: XProcException =>
         assert(ex.code.getLocalName == "XD0075")
-      case _ => fail()
+      case _: Throwable => fail()
     }
   }
 
@@ -396,7 +712,7 @@ class UrifyWindowsSpec extends AnyFlatSpec with BeforeAndAfter {
     } catch {
       case ex: XProcException =>
         assert(ex.code.getLocalName == "XD0077")
-      case _ => fail()
+      case _: Throwable => fail()
     }
   }
 
@@ -432,7 +748,7 @@ class UrifyWindowsSpec extends AnyFlatSpec with BeforeAndAfter {
     } catch {
       case ex: XProcException =>
         assert(ex.code.getLocalName == "XD0077")
-      case _ => fail()
+      case _: Throwable => fail()
     }
   }
 
@@ -486,7 +802,7 @@ class UrifyWindowsSpec extends AnyFlatSpec with BeforeAndAfter {
     } catch {
       case ex: XProcException =>
         assert(ex.code.getLocalName == "XD0075")
-      case _ => fail()
+      case _: Throwable => fail()
     }
   }
 
@@ -546,7 +862,7 @@ class UrifyWindowsSpec extends AnyFlatSpec with BeforeAndAfter {
     } catch {
       case ex: XProcException =>
         assert(ex.code.getLocalName == "XD0075")
-      case _ => fail()
+      case _: Throwable => fail()
     }
   }
 
@@ -564,7 +880,7 @@ class UrifyWindowsSpec extends AnyFlatSpec with BeforeAndAfter {
     } catch {
       case ex: XProcException =>
         assert(ex.code.getLocalName == "XD0077")
-      case _ => fail()
+      case _: Throwable => fail()
     }
   }
 
@@ -600,7 +916,7 @@ class UrifyWindowsSpec extends AnyFlatSpec with BeforeAndAfter {
     } catch {
       case ex: XProcException =>
         assert(ex.code.getLocalName == "XD0077")
-      case _ => fail()
+      case _: Throwable => fail()
     }
   }
 
@@ -654,7 +970,7 @@ class UrifyWindowsSpec extends AnyFlatSpec with BeforeAndAfter {
     } catch {
       case ex: XProcException =>
         assert(ex.code.getLocalName == "XD0075")
-      case _ => fail()
+      case _: Throwable => fail()
     }
   }
 
@@ -672,7 +988,7 @@ class UrifyWindowsSpec extends AnyFlatSpec with BeforeAndAfter {
     } catch {
       case ex: XProcException =>
         assert(ex.code.getLocalName == "XD0077")
-      case _ => fail()
+      case _: Throwable => fail()
     }
   }
 
@@ -690,7 +1006,7 @@ class UrifyWindowsSpec extends AnyFlatSpec with BeforeAndAfter {
     } catch {
       case ex: XProcException =>
         assert(ex.code.getLocalName == "XD0077")
-      case _ => fail()
+      case _: Throwable => fail()
     }
   }
 
@@ -726,7 +1042,7 @@ class UrifyWindowsSpec extends AnyFlatSpec with BeforeAndAfter {
     } catch {
       case ex: XProcException =>
         assert(ex.code.getLocalName == "XD0075")
-      case _ => fail()
+      case _: Throwable => fail()
     }
   }
 
@@ -738,7 +1054,7 @@ class UrifyWindowsSpec extends AnyFlatSpec with BeforeAndAfter {
     } catch {
       case ex: XProcException =>
         assert(ex.code.getLocalName == "XD0077")
-      case _ => fail()
+      case _: Throwable => fail()
     }
   }
 
@@ -750,7 +1066,7 @@ class UrifyWindowsSpec extends AnyFlatSpec with BeforeAndAfter {
     } catch {
       case ex: XProcException =>
         assert(ex.code.getLocalName == "XD0077")
-      case _ => fail()
+      case _: Throwable => fail()
     }
   }
 
@@ -786,7 +1102,7 @@ class UrifyWindowsSpec extends AnyFlatSpec with BeforeAndAfter {
     } catch {
       case ex: XProcException =>
         assert(ex.code.getLocalName == "XD0077")
-      case _ => fail()
+      case _: Throwable => fail()
     }
   }
 
@@ -840,7 +1156,7 @@ class UrifyWindowsSpec extends AnyFlatSpec with BeforeAndAfter {
     } catch {
       case ex: XProcException =>
         assert(ex.code.getLocalName == "XD0075")
-      case _ => fail()
+      case _: Throwable => fail()
     }
   }
 
@@ -900,7 +1216,7 @@ class UrifyWindowsSpec extends AnyFlatSpec with BeforeAndAfter {
     } catch {
       case ex: XProcException =>
         assert(ex.code.getLocalName == "XD0075")
-      case _ => fail()
+      case _: Throwable => fail()
     }
   }
 
@@ -918,7 +1234,7 @@ class UrifyWindowsSpec extends AnyFlatSpec with BeforeAndAfter {
     } catch {
       case ex: XProcException =>
         assert(ex.code.getLocalName == "XD0077")
-      case _ => fail()
+      case _: Throwable => fail()
     }
   }
 
@@ -954,7 +1270,7 @@ class UrifyWindowsSpec extends AnyFlatSpec with BeforeAndAfter {
     } catch {
       case ex: XProcException =>
         assert(ex.code.getLocalName == "XD0077")
-      case _ => fail()
+      case _: Throwable => fail()
     }
   }
 
@@ -966,7 +1282,7 @@ class UrifyWindowsSpec extends AnyFlatSpec with BeforeAndAfter {
     } catch {
       case ex: XProcException =>
         assert(ex.code.getLocalName == "XD0080")
-      case _ => fail()
+      case _: Throwable => fail()
     }
   }
 
@@ -978,7 +1294,7 @@ class UrifyWindowsSpec extends AnyFlatSpec with BeforeAndAfter {
     } catch {
       case ex: XProcException =>
         assert(ex.code.getLocalName == "XD0080")
-      case _ => fail()
+      case _: Throwable => fail()
     }
   }
 
@@ -990,7 +1306,7 @@ class UrifyWindowsSpec extends AnyFlatSpec with BeforeAndAfter {
     } catch {
       case ex: XProcException =>
         assert(ex.code.getLocalName == "XD0080")
-      case _ => fail()
+      case _: Throwable => fail()
     }
   }
 
@@ -1002,7 +1318,7 @@ class UrifyWindowsSpec extends AnyFlatSpec with BeforeAndAfter {
     } catch {
       case ex: XProcException =>
         assert(ex.code.getLocalName == "XD0080")
-      case _ => fail()
+      case _: Throwable => fail()
     }
   }
 
@@ -1014,7 +1330,7 @@ class UrifyWindowsSpec extends AnyFlatSpec with BeforeAndAfter {
     } catch {
       case ex: XProcException =>
         assert(ex.code.getLocalName == "XD0080")
-      case _ => fail()
+      case _: Throwable => fail()
     }
   }
 
@@ -1026,7 +1342,7 @@ class UrifyWindowsSpec extends AnyFlatSpec with BeforeAndAfter {
     } catch {
       case ex: XProcException =>
         assert(ex.code.getLocalName == "XD0080")
-      case _ => fail()
+      case _: Throwable => fail()
     }
   }
 
@@ -1044,7 +1360,7 @@ class UrifyWindowsSpec extends AnyFlatSpec with BeforeAndAfter {
     } catch {
       case ex: XProcException =>
         assert(ex.code.getLocalName == "XD0080")
-      case _ => fail()
+      case _: Throwable => fail()
     }
   }
 
@@ -1056,7 +1372,7 @@ class UrifyWindowsSpec extends AnyFlatSpec with BeforeAndAfter {
     } catch {
       case ex: XProcException =>
         assert(ex.code.getLocalName == "XD0080")
-      case _ => fail()
+      case _: Throwable => fail()
     }
   }
 
@@ -1068,7 +1384,7 @@ class UrifyWindowsSpec extends AnyFlatSpec with BeforeAndAfter {
     } catch {
       case ex: XProcException =>
         assert(ex.code.getLocalName == "XD0080")
-      case _ => fail()
+      case _: Throwable => fail()
     }
   }
 
@@ -1086,7 +1402,7 @@ class UrifyWindowsSpec extends AnyFlatSpec with BeforeAndAfter {
     } catch {
       case ex: XProcException =>
         assert(ex.code.getLocalName == "XD0080")
-      case _ => fail()
+      case _: Throwable => fail()
     }
   }
 
@@ -1122,7 +1438,7 @@ class UrifyWindowsSpec extends AnyFlatSpec with BeforeAndAfter {
     } catch {
       case ex: XProcException =>
         assert(ex.code.getLocalName == "XD0080")
-      case _ => fail()
+      case _: Throwable => fail()
     }
   }
 
@@ -1134,7 +1450,7 @@ class UrifyWindowsSpec extends AnyFlatSpec with BeforeAndAfter {
     } catch {
       case ex: XProcException =>
         assert(ex.code.getLocalName == "XD0080")
-      case _ => fail()
+      case _: Throwable => fail()
     }
   }
 
@@ -1146,7 +1462,7 @@ class UrifyWindowsSpec extends AnyFlatSpec with BeforeAndAfter {
     } catch {
       case ex: XProcException =>
         assert(ex.code.getLocalName == "XD0080")
-      case _ => fail()
+      case _: Throwable => fail()
     }
   }
 
@@ -1176,7 +1492,7 @@ class UrifyWindowsSpec extends AnyFlatSpec with BeforeAndAfter {
     } catch {
       case ex: XProcException =>
         assert(ex.code.getLocalName == "XD0080")
-      case _ => fail()
+      case _: Throwable => fail()
     }
   }
 
@@ -1188,7 +1504,7 @@ class UrifyWindowsSpec extends AnyFlatSpec with BeforeAndAfter {
     } catch {
       case ex: XProcException =>
         assert(ex.code.getLocalName == "XD0080")
-      case _ => fail()
+      case _: Throwable => fail()
     }
   }
 
@@ -1200,7 +1516,7 @@ class UrifyWindowsSpec extends AnyFlatSpec with BeforeAndAfter {
     } catch {
       case ex: XProcException =>
         assert(ex.code.getLocalName == "XD0074")
-      case _ => fail()
+      case _: Throwable => fail()
     }
   }
 
@@ -1212,7 +1528,7 @@ class UrifyWindowsSpec extends AnyFlatSpec with BeforeAndAfter {
     } catch {
       case ex: XProcException =>
         assert(ex.code.getLocalName == "XD0074")
-      case _ => fail()
+      case _: Throwable => fail()
     }
   }
 
@@ -1224,7 +1540,7 @@ class UrifyWindowsSpec extends AnyFlatSpec with BeforeAndAfter {
     } catch {
       case ex: XProcException =>
         assert(ex.code.getLocalName == "XD0074")
-      case _ => fail()
+      case _: Throwable => fail()
     }
   }
 
@@ -1236,7 +1552,7 @@ class UrifyWindowsSpec extends AnyFlatSpec with BeforeAndAfter {
     } catch {
       case ex: XProcException =>
         assert(ex.code.getLocalName == "XD0074")
-      case _ => fail()
+      case _: Throwable => fail()
     }
   }
 
@@ -1248,7 +1564,7 @@ class UrifyWindowsSpec extends AnyFlatSpec with BeforeAndAfter {
     } catch {
       case ex: XProcException =>
         assert(ex.code.getLocalName == "XD0074")
-      case _ => fail()
+      case _: Throwable => fail()
     }
   }
 
@@ -1260,7 +1576,7 @@ class UrifyWindowsSpec extends AnyFlatSpec with BeforeAndAfter {
     } catch {
       case ex: XProcException =>
         assert(ex.code.getLocalName == "XD0074")
-      case _ => fail()
+      case _: Throwable => fail()
     }
   }
 
@@ -1278,7 +1594,7 @@ class UrifyWindowsSpec extends AnyFlatSpec with BeforeAndAfter {
     } catch {
       case ex: XProcException =>
         assert(ex.code.getLocalName == "XD0074")
-      case _ => fail()
+      case _: Throwable => fail()
     }
   }
 
@@ -1290,7 +1606,7 @@ class UrifyWindowsSpec extends AnyFlatSpec with BeforeAndAfter {
     } catch {
       case ex: XProcException =>
         assert(ex.code.getLocalName == "XD0074")
-      case _ => fail()
+      case _: Throwable => fail()
     }
   }
 
@@ -1302,7 +1618,7 @@ class UrifyWindowsSpec extends AnyFlatSpec with BeforeAndAfter {
     } catch {
       case ex: XProcException =>
         assert(ex.code.getLocalName == "XD0074")
-      case _ => fail()
+      case _: Throwable => fail()
     }
   }
 
@@ -1320,7 +1636,7 @@ class UrifyWindowsSpec extends AnyFlatSpec with BeforeAndAfter {
     } catch {
       case ex: XProcException =>
         assert(ex.code.getLocalName == "XD0074")
-      case _ => fail()
+      case _: Throwable => fail()
     }
   }
 
@@ -1356,7 +1672,7 @@ class UrifyWindowsSpec extends AnyFlatSpec with BeforeAndAfter {
     } catch {
       case ex: XProcException =>
         assert(ex.code.getLocalName == "XD0074")
-      case _ => fail()
+      case _: Throwable => fail()
     }
   }
 
@@ -1368,7 +1684,7 @@ class UrifyWindowsSpec extends AnyFlatSpec with BeforeAndAfter {
     } catch {
       case ex: XProcException =>
         assert(ex.code.getLocalName == "XD0074")
-      case _ => fail()
+      case _: Throwable => fail()
     }
   }
 
@@ -1380,7 +1696,7 @@ class UrifyWindowsSpec extends AnyFlatSpec with BeforeAndAfter {
     } catch {
       case ex: XProcException =>
         assert(ex.code.getLocalName == "XD0074")
-      case _ => fail()
+      case _: Throwable => fail()
     }
   }
 
@@ -1410,7 +1726,7 @@ class UrifyWindowsSpec extends AnyFlatSpec with BeforeAndAfter {
     } catch {
       case ex: XProcException =>
         assert(ex.code.getLocalName == "XD0074")
-      case _ => fail()
+      case _: Throwable => fail()
     }
   }
 
@@ -1422,7 +1738,7 @@ class UrifyWindowsSpec extends AnyFlatSpec with BeforeAndAfter {
     } catch {
       case ex: XProcException =>
         assert(ex.code.getLocalName == "XD0074")
-      case _ => fail()
+      case _: Throwable => fail()
     }
   }
 
