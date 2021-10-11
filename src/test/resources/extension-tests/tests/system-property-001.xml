@@ -1,0 +1,60 @@
+<t:test xmlns:t="http://xproc.org/ns/testsuite/3.0" expected="pass">
+
+<t:info>
+  <t:title>Test Java system property</t:title>
+  <t:revision-history>
+    <t:revision>
+      <t:date>2020-01—04</t:date>
+      <t:author initials="ndw">
+        <t:name>Norman Walsh</t:name>
+      </t:author>
+      <t:description xmlns="http://www.w3.org/1999/xhtml">
+        <p>Initial checkin.</p>
+      </t:description>
+    </t:revision>
+  </t:revision-history>
+</t:info>
+
+<t:description xmlns="http://www.w3.org/1999/xhtml">
+  <p>Test that java:name works in p:system-property</p>
+</t:description>
+
+<t:property name="random-unique-property-name" value="Spoon!"/>
+
+<t:pipeline>
+  <p:declare-step xmlns:p="http://www.w3.org/ns/xproc"
+                  xmlns:cx="http://xmlcalabash.com/ns/extensions"
+                  version="3.0">
+    <p:output port="result"/>
+
+    <p:identity>
+      <p:with-input port="source">
+        <p:inline xmlns:lcl="http://localhost/">
+          <result>{p:system-property('lcl:random-unique-property-name')}</result>
+        </p:inline>
+      </p:with-input>
+    </p:identity>
+  </p:declare-step>
+</t:pipeline>
+
+<t:schematron>
+  <s:schema xmlns:s="http://purl.oclc.org/dsdl/schematron"
+            xmlns:p="http://www.w3.org/ns/xproc"
+            xmlns:rng="http://relaxng.org/ns/structure/1.0">
+     <s:ns prefix="p" uri="http://www.w3.org/ns/xproc"/>
+     <s:ns prefix="cx" uri="http://xmlcalabash.com/ns/extensions"/>
+     <s:ns prefix="c" uri="http://www.w3.org/ns/xproc-step"/>
+
+     <s:pattern>
+       <s:rule context="/">
+         <s:assert test="/count(result) = 1">Result should be a single text node.</s:assert>
+       </s:rule>
+     </s:pattern>
+     <s:pattern>
+       <s:rule context="/result">
+         <s:assert test="string(.) = 'Spoon!'">Value should be ‘Spoon!’ not <s:value-of select="."/></s:assert>
+       </s:rule>
+     </s:pattern>
+  </s:schema>
+</t:schematron>
+</t:test>

@@ -1,0 +1,45 @@
+<test xmlns='http://xproc.org/ns/testsuite/3.0'
+      xmlns:err='http://www.w3.org/ns/xproc-error'
+      expected="fail" code="err:XD0001">
+  <pipeline>
+<p:declare-step xmlns:p="http://www.w3.org/ns/xproc"
+                xmlns:cx="http://xmlcalabash.com/ns/extensions"
+                name="main"
+                version="3.0">
+  <p:output port="result"/>
+
+  <p:identity name="id1">
+    <p:with-input port="source">
+      <p:inline>
+        <doc/>
+      </p:inline>
+    </p:with-input>
+  </p:identity>
+
+  <p:identity name="id2">
+    <p:with-input port="source">
+      <p:inline>
+        <doc/>
+      </p:inline>
+    </p:with-input>
+  </p:identity>
+
+  <p:identity name="combine">
+    <p:with-input port="source" pipe="@id1 @id2"/>
+  </p:identity>
+
+  <p:choose>
+    <p:when test="count(.) gt 1">
+      <p:identity>
+        <p:with-input><result>fail</result></p:with-input>
+      </p:identity>
+    </p:when>
+    <p:otherwise>
+      <p:identity>
+        <p:with-input><result>fail</result></p:with-input>
+      </p:identity>
+    </p:otherwise>
+  </p:choose>
+</p:declare-step>
+  </pipeline>
+</test>

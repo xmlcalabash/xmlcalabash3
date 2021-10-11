@@ -1,0 +1,54 @@
+<t:test xmlns:t="http://xproc.org/ns/testsuite/3.0" expected="pass">
+
+<t:info>
+  <t:title>Test error output from p:load with a well-formedness error</t:title>
+  <t:revision-history>
+    <t:revision>
+      <t:date>2018-10-25</t:date>
+      <t:author initials="ndw">
+        <t:name>Norman Walsh</t:name>
+      </t:author>
+      <t:description xmlns="http://www.w3.org/1999/xhtml">
+        <p>Initial checkin.</p>
+      </t:description>
+    </t:revision>
+  </t:revision-history>
+</t:info>
+
+<t:description xmlns="http://www.w3.org/1999/xhtml">
+  <p>Test that the <code>p:load</code> step gives a useful message for a well-formedness error..</p>
+</t:description>
+
+<t:pipeline>
+  <p:declare-step xmlns:p="http://www.w3.org/ns/xproc"
+                  xmlns:cx="http://xmlcalabash.com/ns/extensions"
+                  version="3.0">
+    <p:output port="result"
+              serialization="map { 'omit-xml-declaration': true(),
+                                   'indent': true() }"/>
+
+    <cx:base64-encode>
+      <p:with-input port="source">
+        <p:inline content-type="text/plain">Hello, world.</p:inline>
+      </p:with-input>
+    </cx:base64-encode>
+  </p:declare-step>
+</t:pipeline>
+
+<t:schematron>
+  <s:schema xmlns:s="http://purl.oclc.org/dsdl/schematron"
+            xmlns:p="http://www.w3.org/ns/xproc"
+            xmlns:rng="http://relaxng.org/ns/structure/1.0">
+     <s:ns prefix="p" uri="http://www.w3.org/ns/xproc"/>
+     <s:ns prefix="cx" uri="http://xmlcalabash.com/ns/extensions"/>
+     <s:ns prefix="c" uri="http://www.w3.org/ns/xproc-step"/>
+
+     <s:pattern>
+       <s:rule context="/">
+         <s:assert test="count(.) = 1">Result should be a single text node.</s:assert>
+         <s:assert test="starts-with(., 'SGVsbG8sIHdvcmxkLg')">Value should be ‘Hello, world.’ base64 encoded.</s:assert>
+       </s:rule>
+     </s:pattern>
+  </s:schema>
+</t:schematron>
+</t:test>

@@ -1,0 +1,31 @@
+# K/A scheme (known or absent)
+# I/X scheme (implicit or explicit)
+# H/N scheme (hierarchical or non-hierarchical)
+# A/R path   (absolute or relative)
+# D/_ drive letter (drive letter)
+# A/_ authority    (authority)
+
+AIHA__ 2021-10-10 ///path/to/thing
+AIHR_A 2021-10-10 //authority
+AIHA_A 2021-10-10 //authority/
+AIHA_A 2021-10-10 //authority/path/to/thing
+AIHA__ 2021-10-10 /Documents and Files/thing
+AIHA__ 2021-10-10 /path/to/thing
+KIHAD_ 2021-10-10 C:/Users/Jane/Documents and Files/Thing
+KIHRD_ 2021-10-10 C:Users/Jane/Documents and Files/Thing
+AIHR__ 2021-10-10 Documents and Files/thing
+KXHR__ 2021-10-10 file:
+KXHA__ 2021-10-10 file:///path/to/thing
+KXHR_A 2021-10-10 file://authority.com
+KXHA_A 2021-10-10 file://authority.com/
+KXHA_A 2021-10-10 file://authority.com/path/to/thing
+KXHA__ 2021-10-10 file:/path/to/thing
+KXHAD_ 2021-10-10 file:C:/Users/Jane/Documents and Files/Thing
+KXHRD_ 2021-10-10 file:C:Users/Jane/Documents and Files/Thing
+KXHR__ 2021-10-10 file:path/to/thing
+KXHR__ 2021-10-10 https:
+KXHA__ 2021-10-10 https://example.com
+KXHA__ 2021-10-10 https://example.com/
+KXHA__ 2021-10-10 https://example.com/path/to/thing
+AIHR__ 2021-10-10 path/to/thing
+KXNR__ 2021-10-10 urn:publicid:ISO+8879%3A1986:ENTITIES+Added+Latin+1:EN

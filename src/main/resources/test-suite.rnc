@@ -1,0 +1,60 @@
+namespace rng  = "http://relaxng.org/ns/structure/1.0"
+namespace t = "http://xproc.org/ns/testsuite/3.0"
+default namespace = "http://xproc.org/ns/testsuite/3.0"
+
+start = test | test-suite | test-div
+
+test-suite =
+    element t:test-suite {
+        attribute version { text }?
+      & (title?, test*, test-div*)
+    }
+
+test-div =
+    element t:div {
+        title?, test*, test-div*
+    }
+
+title =
+    element title { text }
+
+test =
+    element t:test {
+        (attribute src { text }
+         | attribute expected { "pass" }
+         | (attribute expected { "fail" }
+            & attribute code { text }?))
+      & (pipeline? & schematron? & input* & binding*)
+    }
+
+pipeline =
+    element t:pipeline {
+        attribute src { text }?
+      & any*
+    }
+
+schematron =
+    element t:schematron {
+        attribute src { text }?
+      & any*
+    }
+
+input =
+    element t:input {
+        attribute port { text }
+      & attribute src { text }?
+      & any*
+    }
+
+binding =
+    element t:binding {
+        attribute name { text }
+      & attribute select { text }?
+      & any*
+    }
+
+any =
+    element * {
+        attribute * { text }*
+      & (text | any)*
+    }

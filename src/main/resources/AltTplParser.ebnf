@@ -1,0 +1,114 @@
+// This is a grammar for a simple, text-base pipeline language.
+//
+// Bits gleefully stolen from the XPath 2.0 and Java 7 grammars.
+//
+// It is designed to be fed to http://www.bottlecaps.de/rex/
+
+Pipeline       ::= Namespace* "pipeline" StepBody EOF
+
+Namespace      ::= "namespace" AnyName "=" StringLiteral
+
+StepBody       ::= "{" Inputs? Options? Outputs? Runs? "}"
+
+Inputs         ::= "inputs:" Input Input*
+Input          ::= AnyName ("from:" Binding)?
+
+Outputs        ::= "outputs:" Output Output*
+Output         ::= AnyName ("from:" Binding)?
+
+Options        ::= "options:" Option Option*
+Option         ::= AnyName ("=" StringLiteral)?
+
+Binding        ::= (AnyName|StringLiteral|Markup|MultiBinding)
+MultiBinding   ::= "(" AnyName|StringLiteral ("," AnyName|StringLiteral|Markup)* ")"
+
+Runs           ::= "runs:" Step Step*
+
+Step           ::= (AtomicStep | CompoundStep)
+
+AtomicStep     ::= StepType StepBody?
+CompoundStep   ::= Group | ForEach | While | Until | Choose | Try
+
+Group          ::= "group" StepBody
+ForEach        ::= "for-each" StepBody
+While          ::= "while" StepBody
+Until          ::= "until" StepBody
+Choose         ::= "choose" "{" When* Otherwise? "}"
+When           ::= "when" StringLiteral ("with:" Binding)? StepBody
+Otherwise      ::= "otherwise" StepBody
+Try            ::= "try" StepBody Catch+
+Catch          ::= "catch" ErrorList? StepBody
+ErrorList      ::= QName ("," QName)*
+
+Ignorable      ::= WhiteSpace | Comment /* ws: definition */
+
+<?TOKENS?>
+
+UnicodeInputCharacter  ::= UnicodeEscape | RawInputCharacter
+UnicodeEscape          ::= '\' UnicodeMarker HexDigit HexDigit HexDigit HexDigit
+UnicodeMarker          ::= 'u'+
+RawInputCharacter      ::= [#x0001-#xD7FF] | [#xE000-#xFFFD] | [#x10000-#x10FFFF]
+HexDigit               ::= [0-9a-fA-F]
+InputCharacter         ::= UnicodeInputCharacter - ( CR | LF )
+
+Comment                ::= TraditionalComment | EndOfLineComment
+TraditionalComment     ::= '/*' ( UnicodeInputCharacter*
+                                  - ( UnicodeInputCharacter* '*/' UnicodeInputCharacter* ) )
+                           '*/'
+EndOfLineComment       ::= '//' InputCharacter*
+
+WhiteSpace             ::= ' ' | #x0009 | #x000C | LineTerminator
+
+LF                     ::= #x000A
+CR                     ::= #x000D
+LineTerminator         ::= LF | CR | CR LF
+
+StringLiteral          ::= '"' ( EscapeQuot | [^"] )* '"'
+                         | "'" ( EscapeApos | [^'] )* "'"  /* ws: explicit */
+EscapeQuot             ::= '""'
+EscapeApos             ::= "''"
+
+Markup                 ::= "«" ( [^»] )* "»"
+                         | "„" ( [^“”] )* ("“"|"”")
+                         | "「" ( [^」] )* "」"
+                         | "﹁" ( [^﹂] )* "﹂"
+                         | "『" ( [^』] )* "』"
+                         | "﹃" ( [^﹄] )* "﹄"
+                         | "《" ( [^》] )* "》" /* ws: explicit */
+
+EOF                    ::= $
+
+NameString             ::= NameStartChar NameChar*
+StepType               ::= QName - CompoundStepType
+AnyName                ::= NameString
+QName                  ::= (NameString ":")? NameString
+
+CompoundStepType       ::= ("pipeline" | "group" | "for-each" | "while" | "until"
+                            | "choose" | "when" | "otherwise" | "try" | "catch" )
+
+NameStartChar
+         ::= [A-Z]
+           | '_'
+           | [a-z]
+           | [#x00C0-#x00D6]
+           | [#x00D8-#x00F6]
+           | [#x00F8-#x02FF]
+           | [#x0370-#x037D]
+           | [#x037F-#x1FFF]
+           | [#x200C-#x200D]
+           | [#x2070-#x218F]
+           | [#x2C00-#x2FEF]
+           | [#x3001-#x3009]
+           | [#x3010-#xD7FF]
+           | [#xF900-#xFDCF]
+           | [#xFDF0-#xFE40]
+           | [#xFE45-#xFFFD]
+           | [#x10000-#xEFFFF]
+
+NameChar ::= NameStartChar
+           | '-'
+           | '.'
+           | [0-9]
+           | #x00B7
+           | [#x0300-#x036F]
+           | [#x203F-#x2040]

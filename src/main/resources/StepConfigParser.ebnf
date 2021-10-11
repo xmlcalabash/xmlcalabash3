@@ -1,0 +1,98 @@
+// This is a grammar for the step configuration file
+//
+// It is designed to be fed to http://www.bottlecaps.de/rex/
+
+Config         ::= Prefix* (Step|Function)* EOF
+
+Prefix         ::= "prefix" Macro "=" Expansion
+
+Step           ::= "step" StepName
+                   Implementation*
+                   Input*
+                   Output*
+                   Option*
+
+Function       ::= "function" FunctionName Implementation*
+
+Implementation ::= "has" "implementation" ClassName
+
+Input          ::= "primary"? "input" PortName "*"?
+Output         ::= "primary"? "output" PortName "*"?
+
+Option         ::= "option" OptionName "?"? DeclaredType? ("=" StringLiteral)?
+
+DeclaredType   ::=  ("as" SeqType) | ("of" TokenList)
+TokenList      ::= '(' Literal ('|' Literal)* ')'
+
+SeqType        ::= TypeName Occurrence?
+
+// ...
+
+Ignorable      ::= WhiteSpace | Comment /* ws: definition */
+
+<?TOKENS?>
+
+UnicodeInputCharacter  ::= UnicodeEscape | RawInputCharacter
+UnicodeEscape          ::= '\' UnicodeMarker HexDigit HexDigit HexDigit HexDigit
+UnicodeMarker          ::= 'u'+
+RawInputCharacter      ::= [#x0001-#xD7FF] | [#xE000-#xFFFD] | [#x10000-#x10FFFF]
+HexDigit               ::= [0-9a-fA-F]
+InputCharacter         ::= UnicodeInputCharacter - ( CR | LF )
+
+Comment                ::= TraditionalComment | EndOfLineComment
+TraditionalComment     ::= '/*' ( UnicodeInputCharacter*
+                                  - ( UnicodeInputCharacter* '*/' UnicodeInputCharacter* ) )
+                           '*/'
+EndOfLineComment       ::= '//' InputCharacter*
+
+WhiteSpace             ::= ' ' | #x0009 | #x000C | LineTerminator
+
+LF                     ::= #x000A
+CR                     ::= #x000D
+LineTerminator         ::= LF | CR | CR LF
+
+StringLiteral          ::= '"' ( EscapeQuot | [^"] )* '"'
+                         | "'" ( EscapeApos | [^'] )* "'"  /* ws: explicit */
+EscapeQuot             ::= '""'
+EscapeApos             ::= "''"
+
+EOF                    ::= $
+
+NameString             ::= NameStartChar NameChar*
+QName                  ::= NameStartChar NameChar* (":" NameChar+) | NameChar*
+
+PortName               ::= NameString
+StepName               ::= QName
+OptionName             ::= NameString
+ClassName              ::= QName
+TypeName               ::= NameString
+Literal                ::= NameString
+Macro                  ::= NameString
+FunctionName           ::= QName
+Expansion              ::= StringLiteral
+
+Occurrence             ::= '*' | '?' | '+'
+
+NameStartChar
+         ::= [A-Z]
+           | '_'
+           | [a-z]
+           | [#x00C0-#x00D6]
+           | [#x00D8-#x00F6]
+           | [#x00F8-#x02FF]
+           | [#x0370-#x037D]
+           | [#x037F-#x1FFF]
+           | [#x200C-#x200D]
+           | [#x2070-#x218F]
+           | [#x2C00-#x2FEF]
+           | [#x3001-#xD7FF]
+           | [#xF900-#xFDCF]
+           | [#xFDF0-#xFFFD]
+           | [#x10000-#xEFFFF]
+NameChar ::= NameStartChar
+           | '-'
+           | '.'
+           | [0-9]
+           | #x00B7
+           | [#x0300-#x036F]
+           | [#x203F-#x2040]

@@ -1,0 +1,41 @@
+<t:test xmlns:t="http://xproc.org/ns/testsuite/3.0" expected="fail"
+        xmlns:cx="http://xmlcalabash.com/ns/extensions"
+        code="cx:XI0062">
+  <t:info>
+    <t:title>cx-until-003</t:title>
+    <t:revision-history>
+      <t:revision>
+        <t:date>2019-08-03</t:date>
+        <t:author initials="ndw">
+          <t:name>Norman Walsh</t:name>
+        </t:author>
+        <t:description xmlns="http://www.w3.org/1999/xhtml">
+          <p>Initial publication</p>
+        </t:description>
+      </t:revision>
+    </t:revision-history>
+  </t:info>
+  <t:description xmlns="http://www.w3.org/1999/xhtml">
+    <p>Tests the cx:until extension</p>
+  </t:description>
+  <t:pipeline>
+
+<p:declare-step xmlns:p="http://www.w3.org/ns/xproc"
+                xmlns:cx="http://xmlcalabash.com/ns/extensions"
+                exclude-inline-prefixes="cx"
+                name="main" version="3.0">
+  <p:output port="result" sequence="true"/>
+
+  <p:identity name="id">
+    <p:with-input><doc/></p:with-input>
+  </p:identity>
+
+  <cx:until name="until" return="last" max-iterations="4" comparator="false()">
+    <p:add-attribute attribute-name="a" attribute-value="1"/>
+  </cx:until>
+
+  <p:wrap-sequence wrapper="wrapper"/>
+</p:declare-step>
+
+</t:pipeline>
+</t:test>

@@ -1,0 +1,88 @@
+// This a grammar for sequences of atomics
+
+Sequence ::= Item
+             | '(' (Item ("," Item)*)? ')'
+
+Item     ::= IntegerLiteral | DecimalLiteral | DoubleLiteral
+             | StringLiteral | URIQualifiedName
+             | PrefixedName | UnprefixedName
+
+Whitespace
+         ::= S^WS
+           | Comment
+          /* ws: definition */
+Comment  ::= '(:' ( CommentContents | Comment )* ':)'
+          /* ws: explicit */
+
+<?TOKENS?>
+
+IntegerLiteral
+         ::= Digits
+DecimalLiteral
+         ::= '.' Digits
+           | Digits '.' [0-9]*
+          /* ws: explicit */
+DoubleLiteral
+         ::= ( '.' Digits | Digits ( '.' [0-9]* )? ) [eE] [+#x2D]? Digits
+          /* ws: explicit */
+StringLiteral
+         ::= '"' ( EscapeQuot | [^"] )* '"'
+           | "'" ( EscapeApos | [^'] )* "'"
+          /* ws: explicit */
+URIQualifiedName
+         ::= BracedURILiteral NCName
+          /* ws: explicit */
+BracedURILiteral
+         ::= 'Q' '{' [^{}]* '}'
+          /* ws: explicit */
+EscapeQuot
+         ::= '""'
+EscapeApos
+         ::= "''"
+NCName   ::= Name - ( Char* ':' Char* )
+QName    ::= PrefixedName
+           | UnprefixedName
+PrefixedName
+         ::= Prefix ':' LocalPart
+UnprefixedName
+         ::= LocalPart
+Prefix   ::= NCName
+LocalPart
+         ::= NCName
+Char     ::= #x0009
+           | #x000A
+           | #x000D
+           | [#x0020-#xD7FF]
+           | [#xE000-#xFFFD]
+           | [#x10000-#x10FFFF]
+NameStartChar
+         ::= ':'
+           | [A-Z]
+           | '_'
+           | [a-z]
+           | [#x00C0-#x00D6]
+           | [#x00D8-#x00F6]
+           | [#x00F8-#x02FF]
+           | [#x0370-#x037D]
+           | [#x037F-#x1FFF]
+           | [#x200C-#x200D]
+           | [#x2070-#x218F]
+           | [#x2C00-#x2FEF]
+           | [#x3001-#xD7FF]
+           | [#xF900-#xFDCF]
+           | [#xFDF0-#xFFFD]
+           | [#x10000-#xEFFFF]
+NameChar ::= NameStartChar
+           | '-'
+           | '.'
+           | [0-9]
+           | #x00B7
+           | [#x0300-#x036F]
+           | [#x203F-#x2040]
+Name     ::= NameStartChar NameChar*
+S        ::= ( #x0020 | #x0009 | #x000D | #x000A )+
+Digits   ::= [0-9]+
+CommentContents
+         ::= ( Char+ - ( Char* ( '(:' | ':)' ) Char* ) ) &( '(:' | ':)' )
+
+EOF      ::= $

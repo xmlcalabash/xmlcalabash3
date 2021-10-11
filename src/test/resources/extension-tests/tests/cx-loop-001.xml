@@ -1,0 +1,54 @@
+<t:test xmlns:t="http://xproc.org/ns/testsuite/3.0" expected="pass">
+  <t:info>
+    <t:title>cx-loop-001</t:title>
+    <t:revision-history>
+      <t:revision>
+        <t:date>2019-08-04</t:date>
+        <t:author initials="ndw">
+          <t:name>Norman Walsh</t:name>
+        </t:author>
+        <t:description xmlns="http://www.w3.org/1999/xhtml">
+          <p>Initial publication</p>
+        </t:description>
+      </t:revision>
+    </t:revision-history>
+  </t:info>
+  <t:description xmlns="http://www.w3.org/1999/xhtml">
+    <p>Tests the cx:loop extension</p>
+  </t:description>
+  <t:pipeline>
+
+<p:declare-step xmlns:p="http://www.w3.org/ns/xproc"
+                xmlns:cx="http://xmlcalabash.com/ns/extensions"
+                exclude-inline-prefixes="cx"
+                name="main" version="3.0">
+  <p:output port="result" sequence="true"/>
+
+  <cx:loop from="-3" to="12" by="6">
+    <p:wrap-sequence wrapper="doc"/>
+  </cx:loop>
+
+  <p:wrap-sequence wrapper="wrapper"/>
+</p:declare-step>
+
+</t:pipeline>
+
+<t:schematron>
+  <s:schema xmlns:s="http://purl.oclc.org/dsdl/schematron" xmlns="http://www.w3.org/1999/xhtml">
+    <s:pattern>
+      <s:rule context="/">
+        <s:assert test="wrapper">The pipeline root is not “wrapper”.</s:assert>
+      </s:rule>
+    </s:pattern>
+    <s:pattern>
+      <s:rule context="wrapper">
+        <s:assert test="count(doc) = 3">There aren’t exactly three doc elements</s:assert>
+        <s:assert test="string(doc[1]) = '-3'">First doc isn’t labeled -3.</s:assert>
+        <s:assert test="string(doc[2]) = '3'">First doc isn’t labeled 3.</s:assert>
+        <s:assert test="string(doc[3]) = '9'">First doc isn’t labeled 9.</s:assert>
+      </s:rule>
+    </s:pattern>
+  </s:schema>
+</t:schematron>
+
+</t:test>

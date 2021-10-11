@@ -1,0 +1,659 @@
+namespace xi=http://xmlcalabash.com/ns/extensions
+
+XD0004
+The p:choose contained no matching p:when options and no p:otherwise.
+The p:choose step contains a number of alternatives. Exactly one of those
+alternatives must be selected. The selected alternative is the first p:when
+for which the `test` condition returns true. If no p:when alternatives are
+selected, a p:otherwise must be present. This error is raised if the
+p:choose does not contain a selected p:when or a p:otherwise.
+
+XD0001
+No context item for “$1”. $2.
+
+XD0006
+A sequence of documents is not allowed on the “$1” input port.
+
+XD0007
+A sequence of documents is not allowed on the “$1” output port.
+
+XD0008
+A sequence is not allowed as the context item in expression: “$1” (Saxon: $2)
+
+XD0010
+A p:viewport cannot process attributes: “$1”.
+
+XD0015/1
+There is no in-scope namespace for the QName “$1”.
+
+XD0015/2
+$1
+
+XD0016
+Invalid selection, “$1” selects $2.
+
+XD0019/1
+Invalid value specified: “$1”. Value must be of type “$2”: $3.
+
+XD0019/2
+Invalid match pattern “$1”: $2
+
+XD0019/3
+Invalid visibility: “$1” (Must be “public” or “private”.)
+
+XD0019/4
+Bad value: “$1”
+
+XD0019/5
+Value “$1” is not one of “$2”.
+
+XD0011
+File not found: “$1”
+
+XD0021
+Access denied: $1
+
+XD0023
+Validity error in “$1” at line $2, column $3: $4
+
+XD0023
+Validity error in “$1”: $2
+
+XD0026
+The context item is empty in expression: “$1” (Saxon: $2)
+
+XD0030
+Error: $1
+
+XD0034
+$1
+
+XD0036
+Computed result “$1” does not match specified type “$2”.
+
+XD0036
+Computed result “$2” does not match specified type “$3” for “$1”.
+
+XD0038
+Input content type “$1” is not an acceptable type (expected one of $2).
+
+XD0039
+Unsupported character set “$1”.
+
+XD0040
+The content is not correctly encoded for the $1 encoding.
+
+XD0042
+Output content type “$1” is not an acceptable type (expected one of $2).
+
+XD0044
+Invalid second argument to p:document-property: “$1”. Argument must be a string or QName.
+
+XD0045
+Invalid key: “$1”. Document property map keys must be QNames.
+
+XD0046
+Invalid key: “$1”. Serialization option keys must be QNames.
+
+XD0047
+The values of the serialization options must be atomic. Invalid: “$1”
+
+XD0048
+The serialization options must be a map. Invalid: “$1”
+
+XD0049
+Parse error in “$1” at line $2, column $3: $4
+
+XD0049
+Parse error in “$1”: $2
+
+XD0011
+Failed to load XML: $1
+
+XD0054
+Cannot specify an encoding (“$1”) with an XML or HTML content type (“$2”).
+
+XD0055
+It is an error to specify a charset (“$1”) when no encoding is provided.
+
+XD0056
+When an encoding is specified, markup is not allowed: “$1”.
+
+XD0057
+Invalid JSON: “$1”.
+
+XD0060
+Unsupported encoding: “$1”.
+
+XD0062
+Mismatched content types: “$1” is not the same as “$2”.
+
+XD0063
+When an non-XML (and non-HTML) encoding is specified for a p:inline, markup is not allowed: “$1”.
+
+XD0064
+Invalid URI: “$1”.
+
+XD0072
+Cannot pass “$1” documents to p:viewport (only HTML and XML are allowed).
+
+XD0079
+Invalid media type: “$1”.
+
+XS0001
+Pipeline contains a loop from “$2” on “$1”.
+
+XS0002
+Duplicate step name: “$1”.
+
+XS0003
+No connection provided for input port ‘$2’ on step ‘$1’.
+
+XS0004
+Option names must not be repeated; the “$1” option appears more than once.
+
+XS0006
+Step $1 has an unconnected output port: $2.
+
+XS0008
+Attribute not allowed here: “$1”.
+
+XS0010
+There is no port named “$2” on “$1” steps.
+
+XS0011
+Duplicate port name: ‘$1’
+
+XS0018
+The option named “$1” is required, but no value was provided for it.
+
+XS0022/1
+There’s no step named “$1” visible from here.
+
+XS0022/2
+There’s no primary input port on the containing step named “$1”.
+
+XS0022/3
+There’s no primary output port on the step named “$1”.
+
+XS0022/4
+The port “$2” on “$1” is not readable from here.
+
+XS0028
+Name cannot be in the XProc namespace: “$1”.
+
+XS0030
+Attempt to make port ‘$1’ primary when ‘$2’ is already primary.
+
+XS0031
+The option named ‘$2’ is not allowed on a ‘$1’ step.
+
+XS0032
+No connection provided for primary input port ‘$2’ on step ‘$1’ and no default readable port exists.
+
+XS0036
+Cannot redefine steps; “$1” is already in scope.
+
+XS0037
+Only whitespace text nodes allowed: “$1”.
+
+XS0038
+Required attribute “$1” is missing.
+
+XS0043
+The port attribute is not allowed on p:with-input for $2.
+
+XS0044
+There’s no in-scope declaration for steps of type “$1”.
+
+XS0052/1
+Failed to import “$1”.
+
+XS0052/2
+Error p:import cannot import a “$1”.
+
+XS0053
+An imported pipeline must have a type.
+
+XS0064/1
+Only the last p:catch may omit the code.
+
+XS0064/2
+Code “$1” repeated; only one catch may contain a given code
+
+XS0064/3
+Error codes may not be repeated, “$1” occurs more than once.
+
+XS0065
+Steps of type “$1” have no primary input port.
+
+XS0067/1
+Pipe has no step and there’s no default readable port
+
+XS0067/2
+Pipe has no port and step has no primary output port
+
+XS0069
+The encoding “$1” is not supported.
+The only encoding supported is “base64”.
+
+XS0060
+Unacceptable version; XProc version “$1” is not supported.
+
+XS0062
+The version attribute is required on the root element.
+
+XS0063
+Invalid version, “$1” is not a decimal number.
+
+XS0070
+It is an error to specify an encoding, “$1”, if the content type is an XML media type: “$2”.
+
+XS0072
+Invalid output port: “$1”. The outputs of p:finally must be different from the p:try and p:catch outputs.
+
+XS0073
+There is no in-scope step named “$1”.
+
+XS0075
+Invalid p:try: $1.
+
+XS0077
+Invalid value specified: “$1”. Value must be $2.
+
+XS0079/1
+Comment not allowed here. Found “$1”.
+
+XS0079/2
+Processing instruction not allowed here. Found “$1”.
+
+XS0079/3
+Text not allowed here. Found “$1”.
+
+XS0080
+Duplicated option name: “$1”.
+
+XS0081
+If an href attribute is present, no other data bindings may be specified.
+
+XS0082
+If a pipe attribute is present, no other data bindings may be specified.
+
+XS0083
+The code attribute on p:catch must be a list of EQNames, “$1” is not valid.
+
+XS0085
+The pipe and href attributes may not both be specified.
+
+XS0086
+More than one p:with-input for the same port: “$1”
+
+XS0089
+If a p:empty binding is used, it must be the only binding.
+
+XS0090
+Invalid pipe attribute value: “$1”; must be port, port@step, or @step.
+
+XS0096
+Invalid sequence type: “$1”. $2.
+
+XS0100/1
+Invalid pipeline: $1.
+
+XS0100/2
+XProc element not allowed here: “$1”
+
+XS0102/1
+Mismatched primary outputs in p:choose, “$1” != “$2”
+
+XS0102/2
+Mismatched primary outputs in p:try, “$1” != “$2”
+
+XS0107/1
+There is no variable or reference named “$1” in scope.
+
+XS0107/2
+Static error in expression “$1”: $2
+
+XS0107/3
+Static expression references context item.
+
+XS0107/4
+Static expression references non-static variable “$1”
+
+XS0108
+It is a static error if a p:if does not specify a primary output port.
+
+XS0112
+No output on p:finally may be primary: “$1”
+
+XC0001
+The content type is not a valid text content type: “$1”.
+
+XC0007
+Parameter “$1” has invalid type “$2” for an XSLT 2.0 stylesheet.
+
+XC0009
+XQuery version “$1” is not supported.
+
+XC0013
+Cannot rename PI to a name with a namespace: “$1”.
+
+XC0023
+Bad pattern: “$1”. Matches $2 node where it must only match elements.
+
+XC0024
+Bad child position; cannot specify “$2” with pattern “$1”.
+
+XC0025
+Bad position; cannot specify “$2” with pattern “$1”.
+
+XC0029/1
+XInclude error: $1
+
+XC0029/2
+XInclude resource error, failed to load: $1. $2.
+
+XC0036/1
+Bad CRC version in p:hash: “$1”.
+
+XC0036/2
+Bad MD version in p:hash: “$1”.
+
+XC0036/3
+Bad SHA version in p:hash: “$1”.
+
+XC0036/4
+Bad p:hash algorithim version: “$1”.
+
+XC0036/5
+Attempted p:hash failed: “$1”.
+
+XC0036/6
+The cx:hmac algorithm requires an ‘accessKey’ parameter.
+
+XC0037
+Value is not correctly x-www-form-urlencoded: “$1”.
+
+XC0038
+The requested version, “$1”, is not available.
+
+XC0050
+Cannot store at “$1”
+
+XC0053
+Validity error in “$1”: $2.
+
+XC0054
+Validity error in “$1”: $2.
+
+XC0056
+There is no template named “$1”.
+
+XC0059
+Cannot add namespaces, “$1” is invalid.
+
+XC0060
+Unsupported UUID version: $1.
+
+XC0069
+The ‘content-type’ property cannot be set with p:set-properties.
+
+XC0070
+Serialization property is not a map: “$1”.
+
+XC0084/1
+Bad archive URI: $1
+
+XC0084/2
+Bad archive URI.
+
+XC0091
+Multiple top-level elements are not allowed in p:escape-markup.
+
+XC0092
+Attribute name collision: “$1”
+
+XC0093
+Error compiling stylesheet: “$1”.
+
+XC0094
+Cannot process “$1” documents with XSLT 2.0.
+
+XC0095
+XSLT runtime error “$1”: “$2”.
+
+XC0096
+User termination: “$1”.
+
+XC0098
+XPath error occurred: $1
+
+XC0101
+Cannot process “$1” documents with XQuery 3.0.
+
+XC0102
+Parameter “$1” has invalid type “$2” for an XQuery 3.0 query.
+
+XC0104
+Error evaluating query: $1
+
+XC0113
+Attempt to delete non-empty directory without the recursive option: $1
+
+XC0115
+Cannot move ($1) onto an existing file ($2).
+
+XC0119
+Invalid flatten-to-depth: “$1”. It must be “unbounded” or a positive integer.
+
+XC0120
+Archive has no base URI, and no relative-to provided.
+
+XC0124/1
+Invalid “$1” parameter value “$2”.
+
+XC0124/2
+Invalid parameter type, “$1” must be a string.
+
+XC0125
+Resource is multipart: $1
+
+XC0126
+Assertion failed: “$1”
+
+XC0127
+Duplicate header: “$1”
+
+XC0128
+Unsupported URI scheme: “$1”
+
+XC0129
+Unsupported HTTP version: “$1”
+
+XC0131
+Unsupported transfer encoding: “$1”
+
+XC0134
+Cannot return info for URI scheme in “$1”
+
+XC0136
+Cannot touch file with URI scheme in “$1”
+
+XC0138
+Cannot create temporary file URI scheme in “$1”
+
+XC0142
+Cannot delete URIs with the scheme in “$1”
+
+XC0147
+Invalid regular expression: “$1”
+
+XC0143
+Delete not allowed: $1
+
+XC0151
+Schema is not a valid schematron document.
+
+XC0155
+Validity error in “$1”: $2.
+
+XC0156/1
+Validity error in “$1”: $2.
+
+XC0156/2
+Validity error in “$1” at $2:$3: $4.
+
+XC0157
+Cannot copy directory ($1) to file ($2)
+
+XC0158
+Cannot move directory ($1) to file ($2)
+
+XC0203
+The specified boundary cannot be used in a multipart request: “$1”.
+
+{http://xmlcalabash.com/ns/extensions}XI0016
+No input specified for pipeline port “$1”.
+
+{http://xmlcalabash.com/ns/extensions}XI0017
+You cannot specify both a message attribute and content on an injectable.
+
+{http://xmlcalabash.com/ns/extensions}XI0018
+You cannot redefine the port on an injectable.
+
+{http://xmlcalabash.com/ns/extensions}XI0019
+Internal error: attempt to insert node adjacent to non-existant node.
+
+{http://xmlcalabash.com/ns/extensions}XI0020
+Internal error: attempt to patch unexpected artifact: “$1”
+
+{http://xmlcalabash.com/ns/extensions}XI0021
+Internal error: unexpected input artifact: “$1”
+
+{http://xmlcalabash.com/ns/extensions}XI0022
+Internal error: unexpected message type: “$1”
+
+{http://xmlcalabash.com/ns/extensions}XI0023
+Invalid port: “$1”
+
+{http://xmlcalabash.com/ns/extensions}XI0024
+Internal error: unexpected document properties value: “$1”
+
+{http://xmlcalabash.com/ns/extensions}XI0025
+Internal error: attempt to redefine id: “$1”
+
+{http://xmlcalabash.com/ns/extensions}XI0026
+Invalid root: “$1”. Root must be c:document-properties
+
+{http://xmlcalabash.com/ns/extensions}XI0027
+Invalid text: “$1”. Only whitespace text nodes are allowed between properties.
+
+{http://xmlcalabash.com/ns/extensions}XI0028
+Invalid value: “$1”. Source must be an XML document.
+
+{http://xmlcalabash.com/ns/extensions}XI0029
+Duplicate property names are not allowed: “$1”.
+
+{http://xmlcalabash.com/ns/extensions}XI0030
+The xsi:type attribute can only be specified on atomic properties.
+
+{http://xmlcalabash.com/ns/extensions}XI0031
+Unexpected atomic type: “$1”
+
+{http://xmlcalabash.com/ns/extensions}XI0032
+The p:wrap-sequence step only wraps documents; items are not allowed.
+
+{http://xmlcalabash.com/ns/extensions}XI0033
+The p:wrap-sequence step only wraps XML documents.
+
+{http://xmlcalabash.com/ns/extensions}XI0034
+Failed to cast to XML: “$1”.
+
+{http://xmlcalabash.com/ns/extensions}XI0035
+Cannot create media type for unexpected value: “$1”.
+
+{http://xmlcalabash.com/ns/extensions}XI0036
+No pipeline specified.
+
+{http://xmlcalabash.com/ns/extensions}XI0037
+Attempt to redefine parameter “$1”. Parameters cannot be redefined.
+
+{http://xmlcalabash.com/ns/extensions}XI0038
+Invalid prefix character: “$1”. Only “+” and “?” are supported.
+
+{http://xmlcalabash.com/ns/extensions}XI0039
+Cannot parse input: “$1”.
+
+{http://xmlcalabash.com/ns/extensions}XI0040
+Cannot parse output: “$1”.
+
+{http://xmlcalabash.com/ns/extensions}XI0041
+Attempt to redefine namespace prefix: “$1”. Namespace bindings cannot be redefined.
+
+{http://xmlcalabash.com/ns/extensions}XI0042
+Cannot parse namespace binding: “$1”.
+
+{http://xmlcalabash.com/ns/extensions}XI0043
+Unexpected option: “$1”.
+
+{http://xmlcalabash.com/ns/extensions}XI0044
+Option “$1” must be followed by a value.
+
+{http://xmlcalabash.com/ns/extensions}XI0045
+Multiple pipelines specified: “$1”, “$2”. Only one pipeline may be specified.
+
+{http://xmlcalabash.com/ns/extensions}XI0046
+Cannot parse port binding: “$1”.
+
+{http://xmlcalabash.com/ns/extensions}XI0047
+Internal error: expression is not an XPath expression: “$1”.
+
+{http://xmlcalabash.com/ns/extensions}XI0048
+Internal error: configuration object is not an XMLCalabash object.
+
+{http://xmlcalabash.com/ns/extensions}XI0049
+Internal error: configuration object differs from runtime configuration object.
+
+{http://xmlcalabash.com/ns/extensions}XI0053
+Could not initialize requested Saxon version.
+
+{http://xmlcalabash.com/ns/extensions}XI0061
+While loop exceeded maximum iterations: $1
+
+{http://xmlcalabash.com/ns/extensions}XI0062
+Until loop exceeded maximum iterations: $1
+
+{http://xmlcalabash.com/ns/extensions}XI0063
+The cx:loop increment may not be zero.
+
+{http://xmlcalabash.com/ns/extensions}XI0064
+Invalid configuration file scheme, “$1:”. Only file: is allowed.
+
+{http://xmlcalabash.com/ns/extensions}XI0065
+Configuration file not found: “$1”.
+
+{http://xmlcalabash.com/ns/extensions}XI0066
+Malformed URI: “$1”: $2.
+
+xi:XI0067
+Attempt to redefine log level from “$2” to “$1”
+Only one of --info or --debug may be specified.
+
+xi:XI0068
+Ambiguous graph type: “$1”
+
+xi:XI0069
+Invalid graph type: “$1”
+Only “tree”, “pipeline”, “graph”, and “open-graph” are allowed.
+
+{http://xmlcalabash.com/ns/extensions}XI0999
+It must be time for breakfast at Milliways, something impossible has happened: $1
+
+{http://xmlcalabash.com/ns/extensions}XI9999
+This is the end of the file.
+
+{http://xmlcalabash.com/ns/extension-errors}XX0060
+Invalid cx:loop bounds: “$1” to “$2” by “$3”.
+
+

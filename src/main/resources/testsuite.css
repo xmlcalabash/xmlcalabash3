@@ -1,0 +1,23 @@
+.fail {
+    background-color: #ffaaaa;
+}
+
+.testcase {
+    border-top: 1px solid black;
+}
+
+.testcases {
+    padding-top: 1rem;
+}
+
+.pname::after {
+    content: ":";
+}
+
+.system-out, .system-err, .error {
+    padding-left: 1rem;
+}
+
+.hidden {
+    display: none;
+}
