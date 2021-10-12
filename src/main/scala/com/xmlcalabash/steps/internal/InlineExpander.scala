@@ -272,7 +272,7 @@ protected[xmlcalabash] class InlineExpander(val config: XMLCalabashConfig, val n
     while (iter.hasNext) {
       val next = iter.next()
       string = string + s + next.getStringValue
-      s = " "
+      //s = " "
     }
     string
   }
