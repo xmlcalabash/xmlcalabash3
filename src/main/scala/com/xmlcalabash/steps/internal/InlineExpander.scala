@@ -264,17 +264,39 @@ protected[xmlcalabash] class InlineExpander(val config: XMLCalabashConfig, val n
   }
 
   private def expandString(text: String): String = {
-    val expr = new XProcVtExpression(exprContext, text)
-    var s = ""
-    var string = ""
-    val evaluator = config.expressionEvaluator.newInstance()
-    val iter = evaluator.value(expr, contextItem.toList, msgBindings, None).item.iterator()
-    while (iter.hasNext) {
-      val next = iter.next()
-      string = string + s + next.getStringValue
-      //s = " "
+    val vtexpr = new XProcVtExpression(exprContext, text)
+
+    // This code used to just evaluate the template expression and treat the
+    // static and dynamic parts as part of the same result. But that doesn't
+    // work because we need to put a space between sequences that are
+    // the results of evaluating the expression, but not between the static
+    // and dynamic parts.
+    //
+    // "test-{1+1}" => "test-2"
+    // "{(3,4,5)}" => "3 4 5"
+
+    val sb = new StringBuffer()
+
+    var template = false
+    for (part <- vtexpr.avt) {
+      if (template) {
+        val expr = new XProcXPathExpression(exprContext, part)
+        val evaluator = config.expressionEvaluator.newInstance()
+        val iter = evaluator.value(expr, contextItem.toList, msgBindings, None).item.iterator()
+        var s = ""
+        while (iter.hasNext) {
+          val next = iter.next()
+          sb.append(s)
+          sb.append(next.getStringValue)
+          s = " "
+        }
+      } else {
+        sb.append(part)
+      }
+      template = !template
     }
-    string
+
+    sb.toString
   }
 
   private def expandNodes(text: String, builder: SaxonTreeBuilder): Unit = {
