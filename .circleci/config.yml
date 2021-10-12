@@ -1,0 +1,99 @@
+version: 2.1
+
+executors:
+  docker-default:
+    docker:
+      - image: cimg/openjdk:11.0
+
+jobs:
+  build:
+    executor: docker-default
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ checksum "build.sbt" }}
+            - v1-depdencies-
+
+      - run: gpg --keyserver keyserver.ubuntu.com --recv-keys 4C5F68D09D42BA7FAC888DF9A929EA2321FDBF8F
+
+      - run: |
+          echo "realm=Sonatype Nexus Repository Manager" > ~/.sbt/.credentials
+          echo "host=oss.sonatype.org" >> ~/.sbt/.credentials
+          echo "user=$SONATYPE_USER" >> ~/.sbt/.credentials
+          echo "password=$SONATYPE_PASSWORD" >> ~/.sbt/.credentials
+
+      - run: mkdir -p build/distributions
+
+      - when:
+          condition:
+            matches:
+              pattern: "^$"
+              value: << pipeline.git.tag >>
+          steps:
+            - run: echo This is an untagged commit
+            - run: sbt test
+
+      - when:
+          condition:
+            not:
+              matches:
+                pattern: "^$"
+                value: << pipeline.git.tag >>
+          steps:
+            - run: echo This is a tagged commit
+            - run: curl -s -o /tmp/publish.key $PUBLISH_URI
+            - run: openssl enc -d -aes-256-cbc -md sha512 -pbkdf2 -iter 100000 -salt -in /tmp/publish.key -out ~/.gnupg/secring.gpg -k $PUBLISH_DATA
+            - run: sbt test publishSigned
+            - run: rm /tmp/publish.key ~/.gnupg/secring.gpg
+            - run: cp target/scala-2.13/*.jar build/distributions
+
+      - run: rm ~/.sbt/.credentials
+
+      - save_cache:
+          paths:
+            - "~/.iv2/cache"
+            - "~/.sbt"
+            - "~/.m2"
+            - "target/resolution-cache"
+            - "target/streams"
+            - "project/target/resolution-cache"
+            - "project/target/streams"
+          key: v1-dependencies-{{ checksum "build.sbt" }}
+
+      - persist_to_workspace:
+          root: build
+          paths:
+            - distributions
+
+  publish-github-release:
+    docker:
+      - image: cibuilds/github:0.10
+    steps:
+      - attach_workspace:
+          at: ./artifacts
+      - run:
+          name: "Publish Release on GitHub"
+          command: |
+            VERSION=${CIRCLE_TAG}
+            ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} ${VERSION} ./artifacts/distributions/
+
+
+workflows:
+  version: 2
+  build:
+    jobs:
+      - build:
+          filters:
+            branches:
+              ignore: gh-pages
+            tags:
+              only: /.+/
+      - publish-github-release:
+          requires:
+            - build
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /.+/
