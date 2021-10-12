@@ -71,8 +71,6 @@ class TestRunner(runtimeConfig: XMLCalabashConfig, online: Boolean, regex: Optio
   private val testFiles = ListBuffer.empty[String]
   private val fnregex = "^.*.xml".r
 
-  private val verboseOutput = Option(System.getenv("VERBOSE_TEST_OUTPUT")).getOrElse("false") == "true"
-
   private val context = new StaticContext(runtimeConfig)
   private val processor = runtimeConfig.processor
   private val builder = processor.newDocumentBuilder()
@@ -99,6 +97,11 @@ class TestRunner(runtimeConfig: XMLCalabashConfig, online: Boolean, regex: Optio
   private val sortedList = testFiles.sorted
   testFiles.clear()
   testFiles ++= sortedList
+
+  private def verboseOutput: Boolean = {
+    (Option(System.getenv("VERBOSE_TEST_OUTPUT")).getOrElse("false") == "true"
+      || Option(System.getProperty("VERBOSE_TEST_OUTPUT")).getOrElse("false") == "true")
+  }
 
   def rematch(path: String): Unit = {
     if (testlist.nonEmpty) {
@@ -732,6 +735,7 @@ class TestRunner(runtimeConfig: XMLCalabashConfig, online: Boolean, regex: Optio
     if (result.passed) {
       if (expected != "pass") {
         result.passed = false // it was supposed to fail...
+        result.errorWasPass = true
       }
       result
     } else {

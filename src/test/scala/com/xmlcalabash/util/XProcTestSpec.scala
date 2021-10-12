@@ -17,14 +17,17 @@ class XProcTestSpec extends AnyFunSpec {
   protected val runtimeConfig: XMLCalabashConfig = XMLCalabashConfig.newInstance()
   protected val testFiles: ListBuffer[String] = ListBuffer.empty[String]
 
-  private val verboseOutput = Option(System.getenv("VERBOSE_TEST_OUTPUT")).getOrElse("false") == "true"
-
   protected val online: Boolean = try {
     val docreq = new DocumentRequest(new URI("http://www.w3.org/"), MediaType.HTML)
-    val doc = runtimeConfig.documentManager.parse(docreq)
+    runtimeConfig.documentManager.parse(docreq)
     true
   } catch {
-    case ex: Exception => false
+    case _: Exception => false
+  }
+
+  private def verboseOutput: Boolean = {
+    (Option(System.getenv("VERBOSE_TEST_OUTPUT")).getOrElse("false") == "true"
+      || Option(System.getProperty("VERBOSE_TEST_OUTPUT")).getOrElse("false") == "true")
   }
 
   protected def runtests(title: String, testFiles: List[String]): Unit = {
@@ -66,7 +69,11 @@ class XProcTestSpec extends AnyFunSpec {
         if (result.passed) {
           println(s"PASS: $fn")
         } else {
-          println(s"FAIL: $fn")
+          if (result.errorWasPass) {
+            println(s"FAIL: $fn (should have raised exception)")
+          } else {
+            println(s"FAIL: $fn")
+          }
         }
       }
       assert(result.passed)

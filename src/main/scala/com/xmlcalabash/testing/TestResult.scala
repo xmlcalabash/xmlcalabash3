@@ -8,6 +8,7 @@ import net.sf.saxon.s9api.QName
 
 class TestResult(pass: Boolean) {
   private var _passed = pass
+  private var _errorWasPass = false
   private var _skipped: Option[String] = None
   private var _message = ""
   private var _baseURI = Option.empty[URI]
@@ -21,6 +22,11 @@ class TestResult(pass: Boolean) {
 
   def passed_=(pass: Boolean): Unit = {
     _passed = pass
+  }
+
+  def errorWasPass: Boolean = _errorWasPass
+  def errorWasPass_=(err: Boolean): Unit = {
+    _errorWasPass = err
   }
 
   def skipped: Option[String] = _skipped
