@@ -151,7 +151,7 @@ object XProcException {
   def xdInvalidURI(uri: String, location: Option[Location]): XProcException = dynamicError(64, uri, location)
   def xdBadMapKey(key: String, location: Option[Location]): XProcException = dynamicError(70, key, location)
   def xdBadViewportInput(contentType: MediaType, location: Option[Location]): XProcException = dynamicError(72, contentType, location)
-  def xdBadViewportResult(location: Option[Location]): XProcException = dynamicError(73, location)
+  def xdBadViewportResult(contentType: String, location: Option[Location]): XProcException = dynamicError(73, contentType, location)
 
   def xdUrifyFailed(filepath: String, basedir: String, location: Option[Location]): XProcException = dynamicError(74, List(filepath, basedir), location)
   def xdUrifyDifferentDrives(filepath: String, basedir: String, location: Option[Location]): XProcException = dynamicError(75, List(filepath, basedir), location)

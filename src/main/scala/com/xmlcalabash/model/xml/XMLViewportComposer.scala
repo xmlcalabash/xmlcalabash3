@@ -4,7 +4,7 @@ import com.jafpl.messages.{Message, Metadata}
 import com.jafpl.steps.{ViewportComposer, ViewportItem}
 import com.xmlcalabash.config.XMLCalabashConfig
 import com.xmlcalabash.exceptions.XProcException
-import com.xmlcalabash.messages.{XdmNodeItemMessage, XdmValueItemMessage}
+import com.xmlcalabash.messages.{AnyItemMessage, XdmNodeItemMessage, XdmValueItemMessage}
 import com.xmlcalabash.model.util.{SaxonTreeBuilder, ValueParser, XProcConstants}
 import com.xmlcalabash.runtime.{ProcessMatch, ProcessMatchingNodes, StaticContext, XProcMetadata, XProcVtExpression, XProcXPathExpression}
 import com.xmlcalabash.util.{TypeUtils, VoidLocation}
@@ -173,14 +173,16 @@ class XMLViewportComposer(config: XMLCalabashConfig, context: StaticContext, pat
       item
     }
     override def getMetadata: Metadata = meta
-    override def putItems(items: List[Any]): Unit = {
+    override def putItems(items: List[Message]): Unit = {
       val lb = ListBuffer.empty[XdmNode]
-      for (item <- items) {
-        item match {
-          case node: XdmNode =>
-            lb += node
+      for (msg <- items) {
+        msg match {
+          case ni: XdmNodeItemMessage =>
+            lb += ni.item
+          case ai: AnyItemMessage =>
+            throw XProcException.xdBadViewportResult(ai.metadata.contentType.toString, context.location)
           case _ =>
-            throw XProcException.xdBadViewportResult(context.location)
+            throw XProcException.xdBadViewportResult("unknown content", context.location)
         }
       }
 

@@ -137,6 +137,9 @@ Invalid URI: “$1”.
 XD0072
 Cannot pass “$1” documents to p:viewport (only HTML and XML are allowed).
 
+XD0073
+Viewport pipeline returned $1; only XML, HTML, and text allowed.
+
 XD0079
 Invalid media type: “$1”.
 
