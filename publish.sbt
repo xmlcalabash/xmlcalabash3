@@ -1,6 +1,7 @@
 ThisBuild / organization := "com.xmlcalabash"
 ThisBuild / organizationName := "XML Calabash"
 ThisBuild / organizationHomepage := Some(url("https://xmlcalabash.com/"))
+ThisBuild / versionScheme := Some("semver-spec")
 
 ThisBuild / scmInfo := Some(
   ScmInfo(
@@ -30,3 +31,18 @@ ThisBuild / publishTo := {
   else Some("releases" at nexus + "service/local/staging/deploy/maven2")
 }
 ThisBuild / publishMavenStyle := true
+
+credentials += Credentials(Path.userHome / ".sbt" / ".credentials")
+credentials += Credentials(
+            "GnuPG Key ID",
+            "gpg",
+            "4C5F68D09D42BA7FAC888DF9A929EA2321FDBF8F",
+            System.getenv("PGP_PASSPHRASE"))
+
+publishTo := {
+  val nexus = "https://oss.sonatype.org/"
+  if (isSnapshot.value)
+    Some("snapshots" at nexus + "content/repositories/snapshots")
+  else
+    Some("releases"  at nexus + "service/local/staging/deploy/maven2")
+}
