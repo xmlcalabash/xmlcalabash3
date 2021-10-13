@@ -13,6 +13,6 @@ class ContentTypeCheckerParams(val port: String,
                                val inputPort: Boolean,
                                val sequence: Boolean) extends ImplParams {
   def this(port: String, contentTypes: List[MediaType], context: StaticContext, select: Option[String], inputPort: Boolean, sequence: Boolean) = {
-    this(port, contentTypes, context, select, XProcException.xd0038, inputPort, sequence)
+    this(port, contentTypes, context, select, XProcException.err_xd0038, inputPort, sequence)
   }
 }

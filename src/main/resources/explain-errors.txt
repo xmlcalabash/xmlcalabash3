@@ -122,6 +122,12 @@ When an encoding is specified, markup is not allowed: “$1”.
 XD0057
 Invalid JSON: “$1”.
 
+XD0058
+Invalid JSON: “$1”.
+
+XD0059
+Invalid option: “$1”.
+
 XD0060
 Unsupported encoding: “$1”.
 
@@ -290,6 +296,9 @@ The pipe and href attributes may not both be specified.
 
 XS0086
 More than one p:with-input for the same port: “$1”
+
+XS0087
+There’s no in-scope namespace binding for the name “$1”.
 
 XS0089
 If a p:empty binding is used, it must be the only binding.

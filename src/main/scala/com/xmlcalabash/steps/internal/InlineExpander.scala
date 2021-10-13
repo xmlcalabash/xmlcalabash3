@@ -128,7 +128,7 @@ protected[xmlcalabash] class InlineExpander(val config: XMLCalabashConfig, val n
       } catch {
         case ex: SaxonApiException =>
           if (ex.getMessage.contains("Invalid JSON")) {
-            throw XProcException.xdInvalidJson(ex.getMessage, exprContext.location)
+            throw XProcException.xdInvalidJson(ex.getMessage, ex, exprContext.location)
           } else {
             throw ex
           }

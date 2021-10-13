@@ -89,7 +89,19 @@ class NameBinding(override val config: XMLCalabashConfig) extends Artifact(confi
     typeUtils = new TypeUtils(config, staticContext)
 
     if (attributes.contains(XProcConstants._name)) {
-      _name = staticContext.parseQName(attr(XProcConstants._name).get)
+      val name = attr(XProcConstants._name).get
+      try {
+        _name = staticContext.parseQName(name)
+      } catch {
+        case ex: XProcException =>
+          if (ex.code == XProcException.err_xd0015) {
+            throw XProcException.xsOptionUndeclaredNamespace(name, ex.location)
+          } else {
+            throw ex
+          }
+        case ex: Throwable =>
+          throw ex
+      }
       this match {
         case _: WithOption =>
           () // This would be ok if the step has an option declared in the p: namespace
@@ -304,7 +316,7 @@ class NameBinding(override val config: XMLCalabashConfig) extends Artifact(confi
               context += new XdmNodeItemMessage(result, XProcMetadata.XML, inline.staticContext)
             } catch {
               case ex: XProcException =>
-                if (ex.code == XProcException.xs0107 && ex.details(1).toString.contains("Undeclared variable")) {
+                if (ex.code == XProcException.err_xs0107 && ex.details(1).toString.contains("Undeclared variable")) {
                   throw XProcException.xsStaticRefsNonStaticStr(ex.details.head.toString, location)
                 }
                 throw ex

@@ -122,7 +122,7 @@ class XMLContext(override val config: XMLCalabashConfig, override val artifact: 
         MediaType.parseList(ctypes.get).toList
       } catch {
         case ex: XProcException =>
-          if (ex.code == XProcException.xc0070) {
+          if (ex.code == XProcException.err_xc0070) {
             // Map to the static error...
             throw XProcException.xsUnrecognizedContentTypeShortcut(ex.details.head.toString, ex.location)
           } else {

@@ -34,7 +34,7 @@ class ContentTypeChecker() extends XmlStep {
   private val nodeMeta = mutable.HashMap.empty[XdmNode, XProcMetadata]
   private val nodes = ListBuffer.empty[XdmNode]
   protected var allowedTypes = List.empty[MediaType]
-  protected var errCode = XProcException.xd0038
+  protected var errCode = XProcException.err_xd0038
   protected var select = Option.empty[String]
   protected var selectContext: StaticContext = _
   protected var portName: String = _
@@ -86,7 +86,7 @@ class ContentTypeChecker() extends XmlStep {
       val allowed = meta.contentType.allowed(allowedTypes)
       if (!allowed) {
         // Hack
-        if (errCode == XProcException.xd0072) {
+        if (errCode == XProcException.err_xd0072) {
           throw XProcException.xdBadViewportInput(meta.contentType, location)
         } else {
           if (inputPort) {

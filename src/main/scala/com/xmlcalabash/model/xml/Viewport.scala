@@ -88,7 +88,7 @@ class Viewport(override val config: XMLCalabashConfig) extends Container(config)
 
     logger.debug(s"Adding content-type-checker for viewport source")
     val params = new ContentTypeCheckerParams(input.port, List(MediaType.XML, MediaType.HTML, MediaType.XHTML), staticContext, None,
-      XProcException.xd0072, inputPort = true, true)
+      XProcException.err_xd0072, inputPort = true, true)
     val atomic = new AtomicStep(config, params)
     atomic.stepType = XProcConstants.cx_content_type_checker
     // Put this outside the viewport so that its output is attached to the viewport input, not the viewport output

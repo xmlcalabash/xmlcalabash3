@@ -196,6 +196,7 @@ object XProcConstants {
   val _doctype_public = new QName("", "doctype-public")
   val _doctype_system = new QName("", "doctype-system")
   val _document_properties = new QName("", "document-properties")
+  val _duplicates = new QName("", "duplicates")
   val _encoding = new QName("", "encoding")
   val _escape_uri_attributes = new QName("", "escape-uri-attributes")
   val _exclude_inline_prefixes = new QName("", "exclude-inline-prefixes")

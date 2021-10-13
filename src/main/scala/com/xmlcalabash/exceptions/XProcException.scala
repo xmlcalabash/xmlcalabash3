@@ -9,17 +9,20 @@ import com.xmlcalabash.model.xml.Artifact
 import com.xmlcalabash.runtime.{StaticContext, XProcExpression}
 import com.xmlcalabash.util.MediaType
 import net.sf.saxon.om.StructuredQName
-import net.sf.saxon.s9api.{QName, XdmItem, XdmNode}
+import net.sf.saxon.s9api.{QName, SaxonApiException, XdmItem, XdmNode}
 
 import scala.collection.mutable.ListBuffer
 
 object XProcException {
-  val xd0011 = new QName("err", XProcConstants.ns_err, "XD0011")
-  val xd0038 = new QName("err", XProcConstants.ns_err, "XD0038")
-  val xd0072 = new QName("err", XProcConstants.ns_err, "XD0072")
+  val err_xd0011 = new QName("err", XProcConstants.ns_err, "XD0011")
+  val err_xd0015 = new QName("err", XProcConstants.ns_err, "XD0015")
+  val err_xd0030 = new QName("err", XProcConstants.ns_err, "XD0030")
+  val err_xd0038 = new QName("err", XProcConstants.ns_err, "XD0038")
+  val err_xd0057 = new QName("err", XProcConstants.ns_err, "XD0057")
+  val err_xd0072 = new QName("err", XProcConstants.ns_err, "XD0072")
 
-  val xc0070 = new QName("err", XProcConstants.ns_err, "XC0070")
-  val xs0107 = new QName("err", XProcConstants.ns_err, "XS0107")
+  val err_xc0070 = new QName("err", XProcConstants.ns_err, "XC0070")
+  val err_xs0107 = new QName("err", XProcConstants.ns_err, "XS0107")
 
   def xtde(errNo: Int): StructuredQName = {
     new StructuredQName("err", XProcConstants.ns_xqt_errors, f"XTDE$errNo%04d")
@@ -144,7 +147,9 @@ object XProcException {
   def xdCannotEncodeMarkup(encoding: String, contentType: MediaType, location: Option[Location]): XProcException = dynamicError(54, List(encoding,contentType), location)
   def xdCharsetWithoutEncoding(contentType: String, location: Option[Location]): XProcException = dynamicError(55, contentType, location)
   def xdNoMarkupAllowedEncoded(name: QName, location: Option[Location]): XProcException = dynamicError(56, name, location)
-  def xdInvalidJson(message: String, location: Option[Location]): XProcException = dynamicError(57, message, location)
+  def xdInvalidJson(message: String, cause: SaxonApiException, location: Option[Location]): XProcException = dynamicError(57, List(message, cause), location)
+  def xdDuplicateKeysForbidden(message: String, location: Option[Location]): XProcException = dynamicError(58, message, location)
+  def xdInvalidKeyValue(message: String, location: Option[Location]): XProcException = dynamicError(59, message, location)
   def xdUnsupportedEncoding(encoding: String, location: Option[Location]): XProcException = dynamicError(60, encoding, location)
   def xdKeyIsInvalidQName(key: String, location: Option[Location]): XProcException = dynamicError(61, key, location)
   def xdMismatchedContentType(declType: MediaType, propType: MediaType, location: Option[Location]): XProcException = dynamicError(62, List(declType,propType), location)
@@ -223,7 +228,7 @@ object XProcException {
   def xsInlineExpandTextNotAllowed(location: Option[Location]): XProcException = staticError(84, location)
   def xsPipeAndHref(location: Option[Location]): XProcException = staticError(85, location)
   def xsDupWithInputPort(port: String, location: Option[Location]): XProcException = staticError(86, port, location)
-
+  def xsOptionUndeclaredNamespace(name: String, location: Option[Location]): XProcException = staticError(87, name, location)
   def xsTvtForbidden(location: Option[Location]): XProcException = staticError(88, location)
   def xsNoSiblingsOnEmpty(location: Option[Location]): XProcException = staticError(89, None, location)
   def xsInvalidPipeToken(token: String, location: Option[Location]): XProcException = staticError(90, token, location)

@@ -8,7 +8,7 @@ import com.xmlcalabash.runtime.params.DocumentLoaderParams
 import com.xmlcalabash.runtime.{BinaryNode, ImplParams, StaticContext, XProcMetadata, XProcXPathExpression, XmlPortSpecification}
 import com.xmlcalabash.steps.DefaultXmlStep
 import com.xmlcalabash.util.{MediaType, S9Api}
-import net.sf.saxon.s9api.{QName, XdmMap, XdmNode, XdmValue}
+import net.sf.saxon.s9api.{QName, SaxonApiException, XdmMap, XdmNode, XdmValue}
 
 import scala.collection.mutable.ListBuffer
 
@@ -125,20 +125,45 @@ class DocumentLoader() extends AbstractLoader {
     val request = new DocumentRequest(Some(href), Some(contentType), location, params)
     request.docprops = docProps
 
-    val result = config.documentManager.parse(request)
-    val metadata = new XProcMetadata(result.contentType, docProps ++ result.props)
+    try {
+      val result = config.documentManager.parse(request)
+      val metadata = new XProcMetadata(result.contentType, docProps ++ result.props)
 
-    if (result.shadow.isDefined) {
-      val binary = new BinaryNode(config, result.shadow.get)
-      consumer.get.receive("result", binary, metadata)
-    } else {
-      result.value match {
-        case node: XdmNode =>
-          val patched = S9Api.patchBaseURI(config.config, node, metadata.baseURI)
-          consumer.get.receive("result", patched, metadata)
-        case _ =>
-          consumer.get.receive("result", result.value, metadata)
+      if (result.shadow.isDefined) {
+        val binary = new BinaryNode(config, result.shadow.get)
+        consumer.get.receive("result", binary, metadata)
+      } else {
+        result.value match {
+          case node: XdmNode =>
+            val patched = S9Api.patchBaseURI(config.config, node, metadata.baseURI)
+            consumer.get.receive("result", patched, metadata)
+          case _ =>
+            consumer.get.receive("result", result.value, metadata)
+        }
       }
+    } catch {
+      case ex: XProcException =>
+        ex.code match {
+          case XProcException.err_xd0057 =>
+            val cause = ex.details(1).asInstanceOf[SaxonApiException]
+            if (cause.getMessage.contains("Duplicate key value")) {
+              val dups = params.get(XProcConstants._duplicates)
+              if (dups.isDefined && dups.get.toString == "reject") {
+                throw XProcException.xdDuplicateKeysForbidden(cause.getMessage, ex.location)
+              }
+            }
+            throw ex
+          case XProcException.err_xd0030 =>
+            val message = ex.details.head.asInstanceOf[String]
+            if (message.contains("Invalid option")) {
+              throw XProcException.xdInvalidKeyValue(message, ex.location)
+            }
+            throw ex
+          case _ =>
+            throw ex
+        }
+      case ex: Throwable =>
+        throw ex
     }
   }
 }

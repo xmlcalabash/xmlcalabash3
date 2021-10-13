@@ -35,7 +35,7 @@ class Import(override val config: XMLCalabashConfig) extends Artifact(config) {
         root = S9Api.documentElement(response.value.asInstanceOf[XdmNode]).get
       } catch {
         case ex: XProcException =>
-          if (ex.code == XProcException.xd0011) {
+          if (ex.code == XProcException.err_xd0011) {
             throw XProcException.xsImportFailed(_href, location)
           } else {
             throw ex
