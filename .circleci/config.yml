@@ -42,11 +42,8 @@ jobs:
                 value: << pipeline.git.tag >>
           steps:
             - run: echo This is a tagged commit
-            - run: curl -s -o /tmp/publish.key $PUBLISH_URI
-            - run: openssl enc -d -aes-256-cbc -md sha512 -pbkdf2 -iter 100000 -salt -in /tmp/publish.key -out ~/.gnupg/secring.gpg -k $PUBLISH_DATA
-            - run: sbt test publishSigned
-            - run: rm /tmp/publish.key ~/.gnupg/secring.gpg
-            - run: cp target/scala-2.13/*.jar build/distributions
+            - run: sbt test universal:packageBin
+            - run: cp target/scala-2.13/*.zip build/distributions
 
       - run: rm ~/.sbt/.credentials
 
