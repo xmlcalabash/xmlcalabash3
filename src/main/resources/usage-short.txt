@@ -2,7 +2,7 @@ Usage: com.xmlcalabash.drivers.main [options] pipeline.xpl
 Options:
   --help/-h
   --input port=uri, -iport=uri, --output port=filename, -oport=filename,
-  --verbose/-v, --graph type(s), --norun,
+  --verbose, --graph type(s), --norun,
   --bind prefix=namespace, -bprefix=namespace
   --stacktrace, --info, --debug, -Dproperty=value,
   optname=value, +optname=filename, ?optname=expression

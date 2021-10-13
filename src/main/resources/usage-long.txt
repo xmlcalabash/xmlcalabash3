@@ -12,7 +12,7 @@ Options:
     Save the result that appears on the output port named ‘port’ in the file
     named ‘filename’.
 
-  --verbose/-v
+  --verbose
 
     Enable verbose output.
 
