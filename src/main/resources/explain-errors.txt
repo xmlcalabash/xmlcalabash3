@@ -650,6 +650,10 @@ xi:XI0069
 Invalid graph type: “$1”
 Only “tree”, “pipeline”, “graph”, and “open-graph” are allowed.
 
+xi:XI0070
+Cannot parse “$1” as a property name/value pair.
+The format of the -D value must be “name=value”.
+
 {http://xmlcalabash.com/ns/extensions}XI0999
 It must be time for breakfast at Milliways, something impossible has happened: $1
 

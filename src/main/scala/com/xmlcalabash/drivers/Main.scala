@@ -11,6 +11,8 @@ import com.xmlcalabash.util.{ArgBundle, URIUtils}
 import net.sf.saxon.s9api.QName
 import org.slf4j.LoggerFactory
 
+import java.io.{BufferedInputStream, BufferedReader, InputStream, InputStreamReader}
+
 object Main extends App {
   type OptionMap = Map[Symbol, Any]
 
@@ -21,61 +23,15 @@ object Main extends App {
   try {
     options = new ArgBundle(config, args.toList)
 
-    if (config.debugOptions.logLevel.isDefined) {
-      // Try to tweak the log level. This will only work if the user hasn't
-      // reconfigured logging. But if they've reconfigured logging, presumably
-      // they don't need this!
-      val level = config.debugOptions.logLevel.get
-      val logcontext = LoggerFactory.getILoggerFactory
-      val logger = logcontext.getLogger("root")
-      logger match {
-        case lgr: ch.qos.logback.classic.Logger =>
-          lgr.setLevel(ch.qos.logback.classic.Level.toLevel(level))
-        case _ =>
-          logger.warn(s"Logging configuration doesn't support command line --${level} option")
-      }
-    }
-
-    config.debugOptions.injectables = options.injectables
-
-    val parser = new Parser(config)
-    val pipeline = parser.loadDeclareStep(new URI(options.pipeline))
-
-    decl = Some(pipeline)
-
-    config.debugOptions.dumpTree(pipeline)
-    config.debugOptions.dumpPipeline(pipeline)
-
-    val runtime = pipeline.runtime()
-
-    if (!config.debugOptions.run) {
-      System.exit(0)
-    }
-
-    for (port <- options.inputs.keySet) {
-      for (filename <- options.inputs(port)) {
-        val href = URIUtils.cwdAsURI.resolve(filename)
-        val request = new DocumentRequest(href)
-        val response = config.documentManager.parse(request)
-        runtime.input(port, response.value, new XProcMetadata(response.contentType))
-      }
-    }
-
-    for (port <- runtime.outputs) {
-      val output = runtime.decl.output(port)
-      val pc = if (options.outputs.contains(port)) {
-        new PrintingConsumer(runtime, output, options.outputs(port))
+    if (options.hasPipeline) {
+      runPipeline()
+    } else {
+      if (options.help) {
+        longHelp()
       } else {
-        new PrintingConsumer(runtime, output)
+        shortHelp()
       }
-      runtime.output(port, pc)
     }
-
-    for ((name, value) <- options.options) {
-      runtime.option(name, value.value, new StaticContext(config))
-    }
-
-    runtime.run()
   } catch {
     case ex: Exception =>
       errored = true
@@ -162,4 +118,83 @@ object Main extends App {
   if (errored) {
     System.exit(1)
   }
+
+  def shortHelp(): Unit = {
+    help(getClass.getResourceAsStream("/usage-short.txt"))
+  }
+
+  def longHelp(): Unit = {
+    help(getClass.getResourceAsStream("/usage-long.txt"))
+  }
+
+  private def help(stream: InputStream): Unit = {
+    if (stream == null) {
+      throw XProcException.xiThisCantHappen("help text is missing.", None)
+    }
+    val reader = new BufferedReader(new InputStreamReader(stream))
+    var line = reader.readLine()
+    while (Option(line).isDefined) {
+      println(line)
+      line = reader.readLine()
+    }
+  }
+
+  def runPipeline(): Unit = {
+    if (config.debugOptions.logLevel.isDefined) {
+      // Try to tweak the log level. This will only work if the user hasn't
+      // reconfigured logging. But if they've reconfigured logging, presumably
+      // they don't need this!
+      val level = config.debugOptions.logLevel.get
+      val logcontext = LoggerFactory.getILoggerFactory
+      val logger = logcontext.getLogger("root")
+      logger match {
+        case lgr: ch.qos.logback.classic.Logger =>
+          lgr.setLevel(ch.qos.logback.classic.Level.toLevel(level))
+        case _ =>
+          logger.warn(s"Logging configuration doesn't support command line --${level} option")
+      }
+    }
+
+    config.debugOptions.injectables = options.injectables
+
+    val parser = new Parser(config)
+    val pipeline = parser.loadDeclareStep(new URI(options.pipeline))
+
+    decl = Some(pipeline)
+
+    config.debugOptions.dumpTree(pipeline)
+    config.debugOptions.dumpPipeline(pipeline)
+
+    val runtime = pipeline.runtime()
+
+    if (!config.debugOptions.run) {
+      System.exit(0)
+    }
+
+    for (port <- options.inputs.keySet) {
+      for (filename <- options.inputs(port)) {
+        val href = URIUtils.cwdAsURI.resolve(filename)
+        val request = new DocumentRequest(href)
+        val response = config.documentManager.parse(request)
+        runtime.input(port, response.value, new XProcMetadata(response.contentType))
+      }
+    }
+
+    for (port <- runtime.outputs) {
+      val output = runtime.decl.output(port)
+      val pc = if (options.outputs.contains(port)) {
+        new PrintingConsumer(runtime, output, options.outputs(port))
+      } else {
+        new PrintingConsumer(runtime, output)
+      }
+      runtime.output(port, pc)
+    }
+
+    for ((name, value) <- options.options) {
+      runtime.option(name, value.value, new StaticContext(config))
+    }
+
+    runtime.run()
+  }
+
 }

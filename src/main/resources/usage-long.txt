@@ -1,0 +1,70 @@
+Usage: com.xmlcalabash.drivers.main [options] pipeline.xpl
+Options:
+  --input port=uri
+  -iport=uri
+
+    Provide the resource identified by ‘uri’ on the input port named ‘port’.
+    A sequence can be provided by repeating the option with the same port name.
+
+  --output port=filename
+  -oport=filename
+
+    Save the result that appears on the output port named ‘port’ in the file
+    named ‘filename’.
+
+  --verbose/-v
+
+    Enable verbose output.
+
+  --help/-h
+
+    This help message.
+
+  --graph type
+
+    Output a description of the graph described by the pipeline. 
+    The ‘type’ can be one or more of ‘tree’, ‘pipeline’, ‘graph’, and
+    ‘open-graph’. To specify more than one, separate them with commas.
+
+  --norun
+
+    Compile the pipeline (compute the graphs), but don’t run it.
+
+  --bind prefix=namespace
+  -bprefix=namespace
+
+    Use the namespace binding for options that follow.
+
+  --stacktrace
+
+    If the pipeline fails, print a stack trace.
+
+  --info
+
+    If you’re using the default logging configuration, this will
+    enable “info” level logging which is slightly more verbose than
+    the default.
+
+  --debug
+
+    If you’re using the default logging configuration, this will
+    enable “debug” level logging which is vastly more verbose than
+    the default.
+
+  -Dproperty=value
+
+    Sets the Java system property named ‘property’ to the value ‘value’.
+
+  optname=value
+
+    Provide the value ‘value’ for the pipeline option named ‘optname’.
+
+  +optname=filename
+
+    Provide the contents of the file named ‘filename’ as the value of
+    the option named ‘optname’. This can be XML, JSON, or binary.
+
+  ?optname=expression
+
+    Provide as the value of the option named ‘optname’ the result of
+    evaluating the XPath expression ‘expression’.

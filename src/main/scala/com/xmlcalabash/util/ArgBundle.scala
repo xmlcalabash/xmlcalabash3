@@ -1,15 +1,16 @@
 package com.xmlcalabash.util
 
 import com.jafpl.messages.Message
-import com.xmlcalabash.config.{XMLCalabashConfig, XMLCalabashDebugOptions}
+import com.xmlcalabash.config.{DocumentRequest, XMLCalabashConfig}
 import com.xmlcalabash.exceptions.XProcException
 import com.xmlcalabash.messages.XdmValueItemMessage
-import com.xmlcalabash.model.xml.XMLContext
 import com.xmlcalabash.model.util.ValueParser
-import com.xmlcalabash.runtime.{StaticContext, XProcMetadata, XProcXPathExpression}
+import com.xmlcalabash.model.xml.XMLContext
+import com.xmlcalabash.runtime.{XProcMetadata, XProcXPathExpression}
 import net.sf.saxon.lib.NamespaceConstant
 import net.sf.saxon.s9api.{ItemTypeFactory, QName, XdmAtomicValue}
 
+import java.net.URI
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 
@@ -25,6 +26,7 @@ class ArgBundle(xmlCalabash: XMLCalabashConfig) {
   private val _options = mutable.HashMap.empty[QName, XProcVarValue]
   private var _pipeline = Option.empty[String]
   private var _verbose = false
+  private var _help = false
   private val _debugOptions = xmlCalabash.debugOptions
 
   def this(config: XMLCalabashConfig, args: List[String]) = {
@@ -32,6 +34,7 @@ class ArgBundle(xmlCalabash: XMLCalabashConfig) {
     parse(args)
   }
 
+  def help: Boolean = _help
   def verbose: Boolean = _verbose
   def inputs: Map[String, List[String]] = _inputs.toMap
   def outputs: Map[String, List[String]] = _outputs.toMap
@@ -39,6 +42,7 @@ class ArgBundle(xmlCalabash: XMLCalabashConfig) {
   def inScopeNamespaces: Map[String,String] = _nsbindings.toMap
   def data: Map[String, List[String]] = _data.toMap
   def options: Map[QName, XProcVarValue] = _options.toMap
+  def hasPipeline: Boolean = _pipeline.isDefined
   def pipeline: String = {
     if (_pipeline.isDefined) {
       _pipeline.get
@@ -85,8 +89,9 @@ class ArgBundle(xmlCalabash: XMLCalabashConfig) {
 
           kind match {
             case "+" =>
-              val node = xmlCalabash.parse(value, URIUtils.cwdAsURI)
-              _options.put(qname, new XProcVarValue(node, scontext))
+              val request = new DocumentRequest(URI.create(value))
+              val resp = xmlCalabash.documentManager.parse(request)
+              _options.put(qname, new XProcVarValue(resp.value, scontext))
             case "?" =>
               val paramBind = mutable.HashMap.empty[String, Message]
               for ((qname, value) <- _options) {
@@ -97,9 +102,7 @@ class ArgBundle(xmlCalabash: XMLCalabashConfig) {
 
               val expr = new XProcXPathExpression(scontext, value)
               val msg = xmlCalabash.expressionEvaluator.newInstance().singletonValue(expr, List(), paramBind.toMap, None)
-              val eval = msg.asInstanceOf[XdmValueItemMessage].item
-
-              _options.put(qname, new XProcVarValue(eval, scontext))
+              _options.put(qname, new XProcVarValue(msg.item, scontext))
             case null =>
               // Ordinary parameters are created as 'untypedAtomic' values so that numbers
               // can be treated as numbers, etc.
@@ -114,34 +117,13 @@ class ArgBundle(xmlCalabash: XMLCalabashConfig) {
           try {
             optname match {
               case "verbose" => _verbose = true
+              case "help" => _help = true
               case "norun" => _debugOptions.run = false
               case "graph" =>
                 parseGraphOptions(args(pos+1))
                 pos += 1
               case "inject" =>
                 _injectables += args(pos+1)
-                pos += 1
-              case "input" =>
-                val rest = args(pos + 1)
-                val eqpos = rest.indexOf("=")
-                if (eqpos > 0) {
-                  val port = rest.substring(0, eqpos)
-                  val value = rest.substring(eqpos+1)
-                  parsePort(_inputs, s"$port=$value")
-                } else {
-                  throw XProcException.xiArgBundleCannotParseInput(s"--input $rest")
-                }
-                pos += 1
-              case "output" =>
-                val rest = args(pos + 1)
-                val eqpos = rest.indexOf("=")
-                if (eqpos > 0) {
-                  val port = rest.substring(0, eqpos)
-                  val value = rest.substring(eqpos+1)
-                  parsePort(_outputs, s"$port=$value")
-                } else {
-                  throw XProcException.xiArgBundleCannotParseInput(s"--output $rest")
-                }
                 pos += 1
               case "bind" =>
                 val rest = args(pos + 1)
@@ -186,10 +168,7 @@ class ArgBundle(xmlCalabash: XMLCalabashConfig) {
               if (!skip) {
                 ch match {
                   case 'v' => _verbose = true
-                  case 'd' =>
-                    val rest = chars.substring(chpos + 1)
-                    parseGraphOptions(rest)
-                    skip = true
+                  case 'h' => _help = true
                   case 'i' =>
                     val rest = chars.substring(chpos + 1)
                     val eqpos = rest.indexOf("=")
@@ -239,6 +218,18 @@ class ArgBundle(xmlCalabash: XMLCalabashConfig) {
                     } else {
                       throw XProcException.xiArgBundleCannotParseNamespace(rest)
                     }
+                  case 'D' =>
+                    val rest = chars.substring(chpos + 1)
+                    val eqpos = rest.indexOf("=")
+                    if (eqpos > 0) {
+                      val prop = rest.substring(0, eqpos)
+                      val value = rest.substring(eqpos+1)
+                      System.setProperty(prop, value)
+                    } else {
+                      throw XProcException.xiArgBundleCannotParseProperty(s"-D$rest")
+                    }
+                    skip = true
+
                   case _ =>
                     throw XProcException.xiArgBundleUnexpectedOption(ch.toString)
                 }

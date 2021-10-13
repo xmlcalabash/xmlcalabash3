@@ -99,6 +99,7 @@ object XProcException {
   def xiArgBundleDuplicateLogLevel(level: String, curLevel: String): XProcException = internalError(67, None, List(level, curLevel))
   def xiArgBundleAmbiguousGraphKey(token: String): XProcException = internalError(68, None, token)
   def xiArgBundleInvalidGraphKey(token: String): XProcException = internalError(69, None, token)
+  def xiArgBundleCannotParseProperty(str: String): XProcException = internalError(70, None, str)
 
   def xiThisCantHappen(msg: String, location: Option[Location]): XProcException = internalError(999, location, msg)
 

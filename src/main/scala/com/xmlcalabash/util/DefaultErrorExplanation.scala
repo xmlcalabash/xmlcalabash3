@@ -13,7 +13,7 @@ class DefaultErrorExplanation() extends ErrorExplanation {
   protected val logger: Logger = LoggerFactory.getLogger(this.getClass)
   private val messages = ListBuffer.empty[ErrorExplanationTemplate]
 
-  private var namespaces = mutable.HashMap.empty[String, String]
+  private val namespaces = mutable.HashMap.empty[String, String]
   private var code = Option.empty[String]
   private var variant = 1
   private var message = ""
