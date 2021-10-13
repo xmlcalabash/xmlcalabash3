@@ -178,20 +178,9 @@ libraryDependencies += "org.scalatest" %% "scalatest" % "3.2.3" % "test"
 
 dependencyOverrides += "xml-apis" % "xml-apis" % "1.3.04"
 
-// ============================================================
-// Configure sbt package
-
-retrieveManaged := true
-
-packageOptions +=  Package.ManifestAttributes(
-  "Class-Path" -> "test"
-)
-
-/*
-artifactName := { (sv: ScalaVersion, module: ModuleID, artifact: Artifact) =>
-  artifact.name + "-" + module.revision + "." + artifact.extension
-}
- */
+// The Urify tests have to mock the OS. If execution of
+// The Windows and NonWindows variants overlaps, bad happens.
+Test / parallelExecution := false
 
 // ============================================================
 
