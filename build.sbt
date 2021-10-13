@@ -1,15 +1,18 @@
 import java.io.{BufferedReader, InputStreamReader}
 
+enablePlugins(JavaAppPackaging)
+
 lazy val xmlCalabashVersion = "2.99.0"
 lazy val jafplVersion = "0.3.74"
 lazy val saxonVersion = "10.6"
-lazy val useSaxonEE = false
+lazy val useSaxonEE = Option(System.getProperty("saxonEdition")).getOrElse("HE") == "EE"
 
 name         := "XML Calabash"
 organization := "com.xmlcalabash"
 homepage     := Some(url("https://xmlcalabash.com/"))
 version      := xmlCalabashVersion
 scalaVersion := "2.13.5"
+maintainer   := "ndw@nwalsh.com" // for packaging
 
 Global / excludeLintKeys += homepage
 Global / excludeLintKeys += organization
@@ -121,7 +124,6 @@ publish := Def.taskDyn {
   }
 }.value
 
-
 resolvers += "Artima Maven Repository" at "https://repo.artima.com/releases"
 resolvers += "Restlet" at "https://maven.restlet.com"
 resolvers += "Saxonica" at "https://dev.saxonica.com/maven"
@@ -134,19 +136,35 @@ libraryDependencies += "org.scala-lang.modules" %% "scala-xml" % "1.3.0"
 libraryDependencies += "org.scala-lang.modules" %% "scala-parser-combinators" % "1.1.2"
 libraryDependencies += "org.scala-lang.modules" %% "scala-swing" % "2.1.1"
 libraryDependencies += "com.ibm.icu" % "icu4j" % "59.1"
-libraryDependencies += "org.apache.httpcomponents" % "httpclient" % "4.5.11"
 libraryDependencies += "org.apache.httpcomponents" % "httpcore" % "4.4.13"
 libraryDependencies += "org.apache.httpcomponents" % "httpmime" % "4.5.11"
+
+libraryDependencies +=
+  "org.apache.httpcomponents" % "httpclient" % "4.5.11" excludeAll(
+    ExclusionRule(organization = "commons-logging")
+  )
+
 libraryDependencies += "org.restlet.jee" % "org.restlet" % "2.2.2"
-//libraryDependencies += "org.restlet.jee" % "org.restlet.ext.fileupload" % "2.2.2"
-//libraryDependencies += "org.restlet.jee" % "org.restlet.ext.slf4j" % "2.2.2"
 libraryDependencies += "org.xmlresolver" % "xmlresolver" % "3.1.0"
 libraryDependencies += "nu.validator" % "htmlparser" % "1.4.12"
 libraryDependencies += "com.atlassian.commonmark" % "commonmark" % "0.12.1"
 libraryDependencies += "com.fasterxml.jackson.dataformat" % "jackson-dataformat-yaml" % "2.10.2"
 libraryDependencies += "com.fasterxml.jackson.core" % "jackson-databind" % "2.10.2"
+
+libraryDependencies +=
+  "org.relaxng" % "jing" % "20181222" excludeAll(
+    ExclusionRule(organization = "com.sun.xml.bind.jaxb"),
+    ExclusionRule(organization = "isorelax"),
+    ExclusionRule(organization = "relaxngDatatype"),
+    ExclusionRule(organization = "net.sf.saxon")
+  )
+
 libraryDependencies += "com.jafpl" % "jafpl_2.13" % jafplVersion
-libraryDependencies += "com.nwalsh" % "sinclude" % "4.0.0" excludeAll(ExclusionRule(organization="com.saxonica"), ExclusionRule(organization="net.sf.saxon"))
+
+libraryDependencies +=
+  "com.nwalsh" % "sinclude" % "4.0.0" excludeAll(
+    ExclusionRule(organization="com.saxonica"),
+    ExclusionRule(organization="net.sf.saxon"))
 
 libraryDependencies ++= (
   if (useSaxonEE) {
@@ -158,39 +176,22 @@ libraryDependencies ++= (
 
 libraryDependencies += "org.scalatest" %% "scalatest" % "3.2.3" % "test"
 
-// ============================================================
-// This section is an attempt to get sbt assembly to work.
-// It's a bit of trial and error more than informed choice.
-
-assembly / assemblyJarName := Array("xml-calabash",
-  xmlCalabashVersion,
-  saxonVersion.split("\\.").take(2).mkString("")).mkString("-") + ".jar"
-
-assembly / test := {}
-
-libraryDependencies +=
-  "org.relaxng" % "jing" % "20181222" excludeAll(
-    ExclusionRule(organization = "com.sun.xml.bind.jaxb"),
-    ExclusionRule(organization = "isorelax"),
-    ExclusionRule(organization = "relaxngDatatype"),
-    ExclusionRule(organization = "net.sf.saxon")
-  )
-
-libraryDependencies +=
-  "org.apache.httpcomponents" % "httpclient" % "4.5.3" excludeAll(
-    ExclusionRule(organization = "commons-logging")
-  )
-
-//dependencyOverrides += "net.sf.saxon" % "Saxon-HE" % saxonVersion
 dependencyOverrides += "xml-apis" % "xml-apis" % "1.3.04"
 
-/* ???
-mappings in (Compile, packageBin) := {
-  (mappings in (Compile, packageBin)).value.filter {
-    case (file, toPath) => toPath != "com/xmlcalabash/drivers/Test.class"
-  }
+// ============================================================
+// Configure sbt package
+
+retrieveManaged := true
+
+packageOptions +=  Package.ManifestAttributes(
+  "Class-Path" -> "test"
+)
+
+/*
+artifactName := { (sv: ScalaVersion, module: ModuleID, artifact: Artifact) =>
+  artifact.name + "-" + module.revision + "." + artifact.extension
 }
-*/
+ */
 
 // ============================================================
 
