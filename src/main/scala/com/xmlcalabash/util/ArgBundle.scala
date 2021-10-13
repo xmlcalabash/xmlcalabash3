@@ -64,7 +64,7 @@ class ArgBundle(xmlCalabash: XMLCalabashConfig) {
     // +param=file value
     // ?param=xpath expression value
 
-    val longPortRegex   = "--((input)|(output))".r
+    val longPortRegex   = "--(input|output)".r
     val paramRegex      = "([+?])?([^-]\\S+)=(\\S+)".r
     val pipelineRegex   = "([^-])(.*)".r
     val shortOptRegex   = "-(.+)".r
