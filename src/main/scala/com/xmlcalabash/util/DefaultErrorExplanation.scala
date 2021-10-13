@@ -18,7 +18,7 @@ class DefaultErrorExplanation() extends ErrorExplanation {
   private var variant = 1
   private var message = ""
   private var explanation = ""
-  private val stream = getClass.getResourceAsStream("/xproc-errors.txt")
+  private val stream = getClass.getResourceAsStream("/explain-errors.txt")
 
   namespaces.put("", "http://xmlcalabash.com/ns/ERROR")
 
