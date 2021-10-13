@@ -1,6 +1,5 @@
 package com.xmlcalabash.drivers
 
-import java.net.URI
 import com.jafpl.exceptions.{JafplException, JafplLoopDetected}
 import com.jafpl.graph.{Binding, Node}
 import com.xmlcalabash.config.{DocumentRequest, XMLCalabashConfig}
@@ -11,7 +10,8 @@ import com.xmlcalabash.util.{ArgBundle, URIUtils}
 import net.sf.saxon.s9api.QName
 import org.slf4j.LoggerFactory
 
-import java.io.{BufferedInputStream, BufferedReader, InputStream, InputStreamReader}
+import java.io.{BufferedReader, InputStream, InputStreamReader}
+import java.net.URI
 
 object Main extends App {
   type OptionMap = Map[Symbol, Any]

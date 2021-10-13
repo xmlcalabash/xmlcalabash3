@@ -5,6 +5,8 @@ import com.xmlcalabash.model.util.XProcConstants
 import net.sf.saxon.s9api.QName
 import org.slf4j.{Logger, LoggerFactory}
 
+import java.io.InputStream
+import java.util.Locale
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 import scala.io.Source
@@ -18,89 +20,109 @@ class DefaultErrorExplanation() extends ErrorExplanation {
   private var variant = 1
   private var message = ""
   private var explanation = ""
-  private val stream = getClass.getResourceAsStream("/explain-errors.txt")
 
   namespaces.put("", "http://xmlcalabash.com/ns/ERROR")
 
-  for (line <- Source.fromInputStream(stream, "UTF-8").getLines()) {
-    if (line == "") {
-      if (code.isDefined) {
-        messages += new ErrorExplanationTemplate(code.get, variant, message, explanation)
-        code = None
-        variant = 1
-        message = ""
-        explanation = ""
-      }
-    } else {
-      val Namespace = "namespace\\s+(\\S+)\\s*=\\s*(.*)\\s*".r
-      line match {
-        case Namespace(prefix, uri) =>
-          namespaces.put(prefix, uri)
-        case _ =>
-          if (code.isEmpty) {
-            val PrefixCode = "([^{]\\S*):(\\S+)".r
-            val PrefixCodeVar = "([^{]\\S*):(\\S+)\\s*/\\s*(\\d+)".r
-            val BareCode = "([^:\\s]+)".r
-            val BareCodeVar = "([^:\\s]+)\\s*/\\s*(\\d+)".r
-            val ClarkCode = "\\{(.*)\\}\\s*(\\S+)".r
-            val ClarkCodeVar = "\\{(.*)\\}\\s*(\\S+)\\s*/\\s*(\\d+)".r
+  private val uc = System.getProperty("user.country")
+  private val ul = System.getProperty("user.language")
 
-            val qcode = line match {
-              case PrefixCodeVar(prefix, localname, vcode) =>
-                variant = vcode.toInt
-                var uri = namespaces.getOrElse(prefix, "")
-                if (uri == "") {
-                  logger.error(s"Invalid error code: ${prefix}:${localname}, no namespace binding for ${prefix} in error explanations.")
-                  uri = namespaces("")
-                }
-                Some(new QName(uri, localname))
-              case PrefixCode(prefix, localname) =>
-                variant = 1
-                var uri = namespaces.getOrElse(prefix, "")
-                if (uri == "") {
-                  logger.error(s"Invalid error code: ${prefix}:${localname}, no namespace binding for ${prefix} in error explanations.")
-                  uri = namespaces("")
-                }
-                Some(new QName(uri, localname))
-              case ClarkCodeVar(namespace, localname, vcode) =>
-                variant = vcode.toInt
-                Some(new QName(namespace, localname))
-              case ClarkCode(namespace, localname) =>
-                variant = 1
-                Some(new QName(namespace, localname))
-              case BareCodeVar(bcode, vcode) =>
-                variant = vcode.toInt
-                Some(new QName(XProcConstants.ns_err, bcode))
-              case BareCode(bcode) =>
-                variant = 1
-                Some(new QName(XProcConstants.ns_err, bcode))
-              case _  =>
-                logger.info(s"Expected error code on line: $line")
-                None
-            }
+  if (Option(uc).isDefined && uc != "" && Option(ul).isDefined && ul != "") {
+    loadExplanations(getClass.getResourceAsStream(s"/explain-errors.${ul}_${uc}.txt"))
+  }
 
-            if (qcode.isDefined) {
-              code = Some(qcode.get.getClarkName)
-            } else {
-              // If it's *still* empty, move along
-              if (message == "") {
-                message = line
-              } else {
-                explanation += line + "\n"
+  if (Option(ul).isDefined && ul != "") {
+    loadExplanations(getClass.getResourceAsStream(s"/explain-errors.${ul}.txt"))
+  }
+
+  loadExplanations(getClass.getResourceAsStream("/explain-errors.txt"))
+
+  private def loadExplanations(stream: InputStream): Unit = {
+    if (Option(stream).isEmpty) {
+      return
+    }
+
+    for (line <- Source.fromInputStream(stream, "UTF-8").getLines()) {
+      if (line == "") {
+        if (code.isDefined) {
+          messages += new ErrorExplanationTemplate(code.get, variant, message, explanation)
+          code = None
+          variant = 1
+          message = ""
+          explanation = ""
+        }
+      } else {
+        val Namespace = "namespace\\s+(\\S+)\\s*=\\s*(.*)\\s*".r
+        line match {
+          case Namespace(prefix, uri) =>
+            namespaces.put(prefix, uri)
+          case _ =>
+            if (code.isEmpty) {
+              val PrefixCode = "([^{]\\S*):(\\S+)".r
+              val PrefixCodeVar = "([^{]\\S*):(\\S+)\\s*/\\s*(\\d+)".r
+              val BareCode = "([^:\\s]+)".r
+              val BareCodeVar = "([^:\\s]+)\\s*/\\s*(\\d+)".r
+              val ClarkCode = "\\{(.*)\\}\\s*(\\S+)".r
+              val ClarkCodeVar = "\\{(.*)\\}\\s*(\\S+)\\s*/\\s*(\\d+)".r
+
+              val qcode = line match {
+                case PrefixCodeVar(prefix, localname, vcode) =>
+                  variant = vcode.toInt
+                  var uri = namespaces.getOrElse(prefix, "")
+                  if (uri == "") {
+                    logger.error(s"Invalid error code: ${prefix}:${localname}, no namespace binding for ${prefix} in error explanations.")
+                    uri = namespaces("")
+                  }
+                  Some(new QName(uri, localname))
+                case PrefixCode(prefix, localname) =>
+                  variant = 1
+                  var uri = namespaces.getOrElse(prefix, "")
+                  if (uri == "") {
+                    logger.error(s"Invalid error code: ${prefix}:${localname}, no namespace binding for ${prefix} in error explanations.")
+                    uri = namespaces("")
+                  }
+                  Some(new QName(uri, localname))
+                case ClarkCodeVar(namespace, localname, vcode) =>
+                  variant = vcode.toInt
+                  Some(new QName(namespace, localname))
+                case ClarkCode(namespace, localname) =>
+                  variant = 1
+                  Some(new QName(namespace, localname))
+                case BareCodeVar(bcode, vcode) =>
+                  variant = vcode.toInt
+                  Some(new QName(XProcConstants.ns_err, bcode))
+                case BareCode(bcode) =>
+                  variant = 1
+                  Some(new QName(XProcConstants.ns_err, bcode))
+                case _  =>
+                  logger.info(s"Expected error code on line: $line")
+                  None
               }
+
+              if (qcode.isDefined) {
+                code = Some(qcode.get.getClarkName)
+              } else {
+                // If it's *still* empty, move along
+                if (message == "") {
+                  message = line
+                } else {
+                  explanation += line + "\n"
+                }
+              }
+            } else if (message == "") {
+              message = line
+            } else {
+              explanation += line + "\n"
             }
-          } else if (message == "") {
-            message = line
-          } else {
-            explanation += line + "\n"
-          }
+        }
       }
+    }
+
+    if (code.isDefined) {
+      messages += new ErrorExplanationTemplate(code.get, variant, message, explanation)
     }
   }
 
-  if (code.isDefined) {
-    messages += new ErrorExplanationTemplate(code.get, variant, message, explanation)
-  }
+
 
   override def message(code: QName, variant: Int): String = {
     message(code, variant, List.empty[Any])

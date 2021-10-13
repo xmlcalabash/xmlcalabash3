@@ -19,6 +19,7 @@ object XProcException {
   val err_xd0030 = new QName("err", XProcConstants.ns_err, "XD0030")
   val err_xd0038 = new QName("err", XProcConstants.ns_err, "XD0038")
   val err_xd0057 = new QName("err", XProcConstants.ns_err, "XD0057")
+  val err_xd0059 = new QName("err", XProcConstants.ns_err, "XD0059")
   val err_xd0072 = new QName("err", XProcConstants.ns_err, "XD0072")
 
   val err_xc0070 = new QName("err", XProcConstants.ns_err, "XC0070")
