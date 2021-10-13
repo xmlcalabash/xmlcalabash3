@@ -25,6 +25,8 @@ jobs:
 
       - run: mkdir -p build/distributions
 
+      - run: sbt test
+
       - when:
           condition:
             matches:
@@ -32,7 +34,6 @@ jobs:
               value: << pipeline.git.tag >>
           steps:
             - run: echo This is an untagged commit
-            - run: sbt test
 
       - when:
           condition:
@@ -42,8 +43,8 @@ jobs:
                 value: << pipeline.git.tag >>
           steps:
             - run: echo This is a tagged commit
-            - run: sbt test universal:packageBin
-            - run: cp target/scala-2.13/*.zip build/distributions
+            - run: sbt "Universal / packageBin"
+            - run: cp target/universal/*.zip build/distributions
 
       - run: rm ~/.sbt/.credentials
 
