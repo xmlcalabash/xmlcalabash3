@@ -173,6 +173,9 @@ There is no port named “$2” on “$1” steps.
 XS0011
 Duplicate port name: ‘$1’
 
+XS0017
+Option is both required and has default value: $1.
+
 XS0018
 The option named “$1” is required, but no value was provided for it.
 

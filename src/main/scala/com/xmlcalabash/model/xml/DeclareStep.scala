@@ -166,7 +166,7 @@ class DeclareStep(override val config: XMLCalabashConfig) extends DeclContainer(
           }
         case option: DeclareOption =>
           if (_bindings.contains(option.name)) {
-            throw new RuntimeException("duplicate option name")
+            throw XProcException.xsDuplicateOptionName(option.name, location)
           }
           _bindings.put(option.name, option)
 

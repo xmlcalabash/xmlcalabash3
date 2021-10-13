@@ -154,6 +154,10 @@ class NameBinding(override val config: XMLCalabashConfig) extends Artifact(confi
     _select = attr(XProcConstants._select)
     _visibility = attr(XProcConstants._visibility)
 
+    if (_required.isDefined && _required.get && _select.isDefined) {
+      throw XProcException.xsRequiredAndDefaulted(_name, location)
+    }
+
     val _collection = attr(XProcConstants._collection)
     if (_collection.isDefined) {
       val coll = _collection.get

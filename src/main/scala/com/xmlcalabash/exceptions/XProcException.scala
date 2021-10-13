@@ -172,11 +172,13 @@ object XProcException {
   def xsLoop(step: String, port: String, location: Option[Location]): XProcException = staticError(1, List(step, port), location)
   def xsDuplicateStepName(step: String, location: Option[Location]): XProcException = staticError(2, step, location)
   def xsUnconnectedInputPort(step: String, port: String, location: Option[Location]): XProcException = staticError(3, List(step,port), location)
-  def xsDupOptionName(location: Option[Location], name: String): XProcException = staticError(4, name, location)
+  def xsDuplicateOptionName(name: String, location: Option[Location]): XProcException = staticError(4, name, location)
+  def xsDuplicateOptionName(name: QName, location: Option[Location]): XProcException = staticError(4, name, location)
   def xsUnconnectedOutputPort(step: String, port: String, location: Option[Location]): XProcException = staticError(6, List(step, port), location)
   def xsBadAttribute(name: QName, location: Option[Location]): XProcException = staticError(8, name, location)
   def xsBadPortName(stepType: QName, port: String, location: Option[Location]): XProcException = staticError(10, List(stepType, port), location)
   def xsDupPortName(port: String, location: Option[Location]): XProcException = staticError(11, port, location)
+  def xsRequiredAndDefaulted(name: QName, location: Option[Location]) = staticError(17, name, location)
   def xsMissingRequiredOption(optName: QName, location: Option[Location]): XProcException = staticError(18, optName, location)
 
   def xsPortNotReadableNoStep(step: String, location: Option[Location]): XProcException = staticError((22,1), step, location)
@@ -545,7 +547,7 @@ object XProcException {
     ex match {
       case jex: JafplException =>
         jex.code match {
-          case JafplException.DUP_OPTION_NAME => XProcException.xsDupOptionName(jex.location, jex.details.head.asInstanceOf[String])
+          case JafplException.DUP_OPTION_NAME => XProcException.xsDuplicateOptionName(jex.details.head.asInstanceOf[String], jex.location)
           // Port missing must be a cardinality error
           case JafplException.INPUT_PORT_MISSING => XProcException.xdInputSequenceNotAllowed(jex.details.head.asInstanceOf[String], jex.location)
           case JafplException.INPUT_CARDINALITY_ERROR => XProcException.xdInputSequenceNotAllowed(jex.details.head.asInstanceOf[String], jex.location)
