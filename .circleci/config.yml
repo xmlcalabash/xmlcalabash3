@@ -45,6 +45,11 @@ jobs:
             - run: echo This is a tagged commit
             - run: sbt "Universal / packageBin"
             - run: cp target/universal/*.zip build/distributions
+            - run: curl -s -o /tmp/publish.key $PUBLISH_URI
+            - run: openssl enc -d -aes-256-cbc -md sha512 -pbkdf2 -iter 100000 -salt -in /tmp/publish.key -out ~/.gnupg/secring.gpg -k $PUBLISH_DATA
+            - run: sbt publishSigned
+            - run: rm /tmp/publish.key ~/.gnupg/secring.gpg
+            - run: cp target/scala-2.13/*.jar build/distributions
 
       - run: rm ~/.sbt/.credentials
 
