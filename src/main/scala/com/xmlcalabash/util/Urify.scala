@@ -234,7 +234,7 @@ class Urify(val filepath: String) {
 
   def resolve(uri: String): String = {
     val respath = new Urify(uri)
-    if (respath.scheme.isDefined && respath.absolute) {
+    if (!respath.hierarchical || (respath.scheme.isDefined && respath.absolute)) {
       return respath.toString
     }
 

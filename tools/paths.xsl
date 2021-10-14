@@ -164,6 +164,7 @@
 
   <xsl:variable name="error" as="xs:string?">
     <xsl:choose>
+      <xsl:when test="@hierarchical='false'"></xsl:when>
       <xsl:when test="$path = 'relative' and not($hierarchical eq 'true')">err:XD0080</xsl:when>
       <xsl:when test="$os = 'windows' and @path = 'relative'
                       and starts-with($basedir, 'file:not')">err:XD0074</xsl:when>
@@ -175,7 +176,8 @@
       <xsl:when test="$os = 'windows' and @path = 'relative'
                       and ((@drive and exists($authority)) or (@authority and exists($drive)))
                       ">err:XD0076</xsl:when>
-      <xsl:when test="$path = 'relative' and @scheme and $ascheme != $scheme">err:XD0077</xsl:when>
+      <xsl:when test="$path = 'relative' and not(@hierarchical = 'false')
+                      and @scheme and $ascheme != $scheme">err:XD0077</xsl:when>
       <xsl:when test="$path = 'relative' and starts-with($basedir, 'http') and @scheme = 'file'">err:XD0077</xsl:when>
       <xsl:when test="not(@scheme) and not($hierarchical eq 'true')">err:XD0080</xsl:when>
       <xsl:when test="$path = 'relative' and not($absolute)">err:XD0074</xsl:when>

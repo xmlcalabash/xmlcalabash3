@@ -550,14 +550,8 @@ class UrifyWindowsSpec extends AnyFlatSpec with BeforeAndAfter {
 
   "urn:publicid:ISO+8879%3A1986:ENTITIES+Added+Latin+1:EN " should " throw an exception against file:///C:/Users/Jane%20Doe/Documents/" in {
     val basepath = new Urify("file:///C:/Users/Jane%20Doe/Documents/")
-    try {
-      basepath.resolve("urn:publicid:ISO+8879%3A1986:ENTITIES+Added+Latin+1:EN")
-      fail()
-    } catch {
-      case ex: XProcException =>
-        assert(ex.code.getLocalName == "XD0077")
-      case _: Throwable => fail()
-    }
+    val path = basepath.resolve("urn:publicid:ISO+8879%3A1986:ENTITIES+Added+Latin+1:EN")
+    assert(path == "urn:publicid:ISO+8879%3A1986:ENTITIES+Added+Latin+1:EN")
   }
 
   "///path/to/thing " should " resolve against file:///D:/Users/Jane%20Doe/Documents/" in {
@@ -742,14 +736,8 @@ class UrifyWindowsSpec extends AnyFlatSpec with BeforeAndAfter {
 
   "urn:publicid:ISO+8879%3A1986:ENTITIES+Added+Latin+1:EN " should " throw an exception against file:///D:/Users/Jane%20Doe/Documents/" in {
     val basepath = new Urify("file:///D:/Users/Jane%20Doe/Documents/")
-    try {
-      basepath.resolve("urn:publicid:ISO+8879%3A1986:ENTITIES+Added+Latin+1:EN")
-      fail()
-    } catch {
-      case ex: XProcException =>
-        assert(ex.code.getLocalName == "XD0077")
-      case _: Throwable => fail()
-    }
+    val path = basepath.resolve("urn:publicid:ISO+8879%3A1986:ENTITIES+Added+Latin+1:EN")
+    assert(path == "urn:publicid:ISO+8879%3A1986:ENTITIES+Added+Latin+1:EN")
   }
 
   "///path/to/thing " should " resolve against file://hostname/Documents/" in {
@@ -910,14 +898,8 @@ class UrifyWindowsSpec extends AnyFlatSpec with BeforeAndAfter {
 
   "urn:publicid:ISO+8879%3A1986:ENTITIES+Added+Latin+1:EN " should " throw an exception against file://hostname/Documents/" in {
     val basepath = new Urify("file://hostname/Documents/")
-    try {
-      basepath.resolve("urn:publicid:ISO+8879%3A1986:ENTITIES+Added+Latin+1:EN")
-      fail()
-    } catch {
-      case ex: XProcException =>
-        assert(ex.code.getLocalName == "XD0077")
-      case _: Throwable => fail()
-    }
+    val path = basepath.resolve("urn:publicid:ISO+8879%3A1986:ENTITIES+Added+Latin+1:EN")
+    assert(path == "urn:publicid:ISO+8879%3A1986:ENTITIES+Added+Latin+1:EN")
   }
 
   "///path/to/thing " should " resolve against http://example.com/Documents/" in {
@@ -1096,14 +1078,8 @@ class UrifyWindowsSpec extends AnyFlatSpec with BeforeAndAfter {
 
   "urn:publicid:ISO+8879%3A1986:ENTITIES+Added+Latin+1:EN " should " throw an exception against http://example.com/Documents/" in {
     val basepath = new Urify("http://example.com/Documents/")
-    try {
-      basepath.resolve("urn:publicid:ISO+8879%3A1986:ENTITIES+Added+Latin+1:EN")
-      fail()
-    } catch {
-      case ex: XProcException =>
-        assert(ex.code.getLocalName == "XD0077")
-      case _: Throwable => fail()
-    }
+    val path = basepath.resolve("urn:publicid:ISO+8879%3A1986:ENTITIES+Added+Latin+1:EN")
+    assert(path == "urn:publicid:ISO+8879%3A1986:ENTITIES+Added+Latin+1:EN")
   }
 
   "///path/to/thing " should " resolve against file:///home/jdoe/documents/" in {
@@ -1264,14 +1240,8 @@ class UrifyWindowsSpec extends AnyFlatSpec with BeforeAndAfter {
 
   "urn:publicid:ISO+8879%3A1986:ENTITIES+Added+Latin+1:EN " should " throw an exception against file:///home/jdoe/documents/" in {
     val basepath = new Urify("file:///home/jdoe/documents/")
-    try {
-      basepath.resolve("urn:publicid:ISO+8879%3A1986:ENTITIES+Added+Latin+1:EN")
-      fail()
-    } catch {
-      case ex: XProcException =>
-        assert(ex.code.getLocalName == "XD0077")
-      case _: Throwable => fail()
-    }
+    val path = basepath.resolve("urn:publicid:ISO+8879%3A1986:ENTITIES+Added+Latin+1:EN")
+    assert(path == "urn:publicid:ISO+8879%3A1986:ENTITIES+Added+Latin+1:EN")
   }
 
   "///path/to/thing " should " throw an exception against urn:publicid:ISO+8879%3A1986:ENTITIES+Added+Latin+1:EN" in {
@@ -1498,14 +1468,8 @@ class UrifyWindowsSpec extends AnyFlatSpec with BeforeAndAfter {
 
   "urn:publicid:ISO+8879%3A1986:ENTITIES+Added+Latin+1:EN " should " throw an exception against urn:publicid:ISO+8879%3A1986:ENTITIES+Added+Latin+1:EN" in {
     val basepath = new Urify("urn:publicid:ISO+8879%3A1986:ENTITIES+Added+Latin+1:EN")
-    try {
-      basepath.resolve("urn:publicid:ISO+8879%3A1986:ENTITIES+Added+Latin+1:EN")
-      fail()
-    } catch {
-      case ex: XProcException =>
-        assert(ex.code.getLocalName == "XD0080")
-      case _: Throwable => fail()
-    }
+    val path = basepath.resolve("urn:publicid:ISO+8879%3A1986:ENTITIES+Added+Latin+1:EN")
+    assert(path == "urn:publicid:ISO+8879%3A1986:ENTITIES+Added+Latin+1:EN")
   }
 
   "///path/to/thing " should " throw an exception against file:not-absolute" in {
@@ -1732,14 +1696,8 @@ class UrifyWindowsSpec extends AnyFlatSpec with BeforeAndAfter {
 
   "urn:publicid:ISO+8879%3A1986:ENTITIES+Added+Latin+1:EN " should " throw an exception against file:not-absolute" in {
     val basepath = new Urify("file:not-absolute")
-    try {
-      basepath.resolve("urn:publicid:ISO+8879%3A1986:ENTITIES+Added+Latin+1:EN")
-      fail()
-    } catch {
-      case ex: XProcException =>
-        assert(ex.code.getLocalName == "XD0074")
-      case _: Throwable => fail()
-    }
+    val path = basepath.resolve("urn:publicid:ISO+8879%3A1986:ENTITIES+Added+Latin+1:EN")
+    assert(path == "urn:publicid:ISO+8879%3A1986:ENTITIES+Added+Latin+1:EN")
   }
 
 

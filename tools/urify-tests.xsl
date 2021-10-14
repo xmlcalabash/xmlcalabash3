@@ -38,6 +38,15 @@
         <t:title>{$name}-{format-number($num, '001')}</t:title>
         <t:revision-history>
           <t:revision>
+            <t:date>2021-10-14</t:date>
+            <t:author>
+              <t:name>Norman Walsh</t:name>
+            </t:author>
+            <t:description xmlns="http://www.w3.org/1999/xhtml">
+              <p>Corrected test error; non-hierarchical URIs always resolve.</p>
+            </t:description>
+          </t:revision>
+          <t:revision>
             <t:date>{string(@date)}</t:date>
             <t:author>
               <t:name>Norman Walsh</t:name>
