@@ -2,7 +2,7 @@ package com.xmlcalabash.config
 
 import com.jafpl.runtime.RuntimeConfiguration
 import com.jafpl.util.{ErrorListener, TraceEventManager}
-import com.xmlcalabash.exceptions.{ConfigurationException, ExceptionCode}
+import com.xmlcalabash.exceptions.{ConfigurationException, ExceptionCode, XProcException}
 import com.xmlcalabash.functions.{Cwd, DocumentProperties, DocumentProperty, ForceQNameKeys, InjElapsed, InjId, InjName, InjType, IterationPosition, IterationSize, StepAvailable, SystemProperty, UrifyFunction}
 import com.xmlcalabash.model.util.ExpressionParser
 import com.xmlcalabash.model.xml.{DeclContainer, Library}
@@ -82,7 +82,7 @@ class XMLCalabashConfig(val xprocConfigurer: XProcConfigurer, saxonProcessor: Op
   private var _locale = defaultLocale
   private var _episode = computeEpisode
   private var _showErrors = false
-  private var _builtinSteps = Option.empty[Library]
+  private var _builtinSteps = ListBuffer.empty[Library]
   private var _defaultSerializationOptions = Map.empty[String,Map[QName,String]]
   private val _importedURIs = mutable.HashMap.empty[URI, DeclContainer]
   // Do not allow the order to be random
@@ -141,12 +141,12 @@ class XMLCalabashConfig(val xprocConfigurer: XProcConfigurer, saxonProcessor: Op
     logger.debug(s"(release id: $productHash; episode: $episode)")
   }
 
-  protected[xmlcalabash] def builtinSteps: Option[Library] = _builtinSteps
-  protected[xmlcalabash] def builtinSteps_=(lib: Library): Unit = {
-    if (_builtinSteps.isDefined) {
-      throw new RuntimeException("Attempt to redefine builtin steps")
+  protected[xmlcalabash] def builtinSteps: List[Library] = _builtinSteps.toList
+  protected[xmlcalabash] def builtinSteps_=(libs: List[Library]): Unit = {
+    if (_builtinSteps.nonEmpty) {
+      throw XProcException.xiThisCantHappen("Attempt to redefine builtin steps", None)
     }
-    _builtinSteps = Some(lib)
+    _builtinSteps ++= libs
   }
 
   protected[xmlcalabash] def importedURIs: List[URI] = _imports.toList

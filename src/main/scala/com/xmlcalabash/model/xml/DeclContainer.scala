@@ -117,10 +117,12 @@ class DeclContainer(override val config: XMLCalabashConfig) extends Container(co
       if (parent.isDefined) {
         found = parent.get.declaration(stepType)
       } else {
-        if (config.builtinSteps.isDefined) {
-          for (sig <- config.builtinSteps.get.inScopeDeclarations) {
-            if (sig.stepType.isDefined && sig.stepType.get == stepType) {
-              found = Some(sig)
+        for (lib <- config.builtinSteps) {
+          for (sig <- lib.inScopeDeclarations) {
+            if (found.isEmpty) {
+              if (sig.stepType.isDefined && sig.stepType.get == stepType) {
+                found = Some(sig)
+              }
             }
           }
         }

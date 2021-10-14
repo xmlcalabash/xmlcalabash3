@@ -14,7 +14,7 @@ import javax.xml.transform.sax.SAXSource
 import scala.collection.mutable.ListBuffer
 
 class Parser(config: XMLCalabashConfig) {
-  private var _builtInSteps: Option[Library] = config.builtinSteps
+  private var _builtInSteps = config.builtinSteps
   private var matcher: ProcessMatch = _
 
   // Someone has to load the default steps; feels like here's as good a place as any.
@@ -24,7 +24,7 @@ class Parser(config: XMLCalabashConfig) {
     _builtInSteps = config.builtinSteps
   }
 
-  def builtInSteps: Option[Library] = _builtInSteps
+  def builtInSteps: List[Library] = _builtInSteps
 
   def loadLibrary(root: XdmNode): Library = {
     val node = stripUseWhen(root)
@@ -55,7 +55,9 @@ class Parser(config: XMLCalabashConfig) {
       decl.parseDeclarationSignature()
 
       val toElaborate = ListBuffer.empty[DeclContainer]
-      toElaborate += config.builtinSteps.get
+      for (lib <- config.builtinSteps) {
+        toElaborate += lib
+      }
       for (uri <- config.importedURIs) {
         toElaborate += config.importedURI(uri).get
       }
@@ -500,17 +502,23 @@ class Parser(config: XMLCalabashConfig) {
     info
   }
 
-  def init_builtins(): Library = {
-    val xmlbuilder = config.processor.newDocumentBuilder()
-    val stream = getClass.getResourceAsStream("/standard-steps.xpl")
-    val source = new SAXSource(new InputSource(stream))
-    xmlbuilder.setDTDValidation(false)
-    xmlbuilder.setLineNumbering(true)
-    val libnode = xmlbuilder.build(source)
-    val library = loadLibrary(libnode)
-    library.loadImports()
-    library.updateInScopeSteps()
-    library
+  def init_builtins(): List[Library] = {
+    val libs = ListBuffer.empty[Library]
+    val xpls = getClass.getClassLoader.getResources("com.xmlcalabash.library.xpl")
+    while (xpls.hasMoreElements) {
+      val xpl = xpls.nextElement()
+      val xmlbuilder = config.processor.newDocumentBuilder()
+      val stream = xpl.openStream()
+      val source = new SAXSource(new InputSource(stream))
+      xmlbuilder.setDTDValidation(false)
+      xmlbuilder.setLineNumbering(true)
+      val libnode = xmlbuilder.build(source)
+      val library = loadLibrary(libnode)
+      library.loadImports()
+      library.updateInScopeSteps()
+      libs += library
+    }
+    libs.toList
   }
 
   // ============================================================================
