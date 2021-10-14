@@ -3,7 +3,7 @@ package com.xmlcalabash.config
 import com.jafpl.runtime.RuntimeConfiguration
 import com.jafpl.util.{ErrorListener, TraceEventManager}
 import com.xmlcalabash.exceptions.{ConfigurationException, ExceptionCode, XProcException}
-import com.xmlcalabash.functions.{Cwd, DocumentProperties, DocumentProperty, ForceQNameKeys, InjElapsed, InjId, InjName, InjType, IterationPosition, IterationSize, StepAvailable, SystemProperty, UrifyFunction}
+import com.xmlcalabash.functions.{Cwd, DocumentProperties, DocumentProperty, ForceQNameKeys, FunctionImpl, InjElapsed, InjId, InjName, InjType, IterationPosition, IterationSize, StepAvailable, SystemProperty, UrifyFunction}
 import com.xmlcalabash.model.util.ExpressionParser
 import com.xmlcalabash.model.xml.{DeclContainer, Library}
 import com.xmlcalabash.parsers.XPathParser
@@ -382,30 +382,29 @@ class XMLCalabashConfig(val xprocConfigurer: XProcConfigurer, saxonProcessor: Op
 
   def close(): Unit = {
     closed = true
-    // This doesn't work because I don't know how to dynamically call the constructor that has an argument
-    /*
-    for (xf <- signatures.functions) {
-      val impl = signatures.function(xf).head
-      trace("debug", s"Registering $xf with implementation $impl", "config")
-      println(s"Registering $xf with implementation $impl")
-      val f = Class.forName(impl).newInstance()
-      processor.registerExtensionFunction(f.asInstanceOf[ExtensionFunctionDefinition])
+
+    for ((name,klass) <- _funcImplClasses) {
+      try {
+        val instance = Class.forName(klass).getDeclaredConstructor(this.getClass).newInstance(this)
+        val func = instance.asInstanceOf[FunctionImpl]
+        if (func.getFunctionQName.getURI != name.getNamespaceURI
+          || func.getFunctionQName.getLocalPart != name.getLocalName) {
+          logger.warn(s"Failed to register ${name} with implementation ${klass}; class implements ${func.getFunctionQName}")
+        } else {
+          processor.registerExtensionFunction(func)
+          logger.debug(s"Registered ${name} with implementation ${klass}")
+        }
+      } catch {
+        case _: ClassNotFoundException =>
+          logger.warn(s"Failed to register ${name} with implementation ${klass}: class not found")
+        case _: ClassCastException =>
+          logger.warn(s"Failed to register ${name} with implementation ${klass}: class does not implement com.xmlcalabash.functions.FunctionImpl")
+        case ex: Throwable =>
+          logger.warn(s"Failed to register ${name} with implementation ${klass}: ${ex.getMessage}")
+      }
     }
-    */
-    processor.registerExtensionFunction(new Cwd(this))
-    processor.registerExtensionFunction(new DocumentProperties(this))
-    processor.registerExtensionFunction(new DocumentProperty(this))
-    processor.registerExtensionFunction(new ForceQNameKeys(this))
-    processor.registerExtensionFunction(new InjElapsed(this))
-    processor.registerExtensionFunction(new InjId(this))
-    processor.registerExtensionFunction(new InjName(this))
-    processor.registerExtensionFunction(new InjType(this))
-    processor.registerExtensionFunction(new SystemProperty(this))
-    processor.registerExtensionFunction(new StepAvailable(this))
-    processor.registerExtensionFunction(new IterationPosition(this))
-    processor.registerExtensionFunction(new IterationSize(this))
-    processor.registerExtensionFunction(new UrifyFunction(this))
   }
+
   private def checkClosed(): Unit = {
     if (closed) {
       throw new ConfigurationException(ExceptionCode.CLOSED, "XMLCalabash")
