@@ -174,14 +174,7 @@ class Choose(override val config: XMLCalabashConfig) extends Container(config) {
     }
   }
 
-  /*
-  override protected[model] def makeBindingsExplicit(): Unit = {
-    super.makeBindingsExplicit()
-    println("Hello")
-  }
-   */
-
-    override def graphNodes(runtime: XMLCalabashRuntime, parent: Node): Unit = {
+  override def graphNodes(runtime: XMLCalabashRuntime, parent: Node): Unit = {
     val start = parent.asInstanceOf[ContainerStart]
     val node = start.addChoose(stepName)
     _graphNode = Some(node)

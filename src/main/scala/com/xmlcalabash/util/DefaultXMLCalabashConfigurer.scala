@@ -69,12 +69,19 @@ class DefaultXMLCalabashConfigurer extends XMLCalabashConfigurer {
     }
     configuration.showErrors = config.showErrors
 
+    val tcountprop = "com.xmlcalabash.threadCount"
+    val tcountStr = Option(System.getProperty(tcountprop)).getOrElse("1")
     try {
-      val tcount = Option(System.getProperty("com.xmlcalabash.threadCount")).getOrElse("1").toInt
+      val tcount = tcountStr.toInt
+      if (tcount <= 0) {
+        throw XProcException.xiConfigurationException(s"Invalid thread count in system property ${tcountprop}: ${tcountStr} is not greater than 0")
+      }
       configuration.threadPoolSize = tcount
     } catch {
+      case ex: XProcException =>
+        throw ex
       case _: Exception =>
-        // FIXME: raise exception?
+        throw XProcException.xiConfigurationException(s"Invalid thread count in system property ${tcountprop}: ${tcountStr} is not an integer")
     }
 
     // Have to check because assigning none enables the default behavior

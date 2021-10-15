@@ -3,7 +3,7 @@ package com.xmlcalabash.config
 import com.jafpl.runtime.RuntimeConfiguration
 import com.jafpl.util.{ErrorListener, TraceEventManager}
 import com.xmlcalabash.exceptions.{ConfigurationException, ExceptionCode, XProcException}
-import com.xmlcalabash.functions.{Cwd, DocumentProperties, DocumentProperty, ForceQNameKeys, FunctionImpl, InjElapsed, InjId, InjName, InjType, IterationPosition, IterationSize, StepAvailable, SystemProperty, UrifyFunction}
+import com.xmlcalabash.functions.FunctionImpl
 import com.xmlcalabash.model.util.ExpressionParser
 import com.xmlcalabash.model.xml.{DeclContainer, Library}
 import com.xmlcalabash.parsers.XPathParser
@@ -13,12 +13,10 @@ import com.xmlcalabash.util.URIUtils
 import net.sf.saxon.lib.{ModuleURIResolver, UnparsedTextURIResolver}
 import net.sf.saxon.s9api.{Processor, QName, XdmNode}
 import org.slf4j.{Logger, LoggerFactory}
-import org.xml.sax.{EntityResolver, InputSource}
+import org.xml.sax.EntityResolver
 
 import java.net.URI
-import javax.xml.parsers.SAXParserFactory
 import javax.xml.transform.URIResolver
-import javax.xml.transform.sax.SAXSource
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 
@@ -33,10 +31,6 @@ object XMLCalabashConfig {
 
   def newInstance(processor: Processor): XMLCalabashConfig = {
     newInstance(Some(processor))
-  }
-
-  def newInstance(config: XMLCalabashConfig): XMLCalabashConfig = {
-    newInstance(Some(config.processor))
   }
 
   private def newInstance(processor: Option[Processor]): XMLCalabashConfig = {
@@ -58,6 +52,7 @@ object XMLCalabashConfig {
 
 class XMLCalabashConfig(val xprocConfigurer: XProcConfigurer, saxonProcessor: Option[Processor]) extends RuntimeConfiguration {
   protected val logger: Logger = LoggerFactory.getLogger(this.getClass)
+
   private val _expressionEvaluator = new SaxonExpressionEvaluator(this)
   private val _collections = mutable.HashMap.empty[String, List[XdmNode]]
   private var _debugOptions: XMLCalabashDebugOptions = new XMLCalabashDebugOptions(this)
@@ -91,6 +86,7 @@ class XMLCalabashConfig(val xprocConfigurer: XProcConfigurer, saxonProcessor: Op
   def this(xprocConfig: XProcConfigurer) = {
     this(xprocConfig, None)
   }
+
   def this(xprocConfig: XProcConfigurer, processor: Processor) = {
     this(xprocConfig, Some(processor))
   }

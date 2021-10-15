@@ -666,6 +666,9 @@ xi:XI0070
 Cannot parse “$1” as a property name/value pair.
 The format of the -D value must be “name=value”.
 
+xi:XI0071
+$1
+
 {http://xmlcalabash.com/ns/extensions}XI0999
 It must be time for breakfast at Milliways, something impossible has happened: $1
 

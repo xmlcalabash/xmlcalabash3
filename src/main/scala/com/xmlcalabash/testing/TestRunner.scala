@@ -688,7 +688,7 @@ class TestRunner(runtimeConfig: XMLCalabashConfig, online: Boolean, regex: Optio
       throw new TestException("No pipeline for test")
     }
 
-    val tester = new Tester(XMLCalabashConfig.newInstance(runtimeConfig))
+    val tester = new Tester(XMLCalabashConfig.newInstance(runtimeConfig.processor))
 
     tester.pipeline = pipeline.get
 

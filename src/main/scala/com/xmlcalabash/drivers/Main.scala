@@ -6,7 +6,7 @@ import com.xmlcalabash.config.{DocumentRequest, XMLCalabashConfig}
 import com.xmlcalabash.exceptions.{ModelException, ParseException, XProcException}
 import com.xmlcalabash.model.xml.{DeclareStep, Parser}
 import com.xmlcalabash.runtime.{PrintingConsumer, StaticContext, XProcMetadata}
-import com.xmlcalabash.util.{ArgBundle, URIUtils}
+import com.xmlcalabash.util.{ArgBundle, DefaultErrorExplanation, URIUtils}
 import net.sf.saxon.s9api.QName
 import org.slf4j.LoggerFactory
 
@@ -16,11 +16,13 @@ import java.net.URI
 object Main extends App {
   type OptionMap = Map[Symbol, Any]
 
-  val config = XMLCalabashConfig.newInstance()
+  var config: XMLCalabashConfig = _
   var options: ArgBundle = _
   var decl = Option.empty[DeclareStep]
   var errored = false
+
   try {
+    config = XMLCalabashConfig.newInstance()
     options = new ArgBundle(config, args.toList)
 
     if (options.hasPipeline) {
@@ -35,7 +37,16 @@ object Main extends App {
   } catch {
     case ex: Exception =>
       errored = true
-      config.debugOptions.dumpStacktrace(decl, ex)
+
+      val explain = if (Option(config).isDefined && Option(config.errorExplanation).isDefined) {
+        config.errorExplanation
+      } else {
+        new DefaultErrorExplanation()
+      }
+
+      if (Option(config).isDefined) {
+        config.debugOptions.dumpStacktrace(decl, ex)
+      }
 
       val mappedex = XProcException.mapPipelineException(ex)
 
@@ -80,18 +91,15 @@ object Main extends App {
             first = false
           }
         case jafpl: JafplException =>
-          config.debugOptions.dumpStacktrace(decl, ex)
           println(jafpl.getMessage())
         case xproc: XProcException =>
-          config.debugOptions.dumpStacktrace(decl, ex)
-
           val code = xproc.code
           val message = if (xproc.message.isDefined) {
             xproc.message.get
           } else {
             code match {
               case qname: QName =>
-                config.errorExplanation.message(qname, xproc.variant, xproc.details)
+                explain.message(qname, xproc.variant, xproc.details)
               case _ =>
                 s"Configuration error: code ($code) is not a QName"
             }
@@ -102,7 +110,7 @@ object Main extends App {
             println(s"ERROR $code $message")
           }
 
-          if (options != null && options.verbose && code.isInstanceOf[QName]) {
+          if (Option(options).isDefined && options.verbose && code.isInstanceOf[QName]) {
             val explanation = config.errorExplanation.explanation(code, xproc.variant)
             if (explanation != "") {
               println(explanation)
@@ -110,7 +118,6 @@ object Main extends App {
           }
 
         case _ =>
-          config.debugOptions.dumpStacktrace(decl, ex)
           println("Error: " + ex)
       }
   }
