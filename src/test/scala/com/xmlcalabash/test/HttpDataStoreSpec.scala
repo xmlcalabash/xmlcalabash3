@@ -11,6 +11,7 @@ import java.net.URI
 import scala.collection.mutable.ListBuffer
 
 class HttpDataStoreSpec extends AnyFlatSpec with BeforeAndAfter {
+  System.setProperty("com.xmlcalabash.configFile", "src/test/resources/config.xml")
   private val config = XMLCalabashConfig.newInstance()
   private val httpStore = new HttpDataStore(config, new FallbackDataStore())
   private val baseURI = URI.create("http://localhost:8246/service/")

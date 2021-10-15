@@ -10,7 +10,6 @@ import java.io.{InputStream, OutputStream}
 import java.net.URI
 
 class FallbackDataStoreSpec extends AnyFlatSpec {
-  private val config = XMLCalabashConfig.newInstance()
   private val fallback = new FallbackDataStore()
   private val base = URIUtils.cwdAsURI
   private val nop = new NopIO()

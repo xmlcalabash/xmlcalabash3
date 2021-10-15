@@ -27,10 +27,6 @@ protected class XMLCalabashDebugOptions(config: XMLCalabashConfig) {
 
   private var _stacktrace = false
   private var _output_directory = "."
-  private var _tree = Option.empty[String]
-  private var _pipeline = Option.empty[String]
-  private var _graph = Option.empty[String]
-  private var _open_graph = Option.empty[String]
 
   private val debugOptions = mutable.HashSet.empty[String]
   private val dumped = mutable.HashMap.empty[DeclareStep, mutable.HashSet[String]]
@@ -48,7 +44,14 @@ protected class XMLCalabashDebugOptions(config: XMLCalabashConfig) {
   def graphviz_dot: Option[String] = _graphviz_dot
 
   def graphviz_dot_=(dot: String): Unit = {
-    _graphviz_dot = Some(dot)
+    val x= dot.split("\\s+")
+    for (cmd <- dot.split("\\s+")) {
+      val cmdf = new File(cmd)
+      if (cmdf.exists() && cmdf.canExecute) {
+        _graphviz_dot = Some(cmd)
+        return
+      }
+    }
   }
 
   def run: Boolean = _run
@@ -71,31 +74,45 @@ protected class XMLCalabashDebugOptions(config: XMLCalabashConfig) {
 
   def outputDirectory_=(dir: String): Unit = {
     _output_directory = dir
+    if (_output_directory.endsWith("/") || _output_directory.endsWith("\\")) {
+      _output_directory = _output_directory.substring(0, _output_directory.length - 1)
+    }
   }
 
-  def tree: Option[String] = _tree
-  def tree_=(tree: Option[String]): Unit = {
-    _tree = tree
-    debugOptions += TREE
+  def tree: Boolean = debugOptions.contains(TREE)
+  def tree_=(tree: Boolean): Unit = {
+    if (tree) {
+      debugOptions += TREE
+    } else {
+      debugOptions -= TREE
+    }
   }
 
-  def pipeline: Option[String] = _pipeline
-  def pipeline_=(graph: Option[String]): Unit = {
-    _pipeline = graph
-    debugOptions += PIPELINE
+  def pipeline: Boolean = debugOptions.contains(PIPELINE)
+  def pipeline_=(pipeline: Boolean): Unit = {
+    if (pipeline) {
+      debugOptions += PIPELINE
+    } else {
+      debugOptions -= PIPELINE
+    }
   }
 
-  def graph: Option[String] = _graph
-  def graph_=(graph: Option[String]): Unit = {
-    _graph = graph
-    debugOptions += GRAPH
+  def graph: Boolean = debugOptions.contains(GRAPH)
+  def graph_=(graph: Boolean): Unit = {
+    if (graph) {
+      debugOptions += GRAPH
+    } else {
+      debugOptions -= GRAPH
+    }
   }
 
-  def openGraph: Option[String] = _open_graph
-
-  def openGraph_=(graph: Option[String]): Unit = {
-    _open_graph = graph
-    debugOptions += OPENGRAPH
+  def openGraph: Boolean = debugOptions.contains(OPENGRAPH)
+  def openGraph_=(graph: Boolean): Unit = {
+    if (graph) {
+      debugOptions += OPENGRAPH
+    } else {
+      debugOptions -= OPENGRAPH
+    }
   }
 
   // ===========================================================================================
@@ -156,7 +173,7 @@ protected class XMLCalabashDebugOptions(config: XMLCalabashConfig) {
 
     opt match {
       case TREE =>
-        val basefn = tree.getOrElse(name)
+        val basefn = name
         val fn = s"$outputDirectory/$basefn$ext.xml"
         val fos = new FileOutputStream(new File(fn))
         val pw = new PrintWriter(fos)
@@ -164,7 +181,7 @@ protected class XMLCalabashDebugOptions(config: XMLCalabashConfig) {
         pw.close()
         fos.close()
       case PIPELINE =>
-        val basefn = graph.getOrElse(name)
+        val basefn = name
         val fn = s"$outputDirectory/$basefn$ext.svg"
         val baos = new ByteArrayOutputStream()
         val pw = new PrintWriter(baos)
@@ -172,11 +189,7 @@ protected class XMLCalabashDebugOptions(config: XMLCalabashConfig) {
         pw.close()
         svgPipeline(fn, baos)
       case GRAPH =>
-        val basefn = graph.getOrElse(name)
-        if (debugOptions.contains(PIPELINE) && graph.isEmpty
-          || debugOptions.contains(OPENGRAPH) && openGraph.isEmpty) {
-          ext = s"_graph$ext"
-        }
+        val basefn = s"${name}_graph"
         val fn = s"$outputDirectory/$basefn$ext.svg"
         val baos = new ByteArrayOutputStream()
         val pw = new PrintWriter(baos)
@@ -184,7 +197,7 @@ protected class XMLCalabashDebugOptions(config: XMLCalabashConfig) {
         pw.close()
         svgGraph(fn, baos, "pgx2dot.xsl")
       case OPENGRAPH =>
-        val basefn = openGraph.getOrElse(name)
+        val basefn = name
         ext = s"_open$ext"
         val fn = s"$outputDirectory/$basefn$ext.svg"
         val baos = new ByteArrayOutputStream()

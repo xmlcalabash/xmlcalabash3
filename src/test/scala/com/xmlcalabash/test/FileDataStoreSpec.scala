@@ -10,6 +10,7 @@ import java.io.{File, InputStream, OutputStream}
 import java.net.URI
 
 class FileDataStoreSpec extends AnyFlatSpec with BeforeAndAfter {
+  System.setProperty("com.xmlcalabash.configFile", "src/test/resources/config.xml")
   private val config = XMLCalabashConfig.newInstance()
   private val fileStore = new FileDataStore(config, new FallbackDataStore())
   private val testIO = new TestIO()

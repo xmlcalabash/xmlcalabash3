@@ -276,13 +276,6 @@ class ArgBundle(xmlCalabash: XMLCalabashConfig) {
     val options = opts.split("\\s*,\\s*")
     for (opt <- options) {
       var token = opt
-      var value = Option.empty[String]
-
-      if (opt.contains(":")) {
-        val pos = opt.indexOf(":")
-        token = opt.substring(0, pos)
-        value = Some(opt.substring(pos+1))
-      }
 
       var key = Option.empty[String]
       for (valid <- validKeys) {
@@ -296,10 +289,10 @@ class ArgBundle(xmlCalabash: XMLCalabashConfig) {
 
       if (key.isDefined) {
         key.get match {
-          case "tree" => _debugOptions.tree = value
-          case "pipeline" => _debugOptions.pipeline = value
-          case "graph" => _debugOptions.graph = value
-          case "open-graph" => _debugOptions.openGraph = value
+          case "tree" => _debugOptions.tree = true
+          case "pipeline" => _debugOptions.pipeline = true
+          case "graph" => _debugOptions.graph = true
+          case "open-graph" => _debugOptions.openGraph = true
         }
       } else {
         throw XProcException.xiArgBundleInvalidGraphKey(token)

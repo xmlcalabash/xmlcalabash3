@@ -7,6 +7,7 @@ import scala.collection.mutable.ListBuffer
 import scala.io.Source
 
 class RunExtensionsSpec extends XProcTestSpec {
+  System.setProperty("com.xmlcalabash.configFile", "src/test/resources/config.xml")
   val tests = ListBuffer.empty[String]
 
   val overlist = Option(System.getenv("TEST_LIST")).getOrElse("")

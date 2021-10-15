@@ -14,6 +14,7 @@ import org.scalatest.funspec.AnyFunSpec
 import scala.collection.mutable.ListBuffer
 
 class XProcTestSpec extends AnyFunSpec {
+  System.setProperty("com.xmlcalabash.configFile", "src/test/resources/config.xml")
   protected val runtimeConfig: XMLCalabashConfig = XMLCalabashConfig.newInstance()
   protected val testFiles: ListBuffer[String] = ListBuffer.empty[String]
 

@@ -8,14 +8,14 @@
                       value="XALL"/>
 
 <!--
-  <cc:http-proxy host="localhost" port="8888" scheme="http"/>
+  <cc:http-proxy key="http" value="http://localhost:8888"/>
 -->
 
-  <cc:thread-pool thread-count="5"/>
+  <cc:thread-count>5</cc:thread-count>
   <cc:schema-aware>true</cc:schema-aware>
   <cc:trim-inline-whitespace>true</cc:trim-inline-whitespace>
 
-  <cc:graphviz dot="/usr/local/bin/dot /usr/bin/dot"/>
+  <cc:graphviz>/usr/local/bin/dot /usr/bin/dot</cc:graphviz>
   <cc:show-errors>true</cc:show-errors>
 
   <cc:saxon-configuration-property

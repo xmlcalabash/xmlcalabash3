@@ -1,124 +1,196 @@
 package com.xmlcalabash.util
 
-import com.jafpl.util.DefaultTraceEventManager
-import com.xmlcalabash.config.{XMLCalabashConfig, XMLCalabashConfigurer}
+import com.xmlcalabash.config.{ConfigurationSettings, ConfigurationString, ConfigurationStringMap, XMLCalabashConfig, XMLCalabashConfigurer}
 import com.xmlcalabash.exceptions.XProcException
-import net.sf.saxon.lib.{ModuleURIResolver, UnparsedTextURIResolver}
-import net.sf.saxon.s9api.{Processor, QName}
+import com.xmlcalabash.model.util.XProcConstants
+import net.sf.saxon.s9api.{Axis, Processor, QName, XdmNode, XdmNodeKind}
 import org.slf4j.{Logger, LoggerFactory}
-import org.xml.sax.{EntityResolver, InputSource}
 
+import java.io.File
 import java.util.Properties
-import javax.xml.transform.URIResolver
-import javax.xml.transform.sax.SAXSource
 import scala.collection.mutable
 
 class DefaultXMLCalabashConfigurer extends XMLCalabashConfigurer {
   protected val logger: Logger = LoggerFactory.getLogger(this.getClass)
-  val config = new XMLCalabashConfiguration()
 
-  override def configure(configuration: XMLCalabashConfig): Unit = {
-    config.load()
+  private val _key = new QName("key")
+  private val _value = new QName("value")
+  private val _type = new QName("type")
 
-    if (configuration.processorRequired) {
-      try {
-        configuration.processor = if (config.saxon_configuration_file.isDefined) {
-          new Processor(new SAXSource(new InputSource(config.saxon_configuration_file.get)))
-        } else {
-          new Processor(config.schema_aware)
-        }
-      } catch {
-        case _: RuntimeException =>
-          throw XProcException.xiNoSaxon()
+  private var config: ConfigurationSettings = _
+
+  override def configure(settings: ConfigurationSettings): Unit = {
+    config = settings
+
+    val systemConfig = Option(System.getProperty("com.xmlcalabash.configFile"))
+    if (systemConfig.isDefined) {
+      val fn = URIUtils.resolve(URIUtils.cwdAsURI, systemConfig.get)
+      if (fn.getScheme != "file") {
+        throw XProcException.xiConfigurationException(s"Unacceptable configuration file URI: ${fn}; only file: scheme URIs are allowed")
       }
-
-      for (key <- config.saxon_configuration_properties.keySet) {
-        configuration.processor.getUnderlyingConfiguration.setConfigurationProperty(key, config.saxon_configuration_properties(key))
+      val cfg = new File(fn.getPath)
+      if (!cfg.exists()) {
+        throw XProcException.xiConfigurationException(s"Configuration file not found: ${cfg.getAbsolutePath}")
       }
-    }
-
-    configuration.traceEventManager = new DefaultTraceEventManager()
-    val traces = Option(System.getProperty("com.xmlcalabash.trace")).getOrElse("")
-    for (trace <- traces.split("\\s*,\\s*")) {
-      if (trace.startsWith("-")) {
-        configuration.traceEventManager.disableTrace(trace.substring(1))
-      } else {
-        if (trace.startsWith("+")) {
-          configuration.traceEventManager.enableTrace(trace.substring(1))
-        } else {
-          configuration.traceEventManager.enableTrace(trace)
-        }
-      }
-    }
-
-    val resolver = new XProcURIResolver(configuration)
-    configuration.uriResolver = loadResolver(config.uri_resolver, resolver).asInstanceOf[URIResolver]
-    configuration.entityResolver = loadResolver(config.entity_resolver, resolver).asInstanceOf[EntityResolver]
-    configuration.unparsedTextURIResolver = loadResolver(config.unparsed_text_uri_resolver, resolver).asInstanceOf[UnparsedTextURIResolver]
-    configuration.moduleURIResolver = loadResolver(config.module_uri_resolver, resolver).asInstanceOf[ModuleURIResolver]
-    // FIXME: support an alternate error listener (maybe)
-    configuration.errorListener = new DefaultErrorListener()
-
-    configuration.errorExplanation = new DefaultErrorExplanation()
-    configuration.documentManager = new DefaultDocumentManager(configuration)
-    configuration.defaultSerializationOptions = config.serialization
-    configuration.trimInlineWhitespace = config.trim_inline_whitespace
-    configuration.proxies = config.proxies
-    if (config.graphviz_dot.isDefined) {
-      configuration.debugOptions.graphviz_dot = config.graphviz_dot.get
-    }
-    configuration.showErrors = config.showErrors
-
-    val tcountprop = "com.xmlcalabash.threadCount"
-    val tcountStr = Option(System.getProperty(tcountprop)).getOrElse("1")
-    try {
-      val tcount = tcountStr.toInt
-      if (tcount <= 0) {
-        throw XProcException.xiConfigurationException(s"Invalid thread count in system property ${tcountprop}: ${tcountStr} is not greater than 0")
-      }
-      configuration.threadPoolSize = tcount
-    } catch {
-      case ex: XProcException =>
-        throw ex
-      case _: Exception =>
-        throw XProcException.xiConfigurationException(s"Invalid thread count in system property ${tcountprop}: ${tcountStr} is not an integer")
-    }
-
-    // Have to check because assigning none enables the default behavior
-    if (config.debug_output_directory.isDefined) {
-      configuration.debugOptions.outputDirectory = config.debug_output_directory.get
-    }
-
-    if (config.debug_tree.isDefined) {
-      configuration.debugOptions.tree = config.debug_tree
-    }
-
-    if (config.debug_pipeline.isDefined) {
-      configuration.debugOptions.graph = config.debug_pipeline
-    }
-
-    if (config.debug_graph.isDefined) {
-      configuration.debugOptions.graph = config.debug_graph
-    }
-
-    if (config.debug_open_graph.isDefined) {
-      configuration.debugOptions.openGraph = config.debug_open_graph
-    }
-
-    loadProperties(configuration)
-  }
-
-  private def loadResolver(klass: Option[String], default: XProcURIResolver): Object = {
-    if (klass.isDefined) {
-      // FIXME: implement instantiation of resolvers
-      logger.error(s"Alternate resolvers not yet implemented: $klass.get")
-      default
+      load(cfg)
     } else {
-      default
+      var fn = URIUtils.resolve(URIUtils.homeAsURI, ".xmlcalabash")
+      var cfg = new File(fn.getPath)
+
+      if (cfg.exists()) {
+        load(cfg)
+      }
+
+      fn = URIUtils.resolve(URIUtils.cwdAsURI, ".xmlcalabash")
+      cfg = new File(fn.getPath)
+      if (cfg.exists()) {
+        load(cfg)
+      }
+    }
+
+    loadProperties()
+  }
+
+  private def load(cfg: File): Unit = {
+    logger.debug(s"Loading XML Calabash configuration file: ${cfg.getAbsolutePath}")
+
+    val processor = new Processor(false) // explicitly our own because we don't know about schema awareness yet
+    val builder = processor.newDocumentBuilder()
+    builder.setDTDValidation(false)
+    builder.setLineNumbering(true)
+    val root = S9Api.documentElement(builder.build(cfg))
+    if (root.isDefined) {
+      if (root.get.getNodeName == XProcConstants.cc_xmlcalabash) {
+        parse(root.get)
+      } else {
+        logger.error(s"Not an XML Calabash configuration file: ${cfg.getAbsolutePath}")
+      }
+    } else {
+      logger.error(s"Failed to load: ${cfg.getAbsolutePath}")
     }
   }
 
-  private def loadProperties(configuration: XMLCalabashConfig): Unit = {
+  private def parse(node: XdmNode): Unit = {
+    val iter = node.axisIterator(Axis.CHILD)
+    while (iter.hasNext) {
+      val child = iter.next()
+      child.getNodeKind match {
+        case XdmNodeKind.ELEMENT => configure(child)
+        case XdmNodeKind.TEXT =>
+          if (child.getStringValue.trim != "") {
+            logger.error(s"Ignoring text in configuration: ${child.getStringValue}")
+          }
+        case _ => ()
+      }
+    }
+  }
+
+  private def configure(node: XdmNode): Unit = {
+    node.getNodeName match {
+      case XProcConstants.cc_saxon_configuration_property =>
+        setSaxonConfigurationProperty(node)
+      case XProcConstants.cc_serialization =>
+        setSerialization(node)
+      case _ =>
+        val attr = attributes(node)
+
+        if (attr.contains(_key) && attr.contains(_value)) {
+          if (attr.size > 2 || node.getStringValue.trim != "") {
+            logger.warn(s"Invalid map setting for ${node.getNodeName}")
+          }
+          setMap(node)
+        } else {
+          if (attr.nonEmpty) {
+            logger.warn(s"Invalid attributes for ${node.getNodeName}")
+          }
+          config.set(node.getNodeName, new ConfigurationString(node.getNodeName, node.getStringValue.trim))
+        }
+    }
+  }
+
+  private def attributes(node: XdmNode): Map[QName,String] = {
+    val map = mutable.HashMap.empty[QName,String]
+    val iter = node.axisIterator(Axis.ATTRIBUTE)
+    while (iter.hasNext) {
+      val attr = iter.next()
+      map.put(attr.getNodeName, attr.getStringValue)
+    }
+    map.toMap
+  }
+
+  def setMap(node: XdmNode): Unit = {
+    val key = node.getAttributeValue(_key)
+    val value = node.getAttributeValue(_value)
+
+    if (key == null || value == null) {
+      logger.error(s"Invalid system property configuration: $node")
+    } else {
+      val map = mutable.HashMap.empty[String,String]
+      config.get(node.getNodeName) map { map ++= _.asMap }
+      map.put(key, value)
+      config.set(node.getNodeName, new ConfigurationStringMap(node.getNodeName, map.toMap))
+    }
+  }
+
+  private def setSaxonConfigurationProperty(node: XdmNode): Unit = {
+    val key = node.getAttributeValue(_key)
+    val value = node.getAttributeValue(_value)
+    val vtype = guessType(node.getAttributeValue(_type), value)
+
+    if (key == null || value == null) {
+      logger.error(s"Invalid Saxon configuration property: missing key or value: $node")
+      return
+    }
+
+    vtype match {
+      case "boolean" =>
+        value match {
+          case "true" => config.setSaxonConfigProperty(key, true)
+          case "false" => config.setSaxonConfigProperty(key, false)
+          case _ =>
+            logger.error(s"Invalid boolean value $value for Saxon configuration property $key")
+        }
+      case "integer" => config.setSaxonConfigProperty(key, value.toInt)
+      case "string" => config.setSaxonConfigProperty(key, value)
+      case _ =>
+        logger.error(s"Unexpected key type: $vtype for Saxon configuration property $key")
+    }
+  }
+
+  private def guessType(vtype: String, value: String): String = {
+    if (vtype != null) {
+      vtype
+    } else {
+      if (value == "true" || value == "false") {
+        "boolean"
+      } else {
+        try {
+          val i = value.toInt
+          return "integer"
+        } catch {
+          case _ : Throwable => ()
+        }
+        "string"
+      }
+    }
+  }
+
+  private def setSerialization(node: XdmNode): Unit = {
+    val ctype = node.getAttributeValue(XProcConstants._content_type)
+    if (ctype == null) {
+      logger.error(s"Invalid ${node.getNodeName}, missing content-type")
+    } else {
+      val iter = node.axisIterator(Axis.ATTRIBUTE)
+      while (iter.hasNext) {
+        val attr = iter.next()
+        if (attr.getNodeName != XProcConstants._content_type) {
+          config.setDefaultSerialization(ctype, attr.getNodeName, attr.getStringValue)
+        }
+      }
+    }
+  }
+
+  private def loadProperties(): Unit = {
     val uriEnum = this.getClass.getClassLoader.getResources("com.xmlcalabash.properties")
     while (uriEnum.hasMoreElements) {
       val url = uriEnum.nextElement()
@@ -159,14 +231,14 @@ class DefaultXMLCalabashConfigurer extends XMLCalabashConfigurer {
           case FPattern(pfx,local) =>
             if (nsmap.contains(pfx)) {
               val qname = new QName(pfx, nsmap(pfx), local)
-              configuration.implementFunction(qname, name)
+              config.setFunction(qname, name)
             } else {
               logger.debug(s"No namespace binding for $pfx, ignoring: $name=$value")
             }
           case SPattern(pfx,local) =>
             if (nsmap.contains(pfx)) {
               val qname = new QName(pfx, nsmap(pfx), local)
-              configuration.implementAtomicStep(qname, name)
+              config.setStep(qname, name)
             } else {
               logger.debug(s"No namespace binding for $pfx, ignoring: $name=$value")
             }
@@ -175,5 +247,9 @@ class DefaultXMLCalabashConfigurer extends XMLCalabashConfigurer {
         }
       }
     }
+  }
+
+  override def update(config: XMLCalabashConfig, settings: ConfigurationSettings): Unit = {
+    // nop
   }
 }

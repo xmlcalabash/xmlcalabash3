@@ -13,6 +13,7 @@ import java.util.{Calendar, Date}
 import scala.jdk.CollectionConverters.ListHasAsScala
 
 class InternetProtocolRequestSpec extends AnyFlatSpec with BeforeAndAfter {
+  System.setProperty("com.xmlcalabash.configFile", "src/test/resources/config.xml")
   private val config = XMLCalabashConfig.newInstance()
   private var serverAvailable = true
 

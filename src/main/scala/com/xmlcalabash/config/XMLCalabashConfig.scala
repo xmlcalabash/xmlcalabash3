@@ -1,26 +1,29 @@
 package com.xmlcalabash.config
 
 import com.jafpl.runtime.RuntimeConfiguration
-import com.jafpl.util.{ErrorListener, TraceEventManager}
+import com.jafpl.util.{DefaultTraceEventManager, ErrorListener, TraceEventManager}
 import com.xmlcalabash.exceptions.{ConfigurationException, ExceptionCode, XProcException}
 import com.xmlcalabash.functions.FunctionImpl
-import com.xmlcalabash.model.util.ExpressionParser
+import com.xmlcalabash.model.util.{ExpressionParser, XProcConstants}
 import com.xmlcalabash.model.xml.{DeclContainer, Library}
 import com.xmlcalabash.parsers.XPathParser
 import com.xmlcalabash.runtime.SaxonExpressionEvaluator
 import com.xmlcalabash.sbt.BuildInfo
-import com.xmlcalabash.util.URIUtils
+import com.xmlcalabash.util.{DefaultDocumentManager, DefaultErrorExplanation, DefaultErrorListener, URIUtils, XProcURIResolver}
 import net.sf.saxon.lib.{ModuleURIResolver, UnparsedTextURIResolver}
 import net.sf.saxon.s9api.{Processor, QName, XdmNode}
 import org.slf4j.{Logger, LoggerFactory}
-import org.xml.sax.EntityResolver
+import org.xml.sax.{EntityResolver, InputSource}
 
 import java.net.URI
 import javax.xml.transform.URIResolver
+import javax.xml.transform.sax.SAXSource
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 
 object XMLCalabashConfig {
+  protected val logger: Logger = LoggerFactory.getLogger(this.getClass)
+
   val _configProperty = "com.xmlcalabash.config.XProcConfigurer"
   val _configClass = "com.xmlcalabash.util.DefaultXProcConfigurer"
   var loggedPI = false
@@ -33,10 +36,156 @@ object XMLCalabashConfig {
     newInstance(Some(processor))
   }
 
-  private def newInstance(processor: Option[Processor]): XMLCalabashConfig = {
+  private def newInstance(optProcessor: Option[Processor]): XMLCalabashConfig = {
     val configurer = Class.forName(configClass).getDeclaredConstructor().newInstance().asInstanceOf[XProcConfigurer]
-    val config = new XMLCalabashConfig(configurer, processor)
-    configurer.xmlCalabashConfigurer.configure(config)
+    val settings = new ConfigurationSettings()
+    configurer.xmlCalabashConfigurer.configure(settings)
+
+    val processor = if (optProcessor.isDefined) {
+      optProcessor.get
+    } else {
+      val cfgfile = settings.get(XProcConstants.cc_saxon_configuration) map {
+        _.asString
+      }
+      try {
+        if (cfgfile.isDefined) {
+          new Processor(new SAXSource(new InputSource(cfgfile.get)))
+        } else {
+          val aware = settings.get(XProcConstants.cc_schema_aware)
+          val schemaAware = try {
+            if (aware.isDefined) {
+              aware.get.asBoolean
+            } else {
+              false
+            }
+          } catch {
+            case _: Exception =>
+              throw XProcException.xiConfigurationException(s"Invalid setting for schema-aware: ${aware.get}")
+          }
+          new Processor(schemaAware)
+        }
+      } catch {
+        case ex: XProcException =>
+          throw ex
+        case ex: Exception =>
+          throw XProcException.xiConfigurationException(s"Failed to instantiate a Saxon processor: ${ex.getMessage}")
+      }
+    }
+
+    val sysprop = settings.get(XProcConstants.cc_system_property) map { _.asMap }
+    if (sysprop.isDefined) {
+      for ((name,value) <- sysprop.get) {
+        System.setProperty(name, value);
+      }
+    }
+
+    for (prop <- settings.saxonConfigProperties) {
+      processor.getUnderlyingConfiguration.setConfigurationProperty(prop, settings.getSaxonConfigProperty(prop).get)
+    }
+
+    val config = new XMLCalabashConfig(configurer, settings, processor)
+
+    for (step <- settings.steps) {
+      config.implementAtomicStep(step, settings.getStep(step).get)
+    }
+
+    for (fn <- settings.functions) {
+      config.implementFunction(fn, settings.getFunction(fn).get)
+    }
+
+    config.traceEventManager = new DefaultTraceEventManager()
+    val traces = Option(System.getProperty("com.xmlcalabash.trace")).getOrElse("")
+    for (trace <- traces.split("\\s*,\\s*")) {
+      if (trace.startsWith("-")) {
+        config.traceEventManager.disableTrace(trace.substring(1))
+      } else {
+        if (trace.startsWith("+")) {
+          config.traceEventManager.enableTrace(trace.substring(1))
+        } else {
+          config.traceEventManager.enableTrace(trace)
+        }
+      }
+    }
+
+    val resolver = new XProcURIResolver(config)
+    config.uriResolver = loadResolver(settings.string(XProcConstants.cc_uri_resolver), resolver).asInstanceOf[URIResolver]
+    config.entityResolver = loadResolver(settings.string(XProcConstants.cc_entity_resolver), resolver).asInstanceOf[EntityResolver]
+    config.unparsedTextURIResolver = loadResolver(settings.string(XProcConstants.cc_unparsed_text_uri_resolver), resolver).asInstanceOf[UnparsedTextURIResolver]
+    config.moduleURIResolver = loadResolver(settings.string(XProcConstants.cc_module_uri_resolver), resolver).asInstanceOf[ModuleURIResolver]
+
+    // FIXME: support an alternate error listener (maybe)
+    config.errorListener = new DefaultErrorListener()
+
+    config.errorExplanation = new DefaultErrorExplanation()
+    config.documentManager = new DefaultDocumentManager(config)
+
+    config.defaultSerializationOptions = settings.defaultSerializations
+
+    config.trimInlineWhitespace = settings.boolean(XProcConstants.cc_trim_inline_whitespace).getOrElse(false)
+
+    val proxyMap = settings.get(XProcConstants.cc_http_proxy)
+    if (proxyMap.isDefined) {
+      proxyMap.get match {
+        case map: ConfigurationStringMap =>
+          val proxies = mutable.HashMap.empty[String, URI]
+          for ((key, value) <- map.asMap) {
+            proxies.put(key, new URI(value))
+          }
+          config.proxies = proxies.toMap
+        case _ =>
+          logger.error("The proxy configuration is incorrect (should be a map)")
+      }
+    }
+
+    if (settings.get(XProcConstants.cc_graphviz).isDefined) {
+      config.debugOptions.graphviz_dot = settings.get(XProcConstants.cc_graphviz).get.asString
+    }
+
+    if (settings.get(XProcConstants.cc_show_errors).isDefined) {
+      config.showErrors = settings.get(XProcConstants.cc_show_errors).get.asBoolean
+    }
+
+    val tcountprop = "com.xmlcalabash.threadCount"
+    if (Option(System.getProperty(tcountprop)).isDefined) {
+      val tcountStr = System.getProperty(tcountprop)
+      try {
+        val tcount = tcountStr.toInt
+        if (tcount <= 0) {
+          throw XProcException.xiConfigurationException(s"Invalid thread count in system property ${tcountprop}: ${tcountStr} is not greater than 0")
+        }
+        config.threadPoolSize = tcount
+      } catch {
+        case ex: XProcException =>
+          throw ex
+        case _: Exception =>
+          throw XProcException.xiConfigurationException(s"Invalid thread count in system property ${tcountprop}: ${tcountStr} is not an integer")
+      }
+    } else {
+      if (settings.get(XProcConstants.cc_thread_count).isDefined) {
+        config.threadPoolSize = settings.get(XProcConstants.cc_thread_count).get.asInt
+      }
+    }
+
+    // Have to check because assigning none enables the default behavior
+    if (settings.get(XProcConstants.cc_debug_output_directory).isDefined) {
+      config.debugOptions.outputDirectory = settings.get(XProcConstants.cc_debug_output_directory).get.asString
+    }
+
+    if (settings.get(XProcConstants.cc_debug_tree).isDefined) {
+      config.debugOptions.tree = settings.get(XProcConstants.cc_debug_tree).get.asBoolean
+    }
+    if (settings.get(XProcConstants.cc_debug_pipeline).isDefined) {
+      config.debugOptions.pipeline = settings.get(XProcConstants.cc_debug_pipeline).get.asBoolean
+    }
+    if (settings.get(XProcConstants.cc_debug_graph).isDefined) {
+      config.debugOptions.graph = settings.get(XProcConstants.cc_debug_graph).get.asBoolean
+    }
+    if (settings.get(XProcConstants.cc_debug_open_graph).isDefined) {
+      config.debugOptions.openGraph = settings.get(XProcConstants.cc_debug_open_graph).get.asBoolean
+    }
+
+    settings.close()
+    configurer.xmlCalabashConfigurer.update(config, settings)
     config.close()
 
     if (!loggedPI) {
@@ -48,9 +197,20 @@ object XMLCalabashConfig {
   }
 
   private def configClass: String = Option(System.getProperty(_configProperty)).getOrElse(_configClass)
+
+  private def loadResolver(klass: Option[String], default: XProcURIResolver): Any = {
+    try {
+      val resolver = klass map { Class.forName(_).getDeclaredConstructor().newInstance() }
+      resolver.getOrElse(default)
+    } catch {
+      case ex: Exception =>
+        logger.error(s"Failed to instantiate resolver ${klass.get}: ${ex.getMessage}")
+        default
+    }
+  }
 }
 
-class XMLCalabashConfig(val xprocConfigurer: XProcConfigurer, saxonProcessor: Option[Processor]) extends RuntimeConfiguration {
+class XMLCalabashConfig(val xprocConfigurer: XProcConfigurer, val configSettings: ConfigurationSettings, val processor: Processor) extends RuntimeConfiguration {
   protected val logger: Logger = LoggerFactory.getLogger(this.getClass)
 
   private val _expressionEvaluator = new SaxonExpressionEvaluator(this)
@@ -59,7 +219,6 @@ class XMLCalabashConfig(val xprocConfigurer: XProcConfigurer, saxonProcessor: Op
 
   private var closed = false
   private var _threadPoolSize: Int = 2
-  private var _processor: Processor = _
   private var _errorListener: ErrorListener = _
   private val _stepImplClasses = mutable.HashMap.empty[QName,String]
   private val _funcImplClasses = mutable.HashMap.empty[QName,String]
@@ -83,18 +242,6 @@ class XMLCalabashConfig(val xprocConfigurer: XProcConfigurer, saxonProcessor: Op
   // Do not allow the order to be random
   private val _imports = ListBuffer.empty[URI]
 
-  def this(xprocConfig: XProcConfigurer) = {
-    this(xprocConfig, None)
-  }
-
-  def this(xprocConfig: XProcConfigurer, processor: Processor) = {
-    this(xprocConfig, Some(processor))
-  }
-
-  if (saxonProcessor.isDefined) {
-    _processor = saxonProcessor.get
-  }
-
   def productName: String = BuildInfo.name
   def productVersion: String = BuildInfo.version
   def productHash: String = BuildInfo.gitHash.substring(0,6)
@@ -117,18 +264,6 @@ class XMLCalabashConfig(val xprocConfigurer: XProcConfigurer, saxonProcessor: Op
   def proxies: Map[String,URI] = _proxies
   def proxies_=(map: Map[String,URI]): Unit = {
     _proxies = map
-  }
-
-  def processorRequired: Boolean = _processor == null
-  def processor: Processor = {
-    if (_processor == null) {
-      throw new ConfigurationException(ExceptionCode.CFGINCOMPLETE, "processor")
-    }
-    _processor
-  }
-  def processor_=(proc: Processor): Unit = {
-    checkClosed()
-    _processor = proc
   }
 
   def logProductDetails(): Unit = {
@@ -379,6 +514,8 @@ class XMLCalabashConfig(val xprocConfigurer: XProcConfigurer, saxonProcessor: Op
   def close(): Unit = {
     closed = true
 
+    configSettings.close()
+
     for ((name,klass) <- _funcImplClasses) {
       try {
         val instance = Class.forName(klass).getDeclaredConstructor(this.getClass).newInstance(this)
@@ -403,7 +540,7 @@ class XMLCalabashConfig(val xprocConfigurer: XProcConfigurer, saxonProcessor: Op
 
   private def checkClosed(): Unit = {
     if (closed) {
-      throw new ConfigurationException(ExceptionCode.CLOSED, "XMLCalabash")
+      throw XProcException.xiConfigurationException("Cannot update XML Calabash configuration after initialization")
     }
   }
 }

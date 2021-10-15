@@ -6,6 +6,7 @@ import net.sf.saxon.s9api.QName
 import org.scalatest.flatspec.AnyFlatSpec
 
 class ArgBundleSpec extends AnyFlatSpec {
+  System.setProperty("com.xmlcalabash.configFile", "src/test/resources/config.xml")
   private val config = XMLCalabashConfig.newInstance()
 
   "Parsing nothing" should "fail" in {

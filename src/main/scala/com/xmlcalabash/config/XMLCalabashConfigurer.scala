@@ -1,5 +1,6 @@
 package com.xmlcalabash.config
 
 trait XMLCalabashConfigurer {
-  def configure(configuration: XMLCalabashConfig): Unit
+  def configure(settings: ConfigurationSettings): Unit
+  def update(config: XMLCalabashConfig, settings: ConfigurationSettings): Unit
 }

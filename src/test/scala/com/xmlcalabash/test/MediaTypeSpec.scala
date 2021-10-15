@@ -5,7 +5,7 @@ import com.xmlcalabash.util.MediaType
 import org.scalatest.flatspec.AnyFlatSpec
 
 class MediaTypeSpec extends AnyFlatSpec {
-  private val config = XMLCalabashConfig.newInstance()
+  System.setProperty("com.xmlcalabash.configFile", "src/test/resources/config.xml")
   private val text_xml = MediaType.parse("text/xml")
   private val application_xml = MediaType.parse("application/xml")
   private val application_xhtml = MediaType.parse("application/xhtml+xml")
