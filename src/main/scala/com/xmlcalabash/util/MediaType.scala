@@ -69,6 +69,11 @@ object MediaType {
   def parse(mtype: String, forceEncoding: Option[String]): MediaType = {
     // [-]type/subtype; name1=val1; name2=val2
     var pos = mtype.indexOf("/")
+
+    if (pos < 0) {
+      throw XProcException.xdUnrecognizedContentType(mtype, None)
+    }
+
     var mediaType = if (pos < 0) {
       mtype.trim
     } else {
