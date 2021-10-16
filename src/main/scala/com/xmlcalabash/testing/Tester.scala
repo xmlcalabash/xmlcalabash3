@@ -5,10 +5,11 @@ import com.xmlcalabash.exceptions.{ModelException, TestException, XProcException
 import com.xmlcalabash.messages.XdmNodeItemMessage
 import com.xmlcalabash.model.xml.Parser
 import com.xmlcalabash.runtime.{BufferingConsumer, StaticContext, XMLCalabashRuntime, XProcMetadata}
-import com.xmlcalabash.util.{MediaType, S9Api, XProcVarValue}
-import net.sf.saxon.s9api.{QName, XdmNode, XdmValue}
+import com.xmlcalabash.util.{MediaType, S9Api}
+import net.sf.saxon.s9api.{QName, Serializer, XdmNode, XdmValue}
 import org.slf4j.{Logger, LoggerFactory}
 
+import java.io.StringWriter
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 
@@ -109,7 +110,12 @@ class Tester(runtimeConfig: XMLCalabashConfig) {
         if (results.isEmpty) {
           new TestResult(true)
         } else {
-          System.err.println(resultDoc)
+          val sw = new StringWriter()
+          val ser = runtime.processor.newSerializer(sw)
+          ser.setOutputProperty(Serializer.Property.INDENT, "no")
+          S9Api.serialize(runtime.config, resultDoc, ser)
+          sw.close();
+          System.err.println(sw.toString)
           for (item <- results) {
             System.err.println(item.getStringValue)
           }
