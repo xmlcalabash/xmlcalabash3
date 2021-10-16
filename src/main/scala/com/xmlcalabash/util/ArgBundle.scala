@@ -170,7 +170,12 @@ class ArgBundle(xmlCalabash: XMLCalabashConfig) {
                   case 'v' => _verbose = true
                   case 'h' => _help = true
                   case 'i' =>
-                    val rest = chars.substring(chpos + 1)
+                    var rest = chars.substring(chpos + 1)
+                    if (rest == "" && pos < args.length) {
+                      pos += 1
+                      rest = args(pos)
+                    }
+
                     val eqpos = rest.indexOf("=")
                     if (eqpos > 0) {
                       val port = rest.substring(0, eqpos)
@@ -182,7 +187,12 @@ class ArgBundle(xmlCalabash: XMLCalabashConfig) {
                     skip = true
 
                   case 'o' =>
-                    val rest = chars.substring(chpos + 1)
+                    var rest = chars.substring(chpos + 1)
+                    if (rest == "" && pos < args.length) {
+                      pos += 1
+                      rest = args(pos)
+                    }
+
                     val eqpos = rest.indexOf("=")
                     if (eqpos > 0) {
                       val port = rest.substring(0, eqpos)

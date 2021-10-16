@@ -82,18 +82,6 @@ class ArgBundleSpec extends AnyFlatSpec {
     assert(bundle.pipeline == "pipe.xpl")
   }
 
-  "Parsing -i source=doc.xml pipeline" should "fail" in {
-    val bundle = new ArgBundle(config)
-    val args = "-i source=doc.xml pipe.xpl".split("\\s+")
-    var pass = false
-    try {
-      bundle.parse(args.toList)
-    } catch {
-      case _: Throwable => pass = true
-    }
-    assert(pass)
-  }
-
   "Parsing --input source=doc.xml pipeline" should "succeed" in {
     val bundle = new ArgBundle(config)
     val args = "--input source=doc.xml pipe.xpl".split("\\s+")
@@ -187,18 +175,6 @@ class ArgBundleSpec extends AnyFlatSpec {
     assert(bundle.outputs("result").length == 1)
     assert(bundle.outputs("result").head == "doc.xml")
     assert(bundle.pipeline == "pipe.xpl")
-  }
-
-  "Parsing -o result=doc.xml pipeline" should "fail" in {
-    val bundle = new ArgBundle(config)
-    val args = "-o result=doc.xml pipe.xpl".split("\\s+")
-    var pass = false
-    try {
-      bundle.parse(args.toList)
-    } catch {
-      case _: Throwable => pass = true
-    }
-    assert(pass)
   }
 
   "Parsing --output result=doc.xml pipeline" should "succeed" in {
