@@ -8,7 +8,7 @@ import net.sf.saxon.`type`.{SchemaType, Untyped}
 import net.sf.saxon.event.{NamespaceReducer, Receiver}
 import net.sf.saxon.expr.instruct.Executable
 import net.sf.saxon.om.{AttributeMap, EmptyAttributeMap, FingerprintedQName, NameOfNode, NamePool, NamespaceBinding, NamespaceMap, NodeName}
-import net.sf.saxon.s9api.{Axis, Location, QName, XdmDestination, XdmNode, XdmNodeKind, XdmValue}
+import net.sf.saxon.s9api.{Axis, Location, Processor, QName, XdmDestination, XdmNode, XdmNodeKind, XdmValue}
 import net.sf.saxon.serialize.SerializationProperties
 import net.sf.saxon.trans.XPathException
 import net.sf.saxon.{Configuration, Controller}
@@ -48,8 +48,8 @@ object SaxonTreeBuilder {
   }
 }
 
-class SaxonTreeBuilder(runtime: XMLCalabashConfig) {
-  protected val config: Configuration = runtime.processor.getUnderlyingConfiguration
+class SaxonTreeBuilder(processor: Processor) {
+  protected val config: Configuration = processor.getUnderlyingConfiguration
   protected val pool: NamePool = config.getNamePool
   protected val controller: Controller = new Controller(config)
 
@@ -60,6 +60,10 @@ class SaxonTreeBuilder(runtime: XMLCalabashConfig) {
   protected var seenRoot = false
   private val emptyAttributeMap = EmptyAttributeMap.getInstance()
   private var _location = Option.empty[Location]
+
+  def this(config: XMLCalabashConfig) = {
+    this(config.processor)
+  }
 
   def this(runtime: XMLCalabashRuntime) = {
     this(runtime.config)
