@@ -329,6 +329,7 @@ object XProcException {
   def xcArchiveFormatError(format: QName, location: Option[Location]): XProcException = stepError((85,3), format, location)
   def xcMultipleTopLevelElements(location: Option[Location]): XProcException = stepError(91, location)
   def xcAttributeNameCollision(qname: QName, location: Option[Location]): XProcException = stepError(92, qname, location)
+  def xcAttributeNameCollision(name: String, location: Option[Location]): XProcException = stepError(92, name, location)
   def xcXsltCompileError(msg: String, ex: Exception, location: Option[Location]): XProcException = stepError(93, msg, location)
   def xcXsltInputNot20Compatible(media: MediaType, location: Option[Location]): XProcException = stepError(94, media, location)
   def xcXsltRuntimeError(code: QName, msg: String, location: Option[Location]): XProcException = stepError(95, List(code, msg), location)
