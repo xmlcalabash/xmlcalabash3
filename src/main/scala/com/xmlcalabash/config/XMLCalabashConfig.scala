@@ -28,6 +28,9 @@ object XMLCalabashConfig {
   val _configClass = "com.xmlcalabash.util.DefaultXProcConfigurer"
   var loggedPI = false
 
+  // Available even when XMLCalabashConfig is being initialized
+  val defaultErrorExplanation: ErrorExplanation = new DefaultErrorExplanation()
+
   def newInstance(): XMLCalabashConfig = {
     newInstance(None)
   }

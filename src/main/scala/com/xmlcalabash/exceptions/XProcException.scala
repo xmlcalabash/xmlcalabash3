@@ -1,6 +1,5 @@
 package com.xmlcalabash.exceptions
 
-import java.net.URI
 import com.jafpl.exceptions.{JafplException, JafplExceptionCode}
 import com.jafpl.graph.Location
 import com.jafpl.messages.{Message, Metadata}
@@ -9,8 +8,9 @@ import com.xmlcalabash.model.xml.Artifact
 import com.xmlcalabash.runtime.{StaticContext, XProcExpression}
 import com.xmlcalabash.util.MediaType
 import net.sf.saxon.om.StructuredQName
-import net.sf.saxon.s9api.{QName, SaxonApiException, XdmItem, XdmNode}
+import net.sf.saxon.s9api.{QName, SaxonApiException, XdmNode}
 
+import java.net.URI
 import scala.collection.mutable.ListBuffer
 
 object XProcException {
@@ -560,7 +560,9 @@ object XProcException {
   }
 }
 
-class XProcException(val code: QName, val variant: Int, val message: Option[String], val location: Option[Location], val details: List[Any]) extends RuntimeException with JafplExceptionCode {
+class XProcException(val code: QName, val variant: Int, val message: Option[String], val location: Option[Location], val details: List[Any])
+  extends RuntimeException(message.getOrElse(s"XProcException ${code}")) with JafplExceptionCode {
+
   private val _underlyingCauses = ListBuffer.empty[Exception]
   private var _errors = Option.empty[XdmNode]
 
@@ -588,6 +590,7 @@ class XProcException(val code: QName, val variant: Int, val message: Option[Stri
     new XProcException(code, variant, message, Some(location), details)
   }
 
+  // N.B. This is necessary so that catch in JAFPL will be able to match the error code!
   override def jafplExceptionCode: Any = code
 
   def underlyingCauses: List[Exception] = _underlyingCauses.toList

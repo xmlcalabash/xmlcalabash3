@@ -41,7 +41,7 @@ object Main extends App {
       val explain = if (Option(config).isDefined && Option(config.errorExplanation).isDefined) {
         config.errorExplanation
       } else {
-        new DefaultErrorExplanation()
+        XMLCalabashConfig.defaultErrorExplanation
       }
 
       if (Option(config).isDefined) {
