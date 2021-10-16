@@ -2,9 +2,10 @@ package com.xmlcalabash.steps
 
 import java.net.URI
 import com.xmlcalabash.exceptions.XProcException
-import com.xmlcalabash.model.util.{SaxonTreeBuilder, XProcConstants}
+import com.xmlcalabash.model.util.{SaxonTreeBuilder, ValueParser, XProcConstants}
 import com.xmlcalabash.runtime.{StaticContext, XProcMetadata, XmlPortSpecification}
-import net.sf.saxon.s9api.{QName, XdmAtomicValue, XdmNode, XdmValue}
+import com.xmlcalabash.util.TypeUtils.castAsXml
+import net.sf.saxon.s9api.{QName, XdmAtomicValue, XdmMap, XdmNode, XdmValue}
 
 import scala.collection.mutable
 import scala.jdk.CollectionConverters.MapHasAsScala
@@ -42,10 +43,36 @@ class SetProperties() extends DefaultXmlStep {
 
     for ((name,value) <- properties.asMap.asScala) {
       val qname = name.getQNameValue
-      if (qname == XProcConstants._content_type) {
-        throw XProcException.xcContentTypeNotAllowed(context.location)
+      qname match {
+        case XProcConstants._content_type =>
+          throw XProcException.xcContentTypeNotAllowed(context.location)
+        case XProcConstants._serialization =>
+          // Make sure the serialization map is map(xs:QName,item()*)
+          value match {
+            case map: XdmMap =>
+              try {
+                val smap = ValueParser.parseDocumentProperties(map, context, location)
+                var xmap = new XdmMap()
+                for ((key,mval) <- smap) {
+                  val obj = castAsXml(mval)
+                  xmap = xmap.put(new XdmAtomicValue(key), obj)
+                }
+                newprops.put(qname, map)
+             } catch {
+                case ex: XProcException =>
+                  if (ex.code == XProcException.err_xd0036) {
+                    throw XProcException.xdBadMapKey(ex.details.head.asInstanceOf[String], location)
+                  }
+                  throw ex
+                case ex: Throwable =>
+                  throw ex
+              }
+            case _ =>
+              throw XProcException.xdInvalidSerialization("Value is not a map", location)
+          }
+        case _ =>
+          newprops.put(qname, value)
       }
-      newprops.put(qname, value)
     }
 
     var result = source

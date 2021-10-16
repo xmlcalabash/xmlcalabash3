@@ -132,25 +132,6 @@ object TypeUtils {
   private def vnd(t: String): MediaType = {
     MediaType.parse(s"application/vnd.xmlcalabash.$t+xml")
   }
-}
-
-class TypeUtils(val processor: Processor, val context: StaticContext) {
-  private val err_XD0045 = new QName(XProcConstants.ns_err, "XD0045")
-
-  def this(config: XMLCalabashConfig, context: StaticContext) = {
-    this(config.processor, context)
-  }
-  def this(config: XMLCalabashRuntime, context: StaticContext) = {
-    this(config.processor, context)
-  }
-  def this(config: XMLCalabashConfig) = {
-    this(config.processor, new StaticContext(config))
-  }
-  def this(config: XMLCalabashRuntime) = {
-    this(config.processor, new StaticContext(config))
-  }
-
-  val typeFactory = new ItemTypeFactory(processor)
 
   def castAtomicAs(value: XdmAtomicValue, seqType: Option[SequenceType], context: StaticContext): XdmAtomicValue = {
     if (seqType.isEmpty) {
@@ -195,6 +176,25 @@ class TypeUtils(val processor: Processor, val context: StaticContext) {
         throw(ex)
     }
   }
+}
+
+class TypeUtils(val processor: Processor, val context: StaticContext) {
+  private val err_XD0045 = new QName(XProcConstants.ns_err, "XD0045")
+
+  def this(config: XMLCalabashConfig, context: StaticContext) = {
+    this(config.processor, context)
+  }
+  def this(config: XMLCalabashRuntime, context: StaticContext) = {
+    this(config.processor, context)
+  }
+  def this(config: XMLCalabashConfig) = {
+    this(config.processor, new StaticContext(config))
+  }
+  def this(config: XMLCalabashRuntime) = {
+    this(config.processor, new StaticContext(config))
+  }
+
+  val typeFactory = new ItemTypeFactory(processor)
 
   // This was added experimentally to handle lists in literal values for include-filter and exclude-filter.
   // It was subsequently decided that literal values shouldn't be lists, so this is no longer being used.
@@ -247,8 +247,18 @@ class TypeUtils(val processor: Processor, val context: StaticContext) {
         parseSequenceType(body)
       case stypere(typename, cardchar) =>
         // xs:sometype?
-        val itype = simpleType(typename)
-        SequenceType.makeSequenceType(itype, cardinality(cardchar))
+        try {
+          val itype = simpleType(typename)
+          SequenceType.makeSequenceType(itype, cardinality(cardchar))
+        } catch {
+          case ex: XProcException =>
+            if (ex.code == XProcException.err_xd0036) {
+              throw XProcException.xsInvalidSequenceType(typename, "Expected QName", None)
+            }
+            throw ex
+          case ex: Throwable =>
+            throw ex
+        }
       case mtypere(mbody, cardchar) =>
         if (mbody.trim == "*") {
           return SequenceType.makeSequenceType(ItemType.ANY_MAP, cardinality(cardchar))

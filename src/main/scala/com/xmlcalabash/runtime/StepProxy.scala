@@ -21,7 +21,6 @@ import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 
 class StepProxy(config: XMLCalabashRuntime, stepType: QName, step: StepExecutable, params: Option[ImplParams], staticContext: StaticContext) extends Step with XProcDataConsumer {
-  private val typeUtils = new TypeUtils(config)
   private var _id: String = _
   private val openStreams = ListBuffer.empty[InputStream]
   protected val logger: Logger = LoggerFactory.getLogger(this.getClass)
@@ -137,7 +136,7 @@ class StepProxy(config: XMLCalabashRuntime, stepType: QName, step: StepExecutabl
 
       valuemsg.item match {
         case atomic: XdmAtomicValue =>
-          val value = typeUtils.castAtomicAs(atomic, opttype, valuemsg.context)
+          val value = TypeUtils.castAtomicAs(atomic, opttype, valuemsg.context)
           if (optlist.isDefined) {
             var found = false
             for (item <- optlist.get) {
@@ -238,7 +237,7 @@ class StepProxy(config: XMLCalabashRuntime, stepType: QName, step: StepExecutabl
         val optsig  = step.signature.option(qname, staticContext.location)
         val opttype: Option[SequenceType] = optsig.declaredType
         if (optsig.defaultSelect.isDefined) {
-          val value = typeUtils.castAtomicAs(new XdmAtomicValue(optsig.defaultSelect.get), opttype, staticContext)
+          val value = TypeUtils.castAtomicAs(new XdmAtomicValue(optsig.defaultSelect.get), opttype, staticContext)
           step.receiveBinding(new NameValueBinding(qname, value, XProcMetadata.ANY, staticContext))
         }
       }

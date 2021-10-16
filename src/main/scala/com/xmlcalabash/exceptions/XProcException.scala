@@ -17,6 +17,7 @@ object XProcException {
   val err_xd0011 = new QName("err", XProcConstants.ns_err, "XD0011")
   val err_xd0015 = new QName("err", XProcConstants.ns_err, "XD0015")
   val err_xd0030 = new QName("err", XProcConstants.ns_err, "XD0030")
+  val err_xd0036 = new QName("err", XProcConstants.ns_err, "XD0036")
   val err_xd0038 = new QName("err", XProcConstants.ns_err, "XD0038")
   val err_xd0057 = new QName("err", XProcConstants.ns_err, "XD0057")
   val err_xd0059 = new QName("err", XProcConstants.ns_err, "XD0059")
@@ -157,7 +158,8 @@ object XProcException {
   def xdMismatchedContentType(declType: MediaType, propType: MediaType, location: Option[Location]): XProcException = dynamicError(62, List(declType,propType), location)
   def xdNoMarkupAllowed(name: QName, location: Option[Location]): XProcException = dynamicError(63, name, location)
   def xdInvalidURI(uri: String, location: Option[Location]): XProcException = dynamicError(64, uri, location)
-  def xdBadMapKey(key: String, location: Option[Location]): XProcException = dynamicError(70, key, location)
+  def xdInvalidSerialization(msg: String, location: Option[Location]): XProcException = dynamicError((70,1), msg, location)
+  def xdBadMapKey(key: String, location: Option[Location]): XProcException = dynamicError((70,2), key, location)
   def xdBadViewportInput(contentType: MediaType, location: Option[Location]): XProcException = dynamicError(72, contentType, location)
   def xdBadViewportResult(contentType: String, location: Option[Location]): XProcException = dynamicError(73, contentType, location)
 

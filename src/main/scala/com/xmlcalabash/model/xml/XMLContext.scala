@@ -102,8 +102,7 @@ class XMLContext(override val config: XMLCalabashConfig, override val artifact: 
   def parseNCName(name: Option[String]): Option[String] = {
     if (name.isDefined) {
       try {
-        val typeUtils = new TypeUtils(config)
-        val ncname = typeUtils.castAtomicAs(new XdmAtomicValue(name.get), ItemType.NCNAME, null)
+        val ncname = TypeUtils.castAtomicAs(new XdmAtomicValue(name.get), ItemType.NCNAME, null)
         Some(ncname.getStringValue)
       } catch {
         case _: SaxonApiException =>

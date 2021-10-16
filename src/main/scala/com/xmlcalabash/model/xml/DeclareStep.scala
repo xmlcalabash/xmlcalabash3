@@ -56,8 +56,7 @@ class DeclareStep(override val config: XMLCalabashConfig) extends DeclContainer(
     val aname = attr(XProcConstants._name)
     if (aname.isDefined) {
       try {
-        val typeUtils = new TypeUtils(config)
-        val ncname = typeUtils.castAtomicAs(XdmAtomicValue.makeAtomicValue(aname.get), ItemType.NCNAME, staticContext)
+        val ncname = TypeUtils.castAtomicAs(XdmAtomicValue.makeAtomicValue(aname.get), ItemType.NCNAME, staticContext)
         _name = Some(ncname.getStringValue)
       } catch {
         case _: SaxonApiException =>

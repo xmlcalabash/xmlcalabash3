@@ -5,8 +5,8 @@ import com.xmlcalabash.config.XMLCalabashConfig
 import com.xmlcalabash.exceptions.{ExceptionCode, ModelException, XProcException}
 import com.xmlcalabash.model.util.XProcConstants.ValueTemplate
 import com.xmlcalabash.runtime.{StaticContext, XMLCalabashRuntime, XProcExpression, XProcVtExpression, XProcXPathExpression}
-import com.xmlcalabash.util.ValueTemplateParser
-import net.sf.saxon.s9api.{Axis, QName, XdmItem, XdmMap, XdmNode, XdmNodeKind, XdmValue}
+import com.xmlcalabash.util.{TypeUtils, ValueTemplateParser}
+import net.sf.saxon.s9api.{Axis, ItemType, QName, XdmAtomicValue, XdmItem, XdmMap, XdmNode, XdmNodeKind, XdmValue}
 
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
@@ -66,15 +66,18 @@ object ValueParser {
         case _ =>
           if (name.get.contains(":")) {
             val pos = name.get.indexOf(':')
-            val prefix = name.get.substring(0, pos)
-            val local = name.get.substring(pos+1)
+
+            val prefix = TypeUtils.castAtomicAs(new XdmAtomicValue(name.get.substring(0, pos)), ItemType.NCNAME, context).getStringValue
+            val local = TypeUtils.castAtomicAs(new XdmAtomicValue(name.get.substring(pos+1)), ItemType.NCNAME, context).getStringValue
+
             if (context.nsBindings.contains(prefix)) {
               Some(new QName(prefix, context.nsBindings(prefix), local))
             } else {
               throw XProcException.xdCannotResolveQName(name.get, context.location)
             }
           } else {
-            Some(new QName("", name.get))
+            val local = TypeUtils.castAtomicAs(new XdmAtomicValue(name.get), ItemType.NCNAME, context).getStringValue
+            Some(new QName("", local))
           }
       }
     } else {

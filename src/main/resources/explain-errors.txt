@@ -140,6 +140,12 @@ When an non-XML (and non-HTML) encoding is specified for a p:inline, markup is n
 XD0064
 Invalid URI: “$1”.
 
+XD0070/1
+$1
+
+XD0070/2
+Map key cannot be converted to QName: “$1”
+
 XD0072
 Cannot pass “$1” documents to p:viewport (only HTML and XML are allowed).
 
