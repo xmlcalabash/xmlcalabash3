@@ -163,17 +163,15 @@
 
 <xsl:template match="case" expand-text="yes">
   <xsl:text>"{filepath} " should " resolve against {basedir}" in {{&#10;</xsl:text>
-  <xsl:text>  val basepath = new Urify("{basedir}")&#10;</xsl:text>
-  <xsl:text>  val path = basepath.resolve("{filepath}")&#10;</xsl:text>
+  <xsl:text>  val path = Urify.urify("{filepath}", "{basedir}")&#10;</xsl:text>
   <xsl:text>  assert(path == "{result}")&#10;</xsl:text>
   <xsl:text>}}&#10;&#10;</xsl:text>
 </xsl:template>
 
 <xsl:template match="case[@error]" expand-text="yes">
   <xsl:text>"{filepath} " should " throw an exception against {basedir}" in {{&#10;</xsl:text>
-  <xsl:text>  val basepath = new Urify("{basedir}")&#10;</xsl:text>
   <xsl:text>  try {{&#10;</xsl:text>
-  <xsl:text>  basepath.resolve("{filepath}")&#10;</xsl:text>
+  <xsl:text>    Urify.urify("{filepath}", "{basedir}")&#10;</xsl:text>
   <xsl:text>  fail()&#10;</xsl:text>
   <xsl:text>  }} catch {{&#10;</xsl:text>
   <xsl:text>  case ex: XProcException =>&#10;</xsl:text>

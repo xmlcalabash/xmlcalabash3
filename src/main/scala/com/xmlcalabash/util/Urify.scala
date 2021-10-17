@@ -35,9 +35,92 @@ object Urify {
   private val Filepath = "^(?i)(file:)(.*)$".r
   private val OtherScheme = "^(?i)([a-z]+):(.*)$".r
   private val Authority = "^//([^/]+)(/.*)?$".r
+
+  def urify(filestr: String): String = {
+    urify(filestr, None)
+  }
+
+  def urify(filestr: String, basedir: String): String = {
+    urify(filestr, Some(basedir))
+  }
+
+  def urify(filestr: String, basedir: Option[String]): String = {
+    val filepath = new Urify(filestr, basedir)
+    if (!filepath.hierarchical || (filepath.scheme.isDefined && filepath.absolute)) {
+      return filepath.toString
+    }
+
+    val basepath = if (basedir.isEmpty) {
+      new Urify(s"file://${cwd}", Some(""))
+    } else {
+      new Urify(basedir.get, Some(""))
+    }
+
+    if (!basepath.hierarchical) {
+      throw XProcException.xdUrifyNonhierarchicalBase(filepath.toString, basepath.toString, None)
+    }
+
+    if (!basepath.absolute) {
+      throw XProcException.xdUrifyFailed(filepath.toString, basepath.toString, None)
+    }
+
+    if (filepath.driveLetter.isDefined
+      && (basepath.driveLetter.isEmpty || filepath.driveLetter.get != basepath.driveLetter.get)) {
+      throw XProcException.xdUrifyDifferentDrives(filepath.toString, basepath.toString, None)
+    }
+
+    if ((filepath.driveLetter.isDefined && basepath.authority.isDefined)
+      || (filepath.authority.isDefined && basepath.driveLetter.isDefined)) {
+      throw XProcException.xdUrifyMixedDrivesAndAuthorities(filepath.toString, basepath.toString, None)
+    }
+
+    if ((filepath.scheme.isDefined && filepath.scheme.get != basepath.scheme.get)) {
+      throw XProcException.xdUrifyDifferentSchemes(filepath.toString, basepath.toString, None)
+    }
+
+    if (basepath.scheme.isDefined && basepath.scheme.get != "file" && basepath.absolute) {
+      return URI.create(basepath.toString).resolve(filepath.toString).toString
+    }
+
+    val rscheme = basepath.scheme.get
+    val rauthority = if (filepath.authority.isDefined) {
+      filepath.authority
+    } else {
+      basepath.authority
+    }
+    val rdrive = basepath.driveLetter
+    val rpath = if (filepath.authority.isDefined || filepath.absolute) {
+      filepath.fixedPath
+    } else {
+      basepath.resolvePaths(basepath.fixedPath, filepath.fixedPath)
+    }
+
+    val sb = new StringBuffer()
+    sb.append(rscheme)
+    sb.append(":")
+    if (rauthority.isDefined) {
+      sb.append("//")
+      sb.append(rauthority.get)
+    } else {
+      if (basepath.scheme.isDefined && basepath.scheme.get == "file") {
+        if (basepath.absolute) {
+          sb.append("//")
+          if (rdrive.isDefined) {
+            sb.append("/")
+          }
+        }
+      }
+    }
+    if (rdrive.isDefined) {
+      sb.append(rdrive.get)
+      sb.append(":")
+    }
+    sb.append(rpath)
+    sb.toString
+  }
 }
 
-class Urify(val filepath: String) {
+class Urify(filepath: String, basedir: Option[String]) {
   private var _scheme = Option.empty[String]
   private var _explicit = false
   private var _hierarchical = true
@@ -47,7 +130,34 @@ class Urify(val filepath: String) {
   private var _absolute = false
 
   if (filesep != "/") {
-    _path = filepath.replace(filesep, "/")
+    var fileuri = Option.empty[Boolean]
+    filepath match {
+      case Urify.OtherScheme(scheme, path) =>
+        if (scheme == "file" || (windows && scheme.length == 1)) {
+          fileuri = Some(true)
+        } else {
+          fileuri = Some(false)
+        }
+      case _ => ()
+    }
+    if (fileuri.isEmpty && (basedir.isEmpty || basedir.get == "")) {
+      fileuri = Some(true)
+    }
+    if (fileuri.isEmpty && basedir.isDefined) {
+      basedir.get match {
+        case Urify.OtherScheme(scheme, path) =>
+          if (scheme != "file") {
+            fileuri = Some(false)
+          }
+        case _ => ()
+      }
+    }
+
+    if (fileuri.isEmpty || fileuri.get) {
+      _path = filepath.replace(filesep, "/")
+    } else {
+      _path = filepath
+    }
   } else {
     _path = filepath
   }
@@ -85,7 +195,7 @@ class Urify(val filepath: String) {
         } else if (List("urn", "doi", "mailto").contains(fpscheme)) {
           _hierarchical = false
         } else {
-          _hierarchical = filepath.contains("/")
+          _hierarchical = _path.contains("/")
           _absolute = _hierarchical && _path.startsWith("/")
         }
       case Urify.Authority(fpauthority, fppath) =>
@@ -93,7 +203,7 @@ class Urify(val filepath: String) {
         _path = Option(fppath).getOrElse("").replaceAll("^/+", "/")
         _absolute = _path.startsWith("/")
       case _ =>
-        _path = filepath.replaceAll("^/+", "/")
+        _path = _path.replaceAll("^/+", "/")
         _absolute = _path.startsWith("/")
     }
   } else {
@@ -123,7 +233,7 @@ class Urify(val filepath: String) {
         } else if (List("urn", "doi", "mailto").contains(fpscheme)) {
           _hierarchical = false
         } else {
-          _hierarchical = filepath.contains("/")
+          _hierarchical = _path.contains("/")
           _absolute = _hierarchical && _path.startsWith("/")
         }
       case Urify.Authority(fpauthority, fppath) =>
@@ -131,24 +241,13 @@ class Urify(val filepath: String) {
         _path = Option(fppath).getOrElse("").replaceAll("^/+", "/")
         _absolute = _path.startsWith("/")
       case _ =>
-        _path = filepath.replaceAll("^/+", "/")
+        _path = _path.replaceAll("^/+", "/")
         _absolute = _path.startsWith("/")
     }
   }
 
-  def this(uri: URI) = {
-    this(uri.toString)
-  }
-
-  def this(copy: Urify) = {
-    this(copy.filepath)
-    _scheme = copy._scheme
-    _explicit = copy._explicit
-    _hierarchical = copy._hierarchical
-    _authority = copy._authority
-    _driveLetter = copy._driveLetter
-    _path = copy._path
-    _absolute = copy._absolute
+  def this (filestr: String) {
+    this(filestr, None)
   }
 
   def scheme: Option[String] = _scheme
@@ -167,6 +266,7 @@ class Urify(val filepath: String) {
 
     var newpath = path.replaceAll("\\?", "%3F")
       .replaceAll("#", "%23")
+      .replaceAll("\\\\", "%5C")
       .replaceAll(" ", "%20")
 
     // unreserved  = ALPHA / DIGIT / "-" / "." / "_" / "~"
@@ -228,78 +328,6 @@ class Urify(val filepath: String) {
     buf.toString
   }
 
-  def resolve(uri: URI): String = {
-    resolve(uri.toString)
-  }
-
-  def resolve(uri: String): String = {
-    val respath = new Urify(uri)
-    if (!respath.hierarchical || (respath.scheme.isDefined && respath.absolute)) {
-      return respath.toString
-    }
-
-    if (!hierarchical) {
-      throw XProcException.xdUrifyNonhierarchicalBase(uri, filepath, None)
-    }
-
-    if (!absolute) {
-      throw XProcException.xdUrifyFailed(uri, filepath, None)
-    }
-
-    if (respath.driveLetter.isDefined && (driveLetter.isEmpty || respath.driveLetter.get != driveLetter.get)) {
-      throw XProcException.xdUrifyDifferentDrives(uri, filepath, None)
-    }
-
-    if ((respath.driveLetter.isDefined && authority.isDefined)
-      || (respath.authority.isDefined && driveLetter.isDefined)) {
-      throw XProcException.xdUrifyMixedDrivesAndAuthorities(uri, filepath, None)
-    }
-
-    if ((respath.scheme.isDefined && respath.scheme.get != scheme.get)) {
-      throw XProcException.xdUrifyDifferentSchemes(uri, filepath, None)
-    }
-
-    if (scheme.isDefined && scheme.get != "file" && absolute) {
-      return URI.create(filepath).resolve(respath.toString).toString
-    }
-
-    val rscheme = scheme.get
-    val rauthority = if (respath.authority.isDefined) {
-      respath.authority
-    } else {
-      authority
-    }
-    val rdrive = driveLetter
-    val rpath = if (respath.authority.isDefined || respath.absolute) {
-      respath.fixedPath
-    } else {
-      resolvePaths(fixedPath, respath.fixedPath)
-    }
-
-    val sb = new StringBuffer()
-    sb.append(rscheme)
-    sb.append(":")
-    if (rauthority.isDefined) {
-      sb.append("//")
-      sb.append(rauthority.get)
-    } else {
-      if (scheme.isDefined && scheme.get == "file") {
-        if (absolute) {
-          sb.append("//")
-          if (rdrive.isDefined) {
-            sb.append("/")
-          }
-        }
-      }
-    }
-    if (rdrive.isDefined) {
-      sb.append(rdrive.get)
-      sb.append(":")
-    }
-    sb.append(rpath)
-    sb.toString
-  }
-
   private def resolvePaths(basepath: String, newpath: String): String = {
     // This is only called when newpath is relative.
     val pos = basepath.lastIndexOf("/")
@@ -329,11 +357,6 @@ class Urify(val filepath: String) {
     }
 
     stack.mkString("/")
-  }
-
-
-  def toURI: URI = {
-    new URI(toString)
   }
 
   override def toString: String = {

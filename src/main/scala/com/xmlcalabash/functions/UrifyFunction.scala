@@ -19,6 +19,10 @@ class UrifyFunction(runtime: XMLCalabashConfig) extends FunctionImpl() {
 
   override def getFunctionQName: StructuredQName = funcname
 
+  override def getMinimumNumberOfArguments: Int = 1
+
+  override def getMaximumNumberOfArguments: Int = 2
+
   override def getArgumentTypes: Array[SequenceType] = Array(SequenceType.SINGLE_ITEM, SequenceType.OPTIONAL_ITEM)
 
   override def getResultType(suppliedArgumentTypes: Array[SequenceType]): SequenceType = SequenceType.SINGLE_ITEM
@@ -42,14 +46,11 @@ class UrifyFunction(runtime: XMLCalabashConfig) extends FunctionImpl() {
       }
 
       val relativeuri = arguments(0).head.getStringValue
-      val proposedbase = arguments(1).head.getStringValue
-
-      if (proposedbase == "") {
-        throw XProcException.xdUrifyFailed(relativeuri, proposedbase, None)
+      if (arguments.length > 1 && Option(arguments(1).head).isDefined) {
+        new StringValue(Urify.urify(relativeuri, arguments(1).head.getStringValue))
+      } else {
+        new StringValue(Urify.urify(relativeuri))
       }
-
-      val result = new Urify(proposedbase).resolve(relativeuri)
-      new StringValue(result.toString)
     }
   }
 }

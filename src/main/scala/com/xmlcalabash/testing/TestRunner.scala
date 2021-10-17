@@ -717,9 +717,9 @@ class TestRunner(runtimeConfig: XMLCalabashConfig, online: Boolean, regex: Optio
         val os = Urify.osname
         val sep = Urify.filesep
         if (urifyFeature.get == "windows") {
-          Urify.mockOS("Windows", "\\", None)
+          Urify.mockOS("Windows", "\\", Some("/home/johndoe/"))
         } else {
-          Urify.mockOS("MacOS", "/", None)
+          Urify.mockOS("MacOS", "/", Some("/home/johndoe/"))
         }
         val mockresult = tester.run()
         Urify.mockOS(os, sep, None)

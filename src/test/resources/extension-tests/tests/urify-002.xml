@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<t:test xmlns:t="http://xproc.org/ns/testsuite/3.0"
+        features="urify-non-windows"
+        expected="pass">
+   <t:info>
+      <t:title>urify-002</t:title>
+      <t:revision-history>
+         <t:revision>
+            <t:date>2021-10-17</t:date>
+            <t:author>
+               <t:name>Norman Walsh</t:name>
+            </t:author>
+            <t:description xmlns="http://www.w3.org/1999/xhtml">
+               <p>Test for the <code>p:urify()</code> function not on Windows.</p>
+            </t:description>
+         </t:revision>
+      </t:revision-history>
+   </t:info>
+   <t:description xmlns="http://www.w3.org/1999/xhtml">
+      <p>Resolve a string against the current working directory. This
+      is just a simple test for the case where the basedir argument is
+      the empty sequence.</p>
+   </t:description>
+   <t:pipeline>
+      <p:declare-step xmlns:p="http://www.w3.org/ns/xproc" name="pipeline" version="3.0">
+         <p:output port="result"/>
+         <p:identity>
+            <p:with-input>
+               <result>{p:urify("path/to/thing", ())}</result>
+            </p:with-input>
+         </p:identity>
+      </p:declare-step>
+   </t:pipeline>
+   <t:schematron>
+      <s:schema xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:s="http://purl.oclc.org/dsdl/schematron"
+                queryBinding="xslt2">
+         <s:pattern>
+            <s:rule context="/">
+               <s:assert test="result">Root element is not 'result'.</s:assert>
+               <s:assert test="string(result)='file:///home/johndoe/path/to/thing'">Incorrect URI in result.</s:assert>
+            </s:rule>
+         </s:pattern>
+      </s:schema>
+   </t:schematron>
+</t:test>
