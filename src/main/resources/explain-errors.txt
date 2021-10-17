@@ -131,6 +131,9 @@ Invalid option: “$1”.
 XD0060
 Unsupported encoding: “$1”.
 
+XD0061
+Invalid QName key: “$1”.
+
 XD0062
 Mismatched content types: “$1” is not the same as “$2”.
 
