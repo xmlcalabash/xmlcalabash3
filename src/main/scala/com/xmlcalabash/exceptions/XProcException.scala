@@ -181,7 +181,7 @@ object XProcException {
   def xsBadAttribute(name: QName, location: Option[Location]): XProcException = staticError(8, name, location)
   def xsBadPortName(stepType: QName, port: String, location: Option[Location]): XProcException = staticError(10, List(stepType, port), location)
   def xsDupPortName(port: String, location: Option[Location]): XProcException = staticError(11, port, location)
-  def xsRequiredAndDefaulted(name: QName, location: Option[Location]) = staticError(17, name, location)
+  def xsRequiredAndDefaulted(name: QName, location: Option[Location]): XProcException = staticError(17, name, location)
   def xsMissingRequiredOption(optName: QName, location: Option[Location]): XProcException = staticError(18, optName, location)
 
   def xsPortNotReadableNoStep(step: String, location: Option[Location]): XProcException = staticError((22,1), step, location)

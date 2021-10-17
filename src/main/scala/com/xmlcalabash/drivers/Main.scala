@@ -165,7 +165,21 @@ object Main extends App {
     config.debugOptions.injectables = options.injectables
 
     val parser = new Parser(config)
-    val pipeline = parser.loadDeclareStep(new URI(options.pipeline))
+    val pipeline = try {
+      parser.loadDeclareStep(new URI(options.pipeline))
+    } catch {
+      case ex: XProcException =>
+        ex.code match {
+          case XProcException.err_xd0036 =>
+            val value = ex.details.head.asInstanceOf[String]
+            val seqtype = ex.details(1).asInstanceOf[String]
+            throw XProcException.xsBadTypeValue(value, seqtype, ex.location)
+          case _ =>
+            throw ex
+        }
+      case ex: Throwable =>
+        throw ex
+    }
 
     decl = Some(pipeline)
 
