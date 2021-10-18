@@ -246,7 +246,7 @@ class Urify(filepath: String, basedir: Option[String]) {
     }
   }
 
-  def this (filestr: String) {
+  def this (filestr: String) = {
     this(filestr, None)
   }
 
