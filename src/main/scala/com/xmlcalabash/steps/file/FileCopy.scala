@@ -80,7 +80,7 @@ class FileCopy() extends FileStep {
     }
 
     builder.endDocument()
-    consumer.get.receive("result", builder.result, new XProcMetadata(MediaType.XML))
+    consumer.receive("result", builder.result, new XProcMetadata(MediaType.XML))
   }
 
   private def copyFromFile(): Unit = {

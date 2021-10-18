@@ -44,7 +44,7 @@ class StringReplace() extends DefaultXmlStep with ProcessMatchingNodes {
     matcher.process(source, pattern)
 
     val result = matcher.result
-    consumer.get.receive("result", result, checkMetadata(result, source_metadata))
+    consumer.receive("result", result, checkMetadata(result, source_metadata))
     }
 
   private def computeReplacement(context: XdmNode): XdmValue = {

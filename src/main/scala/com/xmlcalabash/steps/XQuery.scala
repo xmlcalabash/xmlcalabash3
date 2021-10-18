@@ -170,7 +170,7 @@ class XQuery extends DefaultXmlStep {
         consume(item, "result", Map(), outputProperties.toMap)
         /*
         if (item.isAtomicValue) {
-          consumer.get.receive("result", item, new XProcMetadata(MediaType.JSON))
+          consumer.receive("result", item, new XProcMetadata(MediaType.JSON))
         } else {
           val node = item.asInstanceOf[XdmNode]
           val builder = new SaxonTreeBuilder(config)
@@ -179,9 +179,9 @@ class XQuery extends DefaultXmlStep {
           builder.endDocument()
 
           if (node.getNodeKind == XdmNodeKind.TEXT) {
-            consumer.get.receive("result", builder.result, new XProcMetadata(MediaType.TEXT))
+            consumer.receive("result", builder.result, new XProcMetadata(MediaType.TEXT))
           } else {
-            consumer.get.receive("result", builder.result, new XProcMetadata(MediaType.XML))
+            consumer.receive("result", builder.result, new XProcMetadata(MediaType.XML))
           }
         }
 

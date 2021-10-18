@@ -28,7 +28,7 @@ import scala.collection.mutable.ListBuffer
 class ContentTypeChecker() extends XmlStep {
   private var _location = Option.empty[Location]
   protected val logger: Logger = LoggerFactory.getLogger(this.getClass)
-  protected var consumer: Option[XProcDataConsumer] = None
+  protected var consumer: XProcDataConsumer = _
   protected var config: XMLCalabashRuntime = _
   protected val bindings = mutable.HashMap.empty[String,Message]
   private val nodeMeta = mutable.HashMap.empty[XdmNode, XProcMetadata]
@@ -78,7 +78,7 @@ class ContentTypeChecker() extends XmlStep {
   }
 
   override def setConsumer(consumer: XProcDataConsumer): Unit = {
-    this.consumer = Some(consumer)
+    this.consumer = consumer
   }
 
   override def receive(port: String, item: Any, meta: XProcMetadata): Unit = {
@@ -107,7 +107,7 @@ class ContentTypeChecker() extends XmlStep {
           throw new RuntimeException("Cannot filter non-XML inputs")
       }
     } else {
-      consumer.get.receive("result", item, meta)
+      consumer.receive("result", item, meta)
     }
   }
 
@@ -164,9 +164,9 @@ class ContentTypeChecker() extends XmlStep {
             tree.startDocument(node.getBaseURI)
             tree.addSubtree(node)
             tree.endDocument()
-            consumer.get.receive("result", tree.result, XProcMetadata.xml(node))
+            consumer.receive("result", tree.result, XProcMetadata.xml(node))
           case value: XdmItem =>
-            consumer.get.receive("result", value, XProcMetadata.JSON)
+            consumer.receive("result", value, XProcMetadata.JSON)
           case _ =>
             throw XProcException.xiThisCantHappen(s"Content type checker didn't expect ${item}", location)
         }

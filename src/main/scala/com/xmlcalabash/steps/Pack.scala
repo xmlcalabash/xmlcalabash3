@@ -49,7 +49,7 @@ class Pack() extends DefaultXmlStep {
 
       tree.addEndElement()
       tree.endDocument()
-      consumer.get.receive("result", tree.result, XProcMetadata.XML)
+      consumer.receive("result", tree.result, XProcMetadata.XML)
 
       if (sources.nonEmpty) {
         sources.remove(0)

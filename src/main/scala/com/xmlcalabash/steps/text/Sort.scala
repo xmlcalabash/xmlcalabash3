@@ -109,7 +109,7 @@ class Sort() extends TextLines {
 
     val xformed = result.getXdmNode
 
-    consumer.get.receive("result", xformed, new XProcMetadata(MediaType.TEXT))
+    consumer.receive("result", xformed, new XProcMetadata(MediaType.TEXT))
   }
 
   override def reset(): Unit = {

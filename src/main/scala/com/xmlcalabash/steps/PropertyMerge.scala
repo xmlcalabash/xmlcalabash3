@@ -59,7 +59,7 @@ class PropertyMerge extends DefaultXmlStep {
     }
 
     val newmeta = new XProcMetadata(sourceMeta.get.contentType, prop.get)
-    consumer.get.receive("result", sourceDoc.get, newmeta)
+    consumer.receive("result", sourceDoc.get, newmeta)
   }
 
   private def extractProperties(context: StaticContext, node: XdmNode): Map[QName,XdmValue] = {

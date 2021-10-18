@@ -8,6 +8,6 @@ class Identity() extends DefaultXmlStep {
 
   override def receive(port: String, item: Any, metadata: XProcMetadata): Unit = {
     //println(s"IDENTITY $item")
-    consumer.get.receive("result", item, metadata)
+    consumer.receive("result", item, metadata)
   }
 }

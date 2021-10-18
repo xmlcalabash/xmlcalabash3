@@ -152,7 +152,7 @@ class Unarchive extends DefaultXmlStep {
             val request = new DocumentRequest(href, contentType.get)
             request.baseURI = href
             val response = config.documentManager.parse(request, bais)
-            consumer.get.receive("result", response.value, new XProcMetadata(response.contentType, response.props))
+            consumer.receive("result", response.value, new XProcMetadata(response.contentType, response.props))
           } else {
             logger.info(s"Cannot read {$entry.getName} from ZIP")
           }

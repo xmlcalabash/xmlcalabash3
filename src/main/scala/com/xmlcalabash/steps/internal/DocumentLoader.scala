@@ -131,14 +131,14 @@ class DocumentLoader() extends AbstractLoader {
 
       if (result.shadow.isDefined) {
         val binary = new BinaryNode(config, result.shadow.get)
-        consumer.get.receive("result", binary, metadata)
+        consumer.receive("result", binary, metadata)
       } else {
         result.value match {
           case node: XdmNode =>
             val patched = S9Api.patchBaseURI(config.config, node, metadata.baseURI)
-            consumer.get.receive("result", patched, metadata)
+            consumer.receive("result", patched, metadata)
           case _ =>
-            consumer.get.receive("result", result.value, metadata)
+            consumer.receive("result", result.value, metadata)
         }
       }
     } catch {

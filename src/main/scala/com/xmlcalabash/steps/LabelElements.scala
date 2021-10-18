@@ -56,7 +56,7 @@ class LabelElements() extends DefaultXmlStep with ProcessMatchingNodes {
     matcher = new ProcessMatch(config, this, context)
     matcher.process(source, pattern)
 
-    consumer.get.receive("result", matcher.result, metadata)
+    consumer.receive("result", matcher.result, metadata)
   }
 
   override def startDocument(node: XdmNode): Boolean = {

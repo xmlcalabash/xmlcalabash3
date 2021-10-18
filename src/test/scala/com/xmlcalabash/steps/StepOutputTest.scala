@@ -30,7 +30,7 @@ class StepOutputTest() extends DefaultXmlStep {
             tree.startDocument(None)
             tree.addText("{\"result-type\": \"text-node\"}")
             tree.endDocument()
-            consumer.get.receive("result", tree.result, metadata)
+            consumer.receive("result", tree.result, metadata)
           case "element-node" =>
             val tree = new SaxonTreeBuilder(config)
             tree.startDocument(None)
@@ -38,23 +38,23 @@ class StepOutputTest() extends DefaultXmlStep {
             tree.addText("{\"result-type\": \"element-node\"}")
             tree.addEndElement()
             tree.endDocument()
-            consumer.get.receive("result", tree.result, metadata)
+            consumer.receive("result", tree.result, metadata)
           case "string" =>
             val s = "{\"result-type\": \"string\"}"
-            consumer.get.receive("result", s, metadata)
+            consumer.receive("result", s, metadata)
           case "bytes" =>
             val s = "{\"result-type\": \"bytes\"}"
-            consumer.get.receive("result", s.getBytes("UTF-8"), metadata)
+            consumer.receive("result", s.getBytes("UTF-8"), metadata)
           case "stream" =>
             val s = "{\"result-type\": \"stream\"}"
             val stream = new ByteArrayInputStream(s.getBytes("UTF-8"))
-            consumer.get.receive("result", stream, metadata)
+            consumer.receive("result", stream, metadata)
           case "map-value" =>
             var map = new XdmMap()
             map = map.put(new XdmAtomicValue("result-type"), new XdmAtomicValue("map-value"))
-            consumer.get.receive("result", map, metadata)
+            consumer.receive("result", map, metadata)
           case "string-value" =>
-            consumer.get.receive("result", new XdmAtomicValue("string value."), metadata)
+            consumer.receive("result", new XdmAtomicValue("string value."), metadata)
           case _ =>
             throw new RuntimeException(s"Unexpected result type ${contentType.toString} / $resultType")
         }
@@ -65,7 +65,7 @@ class StepOutputTest() extends DefaultXmlStep {
             tree.startDocument(None)
             tree.addText("Some text.")
             tree.endDocument()
-            consumer.get.receive("result", tree.result, metadata)
+            consumer.receive("result", tree.result, metadata)
           case "element-node" =>
             val tree = new SaxonTreeBuilder(config)
             tree.startDocument(None)
@@ -73,23 +73,23 @@ class StepOutputTest() extends DefaultXmlStep {
             tree.addText("Some element.")
             tree.addEndElement()
             tree.endDocument()
-            consumer.get.receive("result", tree.result, metadata)
+            consumer.receive("result", tree.result, metadata)
           case "string" =>
             val s = "<p>Some string.</p>"
-            consumer.get.receive("result", s, metadata)
+            consumer.receive("result", s, metadata)
           case "bytes" =>
             val s = "<p>Some bytes.</p>"
-            consumer.get.receive("result", s.getBytes("UTF-8"), metadata)
+            consumer.receive("result", s.getBytes("UTF-8"), metadata)
           case "stream" =>
             val s = "<p>Some stream.</p>"
             val stream = new ByteArrayInputStream(s.getBytes("UTF-8"))
-            consumer.get.receive("result", stream, metadata)
+            consumer.receive("result", stream, metadata)
           case "map-value" =>
             var map = new XdmMap()
             map = map.put(new XdmAtomicValue("result-type"), new XdmAtomicValue("value"))
-            consumer.get.receive("result", map, metadata)
+            consumer.receive("result", map, metadata)
           case "string-value" =>
-            consumer.get.receive("result", new XdmAtomicValue("string value."), metadata)
+            consumer.receive("result", new XdmAtomicValue("string value."), metadata)
           case _ =>
             throw new RuntimeException(s"Unexpected result type ${contentType.toString} / $resultType")
         }
@@ -100,7 +100,7 @@ class StepOutputTest() extends DefaultXmlStep {
             tree.startDocument(None)
             tree.addText("Some text.")
             tree.endDocument()
-            consumer.get.receive("result", tree.result, metadata)
+            consumer.receive("result", tree.result, metadata)
           case "element-node" =>
             val tree = new SaxonTreeBuilder(config)
             tree.startDocument(None)
@@ -108,23 +108,23 @@ class StepOutputTest() extends DefaultXmlStep {
             tree.addText("Some element.")
             tree.addEndElement()
             tree.endDocument()
-            consumer.get.receive("result", tree.result, metadata)
+            consumer.receive("result", tree.result, metadata)
           case "string" =>
             val s = "Some string."
-            consumer.get.receive("result", s, metadata)
+            consumer.receive("result", s, metadata)
           case "bytes" =>
             val s = "Some bytes."
-            consumer.get.receive("result", s.getBytes("UTF-8"), metadata)
+            consumer.receive("result", s.getBytes("UTF-8"), metadata)
           case "stream" =>
             val s = "Some stream."
             val stream = new ByteArrayInputStream(s.getBytes("UTF-8"))
-            consumer.get.receive("result", stream, metadata)
+            consumer.receive("result", stream, metadata)
           case "map-value" =>
             var map = new XdmMap()
             map = map.put(new XdmAtomicValue("result-type"), new XdmAtomicValue("value"))
-            consumer.get.receive("result", map, metadata)
+            consumer.receive("result", map, metadata)
           case "string-value" =>
-            consumer.get.receive("result", new XdmAtomicValue("string value."), metadata)
+            consumer.receive("result", new XdmAtomicValue("string value."), metadata)
           case _ =>
             throw new RuntimeException(s"Unexpected result type ${contentType.toString} / $resultType")
         }
@@ -135,7 +135,7 @@ class StepOutputTest() extends DefaultXmlStep {
             tree.startDocument(None)
             tree.addText("Some text.")
             tree.endDocument()
-            consumer.get.receive("result", tree.result, metadata)
+            consumer.receive("result", tree.result, metadata)
           case "element-node" =>
             val tree = new SaxonTreeBuilder(config)
             tree.startDocument(None)
@@ -143,23 +143,23 @@ class StepOutputTest() extends DefaultXmlStep {
             tree.addText("Some element.")
             tree.addEndElement()
             tree.endDocument()
-            consumer.get.receive("result", tree.result, metadata)
+            consumer.receive("result", tree.result, metadata)
           case "string" =>
             val s = "Some string."
-            consumer.get.receive("result", s, metadata)
+            consumer.receive("result", s, metadata)
           case "bytes" =>
             val s = "Some bytes."
-            consumer.get.receive("result", s.getBytes("UTF-8"), metadata)
+            consumer.receive("result", s.getBytes("UTF-8"), metadata)
           case "stream" =>
             val s = "Some stream."
             val stream = new ByteArrayInputStream(s.getBytes("UTF-8"))
-            consumer.get.receive("result", stream, metadata)
+            consumer.receive("result", stream, metadata)
           case "map-value" =>
             var map = new XdmMap()
             map = map.put(new XdmAtomicValue("result-type"), new XdmAtomicValue("value"))
-            consumer.get.receive("result", map, metadata)
+            consumer.receive("result", map, metadata)
           case "string-value" =>
-            consumer.get.receive("result", new XdmAtomicValue("Some string value."), metadata)
+            consumer.receive("result", new XdmAtomicValue("Some string value."), metadata)
           case _ =>
             throw new RuntimeException(s"Unexpected result type ${contentType.toString} / $resultType")
         }
@@ -170,7 +170,7 @@ class StepOutputTest() extends DefaultXmlStep {
             tree.startDocument(None)
             tree.addText("Some text.")
             tree.endDocument()
-            consumer.get.receive("result", tree.result, metadata)
+            consumer.receive("result", tree.result, metadata)
           case "element-node" =>
             val tree = new SaxonTreeBuilder(config)
             tree.startDocument(None)
@@ -178,23 +178,23 @@ class StepOutputTest() extends DefaultXmlStep {
             tree.addText("Some element.")
             tree.addEndElement()
             tree.endDocument()
-            consumer.get.receive("result", tree.result, metadata)
+            consumer.receive("result", tree.result, metadata)
           case "string" =>
             val s = "<doc>Some string.</doc>"
-            consumer.get.receive("result", s, metadata)
+            consumer.receive("result", s, metadata)
           case "bytes" =>
             val s = "<doc>Some bytes.</doc>"
-            consumer.get.receive("result", s.getBytes("UTF-8"), metadata)
+            consumer.receive("result", s.getBytes("UTF-8"), metadata)
           case "stream" =>
             val s = "<doc>Some stream.</doc>"
             val stream = new ByteArrayInputStream(s.getBytes("UTF-8"))
-            consumer.get.receive("result", stream, metadata)
+            consumer.receive("result", stream, metadata)
           case "map-value" =>
             var map = new XdmMap()
             map = map.put(new XdmAtomicValue("result-type"), new XdmAtomicValue("value"))
-            consumer.get.receive("result", map, metadata)
+            consumer.receive("result", map, metadata)
           case "string-value" =>
-            consumer.get.receive("result", new XdmAtomicValue("string value."), metadata)
+            consumer.receive("result", new XdmAtomicValue("string value."), metadata)
           case _ =>
             throw new RuntimeException(s"Unexpected result type ${contentType.toString} / $resultType")
         }

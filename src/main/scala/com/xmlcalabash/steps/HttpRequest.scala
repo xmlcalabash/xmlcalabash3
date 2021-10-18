@@ -402,7 +402,7 @@ class HttpRequest() extends DefaultXmlStep {
       }
     }
 
-    consumer.get.receive("report", report, new XProcMetadata(MediaType.JSON))
+    consumer.receive("report", report, new XProcMetadata(MediaType.JSON))
 
     for (pos <- response.response.indices) {
       val doc = response.response(pos)
@@ -422,9 +422,9 @@ class HttpRequest() extends DefaultXmlStep {
 
       if (result.shadow.isDefined) {
         val node = new BinaryNode(config, result.shadow.get)
-        consumer.get.receive("result", node, meta)
+        consumer.receive("result", node, meta)
       } else {
-        consumer.get.receive("result", result.value, meta)
+        consumer.receive("result", result.value, meta)
       }
     }
   }

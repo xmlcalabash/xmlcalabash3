@@ -112,7 +112,7 @@ class Archive extends DefaultXmlStep {
     } else {
       props.put(XProcConstants._base_uri, new XdmAtomicValue(context.baseURI.get))
     }
-    consumer.get.receive("result", result, new XProcMetadata(MediaType.ZIP, props.toMap))
+    consumer.receive("result", result, new XProcMetadata(MediaType.ZIP, props.toMap))
 
     val builder = new SaxonTreeBuilder(config)
     builder.startDocument(None)
@@ -122,7 +122,7 @@ class Archive extends DefaultXmlStep {
     }
     builder.addEndElement()
     builder.endDocument()
-    consumer.get.receive("report", builder.result, new XProcMetadata(MediaType.XML))
+    consumer.receive("report", builder.result, new XProcMetadata(MediaType.XML))
   }
 
   private def processZip(): BinaryNode = {

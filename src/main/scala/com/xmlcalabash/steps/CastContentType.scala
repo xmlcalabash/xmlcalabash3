@@ -64,9 +64,9 @@ class CastContentType() extends DefaultXmlStep {
 
     contentType.classification match {
       case MediaType.XML =>
-        consumer.get.receive("result", item.get, new XProcMetadata(castTo, metadata.get.properties))
+        consumer.receive("result", item.get, new XProcMetadata(castTo, metadata.get.properties))
       case MediaType.HTML =>
-        consumer.get.receive("result", item.get, metadata.get.castTo(castTo))
+        consumer.receive("result", item.get, metadata.get.castTo(castTo))
       case MediaType.TEXT =>
         val text = item.get.asInstanceOf[XdmNode].getStringValue
         val bais = new ByteArrayInputStream(text.getBytes("UTF-8"))
@@ -74,7 +74,7 @@ class CastContentType() extends DefaultXmlStep {
         val req = new DocumentRequest(baseURI, castTo)
         try {
           val resp = config.documentManager.parse(req, bais)
-          consumer.get.receive("result", resp.value, metadata.get.castTo(castTo))
+          consumer.receive("result", resp.value, metadata.get.castTo(castTo))
         } catch {
           case sae: SaxonApiException =>
             throw XProcException.xdNotWFXML("", sae.getMessage, location)
@@ -95,7 +95,7 @@ class CastContentType() extends DefaultXmlStep {
         smsg = config.expressionEvaluator.newInstance().singletonValue(expr, List(), bindingsMap.toMap, None)
 
         val patched = S9Api.patchBaseURI(config.config, smsg.item.asInstanceOf[XdmNode], metadata.get.baseURI)
-        consumer.get.receive("result", patched, metadata.get.castTo(castTo))
+        consumer.receive("result", patched, metadata.get.castTo(castTo))
       case MediaType.OCTET_STREAM =>
         val builder = new SaxonTreeBuilder(config)
 
@@ -138,7 +138,7 @@ class CastContentType() extends DefaultXmlStep {
         builder.endDocument()
 
         val doc = builder.result
-        consumer.get.receive("result", doc, metadata.get.castTo(castTo))
+        consumer.receive("result", doc, metadata.get.castTo(castTo))
     }
   }
 
@@ -147,7 +147,7 @@ class CastContentType() extends DefaultXmlStep {
 
     contentType.classification match {
       case MediaType.TEXT =>
-        consumer.get.receive("result", item.get, new XProcMetadata(castTo, metadata.get.properties))
+        consumer.receive("result", item.get, new XProcMetadata(castTo, metadata.get.properties))
 
       case MediaType.XML =>
         serializeNodes(item.get.asInstanceOf[XdmNode], contentType)
@@ -166,7 +166,7 @@ class CastContentType() extends DefaultXmlStep {
         builder.startDocument(metadata.get.baseURI)
         builder.addText(smsg.item.toString)
         builder.endDocument()
-        consumer.get.receive("result", builder.result, metadata.get.castTo(castTo))
+        consumer.receive("result", builder.result, metadata.get.castTo(castTo))
 
       case MediaType.OCTET_STREAM =>
         val builder = new SaxonTreeBuilder(config)
@@ -200,7 +200,7 @@ class CastContentType() extends DefaultXmlStep {
         builder.endDocument()
 
         val doc = builder.result
-        consumer.get.receive("result", doc, new XProcMetadata(castTo, metadata.get.properties))
+        consumer.receive("result", doc, new XProcMetadata(castTo, metadata.get.properties))
     }
   }
 
@@ -235,7 +235,7 @@ class CastContentType() extends DefaultXmlStep {
     builder.addText(stream.toString("UTF-8"))
     builder.endDocument()
 
-    consumer.get.receive("result", builder.result, metadata.get.castTo(castTo))
+    consumer.receive("result", builder.result, metadata.get.castTo(castTo))
   }
 
   def castToJSON(context: StaticContext): Unit = {
@@ -249,7 +249,7 @@ class CastContentType() extends DefaultXmlStep {
         bindingsMap.put("{}json", vmsg)
         val smsg = config.expressionEvaluator.newInstance().singletonValue(expr, List(), bindingsMap.toMap, None)
 
-        consumer.get.receive("result", smsg.item, metadata.get.castTo(castTo))
+        consumer.receive("result", smsg.item, metadata.get.castTo(castTo))
 
       case MediaType.XML =>
         val root = S9Api.documentElement(item.get.asInstanceOf[XdmNode])
@@ -267,7 +267,7 @@ class CastContentType() extends DefaultXmlStep {
           bindingsMap.put("{}json", vmsg)
           smsg = config.expressionEvaluator.newInstance().singletonValue(expr, List(), bindingsMap.toMap, None)
 
-          consumer.get.receive("result", smsg.item, metadata.get.castTo(castTo))
+          consumer.receive("result", smsg.item, metadata.get.castTo(castTo))
         } else if (root.get.getNodeName == XProcConstants.c_param_set) {
           var map = new XdmMap()
           for (child <- S9Api.axis(root.get, Axis.CHILD)) {
@@ -279,7 +279,7 @@ class CastContentType() extends DefaultXmlStep {
               map = map.put(new XdmAtomicValue(name), new XdmAtomicValue(value))
             }
           }
-          consumer.get.receive("result", map, metadata.get.castTo(castTo))
+          consumer.receive("result", map, metadata.get.castTo(castTo))
         } else {
           throw new UnsupportedOperationException("Can't cast from XML to JSON")
         }
@@ -288,7 +288,7 @@ class CastContentType() extends DefaultXmlStep {
         throw new UnsupportedOperationException("Can't cast from HTML to JSON")
 
       case MediaType.JSON =>
-        consumer.get.receive("result", item.get, new XProcMetadata(castTo, metadata.get.properties))
+        consumer.receive("result", item.get, new XProcMetadata(castTo, metadata.get.properties))
 
       case MediaType.YAML =>
         val bytes = item.get.asInstanceOf[BinaryNode].bytes
@@ -302,7 +302,7 @@ class CastContentType() extends DefaultXmlStep {
         val vmsg = new XdmValueItemMessage(new XdmAtomicValue(json), XProcMetadata.JSON, context)
         bindingsMap.put("{}json", vmsg)
         val smsg = config.expressionEvaluator.newInstance().singletonValue(expr, List(), bindingsMap.toMap, None)
-        consumer.get.receive("result", smsg.item, new XProcMetadata(castTo, smsg.metadata))
+        consumer.receive("result", smsg.item, new XProcMetadata(castTo, smsg.metadata))
 
       case MediaType.OCTET_STREAM =>
         val builder = new SaxonTreeBuilder(config)
@@ -337,7 +337,7 @@ class CastContentType() extends DefaultXmlStep {
         builder.endDocument()
 
         val doc = builder.result
-        consumer.get.receive("result", doc, new XProcMetadata(castTo, metadata.get.properties))
+        consumer.receive("result", doc, new XProcMetadata(castTo, metadata.get.properties))
     }
   }
 
@@ -351,13 +351,13 @@ class CastContentType() extends DefaultXmlStep {
         val baseURI = metadata.get.baseURI.getOrElse(new URI(""))
         val req = new DocumentRequest(baseURI, castTo)
         val resp = config.documentManager.parse(req, bais)
-        consumer.get.receive("result", resp.value, metadata.get.castTo(castTo))
+        consumer.receive("result", resp.value, metadata.get.castTo(castTo))
 
       case MediaType.XML =>
-        consumer.get.receive("result", item.get, metadata.get.castTo(castTo))
+        consumer.receive("result", item.get, metadata.get.castTo(castTo))
 
       case MediaType.HTML =>
-        consumer.get.receive("result", item.get, metadata.get.castTo(castTo, List()))
+        consumer.receive("result", item.get, metadata.get.castTo(castTo, List()))
 
       case MediaType.JSON =>
         throw new UnsupportedOperationException("Can't cast from JSON to HTML")
@@ -403,7 +403,7 @@ class CastContentType() extends DefaultXmlStep {
           try {
             val bytes = Base64.getDecoder.decode(root.get.getStringValue)
             val meta = metadata.get.castTo(castTo)
-            consumer.get.receive("result", bytes, meta)
+            consumer.receive("result", bytes, meta)
           } catch {
             case iae: IllegalArgumentException =>
               throw XProcException.xcInvalidBase64(iae.getMessage, location)
@@ -422,7 +422,7 @@ class CastContentType() extends DefaultXmlStep {
         throw new UnsupportedOperationException("Can't cast from YAML to binary")
 
       case MediaType.OCTET_STREAM =>
-        consumer.get.receive("result", item.get, metadata.get)
+        consumer.receive("result", item.get, metadata.get)
     }
   }
 }

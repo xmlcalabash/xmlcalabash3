@@ -104,6 +104,6 @@ class Uncompress extends DefaultXmlStep {
     }
 
     val meta = new XProcMetadata(result.contentType, props.toMap)
-    consumer.get.receive("result", result.value, meta)
+    consumer.receive("result", result.value, meta)
   }
 }

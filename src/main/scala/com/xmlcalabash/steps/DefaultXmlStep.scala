@@ -65,15 +65,23 @@ class DefaultXmlStep extends XmlStep {
     XProcConstants.sx_recognize_binary -> Serializer.Property.SAXON_RECOGNIZE_BINARY
   )
 
+  private var _config: XMLCalabashRuntime = _
+  private var _consumer: XProcDataConsumer = _
+  private var _stepType: QName = _
+
   private var _location = Option.empty[Location]
-  protected val logger: Logger = LoggerFactory.getLogger(this.getClass)
-  protected var consumer: Option[XProcDataConsumer] = None
-  protected var config: XMLCalabashRuntime = _
-  protected val bindings = mutable.HashMap.empty[QName, NameValueBinding]
-  protected var stepType: QName = _
-  protected var stepName = Option.empty[String]
+  private val _logger: Logger = LoggerFactory.getLogger(this.getClass)
+  private val _bindings = mutable.HashMap.empty[QName, NameValueBinding]
+  private var _stepName = Option.empty[String]
+
+  def config: XMLCalabashRuntime = _config
+  def consumer: XProcDataConsumer = _consumer
+  def stepType: QName = _stepType
 
   def location: Option[Location] = _location
+  def logger: Logger = _logger
+  def bindings: Map[QName, NameValueBinding] = _bindings.toMap
+  def stepName: Option[String] = _stepName
 
   // ==========================================================================
 
@@ -88,11 +96,11 @@ class DefaultXmlStep extends XmlStep {
   override def bindingSpec: BindingSpecification = BindingSpecification.ANY
 
   override def receiveBinding(variable: NameValueBinding): Unit = {
-    bindings.put(variable.name, variable)
+    _bindings.put(variable.name, variable)
   }
 
   override def setConsumer(consumer: XProcDataConsumer): Unit = {
-    this.consumer = Some(consumer)
+    _consumer = consumer
   }
 
   override def receive(port: String, item: Any, metadata: XProcMetadata): Unit = {
@@ -100,14 +108,14 @@ class DefaultXmlStep extends XmlStep {
   }
 
   override def configure(config: XMLCalabashConfig, stepType: QName, stepName: Option[String], params: Option[ImplParams]): Unit = {
-    this.stepType = stepType
-    this.stepName = stepName
+    _stepType = stepType
+    _stepName = stepName
   }
 
   override def initialize(config: RuntimeConfiguration): Unit = {
     config match {
       case xmlCalabash: XMLCalabashRuntime =>
-        this.config = xmlCalabash
+        _config = xmlCalabash
       case _ => throw XProcException.xiNotXMLCalabash()
     }
   }
@@ -649,7 +657,7 @@ class DefaultXmlStep extends XmlStep {
     }
 
     val mtype = new XProcMetadata(ctype, dprop.toMap)
-    consumer.get.receive(port, outputItem, mtype)
+    consumer.receive(port, outputItem, mtype)
   }
 
   class SerializationOptions(map: XdmMap) {

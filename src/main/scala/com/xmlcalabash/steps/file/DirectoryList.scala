@@ -128,6 +128,6 @@ class DirectoryList() extends DefaultXmlStep {
 
     builder.addEndElement()
     builder.endDocument()
-    consumer.get.receive("result", builder.result, new XProcMetadata(MediaType.XML, path))
+    consumer.receive("result", builder.result, new XProcMetadata(MediaType.XML, path))
   }
 }

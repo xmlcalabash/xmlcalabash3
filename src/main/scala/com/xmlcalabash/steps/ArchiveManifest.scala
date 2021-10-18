@@ -88,7 +88,7 @@ class ArchiveManifest extends DefaultXmlStep {
     builder.endDocument()
     val result = builder.result
 
-    consumer.get.receive("result", result, new XProcMetadata(MediaType.XML))
+    consumer.receive("result", result, new XProcMetadata(MediaType.XML))
   }
 
   private def zipArchive(context: StaticContext, builder: SaxonTreeBuilder): Unit = {

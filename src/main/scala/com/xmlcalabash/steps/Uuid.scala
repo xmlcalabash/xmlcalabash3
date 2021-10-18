@@ -42,7 +42,7 @@ class Uuid() extends DefaultXmlStep  with ProcessMatchingNodes {
     matcher.process(source, pattern)
 
     val result = matcher.result
-    consumer.get.receive("result", result, checkMetadata(result, metadata))
+    consumer.receive("result", result, checkMetadata(result, metadata))
   }
 
   override def startDocument(node: XdmNode): Boolean = {

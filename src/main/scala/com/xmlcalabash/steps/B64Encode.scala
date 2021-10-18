@@ -89,6 +89,6 @@ class B64Encode extends DefaultXmlStep {
     builder.endDocument()
     val result = builder.result
 
-    consumer.get.receive("result", result, new XProcMetadata(MediaType.TEXT))
+    consumer.receive("result", result, new XProcMetadata(MediaType.TEXT))
   }
 }
