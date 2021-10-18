@@ -106,6 +106,7 @@ object XProcException {
   def xiArgBundleInvalidGraphKey(token: String): XProcException = internalError(69, None, token)
   def xiArgBundleCannotParseProperty(str: String): XProcException = internalError(70, None, str)
   def xiConfigurationException(message: String): XProcException = internalError(71, None, message)
+  def xiStepImplementationError(message: String, location: Option[Location]): XProcException = internalError(72, location, message)
 
   def xiThisCantHappen(msg: String, location: Option[Location]): XProcException = internalError(999, location, msg)
 
@@ -154,7 +155,7 @@ object XProcException {
   def xdDuplicateKeysForbidden(message: String, location: Option[Location]): XProcException = dynamicError(58, message, location)
   def xdInvalidKeyValue(message: String, location: Option[Location]): XProcException = dynamicError(59, message, location)
   def xdUnsupportedEncoding(encoding: String, location: Option[Location]): XProcException = dynamicError(60, encoding, location)
-  def xdKeyIsInvalidQName(key: String, location: Option[Location]): XProcException = dynamicError(61, key, location)
+  def xdValueNotAnEQName(value: String, location: Option[Location]): XProcException = dynamicError(61, value, location)
   def xdMismatchedContentType(declType: MediaType, propType: MediaType, location: Option[Location]): XProcException = dynamicError(62, List(declType,propType), location)
   def xdNoMarkupAllowed(name: QName, location: Option[Location]): XProcException = dynamicError(63, name, location)
   def xdInvalidURI(uri: String, location: Option[Location]): XProcException = dynamicError(64, uri, location)

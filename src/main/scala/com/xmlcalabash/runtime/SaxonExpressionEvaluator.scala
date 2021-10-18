@@ -13,7 +13,7 @@ import net.sf.saxon.expr.XPathContext
 import net.sf.saxon.lib.{CollectionFinder, Resource, ResourceCollection}
 import net.sf.saxon.ma.arrays.ArrayItem
 import net.sf.saxon.om.{Item, SpaceStrippingRule}
-import net.sf.saxon.s9api.{ItemTypeFactory, QName, SaxonApiException, SaxonApiUncheckedException, SequenceType, XPathExecutable, XdmArray, XdmAtomicValue, XdmItem, XdmNode, XdmNodeKind, XdmValue}
+import net.sf.saxon.s9api.{ItemType, ItemTypeFactory, QName, SaxonApiException, SaxonApiUncheckedException, SequenceType, XPathExecutable, XdmArray, XdmAtomicValue, XdmItem, XdmNode, XdmNodeKind, XdmValue}
 import net.sf.saxon.trans.XPathException
 import net.sf.saxon.tree.tiny.TinyAttributeImpl
 import net.sf.saxon.value.StringValue
@@ -468,6 +468,9 @@ class SaxonExpressionEvaluator(xmlCalabash: XMLCalabashConfig) extends Expressio
       if (as.isDefined) {
         val matches = as.get.getUnderlyingSequenceType.matches(uvalue, config.getTypeHierarchy)
         if (!matches) {
+          if (Option(as.get.getItemType).isDefined && as.get.getItemType == ItemType.QNAME) {
+            throw XProcException.xdValueNotAnEQName(uvalue.getStringValue, exprContext.location)
+          }
           throw XProcException.xdBadType(uvalue.toString, as.get.toString, exprContext.location)
         }
       }
