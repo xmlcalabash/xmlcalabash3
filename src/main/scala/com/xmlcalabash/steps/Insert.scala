@@ -52,7 +52,7 @@ class Insert() extends DefaultXmlStep  with ProcessMatchingNodes {
     matcher = new ProcessMatch(config, this, context)
     matcher.process(source, pattern)
 
-    consumer.get.receive("result", matcher.result, source_metadata)
+    consumer.receive("result", matcher.result, source_metadata)
   }
 
   override def reset(): Unit = {

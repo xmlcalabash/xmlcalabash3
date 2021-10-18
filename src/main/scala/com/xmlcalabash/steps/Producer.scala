@@ -23,7 +23,7 @@ class Producer() extends DefaultXmlStep {
     super.run(staticContext)
 
     for (item <- items) {
-      consumer.get.receive("result", item, new XProcMetadata(MediaType.TEXT))
+      consumer.receive("result", item, new XProcMetadata(MediaType.TEXT))
     }
   }
 }

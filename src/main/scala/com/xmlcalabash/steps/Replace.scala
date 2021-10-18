@@ -47,7 +47,7 @@ class Replace() extends DefaultXmlStep  with ProcessMatchingNodes {
       metadata = convertMetadataToText(metadata)
     }
 
-    consumer.get.receive("result", matcher.result, metadata)
+    consumer.receive("result", matcher.result, metadata)
   }
 
   override def reset(): Unit = {

@@ -54,6 +54,6 @@ class JavaScript extends DefaultXmlStep {
     val js = engine.eval(script)
     val xml = TypeUtils.castAsXml(js)
 
-    consumer.get.receive("result", xml, new XProcMetadata(TypeUtils.mediaType(xml)))
+    consumer.receive("result", xml, new XProcMetadata(TypeUtils.mediaType(xml)))
   }
 }

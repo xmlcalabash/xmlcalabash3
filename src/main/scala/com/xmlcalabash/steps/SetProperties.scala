@@ -101,6 +101,6 @@ class SetProperties() extends DefaultXmlStep {
     }
 
     val newmeta = new XProcMetadata(metadata.contentType, newprops.toMap)
-    consumer.get.receive("result", result, newmeta)
+    consumer.receive("result", result, newmeta)
   }
 }

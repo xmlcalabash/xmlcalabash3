@@ -37,7 +37,7 @@ class ExceptionTranslator() extends DefaultXmlStep {
 
     tree.addEndElement()
     tree.endDocument()
-    consumer.get.receive("result", tree.result, new XProcMetadata(MediaType.XML))
+    consumer.receive("result", tree.result, new XProcMetadata(MediaType.XML))
   }
 
   private def formatException(tree: SaxonTreeBuilder, exception: Throwable): Unit = {

@@ -13,6 +13,7 @@ import net.sf.saxon.ma.arrays.ArrayItemType
 import net.sf.saxon.ma.map.MapType
 import net.sf.saxon.s9api.{QName, XdmNode}
 
+import java.lang.reflect.InvocationTargetException
 import scala.collection.mutable
 
 class AtomicStep(override val config: XMLCalabashConfig, params: Option[ImplParams]) extends Step(config) with NamedArtifact {
@@ -250,15 +251,32 @@ class AtomicStep(override val config: XMLCalabashConfig, params: Option[ImplPara
       if (declStep.isDefined) {
         new StepRunner(config, declStep.get, sig)
       } else {
-        throw new ModelException(ExceptionCode.NOIMPL, stepType.toString, location)
+        throw XProcException.xiStepImplementationError(s"No implementation for ${stepType.toString}", location)
       }
     } else {
-      val klass = Class.forName(implClass.head).getDeclaredConstructor().newInstance()
-      klass match {
-        case step: XmlStep =>
-          new StepWrapper(step, sig)
-        case _ =>
-          throw new ModelException(ExceptionCode.IMPLNOTSTEP, stepType.toString, location)
+      try {
+        val klass = Class.forName(implClass.head).getDeclaredConstructor().newInstance()
+        klass match {
+          case step: XmlStep =>
+            new StepWrapper(step, sig)
+          case _ =>
+            throw XProcException.xiStepImplementationError(s"Class does not implement an XmlStep: ${stepType.toString}", location)
+        }
+      } catch {
+        case ex: XProcException =>
+          throw ex
+        case _: ClassNotFoundException =>
+          throw XProcException.xiStepImplementationError(s"Class not found: ${implClass.head}", location)
+        case _: IllegalAccessException =>
+          throw XProcException.xiStepImplementationError(s"Constructor inaccessible: ${implClass.head}", location)
+        case ex: InstantiationException =>
+          throw XProcException.xiStepImplementationError(s"Cannot instantiate ${implClass.head}: ${ex.getMessage}", location)
+        case ex: InvocationTargetException =>
+          throw XProcException.xiStepImplementationError(s"Constructor threw exception ${implClass.head}: ${ex.getMessage}", location)
+        case ex: ExceptionInInitializerError =>
+          throw XProcException.xiStepImplementationError(s"Constructor failed for ${implClass.head}: ${ex.getMessage}", location)
+        case ex: Throwable =>
+          throw XProcException.xiStepImplementationError(s"Failed to instantiate ${implClass.head}: ${ex.getMessage}", location)
       }
     }
   }

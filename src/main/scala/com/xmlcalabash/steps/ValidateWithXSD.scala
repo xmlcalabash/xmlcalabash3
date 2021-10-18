@@ -195,13 +195,13 @@ class ValidateWithXSD() extends DefaultXmlStep {
       if (assert_valid) {
         throw raisedException.get
       } else {
-        consumer.get.receive("report", errors.get, XProcMetadata.XML)
-        consumer.get.receive("result", source, sourceMetadata)
+        consumer.receive("report", errors.get, XProcMetadata.XML)
+        consumer.receive("result", source, sourceMetadata)
       }
     } else {
       errors = Some(report.endErrors())
-      consumer.get.receive("report", errors.get, XProcMetadata.XML)
-      consumer.get.receive("result", destination.getXdmNode, sourceMetadata)
+      consumer.receive("report", errors.get, XProcMetadata.XML)
+      consumer.receive("result", destination.getXdmNode, sourceMetadata)
     }
   }
 }

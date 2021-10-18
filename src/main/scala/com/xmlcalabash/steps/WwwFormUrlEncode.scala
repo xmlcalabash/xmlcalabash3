@@ -52,7 +52,7 @@ class WwwFormUrlEncode() extends DefaultXmlStep {
       }
     }
 
-    consumer.get.receive("result", encoded.toString(), new XProcMetadata(MediaType.TEXT))
+    consumer.receive("result", encoded.toString(), new XProcMetadata(MediaType.TEXT))
   }
 
   private def encode(value: String): String = {

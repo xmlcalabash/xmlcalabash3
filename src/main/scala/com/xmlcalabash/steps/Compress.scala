@@ -71,6 +71,6 @@ class Compress extends DefaultXmlStep {
     }
 
     val meta = new XProcMetadata(mtype, props.toMap)
-    consumer.get.receive("result", binary, meta)
+    consumer.receive("result", binary, meta)
   }
 }

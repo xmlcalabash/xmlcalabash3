@@ -76,7 +76,7 @@ class Merge extends DefaultXmlStep {
       }
     }
 
-    consumer.get.receive("result", merged, XProcMetadata.JSON)
+    consumer.receive("result", merged, XProcMetadata.JSON)
   }
 
   private def addToMap(key: XdmAtomicValue, value: XdmValue): Unit = {

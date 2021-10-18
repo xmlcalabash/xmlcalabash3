@@ -51,7 +51,7 @@ class Filter extends DefaultXmlStep {
           builder.addText(item.getStringValue)
       }
       builder.endDocument()
-      consumer.get.receive("result", builder.result, new XProcMetadata(meta.contentType))
+      consumer.receive("result", builder.result, new XProcMetadata(meta.contentType))
     }
   }
 }

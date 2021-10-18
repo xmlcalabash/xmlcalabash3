@@ -52,6 +52,6 @@ class Join() extends DefaultXmlStep {
       throw XProcException.xcContentTypeIsNotText(contentType.toString, location)
     }
 
-    consumer.get.receive("result", new XdmAtomicValue(result), new XProcMetadata(contentType))
+    consumer.receive("result", new XdmAtomicValue(result), new XProcMetadata(contentType))
   }
 }

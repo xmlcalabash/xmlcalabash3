@@ -64,6 +64,6 @@ class WwwFormUrlDecode() extends DefaultXmlStep {
       }
     }
 
-    consumer.get.receive("result", json, new XProcMetadata(MediaType.JSON))
+    consumer.receive("result", json, new XProcMetadata(MediaType.JSON))
   }
 }

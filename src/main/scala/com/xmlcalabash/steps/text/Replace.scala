@@ -44,7 +44,7 @@ class Replace() extends DefaultXmlStep {
     val evaluator = config.expressionEvaluator.newInstance()
     val repl = evaluator.singletonValue(expr, List(contextItem), Map.empty[String,Message], None)
 
-    consumer.get.receive("result", repl.item, meta)
+    consumer.receive("result", repl.item, meta)
   }
 
 }

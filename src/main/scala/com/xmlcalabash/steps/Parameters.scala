@@ -51,7 +51,7 @@ class Parameters() extends DefaultXmlStep {
     builder.addEndElement()
     builder.endDocument()
 
-    consumer.get.receive("result", builder.result, new XProcMetadata(MediaType.XML))
+    consumer.receive("result", builder.result, new XProcMetadata(MediaType.XML))
   }
 
 

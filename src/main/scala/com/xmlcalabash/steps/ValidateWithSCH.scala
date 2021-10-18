@@ -75,7 +75,7 @@ class ValidateWithSCH() extends DefaultXmlStep {
       }
     }
 
-    consumer.get.receive("report", report, new XProcMetadata(MediaType.XML))
-    consumer.get.receive("result", source, sourceMetadata)
+    consumer.receive("report", report, new XProcMetadata(MediaType.XML))
+    consumer.receive("result", source, sourceMetadata)
   }
 }

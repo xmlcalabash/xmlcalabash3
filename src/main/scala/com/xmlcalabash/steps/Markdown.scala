@@ -49,6 +49,6 @@ class Markdown() extends DefaultXmlStep {
 
     val result = config.documentManager.parse(request, stream)
 
-    consumer.get.receive("result", result.value, new XProcMetadata(MediaType.HTML))
+    consumer.receive("result", result.value, new XProcMetadata(MediaType.HTML))
   }
 }

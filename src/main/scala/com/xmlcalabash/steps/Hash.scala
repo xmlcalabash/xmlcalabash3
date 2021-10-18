@@ -85,7 +85,7 @@ class Hash() extends DefaultXmlStep  with ProcessMatchingNodes {
       metadata = convertMetadataToText(metadata)
     }
 
-    consumer.get.receive("result", result, metadata)
+    consumer.receive("result", result, metadata)
   }
 
   override def startDocument(node: XdmNode): Boolean = {

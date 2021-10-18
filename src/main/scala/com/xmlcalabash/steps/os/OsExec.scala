@@ -156,9 +156,9 @@ class OsExec extends DefaultXmlStep {
 
     if (outres.shadow.isDefined) {
       val node = new BinaryNode(config, outres.shadow.get)
-      consumer.get.receive("result", node, new XProcMetadata(resultContentType))
+      consumer.receive("result", node, new XProcMetadata(resultContentType))
     } else {
-      consumer.get.receive("result", outres.value, new XProcMetadata(resultContentType))
+      consumer.receive("result", outres.value, new XProcMetadata(resultContentType))
     }
 
     val errreq = new DocumentRequest(None, Some(errorContentType), location)
@@ -166,9 +166,9 @@ class OsExec extends DefaultXmlStep {
 
     if (errres.shadow.isDefined) {
       val node = new BinaryNode(config, errres.shadow.get)
-      consumer.get.receive("error", node, new XProcMetadata(errorContentType))
+      consumer.receive("error", node, new XProcMetadata(errorContentType))
     } else {
-      consumer.get.receive("error", errres.value, new XProcMetadata(errorContentType))
+      consumer.receive("error", errres.value, new XProcMetadata(errorContentType))
     }
 
     val builder = new SaxonTreeBuilder(config)
@@ -177,7 +177,7 @@ class OsExec extends DefaultXmlStep {
     builder.addText(rc.toString)
     builder.addEndElement()
     builder.endDocument()
-    consumer.get.receive("exit-status", builder.result, new XProcMetadata(MediaType.XML))
+    consumer.receive("exit-status", builder.result, new XProcMetadata(MediaType.XML))
   }
 
   private class ProcessOutputReader(val is: InputStream, val buffer: ArrayBuffer[Byte]) extends Runnable {

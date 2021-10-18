@@ -48,7 +48,7 @@ class Join extends DefaultXmlStep {
       processItem(item, 0)
     }
 
-    consumer.get.receive("result", new XdmArray(items.toArray), XProcMetadata.JSON)
+    consumer.receive("result", new XdmArray(items.toArray), XProcMetadata.JSON)
   }
 
   private def processItem(item: XdmValue, depth: Int): Unit = {

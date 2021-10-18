@@ -51,7 +51,7 @@ class Store extends DefaultXmlStep {
     builder.endDocument()
     val result = builder.result
 
-    consumer.get.receive("result", source, smeta)
-    consumer.get.receive("result-uri", result, new XProcMetadata(MediaType.XML))
+    consumer.receive("result", source, smeta)
+    consumer.receive("result-uri", result, new XProcMetadata(MediaType.XML))
   }
 }

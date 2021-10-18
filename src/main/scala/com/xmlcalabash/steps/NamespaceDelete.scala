@@ -38,6 +38,6 @@ class NamespaceDelete() extends DefaultXmlStep {
     }
 
     val doc = S9Api.removeNamespaces(config.config, source, namespaces.toSet, false)
-    consumer.get.receive("result", doc, metadata)
+    consumer.receive("result", doc, metadata)
   }
 }

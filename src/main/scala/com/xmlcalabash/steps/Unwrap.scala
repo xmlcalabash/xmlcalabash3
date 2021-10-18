@@ -29,7 +29,7 @@ class Unwrap() extends DefaultXmlStep  with ProcessMatchingNodes {
     matcher.process(source, pattern)
 
     val result = matcher.result
-    consumer.get.receive("result", result, checkMetadata(result, source_metadata))
+    consumer.receive("result", result, checkMetadata(result, source_metadata))
   }
 
   override def startDocument(node: XdmNode): Boolean = {

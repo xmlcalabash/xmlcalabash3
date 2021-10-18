@@ -139,7 +139,7 @@ class ValidateWithRNG() extends DefaultXmlStep {
       throw XProcException.xcNotSchemaValidRelaxNG(source.getBaseURI.toASCIIString, "Error loading schema", location)
     }
 
-    consumer.get.receive("report", report.endErrors() , XProcMetadata.XML)
-    consumer.get.receive("result", source, sourceMetadata)
+    consumer.receive("report", report.endErrors() , XProcMetadata.XML)
+    consumer.receive("result", source, sourceMetadata)
   }
 }

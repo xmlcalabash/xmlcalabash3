@@ -59,13 +59,13 @@ class DocumentProperty(runtime: XMLCalabashConfig) extends FunctionImpl() {
             var uri = sval.getStringValue.trim.substring(2)
             val pos = uri.lastIndexOf("}")
             if (pos < 0) {
-              throw XProcException.xdKeyIsInvalidQName(sval.getStringValue, None)
+              throw XProcException.xdValueNotAnEQName(sval.getStringValue, None)
             }
             val local = uri.substring(pos+1)
             uri = uri.substring(0,pos)
 
             if (uri.contains("{") || uri.contains("}")) {
-              throw XProcException.xdKeyIsInvalidQName(sval.getStringValue, None)
+              throw XProcException.xdValueNotAnEQName(sval.getStringValue, None)
             }
 
             new QName("", uri, local)
@@ -78,7 +78,7 @@ class DocumentProperty(runtime: XMLCalabashConfig) extends FunctionImpl() {
               if (uri.isDefined) {
                 new QName(pfx, uri.get, local)
               } else {
-                throw XProcException.xdKeyIsInvalidQName(colonName, None)
+                throw XProcException.xdValueNotAnEQName(colonName, None)
               }
             } else {
               new QName("", colonName)

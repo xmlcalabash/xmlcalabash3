@@ -36,6 +36,6 @@ class Tail() extends TextLines {
       hlines.append("\n")
     }
 
-    consumer.get.receive("result", new XdmAtomicValue(hlines.toString), new XProcMetadata(MediaType.TEXT))
+    consumer.receive("result", new XdmAtomicValue(hlines.toString), new XProcMetadata(MediaType.TEXT))
   }
 }

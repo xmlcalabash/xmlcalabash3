@@ -81,9 +81,9 @@ class Load() extends DefaultXmlStep {
     // This feels like it's in the wrong place; like it should be centralized somehow...
     if (result.shadow.isDefined) {
       val node = new BinaryNode(config, result.shadow.get)
-      consumer.get.receive("result", node, new XProcMetadata(result.contentType, result.props))
+      consumer.receive("result", node, new XProcMetadata(result.contentType, result.props))
     } else {
-      consumer.get.receive("result", result.value, new XProcMetadata(result.contentType, result.props))
+      consumer.receive("result", result.value, new XProcMetadata(result.contentType, result.props))
     }
   }
 }

@@ -39,6 +39,6 @@ class B64Decode extends DefaultXmlStep {
         throw new RuntimeException(s"Don't know how to encode ${source.get}")
     }
 
-    consumer.get.receive("result", decoded, new XProcMetadata(MediaType.OCTET_STREAM))
+    consumer.receive("result", decoded, new XProcMetadata(MediaType.OCTET_STREAM))
   }
 }

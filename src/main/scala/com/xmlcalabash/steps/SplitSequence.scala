@@ -80,13 +80,13 @@ class SplitSequence() extends DefaultXmlStep {
         }
 
         if (matches) {
-          consumer.get.receive("matched", source, meta)
+          consumer.receive("matched", source, meta)
         } else {
-          consumer.get.receive("not-matched", source, meta)
+          consumer.receive("not-matched", source, meta)
           more = !initialOnly
         }
       } else {
-        consumer.get.receive("not-matched", source, meta)
+        consumer.receive("not-matched", source, meta)
       }
     }
   }

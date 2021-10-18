@@ -25,7 +25,7 @@ class PropertyExtract extends DefaultXmlStep {
   override def run(staticContext: StaticContext): Unit = {
     super.run(staticContext)
 
-    consumer.get.receive("result", doc.get, meta.get)
+    consumer.receive("result", doc.get, meta.get)
 
     val builder = new SaxonTreeBuilder(config)
     builder.startDocument(None)
@@ -61,6 +61,6 @@ class PropertyExtract extends DefaultXmlStep {
     builder.addEndElement()
     builder.endDocument()
 
-    consumer.get.receive("properties", builder.result, new XProcMetadata(MediaType.XML))
+    consumer.receive("properties", builder.result, new XProcMetadata(MediaType.XML))
   }
 }

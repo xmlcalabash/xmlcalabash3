@@ -65,6 +65,6 @@ class EscapeMarkup() extends DefaultXmlStep {
     }
 
     tree.endDocument()
-    consumer.get.receive("result", tree.result, metadata)
+    consumer.receive("result", tree.result, metadata)
   }
 }

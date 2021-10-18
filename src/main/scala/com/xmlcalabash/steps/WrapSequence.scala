@@ -61,7 +61,7 @@ class WrapSequence extends DefaultXmlStep {
     builder.addEndElement()
     builder.endDocument()
 
-    consumer.get.receive("result", builder.result, XProcMetadata.XML)
+    consumer.receive("result", builder.result, XProcMetadata.XML)
   }
 
   def runAdjacent(staticContext: StaticContext): Unit = {
@@ -85,7 +85,7 @@ class WrapSequence extends DefaultXmlStep {
             inGroup = false
             builder.addEndElement()
             builder.endDocument()
-            consumer.get.receive("result", builder.result, XProcMetadata.XML)
+            consumer.receive("result", builder.result, XProcMetadata.XML)
           }
         }
       }
@@ -104,7 +104,7 @@ class WrapSequence extends DefaultXmlStep {
       inGroup = false
       builder.addEndElement()
       builder.endDocument()
-      consumer.get.receive("result", builder.result, XProcMetadata.XML)
+      consumer.receive("result", builder.result, XProcMetadata.XML)
     }
   }
 

@@ -46,7 +46,7 @@ class XInclude() extends DefaultXmlStep {
     xincluder.setFixupXmlLang(fixupLang)
 
     try {
-      consumer.get.receive("result", xincluder.expandXIncludes(source), smeta)
+      consumer.receive("result", xincluder.expandXIncludes(source), smeta)
     } catch {
       case ex: XIncludeIOException =>
         throw XProcException.xcXIncludeError(ex.getMessage, location)

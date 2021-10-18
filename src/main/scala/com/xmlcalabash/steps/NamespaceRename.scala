@@ -37,11 +37,11 @@ class NamespaceRename() extends DefaultXmlStep with ProcessMatchingNodes {
     applyTo = stringBinding(_apply_to, "all")
 
     if (from == to) {
-      consumer.get.receive("result", source, metadata)
+      consumer.receive("result", source, metadata)
     } else {
       matcher = new ProcessMatch(config, this, context)
       matcher.process(source, "*")
-      consumer.get.receive("result", matcher.result, metadata)
+      consumer.receive("result", matcher.result, metadata)
     }
   }
 
