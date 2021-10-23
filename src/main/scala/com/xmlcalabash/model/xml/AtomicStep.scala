@@ -2,7 +2,7 @@ package com.xmlcalabash.model.xml
 
 import com.jafpl.graph.{ContainerStart, Node}
 import com.jafpl.messages.Message
-import com.xmlcalabash.config.XMLCalabashConfig
+import com.xmlcalabash.XMLCalabash
 import com.xmlcalabash.exceptions.{ExceptionCode, ModelException, XProcException}
 import com.xmlcalabash.model.util.XProcConstants
 import com.xmlcalabash.runtime.params.StepParams
@@ -16,16 +16,16 @@ import net.sf.saxon.s9api.{QName, XdmNode}
 import java.lang.reflect.InvocationTargetException
 import scala.collection.mutable
 
-class AtomicStep(override val config: XMLCalabashConfig, params: Option[ImplParams]) extends Step(config) with NamedArtifact {
-  def this(config: XMLCalabashConfig) = {
+class AtomicStep(override val config: XMLCalabash, params: Option[ImplParams]) extends Step(config) with NamedArtifact {
+  def this(config: XMLCalabash) = {
     this(config, None)
   }
 
-  def this(config: XMLCalabashConfig, params: ImplParams) = {
+  def this(config: XMLCalabash, params: ImplParams) = {
     this(config, Some(params))
   }
 
-  def this(config: XMLCalabashConfig, params: ImplParams, context: Artifact) = {
+  def this(config: XMLCalabash, params: ImplParams, context: Artifact) = {
     this(config, Some(params))
     _inScopeStatics = context._inScopeStatics
     _inScopeDynamics = context._inScopeDynamics

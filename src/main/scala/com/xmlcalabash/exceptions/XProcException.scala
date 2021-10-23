@@ -26,6 +26,8 @@ object XProcException {
   val err_xc0070 = new QName("err", XProcConstants.ns_err, "XC0070")
   val err_xs0107 = new QName("err", XProcConstants.ns_err, "XS0107")
 
+  var cx_XI0073 = new QName("cx", XProcConstants.ns_cx, "XI0073")
+
   def xtde(errNo: Int): StructuredQName = {
     new StructuredQName("err", XProcConstants.ns_xqt_errors, f"XTDE$errNo%04d")
   }
@@ -107,7 +109,11 @@ object XProcException {
   def xiArgBundleCannotParseProperty(str: String): XProcException = internalError(70, None, str)
   def xiConfigurationException(message: String): XProcException = internalError(71, None, message)
   def xiStepImplementationError(message: String, location: Option[Location]): XProcException = internalError(72, location, message)
+  def xiWrongProcessor(message: String, location: Option[Location]): XProcException = internalError(73, location, message)
+  def xiBadMediaType(message: String, location: Option[Location]): XProcException = internalError(74, location, message)
+  def xiBadConsumers(message: String, location: Option[Location]): XProcException = internalError(75, location, message)
 
+  def xiThisCantHappen(msg: String): XProcException = internalError(999, None, msg)
   def xiThisCantHappen(msg: String, location: Option[Location]): XProcException = internalError(999, location, msg)
 
   def xdContextItemSequence(expr: String, msg: String, location: Option[Location]): XProcException = dynamicError(1, List(expr, msg), location)
@@ -384,7 +390,7 @@ object XProcException {
   def xcFileCopyDirToFile(source: URI, target: URI, location: Option[Location]): XProcException = stepError(157, List(source, target), location)
   def xcFileMoveDirToFile(source: URI, target: URI, location: Option[Location]): XProcException = stepError(158, List(source, target), location)
 
-  def xcInvalidResultDataFormat(location: Option[Location]): XProcException = stepError(201, location)
+  def xcInvalidResultDataFormat(contentType: String, location: Option[Location]): XProcException = stepError(201, contentType, location)
   def xcUnknownCompressionFormat(location: Option[Location]): XProcException = stepError((202,1), location)
   def xcUnknownCompressionFormat(format: QName, location: Option[Location]): XProcException = stepError((202,2), format, location)
   def xcUncompressionError(location: Option[Location]): XProcException = stepError((202,3), location)

@@ -1,12 +1,12 @@
 package com.xmlcalabash.model.xml
 
 import com.jafpl.graph.Node
-import com.xmlcalabash.config.XMLCalabashConfig
+import com.xmlcalabash.XMLCalabash
 import com.xmlcalabash.runtime.{ImplParams, XMLCalabashRuntime}
 
-class AtomicLoader(override val config: XMLCalabashConfig, params: Option[ImplParams]) extends AtomicStep(config, params) {
+class AtomicLoader(override val config: XMLCalabash, params: Option[ImplParams]) extends AtomicStep(config, params) {
 
-  def this(config: XMLCalabashConfig, params: ImplParams, context: Artifact) = {
+  def this(config: XMLCalabash, params: ImplParams, context: Artifact) = {
     this(config, Some(params))
     _inScopeStatics = context._inScopeStatics
     _inScopeDynamics = context._inScopeDynamics

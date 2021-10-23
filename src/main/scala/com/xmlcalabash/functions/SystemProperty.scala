@@ -1,6 +1,6 @@
 package com.xmlcalabash.functions
 
-import com.xmlcalabash.config.XMLCalabashConfig
+import com.xmlcalabash.XMLCalabash
 import com.xmlcalabash.exceptions.XProcException
 import com.xmlcalabash.model.util.XProcConstants
 import net.sf.saxon.expr.{Expression, StaticContext, XPathContext}
@@ -8,7 +8,7 @@ import net.sf.saxon.lib.{ExtensionFunctionCall, ExtensionFunctionDefinition}
 import net.sf.saxon.om.{Item, Sequence, StructuredQName}
 import net.sf.saxon.value.{Int64Value, SequenceType, StringValue}
 
-class SystemProperty(runtime: XMLCalabashConfig) extends FunctionImpl() {
+class SystemProperty(runtime: XMLCalabash) extends FunctionImpl() {
   private val _localhost = "http://localhost/"
   private val funcname = new StructuredQName("p", XProcConstants.ns_p, "system-property")
 

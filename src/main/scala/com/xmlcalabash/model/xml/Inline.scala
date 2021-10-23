@@ -1,7 +1,7 @@
 package com.xmlcalabash.model.xml
 
 import com.jafpl.messages.Message
-import com.xmlcalabash.config.XMLCalabashConfig
+import com.xmlcalabash.XMLCalabash
 import com.xmlcalabash.exceptions.XProcException
 import com.xmlcalabash.model.util.{SaxonTreeBuilder, ValueParser, XProcConstants}
 import com.xmlcalabash.runtime.StaticContext
@@ -14,7 +14,7 @@ import java.io.UnsupportedEncodingException
 import java.util.Base64
 import scala.collection.mutable
 
-class Inline(override val config: XMLCalabashConfig, srcNode: XdmNode, implied: Boolean) extends DataSource(config) {
+class Inline(override val config: XMLCalabash, srcNode: XdmNode, implied: Boolean) extends DataSource(config) {
   private var _node: XdmNode = srcNode
   private var _contentType = Option.empty[MediaType]
   private var _documentProperties = Option.empty[String]
@@ -28,7 +28,7 @@ class Inline(override val config: XMLCalabashConfig, srcNode: XdmNode, implied: 
     throw new RuntimeException("inline document must be a document")
   }
 
-  def this(config: XMLCalabashConfig, srcNode: XdmNode) = {
+  def this(config: XMLCalabash, srcNode: XdmNode) = {
     this(config, srcNode, false)
   }
 

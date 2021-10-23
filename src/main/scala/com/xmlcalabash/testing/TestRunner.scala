@@ -1,7 +1,7 @@
 package com.xmlcalabash.testing
 
 import com.jafpl.messages.Message
-import com.xmlcalabash.config.XMLCalabashConfig
+import com.xmlcalabash.XMLCalabash
 import com.xmlcalabash.exceptions.TestException
 import com.xmlcalabash.messages.XdmNodeItemMessage
 import com.xmlcalabash.model.util.{SaxonTreeBuilder, ValueParser}
@@ -9,7 +9,7 @@ import com.xmlcalabash.model.xml.XMLContext
 import com.xmlcalabash.runtime.{SaxonExpressionEvaluator, StaticContext, XProcLocation, XProcMetadata, XProcXPathExpression}
 import com.xmlcalabash.util.{MediaType, S9Api, TypeUtils, URIUtils, Urify}
 import net.sf.saxon.om.{AttributeMap, EmptyAttributeMap}
-import net.sf.saxon.s9api.{Axis, QName, XdmNode, XdmNodeKind, XdmValue}
+import net.sf.saxon.s9api.{Axis, Processor, QName, XdmNode, XdmNodeKind, XdmValue}
 import org.slf4j.{Logger, LoggerFactory}
 import org.xml.sax.InputSource
 
@@ -25,7 +25,7 @@ object TestRunner {
   private val lock = new Object()
 }
 
-class TestRunner(runtimeConfig: XMLCalabashConfig, online: Boolean, regex: Option[String], testlist: List[String], testloc: List[String]) {
+class TestRunner(processor: Processor, online: Boolean, regex: Option[String], testlist: List[String], testloc: List[String]) {
   private val _testsuite = new QName("", "testsuite")
   private val _properties = new QName("", "properties")
   private val _property = new QName("", "property")
@@ -71,11 +71,12 @@ class TestRunner(runtimeConfig: XMLCalabashConfig, online: Boolean, regex: Optio
   private val testFiles = ListBuffer.empty[String]
   private val fnregex = "^.*.xml".r
 
-  private val context = new StaticContext(runtimeConfig)
-  private val processor = runtimeConfig.processor
   private val builder = processor.newDocumentBuilder()
   builder.setDTDValidation(false)
   builder.setLineNumbering(true)
+
+  private val emptyConfig = XMLCalabash.newInstance(processor)
+  emptyConfig.configure()
 
   for (path <- testloc) {
     val dir = new File(path)
@@ -156,7 +157,7 @@ class TestRunner(runtimeConfig: XMLCalabashConfig, online: Boolean, regex: Optio
   }
 
   def junit(): XdmNode = {
-    val junit = new SaxonTreeBuilder(runtimeConfig)
+    val junit = new SaxonTreeBuilder(processor)
     junit.startDocument(URIUtils.cwdAsURI)
 
     val suite_start_ms = Calendar.getInstance().getTimeInMillis
@@ -273,7 +274,7 @@ class TestRunner(runtimeConfig: XMLCalabashConfig, online: Boolean, regex: Optio
 
     logger.info(s"$failures of $count tests failed")
 
-    val wrapper = new SaxonTreeBuilder(runtimeConfig)
+    val wrapper = new SaxonTreeBuilder(processor)
     wrapper.startDocument(URIUtils.cwdAsURI)
 
     var amap: AttributeMap = EmptyAttributeMap.getInstance()
@@ -299,70 +300,70 @@ class TestRunner(runtimeConfig: XMLCalabashConfig, online: Boolean, regex: Optio
 
     amap = EmptyAttributeMap.getInstance()
     amap = amap.put(TypeUtils.attributeInfo(_name, "processor"))
-    amap = amap.put(TypeUtils.attributeInfo(_value, runtimeConfig.productName))
+    amap = amap.put(TypeUtils.attributeInfo(_value, emptyConfig.productName))
     wrapper.addStartElement(_property, amap)
     wrapper.addEndElement()
     wrapper.addText("\n")
 
     amap = EmptyAttributeMap.getInstance()
     amap = amap.put(TypeUtils.attributeInfo(_name, "version"))
-    amap = amap.put(TypeUtils.attributeInfo(_value, s"${runtimeConfig.productVersion} (with JAFPL ${runtimeConfig.jafplVersion} for Saxon ${runtimeConfig.saxonVersion})"))
+    amap = amap.put(TypeUtils.attributeInfo(_value, s"${emptyConfig.productVersion} (with JAFPL ${emptyConfig.jafplVersion} for Saxon ${emptyConfig.saxonVersion})"))
     wrapper.addStartElement(_property, amap)
     wrapper.addEndElement()
     wrapper.addText("\n")
 
     amap = EmptyAttributeMap.getInstance()
     amap = amap.put(TypeUtils.attributeInfo(_name, "productVersion"))
-    amap = amap.put(TypeUtils.attributeInfo(_value, runtimeConfig.productVersion))
+    amap = amap.put(TypeUtils.attributeInfo(_value, emptyConfig.productVersion))
     wrapper.addStartElement(_property, amap)
     wrapper.addEndElement()
     wrapper.addText("\n")
 
     amap = EmptyAttributeMap.getInstance()
     amap = amap.put(TypeUtils.attributeInfo(_name, "jafplVersion"))
-    amap = amap.put(TypeUtils.attributeInfo(_value, runtimeConfig.jafplVersion))
+    amap = amap.put(TypeUtils.attributeInfo(_value, emptyConfig.jafplVersion))
     wrapper.addStartElement(_property, amap)
     wrapper.addEndElement()
     wrapper.addText("\n")
 
     amap = EmptyAttributeMap.getInstance()
     amap = amap.put(TypeUtils.attributeInfo(_name, "saxonVersion"))
-    amap = amap.put(TypeUtils.attributeInfo(_value, runtimeConfig.saxonVersion))
+    amap = amap.put(TypeUtils.attributeInfo(_value, emptyConfig.saxonVersion))
     wrapper.addStartElement(_property, amap)
     wrapper.addEndElement()
     wrapper.addText("\n")
 
     amap = EmptyAttributeMap.getInstance()
     amap = amap.put(TypeUtils.attributeInfo(_name, "vendor"))
-    amap = amap.put(TypeUtils.attributeInfo(_value, runtimeConfig.vendor))
+    amap = amap.put(TypeUtils.attributeInfo(_value, emptyConfig.vendor))
     wrapper.addStartElement(_property, amap)
     wrapper.addEndElement()
     wrapper.addText("\n")
 
     amap = EmptyAttributeMap.getInstance()
     amap = amap.put(TypeUtils.attributeInfo(_name, "vendorURI"))
-    amap = amap.put(TypeUtils.attributeInfo(_value, runtimeConfig.vendorURI))
+    amap = amap.put(TypeUtils.attributeInfo(_value, emptyConfig.vendorURI))
     wrapper.addStartElement(_property, amap)
     wrapper.addEndElement()
     wrapper.addText("\n")
 
     amap = EmptyAttributeMap.getInstance()
     amap = amap.put(TypeUtils.attributeInfo(_name, "xprocVersion"))
-    amap = amap.put(TypeUtils.attributeInfo(_value, runtimeConfig.xprocVersion))
+    amap = amap.put(TypeUtils.attributeInfo(_value, emptyConfig.xprocVersion))
     wrapper.addStartElement(_property, amap)
     wrapper.addEndElement()
     wrapper.addText("\n")
 
     amap = EmptyAttributeMap.getInstance()
     amap = amap.put(TypeUtils.attributeInfo(_name, "xpathVersion"))
-    amap = amap.put(TypeUtils.attributeInfo(_value, runtimeConfig.xpathVersion))
+    amap = amap.put(TypeUtils.attributeInfo(_value, emptyConfig.xpathVersion))
     wrapper.addStartElement(_property, amap)
     wrapper.addEndElement()
     wrapper.addText("\n")
 
     amap = EmptyAttributeMap.getInstance()
     amap = amap.put(TypeUtils.attributeInfo(_name, "psviSupported"))
-    amap = amap.put(TypeUtils.attributeInfo(_value, runtimeConfig.psviSupported.toString))
+    amap = amap.put(TypeUtils.attributeInfo(_value, emptyConfig.psviSupported.toString))
     wrapper.addStartElement(_property, amap)
     wrapper.addEndElement()
     wrapper.addText("\n")
@@ -431,9 +432,10 @@ class TestRunner(runtimeConfig: XMLCalabashConfig, online: Boolean, regex: Optio
       throw new TestException("Unexpected node in runTestSuite(): " + node.getNodeKind)
     }
 
+    val context = new StaticContext(emptyConfig)
     val when = node.getAttributeValue(_when)
     if (when != null) {
-      val evaluator = new SaxonExpressionEvaluator(runtimeConfig)
+      val evaluator = new SaxonExpressionEvaluator(emptyConfig)
       val expr = new XProcXPathExpression(context, when)
       val run = evaluator.booleanValue(expr, List(), Map.empty[String,Message], None)
       if (!run) {
@@ -486,9 +488,10 @@ class TestRunner(runtimeConfig: XMLCalabashConfig, online: Boolean, regex: Optio
       throw new TestException("Unexpected node in runTestSuite(): " + node.getNodeKind)
     }
 
+    val context = new StaticContext(emptyConfig)
     val when = node.getAttributeValue(_when)
     if (when != null) {
-      val evaluator = new SaxonExpressionEvaluator(runtimeConfig)
+      val evaluator = new SaxonExpressionEvaluator(emptyConfig)
       val expr = new XProcXPathExpression(context, when)
       val run = evaluator.booleanValue(expr, List(), Map.empty[String,Message], None)
       if (!run) {
@@ -538,9 +541,10 @@ class TestRunner(runtimeConfig: XMLCalabashConfig, online: Boolean, regex: Optio
       throw new TestException("Unexpected node in runTestSuite(): " + node.getNodeKind)
     }
 
+    var context = new StaticContext(emptyConfig)
     val when = node.getAttributeValue(_when)
     if (when != null) {
-      val evaluator = new SaxonExpressionEvaluator(runtimeConfig)
+      val evaluator = new SaxonExpressionEvaluator(emptyConfig)
       val expr = new XProcXPathExpression(context, when)
       val run = evaluator.booleanValue(expr, List(), Map.empty[String,Message], None)
       if (!run) {
@@ -579,7 +583,7 @@ class TestRunner(runtimeConfig: XMLCalabashConfig, online: Boolean, regex: Optio
         return result
       }
       if (features.contains("p-validate-with-xsd")) {
-        if (runtimeConfig.processor.getSchemaManager == null) {
+        if (processor.getSchemaManager == null) {
           val result = new TestResult(true) // skipped counts as a pass...
           result.baseURI = node.getBaseURI
           result.skipped = "The 'p-validate-with-xsd' feature is not supported with this version of Saxon"
@@ -688,7 +692,11 @@ class TestRunner(runtimeConfig: XMLCalabashConfig, online: Boolean, regex: Optio
       throw new TestException("No pipeline for test")
     }
 
-    val tester = new Tester(XMLCalabashConfig.newInstance(runtimeConfig.processor))
+    val xmlcalabash = XMLCalabash.newInstance(processor)
+    xmlcalabash.configure()
+    context = new StaticContext(xmlcalabash)
+
+    val tester = new Tester(xmlcalabash)
 
     tester.pipeline = pipeline.get
 
@@ -702,12 +710,12 @@ class TestRunner(runtimeConfig: XMLCalabashConfig, online: Boolean, regex: Optio
 
     for ((port,list) <- inputs) {
       for (doc <- list) {
-        tester.addInput(port,doc)
+        xmlcalabash.args.input(port, doc)
       }
     }
 
     for ((name,bind) <- bindings) {
-      tester.addBinding(name, bind)
+      xmlcalabash.args.option(name.getEQName, bind)
     }
 
     val result = if (urifyFeature.isEmpty) {
@@ -754,10 +762,9 @@ class TestRunner(runtimeConfig: XMLCalabashConfig, online: Boolean, regex: Optio
               ns.put("err", "http://www.w3.org/2005/xqt-errors")
               ns ++= S9Api.inScopeNamespaces(node)
 
-              val scontext = new XMLContext(runtimeConfig)
-              scontext.nsBindings = ns.toMap
-              scontext.location = new XProcLocation(node)
-              val qcode = ValueParser.parseQName(ecode, scontext)
+              context.nsBindings = ns.toMap
+              context.location = new XProcLocation(node)
+              val qcode = ValueParser.parseQName(ecode, context)
               if (result.errQName.isDefined) {
                 passed = passed || qcode == result.errQName.get
               }
@@ -809,11 +816,11 @@ class TestRunner(runtimeConfig: XMLCalabashConfig, online: Boolean, regex: Optio
 
     val src = node.getAttributeValue(_src)
     if ((src == null) && children.isEmpty) {
-      val scontext = new XMLContext(runtimeConfig, Some(node.getBaseURI), S9Api.inScopeNamespaces(node), Some(new XProcLocation(node)))
+      val scontext = new XMLContext(emptyConfig, Some(node.getBaseURI), S9Api.inScopeNamespaces(node), Some(new XProcLocation(node)))
       val value = node.getAttributeValue(_select)
       val contextItem = inlineDocument(node)
       val message = new XdmNodeItemMessage(contextItem.get, new XProcMetadata(MediaType.XML), scontext)
-      val eval = runtimeConfig.expressionEvaluator.newInstance()
+      val eval = emptyConfig.expressionEvaluator.newInstance()
       val result = eval.singletonValue(new XProcXPathExpression(scontext, value), List(message), Map.empty[String,Message], None)
       Some(result.item)
     } else {
@@ -822,7 +829,7 @@ class TestRunner(runtimeConfig: XMLCalabashConfig, online: Boolean, regex: Optio
   }
 
   private def inlineDocument(node: XdmNode): Option[XdmNode] = {
-    val builder = new SaxonTreeBuilder(runtimeConfig)
+    val builder = new SaxonTreeBuilder(emptyConfig)
     val iter = node.axisIterator(Axis.CHILD)
 
     builder.startDocument(node.getBaseURI)

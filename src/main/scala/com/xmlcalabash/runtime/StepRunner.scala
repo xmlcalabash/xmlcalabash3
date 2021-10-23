@@ -3,7 +3,8 @@ import com.jafpl.graph.Location
 import com.jafpl.messages.{ExceptionMessage, Message}
 import com.jafpl.runtime.RuntimeConfiguration
 import com.jafpl.steps.{BindingSpecification, DataConsumer, PortCardinality}
-import com.xmlcalabash.config.{StepSignature, XMLCalabashConfig}
+import com.xmlcalabash.XMLCalabash
+import com.xmlcalabash.config.StepSignature
 import com.xmlcalabash.exceptions.XProcException
 import com.xmlcalabash.messages.{AnyItemMessage, XdmValueItemMessage}
 import com.xmlcalabash.model.util.XProcConstants
@@ -14,7 +15,7 @@ import net.sf.saxon.s9api.{QName, XdmItem, XdmNode, XdmValue}
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 
-class StepRunner(private val pruntime: XMLCalabashConfig, val decl: DeclareStep, val signature: StepSignature) extends StepExecutable {
+class StepRunner(private val pruntime: XMLCalabash, val decl: DeclareStep, val signature: StepSignature) extends StepExecutable {
   private var runtime: XMLCalabashRuntime = _
   private var _location = Option.empty[Location]
   private val consumers = mutable.HashMap.empty[String, ConsumerMap]
@@ -85,7 +86,7 @@ class StepRunner(private val pruntime: XMLCalabashConfig, val decl: DeclareStep,
     }
   }
 
-  override def configure(config: XMLCalabashConfig, stepType: QName, stepName: Option[String], params: Option[ImplParams]): Unit = {
+  override def configure(config: XMLCalabash, stepType: QName, stepName: Option[String], params: Option[ImplParams]): Unit = {
     // nop
   }
 

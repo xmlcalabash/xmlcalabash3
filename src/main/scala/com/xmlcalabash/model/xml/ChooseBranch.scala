@@ -2,7 +2,7 @@ package com.xmlcalabash.model.xml
 
 import com.jafpl.graph.{ChooseStart, Node}
 import com.jafpl.steps.Manifold
-import com.xmlcalabash.config.XMLCalabashConfig
+import com.xmlcalabash.XMLCalabash
 import com.xmlcalabash.exceptions.XProcException
 import com.xmlcalabash.runtime.params.XPathBindingParams
 import com.xmlcalabash.runtime.{StaticContext, XMLCalabashRuntime, XProcXPathExpression}
@@ -11,7 +11,7 @@ import net.sf.saxon.s9api.QName
 
 import scala.collection.mutable
 
-class ChooseBranch(override val config: XMLCalabashConfig) extends Container(config) with NamedArtifact {
+class ChooseBranch(override val config: XMLCalabash) extends Container(config) with NamedArtifact {
   protected var _test = ""
   protected var _collection = false
   protected var testExpr: XProcXPathExpression = _

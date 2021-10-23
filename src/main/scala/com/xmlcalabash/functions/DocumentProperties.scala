@@ -1,6 +1,6 @@
 package com.xmlcalabash.functions
 
-import com.xmlcalabash.config.XMLCalabashConfig
+import com.xmlcalabash.XMLCalabash
 import com.xmlcalabash.exceptions.XProcException
 import com.xmlcalabash.messages.XProcItemMessage
 import com.xmlcalabash.model.util.XProcConstants
@@ -11,7 +11,7 @@ import net.sf.saxon.s9api.{QName, XdmAtomicValue, XdmItem, XdmMap, XdmValue}
 import net.sf.saxon.tree.tiny.{TinyDocumentImpl, TinyElementImpl, TinyTextImpl}
 import net.sf.saxon.value.{SequenceType, StringValue}
 
-class DocumentProperties(runtime: XMLCalabashConfig) extends FunctionImpl {
+class DocumentProperties(runtime: XMLCalabash) extends FunctionImpl {
   val funcname = new StructuredQName("p", XProcConstants.ns_p, "document-properties")
 
   override def getFunctionQName: StructuredQName = funcname

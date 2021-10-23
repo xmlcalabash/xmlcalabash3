@@ -1,12 +1,12 @@
 package com.xmlcalabash.model.xml
 
-import com.xmlcalabash.config.XMLCalabashConfig
+import com.xmlcalabash.XMLCalabash
 import com.xmlcalabash.exceptions.XProcException
 import com.xmlcalabash.runtime.XProcXPathExpression
 import com.xmlcalabash.util.xc.ElaboratedPipeline
 import net.sf.saxon.s9api.XdmNode
 
-class Otherwise(override val config: XMLCalabashConfig) extends ChooseBranch(config) {
+class Otherwise(override val config: XMLCalabash) extends ChooseBranch(config) {
 
   // An otherwise is not atomic, even if it contains only synthetic children
   override def atomic: Boolean = false

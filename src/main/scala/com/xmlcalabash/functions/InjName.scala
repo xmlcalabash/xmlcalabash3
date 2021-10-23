@@ -1,6 +1,6 @@
 package com.xmlcalabash.functions
 
-import com.xmlcalabash.config.XMLCalabashConfig
+import com.xmlcalabash.XMLCalabash
 import com.xmlcalabash.exceptions.XProcException
 import com.xmlcalabash.model.util.XProcConstants
 import net.sf.saxon.expr.XPathContext
@@ -8,7 +8,7 @@ import net.sf.saxon.lib.{ExtensionFunctionCall, ExtensionFunctionDefinition}
 import net.sf.saxon.om.{Sequence, StructuredQName}
 import net.sf.saxon.value.{SequenceType, StringValue}
 
-class InjName(runtime: XMLCalabashConfig) extends FunctionImpl {
+class InjName(runtime: XMLCalabash) extends FunctionImpl {
   private val funcname = new StructuredQName("cx", XProcConstants.ns_cx, "step-name")
 
   override def getFunctionQName: StructuredQName = funcname

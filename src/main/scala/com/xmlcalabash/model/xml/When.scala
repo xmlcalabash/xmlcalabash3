@@ -1,6 +1,6 @@
 package com.xmlcalabash.model.xml
 
-import com.xmlcalabash.config.XMLCalabashConfig
+import com.xmlcalabash.XMLCalabash
 import com.xmlcalabash.exceptions.XProcException
 import com.xmlcalabash.model.util.XProcConstants
 import com.xmlcalabash.util.xc.ElaboratedPipeline
@@ -9,7 +9,7 @@ import net.sf.saxon.s9api.{QName, XdmAtomicValue, XdmNode}
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 
-class When(override val config: XMLCalabashConfig) extends ChooseBranch(config) {
+class When(override val config: XMLCalabash) extends ChooseBranch(config) {
 
   override def parse(node: XdmNode): Unit = {
     super.parse(node)

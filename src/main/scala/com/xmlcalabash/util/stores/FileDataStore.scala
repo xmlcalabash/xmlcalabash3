@@ -1,6 +1,6 @@
 package com.xmlcalabash.util.stores
 
-import com.xmlcalabash.config.XMLCalabashConfig
+import com.xmlcalabash.XMLCalabash
 import com.xmlcalabash.util.{ContentTypes, URIUtils}
 import net.sf.saxon.s9api.XdmAtomicValue
 
@@ -10,7 +10,7 @@ import java.text.SimpleDateFormat
 import java.util.{Date, TimeZone}
 import scala.collection.mutable
 
-class FileDataStore(config: XMLCalabashConfig, fallback: DataStore) extends DataStore {
+class FileDataStore(config: XMLCalabash, fallback: DataStore) extends DataStore {
   override def writeEntry(href: String, baseURI: URI, media: String, handler: DataWriter): URI = {
     val uri = baseURI.resolve(href)
     if ("file".equalsIgnoreCase(uri.getScheme)) {

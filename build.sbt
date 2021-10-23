@@ -184,6 +184,10 @@ Test / parallelExecution := false
 
 // ============================================================
 
+//Compile / unmanagedClasspath += file(s"${baseDirectory.value}/lib")
+//Runtime / unmanagedClasspath += file(s"${baseDirectory.value}/lib")
+//Test / unmanagedClasspath += file(s"${baseDirectory.value}/lib")
+
 Runtime / unmanagedClasspath ++= (
   if (useSaxonEE) {
     Seq(file(s"${baseDirectory.value}/eelib"))

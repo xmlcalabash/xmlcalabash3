@@ -1,7 +1,9 @@
 package com.xmlcalabash.steps.internal
 
+import com.xmlcalabash.XMLCalabash
+
 import java.net.{URI, URLConnection}
-import com.xmlcalabash.config.{DocumentRequest, XMLCalabashConfig}
+import com.xmlcalabash.config.DocumentRequest
 import com.xmlcalabash.exceptions.XProcException
 import com.xmlcalabash.model.util.{ValueParser, XProcConstants}
 import com.xmlcalabash.runtime.params.DocumentLoaderParams
@@ -33,7 +35,7 @@ class DocumentLoader() extends AbstractLoader {
   }
   override def outputSpec: XmlPortSpecification = XmlPortSpecification.ANYRESULTSEQ
 
-  override def configure(config: XMLCalabashConfig, stepType: QName, stepName: Option[String], params: Option[ImplParams]): Unit = {
+  override def configure(config: XMLCalabash, stepType: QName, stepName: Option[String], params: Option[ImplParams]): Unit = {
     super.configure(config, stepType, stepName, params)
 
     if (params.isEmpty) {

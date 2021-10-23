@@ -1,7 +1,7 @@
 package com.xmlcalabash.model.util
 
 import com.jafpl.graph.Location
-import com.xmlcalabash.config.XMLCalabashConfig
+import com.xmlcalabash.XMLCalabash
 import com.xmlcalabash.exceptions.{ExceptionCode, ModelException, XProcException}
 import com.xmlcalabash.model.util.XProcConstants.ValueTemplate
 import com.xmlcalabash.runtime.{StaticContext, XMLCalabashRuntime, XProcExpression, XProcVtExpression, XProcXPathExpression}
@@ -234,7 +234,7 @@ object ValueParser {
     findVariableRefsInAvt(config.expressionParser, list)
   }
 
-  def findVariableRefsInAvt(config: XMLCalabashConfig, list: List[String]): Set[QName] = {
+  def findVariableRefsInAvt(config: XMLCalabash, list: List[String]): Set[QName] = {
     findVariableRefsInAvt(config.expressionParser, list)
   }
 
@@ -252,7 +252,7 @@ object ValueParser {
     variableRefs.toSet
   }
 
-  def findVariableRefsInString(config: XMLCalabashConfig, text: String): Set[QName] = {
+  def findVariableRefsInString(config: XMLCalabash, text: String): Set[QName] = {
     findVariableRefsInString(config.expressionParser, text)
   }
 

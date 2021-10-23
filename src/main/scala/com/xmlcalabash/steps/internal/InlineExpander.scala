@@ -2,7 +2,8 @@ package com.xmlcalabash.steps.internal
 
 import com.jafpl.graph.Location
 import com.jafpl.messages.Message
-import com.xmlcalabash.config.{DocumentRequest, XMLCalabashConfig}
+import com.xmlcalabash.XMLCalabash
+import com.xmlcalabash.config.DocumentRequest
 import com.xmlcalabash.exceptions.XProcException
 import com.xmlcalabash.messages.{XProcItemMessage, XdmNodeItemMessage, XdmValueItemMessage}
 import com.xmlcalabash.model.util.{SaxonTreeBuilder, ValueParser, XProcConstants}
@@ -25,7 +26,7 @@ import scala.jdk.CollectionConverters._
 // the case where this is a default binding, it must *not* evaluate its options if the default
 // is not used.
 
-protected[xmlcalabash] class InlineExpander(val config: XMLCalabashConfig, val node: XdmNode, val meta: XProcMetadata, val exprContext: StaticContext, val location: Option[Location]) {
+protected[xmlcalabash] class InlineExpander(val config: XMLCalabash, val node: XdmNode, val meta: XProcMetadata, val exprContext: StaticContext, val location: Option[Location]) {
   var contentType: MediaType = meta.contentType
   var encoding: Option[String] = None
   var excludeURIs: Set[String] = Set()

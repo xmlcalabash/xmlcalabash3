@@ -1,14 +1,15 @@
 package com.xmlcalabash.model.xml
 
-import java.net.URI
+import com.xmlcalabash.XMLCalabash
 
-import com.xmlcalabash.config.{DocumentRequest, XMLCalabashConfig}
+import java.net.URI
+import com.xmlcalabash.config.DocumentRequest
 import com.xmlcalabash.exceptions.XProcException
 import com.xmlcalabash.model.util.XProcConstants
 import com.xmlcalabash.util.{MediaType, S9Api}
 import net.sf.saxon.s9api.XdmNode
 
-class Import(override val config: XMLCalabashConfig) extends Artifact(config) {
+class Import(override val config: XMLCalabash) extends Artifact(config) {
   private var _href: URI = _
 
   override def parse(node: XdmNode): Unit = {

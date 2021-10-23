@@ -2,7 +2,7 @@ package com.xmlcalabash.util
 
 import com.xmlcalabash.config.{JaxpConfigurer, JingConfigurer, SaxonConfigurer, XMLCalabashConfigurer, XProcConfigurer}
 
-class DefaultXProcConfigurer extends XProcConfigurer {
+class DefaultXProcConfigurer() extends XProcConfigurer {
   val defJaxpConfigurer = new DefaultJaxpConfigurer()
   val defSaxonConfigurer = new DefaultSaxonConfigurer()
   val defJingConfigurer = new DefaultJingConfigurer()

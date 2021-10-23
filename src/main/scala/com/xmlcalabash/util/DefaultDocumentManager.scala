@@ -3,12 +3,15 @@ package com.xmlcalabash.util
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory
 import com.jafpl.messages.Message
-import com.xmlcalabash.config.{DocumentManager, DocumentRequest, DocumentResponse, XMLCalabashConfig}
+import com.xmlcalabash.XMLCalabash
+import com.xmlcalabash.config.{DocumentManager, DocumentRequest, DocumentResponse}
 import com.xmlcalabash.exceptions.XProcException
 import com.xmlcalabash.messages.XdmValueItemMessage
 import com.xmlcalabash.model.util.{SaxonTreeBuilder, XProcConstants}
 import com.xmlcalabash.runtime.{BinaryNode, StaticContext, XProcMetadata, XProcXPathExpression}
 import com.xmlcalabash.util.xc.Errors
+import net.sf.saxon.Configuration
+import net.sf.saxon.lib.ErrorReporter
 import net.sf.saxon.s9api.{QName, SaxonApiException, XdmAtomicValue, XdmNode, XdmValue}
 import net.sf.saxon.trans.XPathException
 import nu.validator.htmlparser.common.XmlViolationPolicy
@@ -32,7 +35,7 @@ import javax.xml.transform.sax.SAXSource
 import scala.collection.mutable
 import scala.xml.SAXParseException
 
-class DefaultDocumentManager(xmlCalabash: XMLCalabashConfig) extends DocumentManager {
+class DefaultDocumentManager(xmlCalabash: XMLCalabash) extends DocumentManager {
   protected val logger: Logger = LoggerFactory.getLogger(this.getClass)
 
   private val _liberal = new QName("", "liberal")
@@ -263,13 +266,21 @@ class DefaultDocumentManager(xmlCalabash: XMLCalabashConfig) extends DocumentMan
       val errors = new Errors(xmlCalabash)
       val listener = new CachingErrorListener(errors)
       val saxonConfig = xmlCalabash.processor.getUnderlyingConfiguration
+
       // FIXME: Saxon10
       /*
       saxonConfig.synchronized {
-        listener.chainedListener = saxonConfig.getErrorListener
-        saxonConfig.setErrorListener(listener)
+        listener.chainedReporter = saxonConfig.makeErrorReporter()
+        saxonConfig.setErrorReporterFactory((config: Configuration) => {
+          def foo(config: Configuration): ErrorReporter = {
+            val reporter = listener
+            reporter
+          }
+
+          foo(config)
+        })
       }
-      */
+       */
 
       val builder = xmlCalabash.processor.newDocumentBuilder
       builder.setDTDValidation(request.dtdValidate)

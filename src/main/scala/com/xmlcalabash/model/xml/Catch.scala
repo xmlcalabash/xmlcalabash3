@@ -1,7 +1,7 @@
 package com.xmlcalabash.model.xml
 
 import com.jafpl.graph.{Node, TryCatchStart}
-import com.xmlcalabash.config.XMLCalabashConfig
+import com.xmlcalabash.XMLCalabash
 import com.xmlcalabash.exceptions.XProcException
 import com.xmlcalabash.model.util.XProcConstants
 import com.xmlcalabash.runtime.XMLCalabashRuntime
@@ -10,7 +10,7 @@ import net.sf.saxon.s9api.{QName, XdmNode}
 
 import scala.collection.mutable
 
-class Catch(override val config: XMLCalabashConfig) extends Container(config) with NamedArtifact {
+class Catch(override val config: XMLCalabash) extends Container(config) with NamedArtifact {
   private val _codes = mutable.HashSet.empty[QName]
 
   def codes: Set[QName] = _codes.toSet

@@ -90,7 +90,7 @@ class Uncompress extends DefaultXmlStep {
       result = config.documentManager.parse(request, gis)
     } catch {
       case _: XProcException =>
-        throw XProcException.xcInvalidResultDataFormat(location)
+        throw XProcException.xcInvalidResultDataFormat(outputContentType.toString, location)
       case ex: Exception =>
         throw ex
     }

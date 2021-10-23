@@ -2,7 +2,8 @@ package com.xmlcalabash.model.xml
 
 import com.jafpl.graph.Node
 import com.jafpl.messages.Message
-import com.xmlcalabash.config.{DocumentRequest, XMLCalabashConfig}
+import com.xmlcalabash.XMLCalabash
+import com.xmlcalabash.config.DocumentRequest
 import com.xmlcalabash.exceptions.XProcException
 import com.xmlcalabash.messages.{XdmNodeItemMessage, XdmValueItemMessage}
 import com.xmlcalabash.model.util.XProcConstants
@@ -15,7 +16,7 @@ import net.sf.saxon.s9api.{QName, SaxonApiException, SequenceType, XdmAtomicValu
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 
-class NameBinding(override val config: XMLCalabashConfig) extends Artifact(config) {
+class NameBinding(override val config: XMLCalabash) extends Artifact(config) {
   protected var _name: QName = _
   protected var _declaredType = Option.empty[SequenceType]
   protected var _as = Option.empty[SequenceType]

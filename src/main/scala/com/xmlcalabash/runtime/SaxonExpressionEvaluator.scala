@@ -3,7 +3,7 @@ package com.xmlcalabash.runtime
 import com.jafpl.graph.BindingParams
 import com.jafpl.messages.{ExceptionMessage, Message, PipelineMessage}
 import com.jafpl.runtime.ExpressionEvaluator
-import com.xmlcalabash.config.XMLCalabashConfig
+import com.xmlcalabash.XMLCalabash
 import com.xmlcalabash.exceptions.XProcException
 import com.xmlcalabash.messages.{AnyItemMessage, XdmNodeItemMessage, XdmValueItemMessage}
 import com.xmlcalabash.model.util.{SaxonTreeBuilder, ValueParser, XProcConstants}
@@ -31,7 +31,7 @@ object SaxonExpressionEvaluator {
   protected val _dynContext = new DynamicVariable[DynamicContext](null)
 }
 
-class SaxonExpressionEvaluator(xmlCalabash: XMLCalabashConfig) extends ExpressionEvaluator {
+class SaxonExpressionEvaluator(xmlCalabash: XMLCalabash) extends ExpressionEvaluator {
   protected val logger: Logger = LoggerFactory.getLogger(this.getClass)
 
   def withContext[T](context: DynamicContext)(thunk: => T): T = SaxonExpressionEvaluator._dynContext.withValue(context)(thunk)

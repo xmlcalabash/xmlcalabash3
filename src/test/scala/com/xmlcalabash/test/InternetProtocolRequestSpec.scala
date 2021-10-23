@@ -1,8 +1,10 @@
 package com.xmlcalabash.test
 
-import com.xmlcalabash.config.{DocumentRequest, XMLCalabashConfig}
+import com.xmlcalabash.XMLCalabash
+import com.xmlcalabash.config.DocumentRequest
 import com.xmlcalabash.runtime.XProcMetadata
 import com.xmlcalabash.util.{InternetProtocolRequest, MediaType}
+import net.sf.saxon.s9api.Processor
 import org.apache.http.impl.cookie.BasicClientCookie
 import org.scalatest.BeforeAndAfter
 import org.scalatest.flatspec.AnyFlatSpec
@@ -14,7 +16,9 @@ import scala.jdk.CollectionConverters.ListHasAsScala
 
 class InternetProtocolRequestSpec extends AnyFlatSpec with BeforeAndAfter {
   System.setProperty("com.xmlcalabash.configFile", "src/test/resources/config.xml")
-  private val config = XMLCalabashConfig.newInstance()
+  private val xmlcalabash = XMLCalabash.newInstance()
+  xmlcalabash.configure()
+  private val config = xmlcalabash
   private var serverAvailable = true
 
   before {

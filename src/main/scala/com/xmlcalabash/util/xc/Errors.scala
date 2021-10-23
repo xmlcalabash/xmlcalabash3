@@ -1,7 +1,7 @@
 package com.xmlcalabash.util.xc
 
 import com.jafpl.graph.Location
-import com.xmlcalabash.config.XMLCalabashConfig
+import com.xmlcalabash.XMLCalabash
 import com.xmlcalabash.model.util.{SaxonTreeBuilder, XProcConstants}
 import com.xmlcalabash.util.TypeUtils
 import net.sf.saxon.`type`.ValidationFailure
@@ -10,7 +10,7 @@ import net.sf.saxon.s9api.{QName, XdmNode}
 
 import scala.collection.mutable
 
-class Errors(val config: XMLCalabashConfig) {
+class Errors(val config: XMLCalabash) {
   private val builder = new SaxonTreeBuilder(config)
   private val openStack = mutable.Stack.empty[QName]
   private val inLibrary = false

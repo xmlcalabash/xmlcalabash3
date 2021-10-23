@@ -534,6 +534,9 @@ Cannot copy directory ($1) to file ($2)
 XC0158
 Cannot move directory ($1) to file ($2)
 
+XC0201
+Unable to interpret resource as “$1”.
+
 XC0203
 The specified boundary cannot be used in a multipart request: “$1”.
 

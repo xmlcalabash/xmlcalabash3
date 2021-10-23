@@ -1,6 +1,9 @@
 package com.xmlcalabash.config
 
+import com.xmlcalabash.XMLCalabash
+import com.xmlcalabash.util.PipelineParameter
+
 trait XMLCalabashConfigurer {
-  def configure(settings: ConfigurationSettings): Unit
-  def update(config: XMLCalabashConfig, settings: ConfigurationSettings): Unit
+  def configure(input: List[PipelineParameter]): List[PipelineParameter]
+  def update(config: XMLCalabash): Unit
 }

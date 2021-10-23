@@ -1,6 +1,6 @@
 package com.xmlcalabash.functions
 
-import com.xmlcalabash.config.XMLCalabashConfig
+import com.xmlcalabash.XMLCalabash
 import com.xmlcalabash.exceptions.XProcException
 import com.xmlcalabash.model.util.XProcConstants
 import com.xmlcalabash.runtime.StaticContext
@@ -11,7 +11,7 @@ import net.sf.saxon.ma.map.MapItem
 import net.sf.saxon.om.{Sequence, StructuredQName}
 import net.sf.saxon.value.{DoubleValue, SequenceType}
 
-class InjElapsed(runtime: XMLCalabashConfig) extends FunctionImpl {
+class InjElapsed(runtime: XMLCalabash) extends FunctionImpl {
   private val funcname = new StructuredQName("cx", XProcConstants.ns_cx, "step-elapsed")
 
   override def getFunctionQName: StructuredQName = funcname

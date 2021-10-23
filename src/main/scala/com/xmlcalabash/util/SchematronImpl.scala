@@ -1,6 +1,6 @@
 package com.xmlcalabash.util
 
-import com.xmlcalabash.config.XMLCalabashConfig
+import com.xmlcalabash.XMLCalabash
 import com.xmlcalabash.exceptions.{TestException, XProcException}
 import com.xmlcalabash.model.util.SaxonTreeBuilder
 import com.xmlcalabash.runtime.XMLCalabashRuntime
@@ -15,7 +15,7 @@ import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 import scala.jdk.CollectionConverters.IteratorHasAsScala
 
-class SchematronImpl(runtimeConfig: XMLCalabashConfig) {
+class SchematronImpl(runtimeConfig: XMLCalabash) {
   private val s_schema = new QName("http://purl.oclc.org/dsdl/schematron", "schema")
   private val _queryBinding = new QName("queryBinding")
   private val _untyped = StructuredQName.fromClarkName("{http://www.w3.org/2001/XMLSchema}untyped")

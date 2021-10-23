@@ -1,7 +1,7 @@
 package com.xmlcalabash.util
 
 import com.jafpl.graph.Location
-import com.xmlcalabash.config.XMLCalabashConfig
+import com.xmlcalabash.XMLCalabash
 import com.xmlcalabash.exceptions.XProcException
 import com.xmlcalabash.model.util.XProcConstants
 import com.xmlcalabash.runtime.{StaticContext, XMLCalabashRuntime, XProcMetadata, XProcXPathExpression}
@@ -27,7 +27,7 @@ import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 import scala.jdk.CollectionConverters.{ListHasAsScala, SeqHasAsJava}
 
-class InternetProtocolRequest(val config: XMLCalabashConfig, val context: StaticContext, val uri: URI) {
+class InternetProtocolRequest(val config: XMLCalabash, val context: StaticContext, val uri: URI) {
   private val _expires = new QName("", "expires")
   private val _date = new QName("", "date")
   private val _content_disposition = new QName("", "content-disposition")
@@ -56,7 +56,7 @@ class InternetProtocolRequest(val config: XMLCalabashConfig, val context: Static
   def this(config: XMLCalabashRuntime, context: StaticContext, uri: URI) =
     this(config.config, context, uri)
 
-  def this(config: XMLCalabashConfig, uri: URI) =
+  def this(config: XMLCalabash, uri: URI) =
     this(config, new StaticContext(config), uri)
 
   def location: Option[Location] = _location

@@ -2,9 +2,9 @@ package com.xmlcalabash.util
 
 import java.io.{IOException, Reader}
 import java.net.{MalformedURLException, URI, URISyntaxException, URL}
-
 import com.sun.org.apache.xml.internal.utils.URI.MalformedURIException
-import com.xmlcalabash.config.XMLCalabashConfig
+import com.xmlcalabash.XMLCalabash
+
 import javax.xml.parsers.SAXParserFactory
 import javax.xml.transform.sax.SAXSource
 import javax.xml.transform.stream.StreamSource
@@ -17,7 +17,7 @@ import org.xml.sax.{EntityResolver, InputSource}
 
 import scala.collection.mutable
 
-class XProcURIResolver(config: XMLCalabashConfig) extends URIResolver with EntityResolver with ModuleURIResolver with UnparsedTextURIResolver {
+class XProcURIResolver(config: XMLCalabash) extends URIResolver with EntityResolver with ModuleURIResolver with UnparsedTextURIResolver {
   protected val logger: Logger = LoggerFactory.getLogger(this.getClass)
   protected var _uriResolver = Option.empty[URIResolver]
   protected var _entityResolver = Option.empty[EntityResolver]

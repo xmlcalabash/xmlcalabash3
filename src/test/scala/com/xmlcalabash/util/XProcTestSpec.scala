@@ -5,22 +5,25 @@ package com.xmlcalabash.util
    /me takes an "I told you so" token, 18 Oct 2018.
  */
 
-import java.io.File
-import java.net.URI
-import com.xmlcalabash.config.{DocumentRequest, XMLCalabashConfig}
+import com.xmlcalabash.config.DocumentRequest
 import com.xmlcalabash.testing.TestRunner
+import net.sf.saxon.s9api.Processor
 import org.scalatest.funspec.AnyFunSpec
 
+import java.io.File
+import java.net.{URI, URL}
 import scala.collection.mutable.ListBuffer
 
 class XProcTestSpec extends AnyFunSpec {
   System.setProperty("com.xmlcalabash.configFile", "src/test/resources/config.xml")
-  protected val runtimeConfig: XMLCalabashConfig = XMLCalabashConfig.newInstance()
+
+  protected val processor = new Processor(true)
   protected val testFiles: ListBuffer[String] = ListBuffer.empty[String]
 
   protected val online: Boolean = try {
-    val docreq = new DocumentRequest(new URI("http://www.w3.org/"), MediaType.HTML)
-    runtimeConfig.documentManager.parse(docreq)
+    val url = new URL("https://xproc.org/")
+    val conn = url.openConnection()
+    conn.connect()
     true
   } catch {
     case _: Exception => false
@@ -63,7 +66,7 @@ class XProcTestSpec extends AnyFunSpec {
   }
 
   protected def test(fn: String): Unit = {
-    val runner = new TestRunner(runtimeConfig, online, None, List.empty[String], List(fn))
+    val runner = new TestRunner(processor, online, None, List.empty[String], List(fn))
     val results = runner.run()
     for (result <- results) {
       if (verboseOutput) {

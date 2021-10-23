@@ -4,7 +4,7 @@ import com.jafpl.graph.Location
 import com.jafpl.messages.Message
 import com.jafpl.runtime.RuntimeConfiguration
 import com.jafpl.steps.BindingSpecification
-import com.xmlcalabash.config.XMLCalabashConfig
+import com.xmlcalabash.XMLCalabash
 import com.xmlcalabash.exceptions.XProcException
 import com.xmlcalabash.messages.{XdmNodeItemMessage, XdmValueItemMessage}
 import com.xmlcalabash.model.util.{SaxonTreeBuilder, XProcConstants}
@@ -111,7 +111,7 @@ class ContentTypeChecker() extends XmlStep {
     }
   }
 
-  override def configure(config: XMLCalabashConfig, stepType: QName, stepName: Option[String], params: Option[ImplParams]): Unit = {
+  override def configure(config: XMLCalabash, stepType: QName, stepName: Option[String], params: Option[ImplParams]): Unit = {
     if (params.isEmpty) {
       throw XProcException.xiWrongImplParams()
     } else {

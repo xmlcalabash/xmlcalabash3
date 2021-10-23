@@ -1,7 +1,7 @@
 package com.xmlcalabash.model.xml
 
 import com.jafpl.graph.{ContainerStart, Node}
-import com.xmlcalabash.config.XMLCalabashConfig
+import com.xmlcalabash.XMLCalabash
 import com.xmlcalabash.exceptions.{ExceptionCode, ModelException, XProcException}
 import com.xmlcalabash.messages.XdmValueItemMessage
 import com.xmlcalabash.runtime.params.XPathBindingParams
@@ -14,7 +14,7 @@ import net.sf.saxon.trans.XPathException
 import java.net.URI
 import scala.collection.mutable
 
-class DeclareOption(override val config: XMLCalabashConfig) extends NameBinding(config) {
+class DeclareOption(override val config: XMLCalabash) extends NameBinding(config) {
   private var _runtimeBindings = Map.empty[QName,XProcVarValue]
 
   override def toString: String = {

@@ -2,12 +2,12 @@ package com.xmlcalabash.util
 
 import com.jafpl.messages.Message
 import com.jafpl.util.ItemTester
-import com.xmlcalabash.config.XMLCalabashConfig
+import com.xmlcalabash.XMLCalabash
 import com.xmlcalabash.exceptions.XProcException
 import com.xmlcalabash.model.xml.ForWhile
 import com.xmlcalabash.runtime.{DynamicContext, StaticContext, XProcXPathExpression}
 
-class XmlItemTester(config: XMLCalabashConfig, comparator: String, maxIterations: Long, art: ForWhile) extends ItemTester {
+class XmlItemTester(config: XMLCalabash, comparator: String, maxIterations: Long, art: ForWhile) extends ItemTester {
   private var count = 0L
 
   override def test(item: List[Message], bindings: Map[String, Message]): Boolean = {

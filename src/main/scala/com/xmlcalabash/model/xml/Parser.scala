@@ -1,6 +1,7 @@
 package com.xmlcalabash.model.xml
 
-import com.xmlcalabash.config.{DocumentRequest, XMLCalabashConfig}
+import com.xmlcalabash.XMLCalabash
+import com.xmlcalabash.config.DocumentRequest
 import com.xmlcalabash.exceptions.XProcException
 import com.xmlcalabash.model.util.{SaxonTreeBuilder, XProcConstants}
 import com.xmlcalabash.runtime.{ProcessMatch, ProcessMatchingNodes, StaticContext, XProcLocation, XProcXPathExpression}
@@ -13,7 +14,7 @@ import java.net.URI
 import javax.xml.transform.sax.SAXSource
 import scala.collection.mutable.ListBuffer
 
-class Parser(config: XMLCalabashConfig) {
+class Parser(config: XMLCalabash) {
   private var _builtInSteps = config.builtinSteps
   private var matcher: ProcessMatch = _
 

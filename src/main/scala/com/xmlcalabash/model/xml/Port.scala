@@ -1,6 +1,6 @@
 package com.xmlcalabash.model.xml
 
-import com.xmlcalabash.config.XMLCalabashConfig
+import com.xmlcalabash.XMLCalabash
 import com.xmlcalabash.exceptions.XProcException
 import com.xmlcalabash.model.util.XProcConstants
 import com.xmlcalabash.runtime.params.SelectFilterParams
@@ -8,7 +8,7 @@ import com.xmlcalabash.util.MediaType
 
 import scala.collection.mutable.ListBuffer
 
-class Port(override val config: XMLCalabashConfig) extends Artifact(config) {
+class Port(override val config: XMLCalabash) extends Artifact(config) {
   protected var _port = ""
   protected[xml] var _sequence = Option.empty[Boolean]
   protected[xml] var _primary = Option.empty[Boolean]

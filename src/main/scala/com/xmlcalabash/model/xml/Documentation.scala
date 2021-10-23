@@ -1,10 +1,10 @@
 package com.xmlcalabash.model.xml
 
-import com.xmlcalabash.config.XMLCalabashConfig
+import com.xmlcalabash.XMLCalabash
 import com.xmlcalabash.util.xc.ElaboratedPipeline
 import net.sf.saxon.s9api.{Axis, QName, XdmNode, XdmNodeKind}
 
-class Documentation(override val config: XMLCalabashConfig, val docs: XdmNode) extends Artifact(config) {
+class Documentation(override val config: XMLCalabash, val docs: XdmNode) extends Artifact(config) {
   override protected[model] def validateStructure(): Unit = {
     // nop
   }

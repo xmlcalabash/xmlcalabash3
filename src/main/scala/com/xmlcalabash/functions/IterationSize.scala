@@ -1,6 +1,6 @@
 package com.xmlcalabash.functions
 
-import com.xmlcalabash.config.XMLCalabashConfig
+import com.xmlcalabash.XMLCalabash
 import com.xmlcalabash.exceptions.XProcException
 import com.xmlcalabash.model.util.XProcConstants
 import net.sf.saxon.expr.{StaticContext, XPathContext}
@@ -8,7 +8,7 @@ import net.sf.saxon.lib.{ExtensionFunctionCall, ExtensionFunctionDefinition}
 import net.sf.saxon.om.{Sequence, StructuredQName}
 import net.sf.saxon.value.{Int64Value, SequenceType}
 
-class IterationSize(runtime: XMLCalabashConfig) extends FunctionImpl {
+class IterationSize(runtime: XMLCalabash) extends FunctionImpl {
   private val funcname = new StructuredQName("p", XProcConstants.ns_p, "iteration-size")
 
   override def getFunctionQName: StructuredQName = funcname

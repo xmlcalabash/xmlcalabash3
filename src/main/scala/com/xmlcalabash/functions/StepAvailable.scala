@@ -1,6 +1,6 @@
 package com.xmlcalabash.functions
 
-import com.xmlcalabash.config.XMLCalabashConfig
+import com.xmlcalabash.XMLCalabash
 import com.xmlcalabash.exceptions.XProcException
 import com.xmlcalabash.model.util.XProcConstants
 import com.xmlcalabash.model.xml.DeclareStep
@@ -11,7 +11,7 @@ import net.sf.saxon.om.{Item, Sequence, StructuredQName}
 import net.sf.saxon.s9api.QName
 import net.sf.saxon.value.{BooleanValue, Int64Value, SequenceType}
 
-class StepAvailable(runtime: XMLCalabashConfig) extends FunctionImpl() {
+class StepAvailable(runtime: XMLCalabash) extends FunctionImpl() {
   private val funcname = new StructuredQName("p", XProcConstants.ns_p, "step-available")
 
   override def getFunctionQName: StructuredQName = funcname

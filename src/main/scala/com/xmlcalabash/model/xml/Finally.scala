@@ -1,13 +1,13 @@
 package com.xmlcalabash.model.xml
 
 import com.jafpl.graph.{Node, TryCatchStart}
-import com.xmlcalabash.config.XMLCalabashConfig
+import com.xmlcalabash.XMLCalabash
 import com.xmlcalabash.exceptions.XProcException
 import com.xmlcalabash.runtime.XMLCalabashRuntime
 import com.xmlcalabash.util.xc.ElaboratedPipeline
 import net.sf.saxon.s9api.XdmNode
 
-class Finally(override val config: XMLCalabashConfig) extends Container(config) with NamedArtifact {
+class Finally(override val config: XMLCalabash) extends Container(config) with NamedArtifact {
   override def parse(node: XdmNode): Unit = {
     super.parse(node)
     if (attributes.nonEmpty) {

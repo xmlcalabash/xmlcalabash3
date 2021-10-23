@@ -1,7 +1,7 @@
 package com.xmlcalabash.model.xml
 
 import com.jafpl.graph.{ChooseStart, ContainerStart, Node, WhenStart}
-import com.xmlcalabash.config.XMLCalabashConfig
+import com.xmlcalabash.XMLCalabash
 import com.xmlcalabash.exceptions.XProcException
 import com.xmlcalabash.model.util.XProcConstants
 import com.xmlcalabash.runtime.{XMLCalabashRuntime, XProcXPathExpression}
@@ -10,7 +10,7 @@ import net.sf.saxon.s9api.XdmNode
 
 import scala.collection.mutable
 
-class Choose(override val config: XMLCalabashConfig) extends Container(config) {
+class Choose(override val config: XMLCalabash) extends Container(config) {
   private var hasWhen = false
   private var hasOtherwise = false
   protected var ifexpr: Option[String] = None

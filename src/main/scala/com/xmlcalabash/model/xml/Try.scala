@@ -1,7 +1,7 @@
 package com.xmlcalabash.model.xml
 
 import com.jafpl.graph.{ChooseStart, ContainerStart, Node, TryCatchStart}
-import com.xmlcalabash.config.XMLCalabashConfig
+import com.xmlcalabash.XMLCalabash
 import com.xmlcalabash.exceptions.XProcException
 import com.xmlcalabash.runtime.XMLCalabashRuntime
 import com.xmlcalabash.util.xc.ElaboratedPipeline
@@ -10,7 +10,7 @@ import net.sf.saxon.s9api.{QName, XdmNode}
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 
-class Try(override val config: XMLCalabashConfig) extends Container(config) with NamedArtifact {
+class Try(override val config: XMLCalabash) extends Container(config) with NamedArtifact {
   override def parse(node: XdmNode): Unit = {
     super.parse(node)
     if (attributes.nonEmpty) {
