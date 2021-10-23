@@ -77,13 +77,15 @@ object ArgBundleSpec {
 }
 
 class ArgBundleSpec extends AnyFlatSpec {
+  private val identity_xpl = "src/test/resources/identity.xpl"
+  
   System.setProperty("com.xmlcalabash.configFile", "src/test/resources/config.xml")
 
   "Parsing pipeline" should "succeed" in {
     val bundle = new ArgBundle()
-    val args = "pipe.xpl".split("\\s+")
+    val args = identity_xpl.split("\\s+")
     bundle.parse(args.toList)
-    ArgBundleSpec.assertPipeline(bundle, "pipe.xpl")
+    ArgBundleSpec.assertPipeline(bundle, identity_xpl)
   }
 
   // -i | --input
@@ -114,57 +116,57 @@ class ArgBundleSpec extends AnyFlatSpec {
 
   "Parsing -isource=doc.xml pipeline" should "succeed" in {
     val bundle = new ArgBundle()
-    val args = "-isource=doc.xml pipe.xpl".split("\\s+")
+    val args = s"-isource=doc.xml ${identity_xpl}".split("\\s+")
     bundle.parse(args.toList)
-    ArgBundleSpec.assertPipeline(bundle, "pipe.xpl")
+    ArgBundleSpec.assertPipeline(bundle, identity_xpl)
     ArgBundleSpec.assertInputs(bundle, "source", List("doc.xml"))
   }
 
   "Parsing -isource=doc1.xml -isource=doc2.xml pipeline" should "succeed" in {
     val bundle = new ArgBundle()
-    val args = "-isource=doc1.xml -isource=doc2.xml pipe.xpl".split("\\s+")
+    val args = s"-isource=doc1.xml -isource=doc2.xml ${identity_xpl}".split("\\s+")
     bundle.parse(args.toList)
-    ArgBundleSpec.assertPipeline(bundle, "pipe.xpl")
+    ArgBundleSpec.assertPipeline(bundle, identity_xpl)
     ArgBundleSpec.assertInputs(bundle, "source", List("doc1.xml", "doc2.xml"))
   }
 
   "Parsing -visource=doc.xml pipeline" should "succeed" in {
     val bundle = new ArgBundle()
-    val args = "-visource=doc.xml pipe.xpl".split("\\s+")
+    val args = s"-visource=doc.xml ${identity_xpl}".split("\\s+")
     bundle.parse(args.toList)
-    ArgBundleSpec.assertPipeline(bundle, "pipe.xpl")
+    ArgBundleSpec.assertPipeline(bundle, identity_xpl)
     ArgBundleSpec.assertInputs(bundle, "source", List("doc.xml"))
     ArgBundleSpec.assertVerbose(bundle)
   }
 
   "Parsing --input source=doc.xml pipeline" should "succeed" in {
     val bundle = new ArgBundle()
-    val args = "--input source=doc.xml pipe.xpl".split("\\s+")
+    val args = s"--input source=doc.xml ${identity_xpl}".split("\\s+")
     bundle.parse(args.toList)
-    ArgBundleSpec.assertPipeline(bundle, "pipe.xpl")
+    ArgBundleSpec.assertPipeline(bundle, identity_xpl)
     ArgBundleSpec.assertInputs(bundle, "source", List("doc.xml"))
   }
 
   "Parsing -v --input source=doc.xml pipeline" should "succeed" in {
     val bundle = new ArgBundle()
-    val args = "-v --input source=doc.xml pipe.xpl".split("\\s+")
+    val args = s"-v --input source=doc.xml ${identity_xpl}".split("\\s+")
     bundle.parse(args.toList)
-    ArgBundleSpec.assertPipeline(bundle, "pipe.xpl")
+    ArgBundleSpec.assertPipeline(bundle, identity_xpl)
     ArgBundleSpec.assertInputs(bundle, "source", List("doc.xml"))
     ArgBundleSpec.assertVerbose(bundle)
   }
 
   "Parsing --input source=doc1.xml --input source=doc2.xml pipeline" should "succeed" in {
     val bundle = new ArgBundle()
-    val args = "--input source=doc1.xml --input source=doc2.xml pipe.xpl".split("\\s+")
+    val args = s"--input source=doc1.xml --input source=doc2.xml ${identity_xpl}".split("\\s+")
     bundle.parse(args.toList)
-    ArgBundleSpec.assertPipeline(bundle, "pipe.xpl")
+    ArgBundleSpec.assertPipeline(bundle, identity_xpl)
     ArgBundleSpec.assertInputs(bundle, "source", List("doc1.xml", "doc2.xml"))
   }
 
   "Parsing --input doc.xml pipeline" should "fail" in {
     val bundle = new ArgBundle()
-    val args = "--input doc.xml pipe.xpl".split("\\s+")
+    val args = s"--input doc.xml ${identity_xpl}".split("\\s+")
     var pass = false
     try {
       bundle.parse(args.toList)
@@ -202,56 +204,56 @@ class ArgBundleSpec extends AnyFlatSpec {
 
   "Parsing -oresult=doc.xml pipeline" should "succeed" in {
     val bundle = new ArgBundle()
-    val args = "-oresult=doc.xml pipe.xpl".split("\\s+")
+    val args = s"-oresult=doc.xml ${identity_xpl}".split("\\s+")
     bundle.parse(args.toList)
-    ArgBundleSpec.assertPipeline(bundle, "pipe.xpl")
+    ArgBundleSpec.assertPipeline(bundle, identity_xpl)
     ArgBundleSpec.assertOutputs(bundle, "result", List("doc.xml"))
   }
 
   "Parsing -oresult=doc1.xml -oresult=doc2.xml pipeline" should "succeed" in {
     val bundle = new ArgBundle()
-    val args = "-oresult=doc1.xml -oresult=doc2.xml pipe.xpl".split("\\s+")
+    val args = s"-oresult=doc1.xml -oresult=doc2.xml ${identity_xpl}".split("\\s+")
     bundle.parse(args.toList)
-    ArgBundleSpec.assertPipeline(bundle, "pipe.xpl")
+    ArgBundleSpec.assertPipeline(bundle, identity_xpl)
     ArgBundleSpec.assertOutputs(bundle, "result", List("doc1.xml", "doc2.xml"))
   }
 
   "Parsing -voresult=doc.xml pipeline" should "succeed" in {
     val bundle = new ArgBundle()
-    val args = "-voresult=doc.xml pipe.xpl".split("\\s+")
+    val args = s"-voresult=doc.xml ${identity_xpl}".split("\\s+")
     bundle.parse(args.toList)
-    ArgBundleSpec.assertPipeline(bundle, "pipe.xpl")
+    ArgBundleSpec.assertPipeline(bundle, identity_xpl)
     ArgBundleSpec.assertOutputs(bundle, "result", List("doc.xml"))
   }
 
   "Parsing --output result=doc.xml pipeline" should "succeed" in {
     val bundle = new ArgBundle()
-    val args = "--output result=doc.xml pipe.xpl".split("\\s+")
+    val args = s"--output result=doc.xml ${identity_xpl}".split("\\s+")
     bundle.parse(args.toList)
-    ArgBundleSpec.assertPipeline(bundle, "pipe.xpl")
+    ArgBundleSpec.assertPipeline(bundle, identity_xpl)
     ArgBundleSpec.assertOutputs(bundle, "result", List("doc.xml"))
   }
 
   "Parsing -v --output result=doc.xml pipeline" should "succeed" in {
     val bundle = new ArgBundle()
-    val args = "-v --output result=doc.xml pipe.xpl".split("\\s+")
+    val args = s"-v --output result=doc.xml ${identity_xpl}".split("\\s+")
     bundle.parse(args.toList)
-    ArgBundleSpec.assertPipeline(bundle, "pipe.xpl")
+    ArgBundleSpec.assertPipeline(bundle, identity_xpl)
     ArgBundleSpec.assertOutputs(bundle, "result", List("doc.xml"))
     ArgBundleSpec.assertVerbose(bundle)
   }
 
   "Parsing --output result=doc1.xml --output result=doc2.xml pipeline" should "succeed" in {
     val bundle = new ArgBundle()
-    val args = "--output result=doc1.xml --output result=doc2.xml pipe.xpl".split("\\s+")
+    val args = s"--output result=doc1.xml --output result=doc2.xml ${identity_xpl}".split("\\s+")
     bundle.parse(args.toList)
-    ArgBundleSpec.assertPipeline(bundle, "pipe.xpl")
+    ArgBundleSpec.assertPipeline(bundle, identity_xpl)
     ArgBundleSpec.assertOutputs(bundle, "result", List("doc1.xml", "doc2.xml"))
   }
 
   "Parsing --output doc.xml pipeline" should "fail" in {
     val bundle = new ArgBundle()
-    val args = "--output doc.xml pipe.xpl".split("\\s+")
+    val args = s"--output doc.xml ${identity_xpl}".split("\\s+")
     var pass = false
     try {
       bundle.parse(args.toList)
@@ -306,45 +308,45 @@ class ArgBundleSpec extends AnyFlatSpec {
 
   "Parsing foo=bar pipeline" should "succeed" in {
     val xmlcalabash = XMLCalabash.newInstance()
-    xmlcalabash.args.parse("foo=bar pipe.xpl".split("\\s+").toList)
+    xmlcalabash.args.parse("foo=bar src/test/resources/identity.xpl".split("\\s+").toList)
     xmlcalabash.resolve()
     assert(xmlcalabash.options(new QName("", "foo")).value == new XdmAtomicValue("bar"))
     xmlcalabash.pipeline match {
-      case str: PipelineFilenameDocument => assert(str.value == "pipe.xpl")
+      case str: PipelineFilenameDocument => assert(str.value == identity_xpl)
       case _ => fail()
     }
   }
 
   "Parsing foo=2 pipeline" should "succeed" in {
     val xmlcalabash = XMLCalabash.newInstance()
-    xmlcalabash.args.parse("foo=2 pipe.xpl".split("\\s+").toList)
+    xmlcalabash.args.parse(s"foo=2 ${identity_xpl}".split("\\s+").toList)
     xmlcalabash.resolve()
     val two = new XdmAtomicValue("2", ItemType.UNTYPED_ATOMIC)
     assert(xmlcalabash.options(new QName("", "foo")).value == two)
     xmlcalabash.pipeline match {
-      case str: PipelineFilenameDocument => assert(str.value == "pipe.xpl")
+      case str: PipelineFilenameDocument => assert(str.value == identity_xpl)
       case _ => fail()
     }
   }
 
   "Parsing -bex=foo ex:foo=bar pipeline" should "succeed" in {
     val xmlcalabash = XMLCalabash.newInstance()
-    xmlcalabash.args.parse("-bex=foo ex:foo=bar pipe.xpl".split("\\s+").toList)
+    xmlcalabash.args.parse(s"-bex=foo ex:foo=bar ${identity_xpl}".split("\\s+").toList)
     xmlcalabash.resolve()
     assert(xmlcalabash.options(new QName("foo", "foo")).value == new XdmAtomicValue("bar"))
     xmlcalabash.pipeline match {
-      case str: PipelineFilenameDocument => assert(str.value == "pipe.xpl")
+      case str: PipelineFilenameDocument => assert(str.value == identity_xpl)
       case _ => fail()
     }
   }
 
   "Parsing --bind ex=foo ex:foo=bar pipeline" should "succeed" in {
     val xmlcalabash = XMLCalabash.newInstance()
-    xmlcalabash.args.parse("--bind ex=foo ex:foo=bar pipe.xpl".split("\\s+").toList)
+    xmlcalabash.args.parse(s"--bind ex=foo ex:foo=bar ${identity_xpl}".split("\\s+").toList)
     xmlcalabash.resolve()
     assert(xmlcalabash.options(new QName("foo", "foo")).value == new XdmAtomicValue("bar"))
     xmlcalabash.pipeline match {
-      case str: PipelineFilenameDocument => assert(str.value == "pipe.xpl")
+      case str: PipelineFilenameDocument => assert(str.value == identity_xpl)
       case _ => fail()
     }
   }
@@ -353,7 +355,7 @@ class ArgBundleSpec extends AnyFlatSpec {
     var pass = false
     try {
       val xmlcalabash = XMLCalabash.newInstance()
-      xmlcalabash.args.parse("ex:foo=bar pipe.xpl".split("\\s+").toList)
+      xmlcalabash.args.parse(s"ex:foo=bar ${identity_xpl}".split("\\s+").toList)
       xmlcalabash.resolve()
     } catch {
       case _: Throwable => pass = true
@@ -365,23 +367,23 @@ class ArgBundleSpec extends AnyFlatSpec {
 
   "Parsing ?foo=3+4 pipeline" should "succeed" in {
     val xmlcalabash = XMLCalabash.newInstance()
-    xmlcalabash.args.parse("?foo=3+4 pipe.xpl".split("\\s+").toList)
+    xmlcalabash.args.parse(s"?foo=3+4 ${identity_xpl}".split("\\s+").toList)
     xmlcalabash.resolve()
     assert(xmlcalabash.options(new QName("", "foo")).value == new XdmAtomicValue(7))
     xmlcalabash.pipeline match {
-      case str: PipelineFilenameDocument => assert(str.value == "pipe.xpl")
+      case str: PipelineFilenameDocument => assert(str.value == identity_xpl)
       case _ => fail()
     }
   }
 
   "Parsing ?foo=3+4 ?bar=3+$foo pipeline" should "succeed" in {
     val xmlcalabash = XMLCalabash.newInstance()
-    xmlcalabash.args.parse("?foo=3+4 ?bar=3+$foo pipe.xpl".split("\\s+").toList)
+    xmlcalabash.args.parse(s"?foo=3+4 ?bar=3+$$foo ${identity_xpl}".split("\\s+").toList)
     xmlcalabash.resolve()
     assert(xmlcalabash.options(new QName("", "foo")).value == new XdmAtomicValue(7))
     assert(xmlcalabash.options(new QName("", "bar")).value == new XdmAtomicValue(10))
     xmlcalabash.pipeline match {
-      case str: PipelineFilenameDocument => assert(str.value == "pipe.xpl")
+      case str: PipelineFilenameDocument => assert(str.value == identity_xpl)
       case _ => fail()
     }
   }

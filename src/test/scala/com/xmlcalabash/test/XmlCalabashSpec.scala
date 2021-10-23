@@ -14,6 +14,7 @@ import java.nio.charset.StandardCharsets
 import javax.xml.transform.sax.SAXSource
 
 class XmlCalabashSpec extends AnyFlatSpec {
+  private val identity_xpl = "src/test/resources/identity.xpl"
 
   "Simple initialization " should " succeed" in {
     val proc = XMLCalabash.newInstance()
@@ -22,7 +23,7 @@ class XmlCalabashSpec extends AnyFlatSpec {
 
   "Inputs " should " work" in {
     val proc = XMLCalabash.newInstance()
-    proc.args.pipeline("pipe.xpl")
+    proc.args.pipeline(identity_xpl)
     proc.args.input("source", "src/test/resources/config.xml")
     proc.args.input("source", new File("src/test/resources/config.xml"))
     proc.args.input("source", URI.create(s"${System.getProperty("user.dir")}/src/test/resources/config.xml"))
@@ -31,7 +32,7 @@ class XmlCalabashSpec extends AnyFlatSpec {
 
   "Outputs " should " work" in {
     val proc = XMLCalabash.newInstance()
-    proc.args.pipeline("pipe.xpl")
+    proc.args.pipeline(identity_xpl)
     proc.args.input("result1", "/tmp/one")
     proc.args.input("result2", new File("/tmp/two"))
     proc.args.input("result3", URI.create("file:///tmp/three"))
@@ -40,7 +41,7 @@ class XmlCalabashSpec extends AnyFlatSpec {
 
   "Repeating an outputs " should " make a list" in {
     val proc = XMLCalabash.newInstance()
-    proc.args.pipeline("pipe.xpl")
+    proc.args.pipeline(identity_xpl)
     proc.args.input("result", "/tmp/one")
     proc.args.input("result", new File("/tmp/two"))
     proc.args.input("result", URI.create("file:///tmp/three"))
@@ -50,7 +51,7 @@ class XmlCalabashSpec extends AnyFlatSpec {
   "Non-file output URI " should " raise an exception" in {
     try {
       val proc = XMLCalabash.newInstance()
-      proc.args.pipeline("pipe.xpl")
+      proc.args.pipeline(identity_xpl)
       proc.args.input("result3", URI.create("http://example.com/output"))
       proc.resolve()
       fail()
@@ -62,7 +63,7 @@ class XmlCalabashSpec extends AnyFlatSpec {
 
   "EQName options " should " succeed" in {
     val proc = XMLCalabash.newInstance()
-    proc.args.pipeline("pipe.xpl")
+    proc.args.pipeline(identity_xpl)
     proc.args.option("test", "string value")
     proc.args.option("Q{http://example.com/}test", 35)
     proc.args.option("test2", 3.4)
@@ -72,7 +73,7 @@ class XmlCalabashSpec extends AnyFlatSpec {
 
   "Repeating an option " should " create a sequence" in {
     val proc = XMLCalabash.newInstance()
-    proc.args.pipeline("pipe.xpl")
+    proc.args.pipeline(identity_xpl)
     proc.args.option("test", "string value")
     proc.args.option("Q{}test", 35)
     proc.resolve()
@@ -80,7 +81,7 @@ class XmlCalabashSpec extends AnyFlatSpec {
 
   "QNames " should " work for defined namespaces" in {
     val proc = XMLCalabash.newInstance()
-    proc.args.pipeline("pipe.xpl")
+    proc.args.pipeline(identity_xpl)
     proc.args.namespace("ex", "http://example.com/one")
     proc.args.option("ex:test", "string value")
     proc.args.namespace("ex", "http://example.com/two")
@@ -103,7 +104,7 @@ class XmlCalabashSpec extends AnyFlatSpec {
 
   "Documents " should " work for options" in {
     val proc = XMLCalabash.newInstance()
-    proc.args.pipeline("pipe.xpl")
+    proc.args.pipeline(identity_xpl)
     proc.args.optionDocument("json", URIUtils.cwdAsURI.resolve("src/test/resources/doc.json"))
     proc.args.optionDocument("xmlstring", "src/test/resources/config.xml")
     proc.args.optionDocument("xmlfile", new File("src/test/resources/config.xml"))
@@ -112,7 +113,7 @@ class XmlCalabashSpec extends AnyFlatSpec {
 
   "Expressions " should " work for options" in {
     val proc = XMLCalabash.newInstance()
-    proc.args.pipeline("pipe.xpl")
+    proc.args.pipeline(identity_xpl)
     proc.args.optionExpression("json", "map{'test': 1}")
     proc.args.optionExpression("sum", "3+4")
     proc.args.optionExpression("list", "(1,2, QName('', 'name'))")
@@ -121,7 +122,7 @@ class XmlCalabashSpec extends AnyFlatSpec {
 
   "Expressions " should " be able to refer to preceding options" in {
     val proc = XMLCalabash.newInstance()
-    proc.args.pipeline("pipe.xpl")
+    proc.args.pipeline(identity_xpl)
     proc.args.optionExpression("sum", "3+4")
     proc.args.optionExpression("sumlist", "(1,2, $sum)")
     proc.args.optionExpression("sumsum", "$sum + 5")
@@ -131,7 +132,7 @@ class XmlCalabashSpec extends AnyFlatSpec {
   "Expressions " should " not be able to refer to other options" in {
     try {
       val proc = XMLCalabash.newInstance()
-      proc.args.pipeline("pipe.xpl")
+      proc.args.pipeline(identity_xpl)
       proc.args.optionExpression("no", "$foo")
       proc.resolve()
       fail()
@@ -197,9 +198,9 @@ class XmlCalabashSpec extends AnyFlatSpec {
   /*
   "Run " should " run a pipeline" in {
     val proc = XMLCalabash.newInstance()
-    proc.args.pipeline("pipe.xpl")
+    proc.args.pipeline(identity_xpl)
     proc.args.optionExpression("value", "'test' || string(3+4)")
-    proc.args.input("source", "pipe.xpl")
+    proc.args.input("source", identity_xpl)
     proc.run()
   }
    */
