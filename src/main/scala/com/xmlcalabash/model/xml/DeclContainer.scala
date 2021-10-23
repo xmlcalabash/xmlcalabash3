@@ -1,13 +1,14 @@
 package com.xmlcalabash.model.xml
 
-import com.xmlcalabash.config.{StepSignature, XMLCalabashConfig}
+import com.xmlcalabash.XMLCalabash
+import com.xmlcalabash.config.StepSignature
 import com.xmlcalabash.exceptions.XProcException
 import net.sf.saxon.s9api.QName
 
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 
-class DeclContainer(override val config: XMLCalabashConfig) extends Container(config) {
+class DeclContainer(override val config: XMLCalabash) extends Container(config) {
   protected var _psvi_required = Option.empty[Boolean]
   protected var _xpath_version = Option.empty[Double]
   protected var _exclude_inline_prefixes = Option.empty[String]

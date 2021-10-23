@@ -2,8 +2,11 @@ package com.xmlcalabash.config
 
 import java.io.{ByteArrayInputStream, ByteArrayOutputStream, File, FileOutputStream, PrintStream, PrintWriter}
 import com.jafpl.graph.Graph
+import com.xmlcalabash.XMLCalabash
+import com.xmlcalabash.config.XMLCalabashDebugOptions.{GRAPH, OPENGRAPH, PIPELINE, TREE}
 import com.xmlcalabash.model.xml.DeclareStep
 import com.xmlcalabash.model.util.XProcConstants
+import com.xmlcalabash.util.PipelineEnvironmentOption
 
 import javax.xml.transform.sax.SAXSource
 import net.sf.saxon.s9api.{QName, XdmDestination, XdmNode}
@@ -13,26 +16,21 @@ import org.xml.sax.InputSource
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 
-protected class XMLCalabashDebugOptions(config: XMLCalabashConfig) {
-  private val TREE = "tree"
-  private val PIPELINE = "pipeline"
-  private val GRAPH = "graph"
-  private val OPENGRAPH = "open-graph"
+object XMLCalabashDebugOptions {
+  val TREE = "tree"
+  val GRAPH = "graph"
+  val OPENGRAPH = "open-graph"
+  val PIPELINE = "pipeline"
+}
 
+class XMLCalabashDebugOptions(config: XMLCalabash) {
   protected val logger: Logger = LoggerFactory.getLogger(this.getClass)
 
   private val _injectables = ListBuffer.empty[String]
-  private var _graphviz_dot = Option.empty[String]
   private var _run = true
 
-  private var _stacktrace = false
-  private var _output_directory = "."
-
-  private val debugOptions = mutable.HashSet.empty[String]
   private val dumped = mutable.HashMap.empty[DeclareStep, mutable.HashSet[String]]
   private val dumpCount = mutable.HashMap.empty[DeclareStep, mutable.HashMap[String, Long]]
-
-  private var _logLevel = Option.empty[String]
 
   def injectables: List[String] = _injectables.toList
 
@@ -41,16 +39,16 @@ protected class XMLCalabashDebugOptions(config: XMLCalabashConfig) {
     _injectables ++= list
   }
 
-  def graphviz_dot: Option[String] = _graphviz_dot
+  def environmentOptions(name: QName): List[PipelineEnvironmentOption] = {
+    config.parameters collect { case p: PipelineEnvironmentOption => p } filter { _.eqname == name.getEQName }
+  }
 
-  def graphviz_dot_=(dot: String): Unit = {
-    val x= dot.split("\\s+")
-    for (cmd <- dot.split("\\s+")) {
-      val cmdf = new File(cmd)
-      if (cmdf.exists() && cmdf.canExecute) {
-        _graphviz_dot = Some(cmd)
-        return
-      }
+  def graphviz_dot: Option[String] = {
+    val envOpt = environmentOptions(XProcConstants.cc_graphviz).headOption
+    if (envOpt.isDefined && envOpt.head.getString.isDefined) {
+      envOpt.head.getString
+    } else {
+      None
     }
   }
 
@@ -60,68 +58,52 @@ protected class XMLCalabashDebugOptions(config: XMLCalabashConfig) {
     _run = run
   }
 
-  def stacktrace: Boolean = _stacktrace
-  def stacktrace_=(trace: Boolean): Unit = {
-    _stacktrace = trace
-  }
-
-  def logLevel: Option[String] = _logLevel
-  def logLevel_=(level: String): Unit = {
-    _logLevel = Some(level)
-  }
-
-  def outputDirectory: String = _output_directory
-
-  def outputDirectory_=(dir: String): Unit = {
-    _output_directory = dir
-    if (_output_directory.endsWith("/") || _output_directory.endsWith("\\")) {
-      _output_directory = _output_directory.substring(0, _output_directory.length - 1)
-    }
-  }
-
-  def tree: Boolean = debugOptions.contains(TREE)
-  def tree_=(tree: Boolean): Unit = {
-    if (tree) {
-      debugOptions += TREE
+  def stacktrace: Boolean = {
+    val envOpt = environmentOptions(XProcConstants.cc_stacktrace).headOption
+    if (envOpt.isDefined && envOpt.head.getBoolean.isDefined) {
+      envOpt.head.getBoolean.get
     } else {
-      debugOptions -= TREE
+      false
     }
   }
 
-  def pipeline: Boolean = debugOptions.contains(PIPELINE)
-  def pipeline_=(pipeline: Boolean): Unit = {
-    if (pipeline) {
-      debugOptions += PIPELINE
+  def logLevel: Option[String] = {
+    val envOpt = environmentOptions(XProcConstants.cc_loglevel).headOption
+    if (envOpt.isDefined && envOpt.head.getString.isDefined) {
+      envOpt.head.getString
     } else {
-      debugOptions -= PIPELINE
+      None
     }
   }
 
-  def graph: Boolean = debugOptions.contains(GRAPH)
-  def graph_=(graph: Boolean): Unit = {
-    if (graph) {
-      debugOptions += GRAPH
+  def outputDirectory: String = {
+    val envOpt = environmentOptions(XProcConstants.cc_debug_output_directory).headOption
+    if (envOpt.isDefined && envOpt.head.getString.isDefined) {
+      val dir = envOpt.head.getString.get
+      val fs = System.getProperty("file.separator", "/")
+      if (dir.endsWith(fs)) {
+        dir.substring(0, dir.length - 1)
+      } else {
+        dir
+      }
     } else {
-      debugOptions -= GRAPH
+      "."
     }
   }
 
-  def openGraph: Boolean = debugOptions.contains(OPENGRAPH)
-  def openGraph_=(graph: Boolean): Unit = {
-    if (graph) {
-      debugOptions += OPENGRAPH
-    } else {
-      debugOptions -= OPENGRAPH
+  def tree: Boolean = graph_option(TREE)
+  def pipeline: Boolean = graph_option(PIPELINE)
+  def graph: Boolean = graph_option(GRAPH)
+  def open_graph: Boolean = graph_option(OPENGRAPH)
+
+  private def graph_option(name: String): Boolean = {
+    val found = environmentOptions(XProcConstants.cc_graph) find {
+      _.getString.get == name
     }
+    found.isDefined
   }
 
   // ===========================================================================================
-
-  def dumpStacktrace(decl: Option[DeclareStep], ex: Exception): Unit = {
-    if (stacktrace) {
-      ex.printStackTrace(System.err)
-    }
-  }
 
   def dumpTree(decl: DeclareStep): Unit = {
     dump(decl, TREE)
@@ -144,7 +126,7 @@ protected class XMLCalabashDebugOptions(config: XMLCalabashConfig) {
   }
 
   private def dump(decl: DeclareStep, opt: String, graph: Option[Graph]): Unit = {
-    if (!debugOptions.contains(opt)) {
+    if (!graph_option(opt)) {
       return
     }
 

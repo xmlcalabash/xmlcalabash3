@@ -1,23 +1,22 @@
 package com.xmlcalabash.runtime
 
 import java.net.URI
-
 import com.jafpl.graph.Location
 import com.jafpl.messages.Message
-import com.xmlcalabash.config.XMLCalabashConfig
+import com.xmlcalabash.XMLCalabash
 import com.xmlcalabash.model.xml.{Artifact, NameBinding}
 import com.xmlcalabash.util.S9Api
 import net.sf.saxon.s9api.XdmNode
 
 import scala.collection.mutable
 
-class StaticContext(val config: XMLCalabashConfig, val artifact: Option[Artifact]) {
+class StaticContext(val config: XMLCalabash, val artifact: Option[Artifact]) {
   protected var _baseURI: Option[URI] = None
   protected var _inScopeNS = Map.empty[String,String]
   protected var _location: Option[Location] = None
   protected var _statics = Map.empty[String,Message]
 
-  def this(config: XMLCalabashConfig) = {
+  def this(config: XMLCalabash) = {
     this(config, None)
   }
 
@@ -25,7 +24,7 @@ class StaticContext(val config: XMLCalabashConfig, val artifact: Option[Artifact
     this(config.config, None)
   }
 
-  def this(config: XMLCalabashConfig, artifact: Artifact) = {
+  def this(config: XMLCalabash, artifact: Artifact) = {
     this(config, Some(artifact))
   }
 
@@ -49,7 +48,7 @@ class StaticContext(val config: XMLCalabashConfig, val artifact: Option[Artifact
     this(context, Some(artifact))
   }
 
-  def this(config: XMLCalabashConfig, artifact: Option[Artifact], node: XdmNode) = {
+  def this(config: XMLCalabash, artifact: Option[Artifact], node: XdmNode) = {
     this(config, artifact)
     _baseURI = Option(node.getBaseURI)
     _inScopeNS = S9Api.inScopeNamespaces(node)

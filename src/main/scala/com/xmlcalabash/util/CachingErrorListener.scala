@@ -1,15 +1,19 @@
 package com.xmlcalabash.util
 
 import com.xmlcalabash.util.xc.Errors
+
 import javax.xml.transform.{ErrorListener, TransformerException}
 import net.sf.saxon.`type`.ValidationException
+import net.sf.saxon.lib.ErrorReporter
+import net.sf.saxon.s9api.XmlProcessingError
 import org.xml.sax.{ErrorHandler, SAXParseException}
 
 import scala.collection.mutable.ListBuffer
 
-class CachingErrorListener(errors: Errors) extends ErrorListener with ErrorHandler {
+class CachingErrorListener(errors: Errors) extends ErrorListener with ErrorHandler with ErrorReporter {
   private val _exceptions = ListBuffer.empty[Exception]
   private var _listener = Option.empty[ErrorListener]
+  private var _reporter = Option.empty[ErrorReporter]
   private var _handler = Option.empty[ErrorHandler]
 
   private var showErrors = errors.config.showErrors
@@ -32,6 +36,11 @@ class CachingErrorListener(errors: Errors) extends ErrorListener with ErrorHandl
   def chainedHandler: Option[ErrorHandler] = _handler
   def chainedHandler_=(handler: ErrorHandler): Unit = {
     _handler = Some(handler)
+  }
+
+  def chainedReporter: Option[ErrorReporter] = _reporter
+  def chainedReporter_=(reporter: ErrorReporter): Unit = {
+    _reporter = Some(reporter)
   }
 
   def exceptions: List[Exception] = _exceptions.toList
@@ -109,5 +118,9 @@ class CachingErrorListener(errors: Errors) extends ErrorListener with ErrorHandl
       case _: Exception =>
         errors.xsdValidationError(exception.getLocalizedMessage)
     }
+  }
+
+  override def report(xmlProcessingError: XmlProcessingError): Unit = {
+    println("wat?")
   }
 }

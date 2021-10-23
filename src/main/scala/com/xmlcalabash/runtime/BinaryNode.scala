@@ -1,6 +1,6 @@
 package com.xmlcalabash.runtime
 
-import com.xmlcalabash.config.XMLCalabashConfig
+import com.xmlcalabash.XMLCalabash
 import com.xmlcalabash.model.util.SaxonTreeBuilder
 import net.sf.saxon.s9api.XdmNode
 import org.apache.http.util.ByteArrayBuffer
@@ -13,7 +13,7 @@ import java.io.{ByteArrayInputStream, ByteArrayOutputStream, File, FileInputStre
 // to tunnel it through XmlStep and I don't want to break the node/binary association
 // by manufacturing another one later.)
 
-class BinaryNode(config: XMLCalabashConfig, private val rawValue: Any) {
+class BinaryNode(config: XMLCalabash, private val rawValue: Any) {
   protected val logger: Logger = LoggerFactory.getLogger(this.getClass)
   private var cacheBytes = Option.empty[Array[Byte]]
   private var cacheFile = Option.empty[File]

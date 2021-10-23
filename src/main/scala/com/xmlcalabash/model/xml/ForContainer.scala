@@ -1,8 +1,8 @@
 package com.xmlcalabash.model.xml
 
-import com.xmlcalabash.config.XMLCalabashConfig
+import com.xmlcalabash.XMLCalabash
 
-abstract class ForContainer(override val config: XMLCalabashConfig) extends Container(config) {
+abstract class ForContainer(override val config: XMLCalabash) extends Container(config) {
 
   protected def setupLoopInputs(primary: Option[Boolean]): Unit = {
     val first = firstChild

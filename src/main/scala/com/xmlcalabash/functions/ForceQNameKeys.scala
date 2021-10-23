@@ -1,6 +1,6 @@
 package com.xmlcalabash.functions
 
-import com.xmlcalabash.config.XMLCalabashConfig
+import com.xmlcalabash.XMLCalabash
 import com.xmlcalabash.exceptions.XProcException
 import com.xmlcalabash.model.util.XProcConstants
 import com.xmlcalabash.runtime.StaticContext
@@ -13,7 +13,7 @@ import net.sf.saxon.om.{Item, Sequence, StructuredQName}
 import net.sf.saxon.s9api.{QName, XdmAtomicValue, XdmMap, XdmValue}
 import net.sf.saxon.value.{QNameValue, SequenceType}
 
-class ForceQNameKeys(runtime: XMLCalabashConfig) extends FunctionImpl {
+class ForceQNameKeys(runtime: XMLCalabash) extends FunctionImpl {
   val funcname = new StructuredQName("p", XProcConstants.ns_p, "force-qname-keys")
 
   override def getFunctionQName: StructuredQName = funcname

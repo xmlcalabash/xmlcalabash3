@@ -10,12 +10,14 @@ import net.sf.saxon.s9api.{QName, XdmAtomicValue, XdmMap, XdmNode, XdmValue}
 import scala.collection.mutable
 
 object XProcMetadata {
+  private val _empty = new XProcMetadata(None)
   private val _any = new XProcMetadata(MediaType.OCTET_STREAM)
   private val _xml = new XProcMetadata(MediaType.XML)
   private val _json = new XProcMetadata(MediaType.JSON)
   private val _html = new XProcMetadata(MediaType.HTML)
   private val _text = new XProcMetadata(MediaType.TEXT)
   private val _exception = new XProcMetadata(MediaType.OCTET_STREAM)
+  def EMPTY: XProcMetadata = _empty
   def ANY: XProcMetadata = _any
   def XML: XProcMetadata = _xml
   def JSON: XProcMetadata = _json

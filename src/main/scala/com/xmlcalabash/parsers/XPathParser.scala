@@ -1,6 +1,6 @@
 package com.xmlcalabash.parsers
 
-import com.xmlcalabash.config.XMLCalabashConfig
+import com.xmlcalabash.XMLCalabash
 import com.xmlcalabash.model.util.ExpressionParser
 import com.xmlcalabash.parsers.XPath31.EventHandler
 import org.slf4j.{Logger, LoggerFactory}
@@ -15,7 +15,7 @@ class XPathParser() extends ExpressionParser {
   private var _errors = false
   private var _trace = false
 
-  def this(cfg: XMLCalabashConfig) = {
+  def this(cfg: XMLCalabash) = {
     this()
     _trace = cfg.traceEventManager.traceEnabled("XPathParser")
   }

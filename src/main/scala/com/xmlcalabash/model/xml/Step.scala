@@ -1,7 +1,7 @@
 package com.xmlcalabash.model.xml
 
 import com.jafpl.graph.Node
-import com.xmlcalabash.config.XMLCalabashConfig
+import com.xmlcalabash.XMLCalabash
 import com.xmlcalabash.exceptions.XProcException
 import com.xmlcalabash.model.util.XProcConstants
 import com.xmlcalabash.runtime.XMLCalabashRuntime
@@ -10,7 +10,7 @@ import net.sf.saxon.s9api.XdmNode
 
 import scala.collection.mutable.ListBuffer
 
-class Step(override val config: XMLCalabashConfig) extends Artifact(config) with NamedArtifact {
+class Step(override val config: XMLCalabash) extends Artifact(config) with NamedArtifact {
   protected[xmlcalabash] var _name = Option.empty[String]
   override def stepName: String = _name.getOrElse(tumble_id)
   protected[model] def stepName_=(name: String): Unit = {

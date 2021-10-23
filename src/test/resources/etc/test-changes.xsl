@@ -92,8 +92,8 @@ New failing tests: {count($new-fail)}
   </xsl:if>
 
   <xsl:text>Failing tests:&#10;</xsl:text>
-  <xsl:for-each select="map:keys($fail)">
-    <xsl:sequence select=". || '&#10;'"/>
+  <xsl:for-each select="sort(map:keys($fail))">
+    <xsl:value-of select=". || '&#10;'"/>
   </xsl:for-each>
 </xsl:template>
 

@@ -1,13 +1,13 @@
 package com.xmlcalabash.model.xml
 
 import com.jafpl.graph.Node
-import com.xmlcalabash.config.XMLCalabashConfig
+import com.xmlcalabash.XMLCalabash
 import com.xmlcalabash.model.util.XProcConstants
 import com.xmlcalabash.runtime.XMLCalabashRuntime
 import com.xmlcalabash.runtime.params.EmptyLoaderParams
 import com.xmlcalabash.util.xc.ElaboratedPipeline
 
-class Empty(override val config: XMLCalabashConfig) extends DataSource(config) {
+class Empty(override val config: XMLCalabash) extends DataSource(config) {
 
   def this(copy: Empty) = {
     this(copy.config)

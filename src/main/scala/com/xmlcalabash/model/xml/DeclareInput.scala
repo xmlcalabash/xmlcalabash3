@@ -1,7 +1,7 @@
 package com.xmlcalabash.model.xml
 
 import com.jafpl.graph.Node
-import com.xmlcalabash.config.XMLCalabashConfig
+import com.xmlcalabash.XMLCalabash
 import com.xmlcalabash.exceptions.XProcException
 import com.xmlcalabash.model.util.XProcConstants
 import com.xmlcalabash.runtime.XMLCalabashRuntime
@@ -12,7 +12,7 @@ import net.sf.saxon.s9api.XdmNode
 
 import scala.collection.mutable.ListBuffer
 
-class DeclareInput(override val config: XMLCalabashConfig) extends Port(config) {
+class DeclareInput(override val config: XMLCalabash) extends Port(config) {
   private val _exclude_result_prefixes = List.empty[String]
   protected[xmlcalabash] val defaultInputs: ListBuffer[DataSource] = ListBuffer.empty[DataSource]
 

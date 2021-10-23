@@ -1,7 +1,8 @@
 package com.xmlcalabash.util
 
+import com.xmlcalabash.XMLCalabash
+
 import java.util
-import com.xmlcalabash.config.XMLCalabashConfig
 import com.xmlcalabash.exceptions.XProcException
 import com.xmlcalabash.model.util.{ValueParser, XProcConstants}
 import com.xmlcalabash.parsers.SequenceBuilder
@@ -181,13 +182,13 @@ object TypeUtils {
 class TypeUtils(val processor: Processor, val context: StaticContext) {
   private val err_XD0045 = new QName(XProcConstants.ns_err, "XD0045")
 
-  def this(config: XMLCalabashConfig, context: StaticContext) = {
+  def this(config: XMLCalabash, context: StaticContext) = {
     this(config.processor, context)
   }
   def this(config: XMLCalabashRuntime, context: StaticContext) = {
     this(config.processor, context)
   }
-  def this(config: XMLCalabashConfig) = {
+  def this(config: XMLCalabash) = {
     this(config.processor, new StaticContext(config))
   }
   def this(config: XMLCalabashRuntime) = {

@@ -1,7 +1,7 @@
 package com.xmlcalabash.model.xml
 
 import com.jafpl.graph.{ChooseStart, ContainerStart, Node}
-import com.xmlcalabash.config.XMLCalabashConfig
+import com.xmlcalabash.XMLCalabash
 import com.xmlcalabash.exceptions.XProcException
 import com.xmlcalabash.model.util.XProcConstants
 import com.xmlcalabash.runtime.XMLCalabashRuntime
@@ -9,7 +9,7 @@ import net.sf.saxon.s9api.XdmNode
 
 import scala.collection.mutable
 
-class If(override val config: XMLCalabashConfig) extends Choose(config) {
+class If(override val config: XMLCalabash) extends Choose(config) {
   override protected[model] def makeStructureExplicit(): Unit = {
     // p:if is purely syntactic sugar for a p:choose...so let's implement it that way
 

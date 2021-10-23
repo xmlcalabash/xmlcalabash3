@@ -16,6 +16,8 @@ class ConfigurationSettings() {
   private val _functions = mutable.HashMap.empty[QName,String]
   private val _steps = mutable.HashMap.empty[QName,String]
 
+  var loadConfig = true
+
   def close(): Unit = {
     closed = true
   }

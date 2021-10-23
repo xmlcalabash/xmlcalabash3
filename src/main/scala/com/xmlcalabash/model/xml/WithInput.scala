@@ -1,8 +1,7 @@
 package com.xmlcalabash.model.xml
 
 import com.jafpl.graph.Node
-import com.xmlcalabash.config.XMLCalabashConfig
-import com.xmlcalabash.exceptions
+import com.xmlcalabash.{XMLCalabash, exceptions}
 import com.xmlcalabash.exceptions.XProcException
 import com.xmlcalabash.model.util.{SaxonTreeBuilder, XProcConstants}
 import com.xmlcalabash.runtime.params.SelectFilterParams
@@ -11,7 +10,7 @@ import com.xmlcalabash.util.xc.ElaboratedPipeline
 import net.sf.saxon.functions.ConstantFunction.{False, True}
 import net.sf.saxon.s9api.{QName, XdmNode}
 
-class WithInput(override val config: XMLCalabashConfig) extends Port(config) {
+class WithInput(override val config: XMLCalabash) extends Port(config) {
   private val _exclude_inline_prefixes = List.empty[String]
   private var _context: StaticContext = _
   private var portSpecified = false

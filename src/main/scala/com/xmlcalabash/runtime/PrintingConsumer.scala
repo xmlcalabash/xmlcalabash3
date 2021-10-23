@@ -3,6 +3,7 @@ package com.xmlcalabash.runtime
 import java.io.{ByteArrayOutputStream, File, FileOutputStream, PrintStream}
 import com.jafpl.messages.{ItemMessage, Message}
 import com.jafpl.steps.DataConsumer
+import com.xmlcalabash.XMLCalabash
 import com.xmlcalabash.exceptions.XProcException
 import com.xmlcalabash.messages.{AnyItemMessage, XProcItemMessage, XdmValueItemMessage}
 import com.xmlcalabash.model.util.UniqueId

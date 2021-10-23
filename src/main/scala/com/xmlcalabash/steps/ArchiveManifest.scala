@@ -23,10 +23,10 @@ class ArchiveManifest extends DefaultXmlStep {
 
   private var source: Any = _
   private var smeta: XProcMetadata = _
+  private var relativeTo: URI = _
 
   private var format = Option.empty[QName]
   private var parameters = Map.empty[QName, XdmValue]
-  private var relativeTo = Option.empty[URI]
   private var overrideContentTypes = List.empty[Tuple2[Pattern,MediaType]]
 
   override def inputSpec: XmlPortSpecification = XmlPortSpecification.ANYSOURCE
@@ -68,9 +68,15 @@ class ArchiveManifest extends DefaultXmlStep {
     }
 
     relativeTo = if (uriBinding(_relativeTo).isDefined) {
-      uriBinding(_relativeTo)
+      val uri = uriBinding(_relativeTo)
+      if (uri.isEmpty) {
+        throw XProcException.xcArchiveNoBaseURI(location)
+      }
+      uri.get
     } else if (smeta.baseURI.isDefined) {
-      smeta.baseURI
+      // This is going to be .../something.zip but we want to make
+      // .../something.zip/filename URIs so tack on a "/".
+      new URI(smeta.baseURI.get.toString + "/")
     } else {
       throw XProcException.xcArchiveNoBaseURI(location)
     }
@@ -111,17 +117,7 @@ class ArchiveManifest extends DefaultXmlStep {
         var amap: AttributeMap = EmptyAttributeMap.getInstance()
         amap = amap.put(TypeUtils.attributeInfo(XProcConstants._name, entry.getName))
 
-        val href = if (relativeTo.isDefined) {
-          relativeTo.get.resolve(entry.getName)
-        } else {
-          if (context.baseURI.isDefined) {
-            context.baseURI.get.resolve(entry.getName)
-          } else {
-            // I wouldn't expect this to succeed, as the name is unlikely to be an absolute
-            // URI, but I've run out of options.
-            new URI(entry.getName)
-          }
-        }
+        val href = relativeTo.resolve(entry.getName)
 
         amap = amap.put(TypeUtils.attributeInfo(XProcConstants._href, href.toASCIIString))
         amap = archiveAttribute(amap, XProcConstants._comment, Option(entry.getComment))

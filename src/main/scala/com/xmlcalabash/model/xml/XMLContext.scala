@@ -2,7 +2,7 @@ package com.xmlcalabash.model.xml
 
 import java.net.URI
 import com.jafpl.graph.Location
-import com.xmlcalabash.config.XMLCalabashConfig
+import com.xmlcalabash.XMLCalabash
 import com.xmlcalabash.exceptions.XProcException
 import com.xmlcalabash.model.util.{ValueParser, XProcConstants}
 import com.xmlcalabash.runtime.StaticContext
@@ -19,23 +19,23 @@ object XMLContext {
       XProcConstants.fn_collection, XProcConstants._collection)
 }
 
-class XMLContext(override val config: XMLCalabashConfig, override val artifact: Option[Artifact]) extends StaticContext(config, artifact) {
-  def this(config: XMLCalabashConfig, artifact: Artifact) = {
+class XMLContext(override val config: XMLCalabash, override val artifact: Option[Artifact]) extends StaticContext(config, artifact) {
+  def this(config: XMLCalabash, artifact: Artifact) = {
     this(config, Some(artifact))
   }
 
-  def this(config: XMLCalabashConfig) = {
+  def this(config: XMLCalabash) = {
     this(config, None)
   }
 
-  def this(config: XMLCalabashConfig, artifact: Artifact, baseURI: Option[URI], ns: Map[String,String], location: Option[Location]) = {
+  def this(config: XMLCalabash, artifact: Artifact, baseURI: Option[URI], ns: Map[String,String], location: Option[Location]) = {
     this(config, Some(artifact))
     _baseURI = baseURI
     _inScopeNS = ns
     _location = location
   }
 
-  def this(config: XMLCalabashConfig, baseURI: Option[URI], ns: Map[String,String], location: Option[Location]) = {
+  def this(config: XMLCalabash, baseURI: Option[URI], ns: Map[String,String], location: Option[Location]) = {
     this(config, None)
     _baseURI = baseURI
     _inScopeNS = ns

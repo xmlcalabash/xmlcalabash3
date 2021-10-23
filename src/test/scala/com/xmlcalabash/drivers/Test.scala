@@ -1,11 +1,11 @@
 package com.xmlcalabash.drivers
 
-import com.xmlcalabash.config.{DocumentRequest, XMLCalabashConfig}
-import com.xmlcalabash.drivers.Main.config
+import com.xmlcalabash.XMLCalabash
+import com.xmlcalabash.config.DocumentRequest
 import com.xmlcalabash.exceptions.XProcException
 import com.xmlcalabash.testing.TestRunner
 import com.xmlcalabash.util.{DefaultErrorExplanation, MediaType, S9Api}
-import net.sf.saxon.s9api.{QName, Serializer, XdmAtomicValue, XdmDestination, XdmValue}
+import net.sf.saxon.s9api.{Processor, QName, Serializer, XdmAtomicValue, XdmDestination, XdmValue}
 import org.slf4j.LoggerFactory
 
 import java.io.{BufferedReader, File, FileReader, PrintWriter}
@@ -16,7 +16,7 @@ import scala.collection.mutable.ListBuffer
 import scala.jdk.javaapi.CollectionConverters.asJava
 
 object Test extends App {
-  private var xmlCalabash: XMLCalabashConfig = _
+  private var xmlCalabash: XMLCalabash = _
 
   private val testlist = ListBuffer.empty[String]
   private var regex = Option.empty[String]
@@ -59,9 +59,10 @@ object Test extends App {
   }
 
   try {
-    xmlCalabash = XMLCalabashConfig.newInstance()
-
-    val runner = new TestRunner(xmlCalabash, online, regex, testlist.toList, testLocations.toList)
+    val processor = new Processor(true)
+    xmlCalabash = XMLCalabash.newInstance(processor)
+    xmlCalabash.configure()
+    val runner = new TestRunner(processor, online, regex, testlist.toList, testLocations.toList)
 
     if (xmlOutput.isDefined) {
       val junit = runner.junit()
@@ -74,7 +75,7 @@ object Test extends App {
       // If we can find the previous results and the compare stylesheet, print the changes report
       val outputf = Paths.get(xmlOutput.get).toAbsolutePath
       val prevf = outputf.getParent.resolve("../test-suite/reports/xml-calabash.xml")
-      val comp = outputf.getParent.resolve("tools/test-changes.xsl")
+      val comp = outputf.getParent.resolve("src/test/resources/etc/test-changes.xsl")
       if (Files.exists(prevf) && Files.exists(comp)) {
         val builder = xmlCalabash.processor.newDocumentBuilder()
         val xsl = builder.build(comp.toFile)

@@ -1,6 +1,6 @@
 package com.xmlcalabash.steps.internal
 
-import com.xmlcalabash.config.XMLCalabashConfig
+import com.xmlcalabash.XMLCalabash
 import com.xmlcalabash.runtime.params.EmptyLoaderParams
 import com.xmlcalabash.runtime.{ImplParams, StaticContext, XmlPortSpecification}
 import com.xmlcalabash.steps.DefaultXmlStep
@@ -12,7 +12,7 @@ class EmptyLoader() extends AbstractLoader {
   }
   override def outputSpec: XmlPortSpecification = XmlPortSpecification.ANYRESULTSEQ
 
-  override def configure(config: XMLCalabashConfig, stepType: QName, stepName: Option[String], params: Option[ImplParams]): Unit = {
+  override def configure(config: XMLCalabash, stepType: QName, stepName: Option[String], params: Option[ImplParams]): Unit = {
     if (params.isEmpty) {
       throw new RuntimeException("empty loader params required")
     }

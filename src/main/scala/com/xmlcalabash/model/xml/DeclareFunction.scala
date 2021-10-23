@@ -1,8 +1,8 @@
 package com.xmlcalabash.model.xml
 
-import com.xmlcalabash.config.XMLCalabashConfig
+import com.xmlcalabash.XMLCalabash
 
-class DeclareFunction(override val config: XMLCalabashConfig) extends Artifact(config) {
+class DeclareFunction(override val config: XMLCalabash) extends Artifact(config) {
   override protected[model] def makeStructureExplicit(): Unit = {
     for (child <- allChildren) {
       child.makeStructureExplicit()

@@ -1,7 +1,7 @@
 package com.xmlcalabash.util
 
 import com.jafpl.graph.Location
-import com.xmlcalabash.config.XMLCalabashConfig
+import com.xmlcalabash.XMLCalabash
 import com.xmlcalabash.exceptions.XProcException
 import com.xmlcalabash.messages.XProcItemMessage
 import com.xmlcalabash.model.util.{SaxonTreeBuilder, XProcConstants}
@@ -14,7 +14,7 @@ import net.sf.saxon.s9api.{Axis, XdmNode, XdmNodeKind}
 import scala.collection.mutable
 import scala.jdk.CollectionConverters.ListHasAsScala
 
-class TvtExpander(config: XMLCalabashConfig,
+class TvtExpander(config: XMLCalabash,
                   contextItem: Option[XProcItemMessage],
                   exprContext: StaticContext,
                   msgBindings: Map[String, XProcItemMessage],

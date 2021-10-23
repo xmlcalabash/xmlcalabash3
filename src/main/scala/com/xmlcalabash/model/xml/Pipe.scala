@@ -1,18 +1,18 @@
 package com.xmlcalabash.model.xml
 
 import com.jafpl.graph.Node
-import com.xmlcalabash.config.XMLCalabashConfig
+import com.xmlcalabash.XMLCalabash
 import com.xmlcalabash.exceptions.XProcException
 import com.xmlcalabash.model.util.XProcConstants
 import com.xmlcalabash.runtime.XMLCalabashRuntime
 import com.xmlcalabash.util.xc.ElaboratedPipeline
 import net.sf.saxon.s9api.XdmNode
 
-class Pipe(override val config: XMLCalabashConfig, shortcut: Option[String]) extends DataSource(config) {
-  def this(config: XMLCalabashConfig) = {
+class Pipe(override val config: XMLCalabash, shortcut: Option[String]) extends DataSource(config) {
+  def this(config: XMLCalabash) = {
     this(config, None)
   }
-  def this(config: XMLCalabashConfig, shortcut: String) = {
+  def this(config: XMLCalabash, shortcut: String) = {
     this(config, Some(shortcut))
   }
 

@@ -1,6 +1,6 @@
 package com.xmlcalabash.util
 
-import com.xmlcalabash.config.XMLCalabashConfig
+import com.xmlcalabash.XMLCalabash
 import com.xmlcalabash.exceptions.XProcException
 import com.xmlcalabash.model.util.{SaxonTreeBuilder, ValueParser, XProcConstants}
 import com.xmlcalabash.runtime.{StaticContext, XMLCalabashRuntime}
@@ -60,9 +60,9 @@ object S9Api {
     }
   }
 
-  def inScopeNamespaces(node: XdmNode): Map[String,String] = {
+  def inScopeNamespaces(node: XdmNode): Map[String, String] = {
     val nsiter = node.axisIterator(Axis.NAMESPACE)
-    val ns = mutable.HashMap.empty[String,String]
+    val ns = mutable.HashMap.empty[String, String]
     while (nsiter.hasNext) {
       val attr = nsiter.next()
       val prefix = if (attr.getNodeName == null) {
@@ -77,7 +77,7 @@ object S9Api {
   }
 
   // FIXME: THIS METHOD IS A GROTESQUE HACK!
-  def xdmToInputSource(config: XMLCalabashConfig, node: XdmNode): InputSource = {
+  def xdmToInputSource(config: XMLCalabash, node: XdmNode): InputSource = {
     val out = new ByteArrayOutputStream()
     val serializer = config.processor.newSerializer
     serializer.setOutputStream(out)
@@ -99,7 +99,7 @@ object S9Api {
     str
   }
 
-  def configureSerializer(serializer: Serializer, options: Map[QName,String]): Unit = {
+  def configureSerializer(serializer: Serializer, options: Map[QName, String]): Unit = {
     for (opt <- options.keySet) {
       try {
         serializer.setOutputProperty(opt, options(opt))
@@ -108,16 +108,16 @@ object S9Api {
           // You attempted to set a serialization parameter that is unknown. Ignore it.
           ()
         case ex: Exception =>
-          throw(ex)
+          throw (ex)
       }
     }
   }
 
-  def serialize(config: XMLCalabashConfig, value: XdmValue, serializer: Serializer): Unit = {
+  def serialize(config: XMLCalabash, value: XdmValue, serializer: Serializer): Unit = {
     serialize(config, List(value), serializer)
   }
 
-  def serialize(xproc: XMLCalabashConfig, values: List[XdmValue], serializer: Serializer): Unit = {
+  def serialize(xproc: XMLCalabash, values: List[XdmValue], serializer: Serializer): Unit = {
     for (value <- values) {
       value match {
         case arr: XdmArray =>
@@ -140,7 +140,7 @@ object S9Api {
     }
   }
 
-  private def serializeMap(xproc: XMLCalabashConfig, value: XdmMap, serializer: Serializer): Unit = {
+  private def serializeMap(xproc: XMLCalabash, value: XdmMap, serializer: Serializer): Unit = {
     serializer.serializeXdmValue(OPEN_BRACE)
     val map = value.asMap()
 
@@ -163,11 +163,11 @@ object S9Api {
     serializer.serializeXdmValue(CLOSE_BRACE)
   }
 
-  private def serializeArr(xproc: XMLCalabashConfig, arr: XdmArray, serializer: Serializer): Unit = {
+  private def serializeArr(xproc: XMLCalabash, arr: XdmArray, serializer: Serializer): Unit = {
     serializer.serializeXdmValue(OPEN_SQUARE)
 
     var idx = 0
-    for (idx <- 0  until arr.arrayLength()) {
+    for (idx <- 0 until arr.arrayLength()) {
       val value = arr.get(idx)
       if (idx > 0) {
         serializer.serializeXdmValue(COMMA)
@@ -181,7 +181,7 @@ object S9Api {
 
   def serializationPropertyMap(props: SerializationProperties): Map[QName, XdmValue] = {
     val map = mutable.HashMap.empty[QName, XdmValue]
-    for ((key,value) <- props.getProperties.asScala) {
+    for ((key, value) <- props.getProperties.asScala) {
       map.put(ValueParser.parseClarkName(key.asInstanceOf[String]), new XdmAtomicValue(value.asInstanceOf[String]))
     }
     map.toMap
@@ -225,7 +225,7 @@ object S9Api {
   // we patch the actual, underlying base URI so that we don't get functions (in XSLT or XQuery,
   // for example) that think the base URI is one thing when the document properties
   // say it's something else.
-  def patchBaseURI(config: XMLCalabashConfig, node: XdmNode, baseURI: Option[URI]): XdmNode = {
+  def patchBaseURI(config: XMLCalabash, node: XdmNode, baseURI: Option[URI]): XdmNode = {
     if (baseURI.isEmpty) {
       return node
     }
@@ -348,8 +348,12 @@ object S9Api {
     aprefix
   }
 
-  def removeNamespaces(config: XMLCalabashConfig, node: XdmNode, excludeNS: Set[String], preserveUsed: Boolean): XdmNode = {
-    val tree = new SaxonTreeBuilder(config)
+  def removeNamespaces(config: XMLCalabash, node: XdmNode, excludeNS: Set[String], preserveUsed: Boolean): XdmNode = {
+    removeNamespaces(config.processor, node, excludeNS, preserveUsed)
+  }
+
+  def removeNamespaces(processor: Processor, node: XdmNode, excludeNS: Set[String], preserveUsed: Boolean): XdmNode = {
+    val tree = new SaxonTreeBuilder(processor)
     tree.startDocument(node.getBaseURI)
     removeNamespacesWriter(tree, node, excludeNS, preserveUsed)
     tree.endDocument()

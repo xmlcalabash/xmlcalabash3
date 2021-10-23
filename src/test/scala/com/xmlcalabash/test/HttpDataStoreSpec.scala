@@ -1,8 +1,8 @@
 package com.xmlcalabash.test
 
-import com.xmlcalabash.config.XMLCalabashConfig
+import com.xmlcalabash.XMLCalabash
 import com.xmlcalabash.util.stores.{DataInfo, DataReader, DataWriter, FallbackDataStore, FileDataStore, HttpDataStore}
-import net.sf.saxon.s9api.XdmAtomicValue
+import net.sf.saxon.s9api.{Processor, XdmAtomicValue}
 import org.scalatest.BeforeAndAfter
 import org.scalatest.flatspec.AnyFlatSpec
 
@@ -12,7 +12,9 @@ import scala.collection.mutable.ListBuffer
 
 class HttpDataStoreSpec extends AnyFlatSpec with BeforeAndAfter {
   System.setProperty("com.xmlcalabash.configFile", "src/test/resources/config.xml")
-  private val config = XMLCalabashConfig.newInstance()
+  private val xmlcalabash = XMLCalabash.newInstance()
+  xmlcalabash.configure()
+  private val config = xmlcalabash
   private val httpStore = new HttpDataStore(config, new FallbackDataStore())
   private val baseURI = URI.create("http://localhost:8246/service/")
   private var serverAvailable = true
@@ -61,7 +63,7 @@ class HttpDataStoreSpec extends AnyFlatSpec with BeforeAndAfter {
         httpStore.infoEntry("fixed-html", baseURI, "*/*", testIO)
       }
     } catch {
-      case _: Throwable => pass = false
+      case ex: Exception => pass = false
     }
     assert(pass)
   }
@@ -74,7 +76,7 @@ class HttpDataStoreSpec extends AnyFlatSpec with BeforeAndAfter {
         httpStore.listEachEntry("http://localhost:8246/docs/", baseURI, "*/*", testIO)
       }
     } catch {
-      case _: Throwable => pass = false
+      case ex: Exception => pass = false
     }
     pass = !serverAvailable || (pass && testIO.fileCount > 1)
     assert(pass)

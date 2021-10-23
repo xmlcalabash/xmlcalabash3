@@ -1,10 +1,10 @@
 package com.xmlcalabash.model.xml
 
-import com.xmlcalabash.config.XMLCalabashConfig
+import com.xmlcalabash.XMLCalabash
 import com.xmlcalabash.util.xc.ElaboratedPipeline
 import net.sf.saxon.s9api.{Axis, QName, XdmNode, XdmNodeKind}
 
-class PipeInfo(override val config: XMLCalabashConfig, val info: XdmNode) extends Port(config) {
+class PipeInfo(override val config: XMLCalabash, val info: XdmNode) extends Port(config) {
   override protected[model] def validateStructure(): Unit = {
     // nop
   }

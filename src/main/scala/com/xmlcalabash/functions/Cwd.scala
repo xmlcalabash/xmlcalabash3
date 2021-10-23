@@ -1,6 +1,6 @@
 package com.xmlcalabash.functions
 
-import com.xmlcalabash.config.XMLCalabashConfig
+import com.xmlcalabash.XMLCalabash
 import com.xmlcalabash.exceptions.XProcException
 import com.xmlcalabash.model.util.XProcConstants
 import net.sf.saxon.expr.XPathContext
@@ -8,7 +8,7 @@ import net.sf.saxon.lib.{ExtensionFunctionCall, ExtensionFunctionDefinition}
 import net.sf.saxon.om.{Sequence, StructuredQName}
 import net.sf.saxon.value.{AnyURIValue, AtomicValue, SequenceType}
 
-class Cwd(runtime: XMLCalabashConfig) extends FunctionImpl {
+class Cwd(runtime: XMLCalabash) extends FunctionImpl {
   val funcname = new StructuredQName("exf", XProcConstants.ns_exf, "cwd")
 
   override def getFunctionQName: StructuredQName = funcname

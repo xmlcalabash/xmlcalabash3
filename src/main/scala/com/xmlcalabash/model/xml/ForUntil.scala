@@ -2,14 +2,14 @@ package com.xmlcalabash.model.xml
 
 import com.jafpl.graph.{ContainerStart, Node}
 import com.jafpl.steps.Manifold
-import com.xmlcalabash.config.XMLCalabashConfig
+import com.xmlcalabash.XMLCalabash
 import com.xmlcalabash.exceptions.XProcException
 import com.xmlcalabash.runtime.XMLCalabashRuntime
 import com.xmlcalabash.util.XmlItemComparator
 import com.xmlcalabash.util.xc.ElaboratedPipeline
 import net.sf.saxon.s9api.{QName, XdmNode}
 
-class ForUntil(override val config: XMLCalabashConfig) extends ForContainer(config) with NamedArtifact {
+class ForUntil(override val config: XMLCalabash) extends ForContainer(config) with NamedArtifact {
   private val _max_iterations = new QName("max-iterations")
   private val _comparator = new QName("comparator")
   private val _return = new QName("return")

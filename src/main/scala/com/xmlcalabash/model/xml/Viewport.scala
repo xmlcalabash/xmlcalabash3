@@ -2,7 +2,7 @@ package com.xmlcalabash.model.xml
 
 import com.jafpl.graph.{ContainerStart, Node}
 import com.jafpl.steps.Manifold
-import com.xmlcalabash.config.XMLCalabashConfig
+import com.xmlcalabash.XMLCalabash
 import com.xmlcalabash.exceptions.XProcException
 import com.xmlcalabash.model.util.XProcConstants
 import com.xmlcalabash.runtime.XMLCalabashRuntime
@@ -14,7 +14,7 @@ import net.sf.saxon.s9api.{QName, XdmNode}
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 
-class Viewport(override val config: XMLCalabashConfig) extends Container(config) with NamedArtifact {
+class Viewport(override val config: XMLCalabash) extends Container(config) with NamedArtifact {
   private var _match: String = _
   protected var _dependentNameBindings: ListBuffer[NamePipe] = ListBuffer.empty[NamePipe]
 

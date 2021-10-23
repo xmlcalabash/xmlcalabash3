@@ -1,12 +1,12 @@
 package com.xmlcalabash.model.xml
 
 import com.jafpl.graph.Node
-import com.xmlcalabash.config.XMLCalabashConfig
+import com.xmlcalabash.XMLCalabash
 import com.xmlcalabash.runtime.XMLCalabashRuntime
 import com.xmlcalabash.util.xc.ElaboratedPipeline
 import net.sf.saxon.s9api.XdmNode
 
-class WithOutput(override val config: XMLCalabashConfig) extends Port(config) {
+class WithOutput(override val config: XMLCalabash) extends Port(config) {
   override def parse(node: XdmNode): Unit = {
     throw new RuntimeException("This is a purely synthetic element")
   }

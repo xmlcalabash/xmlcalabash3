@@ -1,7 +1,8 @@
 package com.xmlcalabash.util.stores
 
 import com.jafpl.messages.Message
-import com.xmlcalabash.config.{DocumentRequest, XMLCalabashConfig}
+import com.xmlcalabash.XMLCalabash
+import com.xmlcalabash.config.DocumentRequest
 import com.xmlcalabash.messages.XdmValueItemMessage
 import com.xmlcalabash.model.util.XProcConstants
 import com.xmlcalabash.runtime.{StaticContext, XProcMetadata, XProcXPathExpression}
@@ -12,7 +13,7 @@ import java.io.{ByteArrayInputStream, ByteArrayOutputStream, IOException}
 import java.net.URI
 import scala.collection.mutable
 
-class HttpDataStore(config: XMLCalabashConfig, fallback: DataStore) extends DataStore {
+class HttpDataStore(config: XMLCalabash, fallback: DataStore) extends DataStore {
   override def writeEntry(href: String, baseURI: URI, media: String, handler: DataWriter): URI = {
     val uri = baseURI.resolve(href)
     if ("http".equalsIgnoreCase(uri.getScheme) || "https".equalsIgnoreCase(uri.getScheme)) {

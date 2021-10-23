@@ -2,7 +2,7 @@ package com.xmlcalabash.util
 
 import com.jafpl.messages.Message
 import com.jafpl.util.ItemComparator
-import com.xmlcalabash.config.XMLCalabashConfig
+import com.xmlcalabash.XMLCalabash
 import com.xmlcalabash.exceptions.XProcException
 import com.xmlcalabash.messages.XdmValueItemMessage
 import com.xmlcalabash.model.xml.ForUntil
@@ -11,7 +11,7 @@ import net.sf.saxon.s9api.{XdmNode, XdmValue}
 
 import scala.collection.mutable
 
-class XmlItemComparator(config: XMLCalabashConfig, comparator: String, maxIterations: Long, art: ForUntil) extends ItemComparator {
+class XmlItemComparator(config: XMLCalabash, comparator: String, maxIterations: Long, art: ForUntil) extends ItemComparator {
   private var count = 0L
 
   override def areTheSame(a: Any, b: Any): Boolean = {

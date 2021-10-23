@@ -2,7 +2,7 @@ package com.xmlcalabash.model.xml
 
 import com.jafpl.graph.Node
 import com.jafpl.steps.{Manifold, PortCardinality, PortSpecification}
-import com.xmlcalabash.config.XMLCalabashConfig
+import com.xmlcalabash.XMLCalabash
 import com.xmlcalabash.exceptions.XProcException
 import com.xmlcalabash.model.util.XProcConstants
 import com.xmlcalabash.runtime.{XMLCalabashRuntime, XmlPortSpecification}
@@ -12,7 +12,7 @@ import com.xmlcalabash.util.MediaType
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 
-class Container(override val config: XMLCalabashConfig) extends Step(config) with NamedArtifact {
+class Container(override val config: XMLCalabash) extends Step(config) with NamedArtifact {
   protected var _outputs = mutable.HashMap.empty[String, DeclareOutput]
 
   def atomic: Boolean = {

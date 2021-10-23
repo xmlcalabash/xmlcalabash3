@@ -7,7 +7,8 @@ import com.jafpl.messages.Message
 import com.jafpl.runtime.{GraphRuntime, RuntimeConfiguration}
 import com.jafpl.steps.DataConsumer
 import com.jafpl.util.{ErrorListener, TraceEventManager}
-import com.xmlcalabash.config.{DocumentManager, DocumentRequest, DocumentResponse, Signatures, XMLCalabashConfig, XProcConfigurer}
+import com.xmlcalabash.XMLCalabash
+import com.xmlcalabash.config.{DocumentManager, DocumentRequest, DocumentResponse, Signatures, XProcConfigurer}
 import com.xmlcalabash.exceptions.{ConfigurationException, ExceptionCode, ModelException, XProcException}
 import com.xmlcalabash.messages.{AnyItemMessage, XdmNodeItemMessage, XdmValueItemMessage}
 import com.xmlcalabash.model.util.{ExpressionParser, XProcConstants}
@@ -28,7 +29,7 @@ import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 
 class XMLCalabashRuntime protected[xmlcalabash] (val decl: DeclareStep) extends RuntimeConfiguration {
-  val config: XMLCalabashConfig = decl.config
+  val config: XMLCalabash = decl.config
 
   //FIXME: why?
   override def threadPoolSize: Int = config.threadPoolSize
@@ -213,7 +214,7 @@ class XMLCalabashRuntime protected[xmlcalabash] (val decl: DeclareStep) extends 
 
   // ===================================================================================
 
-  def xprocConfigurer: XProcConfigurer = config.xprocConfigurer
+  def xprocConfigurer: XProcConfigurer = config.configurer
 
   def productName: String = config.productName
   def productVersion: String = config.productVersion

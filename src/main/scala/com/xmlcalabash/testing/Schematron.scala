@@ -1,7 +1,8 @@
 package com.xmlcalabash.testing
 
+import com.xmlcalabash.XMLCalabash
+
 import java.net.URI
-import com.xmlcalabash.config.XMLCalabashConfig
 import com.xmlcalabash.exceptions.TestException
 import com.xmlcalabash.util.{S9Api, SchematronImpl}
 
@@ -17,7 +18,7 @@ import scala.collection.mutable.ListBuffer
 
 // In March, 2021, this step was updated to use the SchXslt implementation of Schematron
 
-class Schematron(runtimeConfig: XMLCalabashConfig) {
+class Schematron(runtimeConfig: XMLCalabash) {
   def test(sourceXML: XdmNode, schemaXML: XdmNode): List[XdmNode] = {
     test(sourceXML, schemaXML, None)
   }

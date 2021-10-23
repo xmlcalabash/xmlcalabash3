@@ -3,7 +3,8 @@ package com.xmlcalabash.model.xml
 import com.jafpl.exceptions.JafplLoopDetected
 import com.jafpl.graph.Node
 import com.jafpl.steps.{Manifold, PortCardinality, PortSpecification}
-import com.xmlcalabash.config.{OptionSignature, PortSignature, StepSignature, XMLCalabashConfig}
+import com.xmlcalabash.XMLCalabash
+import com.xmlcalabash.config.{OptionSignature, PortSignature, StepSignature}
 import com.xmlcalabash.exceptions.XProcException
 import com.xmlcalabash.model.util.XProcConstants
 import com.xmlcalabash.runtime.XMLCalabashRuntime
@@ -15,7 +16,7 @@ import net.sf.saxon.s9api.{ItemType, QName, SaxonApiException, XdmAtomicValue, X
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 
-class DeclareStep(override val config: XMLCalabashConfig) extends DeclContainer(config) {
+class DeclareStep(override val config: XMLCalabash) extends DeclContainer(config) {
   private var _type = Option.empty[QName]
   private var _visibility = Option.empty[String]
   private var _signature = Option.empty[StepSignature]

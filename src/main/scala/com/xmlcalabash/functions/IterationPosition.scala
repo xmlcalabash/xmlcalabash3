@@ -1,6 +1,6 @@
 package com.xmlcalabash.functions
 
-import com.xmlcalabash.config.XMLCalabashConfig
+import com.xmlcalabash.XMLCalabash
 import com.xmlcalabash.exceptions.XProcException
 import com.xmlcalabash.model.util.XProcConstants
 import net.sf.saxon.expr.{StaticContext, XPathContext}
@@ -8,7 +8,7 @@ import net.sf.saxon.lib.{ExtensionFunctionCall, ExtensionFunctionDefinition}
 import net.sf.saxon.om.{Sequence, StructuredQName}
 import net.sf.saxon.value.{Int64Value, QNameValue, SequenceType}
 
-class IterationPosition(runtime: XMLCalabashConfig) extends FunctionImpl {
+class IterationPosition(runtime: XMLCalabash) extends FunctionImpl {
   private val funcname = new StructuredQName("p", XProcConstants.ns_p, "iteration-position")
 
   override def getFunctionQName: StructuredQName = funcname

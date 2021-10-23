@@ -1,6 +1,6 @@
 package com.xmlcalabash.test
 
-import com.xmlcalabash.config.XMLCalabashConfig
+import com.xmlcalabash.XMLCalabash
 import com.xmlcalabash.util.MediaType
 import org.scalatest.flatspec.AnyFlatSpec
 

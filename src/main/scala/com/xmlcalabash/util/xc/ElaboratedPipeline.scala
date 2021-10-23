@@ -1,6 +1,6 @@
 package com.xmlcalabash.util.xc
 
-import com.xmlcalabash.config.XMLCalabashConfig
+import com.xmlcalabash.XMLCalabash
 import com.xmlcalabash.model.util.{SaxonTreeBuilder, XProcConstants}
 import com.xmlcalabash.util.{MediaType, TypeUtils}
 import net.sf.saxon.om.{AttributeMap, EmptyAttributeMap, NamespaceMap, SingletonAttributeMap}
@@ -8,7 +8,7 @@ import net.sf.saxon.s9api.{QName, XdmNode}
 
 import scala.collection.mutable
 
-class ElaboratedPipeline(config: XMLCalabashConfig) {
+class ElaboratedPipeline(config: XMLCalabash) {
   private val builder = new SaxonTreeBuilder(config)
   private val openStack = mutable.Stack.empty[QName]
   private val inLibrary = false

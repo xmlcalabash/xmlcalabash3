@@ -1,6 +1,6 @@
 package com.xmlcalabash.model.xml
 
-import com.xmlcalabash.config.XMLCalabashConfig
+import com.xmlcalabash.XMLCalabash
 import com.xmlcalabash.exceptions.XProcException
 import com.xmlcalabash.model.util.XProcConstants
 import com.xmlcalabash.runtime.ImplParams
@@ -8,7 +8,7 @@ import net.sf.saxon.s9api.QName
 
 import scala.collection.mutable.ListBuffer
 
-abstract class DataSource(override val config: XMLCalabashConfig) extends Artifact(config) {
+abstract class DataSource(override val config: XMLCalabash) extends Artifact(config) {
   protected val depends: ListBuffer[String] = ListBuffer.empty[String]
 
   override protected[model] def validateStructure(): Unit = {

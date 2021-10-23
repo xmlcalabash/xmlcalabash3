@@ -1,11 +1,11 @@
 package com.xmlcalabash.model.xml
 
-import com.xmlcalabash.config.XMLCalabashConfig
+import com.xmlcalabash.XMLCalabash
 import com.xmlcalabash.exceptions.XProcException
 import com.xmlcalabash.model.util.XProcConstants
 import net.sf.saxon.s9api.{XdmNode, XdmNodeKind}
 
-class Library(override val config: XMLCalabashConfig) extends DeclContainer(config) {
+class Library(override val config: XMLCalabash) extends DeclContainer(config) {
 
   override def parse(node: XdmNode): Unit = {
     super.parse(node)

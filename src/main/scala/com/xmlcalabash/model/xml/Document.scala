@@ -1,6 +1,7 @@
 package com.xmlcalabash.model.xml
 
-import com.xmlcalabash.config.{DocumentRequest, DocumentResponse, XMLCalabashConfig}
+import com.xmlcalabash.XMLCalabash
+import com.xmlcalabash.config.{DocumentRequest, DocumentResponse}
 import com.xmlcalabash.exceptions.XProcException
 import com.xmlcalabash.model.util.XProcConstants
 import com.xmlcalabash.runtime.XProcVtExpression
@@ -12,7 +13,7 @@ import net.sf.saxon.s9api.{QName, XdmNode}
 import java.net.URI
 import scala.collection.mutable
 
-class Document(override val config: XMLCalabashConfig) extends DataSource(config) {
+class Document(override val config: XMLCalabash) extends DataSource(config) {
   private var _href = "UNINITIALIZED"
   private var _hrefAvt = List.empty[String]
   private var _contentType = Option.empty[MediaType]

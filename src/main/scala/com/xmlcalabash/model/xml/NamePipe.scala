@@ -1,13 +1,13 @@
 package com.xmlcalabash.model.xml
 
 import com.jafpl.graph.Node
-import com.xmlcalabash.config.XMLCalabashConfig
+import com.xmlcalabash.XMLCalabash
 import com.xmlcalabash.exceptions.XProcException
 import com.xmlcalabash.runtime.XMLCalabashRuntime
 import com.xmlcalabash.util.xc.ElaboratedPipeline
 import net.sf.saxon.s9api.{QName, XdmNode}
 
-class NamePipe(override val config: XMLCalabashConfig, val name: QName, val step: String, val link: NameBinding) extends Artifact(config) {
+class NamePipe(override val config: XMLCalabash, val name: QName, val step: String, val link: NameBinding) extends Artifact(config) {
   private var _node = link._graphNode
 
   override def parse(node: XdmNode): Unit = {

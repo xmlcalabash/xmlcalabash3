@@ -1,10 +1,10 @@
 package com.xmlcalabash.model.xml
 
 import java.net.URI
-
 import com.jafpl.graph.{Location, Node}
 import com.jafpl.messages.Message
-import com.xmlcalabash.config.{StepSignature, XMLCalabashConfig}
+import com.xmlcalabash.XMLCalabash
+import com.xmlcalabash.config.StepSignature
 import com.xmlcalabash.exceptions.XProcException
 import com.xmlcalabash.messages.{XdmNodeItemMessage, XdmValueItemMessage}
 import com.xmlcalabash.model.util.{UniqueId, ValueParser, XProcConstants}
@@ -19,7 +19,7 @@ import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 import scala.reflect.ClassTag
 
-class Artifact(val config: XMLCalabashConfig) {
+class Artifact(val config: XMLCalabash) {
   protected val logger: Logger = LoggerFactory.getLogger(this.getClass)
   protected[model] var _readablePorts = List.empty[Port]
   protected[model] var _graphNode: Option[Node] = None

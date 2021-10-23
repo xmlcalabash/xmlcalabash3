@@ -1,8 +1,8 @@
 package com.xmlcalabash.test
 
-import com.xmlcalabash.config.XMLCalabashConfig
+import com.xmlcalabash.XMLCalabash
 import com.xmlcalabash.util.stores.{DataInfo, DataReader, DataWriter, FallbackDataStore, FileDataStore}
-import net.sf.saxon.s9api.XdmAtomicValue
+import net.sf.saxon.s9api.{Processor, XdmAtomicValue}
 import org.scalatest.BeforeAndAfter
 import org.scalatest.flatspec.AnyFlatSpec
 
@@ -11,7 +11,7 @@ import java.net.URI
 
 class FileDataStoreSpec extends AnyFlatSpec with BeforeAndAfter {
   System.setProperty("com.xmlcalabash.configFile", "src/test/resources/config.xml")
-  private val config = XMLCalabashConfig.newInstance()
+  private val config = XMLCalabash.newInstance(new Processor(false))
   private val fileStore = new FileDataStore(config, new FallbackDataStore())
   private val testIO = new TestIO()
   private val tempDir: File = File.createTempFile("xml-calabash-test-", ".dir")

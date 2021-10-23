@@ -2,13 +2,13 @@ package com.xmlcalabash.model.xml
 
 import com.jafpl.graph.{ContainerStart, Node}
 import com.jafpl.steps.Manifold
-import com.xmlcalabash.config.XMLCalabashConfig
+import com.xmlcalabash.XMLCalabash
 import com.xmlcalabash.exceptions.XProcException
 import com.xmlcalabash.runtime.XMLCalabashRuntime
 import com.xmlcalabash.util.xc.ElaboratedPipeline
 import net.sf.saxon.s9api.{QName, XdmNode}
 
-class ForLoop(override val config: XMLCalabashConfig) extends ForContainer(config) with NamedArtifact {
+class ForLoop(override val config: XMLCalabash) extends ForContainer(config) with NamedArtifact {
   private val _from = new QName("from")
   private val _to = new QName("to")
   private val _by = new QName("by")

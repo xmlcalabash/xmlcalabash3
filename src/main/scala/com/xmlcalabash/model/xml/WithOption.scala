@@ -1,7 +1,8 @@
 package com.xmlcalabash.model.xml
 
 import com.jafpl.graph.{ContainerStart, Node}
-import com.xmlcalabash.config.{OptionSignature, XMLCalabashConfig}
+import com.xmlcalabash.XMLCalabash
+import com.xmlcalabash.config.OptionSignature
 import com.xmlcalabash.exceptions.XProcException
 import com.xmlcalabash.messages.{XdmNodeItemMessage, XdmValueItemMessage}
 import com.xmlcalabash.model.util.ValueParser
@@ -14,11 +15,11 @@ import net.sf.saxon.s9api.{QName, XdmAtomicValue, XdmMap, XdmValue}
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 
-class WithOption(override val config: XMLCalabashConfig) extends NameBinding(config) {
+class WithOption(override val config: XMLCalabash) extends NameBinding(config) {
   val typeUtils = new TypeUtils(config)
   private val _precOptions = ListBuffer.empty[OptionSignature]
 
-  def this(config: XMLCalabashConfig, name: QName) = {
+  def this(config: XMLCalabash, name: QName) = {
     this(config)
     _name = name
   }

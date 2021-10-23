@@ -2,7 +2,7 @@ package com.xmlcalabash.model.xml
 
 import com.jafpl.messages.{Message, Metadata}
 import com.jafpl.steps.{ViewportComposer, ViewportItem}
-import com.xmlcalabash.config.XMLCalabashConfig
+import com.xmlcalabash.XMLCalabash
 import com.xmlcalabash.exceptions.XProcException
 import com.xmlcalabash.messages.{AnyItemMessage, XdmNodeItemMessage, XdmValueItemMessage}
 import com.xmlcalabash.model.util.{SaxonTreeBuilder, ValueParser, XProcConstants}
@@ -14,7 +14,7 @@ import net.sf.saxon.s9api.{QName, XdmAtomicValue, XdmNode, XdmValue}
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 
-class XMLViewportComposer(config: XMLCalabashConfig, context: StaticContext, patternString: String) extends ViewportComposer {
+class XMLViewportComposer(config: XMLCalabash, context: StaticContext, patternString: String) extends ViewportComposer {
   private val cx_viewport = new QName("cx", XProcConstants.ns_cx,"viewport")
   private val _index = new QName("index")
   private var matcher: ProcessMatch = _

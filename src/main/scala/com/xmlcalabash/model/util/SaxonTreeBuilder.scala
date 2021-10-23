@@ -1,6 +1,6 @@
 package com.xmlcalabash.model.util
 
-import com.xmlcalabash.config.XMLCalabashConfig
+import com.xmlcalabash.XMLCalabash
 import com.xmlcalabash.exceptions.{ExceptionCode, ModelException, XProcException}
 import com.xmlcalabash.runtime.XMLCalabashRuntime
 import com.xmlcalabash.util.{DefaultLocation, S9Api, SysIdLocation, VoidLocation}
@@ -34,13 +34,13 @@ import scala.jdk.CollectionConverters.{BufferHasAsJava, CollectionHasAsScala}
  */
 
 object SaxonTreeBuilder {
-  def emptyTree(config: XMLCalabashConfig, baseURI: Option[URI]): XdmNode = {
+  def emptyTree(config: XMLCalabash, baseURI: Option[URI]): XdmNode = {
     val tree = new SaxonTreeBuilder(config)
     tree.startDocument(baseURI)
     tree.endDocument()
     tree.result
   }
-  def emptyTree(config: XMLCalabashConfig): XdmNode = {
+  def emptyTree(config: XMLCalabash): XdmNode = {
     val tree = new SaxonTreeBuilder(config)
     tree.startDocument(None)
     tree.endDocument()
@@ -61,7 +61,7 @@ class SaxonTreeBuilder(processor: Processor) {
   private val emptyAttributeMap = EmptyAttributeMap.getInstance()
   private var _location = Option.empty[Location]
 
-  def this(config: XMLCalabashConfig) = {
+  def this(config: XMLCalabash) = {
     this(config.processor)
   }
 
