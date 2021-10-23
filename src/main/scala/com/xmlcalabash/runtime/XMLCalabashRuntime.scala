@@ -182,7 +182,7 @@ class XMLCalabashRuntime protected[xmlcalabash] (val decl: DeclareStep) extends 
     try {
       runtime.runSync()
     } catch {
-      case ex: Throwable =>
+      case ex: Exception =>
         ex match {
           case j: JafplException =>
             throw JafplExceptionMapper.remap(j)

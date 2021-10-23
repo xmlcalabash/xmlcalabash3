@@ -25,7 +25,7 @@ class XmlCalabashSpec extends AnyFlatSpec {
     val proc = XMLCalabash.newInstance()
     proc.args.pipeline(identity_xpl)
     proc.args.input("source", "src/test/resources/config.xml")
-    proc.args.input("source", new File("src/test/resources/config.xml"))
+    proc.args.input("source", new File("src/test/resources/config.xml"), MediaType.XML)
     proc.args.input("source", URI.create(s"${System.getProperty("user.dir")}/src/test/resources/config.xml"))
     proc.resolve()
   }
@@ -34,7 +34,7 @@ class XmlCalabashSpec extends AnyFlatSpec {
     val proc = XMLCalabash.newInstance()
     proc.args.pipeline(identity_xpl)
     proc.args.input("result1", "/tmp/one")
-    proc.args.input("result2", new File("/tmp/two"))
+    proc.args.input("result2", new File("/tmp/two"), MediaType.OCTET_STREAM)
     proc.args.input("result3", URI.create("file:///tmp/three"))
     proc.resolve()
   }
@@ -43,7 +43,7 @@ class XmlCalabashSpec extends AnyFlatSpec {
     val proc = XMLCalabash.newInstance()
     proc.args.pipeline(identity_xpl)
     proc.args.input("result", "/tmp/one")
-    proc.args.input("result", new File("/tmp/two"))
+    proc.args.input("result", new File("/tmp/two"), MediaType.XML)
     proc.args.input("result", URI.create("file:///tmp/three"))
     proc.resolve()
   }
@@ -107,7 +107,7 @@ class XmlCalabashSpec extends AnyFlatSpec {
     proc.args.pipeline(identity_xpl)
     proc.args.optionDocument("json", URIUtils.cwdAsURI.resolve("src/test/resources/doc.json"))
     proc.args.optionDocument("xmlstring", "src/test/resources/config.xml")
-    proc.args.optionDocument("xmlfile", new File("src/test/resources/config.xml"))
+    proc.args.optionDocument("xmlfile", new File("src/test/resources/config.xml"), MediaType.XML)
     proc.resolve()
   }
 

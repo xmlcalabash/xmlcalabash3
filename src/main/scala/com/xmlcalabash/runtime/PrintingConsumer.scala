@@ -10,8 +10,10 @@ import com.xmlcalabash.model.util.UniqueId
 import com.xmlcalabash.model.xml.DeclareOutput
 import com.xmlcalabash.util.S9Api
 import net.sf.saxon.s9api.{QName, Serializer}
+import org.slf4j.{Logger, LoggerFactory}
 
 class PrintingConsumer private(config: XMLCalabashRuntime, output: DeclareOutput, outputs: Option[List[String]]) extends DataConsumer {
+  protected val logger: Logger = LoggerFactory.getLogger(this.getClass)
   private val _id = UniqueId.nextId.toString
   private var index = 0
 
@@ -24,6 +26,7 @@ class PrintingConsumer private(config: XMLCalabashRuntime, output: DeclareOutput
   }
 
   override def consume(port: String, message: Message): Unit = {
+    logger.debug(s"PrintingConsumer received message on ${port}")
     message match {
       case msg: XProcItemMessage =>
         // Check that the message content type is allowed on the output port
