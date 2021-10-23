@@ -20,6 +20,7 @@ trait PipelineParameterURIValue {
 
 trait PipelineParameterFileValue {
   val value: File
+  val contentType: MediaType
 }
 
 trait PipelineParameterXdmNodeValue {
@@ -41,7 +42,7 @@ abstract class PipelineDocument() extends PipelineParameter { }
 
 class PipelineFilenameDocument(val value: String) extends PipelineDocument with PipelineParameterStringValue {}
 class PipelineURIDocument(val value: URI) extends PipelineDocument with PipelineParameterURIValue {}
-class PipelineFileDocument(val value: File) extends PipelineDocument with PipelineParameterFileValue {}
+class PipelineFileDocument(val value: File, val contentType: MediaType) extends PipelineDocument with PipelineParameterFileValue {}
 class PipelineXdmDocument(val value: XdmNode) extends PipelineDocument with PipelineParameterXdmNodeValue {}
 class PipelineTextDocument(val text: String, val contentType: MediaType) extends PipelineDocument with PipelineParameterTextValue {
   def this(text: String, contentType: String) = this(text, MediaType.parse(contentType))
@@ -51,7 +52,9 @@ abstract class PipelineInputDocument(val port: String) extends PipelineDocument 
 
 class PipelineInputFilename(port: String, val value: String) extends PipelineInputDocument(port) with PipelineParameterStringValue {}
 class PipelineInputURI(port: String, val value: URI) extends PipelineInputDocument(port) with PipelineParameterURIValue {}
-class PipelineInputFile(port: String, val value: File) extends PipelineInputDocument(port) with PipelineParameterFileValue {}
+class PipelineInputFile(port: String, val value: File, val contentType: MediaType) extends PipelineInputDocument(port) with PipelineParameterFileValue {
+  def this(port: String, value: File, contentType: String) = this(port, value, MediaType.parse(contentType))
+}
 class PipelineInputXdm(port: String, val value: XdmNode) extends PipelineInputDocument(port) with PipelineParameterXdmNodeValue {}
 class PipelineInputText(port: String, val text: String, val contentType: MediaType) extends PipelineInputDocument(port) with PipelineParameterTextValue {
   def this(port: String, text: String, contentType: String) = this(port, text, MediaType.parse(contentType))

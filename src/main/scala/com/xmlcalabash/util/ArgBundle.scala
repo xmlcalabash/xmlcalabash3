@@ -56,7 +56,7 @@ class ArgBundle() {
   }
 
   def pipeline(xpl: File): Unit = {
-    _pipeline = Some(new PipelineFileDocument(xpl))
+    _pipeline = Some(new PipelineFileDocument(xpl, MediaType.XML))
   }
 
   def pipeline(xpl: XdmNode): Unit = {
@@ -75,8 +75,12 @@ class ArgBundle() {
     _parameters += new PipelineInputURI(port, document)
   }
 
-  def input(port: String, document: File): Unit = {
-    _parameters += new PipelineInputFile(port, document)
+  def input(port: String, document: File, mediaType: MediaType): Unit = {
+    _parameters += new PipelineInputFile(port, document, mediaType)
+  }
+
+  def input(port: String, document: File, contentType: String): Unit = {
+    input(port, document, MediaType.parse(contentType))
   }
 
   def input(port: String, document: XdmNode): Unit = {
@@ -131,8 +135,12 @@ class ArgBundle() {
     _parameters += new PipelineDocumentOption(eqname, new PipelineURIDocument(document))
   }
 
-  def optionDocument(eqname: String, document: File): Unit = {
-    _parameters += new PipelineDocumentOption(eqname, new PipelineFileDocument(document))
+  def optionDocument(eqname: String, document: File, mediaType: MediaType): Unit = {
+    _parameters += new PipelineDocumentOption(eqname, new PipelineFileDocument(document, mediaType))
+  }
+
+  def optionDocument(eqname: String, document: File, contentType: String): Unit = {
+    optionDocument(eqname, document, MediaType.parse(contentType))
   }
 
   def optionExpression(eqname: String, value: String): Unit = {

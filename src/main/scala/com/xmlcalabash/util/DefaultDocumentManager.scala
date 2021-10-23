@@ -11,7 +11,7 @@ import com.xmlcalabash.model.util.{SaxonTreeBuilder, XProcConstants}
 import com.xmlcalabash.runtime.{BinaryNode, StaticContext, XProcMetadata, XProcXPathExpression}
 import com.xmlcalabash.util.xc.Errors
 import net.sf.saxon.Configuration
-import net.sf.saxon.lib.ErrorReporter
+import net.sf.saxon.lib.{AugmentedSource, ErrorReporter, ParseOptions}
 import net.sf.saxon.s9api.{QName, SaxonApiException, XdmAtomicValue, XdmNode, XdmValue}
 import net.sf.saxon.trans.XPathException
 import nu.validator.htmlparser.common.XmlViolationPolicy
@@ -240,7 +240,15 @@ class DefaultDocumentManager(xmlCalabash: XMLCalabash) extends DocumentManager {
       val value = parseHtml(request, new InputSource(stream)).value
       new DocumentResponse(value, contentType, props)
     } else if (contentType.xmlContentType) {
-      val source = new SAXSource(new InputSource(stream))
+      val errors = new Errors(xmlCalabash)
+      val listener = new CachingErrorListener(errors)
+
+      val parseOptions = new ParseOptions()
+      parseOptions.setEntityResolver(xmlCalabash.entityResolver)
+      parseOptions.setErrorReporter(listener)
+      parseOptions.setLineNumbering(true)
+
+      val source = new AugmentedSource(new SAXSource(new InputSource(stream)), parseOptions)
 
       if (request.href.isDefined) {
         source.setSystemId(request.href.get.toASCIIString)
@@ -259,28 +267,6 @@ class DefaultDocumentManager(xmlCalabash: XMLCalabash) extends DocumentManager {
           case t: Throwable => throw t
         }
       }
-
-      // Is this necessary? I'm carefully synchronizing calls that mess with the
-      // configuration's error listener.
-
-      val errors = new Errors(xmlCalabash)
-      val listener = new CachingErrorListener(errors)
-      val saxonConfig = xmlCalabash.processor.getUnderlyingConfiguration
-
-      // FIXME: Saxon10
-      /*
-      saxonConfig.synchronized {
-        listener.chainedReporter = saxonConfig.makeErrorReporter()
-        saxonConfig.setErrorReporterFactory((config: Configuration) => {
-          def foo(config: Configuration): ErrorReporter = {
-            val reporter = listener
-            reporter
-          }
-
-          foo(config)
-        })
-      }
-       */
 
       val builder = xmlCalabash.processor.newDocumentBuilder
       builder.setDTDValidation(request.dtdValidate)
@@ -321,13 +307,6 @@ class DefaultDocumentManager(xmlCalabash: XMLCalabash) extends DocumentManager {
               throw XProcException.xdNotWFXML(href, msg, request.location)
             }
           }
-      } finally {
-        // FIXME: Saxon10
-        /*
-        saxonConfig.synchronized {
-          saxonConfig.setErrorListener(listener.chainedListener.get)
-        }
-         */
       }
 
       new DocumentResponse(node, contentType, props)

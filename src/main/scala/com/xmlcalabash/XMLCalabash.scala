@@ -22,7 +22,7 @@ import net.sf.saxon.s9api.{ItemType, Processor, QName, XdmAtomicValue, XdmNode, 
 import org.slf4j.{Logger, LoggerFactory}
 import org.xml.sax.{EntityResolver, InputSource}
 
-import java.io.{ByteArrayInputStream, FileInputStream}
+import java.io.{BufferedReader, ByteArrayInputStream, FileInputStream, FileReader}
 import java.net.URI
 import java.nio.charset.StandardCharsets
 import javax.xml.transform.URIResolver
@@ -84,12 +84,10 @@ class XMLCalabash private(userProcessor: Option[Processor], val configurer: XPro
   private var _errorExplanation: ErrorExplanation = _
   private var _documentManager: DocumentManager = _
   private var _htmlSerializer = false
-  private var _trim_inline_whitespace = false
   private var _staticBaseURI = URIUtils.cwdAsURI
   private var _locale = defaultLocale
   private var _episode = computeEpisode
-  private var _showErrors = false
-  private var _builtinSteps = ListBuffer.empty[Library]
+  private val _builtinSteps = ListBuffer.empty[Library]
   private val _importedURIs = mutable.HashMap.empty[URI, DeclContainer]
   // Do not allow the order to be random
   private val _imports = ListBuffer.empty[URI]
@@ -377,17 +375,20 @@ class XMLCalabash private(userProcessor: Option[Processor], val configurer: XPro
       case v: PipelineUriOption => new XdmAtomicValue(v.value)
       case v: PipelineUntypedOption => new XdmAtomicValue(v.value, ItemType.UNTYPED_ATOMIC)
       case v: PipelineDocumentOption =>
-        val uri = v.value match {
+        v.value match {
           case doc: PipelineFilenameDocument =>
-            URIUtils.cwdAsURI.resolve(doc.value)
+            val req = new DocumentRequest(URIUtils.cwdAsURI.resolve(doc.value))
+            val resp = documentManager.parse(req)
+            resp.value
           case doc: PipelineURIDocument =>
-            URIUtils.cwdAsURI.resolve(doc.value)
+            val req = new DocumentRequest(URIUtils.cwdAsURI.resolve(doc.value))
+            val resp = documentManager.parse(req)
+            resp.value
           case doc: PipelineFileDocument =>
-            doc.value.toURI
+            val req = new DocumentRequest(doc.value.toURI, doc.contentType)
+            val resp = documentManager.parse(req, new FileInputStream(doc.value))
+            resp.value
         }
-        val req = new DocumentRequest(uri)
-        val doc = documentManager.parse(req)
-        doc.value
       case v: PipelineExpressionOption =>
         val bindings = mutable.HashMap.empty[String,Message]
         for ((name, value) <- options) {
@@ -401,7 +402,7 @@ class XMLCalabash private(userProcessor: Option[Processor], val configurer: XPro
       case v: PipelineXdmValueOption =>
         v.value
       case _ =>
-        throw new RuntimeException("Unexpected expression value")
+        throw XProcException.xiThisCantHappen(s"Unexpected pipeline option type: ${opt}")
     }
     if (options.contains(name)) {
       val newvalue = options(name).value.append(value)
@@ -434,69 +435,69 @@ class XMLCalabash private(userProcessor: Option[Processor], val configurer: XPro
   }
 
   def run(): Unit = {
-    loadPipeline()
-
-    if (!debugOptions.run) {
-      return
-    }
-
-    val context = new StaticContext(this)
-
-    for (port <- _inputs.keySet) {
-      for (opt <- _inputs(port)) {
-        val doc = opt match {
-          case in: PipelineInputFilename =>
-            loadDocument(context, URIUtils.cwdAsURI.resolve(in.value))
-          case in: PipelineInputURI =>
-            loadDocument(context, URIUtils.cwdAsURI.resolve(in.value))
-          case in: PipelineInputFile =>
-            val request = new DocumentRequest(URIUtils.cwdAsURI.resolve(in.value.getAbsolutePath))
-            val response = documentManager.parse(request, new FileInputStream(in.value))
-            val meta = new XProcMetadata(response.contentType, response.props)
-            new XdmValueItemMessage(response.value, meta, context)
-          case in: PipelineInputXdm =>
-            val meta = new XProcMetadata(MediaType.XML)
-            new XdmValueItemMessage(in.value, meta, context)
-          case in: PipelineInputText =>
-            val bais = new ByteArrayInputStream(in.text.getBytes(StandardCharsets.UTF_8))
-            val request = new DocumentRequest(URIUtils.cwdAsURI, in.contentType)
-            val response = documentManager.parse(request, bais)
-            val meta = new XProcMetadata(response.contentType, response.props)
-            new XdmValueItemMessage(response.value, meta, context)
-        }
-        _runtime.input(port, doc.item, doc.metadata)
-      }
-    }
-
-    for (port <- runtime.outputs) {
-      val output = runtime.decl.output(port)
-      val pc = if (_outputs.contains(port)) {
-        val opts = _outputs(port)
-        if (opts.nonEmpty && opts.head.isInstanceOf[PipelineOutputConsumer]) {
-          opts.head.asInstanceOf[PipelineOutputConsumer].value
-        } else {
-          val files = ListBuffer.empty[String]
-          for (opt <- opts.toList) {
-            opt match {
-              case out: PipelineOutputFilename =>
-                files += out.value
-              case out: PipelineOutputURI =>
-                files += URIUtils.cwdAsURI.resolve(out.value).getPath
-            }
-          }
-          new PrintingConsumer(runtime, output, files.toList)
-        }
-      } else {
-        new PrintingConsumer(runtime, output)
-      }
-      runtime.output(port, pc)
-    }
-
-    for ((name, value) <- _options) {
-      runtime.option(name, value.value, value.context)
-    }
-
     try {
+      loadPipeline()
+
+      if (!debugOptions.run) {
+        return
+      }
+
+      val context = new StaticContext(this)
+
+      for (port <- _inputs.keySet) {
+        for (opt <- _inputs(port)) {
+          val doc = opt match {
+            case in: PipelineInputFilename =>
+              loadDocument(context, URIUtils.cwdAsURI.resolve(in.value))
+            case in: PipelineInputURI =>
+              loadDocument(context, URIUtils.cwdAsURI.resolve(in.value))
+            case in: PipelineInputFile =>
+              val request = new DocumentRequest(URIUtils.cwdAsURI.resolve(in.value.getAbsolutePath), in.contentType)
+              val response = documentManager.parse(request, new FileInputStream(in.value))
+              val meta = new XProcMetadata(response.contentType, response.props)
+              new XdmValueItemMessage(response.value, meta, context)
+            case in: PipelineInputXdm =>
+              val meta = new XProcMetadata(MediaType.XML)
+              new XdmValueItemMessage(in.value, meta, context)
+            case in: PipelineInputText =>
+              val bais = new ByteArrayInputStream(in.text.getBytes(StandardCharsets.UTF_8))
+              val request = new DocumentRequest(URIUtils.cwdAsURI, in.contentType)
+              val response = documentManager.parse(request, bais)
+              val meta = new XProcMetadata(response.contentType, response.props)
+              new XdmValueItemMessage(response.value, meta, context)
+          }
+          _runtime.input(port, doc.item, doc.metadata)
+        }
+      }
+
+      for (port <- runtime.outputs) {
+        val output = runtime.decl.output(port)
+        val pc = if (_outputs.contains(port)) {
+          val opts = _outputs(port)
+          if (opts.nonEmpty && opts.head.isInstanceOf[PipelineOutputConsumer]) {
+            opts.head.asInstanceOf[PipelineOutputConsumer].value
+          } else {
+            val files = ListBuffer.empty[String]
+            for (opt <- opts.toList) {
+              opt match {
+                case out: PipelineOutputFilename =>
+                  files += out.value
+                case out: PipelineOutputURI =>
+                  files += URIUtils.cwdAsURI.resolve(out.value).getPath
+              }
+            }
+            new PrintingConsumer(runtime, output, files.toList)
+          }
+        } else {
+          new PrintingConsumer(runtime, output)
+        }
+        runtime.output(port, pc)
+      }
+
+      for ((name, value) <- _options) {
+        runtime.option(name, value.value, value.context)
+      }
+
       runtime.run()
     } catch {
       case ex: Exception =>
