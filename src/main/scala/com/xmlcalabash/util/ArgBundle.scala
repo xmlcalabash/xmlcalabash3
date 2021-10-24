@@ -91,6 +91,10 @@ class ArgBundle() {
     _parameters += new PipelineInputText(port, text, contentType)
   }
 
+  def input(port: String, text: String, contentType: String): Unit = {
+    _parameters += new PipelineInputText(port, text, MediaType.parse(contentType))
+  }
+
   def output(port: String, document: String): Unit = {
     _parameters += new PipelineOutputFilename(port, document)
   }
@@ -145,6 +149,22 @@ class ArgBundle() {
 
   def optionExpression(eqname: String, value: String): Unit = {
     _parameters += new PipelineExpressionOption(eqname, value)
+  }
+
+  def config(eqname: String, value: String): Unit = {
+    if (eqname == "file" || eqname == "Q{}file" || eqname == s"Q{${XProcConstants.ns_cc}}file") {
+      _parameters += new PipelineConfigurationFile(new PipelineFilenameDocument(value))
+    } else {
+      if (eqname.contains("{")) {
+        _parameters += new PipelineEnvironmentOptionString(eqname, value)
+      } else {
+        _parameters += new PipelineEnvironmentOptionString(s"Q{${XProcConstants.ns_cc}}${eqname}", value)
+      }
+    }
+  }
+
+  def config(name: QName, value: String): Unit = {
+    config(name.getEQName, value)
   }
 
   def parse(args: List[String]): Unit = {
