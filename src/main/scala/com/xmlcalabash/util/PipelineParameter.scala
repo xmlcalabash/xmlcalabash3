@@ -1,6 +1,7 @@
 package com.xmlcalabash.util
 
 import com.jafpl.steps.DataConsumer
+import com.xmlcalabash.model.xxml.XStaticContext
 import com.xmlcalabash.runtime.StaticContext
 import net.sf.saxon.s9api.{QName, XdmNode, XdmValue}
 import org.slf4j.LoggerFactory
@@ -118,7 +119,7 @@ class PipelineExpressionOption(eqname: String, val expression: String) extends P
   override def toString = s"${eqname} = XPath: ${expression}"
 }
 
-class PipelineOptionValue(val context: StaticContext, val value: XdmValue) extends PipelineParameter {}
+class PipelineOptionValue(val context: XStaticContext, val value: XdmValue) extends PipelineParameter {}
 
 class PipelineSystemProperty(val name: String, val value: String) extends PipelineParameter {
   override def toString = s"${name} = ${value}"

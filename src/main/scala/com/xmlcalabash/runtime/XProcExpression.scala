@@ -1,7 +1,9 @@
 package com.xmlcalabash.runtime
 
-class XProcExpression(val context: StaticContext, val extensionFunctionsAllowed: Boolean) {
-  def this(context: StaticContext) = {
+import com.xmlcalabash.util.MinimalStaticContext
+
+class XProcExpression(val context: MinimalStaticContext, val extensionFunctionsAllowed: Boolean) {
+  def this(context: MinimalStaticContext) = {
     this(context, false)
   }
 

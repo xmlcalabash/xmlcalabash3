@@ -4,6 +4,7 @@ import com.xmlcalabash.XMLCalabash
 import com.xmlcalabash.runtime.params.EmptyLoaderParams
 import com.xmlcalabash.runtime.{ImplParams, StaticContext, XmlPortSpecification}
 import com.xmlcalabash.steps.DefaultXmlStep
+import com.xmlcalabash.util.MinimalStaticContext
 import net.sf.saxon.s9api.QName
 
 class EmptyLoader() extends AbstractLoader {
@@ -31,7 +32,7 @@ class EmptyLoader() extends AbstractLoader {
     }
   }
 
-  override def run(context: StaticContext): Unit = {
+  override def run(context: MinimalStaticContext): Unit = {
     super.run(context)
     // Produce nothing.
   }

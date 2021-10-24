@@ -3,7 +3,7 @@ package com.xmlcalabash.steps
 import com.jafpl.steps.PortCardinality
 import com.xmlcalabash.model.util.XProcConstants
 import com.xmlcalabash.runtime.{ProcessMatch, ProcessMatchingNodes, StaticContext, XProcMetadata, XmlPortSpecification}
-import com.xmlcalabash.util.{S9Api, TypeUtils}
+import com.xmlcalabash.util.{MinimalStaticContext, S9Api, TypeUtils}
 import net.sf.saxon.`type`.BuiltInAtomicType
 import net.sf.saxon.event.ReceiverOption
 import net.sf.saxon.om.{AttributeInfo, AttributeMap, EmptyAttributeMap}
@@ -18,7 +18,7 @@ class StringReplace() extends DefaultXmlStep with ProcessMatchingNodes {
   private var pattern: String = _
   private var matcher: ProcessMatch = _
   private var replace: String = _
-  private var replContext: StaticContext = _
+  private var replContext: MinimalStaticContext = _
 
   override def inputSpec: XmlPortSpecification = new XmlPortSpecification(
     Map("source"->PortCardinality.EXACTLY_ONE),
@@ -33,7 +33,7 @@ class StringReplace() extends DefaultXmlStep with ProcessMatchingNodes {
     source_metadata = metadata
   }
 
-  override def run(context: StaticContext): Unit = {
+  override def run(context: MinimalStaticContext): Unit = {
     super.run(context)
 
     pattern = stringBinding(XProcConstants._match)
@@ -52,7 +52,7 @@ class StringReplace() extends DefaultXmlStep with ProcessMatchingNodes {
     if (replContext.baseURI.isDefined) {
       compiler.setBaseURI(replContext.baseURI.get)
     }
-    for ((pfx, uri) <- replContext.nsBindings) {
+    for ((pfx, uri) <- replContext.inscopeNamespaces) {
       compiler.declareNamespace(pfx, uri)
     }
     val expr = compiler.compile(replace)

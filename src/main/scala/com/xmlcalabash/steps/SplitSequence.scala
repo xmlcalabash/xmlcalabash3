@@ -3,7 +3,7 @@ package com.xmlcalabash.steps
 import com.jafpl.steps.PortCardinality
 import com.xmlcalabash.model.util.XProcConstants
 import com.xmlcalabash.runtime.{BinaryNode, StaticContext, XProcMetadata, XmlPortSpecification}
-import com.xmlcalabash.util.S9Api
+import com.xmlcalabash.util.{MinimalStaticContext, S9Api}
 import net.sf.saxon.expr.LastPositionFinder
 import net.sf.saxon.om.{FocusIterator, Item, NodeInfo}
 import net.sf.saxon.s9api.{QName, XdmItem, XdmMap, XdmNode}
@@ -31,7 +31,7 @@ class SplitSequence() extends DefaultXmlStep {
     metas += metadata
   }
 
-  override def run(staticContext: StaticContext): Unit = {
+  override def run(staticContext: MinimalStaticContext): Unit = {
     super.run(staticContext)
 
     val initialOnly = bindings(_initial_only).value.getUnderlyingValue.effectiveBooleanValue()
@@ -49,7 +49,7 @@ class SplitSequence() extends DefaultXmlStep {
         if (staticContext.baseURI.isDefined) {
           compiler.setBaseURI(staticContext.baseURI.get)
         }
-        for ((pfx, uri) <- bindings(XProcConstants._test).context.nsBindings) {
+        for ((pfx, uri) <- bindings(XProcConstants._test).context.inscopeNamespaces) {
           compiler.declareNamespace(pfx, uri)
         }
         val exec = compiler.compile(testExpr)

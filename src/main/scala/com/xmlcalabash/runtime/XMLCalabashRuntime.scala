@@ -2,33 +2,31 @@ package com.xmlcalabash.runtime
 
 import com.jafpl.config.Jafpl
 import com.jafpl.exceptions.JafplException
-import com.jafpl.graph.Graph
+import com.jafpl.graph.{Graph, Node}
 import com.jafpl.messages.Message
 import com.jafpl.runtime.{GraphRuntime, RuntimeConfiguration}
 import com.jafpl.steps.DataConsumer
 import com.jafpl.util.{ErrorListener, TraceEventManager}
 import com.xmlcalabash.XMLCalabash
-import com.xmlcalabash.config.{DocumentManager, DocumentRequest, DocumentResponse, Signatures, XProcConfigurer}
+import com.xmlcalabash.config.{DocumentManager, DocumentRequest, Signatures, XProcConfigurer}
 import com.xmlcalabash.exceptions.{ConfigurationException, ExceptionCode, ModelException, XProcException}
 import com.xmlcalabash.messages.{AnyItemMessage, XdmNodeItemMessage, XdmValueItemMessage}
 import com.xmlcalabash.model.util.{ExpressionParser, XProcConstants}
-import com.xmlcalabash.model.xml.{Artifact, DataSource, DeclareStep, Document, Empty, Inline}
-import com.xmlcalabash.steps.internal.InlineExpander
-import com.xmlcalabash.util.MediaType
+import com.xmlcalabash.model.xxml.{XArtifact, XDeclareStep, XDocument, XEmpty, XInline, XInput, XStaticContext}
+import com.xmlcalabash.steps.internal.{InlineExpander, XPathSelector}
+import com.xmlcalabash.util.{MediaType, MinimalStaticContext, TypeUtils}
 import com.xmlcalabash.util.stores.{DataStore, FallbackDataStore, FileDataStore, HttpDataStore}
 import net.sf.saxon.lib.{ModuleURIResolver, UnparsedTextURIResolver}
 import net.sf.saxon.s9api.{Processor, QName, XdmAtomicValue, XdmNode, XdmValue}
 import org.slf4j.{Logger, LoggerFactory}
 import org.xml.sax.EntityResolver
 
-import java.io.{File, FileOutputStream}
 import java.net.URI
-import java.nio.charset.StandardCharsets
 import javax.xml.transform.URIResolver
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 
-class XMLCalabashRuntime protected[xmlcalabash] (val decl: DeclareStep) extends RuntimeConfiguration {
+class XMLCalabashRuntime protected[xmlcalabash] (val decl: XDeclareStep) extends XMLCalabashProcessor with RuntimeConfiguration {
   val config: XMLCalabash = decl.config
 
   //FIXME: why?
@@ -47,53 +45,44 @@ class XMLCalabashRuntime protected[xmlcalabash] (val decl: DeclareStep) extends 
   private var _episode = config.computeEpisode
   private var _defaultSerializationOptions: Map[String,Map[QName,String]] = Map.empty[String,Map[QName,String]]
   private var _trim_inline_whitespace = config.trimInlineWhitespace
-  private val idMap = mutable.HashMap.empty[String,Artifact]
+  private val idMap = mutable.HashMap.empty[String,XArtifact]
   private var ran = false
   private var _signatures: Signatures = _
   private var runtime: GraphRuntime = _
+  private var _staticOptions: Map[QName,XdmValueItemMessage] = _
   private var _datastore = Option.empty[DataStore]
-  private val defaultInputs = mutable.HashMap.empty[String, List[DocumentRequest]]
   private val _usedPorts = mutable.HashSet.empty[String]
+  private val _graphNodes = mutable.HashMap.empty[XArtifact, Node]
 
   val jafpl: Jafpl = Jafpl.newInstance()
   val graph: Graph = jafpl.newGraph()
 
-  if (decl._name.isDefined) {
-    graph.label = decl._name.get
+  if (decl.name.isDefined) {
+    graph.label = decl.name.get
   }
 
-  protected[xmlcalabash] def init(decl: DeclareStep): Unit = {
-    try {
-      for (input <- decl.inputs) {
-        if (input.defaultInputs.nonEmpty) {
-          val defaults = ListBuffer.empty[DocumentRequest]
-          for (default <- input.defaultInputs) {
-            default match {
-              case _: Empty =>
-                ()
-              case inline: Inline =>
-                val expander = new InlineExpander(inline)
-                if (inline.documentProperties.isDefined) {
-                  expander.documentProperties = inline.documentProperties.get
-                }
-                defaults += expander.loadDocument(inline.expandText)
-              case doc: Document =>
-                defaults += doc.loadDocument()
-              case _ =>
-                throw XProcException.xiThisCantHappen(s"Unexpected default input type: ${default}", None)
-            }
-          }
-          if (defaults.nonEmpty) {
-            defaultInputs.put(input.port, defaults.toList)
-          }
-        }
-      }
+  def hasNode(art: XArtifact): Boolean = {
+    _graphNodes.contains(art)
+  }
 
+  def node(art: XArtifact): Node = {
+    _graphNodes(art)
+  }
+  def addNode(art: XArtifact, node: Node): Unit = {
+    _graphNodes.put(art, node)
+  }
+
+  def staticOptions: Map[QName, XdmValueItemMessage] = _staticOptions
+
+  protected[xmlcalabash] def init(decl: XDeclareStep): Unit = {
+    try {
       config.debugOptions.dumpPipeline(decl)
       config.debugOptions.dumpOpenGraph(decl, graph)
 
       runtime = new GraphRuntime(graph, this)
       config.debugOptions.dumpGraph(decl, graph)
+
+      _staticOptions = config.staticOptions
 
       runtime.traceEventManager = _traceEventManager
     } catch {
@@ -111,15 +100,15 @@ class XMLCalabashRuntime protected[xmlcalabash] (val decl: DeclareStep) extends 
 
   // ===================================================================================
 
-  def inputs: List[String] = decl.inputPorts
-  def outputs: List[String] = decl.outputPorts
+  def inputs: Set[String] = decl.inputPorts
+  def outputs: Set[String] = decl.outputPorts
 
   protected[runtime] def inputMessage(port: String, msg: Message): Unit = {
     runtime.inputs(port).send(msg)
   }
 
   def input(port: String, item: Any, metadata: XProcMetadata): Unit = {
-    val context = new StaticContext(this)
+    val context = new XStaticContext()
     item match {
       case xnode: XdmNode =>
         input(port, new XdmNodeItemMessage(xnode, metadata, context))
@@ -149,9 +138,13 @@ class XMLCalabashRuntime protected[xmlcalabash] (val decl: DeclareStep) extends 
     decl.output(port).serialization
   }
 
-  def option(name: QName, value: XdmValue, context: StaticContext): Unit = {
+  def option(name: QName, value: XdmValue, context: MinimalStaticContext): Unit = {
     if (runtime.bindings.contains(name.getClarkName)) {
-      runtime.bindings(name.getClarkName).setValue(new XdmValueItemMessage(value, XProcMetadata.XML, context))
+      val optdecl = decl.option(name).get
+      val typeUtils = new TypeUtils(processor, context)
+      val msg = new XdmValueItemMessage(value, XProcMetadata.ANY, context)
+      val cmsg = typeUtils.convertType(name, msg, optdecl.declaredType, optdecl.tokenList)
+      runtime.bindings(name.getClarkName).setValue(cmsg)
     }
   }
 
@@ -164,11 +157,45 @@ class XMLCalabashRuntime protected[xmlcalabash] (val decl: DeclareStep) extends 
       throw new RuntimeException("You must call reset() before running a pipeline a second time.")
     }
 
-    for ((port, defaults) <- defaultInputs) {
-      if (!_usedPorts.contains(port)) {
+    for (xinput <- decl.children[XInput]) {
+      if (!_usedPorts.contains(xinput.port) && xinput.defaultInputs.nonEmpty) {
+        val defaults = ListBuffer.empty[DocumentRequest]
+        for (default <- xinput.defaultInputs) {
+          default match {
+            case _: XEmpty =>
+              ()
+            case inline: XInline =>
+              val expander = new InlineExpander(inline)
+              if (inline.documentProperties.isDefined) {
+                expander.documentProperties = inline.documentProperties.get
+              }
+              expander.copyStaticOptionsToBindings(this)
+              defaults += expander.loadDocument(inline.expandText)
+            case doc: XDocument =>
+              defaults += doc.loadDocument()
+            case _ =>
+              throw XProcException.xiThisCantHappen(s"Unexpected default input type: ${default}", None)
+          }
+        }
         for (source <- defaults) {
           val resp = config.documentManager.parse(source)
-          input(port, resp.value, new XProcMetadata(resp.contentType, resp.props))
+          if (xinput.select.isDefined) {
+            val items = Tuple2(resp.value, new XProcMetadata(resp.contentType, resp.props))
+            val bindings = mutable.HashMap.empty[String, Message]
+            for ((name,value) <- config.staticOptions) {
+              bindings.put(name.getClarkName, value)
+            }
+            val xpselector = new XPathSelector(config, List(items), xinput.select.get, xinput.staticContext, bindings.toMap)
+            val results = xpselector.select()
+            if (results.length != 1 && !xinput.sequence) {
+              throw XProcException.xdInputSequenceNotAllowed(xinput.port, None)
+            }
+            for (result <- results) {
+              input(xinput.port, result, new XProcMetadata(resp.contentType, resp.props))
+            }
+          } else {
+            input(xinput.port, resp.value, new XProcMetadata(resp.contentType, resp.props))
+          }
         }
       }
     }
@@ -230,7 +257,6 @@ class XMLCalabashRuntime protected[xmlcalabash] (val decl: DeclareStep) extends 
   def staticBaseURI: URI = config.staticBaseURI
   def episode: String = _episode
 
-  // FIXME: Setters for these
   def entityResolver: EntityResolver = _entityResolver
   def uriResolver: URIResolver = _uriResolver
   def moduleURIResolver: ModuleURIResolver = _moduleURIResolver
@@ -252,7 +278,10 @@ class XMLCalabashRuntime protected[xmlcalabash] (val decl: DeclareStep) extends 
   }
   override def traceEnabled(trace: String): Boolean = _traceEventManager.traceEnabled(trace)
 
-  override def expressionEvaluator: SaxonExpressionEvaluator = config.expressionEvaluator
+  // We need expression evaluators with access to the *runtime*
+  private val  _expressionEvaluator = new SaxonExpressionEvaluator(this)
+  override def expressionEvaluator: SaxonExpressionEvaluator = _expressionEvaluator
+
   def expressionParser: ExpressionParser = config.expressionParser
 
   def datastore: DataStore = {
@@ -267,11 +296,11 @@ class XMLCalabashRuntime protected[xmlcalabash] (val decl: DeclareStep) extends 
 
   // ====================================================================================
 
-  def addNode(id: String, artifact: Artifact): Unit = {
+  def addNode(id: String, artifact: XArtifact): Unit = {
     idMap.put(id, artifact)
   }
 
-  def node(id: String): Option[Artifact] = idMap.get(id)
+  def node(id: String): Option[XArtifact] = idMap.get(id)
 
 
   def signatures: Signatures = {
@@ -300,33 +329,5 @@ class XMLCalabashRuntime protected[xmlcalabash] (val decl: DeclareStep) extends 
   def trimInlineWhitespace: Boolean = _trim_inline_whitespace
   def trimInlineWhitespace_=(trim: Boolean): Unit = {
     _trim_inline_whitespace = trim
-  }
-
-  // ==============================================================================================
-
-  def stepImplementation(stepType: QName, staticContext: StaticContext): StepWrapper = {
-    stepImplementation(stepType, staticContext, None)
-  }
-
-  def stepImplementation(stepType: QName, staticContext: StaticContext, implParams: Option[ImplParams]): StepWrapper = {
-    val location = staticContext.location
-
-    if (!_signatures.stepTypes.contains(stepType)) {
-      throw new ModelException(ExceptionCode.NOTYPE, stepType.toString, location)
-    }
-
-    val sig = _signatures.step(stepType)
-    val implClass = sig.implementation
-    if (implClass.isEmpty) {
-      throw new ModelException(ExceptionCode.NOIMPL, stepType.toString, location)
-    }
-
-    val klass = Class.forName(implClass.head).getDeclaredConstructor().newInstance()
-    klass match {
-      case step: XmlStep =>
-        new StepWrapper(step, sig)
-      case _ =>
-        throw new ModelException(ExceptionCode.IMPLNOTSTEP, stepType.toString, location)
-    }
   }
 }

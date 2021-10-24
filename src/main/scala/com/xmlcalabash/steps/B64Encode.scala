@@ -5,7 +5,7 @@ import java.net.URI
 import java.util.Base64
 import com.xmlcalabash.model.util.{SaxonTreeBuilder, XProcConstants}
 import com.xmlcalabash.runtime.{NameValueBinding, StaticContext, XProcMetadata, XmlPortSpecification}
-import com.xmlcalabash.util.{MediaType, S9Api, TypeUtils}
+import com.xmlcalabash.util.{MediaType, MinimalStaticContext, S9Api, TypeUtils}
 import net.sf.saxon.s9api.{QName, Serializer, XdmEmptySequence, XdmNode, XdmValue}
 
 import scala.collection.mutable
@@ -39,7 +39,7 @@ class B64Encode extends DefaultXmlStep {
     smeta = Some(metadata)
   }
 
-  override def run(context: StaticContext): Unit = {
+  override def run(context: MinimalStaticContext): Unit = {
     super.run(context)
 
     val baseValue = if (smeta.isDefined) {

@@ -4,7 +4,7 @@ import com.xmlcalabash.exceptions.XProcException
 import com.xmlcalabash.model.util.{SaxonTreeBuilder, XProcConstants}
 import com.xmlcalabash.runtime.{StaticContext, XProcMetadata, XmlPortSpecification}
 import com.xmlcalabash.steps.DefaultXmlStep
-import com.xmlcalabash.util.{InternetProtocolRequest, MediaType, URIUtils}
+import com.xmlcalabash.util.{InternetProtocolRequest, MediaType, MinimalStaticContext, URIUtils}
 
 import java.io.IOException
 import java.net.URI
@@ -18,7 +18,7 @@ class FileMkdir() extends FileStep {
   override def inputSpec: XmlPortSpecification = XmlPortSpecification.NONE
   override def outputSpec: XmlPortSpecification = XmlPortSpecification.XMLRESULT
 
-  override def run(context: StaticContext): Unit = {
+  override def run(context: MinimalStaticContext): Unit = {
     super.run(context)
 
     href = uriBinding(XProcConstants._href).get

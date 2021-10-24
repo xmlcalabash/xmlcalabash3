@@ -2,12 +2,11 @@ package com.xmlcalabash.util
 
 import com.jafpl.messages.Message
 import com.jafpl.util.ItemTester
-import com.xmlcalabash.XMLCalabash
 import com.xmlcalabash.exceptions.XProcException
-import com.xmlcalabash.model.xml.ForWhile
-import com.xmlcalabash.runtime.{DynamicContext, StaticContext, XProcXPathExpression}
+import com.xmlcalabash.model.xxml.{XForWhile, XStaticContext}
+import com.xmlcalabash.runtime.{DynamicContext, SaxonExpressionEvaluator, XMLCalabashRuntime, XProcXPathExpression}
 
-class XmlItemTester(config: XMLCalabash, comparator: String, maxIterations: Long, art: ForWhile) extends ItemTester {
+class XmlItemTester(runtime: XMLCalabashRuntime, comparator: String, maxIterations: Long, art: XForWhile) extends ItemTester {
   private var count = 0L
 
   override def test(item: List[Message], bindings: Map[String, Message]): Boolean = {
@@ -16,13 +15,12 @@ class XmlItemTester(config: XMLCalabash, comparator: String, maxIterations: Long
     }
     count += 1
 
-    val context = new StaticContext(config)
-    val expr = new XProcXPathExpression(context, comparator)
+    val expr = new XProcXPathExpression(art.staticContext, comparator)
 
     var pass = false
-    val dynamicContext = new DynamicContext(Some(art))
+    val dynamicContext = new DynamicContext(runtime, art)
     DynamicContext.withContext(dynamicContext) {
-      val exeval = config.expressionEvaluator.newInstance()
+      val exeval = runtime.expressionEvaluator.newInstance()
       pass = exeval.booleanValue(expr, item, bindings, None)
     }
 

@@ -6,7 +6,7 @@ import com.jafpl.steps.PortCardinality
 import com.xmlcalabash.exceptions.XProcException
 import com.xmlcalabash.model.util.{SaxonTreeBuilder, ValueParser, XProcConstants}
 import com.xmlcalabash.runtime.{StaticContext, XProcMetadata, XmlPortSpecification}
-import com.xmlcalabash.util.{MediaType, S9Api, XProcCollectionFinder}
+import com.xmlcalabash.util.{MediaType, MinimalStaticContext, S9Api, XProcCollectionFinder}
 
 import javax.xml.transform.{ErrorListener, TransformerException}
 import net.sf.saxon.event.{PipelineConfiguration, Receiver}
@@ -58,7 +58,7 @@ class XQuery extends DefaultXmlStep {
     }
   }
 
-  override def run(staticContext: StaticContext): Unit = {
+  override def run(staticContext: MinimalStaticContext): Unit = {
     super.run(staticContext)
 
     val pmap = mapBinding(XProcConstants._parameters)

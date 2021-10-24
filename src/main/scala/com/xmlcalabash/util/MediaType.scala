@@ -10,6 +10,7 @@ import scala.collection.mutable.ListBuffer
 // N.B. This class accepts "*" for type and subtype because it's used for matching
 
 object MediaType {
+  val ANY = new MediaType("*", "*")
   val OCTET_STREAM = new MediaType("application", "octet-stream")
   val TEXT = new MediaType("text", "plain")
   val XML  = new MediaType("application", "xml")
@@ -21,18 +22,18 @@ object MediaType {
   val MULTIPART = new MediaType("multipart", "*")
   val MULTIPART_MIXED = new MediaType("multipart", "mixed")
 
-  val MATCH_XML: Array[MediaType] = Array(
+  val MATCH_XML: List[MediaType] = List(
     MediaType.parse("application/xml"),
     MediaType.parse("text/xml"),
     MediaType.parse("*/*+xml"),
     MediaType.parse("-application/xhtml+xml"))
 
-  val MATCH_HTML: Array[MediaType] = Array(
+  val MATCH_HTML: List[MediaType] = List(
     MediaType.parse("text/html"),
     MediaType.parse("application/xhtml+xml")
   )
 
-  val MATCH_TEXT: Array[MediaType] = Array(
+  val MATCH_TEXT: List[MediaType] = List(
     MediaType.parse("text/*"),
     MediaType.parse("application/relax-ng-compact-syntax"),
     MediaType.parse("application/xquery"),
@@ -41,16 +42,16 @@ object MediaType {
     MediaType.parse("-text/xml")
   )
 
-  val MATCH_JSON: Array[MediaType] = Array(
+  val MATCH_JSON: List[MediaType] = List(
     MediaType.parse("application/json"),
     MediaType.parse("*/*+json")
   )
 
-  val MATCH_YAML: Array[MediaType] = Array(
+  val MATCH_YAML: List[MediaType] = List(
     MediaType.parse("application/vnd.yaml")
   )
 
-  val MATCH_ANY: Array[MediaType] = Array(
+  val MATCH_ANY: List[MediaType] = List(
     MediaType.parse("*/*")
   )
 
@@ -142,21 +143,41 @@ object MediaType {
   }
 
   def parseList(ctypes: String): ListBuffer[MediaType] = {
+    val fullyQualifiedExt = "^((-?)([^/\\s]+)/([^\\s;+]+)(\\+[^/\\s;]+)?(;\\s*([^\\s]+))?)\\s*(.*)$".r
+    val xmlShortcut = "^xml\\s+(.*)$".r
+    val htmlShortcut = "^html\\s+(.*)$".r
+    val textShortcut = "^text\\s+(.*)$".r
+    val jsonShortcut = "^json\\s+(.*)$".r
+    val anyShortcut = "^any\\s+(.*)$".r
+
     val contentTypes = ListBuffer.empty[MediaType]
-    for (ctype <- ctypes.split("\\s+")) {
-      ctype match {
-        case "xml"  => contentTypes ++= MATCH_XML
-        case "html" => contentTypes ++= MATCH_HTML
-        case "text" => contentTypes ++= MATCH_TEXT
-        case "json" => contentTypes ++= MATCH_JSON
-        case "any"  => contentTypes ++= MATCH_ANY
-        case _      =>
-          if (ctype.indexOf("/") <= 0) {
-            throw XProcException.xsUnrecognizedContentTypeShortcut(ctype, None)
-          }
+
+    var typelist = ctypes + " "
+    while (typelist.trim != "") {
+      typelist match {
+        case fullyQualifiedExt(ctype, minus, mediatype, mediasubtype, ext, semi, params, rest) =>
           contentTypes += MediaType.parse(ctype)
+          typelist = rest
+        case xmlShortcut(rest) =>
+          contentTypes ++= MATCH_XML
+          typelist = rest
+        case htmlShortcut(rest) =>
+          contentTypes ++= MATCH_HTML
+          typelist = rest
+        case textShortcut(rest) =>
+          contentTypes ++= MATCH_TEXT
+          typelist = rest
+        case jsonShortcut(rest) =>
+          contentTypes ++= MATCH_JSON
+          typelist = rest
+        case anyShortcut(rest) =>
+          contentTypes ++= MATCH_ANY
+          typelist = rest
+        case _ =>
+          throw XProcException.xsUnrecognizedContentTypeShortcut(typelist, None)
       }
     }
+
     contentTypes
   }
 }
@@ -283,7 +304,7 @@ class MediaType(val mediaType: String, val mediaSubtype: String, val suffix: Opt
     xmlContentType || htmlContentType
   }
 
-  def matchingMediaType(mtypes: Array[MediaType]): Option[MediaType] = {
+  def matchingMediaType(mtypes: List[MediaType]): Option[MediaType] = {
     var matching = Option.empty[MediaType]
     for (mtype <- mtypes) {
       //println(s"$this $mtype ${matches(mtype)}")

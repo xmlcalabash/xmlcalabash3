@@ -7,8 +7,9 @@ import com.xmlcalabash.XMLCalabash
 import com.xmlcalabash.exceptions.XProcException
 import com.xmlcalabash.messages.{AnyItemMessage, XdmNodeItemMessage, XdmValueItemMessage}
 import com.xmlcalabash.model.util.{SaxonTreeBuilder, ValueParser, XProcConstants}
+import com.xmlcalabash.model.xxml.XArtifactContext
 import com.xmlcalabash.runtime.params.XPathBindingParams
-import com.xmlcalabash.util.MediaType
+import com.xmlcalabash.util.{MediaType, MinimalStaticContext}
 import net.sf.saxon.expr.XPathContext
 import net.sf.saxon.lib.{CollectionFinder, Resource, ResourceCollection}
 import net.sf.saxon.ma.arrays.ArrayItem
@@ -31,18 +32,18 @@ object SaxonExpressionEvaluator {
   protected val _dynContext = new DynamicVariable[DynamicContext](null)
 }
 
-class SaxonExpressionEvaluator(xmlCalabash: XMLCalabash) extends ExpressionEvaluator {
+class SaxonExpressionEvaluator(xproc: XMLCalabashProcessor) extends ExpressionEvaluator {
   protected val logger: Logger = LoggerFactory.getLogger(this.getClass)
 
   def withContext[T](context: DynamicContext)(thunk: => T): T = SaxonExpressionEvaluator._dynContext.withValue(context)(thunk)
   def dynContext: Option[DynamicContext] = Option(SaxonExpressionEvaluator._dynContext.value)
 
   override def newInstance(): SaxonExpressionEvaluator = {
-    new SaxonExpressionEvaluator(xmlCalabash)
+    new SaxonExpressionEvaluator(xproc)
   }
 
   override def singletonValue(xpath: Any, context: List[Message], bindings: Map[String, Message], params: Option[BindingParams]): XdmValueItemMessage = {
-    val xdmval = value(xpath, context, bindings, params).item.asInstanceOf[XdmValue]
+    val xdmval = value(xpath, context, bindings, params).item
 
     if (xdmval.size() == 1) {
       new XdmValueItemMessage(xdmval, XProcMetadata.XML, xpath.asInstanceOf[XProcExpression].context)
@@ -69,7 +70,6 @@ class SaxonExpressionEvaluator(xmlCalabash: XMLCalabash) extends ExpressionEvalu
   override def value(xpath: Any, context: List[Message], bindings: Map[String, Message], params: Option[BindingParams]): XdmValueItemMessage = {
     val proxies = mutable.HashMap.empty[Any, XdmItem]
 
-    // FIXME: this is ugly
     val exprContext = xpath match {
       case expr: XProcXPathExpression => Some(expr.context)
       case expr: XProcVtExpression => Some(expr.context)
@@ -77,7 +77,17 @@ class SaxonExpressionEvaluator(xmlCalabash: XMLCalabash) extends ExpressionEvalu
     }
 
     val newContext = if (exprContext.isDefined) {
-      new DynamicContext(exprContext.get.artifact)
+      exprContext.get match {
+        case xa: XArtifactContext =>
+          xproc match {
+            case runtime: XMLCalabashRuntime =>
+              new DynamicContext(runtime, xa.artifact)
+            case _ =>
+              new DynamicContext(xa.artifact)
+          }
+        case _ =>
+          new DynamicContext()
+      }
     } else {
       new DynamicContext()
     }
@@ -226,13 +236,8 @@ class SaxonExpressionEvaluator(xmlCalabash: XMLCalabash) extends ExpressionEvalu
               proxies: Map[Any,XdmItem], options: XPathBindingParams): XdmValue = {
     val patchBindings = mutable.HashMap.empty[QName, XdmValue]
 
-    for ((str, value) <- xpath.context.statics) {
-      value match {
-        case msg: XdmValueItemMessage =>
-          patchBindings.put(ValueParser.parseClarkName(str), msg.item)
-        case _ =>
-          throw XProcException.xiInvalidMessage(None, value)
-      }
+    for ((str, constant) <- xpath.context.inscopeConstants) {
+      patchBindings.put(str, constant.constantValue.get.item)
     }
 
     for ((str, value) <- bindings) {
@@ -282,7 +287,7 @@ class SaxonExpressionEvaluator(xmlCalabash: XMLCalabash) extends ExpressionEvalu
             }
           }
 
-          val typeFactory = new ItemTypeFactory(xmlCalabash.processor)
+          val typeFactory = new ItemTypeFactory(xproc.processor)
           val untypedAtomicType = typeFactory.getAtomicType(XProcConstants.xs_untypedAtomic)
           xdmval = new XdmAtomicValue(sbuf.toString, untypedAtomicType)
         } else {
@@ -336,15 +341,15 @@ class SaxonExpressionEvaluator(xmlCalabash: XMLCalabash) extends ExpressionEvalu
   private def computeValue(xpath: String,
                            as: Option[SequenceType],
                            contextItem: List[Message],
-                           exprContext: StaticContext,
+                           exprContext: MinimalStaticContext,
                            bindings: Map[QName,XdmValue],
                            proxies: Map[Any, XdmItem],
                            extensionsOk: Boolean,
                            params: XPathBindingParams,
                            useCollection: Boolean): XdmValue = {
-    val config = xmlCalabash.processor.getUnderlyingConfiguration
+    val config = xproc.processor.getUnderlyingConfiguration
 
-    val sconfig = xmlCalabash.processor.getUnderlyingConfiguration
+    val sconfig = xproc.processor.getUnderlyingConfiguration
     val curfinder = sconfig.getCollectionFinder
 
     if (useCollection) {
@@ -353,7 +358,7 @@ class SaxonExpressionEvaluator(xmlCalabash: XMLCalabash) extends ExpressionEvalu
     }
 
     try {
-      val xcomp = xmlCalabash.processor.newXPathCompiler()
+      val xcomp = xproc.processor.newXPathCompiler()
       val baseURI = if (exprContext.baseURI.isDefined) {
         exprContext.baseURI.get
       } else {
@@ -366,13 +371,13 @@ class SaxonExpressionEvaluator(xmlCalabash: XMLCalabash) extends ExpressionEvalu
       for (varname <- bindings.keySet) {
         xcomp.declareVariable(varname)
       }
-      for (varname <- params.statics.keySet) {
+      for (varname <- params.constants.keySet) {
         if (!bindings.contains(varname)) {
           xcomp.declareVariable(varname)
         }
       }
 
-      for ((prefix, uri) <- exprContext.nsBindings) {
+      for ((prefix, uri) <- exprContext.inscopeNamespaces) {
         xcomp.declareNamespace(prefix, uri)
       }
 
@@ -395,7 +400,7 @@ class SaxonExpressionEvaluator(xmlCalabash: XMLCalabash) extends ExpressionEvalu
       for ((varname, varvalue) <- bindings) {
         selector.setVariable(varname, varvalue)
       }
-      for ((varname, varvalue) <- params.statics) {
+      for ((varname, varvalue) <- params.constants) {
         if (!bindings.contains(varname)) {
           selector.setVariable(varname, varvalue)
         }
@@ -521,9 +526,9 @@ class SaxonExpressionEvaluator(xmlCalabash: XMLCalabash) extends ExpressionEvalu
         }
 
         msg.metadata match {
-          case xproc: XProcMetadata =>
-            val props = xproc.properties
-            val builder = new SaxonTreeBuilder(xmlCalabash)
+          case meta: XProcMetadata =>
+            val props = meta.properties
+            val builder = new SaxonTreeBuilder(xproc)
             builder.startDocument(None)
             builder.addStartElement(XProcConstants.c_document_properties)
             for ((key,value) <- props) {
@@ -545,7 +550,7 @@ class SaxonExpressionEvaluator(xmlCalabash: XMLCalabash) extends ExpressionEvalu
   }
 
   private def emptyProxy(): XdmNode = {
-    val builder = new SaxonTreeBuilder(xmlCalabash)
+    val builder = new SaxonTreeBuilder(xproc)
     builder.startDocument(None)
     builder.addStartElement(XProcConstants.c_document_properties)
     builder.addEndElement()

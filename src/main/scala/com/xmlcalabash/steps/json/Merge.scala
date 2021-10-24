@@ -4,6 +4,7 @@ import com.xmlcalabash.exceptions.XProcException
 import com.xmlcalabash.model.util.XProcConstants
 import com.xmlcalabash.runtime.{StaticContext, XProcMetadata, XmlPortSpecification}
 import com.xmlcalabash.steps.DefaultXmlStep
+import com.xmlcalabash.util.MinimalStaticContext
 import net.sf.saxon.s9api.{QName, XdmAtomicValue, XdmItem, XdmMap, XdmNode, XdmValue}
 
 import scala.collection.mutable.ListBuffer
@@ -30,7 +31,7 @@ class Merge extends DefaultXmlStep {
     }
   }
 
-  override def run(staticContext: StaticContext): Unit = {
+  override def run(staticContext: MinimalStaticContext): Unit = {
     super.run(staticContext)
 
     duplicates = bindings(_duplicates).value.getUnderlyingValue.getStringValue
@@ -51,7 +52,7 @@ class Merge extends DefaultXmlStep {
           if (staticContext.baseURI.isDefined) {
             compiler.setBaseURI(staticContext.baseURI.get)
           }
-          for ((pfx, uri) <- staticContext.nsBindings) {
+          for ((pfx, uri) <- staticContext.inscopeNamespaces) {
             compiler.declareNamespace(pfx, uri)
           }
           compiler.declareVariable(p_index)

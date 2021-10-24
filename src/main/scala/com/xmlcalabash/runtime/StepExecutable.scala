@@ -1,7 +1,7 @@
 package com.xmlcalabash.runtime
 
-import com.xmlcalabash.config.StepSignature
+import com.xmlcalabash.model.xxml.XDeclareStep
 
 trait StepExecutable extends XmlStep {
-  def signature: StepSignature
+  def declaration: XDeclareStep
 }

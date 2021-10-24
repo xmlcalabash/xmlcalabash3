@@ -1,13 +1,13 @@
 package com.xmlcalabash.steps
 
 import com.xmlcalabash.exceptions.XProcException
-import com.xmlcalabash.messages.{XdmNodeItemMessage, XdmValueItemMessage}
 import com.xmlcalabash.model.util.XProcConstants
 import com.xmlcalabash.runtime._
+import com.xmlcalabash.util.MinimalStaticContext
 import net.sf.saxon.`type`.BuiltInAtomicType
 import net.sf.saxon.event.ReceiverOption
 import net.sf.saxon.om.{AttributeInfo, AttributeMap, EmptyAttributeMap, FingerprintedQName, NamespaceMap}
-import net.sf.saxon.s9api.{Axis, QName, XdmAtomicValue, XdmNode, XdmValue}
+import net.sf.saxon.s9api.{QName, XdmAtomicValue, XdmNode}
 
 import java.net.URI
 import scala.jdk.CollectionConverters.IterableHasAsScala
@@ -18,7 +18,7 @@ class LabelElements() extends DefaultXmlStep with ProcessMatchingNodes {
   private val _replace = new QName("replace")
   private val p_index = new QName("p", XProcConstants.ns_p, "index")
 
-  private var context: StaticContext = _
+  private var context: MinimalStaticContext = _
   private var attribute: QName = _
   private var label: String = _
   private var labelNamespaceBindings = Map.empty[String, String]
@@ -40,11 +40,11 @@ class LabelElements() extends DefaultXmlStep with ProcessMatchingNodes {
   override def receiveBinding(variable: NameValueBinding): Unit = {
     super.receiveBinding(variable)
     if (variable.name == _label) {
-      labelNamespaceBindings = variable.context.nsBindings
+      labelNamespaceBindings = variable.context.inscopeNamespaces
     }
   }
 
-  override def run(context: StaticContext): Unit = {
+  override def run(context: MinimalStaticContext): Unit = {
     super.run(context)
 
     attribute = qnameBinding(_attribute).get

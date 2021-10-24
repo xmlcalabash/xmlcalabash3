@@ -198,7 +198,7 @@ object S9Api {
     tree.result
   }
 
-  def forceQNameKeys(inputMap: MapItem, context: StaticContext): XdmMap = {
+  def forceQNameKeys(inputMap: MapItem, context: MinimalStaticContext): XdmMap = {
     var map = new XdmMap()
 
     val iter = inputMap.keyValuePairs().iterator()
@@ -206,7 +206,7 @@ object S9Api {
       val pair = iter.next()
       pair.key.getItemType match {
         case BuiltInAtomicType.STRING =>
-          val qname = ValueParser.parseQName(pair.key.getStringValue, context)
+          val qname = context.parseQName(pair.key.getStringValue)
           map = map.put(new XdmAtomicValue(qname), XdmValue.wrap(pair.value))
         case BuiltInAtomicType.QNAME =>
           val qvalue = pair.key.asInstanceOf[QNameValue]
@@ -315,7 +315,11 @@ object S9Api {
       }
 
       if (!found) {
-        throw new RuntimeException("No binding for prefix: " + pfx)
+        if (pfx == "#default") {
+          throw XProcException.xsBadExcludeInlinePrefixesDefault()
+        } else {
+          throw XProcException.xsBadExcludeInlinePrefixes(pfx)
+        }
       }
     }
 

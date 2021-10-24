@@ -68,11 +68,14 @@ class DocumentProperties(runtime: XMLCalabash) extends FunctionImpl {
                 map = map.put(new XdmAtomicValue(XProcConstants._base_uri), value)
               }
             case _ =>
+              map = map.put(new XdmAtomicValue(key), value)
+/*
               if (key.getNamespaceURI == "") {
                 map = map.put(new XdmAtomicValue(key.getLocalName), value)
               } else {
                 map = map.put(new XdmAtomicValue(key), value)
               }
+ */
           }
         }
 

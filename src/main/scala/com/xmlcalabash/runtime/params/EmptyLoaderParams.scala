@@ -1,7 +1,8 @@
 package com.xmlcalabash.runtime.params
 
-import com.xmlcalabash.runtime.{ImplParams, StaticContext}
+import com.xmlcalabash.model.xxml.XStaticContext
+import com.xmlcalabash.runtime.ImplParams
 
-class EmptyLoaderParams(val context: StaticContext) extends ImplParams {
+class EmptyLoaderParams(val context: XStaticContext) extends ImplParams {
 
 }

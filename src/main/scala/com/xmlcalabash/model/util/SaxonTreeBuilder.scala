@@ -2,7 +2,7 @@ package com.xmlcalabash.model.util
 
 import com.xmlcalabash.XMLCalabash
 import com.xmlcalabash.exceptions.{ExceptionCode, ModelException, XProcException}
-import com.xmlcalabash.runtime.XMLCalabashRuntime
+import com.xmlcalabash.runtime.{XMLCalabashProcessor, XMLCalabashRuntime}
 import com.xmlcalabash.util.{DefaultLocation, S9Api, SysIdLocation, VoidLocation}
 import net.sf.saxon.`type`.{SchemaType, Untyped}
 import net.sf.saxon.event.{NamespaceReducer, Receiver}
@@ -61,12 +61,8 @@ class SaxonTreeBuilder(processor: Processor) {
   private val emptyAttributeMap = EmptyAttributeMap.getInstance()
   private var _location = Option.empty[Location]
 
-  def this(config: XMLCalabash) = {
+  def this(config: XMLCalabashProcessor) = {
     this(config.processor)
-  }
-
-  def this(runtime: XMLCalabashRuntime) = {
-    this(runtime.config)
   }
 
   def location: Option[Location] = _location
@@ -144,8 +140,7 @@ class SaxonTreeBuilder(processor: Processor) {
             throw new ModelException(ExceptionCode.BADTREENODE, List(node.getNodeKind.toString, node.getNodeName.toString), node)
         }
       case xpe: XPathException =>
-        // FIXME: wrap in xprocexception
-        throw new RuntimeException(xpe)
+        throw xpe
     }
   }
 
@@ -256,7 +251,6 @@ class SaxonTreeBuilder(processor: Processor) {
   def addStartElement(elemName: NodeName, attrs: AttributeMap, typeCode: SchemaType, nsmap: NamespaceMap): Unit = {
     // Sort out the namespaces...
     var newmap = updateMap(nsmap, elemName.getPrefix, elemName.getURI)
-    // FIXME: this should be iterable?
     for (attr <- attrs.asList.asScala) {
       if (attr.getNodeName.getURI != null && attr.getNodeName.getURI != "") {
         newmap = updateMap(newmap, attr.getNodeName.getPrefix, attr.getNodeName.getURI)
@@ -276,8 +270,7 @@ class SaxonTreeBuilder(processor: Processor) {
       _location = None
     } catch {
       case e: XPathException =>
-        // FIXME: some sort of XProcException
-        throw new RuntimeException(e)
+        throw e
     }
   }
 
@@ -299,8 +292,7 @@ class SaxonTreeBuilder(processor: Processor) {
       return nsmap
     }
 
-    // FIXME: runtime exception should be some form of xproc exception?
-    throw new RuntimeException("Cannot add " + prefix + " to namespace map with URI " + uri)
+    throw XProcException.xiImpossibleNamespaceConfiguration(prefix, uri, None)
   }
 
   def addEndElement(): Unit = {

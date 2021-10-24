@@ -7,8 +7,9 @@ import com.jafpl.steps.PortCardinality
 import com.xmlcalabash.config.DocumentRequest
 import com.xmlcalabash.exceptions.XProcException
 import com.xmlcalabash.model.util.{SaxonTreeBuilder, ValueParser, XProcConstants}
+import com.xmlcalabash.model.xxml.XStaticContext
 import com.xmlcalabash.runtime.{BinaryNode, NameValueBinding, StaticContext, XProcMetadata, XmlPortSpecification}
-import com.xmlcalabash.util.{MediaType, S9Api, TypeUtils}
+import com.xmlcalabash.util.{MediaType, MinimalStaticContext, S9Api, TypeUtils}
 import net.sf.saxon.om.{AttributeMap, EmptyAttributeMap}
 import net.sf.saxon.s9api.{Axis, QName, XdmAtomicValue, XdmNode, XdmNodeKind, XdmValue}
 import org.apache.commons.compress.archivers.ArchiveOutputStream
@@ -29,7 +30,7 @@ class Archive extends DefaultXmlStep {
   private var defaultMethod = "deflated"
   private var defaultLevel = "default"
 
-  private var context: StaticContext = _
+  private var context: MinimalStaticContext = _
 
   private var sources = ListBuffer.empty[DocumentWrapper]
 
@@ -88,7 +89,7 @@ class Archive extends DefaultXmlStep {
     }
   }
 
-  override def run(context: StaticContext): Unit = {
+  override def run(context: MinimalStaticContext): Unit = {
     this.context = context
 
     format = if (qnameBinding(XProcConstants._format).isDefined) {

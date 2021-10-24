@@ -4,6 +4,7 @@ import com.jafpl.graph.Location
 import com.xmlcalabash.XMLCalabash
 import com.xmlcalabash.exceptions.XProcException
 import com.xmlcalabash.model.util.XProcConstants
+import com.xmlcalabash.model.xxml.XStaticContext
 import com.xmlcalabash.runtime.{StaticContext, XMLCalabashRuntime, XProcMetadata, XProcXPathExpression}
 import net.sf.saxon.s9api.{QName, XdmAtomicValue, XdmMap, XdmValue}
 import org.apache.http.auth.{AuthScope, UsernamePasswordCredentials}
@@ -27,7 +28,7 @@ import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 import scala.jdk.CollectionConverters.{ListHasAsScala, SeqHasAsJava}
 
-class InternetProtocolRequest(val config: XMLCalabash, val context: StaticContext, val uri: URI) {
+class InternetProtocolRequest(val config: XMLCalabash, val context: MinimalStaticContext, val uri: URI) {
   private val _expires = new QName("", "expires")
   private val _date = new QName("", "date")
   private val _content_disposition = new QName("", "content-disposition")
@@ -53,11 +54,11 @@ class InternetProtocolRequest(val config: XMLCalabash, val context: StaticContex
   private var _followRedirectCount = -1
   private var _sendBodyAnyway = false
 
-  def this(config: XMLCalabashRuntime, context: StaticContext, uri: URI) =
+  def this(config: XMLCalabashRuntime, context: MinimalStaticContext, uri: URI) =
     this(config.config, context, uri)
 
   def this(config: XMLCalabash, uri: URI) =
-    this(config, new StaticContext(config), uri)
+    this(config, new XStaticContext(), uri)
 
   def location: Option[Location] = _location
   def location_=(loc: Location): Unit = {

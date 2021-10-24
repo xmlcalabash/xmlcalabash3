@@ -3,7 +3,7 @@ package com.xmlcalabash.steps.file
 import com.xmlcalabash.exceptions.XProcException
 import com.xmlcalabash.model.util.{SaxonTreeBuilder, XProcConstants}
 import com.xmlcalabash.runtime.{StaticContext, XProcMetadata, XmlPortSpecification}
-import com.xmlcalabash.util.{InternetProtocolRequest, MediaType}
+import com.xmlcalabash.util.{InternetProtocolRequest, MediaType, MinimalStaticContext}
 
 import java.io.IOException
 import java.net.URI
@@ -16,14 +16,14 @@ class FileDelete() extends FileStep {
   private var recursive = false
   private var failOnError = true
 
-  private var staticContext: StaticContext = _
+  private var staticContext: MinimalStaticContext = _
   private var exception = Option.empty[Exception]
   private val failures = ListBuffer.empty[URI]
 
   override def inputSpec: XmlPortSpecification = XmlPortSpecification.NONE
   override def outputSpec: XmlPortSpecification = XmlPortSpecification.XMLRESULT
 
-  override def run(context: StaticContext): Unit = {
+  override def run(context: MinimalStaticContext): Unit = {
     super.run(context)
 
     staticContext = context

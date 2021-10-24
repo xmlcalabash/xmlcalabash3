@@ -1,6 +1,7 @@
 package com.xmlcalabash.model.util
 
 import net.sf.saxon.lib.SaxonOutputKeys
+import net.sf.saxon.om.StructuredQName
 import net.sf.saxon.s9api.QName
 import net.sf.saxon.serialize.SerializationProperties
 
@@ -26,6 +27,8 @@ object XProcConstants {
 
   val UNKNOWN = new QName("", "UNKNOWN")
 
+  val structured_xs_QName = new StructuredQName("xs", XProcConstants.ns_xs, "QName")
+
   val xml_base = new QName("xml", ns_xml, "base")
   val xml_id = new QName("xml", ns_xml, "id")
   val xml_lang = new QName("xml", ns_xml, "lang")
@@ -33,6 +36,16 @@ object XProcConstants {
   val fn_array = new QName("fn", ns_fn, "array")
   val fn_collection = new QName("fn", ns_fn, "collection")
   val fn_map = new QName("fn", ns_fn, "map")
+
+  val fn_position = new QName("fn", ns_fn, "position")
+  val fn_last = new QName("fn", ns_fn, "last")
+  val fn_current_dateTime = new QName("fn", ns_fn, "current-dateTime")
+  val fn_current_date = new QName("fn", ns_fn, "current-date")
+  val fn_current_time = new QName("fn", ns_fn, "current-time")
+  val fn_implicit_timezone = new QName("fn", ns_fn, "implicit-timezone")
+  val fn_default_collation = new QName("fn", ns_fn, "default-collation")
+  val fn_default_language = new QName("fn", ns_fn, "default-language")
+  val fn_static_base_uri = new QName("fn", ns_fn, "static-base-uri")
 
   val p_catch = new QName("p", ns_p, "catch")
   val p_choose = new QName("p", ns_p, "choose")
@@ -70,6 +83,7 @@ object XProcConstants {
   val p_serialization = new QName("p", ns_p, "serialization")
   val p_sink = new QName("p", ns_p, "sink")
   val p_start = new QName("p", ns_p, "start")
+  val p_system_property = new QName("p", ns_p, "system-property")
   val p_try = new QName("p", ns_p, "try")
   val p_variable = new QName("p", ns_p, "variable")
   val p_viewport = new QName("p", ns_p, "viewport")
@@ -84,12 +98,14 @@ object XProcConstants {
   val cx_creation_time = new QName("cx", ns_cx, "creation-time")
   val cx_document = new QName("cx", ns_cx, "document")
   val cx_document_loader = new QName("cx", ns_cx, "document-loader")
+  val cx_document_loader_vt = new QName("cx", ns_cx, "document-loader-vt")
   val cx_dtd_validate = new QName("cx", ns_cx,"dtd-validate")
   val cx_empty_loader = new QName("cx", ns_cx, "empty-loader")
   val cx_encoding = new QName("cx", ns_cx, "encoding")
   val cx_exception_translator = new QName("cx", ns_cx, "exception-translator")
   val cx_filter = new QName("cx", ns_cx, "filter")
   val cx_inline_loader = new QName("cx", ns_cx, "inline-loader")
+  val cx_inline_loader_vt = new QName("cx", ns_cx, "inline-loader-vt")
   val cx_last_accessed = new QName("cx", ns_cx, "last-accessed")
   val cx_loop = new QName("cx", ns_cx, "loop")
   val cx_multipart = new QName("cx", ns_cx, "multipart")
@@ -98,6 +114,7 @@ object XProcConstants {
   val cx_unknown = new QName("cx", ns_cx, "unknown")
   val cx_until = new QName("cx", ns_cx, "until")
   val cx_use_default_input = new QName("cx", ns_cx, "use-default-input")
+  val cx_value_computation = new QName("cx", ns_cx, "value-computation")
   val cx_while = new QName("cx", ns_cx, "while")
 
   val cc_debug_graph = new QName("cc", ns_cc, "debug-graph")
@@ -290,11 +307,13 @@ object XProcConstants {
   val _suffix = new QName("", "suffix")
   val _suppress_cookies = new QName("", "suppress-cookies")
   val _suppress_indentation = new QName("", "suppress-indentation")
+  val _synthetic = new QName("", "synthetic")
   val _target = new QName("", "target")
   val _test = new QName("", "test")
   val _timeout = new QName("", "timeout")
   val _timestamp = new QName("", "timestamp")
   val _transfer_encoding = new QName("", "transfer-encoding")
+  val _tumble_id = new QName("", "tumble-id")
   val _type = new QName("", "type")
   val _undeclare_prefixes = new QName("", "undeclare-prefixes")
   val _use_when = new QName("", "use-when")
@@ -335,11 +354,12 @@ object XProcConstants {
   val p_expand_text = new QName("p", ns_p, "expand-text")
   val p_inline_expand_text = new QName("p", ns_p, "inline-expand-text")
   val p_message = new QName("p", ns_p, "message")
+  val p_timeout = new QName("p", ns_p, "timeout")
   val p_use_when = new QName("p", ns_p, "use-when")
 
   val err_XC0095 = new QName(ns_err, "XC0095")
   val err_XTMM9000 = new QName(ns_xqt_errors, "XTMM9000")
   val err_XTDE0040 = new QName(ns_xqt_errors, "XTDE0040")
 
-  val BUILD_TREE = ValueParser.parseClarkName(SaxonOutputKeys.BUILD_TREE)
+  val BUILD_TREE: QName = ValueParser.parseClarkName(SaxonOutputKeys.BUILD_TREE)
 }

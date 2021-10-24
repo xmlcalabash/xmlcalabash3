@@ -6,7 +6,7 @@ import java.util.zip.ZipEntry
 import com.xmlcalabash.exceptions.XProcException
 import com.xmlcalabash.model.util.{SaxonTreeBuilder, ValueParser, XProcConstants}
 import com.xmlcalabash.runtime.{BinaryNode, NameValueBinding, StaticContext, XProcMetadata, XmlPortSpecification}
-import com.xmlcalabash.util.{MediaType, TypeUtils, URIUtils}
+import com.xmlcalabash.util.{MediaType, MinimalStaticContext, TypeUtils, URIUtils}
 import net.sf.saxon.om.{AttributeMap, EmptyAttributeMap}
 import net.sf.saxon.s9api.{QName, XdmArray, XdmValue}
 import org.apache.commons.compress.archivers.zip.{ZipArchiveEntry, ZipFile}
@@ -44,7 +44,7 @@ class ArchiveManifest extends DefaultXmlStep {
     }
   }
 
-  override def run(context: StaticContext): Unit = {
+  override def run(context: MinimalStaticContext): Unit = {
     super.run(context)
 
     format = if (qnameBinding(XProcConstants._format).isDefined) {
@@ -97,7 +97,7 @@ class ArchiveManifest extends DefaultXmlStep {
     consumer.receive("result", result, new XProcMetadata(MediaType.XML))
   }
 
-  private def zipArchive(context: StaticContext, builder: SaxonTreeBuilder): Unit = {
+  private def zipArchive(context: MinimalStaticContext, builder: SaxonTreeBuilder): Unit = {
     // ZIP requires random access: https://commons.apache.org/proper/commons-compress/zip.html
     source match {
       case bn: BinaryNode =>
@@ -107,7 +107,7 @@ class ArchiveManifest extends DefaultXmlStep {
     }
   }
 
-  private def zipArchiveFile(context: StaticContext, builder: SaxonTreeBuilder, zfile: File): Unit = {
+  private def zipArchiveFile(context: MinimalStaticContext, builder: SaxonTreeBuilder, zfile: File): Unit = {
     val zipIn = new ZipFile(zfile)
     val enum = zipIn.getEntries
     while (enum.hasMoreElements) {

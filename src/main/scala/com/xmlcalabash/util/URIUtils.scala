@@ -60,7 +60,7 @@ object URIUtils {
 
     // don't double-escape %-escaped chars!
     // FIXME: This should be more general, but Windows seems to be the only problem
-    // and I'm oto lazy to look up how to dyanmically escape "\"
+    // and I'm to lazy to look up how to dyanmically escape "\"
 
     val filesep = System.getProperty("file.separator")
     val adjsrc = if ("\\" == filesep) {
@@ -70,7 +70,7 @@ object URIUtils {
     }
 
     var encoded = ""
-    val bytes = src.getBytes("UTF-8")
+    val bytes = adjsrc.getBytes("UTF-8")
     for (ch <- bytes) {
       if (okChars.indexOf(ch) >= 0) {
         encoded += ch.toChar

@@ -1,18 +1,13 @@
 package com.xmlcalabash.util
 
-import com.jafpl.messages.Message
 import com.jafpl.steps.DataConsumer
-import com.xmlcalabash.config.{DocumentRequest, XMLCalabashDebugOptions}
+import com.xmlcalabash.config.XMLCalabashDebugOptions
 import com.xmlcalabash.exceptions.XProcException
-import com.xmlcalabash.messages.XdmValueItemMessage
-import com.xmlcalabash.model.util.{ValueParser, XProcConstants}
-import com.xmlcalabash.model.xml.XMLContext
-import com.xmlcalabash.runtime.{XProcMetadata, XProcXPathExpression}
-import net.sf.saxon.lib.NamespaceConstant
-import net.sf.saxon.s9api.{Axis, ItemTypeFactory, Processor, QName, XdmAtomicValue, XdmNode, XdmNodeKind, XdmValue}
+import com.xmlcalabash.model.util.XProcConstants
+import net.sf.saxon.s9api.{Axis, Processor, QName, XdmNode, XdmNodeKind, XdmValue}
 import org.slf4j.{Logger, LoggerFactory}
 
-import java.io.File
+import java.io.{BufferedReader, File, InputStreamReader}
 import java.net.URI
 import java.util.Properties
 import scala.collection.mutable
@@ -544,61 +539,64 @@ class ArgBundle() {
     }
   }
 
-  def loadProperties(): Unit = {
-    val uriEnum = this.getClass.getClassLoader.getResources("com.xmlcalabash.properties")
+  def loadSettings(): Unit = {
+    val NSPattern = "namespace\\s+(.+)$".r
+    val FPattern = "function\\s+(.+):(.+)$".r
+    val SPattern = "step\\s+(.+):(.+)$".r
+
+    // These started out as .properties files, but it turned out that didn't (conveniently) work
+    val uriEnum = this.getClass.getClassLoader.getResources("com.xmlcalabash.settings")
     while (uriEnum.hasMoreElements) {
       val url = uriEnum.nextElement()
-      logger.debug(s"Loading properties: $url")
+      logger.debug(s"Loading settings: $url")
 
       val conn = url.openConnection()
       val stream = conn.getInputStream
-      val props = new Properties()
-      props.load(stream)
 
       val nsmap = mutable.HashMap.empty[String,String]
-      val NSPattern = "namespace\\s+(.+)$".r
-      val FPattern = "function\\s+(.+):(.+)$".r
-      val SPattern = "step\\s+(.+):(.+)$".r
 
-      // Properties are unordered so find the namespace bindings
-      var propIter = props.stringPropertyNames().iterator()
-      while (propIter.hasNext) {
-        val name = propIter.next()
-        val value = props.get(name).asInstanceOf[String]
-        value match {
-          case NSPattern(uri) =>
-            if (nsmap.contains(name)) {
-              throw new RuntimeException("Cannot redefine namespace bindings in property file")
-            }
-            nsmap.put(name, uri)
-          case _ => ()
+      val reader = new BufferedReader(new InputStreamReader(stream))
+      var line = reader.readLine()
+      while (line != null) {
+        var pos = line.indexOf("#")
+        if (pos >= 0) {
+          line = line.substring(0, pos)
         }
-      }
+        line = line.trim()
+        if (line != "") {
+          pos = line.indexOf("=")
+          if (pos <= 0) {
+            logger.warn(s"Ignoring unparsable setting: ${line}")
+          } else {
+            val name = line.substring(0, pos).trim
+            val value = line.substring(pos+1).trim
+            name match {
+              case NSPattern(uri) =>
+                if (nsmap.contains(name)) {
+                  throw new RuntimeException("Cannot redefine namespace bindings in property file")
+                }
+                nsmap.put(value, uri)
+              case FPattern(pfx,local) =>
+                if (nsmap.contains(pfx)) {
+                  val qname = new QName(pfx, nsmap(pfx), local)
+                  _parameters += new PipelineFunctionImplementation(qname.getEQName, name, value)
+                } else {
+                  logger.debug(s"No namespace binding for $pfx, ignoring: $name=$value")
+                }
+              case SPattern(pfx,local) =>
+                if (nsmap.contains(pfx)) {
+                  val qname = new QName(pfx, nsmap(pfx), local)
+                  _parameters += new PipelineStepImplementation(qname.getEQName, name, value)
+                } else {
+                  logger.debug(s"No namespace binding for $pfx, ignoring: $name=$value")
+                }
+              case _ =>
+                logger.debug(s"Unparseable property, ignoring: $name=$value")
+            }
+          }
+        }
 
-      // Now parse the step and function declarations
-      propIter = props.stringPropertyNames().iterator()
-      while (propIter.hasNext) {
-        val name = propIter.next()
-        val value = props.get(name).asInstanceOf[String]
-        value match {
-          case NSPattern(uri) => ()
-          case FPattern(pfx,local) =>
-            if (nsmap.contains(pfx)) {
-              val qname = new QName(pfx, nsmap(pfx), local)
-              _parameters += new PipelineFunctionImplementation(qname.getEQName, value, name)
-            } else {
-              logger.debug(s"No namespace binding for $pfx, ignoring: $name=$value")
-            }
-          case SPattern(pfx,local) =>
-            if (nsmap.contains(pfx)) {
-              val qname = new QName(pfx, nsmap(pfx), local)
-              _parameters += new PipelineStepImplementation(qname.getEQName, value, name)
-            } else {
-              logger.debug(s"No namespace binding for $pfx, ignoring: $name=$value")
-            }
-          case _ =>
-            logger.debug(s"Unparseable property, ignoring: $name=$value")
-        }
+        line = reader.readLine()
       }
     }
   }

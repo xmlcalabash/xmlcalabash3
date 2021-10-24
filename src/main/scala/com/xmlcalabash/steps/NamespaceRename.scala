@@ -2,6 +2,7 @@ package com.xmlcalabash.steps
 
 import com.xmlcalabash.exceptions.XProcException
 import com.xmlcalabash.runtime.{ProcessMatch, ProcessMatchingNodes, StaticContext, XProcMetadata, XmlPortSpecification}
+import com.xmlcalabash.util.MinimalStaticContext
 import net.sf.saxon.`type`.{BuiltInAtomicType, Untyped}
 import net.sf.saxon.event.ReceiverOption
 import net.sf.saxon.om.{AttributeInfo, AttributeMap, FingerprintedQName, NameOfNode, NamespaceMap, NodeInfo}
@@ -29,7 +30,7 @@ class NamespaceRename() extends DefaultXmlStep with ProcessMatchingNodes {
     metadata = meta
   }
 
-  override def run(context: StaticContext): Unit = {
+  override def run(context: MinimalStaticContext): Unit = {
     super.run(context)
 
     from = stringBinding(_from)

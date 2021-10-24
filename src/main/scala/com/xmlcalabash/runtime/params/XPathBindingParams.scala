@@ -8,7 +8,7 @@ object XPathBindingParams {
   def EMPTY: XPathBindingParams = _empty
 }
 
-class XPathBindingParams(val statics: Map[QName, XdmValue], val collection: Boolean) extends BindingParams {
+class XPathBindingParams(val constants: Map[QName, XdmValue], val collection: Boolean) extends BindingParams {
   def this(collection: Boolean) = {
     this(Map.empty[QName,XdmValue], collection)
   }

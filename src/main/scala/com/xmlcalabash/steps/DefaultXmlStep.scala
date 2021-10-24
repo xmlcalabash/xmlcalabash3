@@ -8,16 +8,17 @@ import com.xmlcalabash.XMLCalabash
 import com.xmlcalabash.exceptions.XProcException
 import com.xmlcalabash.messages.XdmValueItemMessage
 import com.xmlcalabash.model.util.{SaxonTreeBuilder, XProcConstants}
+import com.xmlcalabash.model.xxml.XStaticContext
 import com.xmlcalabash.runtime._
 import com.xmlcalabash.steps.DefaultXmlStep.showRunningMessage
-import com.xmlcalabash.util.{MediaType, S9Api}
+import com.xmlcalabash.util.{MediaType, MinimalStaticContext, S9Api}
 import net.sf.saxon.`type`.TypeHierarchy
 import net.sf.saxon.expr.parser.RoleDiagnostic
 import net.sf.saxon.lib.NamespaceConstant
 import net.sf.saxon.om.NamespaceMap
 import net.sf.saxon.s9api._
 import net.sf.saxon.trans.XPathException
-import net.sf.saxon.value.QNameValue
+import net.sf.saxon.value.{QNameValue, UntypedAtomicValue}
 import org.slf4j.{Logger, LoggerFactory}
 
 import java.io.{InputStream, OutputStream}
@@ -130,7 +131,7 @@ class DefaultXmlStep extends XmlStep {
     }
   }
 
-  override def run(context: StaticContext): Unit = {
+  override def run(context: MinimalStaticContext): Unit = {
     runningMessage()
     if (_location.isEmpty) {
       _location = context.location
@@ -297,6 +298,8 @@ class DefaultXmlStep extends XmlStep {
       bindings(name).value.getUnderlyingValue match {
         case qn: QNameValue =>
           Some(new QName(qn.getPrefix, qn.getNamespaceURI, qn.getLocalName))
+        case u: UntypedAtomicValue =>
+          Some(bindings(name).context.parseQName(u.getStringValue))
         case _ => None
       }
     } else {
@@ -408,7 +411,7 @@ class DefaultXmlStep extends XmlStep {
     new XProcMetadata(MediaType.TEXT, props.toMap)
   }
 
-  def serialize(context: StaticContext, source: Any, metadata: XProcMetadata, output: OutputStream): Unit = {
+  def serialize(context: MinimalStaticContext, source: Any, metadata: XProcMetadata, output: OutputStream): Unit = {
     source match {
       case bn: BinaryNode =>
         val bytes = new Array[Byte](8192)
@@ -448,7 +451,7 @@ class DefaultXmlStep extends XmlStep {
     }
   }
 
-  private def serializeJson(context: StaticContext, source: Any, metadata: XProcMetadata, output: OutputStream): Unit = {
+  private def serializeJson(context: MinimalStaticContext, source: Any, metadata: XProcMetadata, output: OutputStream): Unit = {
     val expr = new XProcXPathExpression(context, "serialize($map, map {\"method\": \"json\"})")
     val bindingsMap = mutable.HashMap.empty[String, Message]
     val vmsg = new XdmValueItemMessage(source.asInstanceOf[XdmValue], XProcMetadata.TEXT, context)

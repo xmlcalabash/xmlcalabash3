@@ -4,8 +4,10 @@ import java.net.URI
 import com.xmlcalabash.exceptions.XProcException
 import com.xmlcalabash.model.util.{SaxonTreeBuilder, ValueParser, XProcConstants}
 import com.xmlcalabash.runtime.{StaticContext, XProcMetadata, XmlPortSpecification}
+import com.xmlcalabash.util.MinimalStaticContext
 import com.xmlcalabash.util.TypeUtils.castAsXml
 import net.sf.saxon.s9api.{QName, XdmAtomicValue, XdmMap, XdmNode, XdmValue}
+import org.apache.xerces.util.URI.MalformedURIException
 
 import scala.collection.mutable
 import scala.jdk.CollectionConverters.MapHasAsScala
@@ -28,7 +30,7 @@ class SetProperties() extends DefaultXmlStep {
     }
   }
 
-  override def run(context: StaticContext): Unit = {
+  override def run(context: MinimalStaticContext): Unit = {
     super.run(context)
 
     val properties = mapBinding(XProcConstants._properties)
@@ -78,12 +80,19 @@ class SetProperties() extends DefaultXmlStep {
     var result = source
     // The base URI is special; make sure it's not some bogus string
     if (newprops.contains(XProcConstants._base_uri)) {
-      val uri = if (context.baseURI.isDefined) {
-        resolveURI(context.baseURI.get, newprops(XProcConstants._base_uri).toString)
-      } else {
-        new URI(newprops(XProcConstants._base_uri).toString)
+      val ustr = newprops(XProcConstants._base_uri).toString
+      try {
+        val uri = new URI(ustr)
+        if (!uri.isAbsolute) {
+          throw XProcException.xdInvalidURI(ustr, location)
+        }
+        newprops.put(XProcConstants._base_uri, new XdmAtomicValue(uri))
+      } catch {
+        case _: MalformedURIException =>
+          throw XProcException.xdInvalidURI(ustr, location)
+        case ex: Exception =>
+          throw ex
       }
-      newprops.put(XProcConstants._base_uri, new XdmAtomicValue(uri))
     } else {
       if (metadata.properties.contains(XProcConstants._base_uri)) {
         // The base URI property has been removed...

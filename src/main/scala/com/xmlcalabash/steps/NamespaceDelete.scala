@@ -1,11 +1,10 @@
 package com.xmlcalabash.steps
 
 import java.net.URI
-
 import com.xmlcalabash.exceptions.XProcException
 import com.xmlcalabash.model.util.XProcConstants
 import com.xmlcalabash.runtime._
-import com.xmlcalabash.util.S9Api
+import com.xmlcalabash.util.{MinimalStaticContext, S9Api}
 import net.sf.saxon.s9api.{Axis, QName, XdmNode, XdmValue}
 
 import scala.collection.mutable
@@ -23,13 +22,13 @@ class NamespaceDelete() extends DefaultXmlStep {
     metadata = meta
   }
 
-  override def run(context: StaticContext): Unit = {
+  override def run(context: MinimalStaticContext): Unit = {
     super.run(context)
 
     namespaces = mutable.HashSet.empty[String]
     val prefixes = bindings(XProcConstants._prefixes).value.getUnderlyingValue.getStringValue.split("\\s+")
     for (prefix <- prefixes) {
-      val uri = context.nsBindings.get(prefix)
+      val uri = context.inscopeNamespaces.get(prefix)
       if (uri.isDefined) {
         namespaces.add(uri.get)
       } else {

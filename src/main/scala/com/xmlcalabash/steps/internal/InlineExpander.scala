@@ -5,11 +5,11 @@ import com.jafpl.messages.Message
 import com.xmlcalabash.XMLCalabash
 import com.xmlcalabash.config.DocumentRequest
 import com.xmlcalabash.exceptions.XProcException
-import com.xmlcalabash.messages.{XProcItemMessage, XdmNodeItemMessage, XdmValueItemMessage}
+import com.xmlcalabash.messages.{XProcItemMessage, XdmValueItemMessage}
 import com.xmlcalabash.model.util.{SaxonTreeBuilder, ValueParser, XProcConstants}
-import com.xmlcalabash.model.xml.Inline
-import com.xmlcalabash.runtime.{BinaryNode, DynamicContext, StaticContext, XProcExpression, XProcMetadata, XProcVtExpression, XProcXPathExpression}
-import com.xmlcalabash.util.{MediaType, TypeUtils}
+import com.xmlcalabash.model.xxml.{XInline, XMLStaticContext}
+import com.xmlcalabash.runtime.{BinaryNode, DynamicContext, XMLCalabashRuntime, XProcExpression, XProcMetadata, XProcVtExpression, XProcXPathExpression}
+import com.xmlcalabash.util.{MediaType, MinimalStaticContext, TypeUtils}
 import net.sf.saxon.`type`.BuiltInAtomicType
 import net.sf.saxon.event.ReceiverOption
 import net.sf.saxon.om.{AttributeInfo, AttributeMap, EmptyAttributeMap, NamespaceMap}
@@ -26,20 +26,32 @@ import scala.jdk.CollectionConverters._
 // the case where this is a default binding, it must *not* evaluate its options if the default
 // is not used.
 
-protected[xmlcalabash] class InlineExpander(val config: XMLCalabash, val node: XdmNode, val meta: XProcMetadata, val exprContext: StaticContext, val location: Option[Location]) {
+protected[xmlcalabash] class InlineExpander(val config: XMLCalabash, val node: XdmNode, val meta: XProcMetadata, val exprContext: MinimalStaticContext, val location: Option[Location]) {
+  private var _documentProperties: Map[QName, XdmValue] = Map.empty[QName, XdmValue]
+  private val fq_inline_expand_text = TypeUtils.fqName(XProcConstants._inline_expand_text)
+  private val fq_p_inline_expand_text = TypeUtils.fqName(XProcConstants.p_inline_expand_text)
+  private val _msgBindings = mutable.HashMap.empty[String, XProcItemMessage]
+
   var contentType: MediaType = meta.contentType
   var encoding: Option[String] = None
   var excludeURIs: Set[String] = Set()
-  var msgBindings: Map[String, XProcItemMessage] = Map()
   var contextItem: Option[XProcItemMessage] = None
 
-  private var _documentProperties: Map[QName, XdmValue] = Map.empty[QName, XdmValue]
+  def msgBindings: Map[String, XProcItemMessage] = _msgBindings.toMap
+  def msgBindings_=(bindings: Map[String, XProcItemMessage]): Unit = {
+    _msgBindings ++= bindings
+  }
 
-  private val fq_inline_expand_text = TypeUtils.fqName(XProcConstants._inline_expand_text)
-  private val fq_p_inline_expand_text = TypeUtils.fqName(XProcConstants.p_inline_expand_text)
+  def copyStaticOptionsToBindings(runtime: XMLCalabashRuntime): Unit = {
+    for ((name,value) <- runtime.staticOptions) {
+      if (exprContext.inscopeConstants.contains(name)) {
+        _msgBindings.put(name.getClarkName, value)
+      }
+    }
+  }
 
-  def this(inline: Inline) = {
-    this(inline.config, inline.node, new XProcMetadata(inline.contentType), inline.inlineContext, inline.location)
+  def this(inline: XInline) = {
+    this(inline.config, inline.content, new XProcMetadata(inline.contentType), inline.staticContext, inline.location)
     encoding = inline.encoding
     excludeURIs = inline.excludeURIs
   }
@@ -313,9 +325,8 @@ protected[xmlcalabash] class InlineExpander(val config: XMLCalabash, val node: X
   }
 
   protected def xpathValue(expr: XProcExpression): XdmValue = {
-    val dynContext = new DynamicContext()
     val eval = config.expressionEvaluator.newInstance()
-    val msg = eval.withContext(dynContext) { eval.singletonValue(expr, contextItem.toList, msgBindings, None) }
+    val msg = eval.singletonValue(expr, contextItem.toList, msgBindings, None)
     msg.item
   }
 }

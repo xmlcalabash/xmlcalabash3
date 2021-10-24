@@ -5,6 +5,7 @@ import com.xmlcalabash.XMLCalabash
 import com.xmlcalabash.exceptions.XProcException
 import com.xmlcalabash.messages.XdmValueItemMessage
 import com.xmlcalabash.model.util.{SaxonTreeBuilder, ValueParser}
+import com.xmlcalabash.util.MinimalStaticContext
 import net.sf.saxon.om.{AttributeInfo, AttributeMap, NameOfNode, NamespaceResolver}
 import net.sf.saxon.s9api._
 import net.sf.saxon.serialize.SerializationProperties
@@ -18,15 +19,15 @@ import scala.jdk.CollectionConverters.{IteratorHasAsJava, SeqHasAsJava}
 
 class ProcessMatch(config: XMLCalabash,
                    processor: ProcessMatchingNodes,
-                   context: StaticContext,
+                   context: MinimalStaticContext,
                    bindings: Option[Map[String,Message]]) extends SaxonTreeBuilder(config) {
-  def this(runtime: XMLCalabashRuntime, processor: ProcessMatchingNodes, context: StaticContext) = {
+  def this(runtime: XMLCalabashRuntime, processor: ProcessMatchingNodes, context: MinimalStaticContext) = {
     this(runtime.config, processor, context, None)
   }
-  def this(runtime: XMLCalabash, processor: ProcessMatchingNodes, context: StaticContext) = {
+  def this(runtime: XMLCalabash, processor: ProcessMatchingNodes, context: MinimalStaticContext) = {
     this(runtime, processor, context, None)
   }
-  def this(config: XMLCalabash, processor: ProcessMatchingNodes, context: StaticContext, bindings: Map[String,Message]) = {
+  def this(config: XMLCalabash, processor: ProcessMatchingNodes, context: MinimalStaticContext, bindings: Map[String,Message]) = {
     this(config, processor, context, Some(bindings))
   }
 
@@ -267,7 +268,7 @@ class ProcessMatch(config: XMLCalabash,
       }
     }
 
-    for ((prefix, uri) <- context.nsBindings) {
+    for ((prefix, uri) <- context.inscopeNamespaces) {
       xcomp.declareNamespace(prefix, uri)
     }
 

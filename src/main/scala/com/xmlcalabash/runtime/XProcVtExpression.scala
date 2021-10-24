@@ -2,23 +2,24 @@ package com.xmlcalabash.runtime
 
 import com.xmlcalabash.exceptions.XProcException
 import com.xmlcalabash.model.util.ValueParser
+import com.xmlcalabash.util.MinimalStaticContext
 import net.sf.saxon.expr.parser.ExpressionTool
 
-class XProcVtExpression private(override val context: StaticContext, val params: Option[ExprParams]) extends XProcExpression(context) {
+class XProcVtExpression private(override val context: MinimalStaticContext, val params: Option[ExprParams]) extends XProcExpression(context) {
   private var _avt: List[String] = _
   private var _string = false
 
-  def this(context: StaticContext, avt: List[String], stringResult: Boolean) = {
+  def this(context: MinimalStaticContext, avt: List[String], stringResult: Boolean) = {
     this(context, None)
     _avt = avt
     _string = stringResult
   }
 
-  def this(context: StaticContext, avt: List[String]) = {
+  def this(context: MinimalStaticContext, avt: List[String]) = {
     this(context, avt, false)
   }
 
-  def this(context: StaticContext, expr: String, stringResult: Boolean) = {
+  def this(context: MinimalStaticContext, expr: String, stringResult: Boolean) = {
     this(context, None)
     val avt = ValueParser.parseAvt(expr)
     if (avt.isEmpty) {
@@ -28,7 +29,7 @@ class XProcVtExpression private(override val context: StaticContext, val params:
     _string = stringResult
   }
 
-  def this(context: StaticContext, expr: String) = {
+  def this(context: MinimalStaticContext, expr: String) = {
     this(context, expr, false)
   }
 

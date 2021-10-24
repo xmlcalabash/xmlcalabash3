@@ -5,9 +5,16 @@ import com.jafpl.runtime.RuntimeConfiguration
 import com.jafpl.steps.BindingSpecification
 import com.xmlcalabash.XMLCalabash
 import com.xmlcalabash.config.StepSignature
+import com.xmlcalabash.model.xxml.{XDeclareStep, XOption}
+import com.xmlcalabash.util.MinimalStaticContext
 import net.sf.saxon.s9api.{QName, XdmValue}
 
-class StepWrapper(protected[xmlcalabash] val step: XmlStep, val signature: StepSignature) extends StepExecutable {
+import scala.collection.mutable
+
+class StepWrapper(protected[xmlcalabash] val step: XmlStep, decl: XDeclareStep) extends StepExecutable {
+  private val seenOptions = mutable.HashSet.empty[QName]
+
+  override def declaration: XDeclareStep = decl
   override def inputSpec: XmlPortSpecification = step.inputSpec
   override def outputSpec: XmlPortSpecification = step.outputSpec
   override def bindingSpec: BindingSpecification = step.bindingSpec
@@ -15,6 +22,7 @@ class StepWrapper(protected[xmlcalabash] val step: XmlStep, val signature: StepS
   override def setLocation(location: Location): Unit = step.setLocation(location)
 
   override def receiveBinding(variable: NameValueBinding): Unit = {
+    seenOptions += variable.name
     step.receiveBinding(variable)
   }
   override def receive(port: String, item: Any, metadata: XProcMetadata): Unit = {
@@ -26,7 +34,14 @@ class StepWrapper(protected[xmlcalabash] val step: XmlStep, val signature: StepS
   override def initialize(config: RuntimeConfiguration): Unit = {
     step.initialize(config)
   }
-  override def run(context: StaticContext): Unit = {
+  override def run(context: MinimalStaticContext): Unit = {
+    for (option <- decl.children[XOption]) {
+      if (!seenOptions.contains(option.name) && context.inscopeConstants.contains(option.name)) {
+        val value = new NameValueBinding(option.name, context.inscopeConstants(option.name).constantValue.get)
+        step.receiveBinding(value)
+      }
+    }
+
     step.run(context)
   }
   override def reset(): Unit = step.reset()

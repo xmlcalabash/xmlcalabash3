@@ -1,7 +1,6 @@
 package com.xmlcalabash.steps
 
 import java.io.{IOException, StringReader}
-
 import com.jafpl.graph.Location
 import com.jafpl.steps.PortCardinality
 import com.thaiopensource.util.PropertyMapBuilder
@@ -12,7 +11,7 @@ import com.thaiopensource.validate.{SchemaReader, ValidateProperty, ValidationDr
 import com.xmlcalabash.exceptions.XProcException
 import com.xmlcalabash.runtime.{StaticContext, XProcLocation, XProcMetadata, XmlPortSpecification}
 import com.xmlcalabash.util.xc.Errors
-import com.xmlcalabash.util.{CachingErrorListener, S9Api}
+import com.xmlcalabash.util.{CachingErrorListener, MinimalStaticContext, S9Api}
 import net.sf.saxon.s9api.{QName, XdmNode}
 import org.xml.sax.InputSource
 
@@ -60,7 +59,7 @@ class ValidateWithRNG() extends DefaultXmlStep {
     }
   }
 
-  override def run(context: StaticContext): Unit = {
+  override def run(context: MinimalStaticContext): Unit = {
     super.run(context)
 
     if (definedBinding(_dtd_id_idref_warnings)) {
@@ -136,7 +135,7 @@ class ValidateWithRNG() extends DefaultXmlStep {
         }
       }
     } else {
-      throw XProcException.xcNotSchemaValidRelaxNG(source.getBaseURI.toASCIIString, "Error loading schema", location)
+      throw XProcException.xcNotRelaxNG(source.getBaseURI.toASCIIString, "Error loading schema", location)
     }
 
     consumer.receive("report", report.endErrors() , XProcMetadata.XML)

@@ -10,8 +10,7 @@ import com.xmlcalabash.messages.XdmValueItemMessage
 import com.xmlcalabash.model.util.{SaxonTreeBuilder, XProcConstants}
 import com.xmlcalabash.runtime.{BinaryNode, StaticContext, XProcMetadata, XProcXPathExpression}
 import com.xmlcalabash.util.xc.Errors
-import net.sf.saxon.Configuration
-import net.sf.saxon.lib.{AugmentedSource, ErrorReporter, ParseOptions}
+import net.sf.saxon.lib.{AugmentedSource, ParseOptions}
 import net.sf.saxon.s9api.{QName, SaxonApiException, XdmAtomicValue, XdmNode, XdmValue}
 import net.sf.saxon.trans.XPathException
 import nu.validator.htmlparser.common.XmlViolationPolicy
@@ -21,7 +20,6 @@ import org.apache.http.client.utils.DateUtils
 import org.apache.http.impl.client.HttpClients
 import org.apache.http.util.ByteArrayBuffer
 import org.slf4j.{Logger, LoggerFactory}
-import org.xml.sax.helpers.XMLReaderFactory
 import org.xml.sax.{InputSource, SAXException}
 
 import java.io.{File, FileInputStream, FileNotFoundException, IOException, InputStream, UnsupportedEncodingException}

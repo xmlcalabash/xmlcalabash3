@@ -44,6 +44,10 @@ object Urify {
     urify(filestr, Some(basedir))
   }
 
+  def urify(filestr: String, basedir: URI): String = {
+    urify(filestr, Some(basedir.toString))
+  }
+
   def urify(filestr: String, basedir: Option[String]): String = {
     val filepath = new Urify(filestr, basedir)
     if (!filepath.hierarchical || (filepath.scheme.isDefined && filepath.absolute)) {

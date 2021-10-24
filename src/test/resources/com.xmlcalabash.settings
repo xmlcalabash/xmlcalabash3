@@ -1,0 +1,2 @@
+namespace http://xmlcalabash.com/ns/extensions = cx
+step cx:step-output-test = com.xmlcalabash.steps.StepOutputTest

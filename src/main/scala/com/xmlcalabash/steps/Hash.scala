@@ -3,7 +3,7 @@ package com.xmlcalabash.steps
 import com.xmlcalabash.exceptions.XProcException
 import com.xmlcalabash.model.util.XProcConstants
 import com.xmlcalabash.runtime.{ProcessMatch, ProcessMatchingNodes, StaticContext, XProcMetadata, XmlPortSpecification}
-import com.xmlcalabash.util.{HashUtils, TypeUtils}
+import com.xmlcalabash.util.{HashUtils, MinimalStaticContext, TypeUtils}
 import net.sf.saxon.`type`.BuiltInAtomicType
 import net.sf.saxon.event.ReceiverOption
 import net.sf.saxon.om.{AttributeInfo, AttributeMap}
@@ -36,7 +36,7 @@ class Hash() extends DefaultXmlStep  with ProcessMatchingNodes {
     this.metadata = metadata
   }
 
-  override def run(context: StaticContext): Unit = {
+  override def run(context: MinimalStaticContext): Unit = {
     super.run(context)
 
     val value = stringBinding(_value).getBytes("UTF-8")

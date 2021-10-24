@@ -5,6 +5,7 @@ import com.xmlcalabash.exceptions.XProcException
 import com.xmlcalabash.messages.{XProcItemMessage, XdmValueItemMessage}
 import com.xmlcalabash.model.util.{SaxonTreeBuilder, XProcConstants}
 import com.xmlcalabash.runtime.{StaticContext, XProcMetadata, XProcXPathExpression, XmlPortSpecification}
+import com.xmlcalabash.util.MinimalStaticContext
 import net.sf.saxon.s9api.XdmNode
 
 import scala.collection.mutable
@@ -26,7 +27,7 @@ class Filter extends DefaultXmlStep {
     }
   }
 
-  override def run(context: StaticContext): Unit = {
+  override def run(context: MinimalStaticContext): Unit = {
     val select = stringBinding(XProcConstants._select)
 
     val expr = new XProcXPathExpression(context, select)

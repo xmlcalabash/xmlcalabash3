@@ -138,7 +138,7 @@ class DefaultErrorExplanation() extends ErrorExplanation {
   }
 
   override def explanation(code: QName, variant: Int, details: List[Any]): String = {
-    var message = template(code, variant, details.length).explanation
+    val message = template(code, variant, details.length).explanation
     substitute(message, details)
   }
 

@@ -3,6 +3,7 @@ package com.xmlcalabash.steps
 import com.jafpl.steps.PortCardinality
 import com.xmlcalabash.model.util.{SaxonTreeBuilder, XProcConstants}
 import com.xmlcalabash.runtime.{StaticContext, XProcMetadata, XmlPortSpecification}
+import com.xmlcalabash.util.MinimalStaticContext
 import net.sf.saxon.s9api.{QName, XdmNode}
 
 import scala.collection.mutable.ListBuffer
@@ -28,7 +29,7 @@ class Pack() extends DefaultXmlStep {
     }
   }
 
-  override def run(context: StaticContext): Unit = {
+  override def run(context: MinimalStaticContext): Unit = {
     super.run(context)
 
     val wrapName = qnameBinding(_wrapper).get

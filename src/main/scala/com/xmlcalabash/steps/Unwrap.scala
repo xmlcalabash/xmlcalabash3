@@ -3,6 +3,7 @@ package com.xmlcalabash.steps
 import com.xmlcalabash.exceptions.XProcException
 import com.xmlcalabash.model.util.XProcConstants
 import com.xmlcalabash.runtime.{ProcessMatch, ProcessMatchingNodes, StaticContext, XProcMetadata, XmlPortSpecification}
+import com.xmlcalabash.util.MinimalStaticContext
 import net.sf.saxon.om.AttributeMap
 import net.sf.saxon.s9api.{Axis, XdmNode, XdmNodeKind}
 
@@ -20,7 +21,7 @@ class Unwrap() extends DefaultXmlStep  with ProcessMatchingNodes {
     source_metadata = metadata
   }
 
-  override def run(context: StaticContext): Unit = {
+  override def run(context: MinimalStaticContext): Unit = {
     super.run(context)
 
     pattern = stringBinding(XProcConstants._match)

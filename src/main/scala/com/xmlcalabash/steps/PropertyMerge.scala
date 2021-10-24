@@ -3,9 +3,9 @@ package com.xmlcalabash.steps
 import com.jafpl.steps.PortCardinality
 import com.xmlcalabash.exceptions.XProcException
 import com.xmlcalabash.model.util.{SaxonTreeBuilder, ValueParser, XProcConstants}
-import com.xmlcalabash.model.xml.XMLContext
+import com.xmlcalabash.model.xxml.{XMLStaticContext, XStaticContext}
 import com.xmlcalabash.runtime.{StaticContext, XProcMetadata, XmlPortSpecification}
-import com.xmlcalabash.util.S9Api
+import com.xmlcalabash.util.{MinimalStaticContext, S9Api}
 import net.sf.saxon.s9api.{Axis, QName, XdmAtomicValue, XdmNode, XdmNodeKind, XdmValue}
 
 import scala.collection.mutable
@@ -32,7 +32,7 @@ class PropertyMerge extends DefaultXmlStep {
     }
   }
 
-  override def run(staticContext: StaticContext): Unit = {
+  override def run(staticContext: MinimalStaticContext): Unit = {
     super.run(staticContext)
 
     propDoc.get match {
@@ -62,7 +62,7 @@ class PropertyMerge extends DefaultXmlStep {
     consumer.receive("result", sourceDoc.get, newmeta)
   }
 
-  private def extractProperties(context: StaticContext, node: XdmNode): Map[QName,XdmValue] = {
+  private def extractProperties(context: MinimalStaticContext, node: XdmNode): Map[QName,XdmValue] = {
     val prop = mutable.HashMap.empty[QName,XdmValue]
 
    val piter = node.axisIterator(Axis.CHILD)
@@ -77,13 +77,8 @@ class PropertyMerge extends DefaultXmlStep {
 
           val vtypestr = Option(pnode.getAttributeValue(XProcConstants.xsi_type))
           val vtype = if (vtypestr.isDefined) {
-            val ns = S9Api.inScopeNamespaces(pnode)
-            val scontext = new XMLContext(config.config)
-            scontext.nsBindings = ns
-            if (location.isDefined) {
-              scontext.location = location.get
-            }
-            Some(ValueParser.parseQName(vtypestr.get, scontext))
+            val scontext = new XStaticContext(location, S9Api.inScopeNamespaces(pnode))
+            Some(scontext.parseQName(vtypestr.get))
           } else {
             None
           }
@@ -139,12 +134,8 @@ class PropertyMerge extends DefaultXmlStep {
                 case XProcConstants.xs_anyURI =>
                   prop.put(name, new XdmAtomicValue(strvalue))
                 case XProcConstants.xs_QName =>
-                  val scontext = new XMLContext(config.config)
-                  scontext.nsBindings = S9Api.inScopeNamespaces(node)
-                  if (location.isDefined) {
-                    scontext.location = location.get
-                  }
-                  prop.put(name, new XdmAtomicValue(ValueParser.parseQName(strvalue,scontext)))
+                  val scontext = new XStaticContext(location, S9Api.inScopeNamespaces(node))
+                  prop.put(name, new XdmAtomicValue(scontext.parseQName(strvalue)))
                 case XProcConstants.xs_notation =>
                   prop.put(name, new XdmAtomicValue(strvalue))
                 case XProcConstants.xs_decimal =>

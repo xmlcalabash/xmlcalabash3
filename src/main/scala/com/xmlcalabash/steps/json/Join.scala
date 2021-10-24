@@ -3,6 +3,7 @@ package com.xmlcalabash.steps.json
 import com.xmlcalabash.exceptions.XProcException
 import com.xmlcalabash.runtime.{StaticContext, XProcMetadata, XmlPortSpecification}
 import com.xmlcalabash.steps.DefaultXmlStep
+import com.xmlcalabash.util.MinimalStaticContext
 import net.sf.saxon.s9api.{QName, XdmArray, XdmItem, XdmValue}
 
 import scala.collection.mutable.ListBuffer
@@ -25,7 +26,7 @@ class Join extends DefaultXmlStep {
     }
   }
 
-  override def run(staticContext: StaticContext): Unit = {
+  override def run(staticContext: MinimalStaticContext): Unit = {
     super.run(staticContext)
 
     val depth = bindings(_flatten_to_depth).value.getUnderlyingValue.getStringValue

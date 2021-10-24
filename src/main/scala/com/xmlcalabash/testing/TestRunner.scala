@@ -5,11 +5,11 @@ import com.xmlcalabash.XMLCalabash
 import com.xmlcalabash.exceptions.TestException
 import com.xmlcalabash.messages.XdmNodeItemMessage
 import com.xmlcalabash.model.util.{SaxonTreeBuilder, ValueParser, XProcConstants}
-import com.xmlcalabash.model.xml.XMLContext
+import com.xmlcalabash.model.xxml.{XMLStaticContext, XStaticContext}
 import com.xmlcalabash.runtime.{SaxonExpressionEvaluator, StaticContext, XProcLocation, XProcMetadata, XProcXPathExpression}
 import com.xmlcalabash.util.{MediaType, S9Api, TypeUtils, URIUtils, Urify}
 import net.sf.saxon.om.{AttributeMap, EmptyAttributeMap}
-import net.sf.saxon.s9api.{Axis, Processor, QName, XdmNode, XdmNodeKind, XdmValue}
+import net.sf.saxon.s9api.{Axis, ItemType, Processor, QName, XdmAtomicValue, XdmNode, XdmNodeKind, XdmValue}
 import org.slf4j.{Logger, LoggerFactory}
 import org.xml.sax.InputSource
 
@@ -59,6 +59,7 @@ class TestRunner(processor: Processor, online: Boolean, regex: Option[String], t
   private val t_schematron = new QName(tsns, "schematron")
   private val t_input = new QName(tsns, "input")
   private val t_option = new QName(tsns, "option")
+  private val _as = new QName("", "as")
   private val _src = new QName("", "src")
   private val _port = new QName("", "port")
   private val _name = new QName("", "name")
@@ -560,12 +561,6 @@ class TestRunner(processor: Processor, online: Boolean, regex: Option[String], t
     var urifyFeature = Option.empty[String]
     val features = node.getAttributeValue(_features)
     if (features != null) {
-      if (features.contains("lazy-eval")) {
-        val result = new TestResult(true) // skipped counts as a pass...
-        result.baseURI = node.getBaseURI
-        result.skipped = "The 'lazy-eval' feature is not supported"
-        return result
-      }
       if (features.contains("xslt-1")) {
         xmlcalabash.args.config(XProcConstants.cc_xslt10_classpath, Urify.urify("src/test/resources/saxon-6.5.5.jar"))
       }
@@ -775,9 +770,12 @@ class TestRunner(processor: Processor, online: Boolean, regex: Option[String], t
         }
       }
 
+      /*
       if (!result.passed && result.exception.isDefined) {
         result.exception.get.printStackTrace()
       }
+
+       */
 
       result
     }
@@ -814,13 +812,19 @@ class TestRunner(processor: Processor, online: Boolean, regex: Option[String], t
 
     val src = node.getAttributeValue(_src)
     if ((src == null) && children.isEmpty) {
-      val scontext = new XMLContext(emptyConfig, Some(node.getBaseURI), S9Api.inScopeNamespaces(node), Some(new XProcLocation(node)))
-      val value = node.getAttributeValue(_select)
+      val scontext = new XStaticContext(new XProcLocation(node), S9Api.inScopeNamespaces(node))
+      val select = node.getAttributeValue(_select)
       val contextItem = inlineDocument(node)
       val message = new XdmNodeItemMessage(contextItem.get, new XProcMetadata(MediaType.XML), scontext)
       val eval = emptyConfig.expressionEvaluator.newInstance()
-      val result = eval.singletonValue(new XProcXPathExpression(scontext, value), List(message), Map.empty[String,Message], None)
-      Some(result.item)
+      val result = eval.singletonValue(new XProcXPathExpression(scontext, select), List(message), Map.empty[String,Message], None)
+
+      var value = result.item
+      if (node.getAttributeValue(_as) == null) {
+        value = TypeUtils.castAtomicAs(value.asInstanceOf[XdmAtomicValue], ItemType.UNTYPED_ATOMIC, scontext)
+      }
+
+      Some(value)
     } else {
       loadResource(node)
     }

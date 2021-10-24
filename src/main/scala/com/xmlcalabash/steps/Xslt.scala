@@ -5,7 +5,7 @@ import com.xmlcalabash.config.DocumentRequest
 import com.xmlcalabash.exceptions.XProcException
 import com.xmlcalabash.model.util.{SaxonTreeBuilder, ValueParser, XProcConstants}
 import com.xmlcalabash.runtime.{BinaryNode, StaticContext, XProcMetadata, XmlPortSpecification}
-import com.xmlcalabash.util.{MediaType, PipelineEnvironmentOptionString, S9Api, URIUtils, Urify, ValueUtils, XProcCollectionFinder, Xslt10ClassLoader, Xslt10Source}
+import com.xmlcalabash.util.{MediaType, MinimalStaticContext, PipelineEnvironmentOptionString, S9Api, URIUtils, Urify, ValueUtils, XProcCollectionFinder, Xslt10ClassLoader, Xslt10Source}
 import net.sf.saxon.Configuration
 import net.sf.saxon.event.{PipelineConfiguration, Receiver}
 import net.sf.saxon.expr.XPathContext
@@ -36,7 +36,7 @@ class Xslt extends DefaultXmlStep {
   private val inputSequence = ListBuffer.empty[XdmItem]
   private val inputMetadata = ListBuffer.empty[XProcMetadata]
 
-  private var staticContext: StaticContext = _
+  private var staticContext: MinimalStaticContext = _
   private var globalContextItem = Option.empty[XdmValue]
   private var initialMode = Option.empty[QName]
   private var templateName = Option.empty[QName]
@@ -82,7 +82,7 @@ class Xslt extends DefaultXmlStep {
     }
   }
 
-  override def run(staticContext: StaticContext): Unit = {
+  override def run(staticContext: MinimalStaticContext): Unit = {
     super.run(staticContext)
 
     this.staticContext = staticContext
@@ -98,9 +98,6 @@ class Xslt extends DefaultXmlStep {
 
     if (bindings.contains(_global_context_item)) {
       globalContextItem = Some(bindings(_global_context_item).value)
-      if (globalContextItem.get.size() == 0) {
-        globalContextItem = None
-      }
     }
 
     initialMode = qnameBinding(_initial_mode)
@@ -287,7 +284,9 @@ class Xslt extends DefaultXmlStep {
     // FIXME: transformer.getUnderlyingController().setUnparsedTextURIResolver(unparsedTextURIResolver)
 
     if (globalContextItem.isDefined) {
-      transformer.setGlobalContextItem(globalContextItem.get.asInstanceOf[XdmItem])
+      if (globalContextItem.get.size() > 0) {
+        transformer.setGlobalContextItem(globalContextItem.get.asInstanceOf[XdmItem])
+      }
     }
 
     try {

@@ -4,7 +4,7 @@ import com.xmlcalabash.exceptions.XProcException
 import com.xmlcalabash.messages.{XdmNodeItemMessage, XdmValueItemMessage}
 import com.xmlcalabash.model.util.XProcConstants
 import com.xmlcalabash.runtime._
-import com.xmlcalabash.util.TypeUtils
+import com.xmlcalabash.util.{MinimalStaticContext, TypeUtils}
 import net.sf.saxon.om.{AttributeInfo, AttributeMap, EmptyAttributeMap, FingerprintedQName}
 import net.sf.saxon.s9api.{Axis, QName, XdmAtomicValue, XdmNode}
 import net.sf.saxon.value.QNameValue
@@ -14,7 +14,7 @@ import scala.jdk.CollectionConverters.ListHasAsScala
 class Rename() extends DefaultXmlStep with ProcessMatchingNodes {
   private val _new_name = new QName("new-name")
 
-  private var context: StaticContext = _
+  private var context: MinimalStaticContext = _
   private var newName: QName = _
   private var pattern: String = _
   private var matcher: ProcessMatch = _
@@ -29,7 +29,7 @@ class Rename() extends DefaultXmlStep with ProcessMatchingNodes {
     metadata = meta
   }
 
-  override def run(context: StaticContext): Unit = {
+  override def run(context: MinimalStaticContext): Unit = {
     super.run(context)
 
     newName = qnameBinding(_new_name).get

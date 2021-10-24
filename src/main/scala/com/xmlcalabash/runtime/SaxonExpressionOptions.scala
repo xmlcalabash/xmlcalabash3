@@ -81,7 +81,7 @@ class SaxonExpressionOptions private(map: Option[Map[String,Any]]) {
   private def checkBoolean(key: String, value: Any): Boolean = {
     value match {
       case b: Boolean => b
-      case _ => throw XProcException.xdBadValue(value.toString, "boolean", None)
+      case _ => throw XProcException.xdBadType(value.toString, "boolean", None)
     }
   }
 
@@ -96,7 +96,7 @@ class SaxonExpressionOptions private(map: Option[Map[String,Any]]) {
   private def checkDouble(key: String, value: Any): Double = {
     value match {
       case d: Double => d
-      case _ => throw XProcException.xdBadValue(value.toString, "double", None)
+      case _ => throw XProcException.xdBadType(value.toString, "double", None)
     }
   }
 
@@ -111,7 +111,7 @@ class SaxonExpressionOptions private(map: Option[Map[String,Any]]) {
   private def checkQName(key: String, value: Any): QName = {
     value match {
       case q: QName => q
-      case _ => throw XProcException.xdBadValue(value.toString, "QName", None)
+      case _ => throw XProcException.xdBadType(value.toString, "QName", None)
     }
   }
 }

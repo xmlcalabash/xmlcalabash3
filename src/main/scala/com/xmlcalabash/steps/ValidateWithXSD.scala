@@ -1,14 +1,14 @@
 package com.xmlcalabash.steps
 
 import java.net.URI
-
 import com.jafpl.steps.PortCardinality
 import com.xmlcalabash.config.DocumentRequest
 import com.xmlcalabash.exceptions.XProcException
 import com.xmlcalabash.model.util.XProcConstants
 import com.xmlcalabash.runtime.{StaticContext, XProcMetadata, XmlPortSpecification}
 import com.xmlcalabash.util.xc.Errors
-import com.xmlcalabash.util.{CachingErrorListener, MediaType, S9Api}
+import com.xmlcalabash.util.{CachingErrorListener, MediaType, MinimalStaticContext, S9Api}
+
 import javax.xml.transform.sax.SAXSource
 import net.sf.saxon.Controller
 import net.sf.saxon.`type`.ValidationException
@@ -60,7 +60,7 @@ class ValidateWithXSD() extends DefaultXmlStep {
     }
   }
 
-  override def run(context: StaticContext): Unit = {
+  override def run(context: MinimalStaticContext): Unit = {
     super.run(context)
 
     val manager = Option(config.processor.getSchemaManager)

@@ -7,7 +7,7 @@ import com.xmlcalabash.config.DocumentRequest
 import com.xmlcalabash.exceptions.XProcException
 import com.xmlcalabash.model.util.{ValueParser, XProcConstants}
 import com.xmlcalabash.runtime.{BinaryNode, NameValueBinding, StaticContext, XProcMetadata, XmlPortSpecification}
-import com.xmlcalabash.util.{MediaType, URIUtils, Urify}
+import com.xmlcalabash.util.{MediaType, MinimalStaticContext, URIUtils, Urify}
 import net.sf.saxon.s9api.{QName, XdmArray, XdmValue}
 import org.apache.commons.compress.archivers.zip.ZipFile
 import org.apache.commons.compress.utils.IOUtils
@@ -44,7 +44,7 @@ class Unarchive extends DefaultXmlStep {
     }
   }
 
-  override def run(context: StaticContext): Unit = {
+  override def run(context: MinimalStaticContext): Unit = {
     super.run(context)
 
     format = if (qnameBinding(XProcConstants._format).isDefined) {
@@ -98,7 +98,7 @@ class Unarchive extends DefaultXmlStep {
     }
   }
 
-  private def unzip(context: StaticContext): Unit = {
+  private def unzip(context: MinimalStaticContext): Unit = {
     // ZIP requires random access: https://commons.apache.org/proper/commons-compress/zip.html
     source match {
       case bn: BinaryNode =>
@@ -108,7 +108,7 @@ class Unarchive extends DefaultXmlStep {
     }
   }
 
-  private def unzipFile(context: StaticContext, zfile: File): Unit = {
+  private def unzipFile(context: MinimalStaticContext, zfile: File): Unit = {
     val zipIn = new ZipFile(zfile)
     val enum = zipIn.getEntries
     while (enum.hasMoreElements) {

@@ -7,15 +7,14 @@ import com.xmlcalabash.XMLCalabash
 import com.xmlcalabash.config.StepSignature
 import com.xmlcalabash.exceptions.XProcException
 import com.xmlcalabash.messages.{AnyItemMessage, XdmValueItemMessage}
-import com.xmlcalabash.model.util.XProcConstants
-import com.xmlcalabash.model.xml.DeclareStep
-import com.xmlcalabash.util.{S9Api, XProcVarValue}
-import net.sf.saxon.s9api.{QName, XdmItem, XdmNode, XdmValue}
+import com.xmlcalabash.model.xxml.{XDeclareStep, XInput, XOption, XOutput, XStaticContext}
+import com.xmlcalabash.util.{MediaType, MinimalStaticContext, XProcVarValue}
+import net.sf.saxon.s9api.QName
 
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 
-class StepRunner(private val pruntime: XMLCalabash, val decl: DeclareStep, val signature: StepSignature) extends StepExecutable {
+class StepRunner(val decl: XDeclareStep) extends StepExecutable {
   private var runtime: XMLCalabashRuntime = _
   private var _location = Option.empty[Location]
   private val consumers = mutable.HashMap.empty[String, ConsumerMap]
@@ -25,31 +24,39 @@ class StepRunner(private val pruntime: XMLCalabash, val decl: DeclareStep, val s
 
   private val cardMap = mutable.HashMap.empty[String,PortCardinality]
   private val typeMap = mutable.HashMap.empty[String,List[String]]
-  for (port <- signature.inputPorts) {
-    val portSig = signature.input(port, decl.location)
-    portSig.cardinality match {
-      case "1" => cardMap.put(portSig.port, new PortCardinality(1,1))
-      case "*" => cardMap.put(portSig.port, new PortCardinality(0))
-      case "+" => cardMap.put(portSig.port, new PortCardinality(1))
-      case _ => throw new RuntimeException("WTF? Cardinality=" + portSig.cardinality)
+  for (input <- decl.children[XInput]) {
+    if (input.sequence) {
+      cardMap.put(input.port, new PortCardinality(0))
+    } else {
+      cardMap.put(input.port, new PortCardinality(1, 1))
     }
-    typeMap.put(portSig.port, List("application/octet-stream")) // FIXME: THIS IS A LIE
+
+    val ctypes = ListBuffer.empty[String]
+    for (ctype <- input.contentTypes) {
+      ctypes += ctype.toString
+    }
+    typeMap.put(input.port, ctypes.toList)
   }
   private val iSpec = new XmlPortSpecification(cardMap.toMap, typeMap.toMap)
 
   cardMap.clear()
   typeMap.clear()
-  for (port <- signature.outputPorts) {
-    val portSig = signature.output(port, decl.location)
-    portSig.cardinality match {
-      case "1" => cardMap.put(portSig.port, new PortCardinality(1,1))
-      case "*" => cardMap.put(portSig.port, new PortCardinality(0))
-      case "+" => cardMap.put(portSig.port, new PortCardinality(1))
-      case _ => throw new RuntimeException("WTF? Cardinality=" + portSig.cardinality)
+  for (output <- decl.children[XOutput]) {
+    if (output.sequence) {
+      cardMap.put(output.port, new PortCardinality(0))
+    } else {
+      cardMap.put(output.port, new PortCardinality(1, 1))
     }
-    typeMap.put(portSig.port, List("application/octet-stream")) // FIXME: THIS IS A LIE
+
+    val ctypes = ListBuffer.empty[String]
+    for (ctype <- output.contentTypes) {
+      ctypes += ctype.toString
+    }
+    typeMap.put(output.port, ctypes.toList)
   }
   private val oSpec = new XmlPortSpecification(cardMap.toMap, typeMap.toMap)
+
+  override def declaration: XDeclareStep = decl
 
   override def inputSpec: XmlPortSpecification = iSpec
 
@@ -59,8 +66,8 @@ class StepRunner(private val pruntime: XMLCalabash, val decl: DeclareStep, val s
 
   override def setConsumer(consumer: XProcDataConsumer): Unit = {
     // It's too early to set in the runtime, save for later
-    for (port <- signature.outputPorts) {
-      consumers.put(port, new ConsumerMap(port, consumer))
+    for (output <- decl.children[XOutput]) {
+      consumers.put(output.port, new ConsumerMap(output.port, consumer))
     }
   }
 
@@ -70,7 +77,7 @@ class StepRunner(private val pruntime: XMLCalabash, val decl: DeclareStep, val s
 
   override def receiveBinding(variable: NameValueBinding): Unit = {
     // It's too early to set in the runtime, save for later
-    bindings.put(variable.name, new XProcVarValue(variable.value, new StaticContext(variable.context, decl)))
+    bindings.put(variable.name, new XProcVarValue(variable.value, new XStaticContext())) // FIXME: context?
   }
 
   // Input to the pipeline
@@ -98,7 +105,7 @@ class StepRunner(private val pruntime: XMLCalabash, val decl: DeclareStep, val s
     _usedPorts = ports
   }
 
-  override def run(context: StaticContext): Unit = {
+  override def run(context: MinimalStaticContext): Unit = {
     //println("=======================================")
     //decl.dump()
 

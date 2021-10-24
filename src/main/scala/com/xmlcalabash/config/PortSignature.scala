@@ -1,6 +1,6 @@
 package com.xmlcalabash.config
 
-import com.xmlcalabash.model.xml.DataSource
+import com.xmlcalabash.model.xxml.XDataSource
 import com.xmlcalabash.util.MediaType
 
 import scala.collection.mutable.ListBuffer
@@ -9,7 +9,7 @@ class PortSignature(val port: String) {
   private var _cardinality = "1"
   private var _primary = Option.empty[Boolean]
   private val _contentTypes = ListBuffer.empty[MediaType]
-  private val _defaultBindings = ListBuffer.empty[DataSource]
+  private val _defaultBindings = ListBuffer.empty[XDataSource]
 
   def this(port: String, primary: Boolean, sequence: Boolean) = {
     this(port)
@@ -19,7 +19,7 @@ class PortSignature(val port: String) {
     }
   }
 
-  def this(port: String, primary: Boolean, sequence: Boolean, bindings: List[DataSource]) = {
+  def this(port: String, primary: Boolean, sequence: Boolean, bindings: List[XDataSource]) = {
     this(port, primary, sequence)
     _defaultBindings ++= bindings
   }
@@ -42,5 +42,5 @@ class PortSignature(val port: String) {
     _contentTypes ++= types
   }
 
-  def defaultBindings: List[DataSource] = _defaultBindings.toList
+  def defaultBindings: List[XDataSource] = _defaultBindings.toList
 }

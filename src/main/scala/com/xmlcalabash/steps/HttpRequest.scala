@@ -7,7 +7,7 @@ import com.xmlcalabash.exceptions.XProcException
 import com.xmlcalabash.messages.XdmValueItemMessage
 import com.xmlcalabash.model.util.{ValueParser, XProcConstants}
 import com.xmlcalabash.runtime.{BinaryNode, NameValueBinding, StaticContext, XProcMetadata, XProcXPathExpression, XmlPortSpecification}
-import com.xmlcalabash.util.{InternetProtocolRequest, MediaType}
+import com.xmlcalabash.util.{InternetProtocolRequest, MediaType, MinimalStaticContext}
 import net.sf.saxon.s9api.{QName, XdmAtomicValue, XdmMap, XdmValue}
 
 import java.io.ByteArrayOutputStream
@@ -21,7 +21,7 @@ class HttpRequest() extends DefaultXmlStep {
   private val sources = ListBuffer.empty[Any]
   private val sourceMeta = ListBuffer.empty[XProcMetadata]
 
-  private var context: StaticContext = _
+  private var context: MinimalStaticContext = _
   private var href: URI = _
   private var method = ""
   private val headers = mutable.HashMap.empty[String,String]
@@ -133,7 +133,7 @@ class HttpRequest() extends DefaultXmlStep {
     }
   }
 
-  override def run(ctx: StaticContext): Unit = {
+  override def run(ctx: MinimalStaticContext): Unit = {
     super.run(ctx)
 
     context = ctx

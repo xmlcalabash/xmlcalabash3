@@ -4,11 +4,11 @@ import com.jafpl.messages.Message
 import com.jafpl.steps.DataConsumer
 import com.xmlcalabash.exceptions.XProcException
 import com.xmlcalabash.messages.XProcItemMessage
-import com.xmlcalabash.model.xml.DeclareOutput
+import com.xmlcalabash.model.xxml.XOutput
 
 import scala.collection.mutable.ListBuffer
 
-class BufferingConsumer(output: DeclareOutput) extends DataConsumer {
+class BufferingConsumer(output: XOutput) extends DataConsumer {
   private val _items = ListBuffer.empty[XProcItemMessage]
 
   def messages: List[XProcItemMessage] = _items.toList
