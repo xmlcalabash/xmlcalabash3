@@ -23,9 +23,10 @@ class Inline(override val config: XMLCalabash, srcNode: XdmNode, implied: Boolea
   private var _context_provided = false
   private val nameBindings = mutable.HashSet.empty[QName]
   private val _statics = mutable.HashMap.empty[String, Message]
+  private var _expandText = false
 
   if (srcNode.getNodeKind != XdmNodeKind.DOCUMENT) {
-    throw new RuntimeException("inline document must be a document")
+    throw XProcException.xiThisCantHappen(s"Attempt to create p:inline from something that isn't a document node: ${srcNode}")
   }
 
   def this(config: XMLCalabash, srcNode: XdmNode) = {
@@ -44,6 +45,7 @@ class Inline(override val config: XMLCalabash, srcNode: XdmNode, implied: Boolea
     nameBindings ++= copy.nameBindings
     _inScopeDynamics = copy._inScopeDynamics
     _inScopeStatics = copy._inScopeStatics
+    _expandText = copy._expandText
     staticContext = copy.staticContext
   }
 
@@ -107,9 +109,12 @@ class Inline(override val config: XMLCalabash, srcNode: XdmNode, implied: Boolea
       if (_contentType.isEmpty) {
         _contentType = Some(MediaType.XML)
       }
+
+      _expandText = inScopeExpandText(node)
     }
   }
 
+  def expandText: Boolean = _expandText
   def encoding: Option[String] = _encoding
 
   def excludeURIs: Set[String] = {

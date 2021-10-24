@@ -129,11 +129,10 @@ class InlineLoader() extends AbstractLoader {
       Set()
     }
     expander.msgBindings = msgBindings.toMap
-    expander.expandText = expandText
     expander.contextItem = contextItem
     expander.documentProperties = docProps
 
-    val req = expander.loadDocument()
+    val req = expander.loadDocument(expandText)
     val resp = config.documentManager.parse(req)
     if (resp.shadow.isDefined) {
       consumer.receive("result", resp.shadow.get, new XProcMetadata(resp.contentType, resp.props))
