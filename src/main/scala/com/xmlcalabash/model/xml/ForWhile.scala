@@ -106,10 +106,7 @@ class ForWhile(override val config: XMLCalabash) extends ForContainer(config) wi
     val start = parent.asInstanceOf[ContainerStart]
     val node = start.addWhile(tester, returnSet=="all", stepName, containerManifold)
     _graphNode = Some(node)
-
-    for (child <- children[Step]) {
-      child.graphNodes(runtime, node)
-    }
+    super.graphNodes(runtime, parent)
   }
 
   override def graphEdges(runtime: XMLCalabashRuntime, parent: Node): Unit = {

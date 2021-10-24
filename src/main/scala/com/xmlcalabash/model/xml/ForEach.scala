@@ -48,16 +48,7 @@ class ForEach(override val config: XMLCalabash) extends Container(config) with N
     val start = parent.asInstanceOf[ContainerStart]
     val node = start.addForEach(stepName, containerManifold)
     _graphNode = Some(node)
-
-    for (child <- allChildren) {
-      child match {
-        case _: Step =>
-          child.graphNodes(runtime, node)
-        case _: Variable =>
-          child.graphNodes(runtime, node)
-        case _ => ()
-      }
-    }
+    super.graphNodes(runtime, parent)
   }
 
   override def graphEdges(runtime: XMLCalabashRuntime, parent: Node): Unit = {

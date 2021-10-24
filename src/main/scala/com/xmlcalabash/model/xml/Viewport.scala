@@ -122,10 +122,7 @@ class Viewport(override val config: XMLCalabash) extends Container(config) with 
     val composer = new XMLViewportComposer(config, context, _match)
     val node = start.addViewport(composer, stepName, containerManifold)
     _graphNode = Some(node)
-
-    for (child <- children[Step]) {
-      child.graphNodes(runtime, node)
-    }
+    super.graphNodes(runtime, parent)
 
     // The binding links we created earlier now need to be patched so that this
     // is the node they go to.

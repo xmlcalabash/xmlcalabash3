@@ -178,10 +178,7 @@ class Choose(override val config: XMLCalabash) extends Container(config) {
     val start = parent.asInstanceOf[ContainerStart]
     val node = start.addChoose(stepName)
     _graphNode = Some(node)
-
-    for (child <- children[Step]) {
-      child.graphNodes(runtime, node)
-    }
+    super.graphNodes(runtime, parent)
   }
 
   override def graphEdges(runtime: XMLCalabashRuntime, parent: Node): Unit = {
