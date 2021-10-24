@@ -27,7 +27,6 @@ class XMLCalabashDebugOptions(config: XMLCalabash) {
   protected val logger: Logger = LoggerFactory.getLogger(this.getClass)
 
   private val _injectables = ListBuffer.empty[String]
-  private var _run = true
 
   private val dumped = mutable.HashMap.empty[DeclareStep, mutable.HashSet[String]]
   private val dumpCount = mutable.HashMap.empty[DeclareStep, mutable.HashMap[String, Long]]
@@ -52,10 +51,13 @@ class XMLCalabashDebugOptions(config: XMLCalabash) {
     }
   }
 
-  def run: Boolean = _run
-
-  def run_=(run: Boolean): Unit = {
-    _run = run
+  def run: Boolean = {
+    val envOpt = environmentOptions(XProcConstants.cc_run).headOption
+    if (envOpt.isDefined && envOpt.head.getBoolean.isDefined) {
+      envOpt.head.getBoolean.get
+    } else {
+      true
+    }
   }
 
   def stacktrace: Boolean = {
