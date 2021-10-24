@@ -160,6 +160,11 @@ class Container(override val config: XMLCalabash) extends Step(config) with Name
           if (option.select.isDefined && option.static) {
             option.staticValue = computeStatically(option.select.get)
           }
+        case variable: Variable =>
+          variable.makeBindingsExplicit()
+          if (variable.select.isDefined && variable.static) {
+            variable.staticValue = computeStatically(variable.select.get)
+          }
         case _: WithInput =>
           () // we did this above
         case _ =>

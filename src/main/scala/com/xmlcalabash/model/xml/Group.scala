@@ -45,9 +45,7 @@ class Group(override val config: XMLCalabash) extends Container(config) with Nam
       }
     }
 
-    for (child <- children[Step]) {
-      child.graphEdges(runtime, _graphNode.get)
-    }
+    graphChildEdges(runtime)
   }
 
   override def xdump(xml: ElaboratedPipeline): Unit = {

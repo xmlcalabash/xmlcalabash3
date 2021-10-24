@@ -67,15 +67,7 @@ class ForEach(override val config: XMLCalabash) extends Container(config) with N
       }
     }
 
-    for (child <- allChildren) {
-      child match {
-        case _: Step =>
-          child.graphEdges(runtime, _graphNode.get)
-        case _: Variable =>
-          child.graphEdges(runtime, _graphNode.get)
-        case _ => ()
-      }
-    }
+    graphChildEdges(runtime)
   }
 
   override def xdump(xml: ElaboratedPipeline): Unit = {

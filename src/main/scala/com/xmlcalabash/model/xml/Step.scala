@@ -111,4 +111,16 @@ class Step(override val config: XMLCalabash) extends Artifact(config) with Named
       }
     }
   }
+
+  def graphChildEdges(runtime: XMLCalabashRuntime): Unit = {
+    for (child <- allChildren) {
+      child match {
+        case _: Step =>
+          child.graphEdges(runtime, _graphNode.get)
+        case _: Variable =>
+          child.graphEdges(runtime, _graphNode.get)
+        case _ => ()
+      }
+    }
+  }
 }
