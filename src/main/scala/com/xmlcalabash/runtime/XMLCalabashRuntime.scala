@@ -76,7 +76,7 @@ class XMLCalabashRuntime protected[xmlcalabash] (val decl: DeclareStep) extends 
                 if (inline.documentProperties.isDefined) {
                   expander.documentProperties = inline.documentProperties.get
                 }
-                defaults += expander.loadDocument()
+                defaults += expander.loadDocument(inline.expandText)
               case doc: Document =>
                 defaults += doc.loadDocument()
               case _ =>

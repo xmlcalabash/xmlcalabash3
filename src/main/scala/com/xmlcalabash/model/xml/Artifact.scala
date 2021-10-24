@@ -278,6 +278,27 @@ class Artifact(val config: XMLCalabash) {
     }
   }
 
+  def inScopeExpandText(node: XdmNode): Boolean = {
+    if (node.getNodeKind == XdmNodeKind.ELEMENT) {
+      val attr = if (node.getNodeName.getNamespaceURI == XProcConstants.ns_p) {
+        XProcConstants._expand_text
+      } else {
+        XProcConstants.p_expand_text
+      }
+      val expand = Option(node.getAttributeValue(attr))
+      if (expand.isDefined) {
+        // FIXME: what about AVT? what about invalid values?
+        return expand.get == "true"
+      }
+    }
+
+    if (Option(node.getParent).isDefined) {
+      inScopeExpandText(node.getParent)
+    } else {
+      false
+    }
+  }
+
   protected[model] def parse(node: XdmNode): Unit = {
     _synthetic = false
     _tumbleId = tumbleId(node)

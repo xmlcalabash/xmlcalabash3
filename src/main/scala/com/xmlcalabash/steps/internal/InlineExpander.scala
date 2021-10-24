@@ -31,7 +31,6 @@ protected[xmlcalabash] class InlineExpander(val config: XMLCalabash, val node: X
   var encoding: Option[String] = None
   var excludeURIs: Set[String] = Set()
   var msgBindings: Map[String, XProcItemMessage] = Map()
-  var expandText: Boolean = true
   var contextItem: Option[XProcItemMessage] = None
 
   private var _documentProperties: Map[QName, XdmValue] = Map.empty[QName, XdmValue]
@@ -60,7 +59,7 @@ protected[xmlcalabash] class InlineExpander(val config: XMLCalabash, val node: X
     _documentProperties = Map.empty[QName, XdmValue] ++ props
   }
 
-  def loadDocument(): DocumentRequest = {
+  def loadDocument(expandText: Boolean): DocumentRequest = {
     if (encoding.isDefined) {
       if (contentType.xmlContentType || contentType.htmlContentType) {
         throw XProcException.xdCannotEncodeMarkup(encoding.get, contentType, exprContext.location)
