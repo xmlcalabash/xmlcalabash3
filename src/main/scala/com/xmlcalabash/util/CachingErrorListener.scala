@@ -121,6 +121,8 @@ class CachingErrorListener(errors: Errors) extends ErrorListener with ErrorHandl
   }
 
   override def report(xmlProcessingError: XmlProcessingError): Unit = {
-    println("wat?")
+    if (showErrors) {
+      println(xmlProcessingError)
+    }
   }
 }

@@ -26,7 +26,7 @@ class PrintingConsumer private(config: XMLCalabashRuntime, output: DeclareOutput
   }
 
   override def consume(port: String, message: Message): Unit = {
-    logger.debug(s"PrintingConsumer received message on ${port}")
+    logger.debug(s"Received message on ${port}")
     message match {
       case msg: XProcItemMessage =>
         // Check that the message content type is allowed on the output port
@@ -60,6 +60,7 @@ class PrintingConsumer private(config: XMLCalabashRuntime, output: DeclareOutput
               outstream.write(buf, 0, len)
               len = instream.read(buf, 0, buf.length)
             }
+            logger.debug(s"${outstream.toByteArray.length} byte message")
             pos.write(outstream.toByteArray)
           case msg: XdmValueItemMessage =>
             val stream = new ByteArrayOutputStream()
@@ -73,7 +74,12 @@ class PrintingConsumer private(config: XMLCalabashRuntime, output: DeclareOutput
             }
 
             S9Api.serialize(config.config, msg.item, serializer)
-            pos.print(stream.toString("UTF-8"))
+            val content = stream.toString("UTF-8")
+            logger.debug(s"Message: ${content}")
+            pos.print(content)
+            if (!content.endsWith("\n")) {
+              pos.println()
+            }
           case _ =>
             throw new RuntimeException(s"Don't know how to print ${msg.item}")
         }
