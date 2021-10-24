@@ -248,11 +248,12 @@ class DefaultDocumentManager(xmlCalabash: XMLCalabash) extends DocumentManager {
       parseOptions.setErrorReporter(listener)
       parseOptions.setLineNumbering(true)
 
-      val source = new AugmentedSource(new SAXSource(new InputSource(stream)), parseOptions)
-
+      val saxSource = new SAXSource(new InputSource(stream))
       if (request.href.isDefined) {
-        source.setSystemId(request.href.get.toASCIIString)
+        saxSource.setSystemId(request.href.get.toASCIIString)
       }
+
+      val source = new AugmentedSource(saxSource, parseOptions)
 
       var reader = source.getXMLReader
       if (reader == null) {
