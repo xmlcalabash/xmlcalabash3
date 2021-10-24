@@ -125,9 +125,7 @@ class ForWhile(override val config: XMLCalabash) extends ForContainer(config) wi
       }
     }
 
-    for (child <- children[Step]) {
-      child.graphEdges(runtime, _graphNode.get)
-    }
+    graphChildEdges(runtime)
   }
 
   override def xdump(xml: ElaboratedPipeline): Unit = {

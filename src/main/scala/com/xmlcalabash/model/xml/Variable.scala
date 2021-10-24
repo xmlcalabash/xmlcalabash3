@@ -17,11 +17,6 @@ class Variable(override val config: XMLCalabash) extends NameBinding(config) {
 
     val container = this.parent.get
     val cnode = container._graphNode.get.asInstanceOf[ContainerStart]
-    /*
-    if (cnode.parent.nonEmpty) {
-      throw new ModelException(ExceptionCode.INTERNAL, "Don't know what to do about opts here", location)
-    }
-     */
 
     val params = new XPathBindingParams(collection)
     val init = new XProcXPathExpression(staticContext, _select.getOrElse("()"), as, _allowedValues, params)

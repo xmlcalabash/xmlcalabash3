@@ -160,9 +160,7 @@ class Viewport(override val config: XMLCalabash) extends Container(config) with 
       }
     }
 
-    for (child <- children[Step]) {
-      child.graphEdges(runtime, _graphNode.get)
-    }
+    graphChildEdges(runtime)
   }
 
   override def xdump(xml: ElaboratedPipeline): Unit = {
