@@ -136,10 +136,7 @@ class ChooseBranch(override val config: XMLCalabash) extends Container(config) w
     val start = parent.asInstanceOf[ChooseStart]
     val node = start.addWhen(testExpr, stepName, containerManifold)
     _graphNode = Some(node)
-
-    for (child <- children[Step]) {
-      child.graphNodes(runtime, node)
-    }
+    super.graphNodes(runtime, parent)
   }
 
   override def graphEdges(runtime: XMLCalabashRuntime, parent: Node): Unit = {

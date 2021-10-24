@@ -168,143 +168,145 @@ class Container(override val config: XMLCalabash) extends Step(config) with Name
     }
 
     // Add ContentTypeCheckers and select filters if we need them
-    val innerEnv = lastStep.get.environment()
-    for (input <- children[DeclareInput]) {
-      if (input.select.isDefined) {
-        logger.debug(s"Adding select filter for container input ${stepName}/${input.port}: ${input.select.get}")
-        val context = staticContext.withStatics(inScopeStatics)
+    if (lastStep.isDefined) {
+      val innerEnv = lastStep.get.environment()
+      for (input <- children[DeclareInput]) {
+        if (input.select.isDefined) {
+          logger.debug(s"Adding select filter for container input ${stepName}/${input.port}: ${input.select.get}")
+          val context = staticContext.withStatics(inScopeStatics)
 
-        val ispec = if (input.sequence) {
-          XmlPortSpecification.ANYSOURCESEQ
-        } else {
-          XmlPortSpecification.ANYSOURCE
+          val ispec = if (input.sequence) {
+            XmlPortSpecification.ANYSOURCESEQ
+          } else {
+            XmlPortSpecification.ANYSOURCE
+          }
+
+          val params = new SelectFilterParams(context, input.select.get, input.port, ispec)
+          val filter = new AtomicStep(config, params)
+          filter.stepType = XProcConstants.cx_select_filter
+
+          addChild(filter)
+
+          val finput = new WithInput(config)
+          finput.port = "source"
+          finput.primary = true
+          filter.addChild(finput)
+
+          val foutput = new WithOutput(config)
+          foutput.port = "result"
+          foutput.primary = true
+          filter.addChild(foutput)
+
+          for (name <- staticContext.findVariableRefsInString(input.select.get)) {
+            var binding = _inScopeDynamics.get(name)
+            if (binding.isDefined) {
+              val npipe = new NamePipe(config, name, binding.get.tumble_id, binding.get)
+              filter.addChild(npipe)
+            } else {
+              binding = _inScopeStatics.get(name.getClarkName)
+              if (binding.isEmpty) {
+                throw new RuntimeException(s"Reference to variable not in scope: $name")
+              }
+            }
+          }
+
+          replumb(input, foutput)
+
+          val newpipe = new Pipe(config)
+          newpipe.step = stepName
+          newpipe.port = input.port
+          newpipe.link = input
+          finput.addChild(newpipe)
         }
 
-        val params = new SelectFilterParams(context, input.select.get, input.port, ispec)
-        val filter = new AtomicStep(config, params)
-        filter.stepType = XProcConstants.cx_select_filter
+        if (!MediaType.OCTET_STREAM.allowed(input.contentTypes)) {
+          logger.debug(s"Adding content-type-checker for container input ${stepName}/${input.port}")
+          val params = new ContentTypeCheckerParams(input.port, input.contentTypes, staticContext, None, inputPort = true, true)
+          val atomic = new AtomicStep(config, params)
+          atomic.stepType = XProcConstants.cx_content_type_checker
+          addChild(atomic)
 
-        addChild(filter)
+          val winput = new WithInput(config)
+          winput.port = "source"
+          atomic.addChild(winput)
 
-        val finput = new WithInput(config)
-        finput.port = "source"
-        finput.primary = true
-        filter.addChild(finput)
+          val woutput = new WithOutput(config)
+          woutput.port = "result"
+          atomic.addChild(woutput)
 
-        val foutput = new WithOutput(config)
-        foutput.port = "result"
-        foutput.primary = true
-        filter.addChild(foutput)
+          replumb(input, woutput)
 
-        for (name <- staticContext.findVariableRefsInString(input.select.get)) {
-          var binding = _inScopeDynamics.get(name)
-          if (binding.isDefined) {
-            val npipe = new NamePipe(config, name, binding.get.tumble_id, binding.get)
-            filter.addChild(npipe)
-          } else {
-            binding = _inScopeStatics.get(name.getClarkName)
-            if (binding.isEmpty) {
-              throw new RuntimeException(s"Reference to variable not in scope: $name")
-            }
+          val newpipe = new Pipe(config)
+          newpipe.step = stepName
+          newpipe.port = input.port
+          newpipe.link = input
+          winput.addChild(newpipe)
+        }
+      }
+
+      for (output <- children[DeclareOutput]) {
+        var check = false
+        //println(s"${stepName}, ${output.port}, ${output.contentTypes}")
+        for (binding <- output.children[Pipe]) {
+          val port = binding.port
+          val step = innerEnv.step(binding.step).get
+          val outputContentTypes = step match {
+            case atom: AtomicStep =>
+              val decl = atom.declaration(atom.stepType).get
+              decl.output(port, None).contentTypes
+            case cont: Container =>
+              if (cont._outputs.contains(port)) {
+                cont._outputs(port).contentTypes
+              } else {
+                // See if we can find a with-output for this port
+                var woutput = Option.empty[WithOutput]
+                for (wo <- cont.children[WithOutput]) {
+                  if (wo.port == port) {
+                    woutput = Some(wo)
+                  }
+                }
+                if (woutput.isEmpty) {
+                  // It must be implicit, so no checking is required
+                  List(MediaType.OCTET_STREAM)
+                } else {
+                  woutput.get.contentTypes
+                }
+              }
+          }
+
+          //println(s"   ${step} / ${outputContentTypes}")
+          for (pct <- outputContentTypes) {
+            check = check || !pct.allowed(output.contentTypes)
           }
         }
 
-        replumb(input, foutput)
+        if (check) {
+          logger.debug(s"Adding content-type-checker for container output ${stepName}/${output.port}")
+          val params = new ContentTypeCheckerParams(output.port, output.contentTypes, staticContext, None, inputPort = false, true)
+          val atomic = new AtomicStep(config, params)
+          atomic.stepType = XProcConstants.cx_content_type_checker
+          addChild(atomic)
 
-        val newpipe = new Pipe(config)
-        newpipe.step = stepName
-        newpipe.port = input.port
-        newpipe.link = input
-        finput.addChild(newpipe)
-      }
+          val winput = new WithInput(config)
+          winput.port = "source"
+          atomic.addChild(winput)
 
-      if (!MediaType.OCTET_STREAM.allowed(input.contentTypes)) {
-        logger.debug(s"Adding content-type-checker for container input ${stepName}/${input.port}")
-        val params = new ContentTypeCheckerParams(input.port, input.contentTypes, staticContext, None, inputPort = true, true)
-        val atomic = new AtomicStep(config, params)
-        atomic.stepType = XProcConstants.cx_content_type_checker
-        addChild(atomic)
+          val pipes = ListBuffer.empty[Pipe] ++ output.children[Pipe]
+          for (oldpipe <- pipes) {
+            output.removeChild(oldpipe)
+            winput.addChild(oldpipe)
+          }
 
-        val winput = new WithInput(config)
-        winput.port = "source"
-        atomic.addChild(winput)
+          val woutput = new WithOutput(config)
+          woutput.port = "result"
+          atomic.addChild(woutput)
 
-        val woutput = new WithOutput(config)
-        woutput.port = "result"
-        atomic.addChild(woutput)
-
-        replumb(input, woutput)
-
-        val newpipe = new Pipe(config)
-        newpipe.step = stepName
-        newpipe.port = input.port
-        newpipe.link = input
-        winput.addChild(newpipe)
-      }
-    }
-
-    for (output <- children[DeclareOutput]) {
-      var check = false
-      //println(s"${stepName}, ${output.port}, ${output.contentTypes}")
-      for (binding <- output.children[Pipe]) {
-        val port = binding.port
-        val step = innerEnv.step(binding.step).get
-        val outputContentTypes = step match {
-          case atom: AtomicStep =>
-            val decl = atom.declaration(atom.stepType).get
-            decl.output(port, None).contentTypes
-          case cont: Container =>
-            if (cont._outputs.contains(port)) {
-              cont._outputs(port).contentTypes
-            } else {
-              // See if we can find a with-output for this port
-              var woutput = Option.empty[WithOutput]
-              for (wo <- cont.children[WithOutput]) {
-                if (wo.port == port) {
-                  woutput = Some(wo)
-                }
-              }
-              if (woutput.isEmpty) {
-                // It must be implicit, so no checking is required
-                List(MediaType.OCTET_STREAM)
-              } else {
-                woutput.get.contentTypes
-              }
-            }
+          val newpipe = new Pipe(config)
+          newpipe.step = atomic.stepName
+          newpipe.port = "result"
+          newpipe.link = woutput
+          output.addChild(newpipe)
         }
-
-        //println(s"   ${step} / ${outputContentTypes}")
-        for (pct <- outputContentTypes) {
-          check = check || !pct.allowed(output.contentTypes)
-        }
-      }
-
-      if (check) {
-        logger.debug(s"Adding content-type-checker for container output ${stepName}/${output.port}")
-        val params = new ContentTypeCheckerParams(output.port, output.contentTypes, staticContext, None, inputPort = false, true)
-        val atomic = new AtomicStep(config, params)
-        atomic.stepType = XProcConstants.cx_content_type_checker
-        addChild(atomic)
-
-        val winput = new WithInput(config)
-        winput.port = "source"
-        atomic.addChild(winput)
-
-        val pipes = ListBuffer.empty[Pipe] ++ output.children[Pipe]
-        for (oldpipe <- pipes) {
-          output.removeChild(oldpipe)
-          winput.addChild(oldpipe)
-        }
-
-        val woutput = new WithOutput(config)
-        woutput.port = "result"
-        atomic.addChild(woutput)
-
-        val newpipe = new Pipe(config)
-        newpipe.step = atomic.stepName
-        newpipe.port = "result"
-        newpipe.link = woutput
-        output.addChild(newpipe)
       }
     }
   }

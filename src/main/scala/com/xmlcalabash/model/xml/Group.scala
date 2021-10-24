@@ -33,9 +33,7 @@ class Group(override val config: XMLCalabash) extends Container(config) with Nam
       _graphNode = Some(node)
     }
 
-    for (child <- children[Step]) {
-      child.graphNodes(runtime, _graphNode.get)
-    }
+    super.graphNodes(runtime, parNode)
   }
 
   override def graphEdges(runtime: XMLCalabashRuntime, parent: Node): Unit = {
