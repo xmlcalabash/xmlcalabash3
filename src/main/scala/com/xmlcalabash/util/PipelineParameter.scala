@@ -110,6 +110,7 @@ class PipelineEnvironmentOptionString(eqname: String, val value: String) extends
     }
   }
   override def getString: Option[String] = Some(value)
+  override def toString: String = s"config: ${eqname} = ${value}"
 }
 
 class PipelineEnvironmentOptionMap(eqname: String, var key: String, var value: String) extends PipelineEnvironmentOption(eqname) {
