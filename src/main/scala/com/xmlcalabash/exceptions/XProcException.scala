@@ -313,6 +313,8 @@ object XProcException {
   def xcMissingHmacKey(location: Option[Location]): XProcException = stepError((36,6), location)
   def xcValueNotFormUrlEncoded(value: String, location: Option[Location]): XProcException = stepError(37, value, location)
   def xcVersionNotAvailable(version: String, location: Option[Location]): XProcException = stepError(38, version, location)
+  def xcBadXslt10Input(length: Int, location: Option[Location]): XProcException = stepError((39,1), length, location)
+  def xcBadXslt10Input(contentType: MediaType, location: Option[Location]): XProcException = stepError((39,2), contentType, location)
 
   def xcCannotStore(href: URI, location: Option[Location]): XProcException = stepError(50, href, location)
   def xcNotSchemaValidNvdl(href: String, message: String, location: Option[Location]): XProcException = stepError(53, List(href, message), location)
@@ -348,6 +350,7 @@ object XProcException {
   def xcXQueryInvalidParameterType(name: QName, typename: String, location: Option[Location]): XProcException = stepError(102, List(name, typename), location)
   def xcXQueryCompileError(msg: String, location: Option[Location]): XProcException = stepError(103, msg, location)
   def xcXQueryEvalError(msg: String, location: Option[Location]): XProcException = stepError(104, msg, location)
+  def xcBadXslt10Parameter(name: QName, location: Option[Location]): XProcException = stepError(105, name, location)
   def xcRejectDuplicateKeys(key: String, location: Option[Location]): XProcException = stepError(106, key, location)
   def xcPrefixNotInScope(prefix: String, location: Option[Location]): XProcException = stepError(108, prefix, location)
   def xcNamespaceDeleteCollision(uri: String, location: Option[Location]): XProcException = stepError(109, uri, location)

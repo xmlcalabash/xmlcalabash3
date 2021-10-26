@@ -402,6 +402,12 @@ Value is not correctly x-www-form-urlencoded: “$1”.
 XC0038
 The requested version, “$1”, is not available.
 
+XC0039/1
+An XSLT 1.0 transformation must have exactly one document: $1 supplied.
+
+XC0039/2
+XSLT 1.0 can only transform XML or HTML, not $1.
+
 XC0050
 Cannot store at “$1”
 
@@ -461,6 +467,9 @@ Parameter “$1” has invalid type “$2” for an XQuery 3.0 query.
 
 XC0104
 Error evaluating query: $1
+
+XC0105
+Parameter “$1” cannot be passed to an XSLT 1.0 stylesheet.
 
 XC0113
 Attempt to delete non-empty directory without the recursive option: $1
@@ -680,6 +689,9 @@ The format of the -D value must be “name=value”.
 
 xi:XI0071
 $1
+
+xi:XI0073
+Inputs must be created with the same Processor that XML Calabash is using
 
 {http://xmlcalabash.com/ns/extensions}XI0999
 It must be time for breakfast at Milliways, something impossible has happened: $1

@@ -396,7 +396,7 @@ class XMLCalabash private(userProcessor: Option[Processor], val configurer: XPro
           bindings.put(name.getClarkName, msg)
         }
 
-        val expr = new XProcXPathExpression(context, v.exression)
+        val expr = new XProcXPathExpression(context, v.expression)
         val value = expressionEvaluator.value(expr, List(), bindings.toMap, None)
         value.item
       case v: PipelineXdmValueOption =>

@@ -1,10 +1,11 @@
 package com.xmlcalabash.steps
 
 import com.jafpl.steps.PortCardinality
+import com.xmlcalabash.config.DocumentRequest
 import com.xmlcalabash.exceptions.XProcException
 import com.xmlcalabash.model.util.{SaxonTreeBuilder, ValueParser, XProcConstants}
 import com.xmlcalabash.runtime.{BinaryNode, StaticContext, XProcMetadata, XmlPortSpecification}
-import com.xmlcalabash.util.{S9Api, ValueUtils, XProcCollectionFinder}
+import com.xmlcalabash.util.{MediaType, PipelineEnvironmentOptionString, S9Api, URIUtils, Urify, ValueUtils, XProcCollectionFinder, Xslt10ClassLoader, Xslt10Source}
 import net.sf.saxon.Configuration
 import net.sf.saxon.event.{PipelineConfiguration, Receiver}
 import net.sf.saxon.expr.XPathContext
@@ -16,7 +17,9 @@ import net.sf.saxon.serialize.SerializationProperties
 import net.sf.saxon.trans.XPathException
 import net.sf.saxon.tree.wrapper.RebasedDocument
 
-import java.net.URI
+import java.io.{ByteArrayInputStream, ByteArrayOutputStream, OutputStream, StringReader}
+import java.net.{URI, URL}
+import javax.xml.transform.stream.StreamSource
 import javax.xml.transform.{ErrorListener, SourceLocator, TransformerException}
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
@@ -29,7 +32,7 @@ class Xslt extends DefaultXmlStep {
   private val _template_name = new QName("", "template-name")
   private val _output_base_uri = new QName("", "output-base-uri")
 
-  private var stylesheet = Option.empty[XdmNode]
+  private var stylesheet: XdmNode = _
   private val inputSequence = ListBuffer.empty[XdmItem]
   private val inputMetadata = ListBuffer.empty[XProcMetadata]
 
@@ -74,7 +77,7 @@ class Xslt extends DefaultXmlStep {
             throw XProcException.xiThisCantHappen(s"Unexpected node type on XSLT input: ${item}", location);
         }
       case "stylesheet" =>
-        stylesheet = Some(item.asInstanceOf[XdmNode])
+        stylesheet = item.asInstanceOf[XdmNode]
       case _ => ()
     }
   }
@@ -106,8 +109,8 @@ class Xslt extends DefaultXmlStep {
     version = optionalStringBinding(XProcConstants._version)
     populateDefaultCollection = booleanBinding(XProcConstants._populate_default_collection).getOrElse(populateDefaultCollection)
 
-    if (version.isEmpty && stylesheet.isDefined) {
-      val root = S9Api.documentElement(stylesheet.get)
+    if (version.isEmpty) {
+      val root = S9Api.documentElement(stylesheet)
       version = Option(root.get.getAttributeValue(XProcConstants._version))
     }
 
@@ -118,7 +121,7 @@ class Xslt extends DefaultXmlStep {
     version.get match {
       case "3.0" => xslt30()
       case "2.0" => xslt20()
-      case "1.0" => throw XProcException.xcVersionNotAvailable(version.get, location)
+      case "1.0" => xslt10()
       case _ => throw XProcException.xcVersionNotAvailable(version.get, location)
     }
   }
@@ -170,7 +173,7 @@ class Xslt extends DefaultXmlStep {
     compiler.setSchemaAware(processor.isSchemaAware)
 
     val exec = try {
-      compiler.compile(stylesheet.get.asSource())
+      compiler.compile(stylesheet.asSource())
     } catch {
       case sae: Exception =>
         // Compile time exceptions are caught
@@ -276,9 +279,7 @@ class Xslt extends DefaultXmlStep {
           transformer.setBaseOutputURI(base.toASCIIString)
         }
       } else {
-        if (stylesheet.isDefined && stylesheet.get.isInstanceOf[XdmNode]) {
-          transformer.setBaseOutputURI(stylesheet.get.getBaseURI.toASCIIString)
-        }
+        transformer.setBaseOutputURI(stylesheet.getBaseURI.toASCIIString)
       }
     }
 
@@ -380,6 +381,84 @@ class Xslt extends DefaultXmlStep {
         consume(rebuild.result, "secondary", prop.toMap, serprops)
       case _ =>
         consume(item, "secondary", prop.toMap, serprops)
+    }
+  }
+
+  private def xslt10(): Unit = {
+    if (inputSequence.length != 1) {
+      throw XProcException.xcBadXslt10Input(inputSequence.length, location)
+    }
+    if (!inputMetadata.head.contentType.markupContentType) {
+      throw XProcException.xcBadXslt10Input(inputMetadata.head.contentType, location)
+    }
+
+    val cp = config.config.parameters collect { case p: PipelineEnvironmentOptionString => p } filter {
+      _.eqname == XProcConstants.cc_xslt10_classpath.getEQName
+    }
+
+    val classpath = ListBuffer.empty[URL]
+    if (cp.nonEmpty) {
+      for (path <- cp) {
+        try {
+          val url = Urify.urify(path.value)
+          classpath += new URL(url)
+        } catch {
+          case _: Exception =>
+            logger.debug(s"Failed to add ${path.value} to classpath for XSLT 1.0")
+        }
+      }
+    }
+
+    if (classpath.isEmpty) {
+      throw XProcException.xcVersionNotAvailable(version.get, location)
+    }
+
+    val docSource = new Xslt10Source(inputSequence.head.toString, inputMetadata.head.baseURI.getOrElse(staticContext.baseURI.orNull))
+    val xslSource = new Xslt10Source(stylesheet.toString, stylesheet.getBaseURI)
+    val result = new ByteArrayOutputStream()
+
+    val params = mutable.HashMap.empty[String, String]
+    for ((qname, value) <- parameters) {
+      value match {
+        case atomic: XdmAtomicValue =>
+          params.put(qname.getClarkName, atomic.getStringValue)
+        case node: XdmNode =>
+          params.put(qname.getClarkName, node.getStringValue)
+        case _ =>
+          throw XProcException.xcBadXslt10Parameter(qname, location)
+      }
+    }
+
+    try {
+      val loader = new Xslt10ClassLoader(classpath.toArray)
+      val klass = loader.loadClass("com.xmlcalabash.steps.Xslt10")
+      val xslt10 = klass.getDeclaredConstructor(classOf[ClassLoader]).newInstance(loader)
+      val transform = klass.getMethod("transform",
+        classOf[Xslt10Source], classOf[Xslt10Source], classOf[OutputStream], classOf[Map[String,String]])
+
+      transform.invoke(xslt10, docSource, xslSource, result, params.toMap)
+
+      var outputURI = stylesheet.getBaseURI
+      if (outputBaseURI.isDefined) {
+        if (staticContext.baseURI.isDefined) {
+          outputURI = staticContext.baseURI.get.resolve(outputBaseURI.get)
+        } else {
+          outputURI = new URI(Urify.urify(outputBaseURI.get))
+        }
+      }
+
+      val req = new DocumentRequest(outputURI, MediaType.XML)
+      val resp = config.documentManager.parse(req, new ByteArrayInputStream(result.toByteArray))
+      consume(resp.value, "result", resp.props)
+    } catch {
+      case ex: XProcException =>
+        throw ex
+      case ex: Exception =>
+        val cause = ex.getCause
+        if (Option(cause).isDefined) {
+          throw cause
+        }
+        throw XProcException.xdStepFailed(Option(ex.getMessage).getOrElse("[no message]"), location)
     }
   }
 
