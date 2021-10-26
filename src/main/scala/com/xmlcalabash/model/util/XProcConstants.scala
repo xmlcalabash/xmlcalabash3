@@ -127,6 +127,7 @@ object XProcConstants {
   val cc_uri_resolver = new QName("cc", ns_cc, "uri-resolver")
   val cc_verbose = new QName("cc", ns_cc, "verbose")
   val cc_xmlcalabash = new QName("cc", ns_cc, "xmlcalabash")
+  val cc_xslt10_classpath = new QName("cc", ns_cc, "xslt10-classpath")
 
   // The XML Schema type names must be defined somewhere in Saxon but...
   val xs_ENTITY = new QName("xs", ns_xs, "ENTITY")

@@ -4,7 +4,7 @@ import com.jafpl.messages.Message
 import com.xmlcalabash.XMLCalabash
 import com.xmlcalabash.exceptions.TestException
 import com.xmlcalabash.messages.XdmNodeItemMessage
-import com.xmlcalabash.model.util.{SaxonTreeBuilder, ValueParser}
+import com.xmlcalabash.model.util.{SaxonTreeBuilder, ValueParser, XProcConstants}
 import com.xmlcalabash.model.xml.XMLContext
 import com.xmlcalabash.runtime.{SaxonExpressionEvaluator, StaticContext, XProcLocation, XProcMetadata, XProcXPathExpression}
 import com.xmlcalabash.util.{MediaType, S9Api, TypeUtils, URIUtils, Urify}
@@ -555,6 +555,8 @@ class TestRunner(processor: Processor, online: Boolean, regex: Option[String], t
       }
     }
 
+    val xmlcalabash = XMLCalabash.newInstance(processor)
+
     var urifyFeature = Option.empty[String]
     val features = node.getAttributeValue(_features)
     if (features != null) {
@@ -565,10 +567,7 @@ class TestRunner(processor: Processor, online: Boolean, regex: Option[String], t
         return result
       }
       if (features.contains("xslt-1")) {
-        val result = new TestResult(true) // skipped counts as a pass...
-        result.baseURI = node.getBaseURI
-        result.skipped = "XSLT 1.0 is not supported"
-        return result
+        xmlcalabash.args.config(XProcConstants.cc_xslt10_classpath, Urify.urify("src/test/resources/saxon-6.5.5.jar"))
       }
       if (features.contains("xquery_1_0")) {
         val result = new TestResult(true) // skipped counts as a pass...
@@ -692,7 +691,6 @@ class TestRunner(processor: Processor, online: Boolean, regex: Option[String], t
       throw new TestException("No pipeline for test")
     }
 
-    val xmlcalabash = XMLCalabash.newInstance(processor)
     xmlcalabash.configure()
     context = new StaticContext(xmlcalabash)
 
