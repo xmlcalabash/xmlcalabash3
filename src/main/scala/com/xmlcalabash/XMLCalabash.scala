@@ -276,7 +276,7 @@ class XMLCalabash private(userProcessor: Option[Processor], val configurer: XPro
     // Build the options before compiling in case some of them are statics...
     _options.clear()
     val nsmap = mutable.HashMap.empty[String,String]
-    for (param <- args.parameters) {
+    for (param <- parameters) {
       param match {
         case ns: PipelineNamespace =>
           nsmap.put(ns.prefix, ns.namespace)
@@ -355,7 +355,7 @@ class XMLCalabash private(userProcessor: Option[Processor], val configurer: XPro
 
     val nsmap = mutable.HashMap.empty[String,String]
 
-    for (param <- args.parameters) {
+    for (param <- parameters) {
       param match {
         case ns: PipelineNamespace =>
           nsmap.put(ns.prefix, ns.namespace)
@@ -387,7 +387,7 @@ class XMLCalabash private(userProcessor: Option[Processor], val configurer: XPro
     // To deal with outputs, we have to collate multiple outputs to the same port together.
     // But we also have to check that there's at most one explicit DataConsumer.
     val outputMap = mutable.HashMap.empty[String, ListBuffer[PipelineOutputDocument]]
-    for (opt <- args.parameters collect { case p: PipelineOutputDocument => p }) {
+    for (opt <- parameters collect { case p: PipelineOutputDocument => p }) {
       if (!(outputMap.contains(opt.port))) {
         outputMap.put(opt.port, ListBuffer.empty[PipelineOutputDocument])
       }

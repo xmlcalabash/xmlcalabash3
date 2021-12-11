@@ -2,7 +2,7 @@ import java.io.{BufferedReader, InputStreamReader}
 
 enablePlugins(JavaAppPackaging)
 
-lazy val xmlCalabashVersion = "2.99.10"
+lazy val xmlCalabashVersion = "2.99.11"
 lazy val jafplVersion = "0.3.83"
 lazy val saxonVersion = "10.6"
 lazy val useSaxonEE = Option(System.getProperty("saxonEdition")).getOrElse("HE") == "EE"
