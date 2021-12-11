@@ -31,7 +31,6 @@ class TestRunner(processor: Processor, online: Boolean, regex: Option[String], t
   private val _property = new QName("", "property")
   private val _value = new QName("", "value")
   private val _testcase = new QName("", "testcase")
-  private val _classname = new QName("", "classname")
   private val _time = new QName("", "time")
   private val _errors = new QName("", "errors")
   private val _timestamp = new QName("", "timestamp")
@@ -206,7 +205,6 @@ class TestRunner(processor: Processor, online: Boolean, regex: Option[String], t
 
           var amap: AttributeMap = EmptyAttributeMap.getInstance()
           amap = amap.put(TypeUtils.attributeInfo(_name, name))
-          amap = amap.put(TypeUtils.attributeInfo(_classname, this.getClass.getName))
           amap = amap.put(TypeUtils.attributeInfo(_time, ((end_ms - start_ms) / 1000.0).toString))
           junit.addStartElement(_testcase, amap)
 
@@ -267,6 +265,7 @@ class TestRunner(processor: Processor, online: Boolean, regex: Option[String], t
       junit.addEndElement()
 
       junit.addEndElement()
+      junit.addText("\n")
     }
 
     junit.endDocument()
