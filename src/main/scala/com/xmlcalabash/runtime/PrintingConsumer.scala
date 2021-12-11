@@ -7,26 +7,26 @@ import com.xmlcalabash.XMLCalabash
 import com.xmlcalabash.exceptions.XProcException
 import com.xmlcalabash.messages.{AnyItemMessage, XProcItemMessage, XdmValueItemMessage}
 import com.xmlcalabash.model.util.UniqueId
-import com.xmlcalabash.model.xml.DeclareOutput
+import com.xmlcalabash.model.xxml.XOutput
 import com.xmlcalabash.util.S9Api
 import net.sf.saxon.s9api.{QName, Serializer}
 import org.slf4j.{Logger, LoggerFactory}
 
-class PrintingConsumer private(config: XMLCalabashRuntime, output: DeclareOutput, outputs: Option[List[String]]) extends DataConsumer {
+class PrintingConsumer private(config: XMLCalabashRuntime, output: XOutput, outputs: Option[List[String]]) extends DataConsumer {
   protected val logger: Logger = LoggerFactory.getLogger(this.getClass)
   private val _id = UniqueId.nextId.toString
   private var index = 0
 
-  def this(config: XMLCalabashRuntime, output: DeclareOutput) = {
+  def this(config: XMLCalabashRuntime, output: XOutput) = {
     this(config, output, None)
   }
 
-  def this(config: XMLCalabashRuntime, output: DeclareOutput, outputs: List[String]) = {
+  def this(config: XMLCalabashRuntime, output: XOutput, outputs: List[String]) = {
     this(config, output, Some(outputs))
   }
 
   override def consume(port: String, message: Message): Unit = {
-    logger.debug(s"Received message on ${port}")
+    logger.debug(s"PrintingConsumer received message on ${port}")
     message match {
       case msg: XProcItemMessage =>
         // Check that the message content type is allowed on the output port
@@ -60,7 +60,7 @@ class PrintingConsumer private(config: XMLCalabashRuntime, output: DeclareOutput
               outstream.write(buf, 0, len)
               len = instream.read(buf, 0, buf.length)
             }
-            logger.debug(s"${outstream.toByteArray.length} byte message")
+            //logger.debug(s"${outstream.toByteArray.length} byte message")
             pos.write(outstream.toByteArray)
           case msg: XdmValueItemMessage =>
             val stream = new ByteArrayOutputStream()
@@ -75,7 +75,7 @@ class PrintingConsumer private(config: XMLCalabashRuntime, output: DeclareOutput
 
             S9Api.serialize(config.config, msg.item, serializer)
             val content = stream.toString("UTF-8")
-            logger.debug(s"Message: ${content}")
+            //logger.debug(s"Message: ${content}")
             pos.print(content)
             if (!content.endsWith("\n")) {
               pos.println()

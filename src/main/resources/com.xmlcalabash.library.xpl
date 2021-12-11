@@ -3,10 +3,6 @@
            xmlns:xs="http://www.w3.org/2001/XMLSchema"
            version="3.0">
 
-<p:function name="p:system-property"/>
-<p:function name="p:document-properties"/>
-<p:function name="cx:cwd"/>
-
 <p:declare-step type="p:add-attribute">
   <p:input port="source" content-types="application/xml"/>
   <p:output port="result" content-types="application/xml"/>
@@ -152,7 +148,7 @@
   <p:option name="value" required="true" as="xs:string"/>
   <p:option name="algorithm" required="true" as="xs:QName"/>
   <p:option name="match" as="xs:string" select="'/*/node()'" cx:as="XSLTSelectionPattern"/>
-  <p:option name="version" as="xs:string"/>
+  <p:option name="version" as="xs:string?"/>
 </p:declare-step>
 
 <p:declare-step type="p:http-request">
@@ -178,7 +174,7 @@
 <p:input port="insertion" sequence="true" content-types="application/xml text/* */*+xml"/>
 <p:output port="result" content-types="application/xml"/>
 <p:option name="match" select="'/*'" as="xs:string" cx:as="XSLTSelectionPattern"/>
-<p:option name="position" as="xs:token"
+<p:option name="position"
           values="('first-child','last-child','before','after')" select="'after'"/>
 </p:declare-step>
 
@@ -191,7 +187,7 @@
 <p:declare-step type="p:json-merge">
   <p:input port="source" sequence="true" content-types="any"/>
   <p:output port="result" content-types="application/json"/>
-  <p:option name="duplicates" as="xs:token"
+  <p:option name="duplicates"
             values="('reject', 'use-first', 'use-last', 'use-any', 'combine')" select="'use-first'"/>
   <p:option name="key" as="xs:string" select="'concat(''_'',$p:index)'"/><!-- XPathExpression -->
 </p:declare-step>
@@ -209,7 +205,7 @@
   <p:output port="result" sequence="true" content-types="*/*"/>
   <p:option name="href" required="true" as="xs:anyURI"/>
   <p:option name="parameters" as="map(xs:QName,item()*)?"/>
-  <p:option name="content-type" as="xs:string"/>
+  <p:option name="content-type" as="xs:string?"/>
   <p:option name="document-properties" as="map(xs:QName,item()*)?"/>
 </p:declare-step>
 
@@ -222,9 +218,9 @@
 <p:declare-step type="p:namespace-rename">
   <p:input port="source" content-types="xml html"/>
   <p:output port="result" content-types="xml html"/>
-  <p:option name="from" as="xs:anyURI"/>
-  <p:option name="to" as="xs:anyURI"/>
-  <p:option name="apply-to" as="xs:token" select="'all'"
+  <p:option name="from" as="xs:anyURI?"/>
+  <p:option name="to" as="xs:anyURI?"/>
+  <p:option name="apply-to" select="'all'"
             values="('all','elements','attributes')"/>
 </p:declare-step>
 
@@ -328,9 +324,9 @@
 <p:declare-step type="p:text-join">
   <p:input port="source" sequence="true" content-types="text"/>
   <p:output port="result" sequence="false" content-types="text"/>
-  <p:option name="separator" required="false" as="xs:string"/>
-  <p:option name="prefix" required="false" as="xs:string"/>
-  <p:option name="suffix" required="false" as="xs:string"/>
+  <p:option name="separator" required="false" as="xs:string?"/>
+  <p:option name="prefix" required="false" as="xs:string?"/>
+  <p:option name="suffix" required="false" as="xs:string?"/>
   <p:option name="override-content-type" required="false" as="xs:string?"/>
 </p:declare-step>
 
@@ -339,7 +335,7 @@
   <p:output port="result" primary="true" sequence="false" content-types="text"/>
   <p:option name="pattern" required="true" as="xs:string"/>
   <p:option name="replacement" required="true" as="xs:string"/>
-  <p:option name="flags" required="false" as="xs:string"/>
+  <p:option name="flags" required="false" as="xs:string?"/>
 </p:declare-step>
 
 <p:declare-step type="p:text-sort">
@@ -429,8 +425,8 @@
   <p:option name="use-location-hints" select="false()" as="xs:boolean"/>
   <p:option name="try-namespaces" select="false()" as="xs:boolean"/>
   <p:option name="assert-valid" select="true()" as="xs:boolean"/>
-  <p:option name="mode" select="'strict'" as="xs:token" cx:as="strict|lax"/>
-  <p:option name="version" as="xs:string"/>
+  <p:option name="mode" select="'strict'" values="('strict', 'lax')"/>
+  <p:option name="version" as="xs:string?"/>
 </p:declare-step>
 
 <p:declare-step type="p:wrap">
@@ -445,7 +441,7 @@
   <p:input port="source" content-types="application/xml */*+xml text/*" sequence="true"/>
   <p:output port="result" sequence="true" content-types="application/xml"/>
   <p:option name="wrapper" required="true" as="xs:QName"/>
-  <p:option name="group-adjacent" as="xs:string" cx:as="XPathExpression"/>
+  <p:option name="group-adjacent" as="xs:string?" cx:as="XPathExpression"/>
 </p:declare-step>
 
 <p:declare-step type="p:www-form-urldecode">
@@ -455,7 +451,7 @@
 
 <p:declare-step type="p:www-form-urlencode">
   <p:output port="result" content-types="text/plain"/>
-  <p:option name="parameters" required="true" as="map(xs:string,xs:untypedAtomic+)"/>
+  <p:option name="parameters" required="true" as="map(xs:string,xs:anyAtomicType+)"/>
 </p:declare-step>
 
 <p:declare-step type="p:xinclude">
@@ -536,16 +532,29 @@
 </p:declare-step>
 
 <p:declare-step type="cx:document-loader">
+  <p:output port="result" sequence="true"/>
+</p:declare-step>
+
+<p:declare-step type="cx:document-loader-vt">
   <p:input port="source" sequence="true"/>
   <p:output port="result" sequence="true"/>
 </p:declare-step>
 
 <p:declare-step type="cx:inline-loader">
+  <p:output port="result" sequence="true"/>
+</p:declare-step>
+
+<p:declare-step type="cx:inline-loader-vt">
   <p:input port="source" sequence="true"/>
   <p:output port="result" sequence="true"/>
 </p:declare-step>
 
 <p:declare-step type="cx:empty-loader">
+  <p:output port="result" sequence="true"/>
+</p:declare-step>
+
+<p:declare-step type="cx:value-computation">
+  <p:input port="source" sequence="true"/>
   <p:output port="result" sequence="true"/>
 </p:declare-step>
 

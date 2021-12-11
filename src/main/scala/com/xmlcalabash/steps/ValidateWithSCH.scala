@@ -7,7 +7,7 @@ import com.jafpl.steps.PortCardinality
 import com.xmlcalabash.exceptions.XProcException
 import com.xmlcalabash.model.util.XProcConstants
 import com.xmlcalabash.runtime.{StaticContext, XProcLocation, XProcMetadata, XmlPortSpecification}
-import com.xmlcalabash.util.{MediaType, S9Api, SchematronImpl}
+import com.xmlcalabash.util.{MediaType, MinimalStaticContext, S9Api, SchematronImpl}
 
 import javax.xml.transform.sax.SAXSource
 import javax.xml.transform.{Source, URIResolver}
@@ -54,7 +54,7 @@ class ValidateWithSCH() extends DefaultXmlStep {
     }
   }
 
-  override def run(context: StaticContext): Unit = {
+  override def run(context: MinimalStaticContext): Unit = {
     super.run(context)
 
     assert_valid = booleanBinding(XProcConstants._assert_valid).getOrElse(assert_valid)

@@ -1,13 +1,13 @@
 package com.xmlcalabash.runtime
 
-import java.net.URI
 import com.jafpl.graph.{Location, LoopStart}
 import com.jafpl.messages.Message
-import com.xmlcalabash.model.xml.{Artifact, ForEach, ForLoop, ForUntil}
+import com.xmlcalabash.model.xxml.{XArtifact, XStep}
 import net.sf.saxon.om.Item
 import net.sf.saxon.s9api.{QName, XdmNode, XdmValue}
 import net.sf.saxon.value.StringValue
 
+import java.net.URI
 import scala.collection.mutable
 import scala.util.DynamicVariable
 
@@ -18,7 +18,7 @@ object DynamicContext {
 }
 
 class DynamicContext() {
-  private var _artifact = Option.empty[Artifact]
+  private var _artifact = Option.empty[XArtifact]
   private var _iterationPosition = 1L
   private var _iterationSize = 1L
   private val _documents = mutable.HashMap.empty[Any,Message]
@@ -31,27 +31,33 @@ class DynamicContext() {
   private var _injId = Option.empty[String]
   private var _injType = Option.empty[QName]
 
-  def this(artifact: Option[Artifact]) = {
+  def this(artifact: XArtifact) = {
     this()
+    _artifact = Some(artifact)
+  }
 
-    _artifact = artifact
+  def this(runtime: XMLCalabashRuntime, artifact: XArtifact) = {
+    this(artifact)
+
     var found = false
-    var p: Option[Artifact] = artifact
+    var p: Option[XArtifact] = Some(artifact)
     while (!found && p.isDefined) {
-      if (p.get.graphNode.isDefined) {
-        p.get.graphNode.get match {
-          case node: LoopStart =>
-            found = true
-            _iterationPosition = node.iterationPosition
-            _iterationSize = node.iterationSize
-          case _ => ()
-        }
+      p.get match {
+        case step: XStep =>
+          runtime.node(step) match {
+            case node: LoopStart =>
+              found = true
+              _iterationPosition = node.iterationPosition
+              _iterationSize = node.iterationSize
+            case _ => ()
+          }
+        case _ => ()
       }
       p = p.get.parent
     }
   }
 
-  def artifact: Option[Artifact] = _artifact
+  def artifact: Option[XArtifact] = _artifact
 
   def iterationPosition: Long = _iterationPosition
   def iterationSize: Long = _iterationSize

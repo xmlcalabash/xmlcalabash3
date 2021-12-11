@@ -3,7 +3,7 @@ package com.xmlcalabash.steps.text
 import com.xmlcalabash.exceptions.XProcException
 import com.xmlcalabash.model.util.XProcConstants
 import com.xmlcalabash.runtime.{NameValueBinding, StaticContext, XProcMetadata, XmlPortSpecification}
-import com.xmlcalabash.util.MediaType
+import com.xmlcalabash.util.{MediaType, MinimalStaticContext}
 import com.xmlcalabash.util.xc.XsltStylesheet
 
 import javax.xml.transform.{ErrorListener, TransformerException}
@@ -31,14 +31,14 @@ class Sort() extends TextLines {
   override def receiveBinding(variable: NameValueBinding): Unit = {
     super.receiveBinding(variable)
     if (variable.name == _sort_key) {
-      keyNamespaceBindings = variable.context.nsBindings
+      keyNamespaceBindings = variable.context.inscopeNamespaces
     }
   }
 
-  override def run(context: StaticContext): Unit = {
+  override def run(context: MinimalStaticContext): Unit = {
     super.run(context)
 
-    val xslbuilder = new XsltStylesheet(config, context.nsBindings, List(), "2.0")
+    val xslbuilder = new XsltStylesheet(config, context.inscopeNamespaces, List(), "2.0")
 
     xslbuilder.startVariable("lines", "element()*")
     for (line <- lines) {

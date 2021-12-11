@@ -4,7 +4,7 @@ import com.xmlcalabash.exceptions.XProcException
 import com.xmlcalabash.model.util.{SaxonTreeBuilder, XProcConstants}
 import com.xmlcalabash.runtime.{StaticContext, XProcMetadata, XmlPortSpecification}
 import com.xmlcalabash.util.stores.{DataInfo, DataReader, DataWriter}
-import com.xmlcalabash.util.{InternetProtocolRequest, MediaType}
+import com.xmlcalabash.util.{InternetProtocolRequest, MediaType, MinimalStaticContext}
 import net.sf.saxon.s9api.{QName, XdmAtomicValue}
 
 import java.io.{InputStream, OutputStream}
@@ -23,7 +23,7 @@ class FileCopy() extends FileStep {
   private var copyLinks = false
   private var copyAttributes = false
 
-  private var staticContext: StaticContext = _
+  private var staticContext: MinimalStaticContext = _
   private var href: URI = _
   private var target: URI = _
   private var exception = Option.empty[Exception]
@@ -33,7 +33,7 @@ class FileCopy() extends FileStep {
 
   override def outputSpec: XmlPortSpecification = XmlPortSpecification.XMLRESULT
 
-  override def run(context: StaticContext): Unit = {
+  override def run(context: MinimalStaticContext): Unit = {
     super.run(context)
 
     staticContext = context

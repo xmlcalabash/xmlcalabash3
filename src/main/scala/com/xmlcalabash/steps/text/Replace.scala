@@ -5,6 +5,7 @@ import com.xmlcalabash.exceptions.XProcException
 import com.xmlcalabash.messages.XdmNodeItemMessage
 import com.xmlcalabash.runtime.{StaticContext, XProcMetadata, XProcXPathExpression, XmlPortSpecification}
 import com.xmlcalabash.steps.DefaultXmlStep
+import com.xmlcalabash.util.MinimalStaticContext
 import net.sf.saxon.s9api.{QName, XdmNode}
 
 class Replace() extends DefaultXmlStep {
@@ -26,7 +27,7 @@ class Replace() extends DefaultXmlStep {
     meta = metadata
   }
 
-  override def run(context: StaticContext): Unit = {
+  override def run(context: MinimalStaticContext): Unit = {
     super.run(context)
 
     val pattern = stringBinding(_pattern).replace("'", "''")

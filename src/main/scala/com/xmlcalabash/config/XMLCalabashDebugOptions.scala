@@ -1,18 +1,18 @@
 package com.xmlcalabash.config
 
-import java.io.{ByteArrayInputStream, ByteArrayOutputStream, File, FileOutputStream, PrintStream, PrintWriter}
 import com.jafpl.graph.Graph
 import com.xmlcalabash.XMLCalabash
 import com.xmlcalabash.config.XMLCalabashDebugOptions.{GRAPH, OPENGRAPH, PIPELINE, TREE}
-import com.xmlcalabash.model.xml.DeclareStep
 import com.xmlcalabash.model.util.XProcConstants
+import com.xmlcalabash.model.xxml.XDeclareStep
 import com.xmlcalabash.util.PipelineEnvironmentOption
-
-import javax.xml.transform.sax.SAXSource
 import net.sf.saxon.s9api.{QName, XdmDestination, XdmNode}
 import org.slf4j.{Logger, LoggerFactory}
 import org.xml.sax.InputSource
 
+import java.io.{ByteArrayInputStream, ByteArrayOutputStream, File, FileOutputStream, PrintWriter}
+import java.nio.charset.StandardCharsets
+import javax.xml.transform.sax.SAXSource
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 
@@ -28,8 +28,8 @@ class XMLCalabashDebugOptions(config: XMLCalabash) {
 
   private val _injectables = ListBuffer.empty[String]
 
-  private val dumped = mutable.HashMap.empty[DeclareStep, mutable.HashSet[String]]
-  private val dumpCount = mutable.HashMap.empty[DeclareStep, mutable.HashMap[String, Long]]
+  private val dumped = mutable.HashMap.empty[XDeclareStep, mutable.HashSet[String]]
+  private val dumpCount = mutable.HashMap.empty[XDeclareStep, mutable.HashMap[String, Long]]
 
   def injectables: List[String] = _injectables.toList
 
@@ -43,12 +43,18 @@ class XMLCalabashDebugOptions(config: XMLCalabash) {
   }
 
   def graphviz_dot: Option[String] = {
-    val envOpt = environmentOptions(XProcConstants.cc_graphviz).headOption
-    if (envOpt.isDefined && envOpt.head.getString.isDefined) {
-      envOpt.head.getString
-    } else {
-      None
+    var dot = Option.empty[String]
+    for (option <- environmentOptions(XProcConstants.cc_graphviz)) {
+      if (dot.isEmpty && option.getString.isDefined) {
+        for (path <- option.getString.get.split("\\s+")) {
+          val exec = new File(path)
+          if (exec.exists() && exec.canExecute) {
+            dot = Some(path)
+          }
+        }
+      }
     }
+    dot
   }
 
   def run: Boolean = {
@@ -107,27 +113,27 @@ class XMLCalabashDebugOptions(config: XMLCalabash) {
 
   // ===========================================================================================
 
-  def dumpTree(decl: DeclareStep): Unit = {
+  def dumpTree(decl: XDeclareStep): Unit = {
     dump(decl, TREE)
   }
 
-  def dumpPipeline(decl: DeclareStep): Unit = {
+  def dumpPipeline(decl: XDeclareStep): Unit = {
     dump(decl, PIPELINE)
   }
 
-  def dumpGraph(decl: DeclareStep, graph: Graph): Unit = {
+  def dumpGraph(decl: XDeclareStep, graph: Graph): Unit = {
     dump(decl, GRAPH, Some(graph))
   }
 
-  def dumpOpenGraph(decl: DeclareStep, graph: Graph): Unit = {
+  def dumpOpenGraph(decl: XDeclareStep, graph: Graph): Unit = {
     dump(decl, OPENGRAPH, Some(graph))
   }
 
-  private def dump(decl: DeclareStep, opt: String): Unit = {
+  private def dump(decl: XDeclareStep, opt: String): Unit = {
     dump(decl, opt, None)
   }
 
-  private def dump(decl: DeclareStep, opt: String, graph: Option[Graph]): Unit = {
+  private def dump(decl: XDeclareStep, opt: String, graph: Option[Graph]): Unit = {
     if (!graph_option(opt)) {
       return
     }
@@ -161,7 +167,7 @@ class XMLCalabashDebugOptions(config: XMLCalabash) {
         val fn = s"$outputDirectory/$basefn$ext.xml"
         val fos = new FileOutputStream(new File(fn))
         val pw = new PrintWriter(fos)
-        pw.write(decl.xdump.toString)
+        pw.write(decl.dump.toString)
         pw.close()
         fos.close()
       case PIPELINE =>
@@ -169,14 +175,18 @@ class XMLCalabashDebugOptions(config: XMLCalabash) {
         val fn = s"$outputDirectory/$basefn$ext.svg"
         val baos = new ByteArrayOutputStream()
         val pw = new PrintWriter(baos)
-        pw.write(decl.xdump.toString)
+        pw.write(decl.dump.toString)
         pw.close()
+        //println("********* PIPELINE ************")
+        //println(baos.toString(StandardCharsets.UTF_8))
         svgPipeline(fn, baos)
       case GRAPH =>
         val basefn = s"${name}_graph"
         val fn = s"$outputDirectory/$basefn$ext.svg"
         val baos = new ByteArrayOutputStream()
         val pw = new PrintWriter(baos)
+        //println("********* GRAPH ************")
+        //println(graph.get.asXML.toString)
         pw.write(graph.get.asXML.toString)
         pw.close()
         svgGraph(fn, baos, "pgx2dot.xsl")
@@ -188,6 +198,8 @@ class XMLCalabashDebugOptions(config: XMLCalabash) {
         val pw = new PrintWriter(baos)
         pw.write(graph.get.asXML.toString)
         pw.close()
+        //println("********* OPEN GRAPH ************")
+        //println(baos.toString(StandardCharsets.UTF_8))
         svgGraph(fn, baos, "pg2dot.xsl")
     }
   }

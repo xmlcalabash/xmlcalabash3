@@ -62,16 +62,19 @@ Validity error in “$1”: $2
 XD0026
 The context item is empty in expression: “$1” (Saxon: $2)
 
+XD0028
+Value does not satisfy type: “$1”
+
 XD0030
 Error: $1
 
 XD0034
 $1
 
-XD0036
+XD0036/1
 Computed result “$1” does not match specified type “$2”.
 
-XD0036
+XD0036/2
 Computed result “$2” does not match specified type “$3” for “$1”.
 
 XD0038
@@ -182,6 +185,9 @@ There is no port named “$2” on “$1” steps.
 XS0011
 Duplicate port name: ‘$1’
 
+XS0014
+Attempt to make output port ‘$1’ primary when ‘$2’ is already primary.
+
 XS0017
 Option is both required and has default value: $1.
 
@@ -200,11 +206,17 @@ There’s no primary output port on the step named “$1”.
 XS0022/4
 The port “$2” on “$1” is not readable from here.
 
+XS0025/1
+Step types must explicitly be in a namespace.
+
+XS0025/2
+Step types may not be declared in the “$1” namespace.
+
 XS0028
 Name cannot be in the XProc namespace: “$1”.
 
 XS0030
-Attempt to make port ‘$1’ primary when ‘$2’ is already primary.
+Attempt to make input port ‘$1’ primary when ‘$2’ is already primary.
 
 XS0031
 The option named ‘$2’ is not allowed on a ‘$1’ step.
@@ -235,6 +247,12 @@ Error p:import cannot import a “$1”.
 
 XS0053
 An imported pipeline must have a type.
+
+XS0059/1
+The pipeline document has no root element.
+
+XS0059/2
+The pipeline document has an invalid root element: “$1”.
 
 XS0064/1
 Only the last p:catch may omit the code.
@@ -276,20 +294,23 @@ Invalid output port: “$1”. The outputs of p:finally must be different from t
 XS0073
 There is no in-scope step named “$1”.
 
+XS0074
+A p:choose must have at least one p:when or p:otherwise.
+
 XS0075
 Invalid p:try: $1.
 
-XS0077
+XS0077/1
 Invalid value specified: “$1”. Value must be $2.
 
+XS0077/2
+Invalid value, an empty string is not allowed here.
+
+XS0077/3
+Invalid value “$1”, visibility must be “public” or “private”.
+
 XS0079/1
-Comment not allowed here. Found “$1”.
-
-XS0079/2
-Processing instruction not allowed here. Found “$1”.
-
-XS0079/3
-Text not allowed here. Found “$1”.
+Can’t mix comments, processing-instructions, or (non-ws) text here.
 
 XS0080
 Duplicated option name: “$1”.
@@ -312,14 +333,26 @@ More than one p:with-input for the same port: “$1”
 XS0087
 There’s no in-scope namespace binding for the name “$1”.
 
+XS0088
+“$1” shadows static option.
+
 XS0089
 If a p:empty binding is used, it must be the only binding.
 
 XS0090
 Invalid pipe attribute value: “$1”; must be port, port@step, or @step.
 
+XS0092
+The value of a static option cannot be changed: “$1”.
+
+XS0095
+An option may not be both required and static: “$1”.
+
 XS0096
 Invalid sequence type: “$1”. $2.
+
+XS0097
+An attribute in the XProc namespace (“$1”) is not allowed on an element in the XProc namespace: “$2”
 
 XS0100/1
 Invalid pipeline: $1.
@@ -327,11 +360,23 @@ Invalid pipeline: $1.
 XS0100/2
 XProc element not allowed here: “$1”
 
+XS0100/3
+Cannot mix implicit inlines with other connections: “$1”.
+
 XS0102/1
-Mismatched primary outputs in p:choose, “$1” != “$2”
+Mismatched primary outputs in p:choose, “$1” != unnamed port
 
 XS0102/2
+Mismatched primary outputs in p:choose, “$1” != “$2”
+
+XS0102/3
+Mismatched primary outputs in p:try, “$1” != unnamed
+
+XS0102/4
 Mismatched primary outputs in p:try, “$1” != “$2”
+
+XS0103/1
+Mismatched primary outputs in p:choose, “$1” != “$2”
 
 XS0107/1
 There is no variable or reference named “$1” in scope.
@@ -345,11 +390,32 @@ Static expression references context item.
 XS0107/4
 Static expression references non-static variable “$1”
 
+XS0107/5
+Output port “$1” must not have bindings on atomic step type “$2”.
+
+XS0107/6
+Output port “$1” must not have bindings on atomic step.
+
 XS0108
 It is a static error if a p:if does not specify a primary output port.
 
+XS0111
+Unrecognized content type shortcut value: “$1”.
+
 XS0112
 No output on p:finally may be primary: “$1”
+
+XS0113
+Value of the $1 attribute must be ‘true’ or ‘false’.
+
+XS0114
+The port “$1” is not allowed on “$2” steps.
+
+XS0115/1
+Unresolvable deadlock in use-when: “$1”.
+
+XS0115/2
+Unresolvable deadlock in use-when: “$1”.
 
 XC0001
 The content type is not a valid text content type: “$1”.
@@ -528,6 +594,9 @@ Delete not allowed: $1
 XC0151
 Schema is not a valid schematron document.
 
+XC0153
+Schema is not a valid RELAX NG grammar.
+
 XC0155
 Validity error in “$1”: $2.
 
@@ -690,8 +759,14 @@ The format of the -D value must be “name=value”.
 xi:XI0071
 $1
 
+xi:XI0072
+$1
+
 xi:XI0073
 Inputs must be created with the same Processor that XML Calabash is using
+
+xi:XI0998
+$1
 
 {http://xmlcalabash.com/ns/extensions}XI0999
 It must be time for breakfast at Milliways, something impossible has happened: $1

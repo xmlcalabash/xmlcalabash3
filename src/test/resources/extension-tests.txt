@@ -1,6 +1,3 @@
-collection-attr-001.xml
-collection-attr-002.xml
-collection-attr-003.xml
 cx-base64-encode.xml
 cx-loop-001.xml
 cx-loop-002.xml

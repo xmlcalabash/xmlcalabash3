@@ -2,7 +2,7 @@ package com.xmlcalabash.steps
 
 import com.xmlcalabash.model.util.{SaxonTreeBuilder, XProcConstants}
 import com.xmlcalabash.runtime.{NameValueBinding, StaticContext, XProcMetadata, XmlPortSpecification}
-import com.xmlcalabash.util.{MediaType, URIUtils}
+import com.xmlcalabash.util.{MediaType, MinimalStaticContext, URIUtils}
 import net.sf.saxon.s9api.{QName, XdmAtomicValue, XdmValue}
 
 class Count() extends DefaultXmlStep {
@@ -36,7 +36,7 @@ class Count() extends DefaultXmlStep {
     }
   }
 
-  override def run(context: StaticContext): Unit = {
+  override def run(context: MinimalStaticContext): Unit = {
     super.run(context)
 
     sendCount()

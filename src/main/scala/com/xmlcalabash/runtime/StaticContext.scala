@@ -4,52 +4,32 @@ import java.net.URI
 import com.jafpl.graph.Location
 import com.jafpl.messages.Message
 import com.xmlcalabash.XMLCalabash
-import com.xmlcalabash.model.xml.{Artifact, NameBinding}
-import com.xmlcalabash.util.S9Api
-import net.sf.saxon.s9api.XdmNode
+import com.xmlcalabash.model.xxml.{XArtifact, XNameBinding, XOption}
+import com.xmlcalabash.util.{MinimalStaticContext, S9Api, URIUtils}
+import net.sf.saxon.s9api.{QName, XdmNode}
 
 import scala.collection.mutable
 
-class StaticContext(val config: XMLCalabash, val artifact: Option[Artifact]) {
+class StaticContext(val config: XMLCalabash) extends MinimalStaticContext() {
   protected var _baseURI: Option[URI] = None
   protected var _inScopeNS = Map.empty[String,String]
   protected var _location: Option[Location] = None
-  protected var _statics = Map.empty[String,Message]
+  protected var _constants = Map.empty[String,Message]
 
-  def this(config: XMLCalabash) = {
-    this(config, None)
+  def this(runtime: XMLCalabashRuntime) = {
+    this(runtime.config)
   }
 
-  def this(config: XMLCalabashRuntime) = {
-    this(config.config, None)
-  }
-
-  def this(config: XMLCalabash, artifact: Artifact) = {
-    this(config, Some(artifact))
-  }
-
-  def this(runtime: XMLCalabashRuntime, artifact: Option[Artifact]) = {
-    this(runtime.config, artifact)
-  }
-
-  def this(runtime: XMLCalabashRuntime, artifact: Artifact) = {
-    this(runtime.config, Some(artifact))
-  }
-
-  def this(context: StaticContext, artifact: Option[Artifact]) = {
-    this(context.config, artifact)
+  def this(context: StaticContext) = {
+    this(context.config)
     _baseURI = context._baseURI
     _inScopeNS = context._inScopeNS
     _location = context._location
-    _statics = context._statics
+    _constants = context._constants
   }
 
-  def this(context: StaticContext, artifact: Artifact) = {
-    this(context, Some(artifact))
-  }
-
-  def this(config: XMLCalabash, artifact: Option[Artifact], node: XdmNode) = {
-    this(config, artifact)
+  def this(config: XMLCalabash, node: XdmNode) = {
+    this(config)
     _baseURI = Option(node.getBaseURI)
     _inScopeNS = S9Api.inScopeNamespaces(node)
     _location = Some(new XProcLocation(node))
@@ -70,19 +50,23 @@ class StaticContext(val config: XMLCalabash, val artifact: Option[Artifact]) {
     _location = Some(loc)
   }
 
-  def statics: Map[String,Message] = _statics
+  override def inscopeNamespaces: Map[String, String] = _inScopeNS
 
-  def withStatics(statics: Map[String,Message]): StaticContext = {
-    val context = new StaticContext(this, artifact)
-    context._statics = statics
+  override def inscopeConstants: Map[QName, XOption] = Map()
+
+  def constants: Map[String,Message] = _constants
+
+  def withConstants(constants: Map[String,Message]): StaticContext = {
+    val context = new StaticContext(this)
+    context._constants = constants
     context
   }
 
-  def withStatics(bindings: List[NameBinding]): StaticContext = {
-    val statics = mutable.HashMap.empty[String, Message]
+  def withConstants(bindings: List[XNameBinding]): StaticContext = {
+    val constants = mutable.HashMap.empty[String, Message]
     for (bind <- bindings) {
-      statics.put(bind.name.getClarkName, bind.staticValue.get)
+      constants.put(bind.name.getClarkName, bind.constantValue.get)
     }
-    withStatics(statics.toMap)
+    withConstants(constants.toMap)
   }
 }

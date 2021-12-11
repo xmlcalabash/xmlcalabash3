@@ -5,7 +5,7 @@ import java.util.zip.GZIPOutputStream
 import com.xmlcalabash.exceptions.XProcException
 import com.xmlcalabash.model.util.{SaxonTreeBuilder, ValueParser, XProcConstants}
 import com.xmlcalabash.runtime.{BinaryNode, NameValueBinding, StaticContext, XProcMetadata, XmlPortSpecification}
-import com.xmlcalabash.util.MediaType
+import com.xmlcalabash.util.{MediaType, MinimalStaticContext}
 import net.sf.saxon.s9api.{QName, XdmValue}
 
 import scala.collection.mutable
@@ -34,7 +34,7 @@ class Compress extends DefaultXmlStep {
     }
   }
 
-  override def run(context: StaticContext): Unit = {
+  override def run(context: MinimalStaticContext): Unit = {
     super.run(context)
 
     format = qnameBinding(XProcConstants._format)

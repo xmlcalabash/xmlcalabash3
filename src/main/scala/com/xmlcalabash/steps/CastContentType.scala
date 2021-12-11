@@ -11,7 +11,7 @@ import com.xmlcalabash.exceptions.XProcException
 import com.xmlcalabash.messages.XdmValueItemMessage
 import com.xmlcalabash.model.util.{SaxonTreeBuilder, XProcConstants}
 import com.xmlcalabash.runtime.{BinaryNode, NameValueBinding, StaticContext, XProcMetadata, XProcXPathExpression, XmlPortSpecification}
-import com.xmlcalabash.util.{MediaType, S9Api, TypeUtils, ValueUtils}
+import com.xmlcalabash.util.{MediaType, MinimalStaticContext, S9Api, TypeUtils, ValueUtils}
 import net.sf.saxon.om.{AttributeMap, EmptyAttributeMap}
 import net.sf.saxon.s9api.{Axis, QName, SaxonApiException, XdmAtomicValue, XdmItem, XdmMap, XdmNode, XdmNodeKind, XdmValue}
 
@@ -41,7 +41,7 @@ class CastContentType() extends DefaultXmlStep {
     }
   }
 
-  override def run(context: StaticContext): Unit = {
+  override def run(context: MinimalStaticContext): Unit = {
     super.run(context)
 
     if (castTo.xmlContentType) {
@@ -59,7 +59,7 @@ class CastContentType() extends DefaultXmlStep {
     }
   }
 
-  def castToXML(context: StaticContext): Unit = {
+  def castToXML(context: MinimalStaticContext): Unit = {
     val contentType = metadata.get.contentType
 
     contentType.classification match {
@@ -142,7 +142,7 @@ class CastContentType() extends DefaultXmlStep {
     }
   }
 
-  def castToText(context: StaticContext): Unit = {
+  def castToText(context: MinimalStaticContext): Unit = {
     val contentType = metadata.get.contentType
 
     contentType.classification match {
@@ -238,7 +238,7 @@ class CastContentType() extends DefaultXmlStep {
     consumer.receive("result", builder.result, metadata.get.castTo(castTo))
   }
 
-  def castToJSON(context: StaticContext): Unit = {
+  def castToJSON(context: MinimalStaticContext): Unit = {
     val contentType = metadata.get.contentType
 
     contentType.classification match {
@@ -341,7 +341,7 @@ class CastContentType() extends DefaultXmlStep {
     }
   }
 
-  def castToHTML(context: StaticContext): Unit = {
+  def castToHTML(context: MinimalStaticContext): Unit = {
     val contentType = metadata.get.contentType
 
     contentType.classification match {
@@ -373,7 +373,7 @@ class CastContentType() extends DefaultXmlStep {
     }
   }
 
-  def castToBinary(context: StaticContext): Unit = {
+  def castToBinary(context: MinimalStaticContext): Unit = {
     val contentType = metadata.get.contentType
 
     contentType.classification match {

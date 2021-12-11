@@ -123,8 +123,19 @@ class XmlPortSpecification(spec: immutable.Map[String,PortCardinality],
         if (list.contains("application/octet-stream")) {
           true
         } else {
-          // FIXME: Handle the subtle cases like application/xml+rdf => application/xml
-          list.contains(contentType)
+          if (list.contains(contentType)) {
+            true
+          } else {
+            // Match application/xml+rdf against application/xml
+            // The logic here is a bit crude.
+            val pos = contentType.indexOf("+")
+            if (pos > 0) {
+              val basetype = contentType.substring(0, pos)
+              list.contains(basetype)
+            } else {
+              false
+            }
+          }
         }
       } else {
         true

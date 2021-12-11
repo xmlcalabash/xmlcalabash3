@@ -11,7 +11,7 @@ import com.xmlcalabash.model.util.{SaxonTreeBuilder, ValueParser}
 import com.xmlcalabash.runtime.params.SelectFilterParams
 import com.xmlcalabash.runtime.{BinaryNode, ImplParams, StaticContext, XMLCalabashRuntime, XProcDataConsumer, XProcMetadata, XProcXPathExpression, XmlPortSpecification, XmlStep}
 import com.xmlcalabash.steps.DefaultXmlStep
-import com.xmlcalabash.util.{MediaType, XProcVarValue}
+import com.xmlcalabash.util.{MediaType, MinimalStaticContext, XProcVarValue}
 import net.sf.saxon.s9api.{QName, XdmItem, XdmNode, XdmNodeKind, XdmValue}
 import org.slf4j.{Logger, LoggerFactory}
 
@@ -31,9 +31,8 @@ class SelectFilter() extends DefaultXmlStep {
   private val nodeMeta = mutable.HashMap.empty[Any, XProcMetadata]
   private val nodes = ListBuffer.empty[Any]
   private var select: String = _
-  private var selectContext: StaticContext = _
+  private var selectContext: MinimalStaticContext = _
   private var port: String = _
-  private var ispec: XmlPortSpecification = _
 
   // ==========================================================================
 
@@ -57,75 +56,43 @@ class SelectFilter() extends DefaultXmlStep {
           select = cp.select
           selectContext = cp.context
           port = cp.port
-          ispec = cp.ispec
+          sequence = cp.sequence
         case _ => throw XProcException.xiWrongImplParams()
       }
     }
   }
 
-  override def run(context: StaticContext): Unit = {
+  override def run(context: MinimalStaticContext): Unit = {
     super.run(context)
 
-    msgBindings.clear()
-    msgBindings ++= selectContext.statics
+    for ((name, value) <- selectContext.inscopeConstants) {
+      msgBindings.put(name.getClarkName, value.constantValue.get)
+    }
     for ((name, binding) <- bindings) {
       msgBindings.put(name.getClarkName, new XdmValueItemMessage(binding.value, binding.meta, context))
     }
 
-    if (nodes.isEmpty) {
-      makeSelection(List())
-    } else {
-      for (node <- nodes) {
-        val metadata = nodeMeta(node)
-        val msg = node match {
-          case value: XdmNode =>
-            new XdmNodeItemMessage(value, metadata, selectContext)
-          case value: XdmValue =>
-            new XdmValueItemMessage(value, metadata, selectContext)
-          case value: BinaryNode =>
-            val tree = new SaxonTreeBuilder(config)
-            tree.startDocument(metadata.baseURI)
-            tree.endDocument()
-            new AnyItemMessage(tree.result, value, metadata, selectContext)
-          case _ =>
-            throw XProcException.xiThisCantHappen(s"Unexpected node type ${node}", location)
-        }
-        makeSelection(List(msg))
-      }
+    val items = ListBuffer.empty[Tuple2[Any, XProcMetadata]]
+    for (node <- nodes) {
+      items += Tuple2(node, nodeMeta(node))
     }
-  }
 
-  private def makeSelection(context: List[Message]): Unit = {
-    val expr = new XProcXPathExpression(selectContext, select, None, None, None)
-    val exprEval = config.expressionEvaluator.newInstance()
-    val result = exprEval.value(expr, context, msgBindings.toMap, None)
-    val iter = result.item.iterator()
-    var count = 0
-    while (iter.hasNext) {
-      val item = iter.next()
-      count += 1
+    val xpselector = new XPathSelector(config.config, items.toList, select, context, msgBindings.toMap)
+    val results = xpselector.select()
 
-      if (!ispec.cardinality("source").get.withinBounds(count)) {
-        throw XProcException.xdInputSequenceNotAllowed(port, location)
-      }
+    if (results.length != 1 && !sequence) {
+      throw XProcException.xdInputSequenceNotAllowed(port, None)
+    }
 
-      item match {
+    for (result <- results) {
+      result match {
         case node: XdmNode =>
-          if (node.getNodeKind == XdmNodeKind.ATTRIBUTE) {
-            throw XProcException.xdInvalidSelection(select, "attribute", location)
-          }
-          val tree = new SaxonTreeBuilder(config)
-          tree.startDocument(node.getBaseURI)
-          tree.addSubtree(node)
-          tree.endDocument()
-          consume(tree.result, "result")
+          consume(node, "result")
+        case value: XdmValue =>
+          consume(value, "result")
         case _ =>
-          consume(item, "result")
+          throw XProcException.xiThisCantHappen("XPathSelector returned something that wasn't an XdmValue?")
       }
-    }
-
-    if (!ispec.cardinality("source").get.withinBounds(count)) {
-      throw XProcException.xdInputSequenceNotAllowed(port, location)
     }
   }
 

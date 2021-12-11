@@ -4,7 +4,6 @@ import com.jafpl.exceptions.{JafplException, JafplLoopDetected}
 import com.jafpl.graph.{Binding, Node}
 import com.jafpl.messages.Message
 import com.jafpl.runtime.RuntimeConfiguration
-import com.jafpl.steps.DataConsumer
 import com.jafpl.util.{ErrorListener, TraceEventManager}
 import com.xmlcalabash.XMLCalabash.loggedProcessorDetail
 import com.xmlcalabash.config.{DocumentManager, DocumentRequest, ErrorExplanation, XMLCalabashDebugOptions, XProcConfigurer}
@@ -12,17 +11,18 @@ import com.xmlcalabash.exceptions.{ConfigurationException, ExceptionCode, ModelE
 import com.xmlcalabash.functions.FunctionImpl
 import com.xmlcalabash.messages.XdmValueItemMessage
 import com.xmlcalabash.model.util.{ExpressionParser, XProcConstants}
-import com.xmlcalabash.model.xml.{DeclContainer, DeclareStep, Library, Parser, XMLContext}
+import com.xmlcalabash.model.xxml.{XDeclareStep, XNameBinding, XParser, XStaticContext}
 import com.xmlcalabash.parsers.XPathParser
-import com.xmlcalabash.runtime.{PrintingConsumer, SaxonExpressionEvaluator, StaticContext, XMLCalabashRuntime, XProcMetadata, XProcXPathExpression}
+import com.xmlcalabash.runtime.params.XPathBindingParams
+import com.xmlcalabash.runtime.{PrintingConsumer, SaxonExpressionEvaluator, StaticContext, XMLCalabashProcessor, XMLCalabashRuntime, XProcMetadata, XProcXPathExpression}
 import com.xmlcalabash.sbt.BuildInfo
 import com.xmlcalabash.util.{ArgBundle, DefaultErrorExplanation, DefaultXProcConfigurer, MediaType, PipelineBooleanOption, PipelineDocument, PipelineDocumentOption, PipelineDoubleOption, PipelineEnvironmentOption, PipelineEnvironmentOptionMap, PipelineEnvironmentOptionSerialization, PipelineExpressionOption, PipelineFileDocument, PipelineFilenameDocument, PipelineFunctionImplementation, PipelineInputDocument, PipelineInputFile, PipelineInputFilename, PipelineInputText, PipelineInputURI, PipelineInputXdm, PipelineNamespace, PipelineOption, PipelineOptionValue, PipelineOutputConsumer, PipelineOutputDocument, PipelineOutputFilename, PipelineOutputURI, PipelineParameter, PipelineStepImplementation, PipelineStringOption, PipelineSystemProperty, PipelineTextDocument, PipelineURIDocument, PipelineUntypedOption, PipelineUriOption, PipelineXdmDocument, PipelineXdmValueOption, URIUtils}
 import net.sf.saxon.lib.{ModuleURIResolver, UnparsedTextURIResolver}
-import net.sf.saxon.s9api.{ItemType, Processor, QName, XdmAtomicValue, XdmNode, XdmValue}
+import net.sf.saxon.s9api.{ItemType, ItemTypeFactory, Processor, QName, XdmAtomicValue, XdmNode, XdmValue}
 import org.slf4j.{Logger, LoggerFactory}
 import org.xml.sax.{EntityResolver, InputSource}
 
-import java.io.{BufferedReader, ByteArrayInputStream, FileInputStream, FileReader}
+import java.io.{ByteArrayInputStream, FileInputStream}
 import java.net.URI
 import java.nio.charset.StandardCharsets
 import javax.xml.transform.URIResolver
@@ -64,10 +64,11 @@ object XMLCalabash {
   }
 }
 
-class XMLCalabash private(userProcessor: Option[Processor], val configurer: XProcConfigurer) extends RuntimeConfiguration {
+class XMLCalabash private(userProcessor: Option[Processor], val configurer: XProcConfigurer) extends XMLCalabashProcessor with RuntimeConfiguration {
   protected val logger: Logger = LoggerFactory.getLogger(this.getClass)
 
   private var _processor: Processor = _
+  private var _itemTypeFactory: ItemTypeFactory = _
   private var _expressionEvaluator: SaxonExpressionEvaluator = _
   private val _collections = mutable.HashMap.empty[String, List[XdmNode]]
   private var _debugOptions: XMLCalabashDebugOptions = new XMLCalabashDebugOptions(this)
@@ -87,24 +88,60 @@ class XMLCalabash private(userProcessor: Option[Processor], val configurer: XPro
   private var _staticBaseURI = URIUtils.cwdAsURI
   private var _locale = defaultLocale
   private var _episode = computeEpisode
-  private val _builtinSteps = ListBuffer.empty[Library]
-  private val _importedURIs = mutable.HashMap.empty[URI, DeclContainer]
-  // Do not allow the order to be random
-  private val _imports = ListBuffer.empty[URI]
 
-  private var _declaration = Option.empty[DeclareStep]
+  private var _declaration = Option.empty[XDeclareStep]
   private var _runtime: XMLCalabashRuntime = _
 
   private var _pipeline = Option.empty[PipelineDocument]
   private val _inputs = mutable.HashMap.empty[String,ListBuffer[PipelineInputDocument]]
   private val _outputs = mutable.HashMap.empty[String,ListBuffer[PipelineOutputDocument]]
   private val _options = mutable.HashMap.empty[QName,PipelineOptionValue]
+  private val optionBindings = mutable.HashMap.empty[String,Message]
+  private val _staticOptions = mutable.HashMap.empty[QName, XdmValueItemMessage]
+
+  private var _standardLibraryParser = false
+  private val _funcImplClasses = mutable.HashMap.empty[QName,String]
+  private val _stepImplClasses = mutable.HashMap.empty[QName,String]
+  // Only used during static analysis and not valid at runtime
+  private val _staticStepsAvailable = mutable.HashSet.empty[QName]
+  private var _staticStepsIndeterminate = true
 
   private var _except: Option[Exception] = None
   private var _longError = ""
   private var _shortError = ""
 
   val args = new ArgBundle()
+
+  protected[xmlcalabash] def standardLibraryParser: Boolean = _standardLibraryParser
+  protected[xmlcalabash] def standardLibraryParser_=(std: Boolean): Unit = {
+    _standardLibraryParser = std
+  }
+
+  def externalSteps: Map[QName,String] = _stepImplClasses.toMap
+
+  // Only used during static analysis and not valid at runtime
+  protected[xmlcalabash] def staticStepsIndeterminate: Boolean = _staticStepsIndeterminate
+  protected[xmlcalabash] def staticStepsIndeterminate_=(det: Boolean): Unit = {
+    _staticStepsIndeterminate = det
+  }
+
+  // Only used during static analysis and not valid at runtime
+  protected[xmlcalabash] def staticStepsAvailable: Set[QName] = _staticStepsAvailable.toSet
+  protected[xmlcalabash] def staticStepsAvailable_=(aset: Set[QName]): Unit = {
+    _staticStepsAvailable.clear()
+    _staticStepsAvailable ++= aset
+  }
+
+  protected[xmlcalabash] def staticStepAvailable(stepType: QName): Boolean = {
+    if (_stepImplClasses.contains(stepType) || _staticStepsAvailable.contains(stepType)) {
+      true
+    } else {
+      if (staticStepsIndeterminate) {
+        throw XProcException.xiIndeterminateSteps()
+      }
+      false
+    }
+  }
 
   def inputs: Map[String,List[PipelineInputDocument]] = {
     val map = mutable.HashMap.empty[String,List[PipelineInputDocument]]
@@ -123,6 +160,13 @@ class XMLCalabash private(userProcessor: Option[Processor], val configurer: XPro
   }
 
   def options: Map[QName,PipelineOptionValue] = _options.toMap
+  def staticOptions: Map[QName, XdmValueItemMessage] = _staticOptions.toMap
+  def addStatic(name: QName, value: XdmValueItemMessage): Unit = {
+    if (_staticOptions.contains(name)) {
+      throw XProcException.xsShadowsStatic(name, None)
+    }
+    _staticOptions.put(name, value)
+  }
 
   def environmentOptions(name: QName): List[PipelineEnvironmentOption] = {
     parameters collect { case p: PipelineEnvironmentOption => p } filter { _.eqname == name.getEQName }
@@ -163,8 +207,9 @@ class XMLCalabash private(userProcessor: Option[Processor], val configurer: XPro
         }
       }
 
-      val context = new XMLContext(this)
-      val map = mutable.HashMap.empty[QName,String]
+      _itemTypeFactory = new ItemTypeFactory(processor)
+
+      val context = new XStaticContext()
       for (funcEnv <- parameters collect { case p: PipelineFunctionImplementation => p }) {
         val name = context.parseQName(funcEnv.eqname)
         try {
@@ -175,7 +220,7 @@ class XMLCalabash private(userProcessor: Option[Processor], val configurer: XPro
             logger.warn(s"Failed to register ${name} with implementation ${funcEnv.className}; class implements ${func.getFunctionQName}")
           } else {
             _processor.registerExtensionFunction(func)
-            map.put(context.parseQName(funcEnv.eqname), funcEnv.className)
+            _funcImplClasses.put(context.parseQName(funcEnv.eqname), funcEnv.className)
             logger.debug(s"Registered ${name} with implementation ${funcEnv.className}")
           }
         } catch {
@@ -187,7 +232,10 @@ class XMLCalabash private(userProcessor: Option[Processor], val configurer: XPro
             logger.warn(s"Failed to register ${name} with implementation ${funcEnv.className}: ${ex.getMessage}")
         }
       }
-      _funcImplClasses = Some(map.toMap)
+
+      for (stepEnv <- parameters collect { case p: PipelineStepImplementation => p }) {
+        _stepImplClasses.put(context.parseQName(stepEnv.eqname), stepEnv.className)
+      }
 
       _expressionEvaluator = new SaxonExpressionEvaluator(this)
       configurer.xmlCalabashConfigurer.update(this)
@@ -225,12 +273,27 @@ class XMLCalabash private(userProcessor: Option[Processor], val configurer: XPro
       }
     }
 
+    // Build the options before compiling in case some of them are statics...
+    _options.clear()
+    val nsmap = mutable.HashMap.empty[String,String]
+    for (param <- args.parameters) {
+      param match {
+        case ns: PipelineNamespace =>
+          nsmap.put(ns.prefix, ns.namespace)
+        case opt: PipelineOption =>
+          updateOptions(_options, nsmap.toMap, opt)
+        case _ =>
+          () // Just ignore it?
+      }
+    }
+
     _pipeline = args.pipeline
 
     if (_pipeline.isDefined && _declaration.isEmpty) {
-      val parser = new Parser(this)
-      val pipeline = try {
-        _pipeline.get match {
+      val parser = new XParser(this)
+      var pipeline: XDeclareStep = null
+      try {
+        pipeline = _pipeline.get match {
           case uri: PipelineURIDocument =>
             parser.loadDeclareStep(uri.value)
           case str: PipelineFilenameDocument =>
@@ -251,23 +314,32 @@ class XMLCalabash private(userProcessor: Option[Processor], val configurer: XPro
           case _ =>
             throw new RuntimeException("Unexpected pipeline input")
         }
+        if (parser.exceptions.nonEmpty) {
+          throw parser.exceptions.head
+        }
       } catch {
         case ex: XProcException =>
           handleException(ex)
           ex.code match {
             case XProcException.err_xd0036 =>
-              val value = ex.details.head.asInstanceOf[String]
-              val seqtype = ex.details(1).asInstanceOf[String]
-              throw XProcException.xsBadTypeValue(value, seqtype, ex.location)
+              // Weirdo remapping to satisfy the test suite
+              if (ex.variant == 1) {
+                val value = ex.details.head.asInstanceOf[String]
+                val seqtype = ex.details(1).asInstanceOf[String]
+                throw XProcException.xsBadTypeValue(value, seqtype, ex.location)
+              }
             case _ =>
-              throw ex
+              ()
           }
-        case ex: Throwable =>
+          throw ex
+        case ex: Exception =>
           throw ex
       }
 
       _declaration = Some(pipeline)
       close()
+
+      //println(_declaration.get.dump)
 
       debugOptions.dumpTree(pipeline)
       debugOptions.dumpPipeline(pipeline)
@@ -301,7 +373,7 @@ class XMLCalabash private(userProcessor: Option[Processor], val configurer: XPro
 
           _inputs(in.port) += in
 
-        case out: PipelineOutputDocument =>
+        case _: PipelineOutputDocument =>
           () // See below
 
         case opt: PipelineOption =>
@@ -366,7 +438,7 @@ class XMLCalabash private(userProcessor: Option[Processor], val configurer: XPro
   }
 
   private def updateOptions(options: mutable.HashMap[QName,PipelineOptionValue], nsmap: Map[String,String], opt: PipelineOption): Unit = {
-    val context = new XMLContext(this, Some(URIUtils.cwdAsURI), nsmap, None)
+    val context = new XStaticContext(URIUtils.cwdAsURI, nsmap)
     val name = context.parseQName(opt.eqname)
     val value: XdmValue = opt match {
       case v: PipelineBooleanOption => new XdmAtomicValue(v.value)
@@ -494,8 +566,23 @@ class XMLCalabash private(userProcessor: Option[Processor], val configurer: XPro
         runtime.output(port, pc)
       }
 
-      for ((name, value) <- _options) {
-        runtime.option(name, value.value, value.context)
+      for (option <- _declaration.get.options) {
+        if (_options.contains(option.name)) {
+          setOption(option, _options(option.name))
+        } else {
+          if (option.required) {
+            throw XProcException.xsMissingRequiredOption(option.name, None)
+          }
+          if (option.usedByPipeline) {
+            setOption(option)
+          }
+        }
+      }
+
+      for (name <- _options.keySet) {
+        if (!optionBindings.contains(name.getClarkName)) {
+          logger.info(s"Ignoring option '${name}'; it is not used by the pipeline")
+        }
       }
 
       runtime.run()
@@ -517,6 +604,23 @@ class XMLCalabash private(userProcessor: Option[Processor], val configurer: XPro
     if (_except.isDefined) {
       throw _except.get
     }
+  }
+
+  private def setOption(option: XNameBinding): Unit = {
+    val eval = expressionEvaluator.newInstance()
+    val expr = new XProcXPathExpression(option.staticContext, option.select.getOrElse("()"))
+    val value = eval.compute(expr, List(), optionBindings.toMap, Map(), XPathBindingParams.EMPTY)
+    runtime.option(option.name, value, option.staticContext)
+    val msg = new XdmValueItemMessage(value, XProcMetadata.ANY, option.staticContext)
+    optionBindings.put(option.name.getClarkName, msg)
+    // FIXME: does the option value satisfy the type constraints?
+  }
+
+  private def setOption(option: XNameBinding, value: PipelineOptionValue): Unit = {
+    runtime.option(option.name, value.value, value.context)
+    val msg = new XdmValueItemMessage(value.value, XProcMetadata.ANY, value.context)
+    optionBindings.put(option.name.getClarkName, msg)
+    // FIXME: does the option value satisfy the type constraints?
   }
 
   private def handleException(exception: Exception): Unit = {
@@ -608,7 +712,8 @@ class XMLCalabash private(userProcessor: Option[Processor], val configurer: XPro
 
   def runtime: XMLCalabashRuntime = _runtime
   def processor: Processor = _processor
-  def step: DeclareStep = _declaration.orNull
+  def itemTypeFactory: ItemTypeFactory = _itemTypeFactory
+  def step: XDeclareStep = _declaration.orNull
   def pipeline: PipelineDocument = _pipeline.orNull
 
   def errorMessage: String = _shortError
@@ -682,30 +787,6 @@ class XMLCalabash private(userProcessor: Option[Processor], val configurer: XPro
     } else {
       logger.debug(s"${productName} episode: $episode)")
     }
-  }
-
-  protected[xmlcalabash] def builtinSteps: List[Library] = _builtinSteps.toList
-  protected[xmlcalabash] def builtinSteps_=(libs: List[Library]): Unit = {
-    if (_builtinSteps.nonEmpty) {
-      throw XProcException.xiThisCantHappen("Attempt to redefine builtin steps", None)
-    }
-    _builtinSteps ++= libs
-  }
-
-  protected[xmlcalabash] def importedURIs: List[URI] = _imports.toList
-  protected[xmlcalabash] def importedURI(href: URI): Option[DeclContainer] = {
-    _importedURIs.get(href)
-  }
-  protected[xmlcalabash] def addImportedURI(href: URI, container: DeclContainer): Unit = {
-    if (_importedURIs.contains(href)) {
-      throw new RuntimeException(s"Attempt to redefine imported uri: $href")
-    }
-    _importedURIs.put(href, container)
-    _imports += href
-  }
-  protected[xmlcalabash] def clearImportedURIs(): Unit = {
-    _importedURIs.clear()
-    _imports.clear()
   }
 
   def debugOptions: XMLCalabashDebugOptions = _debugOptions
@@ -841,7 +922,7 @@ class XMLCalabash private(userProcessor: Option[Processor], val configurer: XPro
   def defaultSerializationOptions(contentType: String): Map[QName,String] = {
     if (_defaultSerializationOptions.isEmpty) {
       checkClosed()
-      val context = new XMLContext(this)
+      val context = new XStaticContext()
       val map = mutable.HashMap.empty[String,Map[QName,String]]
       for (ser <- parameters collect { case p: PipelineEnvironmentOptionSerialization => p }) {
         val smap = mutable.HashMap.empty[QName, String]
@@ -869,28 +950,6 @@ class XMLCalabash private(userProcessor: Option[Processor], val configurer: XPro
   def episode_=(episode: String): Unit = {
     checkClosed()
     _episode = episode
-  }
-
-  // ==============================================================================================
-  private var _stepImplClasses: Option[Map[QName,String]] = None
-  private var _funcImplClasses: Option[Map[QName,String]] = None
-
-  def atomicStepImplementation(stepType: QName): Option[String] = {
-    if (_stepImplClasses.isEmpty) {
-      checkClosed()
-      val context = new XMLContext(this)
-      val map = mutable.HashMap.empty[QName,String]
-      for (step <- parameters collect { case p: PipelineStepImplementation => p }) {
-        map.put(context.parseQName(step.eqname), step.className)
-      }
-      _stepImplClasses = Some(map.toMap)
-    }
-    _stepImplClasses.get.get(stepType)
-  }
-
-  def functionImplementation(funcName: QName): Option[String] = {
-    // Never empty because it's initialized when the configuration is closed.
-    _funcImplClasses.get.get(funcName)
   }
 
   // FIXME: Should this be a factory, or should XPathParser be reusable?

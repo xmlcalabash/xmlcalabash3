@@ -3,7 +3,7 @@ package com.xmlcalabash.steps
 import com.xmlcalabash.config.DocumentRequest
 import com.xmlcalabash.model.util.{SaxonTreeBuilder, XProcConstants}
 import com.xmlcalabash.runtime.{StaticContext, XProcMetadata, XmlPortSpecification}
-import com.xmlcalabash.util.{MediaType, S9Api}
+import com.xmlcalabash.util.{MediaType, MinimalStaticContext, S9Api}
 import net.sf.saxon.om.FingerprintedQName
 import net.sf.saxon.s9api._
 
@@ -24,7 +24,7 @@ class UnescapeMarkup() extends DefaultXmlStep {
     metadata = meta
   }
 
-  override def run(context: StaticContext): Unit = {
+  override def run(context: MinimalStaticContext): Unit = {
     super.run(context)
 
     if (definedBinding(XProcConstants._namespace)) {

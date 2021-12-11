@@ -14,7 +14,8 @@
 
 <xsl:strip-space elements="*"/>
 
-<xsl:key name="name" match="*" use="@name"/>
+<xsl:key name="name" match="*[not(node-name(.) = xs:QName('p:with-option'))]"
+         use="@name|@tumble-id"/>
 <xsl:key name="id" match="*" use="@xml:id"/>
 
 <xsl:template match="/">
@@ -52,33 +53,51 @@
 
 <xsl:template match="p:variable|p:option">
   <xsl:variable name="label"
-                select="concat(node-name(.),
-                                   if (starts-with(@name, '!syn'))
-                                   then '' else concat(' ', @name))"/>
-  <dot:subgraph name="cluster-{generate-id(.)}" label="{$label}\n${(@varname,@optname)}" color="black">
+                select="'$' || @name || ' ' || local-name(.)"/>
+  <xsl:variable name="expr"
+                select="if (string-length(@select) lt 24)
+                        then string(@select)
+                        else substring(@select, 1, 24) || '…'"/>
+  <dot:subgraph name="cluster-{generate-id(.)}" label="{$label}\n{$expr}" color="black">
     <xsl:call-template name="io"/>
-    <dot:subgraph name="cluster-{@xml:id}-outputs" color="gray" label="outputs" fontcolor="gray" style="rounded">
-      <dot:anchor name="{@xml:id}-output" label="result"/>
-    </dot:subgraph>
     <xsl:apply-templates/>
   </dot:subgraph>
 </xsl:template>
 
 <xsl:template match="p:with-option">
+<!-- ignore?
   <xsl:variable name="label"
                 select="concat(node-name(.),
                                    if (starts-with(@name, '!syn'))
                                    then '' else concat(' ', @name))"/>
   <xsl:if test="*">
-    <dot:anchor name="{generate-id(.)}-input-{generate-id(p:with-input)}" label="${@optname}"/>
+    <dot:anchor name="{generate-id(.)}-input-{generate-id(p:with-input)}" label="${@name}"/>
   </xsl:if>
+-->
 </xsl:template>
 
 <xsl:template match="*">
+  <xsl:variable name="step-label" as="xs:string">
+    <xsl:choose>
+      <xsl:when test="starts-with(@type, 'Q{http://www.w3.org/ns/xproc/}')">
+        <xsl:sequence select="'p:' || substring-after(@type, '}')"/>
+      </xsl:when>
+      <xsl:when test="starts-with(@type, 'Q{http://xmlcalabash.com/ns/extensions/}')">
+        <xsl:sequence select="'cx:' || substring-after(@type, '}')"/>
+      </xsl:when>
+      <xsl:when test="@type">
+        <xsl:sequence select="substring-after(@type, '}')"/>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:sequence select="local-name(.)"/>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:variable>
+
   <xsl:variable name="label"
-                select="concat(node-name(.),
-                                   if (starts-with(@name, '!syn'))
-                                   then '' else concat(' ', @name))"/>
+                select="concat(if (starts-with(@name, '!syn'))
+                               then '' else concat(@name, ' '),
+                               $step-label)"/>
   <dot:subgraph name="cluster-{generate-id(.)}" label="{$label}" color="black">
     <xsl:call-template name="io"/>
     <xsl:apply-templates/>
@@ -102,7 +121,7 @@
 
 <xsl:template match="p:name-pipe" mode="pipes">
   <xsl:variable name="from" select="key('name', @step)"/>
-  <dot:arrow k="2" from="{$from/@xml:id}-output"
+  <dot:arrow from="{$from/@xml:id}-output"
              to="{generate-id(../..)}-binding"/>
 </xsl:template>
 
@@ -111,11 +130,11 @@
 
   <xsl:choose>
     <xsl:when test="$from/self::p:variable">
-      <dot:arrow k="3" gid="{generate-id(.)}" from="{$from/@xml:id}-output"
+      <dot:arrow gid="{generate-id(.)}" from="{$from/@xml:id}-output"
                  to="{generate-id(..)}-input-{generate-id(preceding::p:with-input[1])}"/>
     </xsl:when>
     <xsl:otherwise>
-      <dot:arrow k="3" gid="{generate-id(.)}" from="{$from/@xml:id}-output"
+      <dot:arrow gid="{generate-id(.)}" from="{$from/@xml:id}-output"
                  to="{generate-id(../..)}-input-{generate-id(..)}"/>
     </xsl:otherwise>
   </xsl:choose>

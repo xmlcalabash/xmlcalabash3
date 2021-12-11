@@ -19,7 +19,7 @@ class DefaultXMLCalabashConfigurer() extends XMLCalabashConfigurer {
   override def configure(input: List[PipelineParameter]): List[PipelineParameter] = {
     val args = new ArgBundle()
 
-    args.loadProperties()
+    args.loadSettings()
 
     val searchProp = ListBuffer.empty[PipelineParameter] ++ input
     val propConfig = Option(System.getProperty("com.xmlcalabash.configFile"))

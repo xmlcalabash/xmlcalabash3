@@ -4,7 +4,7 @@ import java.net.URI
 import com.xmlcalabash.config.DocumentRequest
 import com.xmlcalabash.model.util.XProcConstants
 import com.xmlcalabash.runtime.{BinaryNode, StaticContext, XProcMetadata, XmlPortSpecification}
-import com.xmlcalabash.util.MediaType
+import com.xmlcalabash.util.{MediaType, MinimalStaticContext}
 import net.sf.saxon.s9api.{QName, XdmMap, XdmValue}
 
 import scala.collection.mutable
@@ -14,7 +14,7 @@ class Load() extends DefaultXmlStep {
   override def inputSpec: XmlPortSpecification = XmlPortSpecification.NONE
   override def outputSpec: XmlPortSpecification = XmlPortSpecification.ANY
 
-  override def run(context: StaticContext): Unit = {
+  override def run(context: MinimalStaticContext): Unit = {
     super.run(context)
 
     val href = uriBinding(XProcConstants._href);

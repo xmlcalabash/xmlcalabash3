@@ -117,7 +117,10 @@ class XProcMetadata(private val initialContentType: Option[MediaType],
         if (value.size == 0) {
           _contentType = Some(MediaType.OCTET_STREAM)
         } else {
-          _contentType = Some(MediaType.parse(value.itemAt(0).getStringValue, charset)) // FIXME: what about a sequence?
+          if (value.size > 1) {
+            throw XProcException.xiUserError("Content-type property must be a single value, not a list")
+          }
+          _contentType = Some(MediaType.parse(value.itemAt(0).getStringValue, charset))
         }
       } else {
         _contentType = Some(MediaType.OCTET_STREAM)
@@ -134,7 +137,10 @@ class XProcMetadata(private val initialContentType: Option[MediaType],
         if (value.size() == 0) {
           _baseURI = None
         } else {
-          _baseURI = Some(new URI(value.itemAt(0).getStringValue)) // FIXME: what about a sequence?
+          if (value.size > 1) {
+            throw XProcException.xiUserError("Base-uri property must be a single value, not a list")
+          }
+          _baseURI = Some(new URI(value.itemAt(0).getStringValue))
         }
       }
     }

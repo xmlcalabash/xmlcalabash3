@@ -4,7 +4,7 @@ import com.jafpl.steps.PortCardinality
 import com.xmlcalabash.exceptions.XProcException
 import com.xmlcalabash.model.util.{SaxonTreeBuilder, XProcConstants}
 import com.xmlcalabash.runtime.{ProcessMatch, ProcessMatchingNodes, StaticContext, XProcMetadata, XmlPortSpecification}
-import com.xmlcalabash.util.S9Api
+import com.xmlcalabash.util.{MinimalStaticContext, S9Api}
 import net.sf.saxon.om.AttributeMap
 import net.sf.saxon.s9api.{Axis, QName, XdmAtomicValue, XdmNode, XdmNodeKind}
 
@@ -34,7 +34,7 @@ class Replace() extends DefaultXmlStep  with ProcessMatchingNodes {
     }
   }
 
-  override def run(context: StaticContext): Unit = {
+  override def run(context: MinimalStaticContext): Unit = {
     super.run(context)
 
     pattern = stringBinding(XProcConstants._match)

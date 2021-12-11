@@ -2,12 +2,11 @@ package com.xmlcalabash.steps
 
 import java.io.{FileOutputStream, InputStream}
 import java.net.URI
-
 import com.jafpl.steps.PortCardinality
 import com.xmlcalabash.exceptions.XProcException
 import com.xmlcalabash.model.util.{SaxonTreeBuilder, XProcConstants}
 import com.xmlcalabash.runtime.{StaticContext, XProcMetadata, XmlPortSpecification}
-import com.xmlcalabash.util.{MediaType, S9Api}
+import com.xmlcalabash.util.{MediaType, MinimalStaticContext, S9Api}
 import net.sf.saxon.s9api.{Serializer, XdmNode}
 
 class Store extends DefaultXmlStep {
@@ -26,7 +25,7 @@ class Store extends DefaultXmlStep {
     smeta = metadata
   }
 
-  override def run(context: StaticContext): Unit = {
+  override def run(context: MinimalStaticContext): Unit = {
     super.run(context)
 
     val href = if (context.baseURI.isDefined) {

@@ -2,7 +2,7 @@ package com.xmlcalabash.steps
 
 import com.xmlcalabash.model.util.{SaxonTreeBuilder, ValueParser, XProcConstants}
 import com.xmlcalabash.runtime.{NameValueBinding, StaticContext, XProcMetadata, XmlPortSpecification}
-import com.xmlcalabash.util.{MediaType, TypeUtils}
+import com.xmlcalabash.util.{MediaType, MinimalStaticContext, TypeUtils}
 import net.sf.saxon.om.{AttributeMap, EmptyAttributeMap}
 import net.sf.saxon.s9api.{QName, XdmValue}
 
@@ -19,7 +19,7 @@ class Parameters() extends DefaultXmlStep {
     }
   }
 
-  override def run(staticContext: StaticContext): Unit = {
+  override def run(staticContext: MinimalStaticContext): Unit = {
     super.run(staticContext)
 
     val builder = new SaxonTreeBuilder(config)

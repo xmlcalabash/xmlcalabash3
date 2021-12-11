@@ -5,6 +5,7 @@ import com.xmlcalabash.XMLCalabash
 import com.xmlcalabash.exceptions.XProcException
 import com.xmlcalabash.messages.XProcItemMessage
 import com.xmlcalabash.model.util.{SaxonTreeBuilder, XProcConstants}
+import com.xmlcalabash.model.xxml.XStaticContext
 import com.xmlcalabash.runtime.{StaticContext, XProcVtExpression}
 import net.sf.saxon.`type`.BuiltInAtomicType
 import net.sf.saxon.event.ReceiverOption
@@ -16,7 +17,7 @@ import scala.jdk.CollectionConverters.ListHasAsScala
 
 class TvtExpander(config: XMLCalabash,
                   contextItem: Option[XProcItemMessage],
-                  exprContext: StaticContext,
+                  exprContext: XStaticContext,
                   msgBindings: Map[String, XProcItemMessage],
                   location: Option[Location]) {
   private val excludeURIs = mutable.HashSet.empty[String]

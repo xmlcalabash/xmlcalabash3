@@ -2,13 +2,11 @@ package com.xmlcalabash.steps
 
 import com.xmlcalabash.exceptions.XProcException
 import com.xmlcalabash.model.util.SaxonTreeBuilder
-import com.xmlcalabash.runtime.{StaticContext, XProcMetadata, XmlPortSpecification}
-import com.xmlcalabash.util.S9Api
+import com.xmlcalabash.runtime.{XProcMetadata, XmlPortSpecification}
+import com.xmlcalabash.util.{MinimalStaticContext, S9Api}
 import net.sf.saxon.expr.LastPositionFinder
-import net.sf.saxon.om.{Item, NodeInfo}
-import net.sf.saxon.s9api.{QName, XdmItem, XdmNode, XdmValue}
+import net.sf.saxon.s9api.{QName, XdmNode, XdmValue}
 import net.sf.saxon.tree.iter.ManualIterator
-import net.sf.saxon.value.SequenceExtent
 
 import scala.collection.mutable.ListBuffer
 
@@ -18,7 +16,7 @@ class WrapSequence extends DefaultXmlStep {
 
   private val inputs = ListBuffer.empty[XdmNode]
   private var groupAdjacent = Option.empty[String]
-  private var groupAdjacentContext = Option.empty[StaticContext]
+  private var groupAdjacentContext = Option.empty[MinimalStaticContext]
 
   private var wrapper: QName = _
   private var index = 1
@@ -34,7 +32,7 @@ class WrapSequence extends DefaultXmlStep {
     }
   }
 
-  override def run(staticContext: StaticContext): Unit = {
+  override def run(staticContext: MinimalStaticContext): Unit = {
     super.run(staticContext)
 
     wrapper = qnameBinding(_wrapper).get
@@ -50,7 +48,7 @@ class WrapSequence extends DefaultXmlStep {
     }
   }
 
-  def runSimple(staticContext: StaticContext): Unit = {
+  def runSimple(staticContext: MinimalStaticContext): Unit = {
     val builder = new SaxonTreeBuilder(config)
     builder.startDocument(staticContext.baseURI)
 
@@ -64,7 +62,7 @@ class WrapSequence extends DefaultXmlStep {
     consumer.receive("result", builder.result, XProcMetadata.XML)
   }
 
-  def runAdjacent(staticContext: StaticContext): Unit = {
+  def runAdjacent(staticContext: MinimalStaticContext): Unit = {
     var inGroup = false
     var lastValue: XdmValue = null
     var builder: SaxonTreeBuilder = null
@@ -111,7 +109,7 @@ class WrapSequence extends DefaultXmlStep {
   private def adjacentValue(node: XdmNode): XdmValue = {
     val compiler = config.processor.newXPathCompiler()
     compiler.setBaseURI(groupAdjacentContext.get.baseURI.get)
-    for ((pfx, uri) <- bindings(_group_adjacent).context.nsBindings) {
+    for ((pfx, uri) <- bindings(_group_adjacent).context.inscopeNamespaces) {
       compiler.declareNamespace(pfx, uri)
     }
     val exec = compiler.compile(groupAdjacent.get)

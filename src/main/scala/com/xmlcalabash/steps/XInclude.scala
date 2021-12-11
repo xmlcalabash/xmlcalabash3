@@ -4,6 +4,7 @@ import com.nwalsh.sinclude.exceptions.{MalformedXPointerSchemeException, Unknown
 import com.xmlcalabash.exceptions.XProcException
 import com.xmlcalabash.model.util.XProcConstants
 import com.xmlcalabash.runtime.{StaticContext, XProcMetadata, XmlPortSpecification}
+import com.xmlcalabash.util.MinimalStaticContext
 import net.sf.saxon.s9api.{QName, XdmNode}
 import net.sf.saxon.trans.XPathException
 
@@ -17,7 +18,7 @@ class XInclude() extends DefaultXmlStep {
   private var source: XdmNode = _
   private var smeta: XProcMetadata = _
 
-  private var staticContext: StaticContext = _
+  private var staticContext: MinimalStaticContext = _
 
   override def inputSpec: XmlPortSpecification = XmlPortSpecification.MARKUPSOURCE
   override def outputSpec: XmlPortSpecification = XmlPortSpecification.XMLRESULT
@@ -27,7 +28,7 @@ class XInclude() extends DefaultXmlStep {
     smeta = metadata
   }
 
-  override def run(context: StaticContext): Unit = {
+  override def run(context: MinimalStaticContext): Unit = {
     super.run(context)
 
     staticContext = context

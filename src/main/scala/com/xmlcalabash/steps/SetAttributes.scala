@@ -3,7 +3,7 @@ package com.xmlcalabash.steps
 import com.xmlcalabash.exceptions.XProcException
 import com.xmlcalabash.model.util.XProcConstants
 import com.xmlcalabash.runtime.{ProcessMatch, ProcessMatchingNodes, StaticContext, XProcMetadata, XmlPortSpecification}
-import com.xmlcalabash.util.{S9Api, TypeUtils}
+import com.xmlcalabash.util.{MinimalStaticContext, S9Api, TypeUtils}
 import net.sf.saxon.om.{AttributeMap, EmptyAttributeMap, NamespaceMap}
 import net.sf.saxon.s9api.{Axis, QName, XdmNode}
 
@@ -31,7 +31,7 @@ class SetAttributes() extends DefaultXmlStep with ProcessMatchingNodes {
     }
   }
 
-  override def run(context: StaticContext): Unit = {
+  override def run(context: MinimalStaticContext): Unit = {
     super.run(context)
 
     pattern = stringBinding(XProcConstants._match)

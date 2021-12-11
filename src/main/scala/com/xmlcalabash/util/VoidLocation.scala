@@ -9,7 +9,7 @@ object VoidLocation {
   def instance(): VoidLocation = loc
 }
 
-class VoidLocation extends Location {
+class VoidLocation private extends Location {
   override def getSystemId: String = null
 
   override def getPublicId: String = null

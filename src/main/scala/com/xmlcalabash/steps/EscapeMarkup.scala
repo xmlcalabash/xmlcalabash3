@@ -1,11 +1,10 @@
 package com.xmlcalabash.steps
 
 import java.io.StringWriter
-
 import com.xmlcalabash.exceptions.XProcException
 import com.xmlcalabash.model.util.{SaxonTreeBuilder, XProcConstants}
 import com.xmlcalabash.runtime.{StaticContext, XProcMetadata, XmlPortSpecification}
-import com.xmlcalabash.util.S9Api
+import com.xmlcalabash.util.{MinimalStaticContext, S9Api}
 import net.sf.saxon.s9api._
 
 class EscapeMarkup() extends DefaultXmlStep {
@@ -21,7 +20,7 @@ class EscapeMarkup() extends DefaultXmlStep {
     metadata = meta
   }
 
-  override def run(context: StaticContext): Unit = {
+  override def run(context: MinimalStaticContext): Unit = {
     super.run(context)
 
     val options = mapBinding(XProcConstants._serialization)

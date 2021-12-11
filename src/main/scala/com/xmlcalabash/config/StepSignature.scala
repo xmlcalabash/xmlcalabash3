@@ -1,8 +1,8 @@
 package com.xmlcalabash.config
 
 import com.jafpl.graph.Location
-import com.xmlcalabash.exceptions.{ExceptionCode, ModelException}
-import com.xmlcalabash.model.xml.DeclareStep
+import com.xmlcalabash.exceptions.{ExceptionCode, ModelException, XProcException}
+import com.xmlcalabash.model.xxml.XDeclareStep
 import net.sf.saxon.s9api.QName
 
 import scala.collection.mutable
@@ -13,7 +13,7 @@ class StepSignature(val stepType: Option[QName]) {
   private val _outputPorts = mutable.HashMap.empty[String, PortSignature]
   private val _options = ListBuffer.empty[OptionSignature]
   private val _implementation = ListBuffer.empty[String]
-  private var _declaration = Option.empty[DeclareStep]
+  private var _declaration = Option.empty[XDeclareStep]
 
   def addInput(port: PortSignature, location: Location): Unit = {
     if (_inputPorts.contains(port.port)) {
@@ -47,8 +47,8 @@ class StepSignature(val stepType: Option[QName]) {
     _implementation += className
   }
 
-  def declaration: Option[DeclareStep] = _declaration
-  def declaration_=(decl: DeclareStep): Unit = {
+  def declaration: Option[XDeclareStep] = _declaration
+  def declaration_=(decl: XDeclareStep): Unit = {
     if (_implementation.nonEmpty) {
       throw new RuntimeException("Cannot have an atomic step with the same name as a non-atomic step")
     }
@@ -91,13 +91,13 @@ class StepSignature(val stepType: Option[QName]) {
     }
   }
 
-  def option(name: QName, location: Option[Location]): OptionSignature = {
+  def option(name: QName): Option[OptionSignature] = {
     for (opt <- _options) {
       if (opt.name == name) {
-        return opt
+        return Some(opt)
       }
     }
-    throw new ModelException(ExceptionCode.BADOPTSIG, List(stepType.toString, name.toString), location)
+    None
   }
 
   def primaryInput: Option[PortSignature] = {
@@ -119,11 +119,7 @@ class StepSignature(val stepType: Option[QName]) {
   }
 
   override def toString: String = {
-    if (stepType.isDefined) {
-      stepType.get.toString
-    } else {
-      "anonymous StepSignature"
-    }
+    stepType.toString
   }
 }
 

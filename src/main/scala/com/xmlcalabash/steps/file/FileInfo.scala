@@ -3,7 +3,7 @@ package com.xmlcalabash.steps.file
 import com.xmlcalabash.exceptions.XProcException
 import com.xmlcalabash.model.util.{SaxonTreeBuilder, XProcConstants}
 import com.xmlcalabash.runtime.{StaticContext, XProcMetadata, XmlPortSpecification}
-import com.xmlcalabash.util.{InternetProtocolRequest, MediaType, TypeUtils, URIUtils}
+import com.xmlcalabash.util.{InternetProtocolRequest, MediaType, MinimalStaticContext, TypeUtils, URIUtils}
 import net.sf.saxon.om.{AttributeMap, EmptyAttributeMap}
 import net.sf.saxon.s9api.QName
 
@@ -17,13 +17,13 @@ class FileInfo() extends FileStep {
   private var href: URI = _
   private var failOnError = true
 
-  private var staticContext: StaticContext = _
+  private var staticContext: MinimalStaticContext = _
   private var builder: SaxonTreeBuilder = _
 
   override def inputSpec: XmlPortSpecification = XmlPortSpecification.NONE
   override def outputSpec: XmlPortSpecification = XmlPortSpecification.XMLRESULT
 
-  override def run(context: StaticContext): Unit = {
+  override def run(context: MinimalStaticContext): Unit = {
     super.run(context)
 
     staticContext = context

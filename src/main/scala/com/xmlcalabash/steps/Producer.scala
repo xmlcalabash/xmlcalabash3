@@ -1,7 +1,7 @@
 package com.xmlcalabash.steps
 
 import com.xmlcalabash.runtime.{StaticContext, XProcMetadata, XmlPortSpecification}
-import com.xmlcalabash.util.MediaType
+import com.xmlcalabash.util.{MediaType, MinimalStaticContext}
 
 import scala.collection.mutable
 
@@ -19,7 +19,7 @@ class Producer() extends DefaultXmlStep {
   override def inputSpec: XmlPortSpecification = XmlPortSpecification.NONE
   override def outputSpec: XmlPortSpecification = XmlPortSpecification.ANYRESULTSEQ
 
-  override def run(staticContext: StaticContext): Unit = {
+  override def run(staticContext: MinimalStaticContext): Unit = {
     super.run(staticContext)
 
     for (item <- items) {

@@ -1,18 +1,21 @@
 package com.xmlcalabash.util
 
 import com.xmlcalabash.XMLCalabash
-
-import java.util
 import com.xmlcalabash.exceptions.XProcException
-import com.xmlcalabash.model.util.{ValueParser, XProcConstants}
-import com.xmlcalabash.parsers.SequenceBuilder
-import com.xmlcalabash.runtime.{StaticContext, XMLCalabashRuntime}
+import com.xmlcalabash.messages.XdmValueItemMessage
+import com.xmlcalabash.model.util.XProcConstants
+import com.xmlcalabash.runtime.XMLCalabashRuntime
 import jdk.nashorn.api.scripting.ScriptObjectMirror
-import net.sf.saxon.`type`.BuiltInAtomicType
+import net.sf.saxon.`type`.{BuiltInAtomicType, TypeHierarchy, ValidationException}
 import net.sf.saxon.event.ReceiverOption
+import net.sf.saxon.expr.parser.{Loc, RoleDiagnostic}
 import net.sf.saxon.om.{AttributeInfo, FingerprintedQName}
 import net.sf.saxon.s9api._
+import net.sf.saxon.trans.XPathException
+import net.sf.saxon.value.StringValue
+import org.slf4j.{Logger, LoggerFactory}
 
+import java.net.URI
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 import scala.jdk.CollectionConverters.{CollectionHasAsScala, IterableHasAsJava, MapHasAsScala}
@@ -62,14 +65,14 @@ object TypeUtils {
       case xarr: XdmArray =>
         val list = ListBuffer.empty[Any]
         var idx = 0
-        for (idx <- 0  until xarr.arrayLength()) {
+        for (idx <- 0 until xarr.arrayLength()) {
           val value = xarr.get(idx)
           list += castAsJava(value)
         }
         list.toArray
       case xmap: XdmMap =>
         val map = xmap.asMap()
-        val jmap = mutable.HashMap.empty[Any,Any]
+        val jmap = mutable.HashMap.empty[Any, Any]
         for (key <- map.asScala.keySet) {
           val value = map.asScala(key)
           jmap.put(castAsJava(key), castAsJava(value))
@@ -92,14 +95,14 @@ object TypeUtils {
       case xarr: XdmArray =>
         val list = ListBuffer.empty[Any]
         var idx = 0
-        for (idx <- 0  until xarr.arrayLength()) {
+        for (idx <- 0 until xarr.arrayLength()) {
           val value = xarr.get(idx)
           list += castAsScala(value)
         }
         list.toArray
       case xmap: XdmMap =>
         val map = xmap.asMap()
-        val jmap = mutable.HashMap.empty[Any,Any]
+        val jmap = mutable.HashMap.empty[Any, Any]
         for (key <- map.asScala.keySet) {
           val value = map.asScala(key)
           jmap.put(castAsScala(key), castAsScala(value))
@@ -134,7 +137,7 @@ object TypeUtils {
     MediaType.parse(s"application/vnd.xmlcalabash.$t+xml")
   }
 
-  def castAtomicAs(value: XdmAtomicValue, seqType: Option[SequenceType], context: StaticContext): XdmAtomicValue = {
+  def castAtomicAs(value: XdmAtomicValue, seqType: Option[SequenceType], context: MinimalStaticContext): XdmAtomicValue = {
     if (seqType.isEmpty) {
       return value
     }
@@ -142,15 +145,17 @@ object TypeUtils {
     castAtomicAs(value, seqType.get.getItemType, context)
   }
 
-  def castAtomicAs(value: XdmAtomicValue, xsdtype: ItemType, context: StaticContext): XdmAtomicValue = {
+  def castAtomicAs(value: XdmAtomicValue, xsdtype: ItemType, context: MinimalStaticContext): XdmAtomicValue = {
+    /*
     if ((xsdtype == ItemType.UNTYPED_ATOMIC) || (xsdtype == ItemType.STRING || (xsdtype == ItemType.ANY_ITEM))) {
       return value
     }
+     */
 
     if (xsdtype == ItemType.QNAME) {
       val qnamev = value.getPrimitiveTypeName match {
-        case XProcConstants.xs_string => new XdmAtomicValue(ValueParser.parseQName(value.getStringValue, context))
-        case XProcConstants.xs_untypedAtomic => new XdmAtomicValue(ValueParser.parseQName(value.getStringValue, context))
+        case XProcConstants.xs_string => new XdmAtomicValue(context.parseQName(value.getStringValue))
+        case XProcConstants.xs_untypedAtomic => new XdmAtomicValue(context.parseQName(value.getStringValue))
         case XProcConstants.xs_QName => value
         case _ =>
           throw new RuntimeException(s"Don't know how to convert $value to an xs:QName")
@@ -174,145 +179,11 @@ object TypeUtils {
           throw XProcException.xdBadType(value.getStringValue, xsdtype.toString, location)
         }
       case ex: Exception =>
-        throw(ex)
-    }
-  }
-}
-
-class TypeUtils(val processor: Processor, val context: StaticContext) {
-  private val err_XD0045 = new QName(XProcConstants.ns_err, "XD0045")
-
-  def this(config: XMLCalabash, context: StaticContext) = {
-    this(config.processor, context)
-  }
-  def this(config: XMLCalabashRuntime, context: StaticContext) = {
-    this(config.processor, context)
-  }
-  def this(config: XMLCalabash) = {
-    this(config.processor, new StaticContext(config))
-  }
-  def this(config: XMLCalabashRuntime) = {
-    this(config.processor, new StaticContext(config))
-  }
-
-  val typeFactory = new ItemTypeFactory(processor)
-
-  // This was added experimentally to handle lists in literal values for include-filter and exclude-filter.
-  // It was subsequently decided that literal values shouldn't be lists, so this is no longer being used.
-  // I'm leaving it around for the time being (19 Aug 2018) in case it turns out to be useful somewhere
-  // else.
-  def castSequenceAs(value: XdmAtomicValue, xsdtype: Option[QName], occurrence: String, context: StaticContext): XdmValue = {
-    // Today, we only need to handle a sequence of strings
-    if (xsdtype.isEmpty || xsdtype.get != XProcConstants.xs_string) {
-      throw new IllegalArgumentException("Only lists of strings are supported")
-    }
-
-    val builder = new SequenceBuilder()
-    val list = builder.parse(value.getStringValue)
-    val alist = new util.ArrayList[XdmAtomicValue]
-
-    val itype = typeFactory.getAtomicType(XProcConstants.xs_string)
-    for (item <- list) {
-      if (item.as != XProcConstants.xs_string) {
-        throw new IllegalArgumentException("Only lists of strings are supported")
-      }
-      alist.add(new XdmAtomicValue(item.item, itype))
-    }
-
-    new XdmValue(alist)
-  }
-
-  def parseSequenceType(seqType: Option[String]): Option[SequenceType] = {
-    if (seqType.isDefined) {
-      Some(parseSequenceType(seqType.get))
-    } else {
-      None
+        throw (ex)
     }
   }
 
-  def parseSequenceType(seqType: String): SequenceType = {
-    // XPathParser.parseSequenceType returns a type.SequenceType.
-    // I need an s9api.SequenceType. Michael Kay confirms there's no
-    // easy way to convert between them. I'm rolling my own until such time
-    // as there's a better way. If it has to stay this way, I should call
-    // the actual XPath 3.1 parser for it, but I'm just going to hack my
-    // way through it for now.
-    val parensre = "^\\((.*)\\)$".r
-    val stypere = "^([^*+?()]+)\\s*([*+?])?$".r
-    val mtypere = "^map\\s*\\((.*)\\)\\s*([*+?])?$".r
-    val atypere = "^array\\s*\\((.*)\\)\\s*([*+?])?$".r
-    val ftypere = "^function\\s*\\((.*)\\)\\s*([*+?])?$".r
-    val itemre  = "^item\\s*\\(\\s*\\)\\s*([*+?])?$".r
-    seqType.trim() match {
-      case parensre(body) =>
-        parseSequenceType(body)
-      case stypere(typename, cardchar) =>
-        // xs:sometype?
-        try {
-          val itype = simpleType(typename)
-          SequenceType.makeSequenceType(itype, cardinality(cardchar))
-        } catch {
-          case ex: XProcException =>
-            if (ex.code == XProcException.err_xd0036) {
-              throw XProcException.xsInvalidSequenceType(typename, "Expected QName", None)
-            }
-            throw ex
-          case ex: Throwable =>
-            throw ex
-        }
-      case mtypere(mbody, cardchar) =>
-        if (mbody.trim == "*") {
-          return SequenceType.makeSequenceType(ItemType.ANY_MAP, cardinality(cardchar))
-        }
-        val tuplere = "^([^,]+),(.*)$".r
-        mbody match {
-          case tuplere(keyseqtype,itemseqtype) =>
-            val keytype = simpleType(keyseqtype)
-            val itemtype = parseSequenceType(itemseqtype)
-            SequenceType.makeSequenceType(typeFactory.getMapType(keytype, itemtype), cardinality(cardchar))
-          case _ =>
-            throw new RuntimeException(s"Unexpected map syntax: map($mbody)")
-        }
-      case atypere(abody, cardchar) =>
-        if (abody.trim == "*") {
-          return SequenceType.makeSequenceType(ItemType.ANY_ARRAY, cardinality(cardchar))
-        }
-        val itemtype = parseSequenceType(abody)
-        SequenceType.makeSequenceType(typeFactory.getArrayType(itemtype), cardinality(cardchar))
-      case ftypere(params, cardchar) =>
-        SequenceType.makeSequenceType(ItemType.ANY_FUNCTION, cardinality(cardchar))
-      case itemre(cardchar) =>
-        SequenceType.makeSequenceType(ItemType.ANY_ITEM, cardinality(cardchar))
-      case _ =>
-        throw new RuntimeException(s"Unexpected sequence type: $seqType")
-    }
-  }
-
-  def parseFakeMapSequenceType(seqType: String): SequenceType = {
-    // This is just like parseSequenceType except that it lies about the type of maps
-    val mtypere = "^map\\s*\\((.*)\\)\\s*([*+?])?$".r
-    seqType.trim() match {
-      case mtypere(mbody, cardchar) =>
-        // I actually only care about the case where the keys are QNames
-        if (mbody.trim == "*") {
-          return SequenceType.makeSequenceType(ItemType.ANY_MAP, cardinality(cardchar))
-        }
-        val tuplere = "^([^,]+),(.*)$".r
-        mbody match {
-          case tuplere(keyseqtype,itemseqtype) =>
-            val keytype = ItemType.ANY_ATOMIC_VALUE
-            val itemtype = parseSequenceType(itemseqtype)
-            SequenceType.makeSequenceType(typeFactory.getMapType(keytype, itemtype), cardinality(cardchar))
-          case _ =>
-            throw new RuntimeException(s"Unexpected map syntax: map($mbody)")
-        }
-      case _ =>
-        parseSequenceType(seqType)
-    }
-  }
-
-  private def simpleType(typename: String): ItemType = {
-    val qname = ValueParser.parseQName(typename, context)
+  def simpleType(qname: QName): ItemType = {
     qname match {
       case XProcConstants.xs_anyURI =>             ItemType.ANY_URI
       case XProcConstants.xs_base64Binary =>       ItemType.BASE64_BINARY
@@ -361,8 +232,117 @@ class TypeUtils(val processor: Processor, val context: StaticContext) {
       case XProcConstants.xs_yearMonthDuration =>  ItemType.YEAR_MONTH_DURATION
       case XProcConstants.xs_anyAtomicType =>      ItemType.ANY_ATOMIC_VALUE
       case _ =>
-        throw XProcException.xsInvalidSequenceType(qname.getClarkName, "Unknown type", context.location)
+        throw XProcException.xsInvalidSequenceType(qname.getEQName, "Unknown type", None)
     }
+  }
+}
+
+class TypeUtils(val processor: Processor, val context: MinimalStaticContext) {
+  protected val logger: Logger = LoggerFactory.getLogger(this.getClass)
+  private val err_XD0045 = new QName(XProcConstants.ns_err, "XD0045")
+
+  def this(config: XMLCalabash, context: MinimalStaticContext) = {
+    this(config.processor, context)
+  }
+
+  def this(config: XMLCalabashRuntime, context: MinimalStaticContext) = {
+    this(config.processor, context)
+  }
+
+  val typeFactory = new ItemTypeFactory(processor)
+  var types = Option.empty[TypeHierarchy]
+
+  def parseSequenceType(seqType: Option[String]): Option[SequenceType] = {
+    if (seqType.isDefined) {
+      Some(parseSequenceType(seqType.get))
+    } else {
+      None
+    }
+  }
+
+  def parseSequenceType(seqType: String): SequenceType = {
+    // XPathParser.parseSequenceType returns a type.SequenceType.
+    // I need an s9api.SequenceType. Michael Kay confirms there's no
+    // easy way to convert between them. I'm rolling my own until such time
+    // as there's a better way. If it has to stay this way, I should call
+    // the actual XPath 3.1 parser for it, but I'm just going to hack my
+    // way through it for now.
+    val parensre = "^\\((.*)\\)$".r
+    val stypere = "^([^*+?()]+)\\s*([*+?])?$".r
+    val mtypere = "^map\\s*\\((.*)\\)\\s*([*+?])?$".r
+    val atypere = "^array\\s*\\((.*)\\)\\s*([*+?])?$".r
+    val ftypere = "^function\\s*\\((.*)\\)\\s*([*+?])?$".r
+    val itemre = "^item\\s*\\(\\s*\\)\\s*([*+?])?$".r
+    seqType.trim() match {
+      case parensre(body) =>
+        parseSequenceType(body)
+      case stypere(typename, cardchar) =>
+        // xs:sometype?
+        try {
+          val itype = simpleType(typename)
+          SequenceType.makeSequenceType(itype, cardinality(cardchar))
+        } catch {
+          case ex: XProcException =>
+            if (ex.code == XProcException.err_xd0036) {
+              throw XProcException.xsInvalidSequenceType(typename, "Expected QName", None)
+            }
+            throw ex
+          case ex: Throwable =>
+            throw ex
+        }
+      case mtypere(mbody, cardchar) =>
+        if (mbody.trim == "*") {
+          return SequenceType.makeSequenceType(ItemType.ANY_MAP, cardinality(cardchar))
+        }
+        val tuplere = "^([^,]+),(.*)$".r
+        mbody match {
+          case tuplere(keyseqtype, itemseqtype) =>
+            val keytype = simpleType(keyseqtype)
+            val itemtype = parseSequenceType(itemseqtype)
+            SequenceType.makeSequenceType(typeFactory.getMapType(keytype, itemtype), cardinality(cardchar))
+          case _ =>
+            throw new RuntimeException(s"Unexpected map syntax: map($mbody)")
+        }
+      case atypere(abody, cardchar) =>
+        if (abody.trim == "*") {
+          return SequenceType.makeSequenceType(ItemType.ANY_ARRAY, cardinality(cardchar))
+        }
+        val itemtype = parseSequenceType(abody)
+        SequenceType.makeSequenceType(typeFactory.getArrayType(itemtype), cardinality(cardchar))
+      case ftypere(params, cardchar) =>
+        SequenceType.makeSequenceType(ItemType.ANY_FUNCTION, cardinality(cardchar))
+      case itemre(cardchar) =>
+        SequenceType.makeSequenceType(ItemType.ANY_ITEM, cardinality(cardchar))
+      case _ =>
+        throw new RuntimeException(s"Unexpected sequence type: $seqType")
+    }
+  }
+
+  def parseFakeMapSequenceType(seqType: String): SequenceType = {
+    // This is just like parseSequenceType except that it lies about the type of maps
+    val mtypere = "^map\\s*\\((.*)\\)\\s*([*+?])?$".r
+    seqType.trim() match {
+      case mtypere(mbody, cardchar) =>
+        // I actually only care about the case where the keys are QNames
+        if (mbody.trim == "*") {
+          return SequenceType.makeSequenceType(ItemType.ANY_MAP, cardinality(cardchar))
+        }
+        val tuplere = "^([^,]+),(.*)$".r
+        mbody match {
+          case tuplere(keyseqtype, itemseqtype) =>
+            val keytype = ItemType.ANY_ATOMIC_VALUE
+            val itemtype = parseSequenceType(itemseqtype)
+            SequenceType.makeSequenceType(typeFactory.getMapType(keytype, itemtype), cardinality(cardchar))
+          case _ =>
+            throw new RuntimeException(s"Unexpected map syntax: map($mbody)")
+        }
+      case _ =>
+        parseSequenceType(seqType)
+    }
+  }
+
+  private def simpleType(typename: String): ItemType = {
+    TypeUtils.simpleType(context.parseQName(typename))
   }
 
   private def cardinality(card: String): OccurrenceIndicator = {
@@ -411,5 +391,69 @@ class TypeUtils(val processor: Processor, val context: StaticContext) {
 
     val itype = typeFactory.getAtomicType(dtype)
     new XdmAtomicValue(value, itype)
+  }
+
+  def checkType(name: QName, valueMsg: XdmValueItemMessage, seqType: Option[SequenceType], tokenList: Option[List[XdmAtomicValue]]): Unit = {
+    convertType(name, valueMsg, seqType, tokenList)
+  }
+
+  def convertType(name: QName, valueMsg: XdmValueItemMessage, seqType: Option[SequenceType], tokenList: Option[List[XdmAtomicValue]]): XdmValueItemMessage = {
+    if (types.isEmpty) {
+      types = Some(processor.getUnderlyingConfiguration.getTypeHierarchy)
+    }
+
+    var value = valueMsg.item
+    if (seqType.isDefined) {
+      // Special cases
+      if (Option(seqType.get.getItemType).isDefined) {
+        seqType.get.getItemType match {
+          case ItemType.QNAME =>
+            value.getUnderlyingValue match {
+              case _: StringValue =>
+                val msg = new XdmValueItemMessage(new XdmAtomicValue(valueMsg.context.parseQName(value.getUnderlyingValue.getStringValue)), valueMsg.metadata, valueMsg.context)
+                value = msg.item
+              case _ =>
+                ()
+            }
+          case ItemType.ANY_URI =>
+            value.getUnderlyingValue match {
+              case _: StringValue =>
+                val msg = new XdmValueItemMessage(new XdmAtomicValue(new URI(value.getUnderlyingValue.getStringValue)), valueMsg.metadata, valueMsg.context)
+                value = msg.item
+              case _ =>
+                ()
+            }
+          case _ =>
+            ()
+        }
+      }
+
+      try {
+        val diag = new RoleDiagnostic(RoleDiagnostic.OPTION, name.toString, 0)
+        val convseq = types.get.applyFunctionConversionRules(value.getUnderlyingValue, seqType.get.getUnderlyingSequenceType, diag, Loc.NONE)
+        value = XdmValue.wrap(convseq)
+      } catch {
+        case ex: ValidationException =>
+          logger.debug(ex.getMessage)
+          throw XProcException.xdBadType(name, value.getUnderlyingValue.toString, seqType.get.toString, None)
+        case ex: XPathException =>
+          logger.debug(ex.getMessage)
+          throw XProcException.xdBadType(name, value.getUnderlyingValue.toString, seqType.get.toString, None)
+        case ex: Exception =>
+          logger.debug(ex.getMessage)
+          throw ex
+      }
+    }
+
+    if (tokenList.isDefined) {
+      if (value ne XdmEmptySequence.getInstance()) {
+        val matched = tokenList.get find { _ == value }
+        if (matched.isEmpty) {
+          throw XProcException.xdBadValue(value.toString, None)
+        }
+      }
+    }
+
+    new XdmValueItemMessage(value, valueMsg.metadata, valueMsg.context)
   }
 }

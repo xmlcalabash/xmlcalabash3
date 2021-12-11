@@ -8,9 +8,10 @@ import com.xmlcalabash.XMLCalabash
 import com.xmlcalabash.exceptions.XProcException
 import com.xmlcalabash.messages.{XdmNodeItemMessage, XdmValueItemMessage}
 import com.xmlcalabash.model.util.{SaxonTreeBuilder, XProcConstants}
+import com.xmlcalabash.model.xxml.XStaticContext
 import com.xmlcalabash.runtime.params.ContentTypeCheckerParams
 import com.xmlcalabash.runtime.{ImplParams, NameValueBinding, StaticContext, XMLCalabashRuntime, XProcDataConsumer, XProcMetadata, XProcXPathExpression, XmlPortSpecification, XmlStep}
-import com.xmlcalabash.util.{MediaType, S9Api, XProcVarValue}
+import com.xmlcalabash.util.{MediaType, MinimalStaticContext, S9Api, XProcVarValue}
 import net.sf.saxon.s9api.{QName, XdmAtomicValue, XdmItem, XdmNode, XdmNodeKind, XdmValue}
 import org.slf4j.{Logger, LoggerFactory}
 
@@ -34,9 +35,9 @@ class ContentTypeChecker() extends XmlStep {
   private val nodeMeta = mutable.HashMap.empty[XdmNode, XProcMetadata]
   private val nodes = ListBuffer.empty[XdmNode]
   protected var allowedTypes = List.empty[MediaType]
-  protected var errCode = XProcException.err_xd0038
+  protected var errCode: QName = XProcException.err_xd0038
   protected var select = Option.empty[String]
-  protected var selectContext: StaticContext = _
+  protected var selectContext: XStaticContext = _
   protected var portName: String = _
   protected var sequence = false
   protected var inputPort = false
@@ -136,12 +137,12 @@ class ContentTypeChecker() extends XmlStep {
     }
   }
 
-  override def run(context: StaticContext): Unit = {
+  override def run(context: MinimalStaticContext): Unit = {
     // FIXME: do whatever logging DefaultXmlStep does.
 
-    for ((name, message) <- selectContext.statics) {
-      if (!bindings.contains(name)) {
-        bindings.put(name, message)
+    for ((name, message) <- selectContext.inscopeConstants) {
+      if (!bindings.contains(name.getClarkName)) {
+        bindings.put(name.getClarkName, message.constantValue.get)
       }
     }
 

@@ -8,7 +8,7 @@ import com.xmlcalabash.config.DocumentRequest
 import com.xmlcalabash.exceptions.XProcException
 import com.xmlcalabash.messages.{AnyItemMessage, XdmNodeItemMessage, XdmValueItemMessage}
 import com.xmlcalabash.model.util.{SaxonTreeBuilder, XProcConstants}
-import com.xmlcalabash.runtime.params.StepParams
+import com.xmlcalabash.model.xxml.XStaticContext
 import com.xmlcalabash.util.{MediaType, S9Api, TypeUtils}
 import net.sf.saxon.ma.map.MapItem
 import net.sf.saxon.s9api.{Axis, QName, SequenceType, XdmAtomicValue, XdmItem, XdmMap, XdmNode, XdmNodeKind, XdmValue}
@@ -20,7 +20,7 @@ import java.net.URI
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 
-class StepProxy(config: XMLCalabashRuntime, stepType: QName, step: StepExecutable, params: Option[ImplParams], staticContext: StaticContext) extends Step with XProcDataConsumer {
+class StepProxy(config: XMLCalabashRuntime, stepType: QName, step: StepExecutable, staticContext: XStaticContext) extends Step with XProcDataConsumer {
   private var _id: String = _
   private val openStreams = ListBuffer.empty[InputStream]
   protected val logger: Logger = LoggerFactory.getLogger(this.getClass)
@@ -111,15 +111,15 @@ class StepProxy(config: XMLCalabashRuntime, stepType: QName, step: StepExecutabl
       new QName("", bindmsg.name)
     }
 
-    if (step.signature.stepType.isDefined) {
-      val ns = step.signature.stepType.get.getNamespaceURI
+    if (step.declaration.stepType.isDefined) {
+      val ns = step.declaration.stepType.get.getNamespaceURI
       if ((ns == XProcConstants.ns_p && qname == XProcConstants._message)
         || (ns != XProcConstants.ns_p && qname == XProcConstants.p_message)) {
         System.err.println(bindmsg.message.toString)
         return
       }
     } else {
-      if (qname == XProcConstants.p_message) {
+      if (qname == XProcConstants._message) {
         System.err.println(bindmsg.message.toString)
         return
       }
@@ -128,9 +128,9 @@ class StepProxy(config: XMLCalabashRuntime, stepType: QName, step: StepExecutabl
     bindings += qname
     bindingsMap.put(qname.getClarkName, bindmsg.message)
 
-    val stepsig = step.signature
-    if (stepsig.optionNames.contains(qname)) {
-      val optsig  = stepsig.option(qname, staticContext.location)
+    val decl = step.declaration
+    if (decl.optionNames.contains(qname)) {
+      val optsig  = decl.option(qname).get
       val opttype: Option[SequenceType] = optsig.declaredType
       val optlist: Option[List[XdmAtomicValue]] = optsig.tokenList
 
@@ -173,7 +173,7 @@ class StepProxy(config: XMLCalabashRuntime, stepType: QName, step: StepExecutabl
           val xvalue = valuemsg.item.getUnderlyingValue
           xvalue match {
             case map: MapItem =>
-              if (optsig.forceQNameKeys) {
+              if (optsig.qnameKeys) {
                 val qmap = S9Api.forceQNameKeys(map, staticContext)
                 step.receiveBinding(new NameValueBinding(qname, qmap, valuemsg))
               } else {
@@ -209,6 +209,15 @@ class StepProxy(config: XMLCalabashRuntime, stepType: QName, step: StepExecutabl
   override def run(): Unit = {
     running = true
 
+    for (name <- step.declaration.optionNames) {
+      if (!bindings.contains(name)) {
+        if (staticContext.inscopeConstants.contains(name)) {
+          val value = staticContext.inscopeConstants(name)
+          step.receiveBinding(new NameValueBinding(name, value.constantValue.get))
+        }
+      }
+    }
+
     for (port <- inputBuffer.keySet) {
       for (message <- inputBuffer(port)) {
         processInput(port, message)
@@ -222,26 +231,6 @@ class StepProxy(config: XMLCalabashRuntime, stepType: QName, step: StepExecutabl
       }
     }
     outputBuffer.clear()
-
-    // If there are statically computed options for this step, pass them along
-    if (params.isDefined && params.get.isInstanceOf[StepParams]) {
-      val atomic = params.get.asInstanceOf[StepParams]
-      for ((name,value) <- atomic.staticallyComputedOptions) {
-        val bindmsg = new BindingMessage(name, value)
-        receiveBinding(bindmsg)
-      }
-    }
-
-    for (qname <- step.signature.optionNames) {
-      if (!bindings.contains(qname)) {
-        val optsig  = step.signature.option(qname, staticContext.location)
-        val opttype: Option[SequenceType] = optsig.declaredType
-        if (optsig.defaultSelect.isDefined) {
-          val value = TypeUtils.castAtomicAs(new XdmAtomicValue(optsig.defaultSelect.get), opttype, staticContext)
-          step.receiveBinding(new NameValueBinding(qname, value, XProcMetadata.ANY, staticContext))
-        }
-      }
-    }
 
     try {
       DynamicContext.withContext(dynamicContext) {
@@ -265,7 +254,7 @@ class StepProxy(config: XMLCalabashRuntime, stepType: QName, step: StepExecutabl
         try {
           stream.close()
         } catch {
-          case ex: IOException => ()
+          case _: IOException => ()
           case ex: Exception =>
             thrown = Some(ex)
         }
@@ -311,7 +300,7 @@ class StepProxy(config: XMLCalabashRuntime, stepType: QName, step: StepExecutabl
     received.put(port, received.getOrElse(port, 1))
     inputSpec.checkInputCardinality(port, received(port))
 
-    val mtypes = step.signature.input(port, staticContext.location).contentTypes
+    val mtypes = step.declaration.input(port).contentTypes
     if (mtypes.nonEmpty) {
       val ctype = message match {
         case msg: XdmNodeItemMessage => Some(msg.metadata.contentType)
@@ -399,7 +388,7 @@ class StepProxy(config: XMLCalabashRuntime, stepType: QName, step: StepExecutabl
     }
 
     // Is the content type ok?
-    val mtypes = step.signature.output(port, staticContext.location).contentTypes
+    val mtypes = step.declaration.output(port).contentTypes
     if (mtypes.nonEmpty) {
       // FIXME: rethrow XC0070 with a location
       if (!metadata.contentType.allowed(mtypes)) {

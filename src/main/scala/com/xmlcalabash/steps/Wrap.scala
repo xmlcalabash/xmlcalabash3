@@ -4,7 +4,7 @@ import com.jafpl.steps.PortCardinality
 import com.xmlcalabash.exceptions.XProcException
 import com.xmlcalabash.model.util.XProcConstants
 import com.xmlcalabash.runtime.{ProcessMatch, ProcessMatchingNodes, StaticContext, XProcMetadata, XmlPortSpecification}
-import com.xmlcalabash.util.{MediaType, S9Api}
+import com.xmlcalabash.util.{MediaType, MinimalStaticContext, S9Api}
 import net.sf.saxon.om.AttributeMap
 import net.sf.saxon.s9api.{Axis, QName, XdmItem, XdmNode, XdmNodeKind, XdmValue}
 
@@ -19,10 +19,10 @@ class Wrap() extends DefaultXmlStep with ProcessMatchingNodes {
   private var pattern: String = _
   private var matcher: ProcessMatch = _
   private var groupAdjacent = Option.empty[String]
-  private var groupAdjacentContext = Option.empty[StaticContext]
+  private var groupAdjacentContext = Option.empty[MinimalStaticContext]
   private var wrapper: QName = _
   private val inGroup = mutable.Stack[Boolean]()
-  private var staticContext: StaticContext = _
+  private var staticContext: MinimalStaticContext = _
 
   override def inputSpec: XmlPortSpecification = new XmlPortSpecification(
     Map("source"->PortCardinality.EXACTLY_ONE),
@@ -35,7 +35,7 @@ class Wrap() extends DefaultXmlStep with ProcessMatchingNodes {
     source_metadata = metadata
   }
 
-  override def run(context: StaticContext): Unit = {
+  override def run(context: MinimalStaticContext): Unit = {
     super.run(context)
 
     staticContext = context
@@ -161,7 +161,7 @@ class Wrap() extends DefaultXmlStep with ProcessMatchingNodes {
     if (staticContext.baseURI.isDefined) {
       xcomp.setBaseURI(staticContext.baseURI.get)
     }
-    for ((pfx,uri) <- groupAdjacentContext.get.nsBindings) {
+    for ((pfx,uri) <- groupAdjacentContext.get.inscopeNamespaces) {
       xcomp.declareNamespace(pfx, uri)
     }
 

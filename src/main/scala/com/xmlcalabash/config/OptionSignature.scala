@@ -1,32 +1,33 @@
 package com.xmlcalabash.config
 
+import com.xmlcalabash.model.xxml.XOption
 import net.sf.saxon.s9api.{QName, SequenceType, XdmAtomicValue}
 
 import scala.collection.mutable.ListBuffer
 
-class OptionSignature(val name: QName) {
+class OptionSignature private(val name: QName) {
   private var _required = true
+  private var _static = false
+  private var _as = "xs:untypedAtomic"
   private var _declaredType = Option.empty[SequenceType]
   private var _occurrence = Option.empty[String]
   private var _tokenList: Option[ListBuffer[XdmAtomicValue]] = None
   private var _defaultValue = Option.empty[String]
   private var _forceQNameKeys = false
 
-  def this(name: QName, optType: SequenceType, required: Boolean) = {
-    this(name)
-    _declaredType = Some(optType)
-    _required = required
+  def this(option: XOption) = {
+    this(option.name)
+    _as = option.as.getOrElse("xs:untypedAtomic")
+    _declaredType = option.declaredType
+    _required = option.required
+    _static = option.static
   }
 
   def required: Boolean = _required
-  def required_=(req: Boolean): Unit = {
-    _required = req
-  }
+  def static: Boolean = _static
 
+  def as: String = _as
   def declaredType: Option[SequenceType] = _declaredType
-  def declaredType_=(value: SequenceType): Unit = {
-    _declaredType = Some(value)
-  }
 
   def occurrence: Option[String] = _occurrence
   def occurrence_=(value: String): Unit = {

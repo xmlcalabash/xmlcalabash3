@@ -4,7 +4,7 @@ import java.io.ByteArrayInputStream
 import com.xmlcalabash.config.DocumentRequest
 import com.xmlcalabash.model.util.{ValueParser, XProcConstants}
 import com.xmlcalabash.runtime.{NameValueBinding, StaticContext, XProcMetadata, XmlPortSpecification}
-import com.xmlcalabash.util.MediaType
+import com.xmlcalabash.util.{MediaType, MinimalStaticContext}
 import net.sf.saxon.s9api.{QName, XdmNode, XdmValue}
 import org.commonmark.parser.Parser
 import org.commonmark.renderer.html.HtmlRenderer
@@ -31,7 +31,7 @@ class Markdown() extends DefaultXmlStep {
     }
   }
 
-  override def run(context: StaticContext): Unit = {
+  override def run(context: MinimalStaticContext): Unit = {
     super.run(context)
 
     val parser = Parser.builder.build

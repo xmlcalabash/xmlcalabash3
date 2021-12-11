@@ -5,11 +5,10 @@ import com.xmlcalabash.XMLCalabash
 import com.xmlcalabash.exceptions.{ExceptionCode, ModelException, XProcException}
 import com.xmlcalabash.model.util.XProcConstants.ValueTemplate
 import com.xmlcalabash.runtime.{StaticContext, XMLCalabashRuntime, XProcExpression, XProcVtExpression, XProcXPathExpression}
-import com.xmlcalabash.util.{TypeUtils, ValueTemplateParser}
+import com.xmlcalabash.util.{MinimalStaticContext, TypeUtils, ValueTemplateParser}
 import net.sf.saxon.s9api.{Axis, ItemType, QName, XdmAtomicValue, XdmItem, XdmMap, XdmNode, XdmNodeKind, XdmValue}
 
 import scala.collection.mutable
-import scala.collection.mutable.ListBuffer
 
 object ValueParser {
   def parseAvt(value: String): Option[ValueTemplate] = {
@@ -97,7 +96,7 @@ object ValueParser {
         if (static) {
           throw XProcException.xsBadTypeValue(value.get, "boolean", location)
         } else {
-          throw XProcException.xdBadValue(value.get, "boolean", location)
+          throw XProcException.xdBadType(value.get, "boolean", location)
         }
       }
     } else {
@@ -106,7 +105,7 @@ object ValueParser {
   }
 
 
-  def parseParameters(value: XdmValue, context: StaticContext): Map[QName, XdmValue] = {
+  def parseParameters(value: XdmValue, context: MinimalStaticContext): Map[QName, XdmValue] = {
     val params = mutable.HashMap.empty[QName, XdmValue]
 
     value match {
@@ -117,7 +116,7 @@ object ValueParser {
           val key = iter.next()
           val value = map.get(key)
 
-          val qname = ValueParser.parseQName(key.getStringValue, context)
+          val qname = context.parseQName(key.getStringValue)
           params.put(qname, value)
         }
       case _ =>
@@ -127,7 +126,7 @@ object ValueParser {
     params.toMap
   }
 
-  def parseDocumentProperties(value: XdmItem, context: StaticContext, location: Option[Location]): Map[QName, XdmValue] = {
+  def parseDocumentProperties(value: XdmItem, context: MinimalStaticContext, location: Option[Location]): Map[QName, XdmValue] = {
     val params = mutable.HashMap.empty[QName, XdmValue]
 
     value match {
@@ -143,7 +142,7 @@ object ValueParser {
             case XProcConstants.xs_QName =>
               key.getQNameValue
             case XProcConstants.xs_string =>
-              ValueParser.parseQName(key.getStringValue, context)
+              context.parseQName(key.getStringValue)
             case _ =>
               throw XProcException.xdBadMapKey(key.getStringValue, location)
           }

@@ -9,7 +9,7 @@ import com.xmlcalabash.model.util.{SaxonTreeBuilder, ValueParser, XProcConstants
 import com.xmlcalabash.runtime.params.InlineLoaderParams
 import com.xmlcalabash.runtime.{BinaryNode, ImplParams, StaticContext, XProcMetadata, XProcVtExpression, XProcXPathExpression, XmlPortSpecification}
 import com.xmlcalabash.steps.DefaultXmlStep
-import com.xmlcalabash.util.{MediaType, S9Api, TypeUtils}
+import com.xmlcalabash.util.{MediaType, MinimalStaticContext, S9Api, TypeUtils}
 import net.sf.saxon.`type`.BuiltInAtomicType
 import net.sf.saxon.event.ReceiverOption
 import net.sf.saxon.om.{AttributeInfo, AttributeMap, EmptyAttributeMap, NamespaceMap}
@@ -30,7 +30,7 @@ import scala.jdk.CollectionConverters._
 class InlineLoader() extends AbstractLoader {
   private var node: XdmNode = _
   private var encoding = Option.empty[String]
-  private var exclude_inline_prefixes = Option.empty[String]
+  private var excludeUris = Set.empty[String]
   private var expandText = false
   private var contextProvided = false
 
@@ -54,7 +54,7 @@ class InlineLoader() extends AbstractLoader {
         content_type = doc.content_type
         encoding = doc.encoding
         _document_properties = doc.document_properties
-        exclude_inline_prefixes = doc.exclude_inline_prefixes
+        excludeUris = doc.exclude_uris
         expandText = doc.expand_text
         contextProvided = doc.context_provided
         exprContext = doc.context
@@ -67,7 +67,7 @@ class InlineLoader() extends AbstractLoader {
     // nop, we do it after we've computed the href attribute
   }
 
-  override def run(context: StaticContext): Unit = {
+  override def run(context: MinimalStaticContext): Unit = {
     super.run(context)
 
     val propContentType = if (docProps.contains(XProcConstants._content_type)) {
@@ -123,14 +123,11 @@ class InlineLoader() extends AbstractLoader {
     val expander = new InlineExpander(config.config, node, meta, exprContext, location)
     expander.contentType = contentType
     expander.encoding = encoding
-    expander.excludeURIs = if (exclude_inline_prefixes.isDefined) {
-      S9Api.urisForPrefixes(node, exclude_inline_prefixes.get.split("\\s+").toSet)
-    } else {
-      Set()
-    }
+    expander.excludeURIs = excludeUris
     expander.msgBindings = msgBindings.toMap
     expander.contextItem = contextItem
     expander.documentProperties = docProps
+    expander.copyStaticOptionsToBindings(config)
 
     val req = expander.loadDocument(expandText)
     val resp = config.documentManager.parse(req)
