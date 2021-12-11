@@ -2,8 +2,7 @@ package com.xmlcalabash.testing
 
 import com.xmlcalabash.XMLCalabash
 import com.xmlcalabash.exceptions.TestException
-import com.xmlcalabash.runtime.BufferingConsumer
-import com.xmlcalabash.util.S9Api
+import com.xmlcalabash.util.{PipelineOutputConsumer, S9Api}
 import net.sf.saxon.s9api.{QName, Serializer, XdmNode}
 import org.slf4j.{Logger, LoggerFactory}
 
@@ -37,13 +36,16 @@ class Tester(xmlcalabash: XMLCalabash) {
 
   def run(): TestResult = {
     try {
-      xmlcalabash.configure()
-      val decl = xmlcalabash.step
-      var result = Option.empty[BufferingConsumer]
+      var result: Option[BufferingConsumer] = Some(new BufferingConsumer())
+      xmlcalabash.parameter(new PipelineOutputConsumer("result", result.get))
 
+      xmlcalabash.configure()
+
+      val decl = xmlcalabash.step
       if (decl.outputPorts.contains("result")) {
-        result = Some(new BufferingConsumer(decl.output("result")))
-        xmlcalabash.args.output("result", result.get)
+        result.get.mediaTypes = decl.output("result").contentTypes
+      } else {
+        result = None
       }
 
       xmlcalabash.run()
