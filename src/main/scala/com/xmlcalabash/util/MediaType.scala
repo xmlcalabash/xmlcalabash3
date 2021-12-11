@@ -19,6 +19,7 @@ object MediaType {
   val HTML = new MediaType("text", "html")
   val XHTML = new MediaType("application", "xhtml+xml")
   val ZIP = new MediaType("application", "zip")
+  val PDF = new MediaType("application", "pdf")
   val MULTIPART = new MediaType("multipart", "*")
   val MULTIPART_MIXED = new MediaType("multipart", "mixed")
 
