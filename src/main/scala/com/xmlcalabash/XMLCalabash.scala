@@ -744,6 +744,10 @@ class XMLCalabash private(userProcessor: Option[Processor], val configurer: XPro
     _parameters.clear()
     _parameters ++= params
   }
+  def parameter(param: PipelineParameter): Unit = {
+    checkClosed()
+    _parameters += param
+  }
 
   private var _safeMode: Option[Boolean] = None
   def safeMode: Boolean = {
@@ -764,7 +768,6 @@ class XMLCalabash private(userProcessor: Option[Processor], val configurer: XPro
   def proxies: Map[String,URI] = {
     if (_proxies.isEmpty) {
       val map = mutable.HashMap.empty[String,URI]
-      val proxies = mutable.HashMap.empty[String, URI]
       for (env <- parameters collect { case p: PipelineEnvironmentOption => p } filter { _.eqname == XProcConstants.cc_http_proxy.getEQName }) {
         env match {
           case proxy: PipelineEnvironmentOptionMap =>
