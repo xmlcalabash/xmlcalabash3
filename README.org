@@ -1,0 +1,7 @@
+#+TITLE: README
+
+This is the XML Calabash 3.0 project. Or it will be.
+
+I’m still lining up a few ducks.
+
+(The [[https://github.com/xmlcalabash/xmlcalabash3-scala-archive][previous version]] of this repository has been renamed.)
