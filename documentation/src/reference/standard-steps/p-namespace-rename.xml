@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?><refentry xmlns="http://docbook.org/ns/docbook" xmlns:p="http://www.w3.org/ns/xproc" xml:id="p-namespace-rename">
+<?db filename="p-namespace-rename"?>
+   <refnamediv>
+      <refname>p:namespace-rename</refname>
+      <refpurpose>The standard p:namespace-rename step</refpurpose>
+   </refnamediv>
+   <refsynopsisdiv>
+
+<refsection role="introduction">
+<title>Introduction</title>
+<para>The <code>p:namespace-rename</code> step renames any namespace declaration or
+use of a namespace in a document to a new IRI value.</para>
+</refsection>
+
+<refsection role="step-declaration">
+<title>Step declaration</title>
+<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="../../../../xmlcalabash/src/main/resources/com/xmlcalabash/library.xpl" xpointer="xpath(/*/*[@type='p:namespace-rename'])"/>
+</refsection>
+
+<refsection role="errors"><title>Errors</title><para>
+<error code="C0014">It is a <glossterm>dynamic error</glossterm>
+if the XML namespace (<uri>http://www.w3.org/XML/1998/namespace</uri>)
+or the
+XMLNS namespace (<uri>http://www.w3.org/2000/xmlns/</uri>) is
+the value of either the <option>from</option> option or the
+<option>to</option> option.</error>
+<error code="C0092">It is a <glossterm>dynamic error</glossterm>
+          if as a consequence of changing or removing the namespace of an attribute
+          the attribute's name is not unique on the respective element.</error>
+</para>
+</refsection>
+
+<refsection role="implementation-features"><title>Implementation-defined and -dependent features</title>
+<para>
+</para>
+</refsection>
+</refsynopsisdiv>
+
+   <refsection>
+      <title>Description</title>
+      <para>TBD.</para>
+   </refsection>
+</refentry>

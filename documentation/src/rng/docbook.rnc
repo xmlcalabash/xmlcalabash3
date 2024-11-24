@@ -1,0 +1,130 @@
+namespace rng  = "http://relaxng.org/ns/structure/1.0"
+namespace db = "http://docbook.org/ns/docbook"
+namespace rddl = "http://www.rddl.org/"
+namespace xlink = "http://www.w3.org/1999/xlink"
+namespace p = "http://www.w3.org/ns/xproc"
+namespace mde = "https://xmlcalabash.com/ns/markdown-extensions"
+
+namespace a = "http://relaxng.org/ns/compatibility/annotations/1.0"
+default namespace = "http://docbook.org/ns/docbook"
+
+include "https://cdn.docbook.org/schema/5.2/rng/docbookxi.rnc" {
+}
+
+db.all.blocks |=
+   p.declare-step
+ | rng.pattern
+ | mde.extensions
+
+p.declare-step =
+   element p:declare-step {
+      attribute * { text }*,
+      (_any_xproc_syntax|db.xi.include)*
+   }
+
+_any_xproc_syntax =
+   element p:* {
+      attribute * { text }*,
+      _any_xproc_syntax*
+   }
+
+rng.pattern =
+    element rng-pattern {
+        attribute schema { text }?,
+        attribute name { text },
+        attribute prefix { text }?,
+        attribute format { "table" }?,
+        empty
+    }
+
+# ======================================================================
+
+mde.extensions =
+    element mde:extensions {
+        attribute version { text },
+        mde.extension+
+    }
+
+mde.extension =
+    element mde:extension {
+        attribute name { text },
+        attribute package { text },
+        attribute class { text },
+        mde.option*
+    }
+
+mde.option =
+    element mde:option {
+        attribute enum { text },
+        attribute type { text }?,
+        attribute package { text }?,
+        attribute class { text }?,
+        attribute values { text }?,
+        attribute nullable { xsd:boolean }?,
+        empty
+    }
+
+# ======================================================================
+
+db.error =
+    element db:error {
+        attribute class { "static" | "dynamic" }?,
+        attribute code { text },
+        db.common.attributes,
+        db.all.inlines*
+    }
+
+db.error.inlines |= db.error
+
+# ======================================================================
+
+db.impl =
+    element db:impl {
+        db.common.attributes,
+        db.all.inlines*
+    }
+
+db.technical.inlines |= db.impl
+
+# ======================================================================
+
+db.port.role.attribute = attribute role { text }
+db.port.attlist =
+   db.port.role.attribute?
+ & db.common.attributes
+ & db.common.linking.attributes
+
+db.port =
+   element port {
+      db.code.attlist, (db.programming.inlines | db._text)*
+   }
+
+db.markup.inlines |= db.port
+
+# ======================================================================
+
+db.technical.inlines |= db.rfc2119
+
+[
+   db:refname [ "rfc2119" ]
+   db:refpurpose [ "An RFC 2119 keyword" ]
+]
+div {
+
+   db.rfc2119.role.attribute = attribute role { text }
+   db.rfc2119.xrefstyle.attribute = db.xrefstyle.attribute
+   db.rfc2119.endterm.attribute = db.endterm.attribute
+
+   db.rfc2119.attlist =
+      db.rfc2119.role.attribute?
+    & db.common.attributes
+    & db.common.linking.attributes
+    & db.rfc2119.xrefstyle.attribute?
+    & db.rfc2119.endterm.attribute?
+
+   db.rfc2119 =
+      element rfc2119 {
+         db.rfc2119.attlist,
+         db.all.inlines*
+      }
+}

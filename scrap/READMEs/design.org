@@ -1,0 +1,62 @@
+:PROPERTIES:
+:ID:       14B51FAA-2B10-4A77-9E36-E5EA8B72AA18
+:END:
+#+title: Design
+#+date: 2024-06-15
+#+author: Norman Tovey-Walsh
+#+startup: showall
+
+* Global configuration
+:PROPERTIES:
+:CUSTOM_ID: xml-calabash-config
+:END:
+
++ saxonConfiguration
++ documentManager
++ standardLibrary
++ globalOptions
+
+* Pipeline configuration
+:PROPERTIES:
+:CUSTOM_ID: pipeline-configuration
+:END:
+
++ globalConfiguration
++ debug
++ nextId()
++ nextDependsId()
++ errors
++ staticOptions
++ uniqueUris
++ episode
++ stepManagers
++ stepAvailable
++ errorExplanation
++ messageReporter
++ proxies
++ mimeTypes
+
+* Step configuration
+:PROPERTIES:
+:CUSTOM_ID: step-configuration
+:END:
+
++ pipelineConfiguration
++ BaseUri
++ Location
++ inScopeNamespaces
++ inScopeStepNames
++ inScopeStepTypes
++ inScopeFunctions
+
+* Runtime configuration
+:PROPERTIES:
+:CUSTOM_ID: runtime-configuration
+:END:
+
++ pipelineConfiguration
++ Graph
++ dynamicOptions
++ inputs
++ outputs
+

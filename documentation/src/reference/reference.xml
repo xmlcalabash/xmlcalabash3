@@ -1,0 +1,43 @@
+<book xmlns="http://docbook.org/ns/docbook"
+      xmlns:h="http://www.w3.org/1999/xhtml"
+      xmlns:xi="http://www.w3.org/2001/XInclude"
+      xmlns:xlink="http://www.w3.org/1999/xlink"
+      xml:id="xmlcalabash-reference" version="5.2">
+<info>
+  <title>XML Calabash Reference</title>
+  <author>
+    <personname>
+      <firstname>Norm</firstname>
+      <surname>Tovey-Walsh</surname>
+    </personname>
+    <email>ndw@nwalsh.com</email>
+  </author>
+  <copyright>
+    <year>2024</year>
+    <holder>Norman Walsh</holder>
+  </copyright>
+  <abstract>
+    <para>The XML Calabash 3.x reference guide.</para>
+  </abstract>
+  <h:link href="./css/xmlcalabash.css" rel="stylesheet"/>
+  <h:link href="./css/xproc.css" rel="stylesheet"/>
+</info>
+
+<preface>
+<title>Preface</title>
+<para>This whole things is pretty rough. There are some experiments with new
+step documentation. And ultimately there needs to be reference documentation about the APIs
+and things. Maybe when they’re a little a little more baked and a little less runny batter.</para>
+</preface>
+
+<xi:include href="depends.xml"/>
+<xi:include href="running.xml"/>
+
+<xi:include href="standard-steps/reference.xml"/>
+<xi:include href="extension-steps/reference.xml"/>
+
+<xi:include href="glossary.xml"/>
+<xi:include href="bibliography.xml"/>
+<xi:include href="changelog.xml"/>
+
+</book>

@@ -1,0 +1,228 @@
+import com.xmlcalabash.build.XmlCalabashBuildExtension
+
+import org.jetbrains.dokka.gradle.DokkaTask
+import org.jetbrains.dokka.base.DokkaBase
+import org.jetbrains.dokka.base.DokkaBaseConfiguration
+
+import java.net.URI
+import java.net.URL
+import java.io.PrintStream
+
+buildscript {
+  dependencies {
+    classpath("org.jetbrains.dokka:dokka-base:1.9.20")
+  }
+}
+
+plugins {
+  id("buildlogic.kotlin-library-conventions")
+  id("com.xmlcalabash.build.xmlcalabash-build")
+  id("com.github.gmazzo.buildconfig") version "5.5.0"
+  id("org.jetbrains.dokka") version "1.9.20"
+  `maven-publish`
+}
+
+configurations.forEach {
+  it.exclude("com.sun.xml.ibind.jaxp")
+  it.exclude("isorelax")
+  it.exclude("relaxngDatatype")
+  it.exclude("net.sf.saxon.Saxon-HE")
+}
+
+// If you add to this list, update BuildConfig as well!
+val dep_brotliDec = project.findProperty("brotliDec").toString()
+val dep_commonsCodec = project.findProperty("commonsCodec").toString()
+val dep_commonsCompress = project.findProperty("commonsCompress").toString()
+val dep_flexmarkAll = project.findProperty("flexmarkAll").toString()
+val dep_htmlparser = project.findProperty("htmlparser").toString()
+val dep_httpClient = project.findProperty("httpClient").toString()
+val dep_jing = project.findProperty("jing").toString()
+val dep_jsonSchemaValidator = project.findProperty("jsonSchemaValidator").toString()
+val dep_schxslt = project.findProperty("schxslt").toString()
+val dep_sinclude = project.findProperty("sinclude").toString()
+val dep_slf4j = project.findProperty("slf4j").toString()
+val dep_tukaaniXz = project.findProperty("tukaaniXz").toString()
+val dep_uuidCreator = project.findProperty("uuidCreator").toString()
+val dep_xmlResolver = project.findProperty("xmlResolver").toString()
+
+dependencies {
+  implementation("org.jetbrains.kotlin:kotlin-stdlib:2.0.0")
+  implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.1")
+  implementation("org.jetbrains.kotlin:kotlin-reflect:2.0.0")
+  implementation("name.dmaus.schxslt:schxslt:${dep_schxslt}")
+  implementation("nu.validator:htmlparser:${dep_htmlparser}")
+  implementation("commons-codec:commons-codec:${dep_commonsCodec}")
+
+  implementation("org.apache.commons:commons-compress:${dep_commonsCompress}")
+  //implementation("org.brotli:dec:${dep_brotliDec}")
+  //implementation("org.tukaani:xz:${dep_tukaaniXz}")
+
+  implementation("javax.activation:activation:1.1.1") // For mimetype mapping
+  implementation("com.nwalsh:sinclude:${dep_sinclude}") {
+    exclude(group="net.sf.saxon", module="Saxon-HE")
+  }
+  implementation("com.vladsch.flexmark:flexmark-all:${dep_flexmarkAll}")
+  implementation("com.github.f4b6a3:uuid-creator:${dep_uuidCreator}")
+  implementation("org.relaxng:jing:${dep_jing}") {
+    exclude(group="net.sf.saxon", module="Saxon-HE")
+  }
+  implementation("com.networknt:json-schema-validator:${dep_jsonSchemaValidator}")
+  implementation("org.xmlresolver:xmlresolver:${dep_xmlResolver}")
+
+  // I was using log4j but httpclient5 uses slf4j.
+  // Could I get httpclient5 to use log4j? Maybe. ¯\_(ツ)_/¯
+  // But I got tired of trying to figure it out so I did this instead.
+  implementation("org.slf4j:slf4j-api:${dep_slf4j}")
+  implementation("org.slf4j:slf4j-simple:${dep_slf4j}")
+  implementation("org.apache.logging.log4j:log4j-to-slf4j:2.23.1")
+
+  implementation("org.apache.httpcomponents.client5:httpclient5:${dep_httpClient}")
+  implementation(files("lib/"))
+}
+
+val xmlbuild = the<XmlCalabashBuildExtension>()
+
+buildConfig {
+  className("XmlCalabashBuildConfig")
+  packageName("com.xmlcalabash")
+  useKotlinOutput { internalVisibility = false } 
+
+  buildConfigField("NAME", xmlbuild.name.get())
+  buildConfigField("VERSION", xmlbuild.version.get())
+  buildConfigField("PRODUCT_NAME", xmlbuild.productName.get())
+  buildConfigField("VENDOR_NAME", xmlbuild.vendorName.get())
+  buildConfigField("VENDOR_URI", xmlbuild.vendorUri.get())
+  buildConfigField("BUILD_DATE", xmlbuild.buildDate.get())
+  buildConfigField("BUILD_HASH", xmlbuild.gitHash())
+
+  val sb = StringBuilder()
+  sb.append("mapOf(\n")
+  arrayOf<String>("brotliDec",
+                  "commonsCodec",
+                  "commonsCompress",
+                  "flexmarkAll",
+                  "htmlparser",
+                  "httpClient",
+                  "jing",
+                  "jsonSchemaValidator",
+                  "schxslt",
+                  "sinclude",
+                  "slf4j",
+                  "tukaaniXz",
+                  "uuidCreator",
+                  "xmlResolver"
+  ).forEach { dep ->
+    sb.append("  \"").append(dep).append("\" to ")
+    sb.append("\"").append(project.findProperty(dep).toString()).append("\"")
+    if (dep != "xmlResolver") {
+      sb.append(",")
+    }
+    sb.append("\n")
+  }
+  sb.append(")\n")
+  
+  buildConfigField("java.util.Map<String,String>", "DEPENDENCIES", sb.toString())
+}
+
+tasks.jar {
+  archiveFileName.set(xmlbuild.jarArchiveFilename())
+}
+
+val sourcesJar by tasks.registering(Jar::class) {
+  archiveClassifier = "sources"
+  from(sourceSets.main.get().allSource)
+}
+
+tasks.withType<DokkaTask>().configureEach {
+  pluginConfiguration<DokkaBase, DokkaBaseConfiguration> {
+    customStyleSheets = listOf(file("../documentation/src/dokka/resources/css/xmlcalabash.css"))
+    //templatesDir = file("../documentation/src/dokka/resources/templates")
+    footerMessage = "© 2024 Norm Tovey-Walsh"
+    separateInheritedMembers = false
+    mergeImplicitExpectActualDeclarations = false
+  }
+
+  dokkaSourceSets {
+    named("main") {
+      moduleName.set("XMLCalabash")
+      includes.from("Module.md")
+      sourceLink {
+        localDirectory.set(file("src/main/kotlin"))
+        remoteUrl.set(URI("https://github.com/xmlcalabash3/xmlcalabash").toURL())
+        remoteLineSuffix.set("#L")
+      }
+    }
+  }
+}
+
+tasks.register("apidocs") {
+  dependsOn("dokkaJavadoc")
+  doLast {
+    val stream = PrintStream(layout.buildDirectory.file("dokka/javadoc/details.json").get().asFile)
+    stream.println("{\"version\": \"${xmlbuild.version.get()}\", \"pubdate\": \"${xmlbuild.buildTime.get()}\"}")
+    stream.close()
+  }
+}
+
+/*
+tasks.withType<Test> {
+    this.classpath.forEach { println(it) }
+}
+*/
+
+tasks.register("helloWorld") {
+  doLast {
+/*
+    val libs = mutableListOf<String>()
+    sourceSets.main.get().runtimeClasspath.forEach {
+                      if (it.isFile()) libs.add(it.getName())
+                    }
+    println(libs.joinToString(" "))
+*/
+    println("Hello, world.")
+  }
+}
+
+publishing {
+  repositories {
+    maven {
+      url = uri("https://github.com/xmlcalabash/xmlcalabash3")
+    }
+  }
+
+  publications {
+    register("mavenJava", MavenPublication::class) {
+      pom {
+        name = "XML Calabash"
+        packaging = "jar"
+        description = "An XProc 3.0 processor"
+        url = "https://github.com/xmlcalabash/xmlcalabash3"
+
+        scm {
+          url = "scm:git@github.com:xmlcalabash/xmlcalabash3.git"
+          connection = "scm:git@github.com:xmlcalabash/xmlcalabash3.git"
+          developerConnection = "scm:git@github.com:xmlcalabash/xmlcalabash3.git"
+        }
+
+        licenses {
+          license {
+            name = "Apache License, Version 2.0"
+            url = "https://www.apache.org/licenses/LICENSE-2.0"
+            distribution = "repo"
+          }
+        }
+
+        developers {
+          developer {
+            id = "ndw"
+            name = "Norm Tovey-Walsh"
+          }
+        }
+      }
+
+      from(components["java"])
+      artifact(sourcesJar.get())
+    }
+  }
+}
+

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?><refentry xmlns="http://docbook.org/ns/docbook" xmlns:p="http://www.w3.org/ns/xproc" xml:id="p-file-mkdir">
+<?db filename="p-file-mkdir"?>
+   <refnamediv>
+      <refname>p:file-mkdir</refname>
+      <refpurpose>The standard p:file-mkdir step</refpurpose>
+   </refnamediv>
+   <refsynopsisdiv>
+
+<refsection role="introduction">
+<title>Introduction</title>
+<para>The <code>p:file-mkdir</code> step creates a directory.</para>
+</refsection>
+
+<refsection role="step-declaration">
+<title>Step declaration</title>
+<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="../../../../xmlcalabash/src/main/resources/com/xmlcalabash/library.xpl" xpointer="xpath(/*/*[@type='p:file-mkdir'])"/>
+</refsection>
+
+<refsection role="errors"><title>Errors</title><para>
+<error code="C0140">It is a <glossterm>dynamic error</glossterm> if an
+      implementation does not support <tag>p:file-mkdir</tag> for a specified scheme.</error>
+<error code="D0064">It is a <glossterm>dynamic 
+      error</glossterm> if the base URI is not both absolute and valid according to <biblioref linkend="rfc3986"/>.</error>
+<error code="C0141">It is a
+          <glossterm>dynamic error</glossterm> if <tag>p:file-mkdir</tag> not available to the step due to access restrictions 
+          in the environment in which the pipeline is run.</error>
+<error code="C0114">It is a <glossterm>dynamic error</glossterm> if the directory referenced by the
+            <option>href</option> option cannot be created.</error>
+</para>
+</refsection>
+
+<refsection role="implementation-features"><title>Implementation-defined and -dependent features</title>
+<para>
+<impl>Conformant processors <rfc2119>must</rfc2119> support URIs whose
+    scheme is <code>file</code> for the <option>href</option> option of <tag>p:file-mkdir</tag>.
+    It is <glossterm>implementation-defined</glossterm> what other schemes are
+    supported by <tag>p:file-mkdir</tag>, and what the interpretation
+    of ‘directory’, ‘file’ and ‘contents’ is for those schemes.</impl>
+</para>
+</refsection>
+</refsynopsisdiv>
+
+   <refsection>
+      <title>Description</title>
+      <para>TBD.</para>
+   </refsection>
+</refentry>

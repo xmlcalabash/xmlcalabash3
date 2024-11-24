@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?><refentry xmlns="http://docbook.org/ns/docbook" xmlns:p="http://www.w3.org/ns/xproc" xml:id="p-http-request">
+<?db filename="p-http-request"?>
+   <refnamediv>
+      <refname>p:http-request</refname>
+      <refpurpose>The standard p:http-request step</refpurpose>
+   </refnamediv>
+   <refsynopsisdiv>
+
+<refsection role="introduction">
+<title>Introduction</title>
+<para>The <code>p:http-request</code> step allows authors to interact
+with resources over HTTP or related protocols. Implementations
+<rfc2119>must</rfc2119> support the <literal>http</literal> and
+<literal>https</literal> protocols.
+</para>
+</refsection>
+
+<refsection role="step-declaration">
+<title>Step declaration</title>
+<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="../../../../xmlcalabash/src/main/resources/com/xmlcalabash/library.xpl" xpointer="xpath(/*/*[@type='p:http-request'])"/>
+</refsection>
+
+<refsection role="errors"><title>Errors</title><para>
+<error code="C0128">It is a <glossterm>dynamic error</glossterm> if the
+  URI’s scheme is unknown or not supported.</error>
+<error code="C0122">It is a <glossterm>dynamic error</glossterm> if
+  the given method is not supported.</error>
+<error code="D0079">It is a <glossterm>dynamic error</glossterm> if a supplied content-type is not 
+        a valid media type of the form 
+        “<literal><replaceable>type</replaceable>/<replaceable>subtype</replaceable>+<replaceable>ext</replaceable></literal>” 
+        or “<literal><replaceable>type</replaceable>/<replaceable>subtype</replaceable></literal>”.</error>
+<error code="C0131">It is a <glossterm>dynamic error</glossterm> if
+      the processor cannot support the requested encoding.</error>
+<error code="C0127">It is a <glossterm>dynamic error</glossterm> if
+  the <option>headers</option> map contains two keys that are the same
+  when compared in a case-insensitive manner.</error>
+<error code="C0123">It is a <glossterm>dynamic error</glossterm> if any key
+  in the “<literal>auth</literal>” map is associated with a value that
+  is not an instance of the required type.</error>
+<error code="C0003">It is a <glossterm>dynamic
+  error</glossterm> if a “<literal>username</literal>” or a
+  “<literal>password</literal>” key is present without specifying a
+  value for the “<literal>auth-method</literal>” key, if the requested
+  <literal>auth-method</literal> isn't supported, or the
+  authentication challenge contains an authentication method that
+  isn't supported.</error>
+<error code="D0079">It is a <glossterm>dynamic error</glossterm> if a supplied content-type is not 
+          a valid media type of the form 
+          “<literal><replaceable>type</replaceable>/<replaceable>subtype</replaceable>+<replaceable>ext</replaceable></literal>” 
+          or “<literal><replaceable>type</replaceable>/<replaceable>subtype</replaceable></literal>”.</error>
+<error code="C0030">It
+      is a <glossterm>dynamic error</glossterm> if the response body cannot
+      be interpreted as requested (e.g. <literal>application/json</literal>
+      to override <literal>application/xml</literal> content).</error>
+<error code="C0125">It is
+        a <glossterm>dynamic error</glossterm> if the key
+        “<literal>accept-multipart</literal>” as the value
+        <code>false()</code> and a multipart response is
+        detected.</error>
+<error code="C0132">It is a <glossterm>dynamic error</glossterm> if
+          the override content encoding cannot be supported.</error>
+<error code="C0078">It is a
+          <glossterm>dynamic error</glossterm> if the value associated
+          with the “<literal>fail-on-timeout</literal>” is associated
+          with <code>true()</code> and a HTTP status code
+          <literal>408</literal> is encountered.</error>
+<error code="C0124">It is a <glossterm>dynamic
+        error</glossterm> if any key in the “parameters” map is
+        associated with a value that is not an instance of the
+        required type.</error>
+<error code="C0126">It is a
+        <glossterm>dynamic error</glossterm> if the XPath expression
+        in <option>assert</option> evaluates to
+        <code>false</code>.</error>
+<error code="C0203">It is a <glossterm>dynamic error</glossterm>
+if the specified boundary is not valid (for example, if it begins with two hyphens “--”).</error>
+<error code="C0133">It is a <glossterm>dynamic error</glossterm>
+if more than one document appears on the <port>source</port> port and
+a <literal>content-type</literal> header is present and the content
+type specified is not a multipart content type.</error>
+</para>
+</refsection>
+
+<refsection role="implementation-features"><title>Implementation-defined and -dependent features</title>
+<para>
+<impl>It is <glossterm>implementation-defined</glossterm>
+  which HTTP methods are supported.</impl>
+<impl>The interpretation of values
+  associated with the “<literal>auth-method</literal>” key other than
+  “<literal>Basic</literal>” or “<literal>Digest</literal>” is
+  <glossterm>implementation-defined</glossterm>.</impl>
+<impl>Other key value pairs in map “<literal>auth</literal>”
+  are <glossterm>implementation-defined</glossterm>.</impl>
+<impl>It is
+    <glossterm>implementation-defined</glossterm> which other
+    key/value pairs in the <option>parameters</option> option are
+    supported.</impl>
+<impl>The default
+          behaviour in case of a redirect response is <glossterm>implementation-defined</glossterm>.</impl>
+<impl>It is
+<glossterm>implementation-defined</glossterm> how a multipart boundary
+is constructed.</impl>
+</para>
+</refsection>
+</refsynopsisdiv>
+
+   <refsection>
+      <title>Description</title>
+      <para>TBD.</para>
+   </refsection>
+</refentry>

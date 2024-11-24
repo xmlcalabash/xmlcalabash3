@@ -1,0 +1,108 @@
+default namespace = "https://xmlcalabash.com/ns/configuration"
+namespace cc = "https://xmlcalabash.com/ns/configuration"
+
+start = cc.xmlCalabash
+
+cc.xmlCalabash =
+    element cc:xml-calabash {
+        attribute version { "1.0" }?,
+        attribute saxon-configuration { text }?,
+        attribute schema-aware { xsd:boolean }?,
+        attribute debug { xsd:boolean }?,
+        attribute verbosity { "detail" | "progress" | "normal" | "warning" | "quiet" }?,
+        (cc.systemProperty
+        | cc.proxy
+        | cc.threading
+        | cc.inline
+        | cc.graphviz
+        | cc.saxonConfigurationProperty
+        | cc.serialization
+        | cc.mimetype
+        | cc.sendMail)*
+    }
+
+cc.systemProperty =
+    element cc:system-property {
+        attribute name { text },
+        attribute value { text },
+        empty
+    }
+
+cc.proxy =
+    element cc:proxy {
+        attribute scheme { text },
+        attribute uri { xsd:anyURI },
+        empty
+    }
+
+cc.threading =
+    element cc:threading {
+        attribute count { xsd:integer },
+        empty
+    }
+
+cc.inline =
+    element cc:inline {
+        attribute trim-whitespace { xsd:boolean },
+        empty
+    }
+
+cc.graphviz =
+    element cc:graphviz {
+        attribute dot { text },
+        empty
+    }
+
+cc.saxonConfigurationProperty =
+    element cc:saxon-configuration-property {
+        attribute name { text },
+        attribute value { text },
+        empty
+    }
+
+cc.serialization =
+    element cc:serialization {
+        attribute content-type { text },
+        attribute * - content-type { text }*,
+
+#        attribute method { text }?,
+#        attribute allow-duplicate-names { xsd:boolean }?,
+#        attribute build-tree { xsd:boolean }?,
+#        attribute byte-order-mark { xsd:boolean }?,
+#        attribute cdata-section-elements { text }?,
+#        attribute doctype-public { text }?,
+#        attribute doctype-system { text }?,
+#        attribute encoding { text }?,
+#        attribute escape-solidus { xsd:boolean }?,
+#        attribute escape-uri-attributes { xsd:boolean }?,
+#        attribute html-version { xsd:decimal }?,
+#        attribute include-content-type { xsd:boolean }?,
+#        attribute indent { xsd:boolean }?,
+#        attribute item-separator { text }?,
+#        attribute json-node-output-method { text }?,
+#        attribute media-type { text }?,
+#        attribute normalization-form { text }?,
+#        attribute omit-xml-declaration { xsd:boolean }?,
+#        attribute standalone { xsd:boolean | "omit" }?,
+#        attribute suppress-indentation { text }?,
+#        attribute undeclare-prefixes { xsd:boolean }?,
+#        attribute version { text }?,
+        empty
+    }
+
+cc.mimetype =
+    element cc:mimetype {
+        attribute content-type { text },
+        attribute extensions { text },
+        empty
+    }
+
+cc.sendMail =
+    element cc:send-mail {
+        attribute host { text },
+        attribute port { xsd:integer }?,
+        attribute username { text }?,
+        attribute password { text }?,
+        empty
+    }
+

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?><refentry xmlns="http://docbook.org/ns/docbook" xmlns:p="http://www.w3.org/ns/xproc" xml:id="p-replace">
+<?db filename="p-replace"?>
+   <refnamediv>
+      <refname>p:replace</refname>
+      <refpurpose>The standard p:replace step</refpurpose>
+   </refnamediv>
+   <refsynopsisdiv>
+
+<refsection role="introduction">
+<title>Introduction</title>
+<para>The <code>p:replace</code> step replaces matching nodes in
+its primary input with the top-level node(s) of the
+<code>replacement</code> port's document.</para>
+</refsection>
+
+<refsection role="step-declaration">
+<title>Step declaration</title>
+<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="../../../../xmlcalabash/src/main/resources/com/xmlcalabash/library.xpl" xpointer="xpath(/*/*[@type='p:replace'])"/>
+</refsection>
+
+<refsection role="errors"><title>Errors</title><para>
+<error code="C0023">It
+is a <glossterm>dynamic error</glossterm> if that pattern matches
+an attribute or a namespace nodes. </error>
+</para>
+</refsection>
+
+<refsection role="implementation-features"><title>Implementation-defined and -dependent features</title>
+<para>
+</para>
+</refsection>
+</refsynopsisdiv>
+
+   <refsection>
+      <title>Description</title>
+      <para>TBD.</para>
+   </refsection>
+</refentry>

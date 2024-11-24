@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?><refentry xmlns="http://docbook.org/ns/docbook" xmlns:p="http://www.w3.org/ns/xproc" xml:id="p-store">
+<?db filename="p-store"?>
+   <refnamediv>
+      <refname>p:store</refname>
+      <refpurpose>The standard p:store step</refpurpose>
+   </refnamediv>
+   <refsynopsisdiv>
+
+<refsection role="introduction">
+<title>Introduction</title>
+<para>The <tag>p:store</tag> step stores (a possibly serialized
+version of) its input to a URI. It outputs a reference to the location
+of the stored document on the <port>result-uri</port> port.
+Aside from these side-effects, it behaves like a <tag>p:identity</tag>
+step, copying its input to the <port>result</port> port.</para>
+</refsection>
+
+<refsection role="step-declaration">
+<title>Step declaration</title>
+<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="../../../../xmlcalabash/src/main/resources/com/xmlcalabash/library.xpl" xpointer="xpath(/*/*[@type='p:store'])"/>
+</refsection>
+
+<refsection role="errors"><title>Errors</title><para>
+<error code="C0050">It is a <glossterm>dynamic error</glossterm>
+if the URI scheme is not supported or the step cannot store to the
+specified location.</error>
+</para>
+</refsection>
+
+<refsection role="implementation-features"><title>Implementation-defined and -dependent features</title>
+<para>
+</para>
+</refsection>
+</refsynopsisdiv>
+
+   <refsection>
+      <title>Description</title>
+      <para>TBD.</para>
+   </refsection>
+</refentry>

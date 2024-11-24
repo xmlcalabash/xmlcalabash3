@@ -1,0 +1,246 @@
+default namespace = "http://www.w3.org/ns/xproc-step"
+namespace c = "http://www.w3.org/ns/xproc-step"
+namespace cx = "http://xmlcalabash.com/ns/extensions"
+namespace db = "http://docbook.org/ns/docbook"
+
+start = c.archive
+
+c.archive = c.sevenzArchive | c.arArchive | c.arjArchive | c.jarArchive | c.tarArchive | c.zipArchive
+
+commonEntryAttributes =
+    [ db:purpose
+          [ "The entry name." ]
+    ]
+    attribute name { text }
+    &
+    [ db:purpose
+          [ "The entry URI." ]
+    ]
+    attribute href { xsd:anyURI }
+    &
+    [ db:purpose
+          [ "The content-type." ]
+    ]
+    attribute content-type { text }
+    &
+    [ db:purpose
+          [ "A comment associated with the entry." ]
+    ]
+    attribute comment { text }?
+    &
+    [ db:purpose
+          [ "The storage method." ]
+    ]
+    attribute method { text }?
+    &
+    [ db:purpose
+          [ "The compression level." ]
+    ]
+    attribute level { text }?
+
+modeAttributes = 
+    [ db:purpose
+          [ "The Unix mode bits." ]
+    ]
+    attribute cx:mode { xsd:integer }?
+
+    &
+    [ db:purpose
+          [ "The Unix mode as a string." ]
+    ]
+    attribute cx:mode-string { text }?
+
+sizeAttribute =
+    [ db:purpose
+          [ "The size of the entry when expanded." ]
+    ]
+    attribute cx:size { xsd:nonNegativeInteger }
+
+# ============================================================
+
+c.sevenzArchive =
+    element c:archive {
+        attribute format { "7z" },
+        c.sevenzEntry*
+    }
+
+c.sevenzEntry =
+    element c:entry {
+        commonEntryAttributes,
+        modeAttributes,
+        [ db:purpose
+              [ "The entry CRC value." ]
+        ]
+        attribute cx:crc { xsd:integer }?,
+        [ db:purpose
+              [ "The file creation time." ]
+        ]
+        attribute cx:file-creation-time { xsd:dateTime }?,
+        [ db:purpose
+              [ "The file last access time." ]
+        ]
+        attribute cx:last-access-time { xsd:dateTime }?,
+        [ db:purpose
+              [ "The Windows attributes" ]
+        ]
+        attribute cx:windows-attributes { xsd:integer }?,
+        [ db:purpose
+              [ "Is this an “anti-item”?" ]
+        ]
+        attribute cx:anti-item { xsd:boolean }?,
+        sizeAttribute,
+        empty
+    }
+
+
+# ============================================================
+
+c.arArchive =
+    element c:archive {
+        attribute format { "ar" },
+        c.arEntry*
+    }
+
+c.arEntry =
+    element c:entry {
+        commonEntryAttributes,
+        modeAttributes,
+        [ db:purpose
+              [ "The group id." ]
+        ]
+        attribute cx:group-id { xsd:integer },
+        [ db:purpose
+              [ "The last modification time." ]
+        ]
+        attribute cx:last-modified { xsd:dateTime }?,
+        sizeAttribute,
+        empty
+    }
+
+# ============================================================
+
+c.arjArchive =
+    element c:archive {
+        attribute format { "arj" },
+        c.arjEntry*
+    }
+
+c.arjEntry =
+    element c:entry {
+        commonEntryAttributes,
+        modeAttributes,
+        [ db:purpose
+              [ "The Windows attributes" ]
+        ]
+        attribute cx:windows-attributes { xsd:integer },
+        [ db:purpose
+              [ "The last modification time." ]
+        ]
+        attribute cx:last-modified { xsd:dateTime }?,
+        [ db:purpose
+              [ "Operating system where the archive was created." ]
+        ]
+        attribute cx:host-os { text }?,
+        sizeAttribute,
+        empty
+    }
+
+
+# ============================================================
+
+c.tarArchive =
+    element c:archive {
+        attribute format { "tar" },
+        c.tarEntry*
+    }
+
+c.tarEntry =
+    element c:entry {
+        commonEntryAttributes,
+        [ db:purpose
+              [ "The Unix mode bits." ]
+        ]
+        attribute cx:mode { xsd:integer },
+        [ db:purpose
+              [ "The Unix mode as a string." ]
+        ]
+        attribute cx:mode-string { text },
+        [ db:purpose
+              [ "The device major number." ]
+        ]
+        attribute cx:dev-major { xsd:integer }?,
+        [ db:purpose
+              [ "The device minor number." ]
+        ]
+        attribute cx:dev-minor { xsd:integer }?,
+        [ db:purpose
+              [ "The group id." ]
+        ]
+        attribute cx:group-id { xsd:integer },
+        [ db:purpose
+              [ "The group name." ]
+        ]
+        attribute cx:group-name { text },
+        [ db:purpose
+              [ "The user id." ]
+        ]
+        attribute cx:user-id { xsd:integer },
+        [ db:purpose
+              [ "The user name." ]
+        ]
+        attribute cx:user-name { text },
+        [ db:purpose
+              [ "The link flag." ]
+        ]
+        attribute cx:link-flag { xsd:integer }?,
+        [ db:purpose
+              [ "The link name." ]
+        ]
+        attribute cx:link-name { text }?,
+        [ db:purpose
+              [ "The file creation time." ]
+        ]
+        attribute cx:file-creation-time { xsd:dateTime }?,
+        [ db:purpose
+              [ "The file last access time." ]
+        ]
+        attribute cx:last-access-time { xsd:dateTime }?,
+        [ db:purpose
+              [ "The last modification time." ]
+        ]
+        attribute cx:last-modified { xsd:dateTime }?,
+        [ db:purpose
+              [ "The file last status change time." ]
+        ]
+        attribute cx:status-change-time { xsd:dateTime }?,
+        sizeAttribute,
+        empty
+    }
+
+# ============================================================
+
+c.zipArchive =
+    element c:archive {
+        attribute format { "zip" },
+        c.zipEntry*
+    }
+
+c.zipEntry =
+    element c:entry {
+        commonEntryAttributes,
+        modeAttributes,
+        [ db:purpose
+              [ "The file creation time." ]
+        ]
+        attribute cx:file-creation-time { xsd:dateTime }?,
+        [ db:purpose
+              [ "The file last access time." ]
+        ]
+        attribute cx:last-access-time { xsd:dateTime }?,
+        [ db:purpose
+              [ "The last modification time." ]
+        ]
+        attribute cx:last-modified { xsd:dateTime }?,
+        sizeAttribute,
+        empty
+    }

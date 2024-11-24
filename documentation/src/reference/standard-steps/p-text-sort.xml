@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?><refentry xmlns="http://docbook.org/ns/docbook" xmlns:p="http://www.w3.org/ns/xproc" xml:id="p-text-sort">
+<?db filename="p-text-sort"?>
+   <refnamediv>
+      <refname>p:text-sort</refname>
+      <refpurpose>The standard p:text-sort step</refpurpose>
+   </refnamediv>
+   <refsynopsisdiv>
+
+<refsection role="introduction">
+<title>Introduction</title>
+<para>The <code>p:text-sort</code> step sorts lines in a text document.</para>
+</refsection>
+
+<refsection role="step-declaration">
+<title>Step declaration</title>
+<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="../../../../xmlcalabash/src/main/resources/com/xmlcalabash/library.xpl" xpointer="xpath(/*/*[@type='p:text-sort'])"/>
+</refsection>
+
+<refsection role="errors"><title>Errors</title><para>
+<error code="C0098">It is a 
+       <glossterm>dynamic error</glossterm> if a dynamic XPath error occurred while applying sort-key to a line.</error>
+<error code="C0099">It is a <glossterm>dynamic error</glossterm> if the result of applying <code>sort-key</code>
+       to a given line results in a sequence with more than one item.</error>
+</para>
+</refsection>
+
+<refsection role="implementation-features"><title>Implementation-defined and -dependent features</title>
+<para>
+<impl>Support for other collations is <glossterm>implementation-defined</glossterm>.</impl>
+</para>
+</refsection>
+</refsynopsisdiv>
+
+   <refsection>
+      <title>Description</title>
+      <para>TBD.</para>
+   </refsection>
+</refentry>

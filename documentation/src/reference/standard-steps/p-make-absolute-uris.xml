@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?><refentry xmlns="http://docbook.org/ns/docbook" xmlns:p="http://www.w3.org/ns/xproc" xml:id="p-make-absolute-uris">
+<?db filename="p-make-absolute-uris"?>
+   <refnamediv>
+      <refname>p:make-absolute-uris</refname>
+      <refpurpose>The standard p:make-absolute-uris step</refpurpose>
+   </refnamediv>
+   <refsynopsisdiv>
+
+<refsection role="introduction">
+<title>Introduction</title>
+<para>The <code>p:make-absolute-uris</code> step makes an element or
+attribute's value in the source document an absolute IRI value in the
+result document.</para>
+</refsection>
+
+<refsection role="step-declaration">
+<title>Step declaration</title>
+<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="../../../../xmlcalabash/src/main/resources/com/xmlcalabash/library.xpl" xpointer="xpath(/*/*[@type='p:make-absolute-uris'])"/>
+</refsection>
+
+<refsection role="errors"><title>Errors</title><para>
+<error code="C0023">It is a <glossterm>dynamic error</glossterm> if
+the pattern matches anything other than element or attribute
+nodes.</error>
+<error code="D0064">It is a <glossterm>dynamic 
+    error</glossterm> if the base URI is not both absolute and valid according to <biblioref linkend="rfc3986"/>.</error>
+</para>
+</refsection>
+
+<refsection role="implementation-features"><title>Implementation-defined and -dependent features</title>
+<para>
+<impl>If the IRI reference specified by the <option>base-uri</option> option
+on <tag>p:make-absolute-uris</tag> is absent and the input document has no base URI,
+the results are <glossterm>implementation-dependent</glossterm>.</impl>
+</para>
+</refsection>
+</refsynopsisdiv>
+
+   <refsection>
+      <title>Description</title>
+      <para>TBD.</para>
+   </refsection>
+</refentry>

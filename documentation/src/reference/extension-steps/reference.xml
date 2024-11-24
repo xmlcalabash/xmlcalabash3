@@ -1,0 +1,12 @@
+<reference xmlns="http://docbook.org/ns/docbook"
+           xmlns:xi="http://www.w3.org/2001/XInclude"
+           xmlns:xlink="http://www.w3.org/1999/xlink"
+           xml:id="extension-steps" version="5.2">
+<info>
+  <title>Extension steps</title>
+</info>
+
+<xi:include href="cx-metadata-extractor.xml"/>
+<xi:include href="cx-unique-id.xml"/>
+
+</reference>

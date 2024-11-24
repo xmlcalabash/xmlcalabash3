@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?><refentry xmlns="http://docbook.org/ns/docbook" xmlns:p="http://www.w3.org/ns/xproc" xml:id="p-split-sequence">
+<?db filename="p-split-sequence"?>
+   <refnamediv>
+      <refname>p:split-sequence</refname>
+      <refpurpose>The standard p:split-sequence step</refpurpose>
+   </refnamediv>
+   <refsynopsisdiv>
+
+<refsection role="introduction">
+<title>Introduction</title>
+<para>The <tag>p:split-sequence</tag> step accepts a sequence of
+documents and divides it into two sequences.</para>
+</refsection>
+
+<refsection role="step-declaration">
+<title>Step declaration</title>
+<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="../../../../xmlcalabash/src/main/resources/com/xmlcalabash/library.xpl" xpointer="xpath(/*/*[@type='p:split-sequence'])"/>
+</refsection>
+
+<refsection role="errors"><title>Errors</title><para>
+<error code="C0150">It is a 
+<glossterm>dynamic error</glossterm> if evaluating the XPath expression
+in option <option>test</option> on a context document results
+in an error.</error>
+</para>
+</refsection>
+
+<refsection role="implementation-features"><title>Implementation-defined and -dependent features</title>
+<para>
+</para>
+</refsection>
+</refsynopsisdiv>
+
+   <refsection>
+      <title>Description</title>
+      <para>TBD.</para>
+   </refsection>
+</refentry>

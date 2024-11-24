@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?><refentry xmlns="http://docbook.org/ns/docbook" xmlns:p="http://www.w3.org/ns/xproc" xml:id="p-cast-content-type">
+<?db filename="p-cast-content-type"?>
+   <refnamediv>
+      <refname>p:cast-content-type</refname>
+      <refpurpose>The standard p:cast-content-type step</refpurpose>
+   </refnamediv>
+   <refsynopsisdiv>
+
+<refsection role="introduction">
+<title>Introduction</title>
+<para>The <tag>p:cast-content-type</tag> step creates a new document by 
+      changing the media type of its input. If the value of the <option>content-type</option>
+   option and the current media type of the document on <port>source</port> port are
+   the same, this document will appear unchanged on <port>result</port> port.</para>
+</refsection>
+
+<refsection role="step-declaration">
+<title>Step declaration</title>
+<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="../../../../xmlcalabash/src/main/resources/com/xmlcalabash/library.xpl" xpointer="xpath(/*/*[@type='p:cast-content-type'])"/>
+</refsection>
+
+<refsection role="errors"><title>Errors</title><para>
+<error code="D0079">It is a <glossterm>dynamic error</glossterm> if a supplied content-type is not 
+         a valid media type of the form 
+         “<literal><replaceable>type</replaceable>/<replaceable>subtype</replaceable>+<replaceable>ext</replaceable></literal>” 
+         or “<literal><replaceable>type</replaceable>/<replaceable>subtype</replaceable></literal>”.</error>
+<error code="C0071">It is a <glossterm>dynamic
+         error</glossterm> if the <tag>p:cast-content-type</tag> step
+         cannot perform the requested cast.</error>
+<error code="C0079">It is a <glossterm>dynamic error</glossterm> if the map
+         <option>parameters</option> contains an entry whose key is defined by the
+         implementation and whose value is not valid for that key.</error>
+<error code="C0072">It is a <glossterm>dynamic
+               error</glossterm> if the <tag>c:data</tag> contains content is not
+               a valid base64 string.</error>
+<error code="C0073">It is a <glossterm>dynamic
+               error</glossterm> if the <tag>c:data</tag> element does not have
+               a <tag class="attribute">content-type</tag> attribute.</error>
+<error code="C0074">It is a <glossterm>dynamic
+               error</glossterm> if the <option>content-type</option> is supplied and is
+               not the same as the <tag class="attribute">content-type</tag> specified on
+               the <tag>c:data</tag> element.</error>
+<error code="D0018">It is a <glossterm>dynamic error</glossterm> if
+     the parameter list contains any elements other than <tag>c:param</tag>.</error>
+<error code="D0014">It is a
+     <glossterm>dynamic error</glossterm> for any unqualified
+     attribute names to appear on a <tag>c:param-set</tag> element.</error>
+<error code="D0025">It is a
+     <glossterm>dynamic error</glossterm> if the <tag class="attribute">namespace</tag> attribute is
+     specified, the <tag class="attribute">name</tag> contains a colon, and the specified namespace is not
+     the same as the in-scope namespace binding for the specified prefix.</error>
+<error code="D0081">It is a
+     <glossterm>dynamic error</glossterm> if the <tag>c:param</tag> element has a
+     <tag class="attribute">value</tag> attribute and is not empty.</error>
+<error code="D0082">It is a <glossterm>dynamic error</glossterm> if the
+     <tag>c:param</tag> specifies a sequence type and the value does not
+     satisfy that type.</error>
+<error code="D0014">It is a
+     <glossterm>dynamic error</glossterm> for any unqualified attribute names
+     other than those specified here to appear on a <tag>c:param</tag> element.</error>
+<error code="D0049">It is a <glossterm>dynamic error</glossterm> if the text value is not
+                  a well-formed XML document</error>
+<error code="D0060">It is a 
+                     <glossterm>dynamic error</glossterm> if the text document can not be converted into
+                     the XPath data model</error>
+<error code="D0057">It is a <glossterm>dynamic
+                  error</glossterm> if the text document does not conform to the JSON grammar, unless the 
+                  parameter liberal is true and the processor chooses to accept the deviation.</error>
+<error code="D0058">It is a <glossterm>dynamic error</glossterm> if the parameter duplicates is 
+                  reject and the text document contains a JSON object with duplicate keys.</error>
+<error code="D0059">It is a <glossterm>dynamic error</glossterm> if the parameter map contains 
+                  an entry whose key is defined in the specification of <function>fn:parse-json</function> and 
+                  whose value is not valid for that key, or if it contains an entry with the key fallback 
+                  when the parameter <literal>escape</literal> with <literal>true()</literal> is also 
+                  present.</error>
+</para>
+</refsection>
+
+<refsection role="implementation-features"><title>Implementation-defined and -dependent features</title>
+<para>
+<impl>The semantics of the keys and the allowed values for
+         these keys are <glossterm>implementation-defined</glossterm>.</impl>
+<impl>It is
+            <glossterm>implementation-defined</glossterm> if any additional
+            conversions are supported.</impl>
+<impl>Casting from an XML media type to any other media type when
+               the input document is not a <tag>c:data</tag> document is
+               <glossterm>implementation-defined</glossterm>.</impl>
+<impl>Casting from an HTML media type to a JSON media type is 
+               <glossterm>implementation-defined</glossterm>.</impl>
+<impl>Casting from an HTML media type to any other media type is
+               <glossterm>implementation-defined</glossterm>.</impl>
+<impl>It is <glossterm>implementation-defined</glossterm> whether
+                  other result formats are supported.</impl>
+<impl>Casting from a JSON media type to an HTML media type is
+               <glossterm>implementation-defined</glossterm>.</impl>
+<impl>Casting from a JSON media type to any other media type is
+               <glossterm>implementation-defined</glossterm>.</impl>
+<impl>The precise way in which 
+                  text documents are parsed into the XPath data model is 
+                  <glossterm>implementation-defined</glossterm>.</impl>
+<impl>Casting from a text media type to any other media type is
+               <glossterm>implementation-defined</glossterm>.</impl>
+<impl>Casting from any other media type to a HTML media type, a JSON media type
+               or a text document is <glossterm>implementation-defined</glossterm>.</impl>
+<impl>Casting from any other media type to any other media type is 
+               <glossterm>implementation-defined</glossterm>.</impl>
+</para>
+</refsection>
+</refsynopsisdiv>
+
+   <refsection>
+      <title>Description</title>
+      <para>TBD.</para>
+   </refsection>
+</refentry>

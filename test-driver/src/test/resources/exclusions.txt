@@ -1,0 +1,26 @@
+ab-import-functions-008 because I can’t seem to hide private functions
+ab-import-functions-009 because I can’t seem to hide private functions
+ab-import-functions-010 because I don’t detect the error when the library is loaded
+ab-import-functions-011 because that doesn’t work
+ab-import-functions-012 because that doesn’t work
+ab-import-functions-015 because XQuery function imports require a namespace
+ab-import-functions-016 because XQuery function imports require a namespace
+ab-import-functions-017 because XQuery function imports require a namespace
+ab-import-functions-018 because XQuery function imports require a namespace
+ab-import-functions-019 because XQuery function imports require a namespace
+ab-import-functions-020 because XQuery function imports require a namespace
+ab-import-functions-021 because XQuery function imports require a namespace
+ab-import-functions-022 because XQuery function imports require a namespace
+ab-import-functions-023 because XQuery function imports require a namespace
+ab-import-functions-024 because XQuery function imports require a namespace
+ab-import-functions-025 because XQuery function imports require a namespace
+ab-import-functions-026 because XQuery function imports require a namespace
+ab-import-functions-027 because XQuery function imports require a namespace
+ab-import-functions-028 because XQuery function imports require a namespace
+ab-import-functions-029 because XQuery function imports require a namespace
+ab-import-functions-030 because XQuery function imports require a namespace
+ab-import-functions-031 because XQuery function imports require a namespace
+ab-override-content-types-005 because https://github.com/xproc/3.0-test-suite/issues/747
+ab-override-content-types-015 because https://github.com/xproc/3.0-test-suite/issues/747
+ab-step-available-061 because I think it should raise err:XS0115
+ab-step-available-064 because I think it should raise err:XS0115 (dup of 061?)

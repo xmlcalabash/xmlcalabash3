@@ -1,0 +1,133 @@
+<chapter xmlns="http://docbook.org/ns/docbook"
+         xmlns:h="http://www.w3.org/1999/xhtml"
+         xmlns:xi="http://www.w3.org/2001/XInclude"
+         xmlns:xlink="http://www.w3.org/1999/xlink"
+         xml:id="dependencies" version="5.2">
+<info>
+  <title>Dependencies</title>
+</info>
+
+<para>XML Calabash runs on the JVM and requires Java version 11 or later. It is
+implemented in Kotlin. It relies on the Kotlin runtime and on third party
+libraries for some functionality. In particular it was built with:
+</para>
+
+<variablelist>
+<varlistentry>
+<term>Saxon 12.x</term>
+<listitem>
+<para>XML Calabash 3.x is built on top of Saxon 12.5. There is no support for
+earlier releases of Saxon. It will work with Saxon HE, but you will have to provide Saxon EE and
+an appropriate license if you want to use EE features (like XML Schema validation).
+</para>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>brotliDec, version <?version DEPENDENCY_brotliDec?></term>
+<listitem>
+<para>To support <literal>.br</literal> archive files.
+</para>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>commonsCodec, version <?version DEPENDENCY_commonsCodec?></term>
+<listitem>
+<para>For common encoders and decoders.
+</para>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>commonsCompress, version <?version DEPENDENCY_commonsCompress?></term>
+<listitem>
+<para>To support processing many flavors of archive files.
+</para>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>flexmarkAll, version <?version DEPENDENCY_flexmarkAll?></term>
+<listitem>
+<para>To support MarkDown to HTML conversion.
+</para>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>htmlparser, version <?version DEPENDENCY_htmlparser?></term>
+<listitem>
+<para>To parse HTML.
+</para>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>httpClient, version <?version DEPENDENCY_httpClient?></term>
+<listitem>
+<para>To support HTTP requests.
+</para>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>jing, version <?version DEPENDENCY_jing?></term>
+<listitem>
+<para>To support RELAX NG and NVDL validation.
+</para>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>jsonSchemaValidator, version <?version DEPENDENCY_jsonSchemaValidator?></term>
+<listitem>
+<para>To support JSON schema validation.
+</para>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>schxslt, version <?version DEPENDENCY_schxslt?></term>
+<listitem>
+<para>To support Schematron.
+</para>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>sinclude, version <?version DEPENDENCY_sinclude?></term>
+<listitem>
+<para>To support XInclude.
+</para>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>slf4j, version <?version DEPENDENCY_slf4j?></term>
+<listitem>
+<para>For logging.
+</para>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>tukaaniXz, version <?version DEPENDENCY_tukaaniXz?></term>
+<listitem>
+<para>To support <literal>.xz</literal> archive files.
+</para>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>uuidCreator, version <?version DEPENDENCY_uuidCreator?></term>
+<listitem>
+<para>To support UUIDs.
+</para>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>xmlResolver, version <?version DEPENDENCY_xmlResolver?></term>
+<listitem>
+<para>For XML Catalog resolution.
+</para>
+</listitem>
+</varlistentry>
+</variablelist>
+
+<para>If your pipelines don’t use features supported by third party libraries
+(for example, if you don’t have <literal>.br</literal> archives or convert
+MarkDown documents), you can omit the dependencies.</para>
+
+<para>In many cases, you can use different versions of these libraries. For
+example, you can usually upgrade to more recent minor revisions. If the third
+party API has changed in some incompatible way, your pipeline will fail.</para>
+
+</chapter>

@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?><refentry xmlns="http://docbook.org/ns/docbook" xmlns:p="http://www.w3.org/ns/xproc" xml:id="p-xslt">
+<?db filename="p-xslt"?>
+   <refnamediv>
+      <refname>p:xslt</refname>
+      <refpurpose>The standard p:xslt step</refpurpose>
+   </refnamediv>
+   <refsynopsisdiv>
+
+<refsection role="introduction">
+<title>Introduction</title>
+<para>The <tag>p:xslt</tag> step invokes an XSLT stylesheet.</para>
+</refsection>
+
+<refsection role="step-declaration">
+<title>Step declaration</title>
+<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="../../../../xmlcalabash/src/main/resources/com/xmlcalabash/library.xpl" xpointer="xpath(/*/*[@type='p:xslt'])"/>
+</refsection>
+
+<refsection role="errors"><title>Errors</title><para>
+<error code="C0038">It is a
+      <glossterm>dynamic error</glossterm> if the specified xslt version is not available.</error>
+<error code="C0093"> It is a <glossterm>dynamic error</glossterm> if a static error occurs during the
+    static analysis of the XSLT stylesheet.</error>
+<error code="C0095">It is a <glossterm>dynamic error</glossterm> if an error occurred during
+    the transformation.</error>
+<error code="C0096">It is a <glossterm>dynamic error</glossterm> if the transformation is
+      terminated by XSLT message termination.</error>
+<error code="C0008">It is a
+        <glossterm>dynamic error</glossterm> if the stylesheet does not support a given mode.</error>
+<error code="C0056">It is a <glossterm>dynamic error</glossterm> if the stylesheet does not provide a given
+        template.</error>
+<error code="C0121">It is a <glossterm>dynamic error</glossterm> if a document appearing
+        on the <port>secondary</port> port has a base URI that is not both absolute and 
+        valid according to <biblioref linkend="rfc3986"/>.</error>
+<error code="C0094">It is a <glossterm>dynamic
+        error</glossterm> if any document supplied on the source port is not an XML document, an
+        HTML documents, or a Text document if XSLT 2.0 is used.</error>
+<error code="C0007">It is a <glossterm>dynamic error</glossterm> if any key in
+        <option>parameters</option> is associated to a value which is not an instance of the XQuery
+        1.0 and XPath 2.0 Data Model, e.g. with a map, an array, or a function.</error>
+<error code="C0008">It is a <glossterm>dynamic error</glossterm> if the specified initial mode
+        cannot be applied to the specified stylesheet.</error>
+<error code="C0056">It is a <glossterm>dynamic error</glossterm> if the specified template 
+        name cannot be applied to the specified stylesheet.</error>
+<error code="C0121">It is a <glossterm>dynamic error</glossterm> if a document appearing
+        on the <port>secondary</port> port has a base URI that is not both absolute and 
+        valid according to <biblioref linkend="rfc3986"/>.</error>
+<error code="C0039">It is a <glossterm>dynamic error</glossterm> if the source port does not
+        contain exactly one XML document or one HTML document if XSLT 1.0 is used.</error>
+<error code="C0105">It is a <glossterm>dynamic error</glossterm> if an XSLT 1.0
+      stylesheet is invoked and option <option>parameters</option> contains a value that is not an atomic value
+      or a node.</error>
+</para>
+</refsection>
+
+<refsection role="implementation-features"><title>Implementation-defined and -dependent features</title>
+<para>
+<impl>It is <glossterm>implementation-defined</glossterm> which XSLT
+    version(s) is/are supported.</impl>
+<impl>Whether static parameters are supported is
+      <glossterm>implementation-defined</glossterm> and depends on the XSLT version (which must be
+    3.0 or higher).</impl>
+<impl>How XSLT message termination errors are reported to the XProc processor is
+      <glossterm>implementation-dependent</glossterm>.</impl>
+<impl>The order in which 
+        result documents appear on the <port>secondary</port> port is
+        <glossterm>implementation-dependent</glossterm>.</impl>
+<impl>The order in which 
+        result documents appear on the <port>secondary</port> port is
+        <glossterm>implementation-dependent</glossterm>.</impl>
+</para>
+</refsection>
+</refsynopsisdiv>
+
+   <refsection>
+      <title>Description</title>
+      <para>TBD.</para>
+   </refsection>
+</refentry>

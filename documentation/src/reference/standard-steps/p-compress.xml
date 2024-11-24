@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?><refentry xmlns="http://docbook.org/ns/docbook" xmlns:p="http://www.w3.org/ns/xproc" xml:id="p-compress">
+<?db filename="p-compress"?>
+   <refnamediv>
+      <refname>p:compress</refname>
+      <refpurpose>The standard p:compress step</refpurpose>
+   </refnamediv>
+   <refsynopsisdiv>
+
+<refsection role="introduction">
+<title>Introduction</title>
+<para>The <tag>p:compress</tag> step serializes the document appearing on its <port>source</port>
+    port and outputs a compressed version of this on its <port>result</port> port.</para>
+</refsection>
+
+<refsection role="step-declaration">
+<title>Step declaration</title>
+<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="../../../../xmlcalabash/src/main/resources/com/xmlcalabash/library.xpl" xpointer="xpath(/*/*[@type='p:compress'])"/>
+</refsection>
+
+<refsection role="errors"><title>Errors</title><para>
+<error code="C0202">It is a <glossterm>dynamic error</glossterm> if the compression
+              format cannot be understood, determined and/or processed.</error>
+<error code="C0079">It is a <glossterm>dynamic error</glossterm> if the map
+              <option>parameters</option> contains an entry whose key is defined by the
+            implementation and whose value is not valid for that key.</error>
+</para>
+</refsection>
+
+<refsection role="implementation-features"><title>Implementation-defined and -dependent features</title>
+<para>
+<impl>It is
+              <glossterm>implementation-defined</glossterm> what other formats are supported.</impl>
+<impl>The semantics of the keys and the allowed values for these keys are
+              <glossterm>implementation-defined</glossterm>.</impl>
+</para>
+</refsection>
+</refsynopsisdiv>
+
+   <refsection>
+      <title>Description</title>
+      <para>Compression is supported by the third party
+Apache Commons Compress™ library.</para>
+   </refsection>
+
+   <refsection>
+     <title>Supported formats</title>
+
+<para>The following formats are supported using the Apache Commons
+Compress™ library version 1.27.1.</para>
+
+<informaltable>
+<tgroup cols="4">
+<thead>
+  <row>
+    <entry>Compression algorithm</entry>
+    <entry>Format</entry>
+    <entry>Content type</entry>
+    <entry>Common file extensions</entry>
+  </row>
+</thead>
+<tbody>
+  <row><entry>BZip2</entry><entry><literal>bzip2</literal></entry><entry><literal>application/bzip2</literal></entry><entry><filename class="extension">.bz2</filename></entry></row>
+  <row><entry>deflate</entry><entry><literal>deflate</literal></entry><entry><literal>application/deflate</literal></entry><entry><filename class="extension">.deflate</filename></entry></row>
+  <row><entry>GZip</entry><entry><literal>gzip</literal></entry><entry><literal>application/gzip</literal></entry><entry><filename class="extension">.gz</filename>, <filename class="extension">.gzip</filename></entry></row>
+  <row><entry>LZMA</entry><entry><literal>lzma</literal></entry><entry><literal>application/lzma</literal></entry><entry><filename class="extension">.lzma</filename></entry></row>
+  <row><entry>XZ</entry><entry><literal>xz</literal></entry><entry><literal>application/xz</literal></entry><entry><filename class="extension">.xz</filename></entry></row>
+</tbody>
+</tgroup>
+</informaltable>
+
+<refsection>
+<title>Notes</title>
+<orderedlist>
+<listitem>
+<para>You can uncompress using the Brotli and Compress algorithms with <tag>p:uncompress</tag>,
+but they are read-only. You cannot compress with those algorithms.</para>
+</listitem>
+<listitem>
+<para>Support for the LZMA and XZ algorithms require the
+<package>org.tukaani:xz:<?dep tukaaniXz?></package> package on the classpath.</para>
+</listitem>
+</orderedlist>
+</refsection>
+
+   </refsection>
+</refentry>

@@ -1,0 +1,15 @@
+<!-- -*- nxml -*- -->
+<cc:xml-calabash xmlns:cc="https://xmlcalabash.com/ns/configuration"
+                 schema-aware="false">
+  <cc:mimetype content-type="application/xml" extensions="xml xpl"/>
+  <cc:mimetype content-type="text/plain" extensions="text"/>
+  <cc:mimetype content-type="application/json" extensions="json"/>
+  <cc:mimetype content-type="application/gzip" extensions="gz"/>
+  <cc:mimetype content-type="text/xquery" extensions="xq xqy"/>
+  <cc:mimetype content-type="application/rng+xml" extensions="rng"/>
+  <cc:mimetype content-type="application/xsd+xml" extensions="xsd"/>
+  <cc:mimetype content-type="application/schematron+xml" extensions="sch"/>
+  <cc:mimetype content-type="text/rnc" extensions="rnc"/>
+  <cc:mimetype content-type="application/nvdl+xml" extensions="nvdl"/>
+  <cc:inline trim-whitespace="true"/>
+</cc:xml-calabash>

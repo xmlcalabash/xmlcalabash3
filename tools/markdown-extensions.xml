@@ -1,0 +1,394 @@
+<extensions xmlns="https://xmlcalabash.com/ns/markdown-extensions" version="0.64.8">
+  <extension name="abbreviation" package="com.vladsch.flexmark.ext.abbreviation" class="AbbreviationExtension">
+    <option enum="ABBREVIATIONS_KEEP" package="com.vladsch.flexmark.util.ast" class="KeepType"
+            values="LAST FIRST FAIL LOCKED"/>
+    <option enum="USE_LINKS" type="boolean"/>
+    <option enum="ABBREVIATIONS_PLACEMENT" package="com.vladsch.flexmark.util.format.options"
+            class="ElementPlacement"
+            values="AS_IS DOCUMENT_TOP GROUP_WITH_FIRST GROUP_WITH_LAST DOCUMENT_BOTTOM"/>
+    <option enum="ABBREVIATIONS_SORT" package="com.vladsch.flexmark.util.format.options"
+            class="ElementPlacementSort"
+            values="AS_IS SORT SORT_UNUSED_LAST SORT_DELETE_UNUSED DELETE_UNUSED"/>
+    <option enum="MAKE_MERGED_ABBREVIATIONS_UNIQUE" type="boolean"/>
+  </extension>
+            
+  <extension name="admonition" package="com.vladsch.flexmark.ext.admonition" class="AdmonitionExtension">
+    <option enum="CONTENT_INDENT" type="integer"/>
+    <option enum="ALLOW_LEADING_SPACE" type="boolean"/>
+    <option enum="INTERRUPTS_PARAGRAPH" type="boolean"/>
+    <option enum="INTERRUPTS_ITEM_PARAGRAPH" type="boolean"/>
+    <option enum="WITH_SPACES_INTERRUPTS_ITEM_PARAGRAPH" type="boolean"/>
+    <option enum="ALLOW_LAZY_CONTINUATION" type="boolean"/>
+    <option enum="UNRESOLVED_QUALIFIER"/>
+    <option enum="QUALIFIER_TYPE_MAP" type="DataKeyMap:string,string"/>
+    <option enum="QUALIFIER_TITLE_MAP" type="DataKeyMap:string,string"/>
+    <option enum="TYPE_SVG_MAP" type="DataKeyMap:string,string"/>
+  </extension>
+
+  <extension name="anchorlink" package="com.vladsch.flexmark.ext.anchorlink" class="AnchorLinkExtension">
+    <option enum="ANCHORLINKS_WRAP_TEXT" type="boolean"/>
+    <option enum="ANCHORLINKS_TEXT_PREFIX"/>
+    <option enum="ANCHORLINKS_TEXT_SUFFIX"/>
+    <option enum="ANCHORLINKS_ANCHOR_CLASS"/>
+    <option enum="ANCHORLINKS_SET_NAME" type="boolean"/>
+    <option enum="ANCHORLINKS_SET_ID" type="boolean"/>
+    <option enum="ANCHORLINKS_NO_BLOCK_QUOTE" type="boolean"/>
+  </extension>
+
+  <extension name="aside" package="com.vladsch.flexmark.ext.aside" class="AsideExtension">
+    <option enum="EXTEND_TO_BLANK_LINE" type="boolean"/>
+    <option enum="IGNORE_BLANK_LINE" type="boolean"/>
+    <option enum="ALLOW_LEADING_SPACE" type="boolean"/>
+    <option enum="INTERRUPTS_PARAGRAPH" type="boolean"/>
+    <option enum="INTERRUPTS_ITEM_PARAGRAPH" type="boolean"/>
+    <option enum="WITH_LEAD_SPACES_INTERRUPTS_ITEM_PARAGRAPH" type="boolean"/>
+  </extension>
+
+  <extension name="attributes" package="com.vladsch.flexmark.ext.attributes" class="AttributesExtension">
+    <option enum="ATTRIBUTES_KEEP" package="com.vladsch.flexmark.util.ast" class="KeepType"
+            values="LAST FIRST FAIL LOCKED"/>
+    <option enum="ASSIGN_TEXT_ATTRIBUTES" type="boolean"/>
+    <option enum="FENCED_CODE_INFO_ATTRIBUTES" type="boolean"/>
+    <option enum="FENCED_CODE_ADD_ATTRIBUTES" class="FencedCodeAddType"
+            values="ADD_TO_PRE_CODE ADD_TO_PRE ADD_TO_CODE"/>
+    <option enum="WRAP_NON_ATTRIBUTE_TEXT" type="boolean"/>
+    <option enum="USE_EMPTY_IMPLICIT_AS_SPAN_DELIMITER" type="boolean"/>
+    <option enum="FORMAT_ATTRIBUTES_COMBINE_CONSECUTIVE" type="boolean"/>
+    <option enum="FORMAT_ATTRIBUTES_SORT" type="boolean"/>
+    <option enum="FORMAT_ATTRIBUTES_SPACES" class="DiscretionaryText"
+            package="com.vladsch.flexmark.util.format.options"
+            values="AS_IS ADD REMOVE"/>
+    <option enum="FORMAT_ATTRIBUTE_EQUAL_SPACE" class="DiscretionaryText"
+            package="com.vladsch.flexmark.util.format.options"
+            values="AS_IS ADD REMOVE"/>
+    <option enum="FORMAT_ATTRIBUTE_VALUE_QUOTES" class="AttributeValueQuotes"
+            values="AS_IS NO_QUOTES_SINGLE_PREFERRED NO_QUOTES_DOUBLE_PREFERRED
+                    SINGLE_PREFERRED DOUBLE_PREFERRED SINGLE_QUOTES DOUBLE_QUOTES"/>
+    <option enum="FORMAT_ATTRIBUTE_ID" class="AttributeImplicitName"
+            values="AS_IS IMPLICIT_PREFERRED EXPLICIT_PREFERRED"/>
+    <option enum="FORMAT_ATTRIBUTE_CLASS" class="AttributeImplicitName"
+            values="AS_IS IMPLICIT_PREFERRED EXPLICIT_PREFERRED"/>
+  </extension>
+
+  <extension name="autolink" package="com.vladsch.flexmark.ext.autolink" class="AutolinkExtension">
+    <option enum="IGNORE_LINKS"/>
+  </extension>
+
+  <extension name="definition" package="com.vladsch.flexmark.ext.definition" class="DefinitionExtension">
+    <option enum="COLON_MARKER" type="boolean"/>
+    <option enum="MARKER_SPACES" type="integer"/>
+    <option enum="TILDE_MARKER" type="boolean"/>
+    <option enum="DOUBLE_BLANK_LINE_BREAKS_LIST" type="boolean"/>
+    <option enum="FORMAT_MARKER_SPACES" type="integer"/>
+    <option enum="FORMAT_MARKER_TYPE" class="DefinitionMarker"
+            package="com.vladsch.flexmark.util.format.options"
+            values="ANY COLON TILDE"/>
+  </extension>
+
+  <extension name="emoji" package="com.vladsch.flexmark.ext.emoji" class="EmojiExtension">
+    <option enum="ROOT_IMAGE_PATH"/>
+    <option enum="USE_SHORTCUT_TYPE" class="EmojiShortcutType"
+            values="GITHUB EMOJI_CHEAT_SHEET ANY_GITHUB_PREFERRED ANY_EMOJI_CHEAT_SHEET_PREFERRED"/>
+    <option enum="USE_IMAGE_TYPE" class="EmojiImageType"
+            values="IMAGE_ONLY UNICODE_ONLY UNICODE_FALLBACK_TO_IMAGE"/>
+    <option enum="USE_UNICODE_FILE_NAMES" type="boolean"/>
+    <option enum="ATTR_IMAGE_SIZE"/>
+    <option enum="ATTR_IMAGE_CLASS"/>
+    <option enum="ATTR_ALIGN"/>
+  </extension>
+
+  <extension name="enumeratedreference" package="com.vladsch.flexmark.ext.enumerated.reference"
+             class="EnumeratedReferenceExtension">
+    <option enum="ENUMERATED_REFERENCES_KEEP" package="com.vladsch.flexmark.util.ast" class="KeepType"
+            values="LAST FIRST FAIL LOCKED"/>
+    <option enum="ENUMERATED_REFERENCE_PLACEMENT" class="ElementPlacement"
+            package="com.vladsch.flexmark.util.format.options"
+            values="AS_IS DOCUMENT_TOP GROUP_WITH_FIRST GROUP_WITH_LAST DOCUMENT_BOTTOM"/>
+    <option enum="ENUMERATED_REFERENCE_SORT" class="ElementPlacementSort"
+            package="com.vladsch.flexmark.util.format.options"
+            values="AS_IS SORT SORT_UNUSED_LAST SORT_DELETE_UNUSED DELETE_UNUSED"/>
+  </extension>
+
+  <extension name="escaped-character" package="com.vladsch.flexmark.ext.escaped.character"
+             class="EscapedCharacterExtension">
+  </extension>
+
+  <extension name="footnotes" package="com.vladsch.flexmark.ext.footnotes" class="FootnoteExtension">
+    <option enum="FOOTNOTES_KEEP" package="com.vladsch.flexmark.util.ast" class="KeepType"
+            values="LAST FIRST FAIL LOCKED"/>
+    <option enum="FOOTNOTE_REF_PREFIX"/>
+    <option enum="FOOTNOTE_REF_SUFFIX"/>
+    <option enum="FOOTNOTE_BACK_REF_STRING"/>
+    <option enum="FOOTNOTE_LINK_REF_CLASS"/>
+    <option enum="FOOTNOTE_BACK_LINK_REF_CLASS"/>
+    <option enum="FOOTNOTE_PLACEMENT" class="ElementPlacement"
+            package="com.vladsch.flexmark.util.format.options"
+            values="AS_IS DOCUMENT_TOP GROUP_WITH_FIRST GROUP_WITH_LAST DOCUMENT_BOTTOM"/>
+    <option enum="FOOTNOTE_SORT" class="ElementPlacementSort"
+            package="com.vladsch.flexmark.util.format.options"
+            values="AS_IS SORT SORT_UNUSED_LAST SORT_DELETE_UNUSED DELETE_UNUSED"/>
+  </extension>
+
+  <extension name="gfm-issues" package="com.vladsch.flexmark.ext.gfm.issues" class="GfmIssuesExtension">
+    <option enum="GIT_HUB_ISSUES_URL_ROOT"/>
+    <option enum="GIT_HUB_ISSUE_URL_PREFIX"/>
+    <option enum="GIT_HUB_ISSUE_URL_SUFFIX"/>
+    <option enum="GIT_HUB_ISSUE_HTML_PREFIX"/>
+    <option enum="GIT_HUB_ISSUE_HTML_SUFFIX"/>
+  </extension>
+
+  <extension name="gfm-strikethrough" package="com.vladsch.flexmark.ext.gfm.strikethrough"
+             class="StrikethroughExtension">
+    <option enum="STRIKETHROUGH_STYLE_HTML_OPEN" nullable="true"/>
+    <option enum="STRIKETHROUGH_STYLE_HTML_CLOSE" nullable="true"/>
+  </extension>
+
+  <extension name="gfm-strikethrough-subscript" package="com.vladsch.flexmark.ext.gfm.strikethrough"
+             class="SubscriptExtension">
+    <option enum="SUBSCRIPT_STYLE_HTML_OPEN" nullable="true"/>
+    <option enum="SUBSCRIPT_STYLE_HTML_CLOSE" nullable="true"/>
+  </extension>
+
+  <extension name="gfm-strikethrough-strikethrough-subscript"
+             package="com.vladsch.flexmark.ext.gfm.strikethrough"
+             class="StrikethroughSubscriptExtension">
+    <option enum="STRIKETHROUGH_STYLE_HTML_OPEN" nullable="true"/>
+    <option enum="STRIKETHROUGH_STYLE_HTML_CLOSE" nullable="true"/>
+    <option enum="SUBSCRIPT_STYLE_HTML_OPEN" nullable="true"/>
+    <option enum="SUBSCRIPT_STYLE_HTML_CLOSE" nullable="true"/>
+  </extension>
+
+  <extension name="gfm-tasklist" package="com.vladsch.flexmark.ext.gfm.tasklist" class="TaskListExtension">
+    <option enum="ITEM_DONE_MARKER"/>
+    <option enum="ITEM_NOT_DONE_MARKER"/>
+    <option enum="TIGHT_ITEM_CLASS"/>
+    <option enum="LOOSE_ITEM_CLASS"/>
+    <option enum="PARAGRAPH_CLASS"/>
+    <option enum="ITEM_DONE_CLASS"/>
+    <option enum="ITEM_NOT_DONE_CLASS"/>
+    <option enum="FORMAT_LIST_ITEM_CASE" class="TaskListItemCase"
+            values="AS_IS LOWERCASE UPPERCASE"/>
+    <option enum="FORMAT_LIST_ITEM_PLACEMENT" class="TaskListItemPlacement"
+            values="AS_IS INCOMPLETE_FIRST INCOMPLETE_NESTED_FIRST
+                    COMPLETE_TO_NON_TASK COMPLETE_NESTED_TO_NON_TASK"/>
+    <option enum="FORMAT_ORDERED_TASK_ITEM_PRIORITY" type="integer"/>
+    <option enum="FORMAT_DEFAULT_TASK_ITEM_PRIORITY" type="integer"/>
+    <option enum="FORMAT_PRIORITIZED_TASK_ITEMS" type="boolean"/>
+    <option enum="FORMAT_TASK_ITEM_PRIORITIES" type="DataKeyMap:character,integer"/>
+  </extension>
+
+  <extension name="gfm-users" package="com.vladsch.flexmark.ext.gfm.users" class="GfmUsersExtension">
+    <option enum="GIT_HUB_USERS_URL_ROOT"/>
+    <option enum="GIT_HUB_USER_URL_PREFIX"/>
+    <option enum="GIT_HUB_USER_URL_SUFFIX"/>
+    <option enum="GIT_HUB_USER_HTML_PREFIX"/>
+    <option enum="GIT_HUB_USER_HTML_SUFFIX"/>
+  </extension>
+
+  <extension name="gitlab" package="com.vladsch.flexmark.ext.gitlab" class="GitLabExtension">
+    <option enum="INS_PARSER" type="boolean"/>
+    <option enum="DEL_PARSER" type="boolean"/>
+    <option enum="BLOCK_QUOTE_PARSER" type="boolean"/>
+    <option enum="NESTED_BLOCK_QUOTES" type="boolean"/>
+    <option enum="INLINE_MATH_PARSER" type="boolean"/>
+    <option enum="RENDER_BLOCK_MATH" type="boolean"/>
+    <option enum="RENDER_BLOCK_MERMAID" type="boolean"/>
+    <option enum="RENDER_VIDEO_IMAGES" type="boolean"/>
+    <option enum="RENDER_VIDEO_LINK" type="boolean"/>
+    <option enum="MATH_LANGUAGES" type="DataKeyArray:string"/>
+    <option enum="MERMAID_LANGUAGES" type="DataKeyArray:string"/>
+    <option enum="INLINE_MATH_CLASS"/>
+    <option enum="BLOCK_MATH_CLASS"/>
+    <option enum="BLOCK_MERMAID_CLASS"/>
+    <option enum="VIDEO_IMAGE_CLASS"/>
+    <option enum="VIDEO_IMAGE_LINK_TEXT_FORMAT"/>
+  </extension>
+
+  <extension name="ins" package="com.vladsch.flexmark.ext.ins" class="InsExtension">
+    <option enum="INS_STYLE_HTML_OPEN" nullable="true"/>
+    <option enum="INS_STYLE_HTML_CLOSE" nullable="true"/>
+  </extension>
+
+  <extension name="jekyll-front-matter" package="com.vladsch.flexmark.ext.jekyll.front.matter"
+             class="JekyllFrontMatterExtension">
+  </extension>
+
+  <!-- configuration requires Java objects
+  <extension name="jekyll-tag" package="com.vladsch.flexmark.ext.jekyll.tag"
+             class="JekyllTagExtension"/>
+  -->
+
+  <extension name="macros" package="com.vladsch.flexmark.ext.macros" class="MacrosExtension">
+    <option enum="MACRO_DEFINITIONS_KEEP" package="com.vladsch.flexmark.util.ast" class="KeepType"
+            values="LAST FIRST FAIL LOCKED"/>
+    <option enum="MACRO_DEFINITIONS_PLACEMENT" package="com.vladsch.flexmark.util.format.options"
+            class="ElementPlacement"
+            values="AS_IS DOCUMENT_TOP GROUP_WITH_FIRST GROUP_WITH_LAST DOCUMENT_BOTTOM"/>
+    <option enum="MACRO_DEFINITIONS_SORT" package="com.vladsch.flexmark.util.format.options"
+            class="ElementPlacementSort"
+            values="AS_IS SORT SORT_UNUSED_LAST SORT_DELETE_UNUSED DELETE_UNUSED"/>
+    <option enum="SOURCE_WRAP_MACRO_REFERENCES" type="boolean"/>
+  </extension>
+
+  <extension name="media-tags" package="com.vladsch.flexmark.ext.media.tags" class="MediaTagsExtension">
+  </extension>
+
+  <extension name="resizable-image" package="com.vladsch.flexmark.ext.resizable.image"
+             class="ResizableImageExtension">
+  </extension>
+
+  <extension name="superscript" package="com.vladsch.flexmark.ext.superscript"
+             class="SuperscriptExtension">
+    <option enum="SUPERSCRIPT_STYLE_HTML_OPEN" nullable="true"/>
+    <option enum="SUPERSCRIPT_STYLE_HTML_CLOSE" nullable="true"/>
+  </extension>
+
+  <extension name="tables" package="com.vladsch.flexmark.ext.tables" class="TablesExtension">
+    <option enum="TRIM_CELL_WHITESPACE" type="boolean"/>
+    <option enum="MIN_SEPARATOR_DASHES" type="integer"/>
+    <option enum="MAX_HEADER_ROWS" type="integer"/>
+    <option enum="MIN_HEADER_ROWS" type="integer"/>
+    <option enum="APPEND_MISSING_COLUMNS" type="boolean"/>
+    <option enum="DISCARD_EXTRA_COLUMNS" type="boolean"/>
+    <option enum="COLUMN_SPANS" type="boolean"/>
+    <option enum="HEADER_SEPARATOR_COLUMN_MATCH" type="boolean"/>
+    <option enum="CLASS_NAME"/>
+    <option enum="WITH_CAPTION" type="boolean"/>
+    <option enum="FORMAT_TABLE_TRIM_CELL_WHITESPACE" type="boolean"/>
+    <option enum="FORMAT_TABLE_LEAD_TRAIL_PIPES" type="boolean"/>
+    <option enum="FORMAT_TABLE_SPACE_AROUND_PIPES" type="boolean"/>
+    <option enum="FORMAT_TABLE_ADJUST_COLUMN_WIDTH" type="boolean"/>
+    <option enum="FORMAT_TABLE_APPLY_COLUMN_ALIGNMENT" type="boolean"/>
+    <option enum="FORMAT_TABLE_FILL_MISSING_COLUMNS" type="boolean"/>
+    <option enum="FORMAT_TABLE_FILL_MISSING_MIN_COLUMN" type="integer" nullable="true"/>
+    <option enum="FORMAT_TABLE_LEFT_ALIGN_MARKER" class="DiscretionaryText"
+            package="com.vladsch.flexmark.util.format.options"
+            values="AS_IS ADD REMOVE"/>
+    <option enum="FORMAT_TABLE_MIN_SEPARATOR_COLUMN_WIDTH" type="integer"/>
+    <option enum="FORMAT_TABLE_MIN_SEPARATOR_DASHES" type="integer"/>
+    <!-- Java classes
+    public static final DataKey<CharWidthProvider> FORMAT_CHAR_WIDTH_PROVIDER
+    public static final DataKey<TableManipulator> FORMAT_TABLE_MANIPULATOR
+    -->
+    <option enum="FORMAT_TABLE_CAPTION" class="TableCaptionHandling"
+            package="com.vladsch.flexmark.util.format.options"
+            values="AS_IS ADD REMOVE_EMPTY REMOVE"/>
+    <option enum="FORMAT_TABLE_CAPTION_SPACES" class="DiscretionaryText"
+            package="com.vladsch.flexmark.util.format.options"
+            values="AS_IS ADD REMOVE"/>
+    <option enum="FORMAT_TABLE_INDENT_PREFIX"/>
+  </extension>
+
+  <extension name="sim-toc" package="com.vladsch.flexmark.ext.toc" class="SimTocExtension">
+    <!-- Java classes
+    <option enum="TOC_CONTENT" class="AttributablePart" package="com.vladsch.flexmark.html.renderer" 
+            values="NODE NODE_POSITION LINK ID"/>
+    <option enum="TOC_LIST" class="AttributablePart" package="com.vladsch.flexmark.html.renderer" 
+            values="NODE NODE_POSITION LINK ID"/>
+    -->
+    <option enum="LEVELS" type="integer"/>
+    <option enum="IS_TEXT_ONLY" type="boolean"/>
+    <option enum="IS_NUMBERED" type="boolean"/>
+    <option enum="LIST_TYPE" package="com.vladsch.flexmark.ext.toc.internal"
+            class="TocOptions.ListType"
+            values="HIERARCHY FLAT FLAT_REVERSED SORTED SORTED_REVERSED"/>
+    <option enum="IS_HTML" type="boolean"/>
+    <option enum="TITLE_LEVEL" type="integer"/>
+    <option enum="TITLE" nullable="true"/>
+    <option enum="AST_INCLUDE_OPTIONS" type="boolean"/>
+    <option enum="BLANK_LINE_SPACER" type="boolean"/>
+    <option enum="DIV_CLASS"/>
+    <option enum="LIST_CLASS"/>
+    <option enum="CASE_SENSITIVE_TOC_TAG" type="boolean"/>
+    <option enum="FORMAT_UPDATE_ON_FORMAT" class="SimTocGenerateOnFormat"
+            values="AS_IS UPDATE REMOVE"/>
+    <!-- Java classes
+    public static final DataKey<TocOptions> FORMAT_OPTIONS
+    -->
+  </extension>
+
+  <extension name="toc" package="com.vladsch.flexmark.ext.toc" class="TocExtension">
+    <!-- Java classes
+    <option enum="TOC_CONTENT" class="AttributablePart" package="com.vladsch.flexmark.html.renderer" 
+            values="NODE NODE_POSITION LINK ID"/>
+    <option enum="TOC_LIST" class="AttributablePart" package="com.vladsch.flexmark.html.renderer" 
+            values="NODE NODE_POSITION LINK ID"/>
+    -->
+    <option enum="LEVELS" type="integer"/>
+    <option enum="IS_TEXT_ONLY" type="boolean"/>
+    <option enum="IS_NUMBERED" type="boolean"/>
+    <option enum="LIST_TYPE" package="com.vladsch.flexmark.ext.toc.internal"
+            class="TocOptions.ListType"
+            values="HIERARCHY FLAT FLAT_REVERSED SORTED SORTED_REVERSED"/>
+    <option enum="IS_HTML" type="boolean"/>
+    <option enum="TITLE_LEVEL" type="integer"/>
+    <option enum="TITLE" nullable="true"/>
+    <option enum="AST_INCLUDE_OPTIONS" type="boolean"/>
+    <option enum="BLANK_LINE_SPACER" type="boolean"/>
+    <option enum="DIV_CLASS"/>
+    <option enum="LIST_CLASS"/>
+    <option enum="CASE_SENSITIVE_TOC_TAG" type="boolean"/>
+    <option enum="FORMAT_UPDATE_ON_FORMAT" class="SimTocGenerateOnFormat"
+            values="AS_IS UPDATE REMOVE"/>
+    <!-- Java classes
+    public static final DataKey<TocOptions> FORMAT_OPTIONS
+    -->
+  </extension>
+
+  <extension name="typographic" package="com.vladsch.flexmark.ext.typographic"
+             class="TypographicExtension">
+    <option enum="ENABLE_QUOTES" type="boolean"/>
+    <option enum="ENABLE_SMARTS" type="boolean"/>
+    <option enum="ANGLE_QUOTE_CLOSE"/>
+    <option enum="ANGLE_QUOTE_OPEN"/>
+    <option enum="ANGLE_QUOTE_UNMATCHED" nullable="true"/>
+    <option enum="DOUBLE_QUOTE_CLOSE"/>
+    <option enum="DOUBLE_QUOTE_OPEN"/>
+    <option enum="DOUBLE_QUOTE_UNMATCHED" nullable="true"/>
+    <option enum="ELLIPSIS"/>
+    <option enum="ELLIPSIS_SPACED"/>
+    <option enum="EM_DASH"/>
+    <option enum="EN_DASH"/>
+    <option enum="SINGLE_QUOTE_CLOSE"/>
+    <option enum="SINGLE_QUOTE_OPEN"/>
+    <option enum="SINGLE_QUOTE_UNMATCHED"/>
+  </extension>
+
+  <extension name="wikilink" package="com.vladsch.flexmark.ext.wikilink" class="WikiLinkExtension">
+    <option enum="ALLOW_INLINES" type="boolean"/>
+    <option enum="ALLOW_ANCHORS" type="boolean"/>
+    <option enum="ALLOW_ANCHOR_ESCAPE" type="boolean"/>
+    <option enum="ALLOW_PIPE_ESCAPE" type="boolean"/>
+    <option enum="DISABLE_RENDERING" type="boolean"/>
+    <option enum="LINK_FIRST_SYNTAX" type="boolean"/>
+    <option enum="LINK_PREFIX"/>
+    <option enum="LINK_PREFIX_ABSOLUTE"/>
+    <option enum="IMAGE_PREFIX"/>
+    <option enum="IMAGE_PREFIX_ABSOLUTE"/>
+    <option enum="IMAGE_LINKS" type="boolean"/>
+    <option enum="LINK_FILE_EXTENSION"/>
+    <option enum="IMAGE_FILE_EXTENSION"/>
+    <option enum="LINK_ESCAPE_CHARS"/>
+    <option enum="LINK_REPLACE_CHARS"/>
+    <!-- Java class
+    <option enum="WIKI_LINK" package="com.vladsch.flexmark.html.renderer"
+            class="LinkType"
+            values="LINK IMAGE LINK_REF IMAGE_REF"/>
+    -->
+  </extension>
+
+  <extension name="xwiki-macros" package="com.vladsch.flexmark.ext.xwiki.macros"
+             class="MacroExtension">
+    <option enum="ENABLE_INLINE_MACROS" type="boolean"/>
+    <option enum="ENABLE_BLOCK_MACROS" type="boolean"/>
+    <option enum="ENABLE_RENDERING" type="boolean"/>
+  </extension>
+
+  <extension name="yaml-front-matter" package="com.vladsch.flexmark.ext.yaml.front.matter"
+             class="YamlFrontMatterExtension">
+  </extension>
+
+  <extension name="youtube-embedded" package="com.vladsch.flexmark.ext.youtube.embedded"
+             class="YouTubeLinkExtension">
+  </extension>
+</extensions>

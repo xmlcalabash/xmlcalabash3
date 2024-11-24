@@ -1,0 +1,125 @@
+<bibliography xmlns="http://docbook.org/ns/docbook"
+	      xmlns:xlink="http://www.w3.org/1999/xlink"
+	      xmlns:xi='http://www.w3.org/2001/XInclude'
+	      version="5.0">
+
+<bibliomixed xml:id="CSS"><abbrev>CSS</abbrev>
+<citetitle xlink:href="https://www.w3.org/TR/css-2018/">CSS Snapshot 2018</citetitle>.
+Tab Atkins Jr., Elika J. Etemad, and Florial Rivoal editors.
+W3C Note 22 January 2019.</bibliomixed>
+
+<bibliomixed xml:id="rfc3986"><abbrev>RFC 3986</abbrev>
+<citetitle xlink:href="https://doi.org/10.17487/RFC3986">RFC 3986:
+Uniform Resource Identifier (URI): General Syntax</citetitle>.
+T. Berners-Lee, R. Fielding, and L. Masinter, editors.
+Internet Engineering Task Force. January, 2005.</bibliomixed>
+
+<bibliomixed xml:id="rfc1319"><abbrev>RFC 1319</abbrev>
+<citetitle xlink:href="https://doi.org/10.17487/RFC1319">RFC 1319:
+The MD2 Message-Digest Algorithm.</citetitle>.
+B. Kaliski, editor.
+Internet Engineering Task Force. April, 1992.</bibliomixed>
+
+<bibliomixed xml:id="rfc1321"><abbrev>RFC 1321</abbrev>
+<citetitle xlink:href="https://doi.org/10.17487/RFC1321">RFC 1321:
+The MD5 Message-Digest Algorith</citetitle>.
+R. Rivest, editor.
+Internet Engineering Task Force. April, 1992.</bibliomixed>
+
+<bibliomixed xml:id="rfc2104"><abbrev>RFC 2104</abbrev>
+<citetitle xlink:href="https://doi.org/10.17487/RFC2104">RFC 2104:
+HMAC: Keyed-Hashing for Message Authentication.</citetitle>
+H. Krawczyk, M. Bellare, and R. Canetti, editors.
+Internet Engineering Task Force. February, 1997.</bibliomixed>
+
+<bibliomixed xml:id="fips180-4"><abbrev>FIPS 180-4</abbrev>
+<citetitle xlink:href="https://csrc.nist.gov/pubs/fips/180-4/upd1/final">FIPS 180-4:
+Secure Hash Standard (SHS)</citetitle>.
+NIST Computer Security Resource Center.
+August, 2015.</bibliomixed>
+
+<bibliomixed xml:id="xproc31"><abbrev>XProc 3.1</abbrev>
+<citetitle xlink:href="https://spec.xproc.org/3.1/xproc/">XProc 3.1:
+An XML Pipeline Language</citetitle>.
+Norman Walsh, Achim Berndzen, Gerrit Imsieke and Erik Siegel, editors.
+</bibliomixed>
+
+<bibliomixed xml:id="relaxng-dtd-compat"><abbrev>RELAX NG DTD Compatibility</abbrev>
+<citetitle>RELAX NG DTD Compatibility</citetitle>.
+OASIS Committee Specification.
+3 December 2001.
+</bibliomixed>
+
+<bibliomixed xml:id="bib.uuid"><abbrev>UUID</abbrev>
+<citetitle xlink:href="https://www.itu.int/ITU-T/studygroups/com17/oid.html">ITU
+X.667: Information technology - Open Systems Interconnection -
+Procedures for the operation of OSI Registration Authorities:
+Generation and registration of Universally Unique Identifiers (UUIDs)
+and their use as ASN.1 Object Identifier components</citetitle>.
+2004.</bibliomixed>
+
+<bibliomixed xml:id="xmlschema-1"><abbrev>W3C XML Schema: Part 1</abbrev>
+<citetitle xlink:href="https://www.w3.org/TR/xmlschema-1/">XML Schema Part 1:
+Structures Second Edition</citetitle>.
+Henry S. Thompson, David Beech, Murray Maloney, et. al., editors.
+World Wide Web Consortium, 28 October 2004.
+</bibliomixed>
+
+<bibliomixed xml:id="xmlschema-2"><abbrev>W3C XML Schema: Part 2</abbrev>
+<citetitle xlink:href="https://www.w3.org/TR/xmlschema-2/">XML Schema Part 2:
+Datatypes Second Edition</citetitle>.
+Paul V. Biron and Ashok Malhotra, editors.
+World Wide Web Consortium, 28 October 2004.
+</bibliomixed>
+
+  
+<bibliomixed xml:id="iso19757-2"><abbrev>RELAX NG</abbrev>ISO/IEC JTC 1/SC 34.
+<citetitle xlink:href="https://www.iso.org/iso/iso_catalogue/catalogue_tc/catalogue_detail.htm?csnumber=52348">ISO/IEC 19757-2:2008(E)
+Document Schema Definition Language (DSDL) -- Part 2:
+Regular-grammar-based
+validation -- RELAX NG</citetitle>
+2008.
+</bibliomixed>
+
+<bibliomixed xml:id="iso19757-4"><abbrev>NVDL</abbrev>ISO/IEC JTC 1/SC 34.
+<citetitle>ISO/IEC 19757-4:2006(E) Document Schema Definition
+Languages (DSDL) — Part 4: Namespace-based Validation Dispatching Language (NVDL)</citetitle>
+2006.
+</bibliomixed>
+
+<bibliomixed xml:id="iso19757-3"><abbrev>Schematron</abbrev>ISO/IEC JTC 1/SC 34.
+<citetitle>ISO/IEC 19757-3:2016(E) Document Schema Definition
+Languages (DSDL) — Part 3: Rule-based validation — Schematron</citetitle>
+2016.
+</bibliomixed>
+
+<bibliomixed xml:id="xsl11"><abbrev>XSL 1.1</abbrev>
+<citetitle xlink:href="https://www.w3.org/TR/xsl/">Extensible Stylesheet
+Language (XSL) Version 1.1</citetitle>.
+Anders Berglund, editor. W3C Recommendation. 5 December 2006.</bibliomixed>
+
+<bibliomixed xml:id="jsonschema2020-12"><abbrev>JSON schema</abbrev>
+  <citetitle xlink:href="https://json-schema.org/draft/2020-12/json-schema-validation.html">JSON Schema Validation: A Vocabulary for 
+    Structural Validation of JSON</citetitle>.
+A.Wright, H. Andrews and B. Hutton, editors.
+Internet Engineering Task Force. June, 2022.</bibliomixed>
+
+<bibliomixed xml:id="xinclude"><abbrev>XInclude</abbrev>
+<citetitle xlink:href="https://www.w3.org/TR/xinclude/">XML Inclusions
+(XInclude) Version 1.0 (Second Edition)</citetitle>. Jonathan Marsh,
+David Orchard, and Daniel Veillard, editors.
+W3C Recommendation. 15 November 2006.</bibliomixed>
+
+<bibliomixed xml:id="xml-base"><abbrev>XML Base</abbrev>
+<citetitle xlink:href="https://www.w3.org/TR/xmlbase/">XML Base
+(Second Edition)</citetitle>.
+Jonathan Marsh and Richard Tobin, editors.
+W3C Recommendation. 28 January 2009.</bibliomixed>
+
+<bibliomixed xml:id="invisible-xml"><abbrev>Invisible XML</abbrev>
+<citetitle xlink:href="https://invisiblexml.org/1.0/">Invisible XML
+Specification</citetitle>, version 1.0.
+Steven Pemberton, editor. Version 2022-06-20.
+</bibliomixed>
+
+</bibliography>

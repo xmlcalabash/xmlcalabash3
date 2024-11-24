@@ -1,0 +1,368 @@
+<appendix xmlns="http://docbook.org/ns/docbook"
+          xmlns:xlink="http://www.w3.org/1999/xlink"
+          xmlns:xi='http://www.w3.org/2001/XInclude'
+          version="5.2" xml:id="configuration">
+<info>
+  <?db filename="configuration"?>
+  <title>Configuration</title>
+</info>
+
+<para>XML Calabash can read a configuration file to establish some default settings.
+The configuration file is an XML document. All of the elements in the configuration file
+must be in the <uri type="namespace">https://xmlcalabash.com/ns/configuration</uri> namespace.
+The conventional prefix for this namespace in the documentation is <code>cc:</code>.</para>
+
+<section xml:id="cc.xml-calabash">
+<info>
+<?db filename="cc-xml-calabash"?>
+<title>cc:xml-calabash</title>
+</info>
+
+<para>The document element of the configuration file is <tag>cc:xml-calabash</tag>:
+</para>
+
+<rng-pattern schema="../../build/xml-calabash.rng"
+             name="cc.xmlCalabash"/>
+
+<variablelist>
+<varlistentry><term><tag class="attribute">version</tag> (string)</term>
+<listitem>
+<para>The configuration file version, must be <literal>1.0</literal>.</para>
+</listitem>
+</varlistentry>
+<varlistentry><term><tag class="attribute">saxon-configuration</tag> (filename)</term>
+<listitem>
+<para>The filename of a
+<link xlink:href="https://www.saxonica.com/html/documentation12/configuration/configuration-file/index.html">Saxon
+configuration file</link>. This file will be loaded to initialize the Saxon configuration.</para>
+</listitem>
+</varlistentry>
+<varlistentry><term><tag class="attribute">schema-aware</tag> (boolean)</term>
+<listitem>
+<para>If <literal>true</literal>, a schema-aware Saxon configuration will be requested.
+This can also be specified <link linkend="cli-schema-aware">on the command line</link>.
+The command-line setting takes precedence.</para>
+<para>Schema-aware processing requires Saxon EE and a valid Saxon license.</para>
+</listitem>
+</varlistentry>
+<varlistentry><term><tag class="attribute">debug</tag> (boolean)</term>
+<listitem>
+<para>The default “debug” setting. This can also be specified <link
+linkend="cli-debug">on the command line</link>. The command-line setting takes precedence.</para>
+</listitem>
+</varlistentry>
+<varlistentry><term><tag class="attribute">verbosity</tag></term>
+<listitem>
+<para>The default “verbosity” setting. This can also be specified <link
+linkend="cli-verbosity">on the command line</link>. The command-line setting takes precedence.</para>
+</listitem>
+</varlistentry>
+</variablelist>
+
+<para>For simplicity, the content model of <tag>cc:xml-calabash</tag> allows every element to
+occur an arbitrary number of times. Where an element defines a single, global setting, the last
+value in document order applies.</para>
+
+</section>
+
+<section xml:id="cc.graphviz">
+<info>
+<?db filename="cc-graphviz"?>
+<title>cc:graphviz</title>
+</info>
+
+<para>Identifies the location of the <link xlink:href="https://graphviz.org/">Graphviz</link>
+executable. Making SVG diagrams of pipelines or graphs requires Graphviz.</para>
+
+<rng-pattern schema="../../build/xml-calabash.rng"
+             name="cc.graphviz"/>
+
+<variablelist>
+<varlistentry><term><tag class="attribute">dot</tag> (filename)</term>
+<listitem>
+<para>Location of the Graphviz “dot” executable.</para>
+</listitem>
+</varlistentry>
+</variablelist>
+
+</section>
+
+<section xml:id="cc.inline">
+<info>
+<?db filename="cc-inline"?>
+<title>cc:inline</title>
+</info>
+
+<para>Properties related to <tag>p:inline</tag> elements.</para>
+
+<rng-pattern schema="../../build/xml-calabash.rng"
+             name="cc.inline"/>
+
+<variablelist>
+<varlistentry><term><tag class="attribute">trim-whitespace</tag> (boolean)</term>
+<listitem>
+<para>It’s often convenient to use indentation in a pipeline document:</para>
+
+<programlisting language="xml"><![CDATA[…
+  <p:with-input port="source">
+    <p:inline>
+      <document/>
+    </p:inline>
+  </p:with-input>
+…]]></programlisting>
+
+<para>But that introduces whitespace at the beginning and end of the inline document.
+As written, the document that is provided on the <port>source</port> port consists
+of: 
+a newline, six spaces, the <code>&lt;document/&gt;</code> element, a newline and
+four spaces. Sometimes that’s annoying. It’s posssible to rewrite the example so that
+there’s no insignificant whitespace, but that makes the pipeline harder to read.</para>
+
+<para>If <tag class="attribute">trim-whitespace</tag> is <literal>true</literal>, leading
+and trailing whitespace in <tag>p:inline</tag> elements is removed. This setting does
+not apply to implicit inlines because they never have leading or trailing whitespace.</para>
+</listitem>
+</varlistentry>
+</variablelist>
+
+</section>
+
+<section xml:id="cc.mimetype">
+<info>
+<?db filename="cc-mimetype"?>
+<title>cc:mimetype</title>
+</info>
+
+<para>Define additional filename extension to content type mappings.</para>
+
+<rng-pattern schema="../../build/xml-calabash.rng"
+             name="cc.mimetype"/>
+
+<para>XML Calabash uses
+<link xlink:href="https://docs.oracle.com/javase/8/docs/api/javax/activation/MimetypesFileTypeMap.html"
+>javax.activation</link> to lookup mime types. You can define
+new types by creating an appropriately formatted
+<filename>.mime.types</filename> file in your home directory. This will work for all
+applications that read the <filename>.mime.types</filename> file.</para>
+
+<para>Alternatively, you can define them in the configuration file.</para>
+
+<variablelist>
+<varlistentry><term><tag class="attribute">content-type</tag> (MIME type)</term>
+<listitem>
+<para>The content-type.</para>
+</listitem>
+</varlistentry>
+<varlistentry><term><tag class="attribute">extensions</tag> (extension+)</term>
+<listitem>
+<para>A space-separated list of filename extensions to associate with the
+content type.</para>
+</listitem>
+</varlistentry>
+</variablelist>
+
+<para>For example, this entry:</para>
+
+<programlisting language="xml"
+><![CDATA[<cc:mimetype content-type="application/xml" extensions="xpl xproc"/>]]></programlisting>
+
+<para>Will tell XML Calabash that filenames (or URIs, generally, in the absence of
+server metadata) that end with
+<literal>.xpl</literal> or <literal>.xproc</literal> should be interpreted as files with the
+<code>application/xml</code> content type.</para>
+</section>
+
+<section xml:id="cc.proxy">
+<info>
+<?db filename="cc-proxy"?>
+<title>cc:proxy</title>
+</info>
+
+<para>Define proxy URIs for internet protocol requests.</para>
+
+<rng-pattern schema="../../build/xml-calabash.rng"
+             name="cc.proxy"/>
+
+<variablelist>
+<varlistentry><term><tag class="attribute">scheme</tag> (protocol scheme)</term>
+<listitem>
+<para>The protocol scheme.</para>
+</listitem>
+</varlistentry>
+<varlistentry><term><tag class="attribute">uri</tag> (anyURI)</term>
+<listitem>
+<para>The proxy URI.</para>
+</listitem>
+</varlistentry>
+</variablelist>
+
+<para>If your network configuration requires the use of a proxy, you can
+define them with <tag>cc:proxy</tag>. For example, this establishes that
+requests for 
+<literal>http:</literal> URIs should use the <uri>http://localhost:8888/</uri>
+proxy.</para>
+
+<programlisting language="xml"><![CDATA[<cc:proxy scheme="http" uri="http://localhost:8888"/>]]></programlisting>
+
+</section>
+
+<section xml:id="cc.saxon-configuration-property">
+<info>
+<?db filename="cc-saxon-cfg-prop"?>
+<title>cc:saxon-configuration-property</title>
+</info>
+
+<para>Sets a Saxon configuration property.</para>
+
+<rng-pattern schema="../../build/xml-calabash.rng"
+             name="cc.saxonConfigurationProperty"/>
+
+<variablelist>
+<varlistentry><term><tag class="attribute">name</tag> (property name)</term>
+<listitem>
+<para>The Saxon configuration property name.</para>
+</listitem>
+</varlistentry>
+<varlistentry><term><tag class="attribute">value</tag></term>
+<listitem>
+<para>The property value.</para>
+</listitem>
+</varlistentry>
+</variablelist>
+
+<para>XML Calabash does not maintain a list of valid properties. Those are
+<link xlink:href="https://www.saxonica.com/documentation12/index.html#!javadoc/net.sf.saxon/Configuration@setConfigurationProperty">defined by Saxon</link>. Attempting to set a property that doesn’t
+exist will throw an exception. Boolean valued properties must have the value
+<literal>true</literal> or <literal>false</literal>.</para>
+
+</section>
+
+<section xml:id="cc.send-mail">
+<info>
+<?db filename="cc-send-mail"?>
+<title>cc:send-mail</title>
+</info>
+
+<para>Define properties for the <tag>p:send-mail</tag> step.</para>
+
+<rng-pattern schema="../../build/xml-calabash.rng"
+             name="cc.sendMail"/>
+
+<variablelist>
+<varlistentry><term><tag class="attribute">host</tag> (string)</term>
+<listitem>
+<para>The SMTP server host.</para>
+</listitem>
+</varlistentry>
+<varlistentry><term><tag class="attribute">port</tag> (integer)</term>
+<listitem>
+<para>The server port.</para>
+</listitem>
+</varlistentry>
+<varlistentry><term><tag class="attribute">username</tag> (string)</term>
+<listitem>
+<para>The user name, if login is required.</para>
+</listitem>
+</varlistentry>
+<varlistentry><term><tag class="attribute">password</tag> (string)</term>
+<listitem>
+<para>The password, if login is required.</para>
+</listitem>
+</varlistentry>
+</variablelist>
+
+<para>In order to send mail, the <tag>p:send-mail</tag> step needs to know the location
+of the SMTP server and login credentials, if they are required.</para>
+
+</section>
+
+<section xml:id="cc.serialization">
+<info>
+<?db filename="cc-serialization"?>
+<title>cc:serialization</title>
+</info>
+
+<para>Default serialization properties for particular content types.</para>
+
+<rng-pattern schema="../../build/xml-calabash.rng"
+             name="cc.serialization"/>
+
+<variablelist>
+<varlistentry><term><tag class="attribute">content-type</tag> (MIME type)</term>
+<listitem>
+<para>The content type.</para>
+</listitem>
+</varlistentry>
+<varlistentry><term><replaceable>any-name</replaceable></term>
+<listitem>
+<para>Any attributes on the <tag>cc:serialization</tag> element other than
+<tag class="attribute">content-type</tag> define the
+default serialization properties for documents with the corresponding content type.</para>
+</listitem>
+</varlistentry>
+</variablelist>
+
+<para>For example, adding this to your configuration file:</para>
+
+<programlisting language="xml"><![CDATA[<cc:serialization content-type="text/html"
+                  method="html" html-version="5"/>]]></programlisting>
+
+<para>Will serialize <literal>text/html</literal> documents using HTML 5 serialization by default.
+The serialization properties on a document take precendence over these defaults.
+</para>
+
+</section>
+
+<section xml:id="cc.system-property">
+<info>
+<?db filename="cc-system-property"?>
+<title>cc:system-property</title>
+</info>
+
+<para>Set Java system properties before running a pipeline.</para>
+
+<rng-pattern schema="../../build/xml-calabash.rng"
+             name="cc.systemProperty"/>
+
+<variablelist>
+<varlistentry><term><tag class="attribute">name</tag> (property name)</term>
+<listitem>
+<para>The Java system property name.</para>
+</listitem>
+</varlistentry>
+<varlistentry><term><tag class="attribute">value</tag></term>
+<listitem>
+<para>The property value.</para>
+</listitem>
+</varlistentry>
+</variablelist>
+
+<para>Any properties specified in the configuration file will be set before the pipeline
+runs.</para>
+
+</section>
+
+<section xml:id="cc.threading">
+<info>
+<?db filename="cc-threading"?>
+<title>cc:threading</title>
+</info>
+
+<para>Control aspects of XML Calabash threading.</para>
+
+<rng-pattern schema="../../build/xml-calabash.rng"
+             name="cc.threading"/>
+
+<variablelist>
+<varlistentry><term><tag class="attribute">count</tag> (integer)</term>
+<listitem>
+<para>The size of the thread pool.</para>
+</listitem>
+</varlistentry>
+</variablelist>
+
+<para>Irrelevant at the moment. XML Calabash is currently single-threaded.</para>
+
+</section>
+
+</appendix>

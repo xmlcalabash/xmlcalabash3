@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?><refentry xmlns="http://docbook.org/ns/docbook" xmlns:p="http://www.w3.org/ns/xproc" xml:id="p-rename">
+<?db filename="p-rename"?>
+   <refnamediv>
+      <refname>p:rename</refname>
+      <refpurpose>The standard p:rename step</refpurpose>
+   </refnamediv>
+   <refsynopsisdiv>
+
+<refsection role="introduction">
+<title>Introduction</title>
+<para>The <code>p:rename</code> step renames elements, attributes, or
+processing-instruction targets in a document.</para>
+</refsection>
+
+<refsection role="step-declaration">
+<title>Step declaration</title>
+<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="../../../../xmlcalabash/src/main/resources/com/xmlcalabash/library.xpl" xpointer="xpath(/*/*[@type='p:rename'])"/>
+</refsection>
+
+<refsection role="errors"><title>Errors</title><para>
+<error code="C0023">It is a <glossterm>dynamic
+error</glossterm> if the pattern matches anything other than element,
+attribute, or processing instruction nodes, or if it matches more
+than one attribute on a single element.</error>
+<error code="C0013">It
+is a <glossterm>dynamic error</glossterm> if the pattern matches
+a processing instruction and the new name has a non-null namespace.</error>
+</para>
+</refsection>
+
+<refsection role="implementation-features"><title>Implementation-defined and -dependent features</title>
+<para>
+</para>
+</refsection>
+</refsynopsisdiv>
+
+   <refsection>
+      <title>Description</title>
+      <para>TBD.</para>
+   </refsection>
+</refentry>

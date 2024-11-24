@@ -1,0 +1,15 @@
+<doc xmlns="https://xmlcalabash.com/ns/examples"
+     xmlns:xi="http://www.w3.org/2001/XInclude"
+     class="book">
+  <chap former="1" class="test">
+    <title>First Chapter</title>
+    <p>…</p>
+  </chap>
+  <xi:include href="default-ch2.xml"/>
+  <chap><title>Third Chapter</title>
+  <p>…</p>
+  </chap>
+  <app><title>Appendix</title>
+  <p>…</p>
+  </app>
+</doc>

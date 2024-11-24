@@ -1,0 +1,155 @@
+<chapter xmlns="http://docbook.org/ns/docbook"
+         xmlns:xlink="http://www.w3.org/1999/xlink"
+         xmlns:xi='http://www.w3.org/2001/XInclude'
+         version="5.2" xml:id="installation">
+<info>
+  <?db filename="installation"?>
+  <title>Installation</title>
+</info>
+
+<para>XML Calabash version <?version version?> is still very much an alpha
+release. While it’s still in alpha/beta, it’s not being published anywhere except on
+the
+<link xlink:href="https://github.com/xmlcalabash/xmlcalabash3/releases">releases
+page</link>. That release is the command line application. In the future,
+library releases will be published as well.
+</para>
+
+<para>Download the latest release and unzip it on your filesystem. That will
+create a <filename class="directory">xmlcalabash-<?version?>/</filename>
+directory containing: <filename>README.md</filename>, 
+<filename>xmlcalabash-<?version?>.jar</filename>, and
+a <filename class="directory">lib/</filename> directory containing
+<emphasis>lots</emphasis> of jar files. The application ships with all of the dependencies
+nesssary to run all of the steps, including the extension steps.
+</para>
+
+<section xml:id="system-configuration">
+<title>System configuration</title>
+
+<para>All
+<link xlink:href="https://en.wikipedia.org/wiki/Java_virtual_machine">JVM</link>
+applications are sensitive to some aspects of your system configuration. For
+example, what version of the Java Virtual Machine you’re using and if you need
+to <link linkend="cc.proxy">use a proxy</link> to connect to the
+internet.</para>
+
+<section xml:id="content-types">
+<title>MIME Types</title>
+
+<para>An XProc processor is especially sensitive to the way MIME types are
+configured. An XProc pipeline can process resources of any type: XML, JSON, ZIP,
+etc. The content type of a resource accessed through HTTP (or HTTPS) is always
+identified by the server. But the content type of a resource loaded from the
+filesystem depends on its filename extension and how your JVM is
+configured.</para>
+
+<note>
+<title>MIME type, media type, or content type?</title>
+<para>Yes. To quote from the Wikipedia article on
+<link xlink:href="https://en.wikipedia.org/wiki/Media_type">media types</link>:</para>
+<blockquote>
+<para>The <link xlink:href="https://en.wikipedia.org/wiki/IANA">IANA</link> and
+<link xlink:href="https://en.wikipedia.org/wiki/IETF">IETF</link>
+use the term “media type”, and consider the term "MIME type" to be obsolete,
+since media types have become used in contexts unrelated to email, such as HTTP.
+By contrast, the <link xlink:href="https://en.wikipedia.org/wiki/WHATWG">WHATWG</link>
+continues to use the term “MIME type” and discourages
+use of the term “media type” as ambiguous, since it is used with a different
+meaning in connection with the CSS <literal>@media</literal> feature.</para>
+<para>The HTTP response header for providing the media type is <literal>Content-Type</literal>.
+The W3C has used <literal>ContentType</literal> as an XML data-type name for a media type.
+<link xlink:href="https://en.wikipedia.org/wiki/Freedesktop.org">XDG</link>
+specifications implemented by Linux desktop environments continue to use the term “MIME type”.
+</para>
+</blockquote>
+<para>Following the lead of W3C with respect to XML, XProc consistently uses the
+term “content type”. In this user guide
+the term “MIME type” is used where that’s consistent with what the JVM documentation uses.</para>
+</note>
+
+<para>When the JVM starts, it looks for a file named
+“<filename>.mime.types</filename>” in the users’s home directory<footnote><para>It
+looks in some
+<link xlink:href="https://docs.oracle.com/javase/8/docs/api/javax/activation/MimetypesFileTypeMap.html">other
+places</link> too, but those are not easily
+user-configurable.</para></footnote>. If it finds one, it uses it to build a
+mapping from filename extensions to MIME types. The
+<filename>.mime.types</filename> file is a text file where each line consists of
+a MIME type followed by a space separated list of filename extensions. For
+example:</para>
+
+<programlisting># MIME type mapping (Likes that start with “#” are comments.)
+application/json json
+application/nvdl+xml nvdl
+application/relax-ng-compact-syntax rnc
+application/relax-ng+xml rng
+application/schematron+xml sch
+text/plain text txt css
+application/xml xml xpl fo
+application/xquery xq xqy
+application/xsd+xml xsd
+application/xslt+xml xsl xslt</programlisting>
+
+<para>For XML Calabash, you can also <link linkend="cc.mimetype">define them</link>
+in the <link linkend="configuration">configuration file</link>.</para>
+
+<para>If there is no MIME type defined for a particular extension, it will be
+identified as an “application/octet-stream” resource. That’s binary.
+It is very explicitly not XML or HTML or JSON or text. Most steps will reject
+binary resources. This will result in errors that might be very confusing if
+you’re not aware of the problem. To avoid that, XML Calabash takes a
+heavy-handed approach.</para>
+
+<para>After the MIME types have been configured, from the system, from the
+user’s <filename>.mime.types</filename> file, and from the configuration file,
+if any of the extensions listed in <xref linkend="mimedef"/> are identified as “application/octet-stream”
+resources, XML Calabash defines a pragmatically more useful default.</para>
+
+<table xml:id="mimedef">
+<title>Default MIME type mappings</title>
+<tgroup cols="2">
+<colspec colwidth="5em"/>
+<thead>
+<row>
+  <entry>Extension</entry><entry>Default MIME type</entry>
+</row>
+</thead>
+<tbody>
+<row><entry>bz2</entry><entry>application/bzip2</entry></row>
+<row><entry>css</entry><entry>text/plain</entry></row>
+<row><entry>fo</entry><entry>application/xml</entry></row>
+<row><entry>gz</entry><entry>application/gzip</entry></row>
+<row><entry>gzip</entry><entry>application/gzip</entry></row>
+<row><entry>json</entry><entry>application/json</entry></row>
+<row><entry>lzma</entry><entry>application/lzma</entry></row>
+<row><entry>nvdl</entry><entry>application/nvdl+xml</entry></row>
+<row><entry>rnc</entry><entry>application/relax-ng-compact-syntax</entry></row>
+<row><entry>rng</entry><entry>application/relax-ng+xml</entry></row>
+<row><entry>sch</entry><entry>application/schematron+xml</entry></row>
+<row><entry>text</entry><entry>text/plain</entry></row>
+<row><entry>txt</entry><entry>text/plain</entry></row>
+<row><entry>xml</entry><entry>application/xml</entry></row>
+<row><entry>xpl</entry><entry>application/xml</entry></row>
+<row><entry>xq</entry><entry>application/xquery</entry></row>
+<row><entry>xqy</entry><entry>application/xquery</entry></row>
+<row><entry>xsd</entry><entry>application/xsd+xml</entry></row>
+<row><entry>xsl</entry><entry>application/xslt+xml</entry></row>
+<row><entry>xslt</entry><entry>application/xslt+xml</entry></row>
+<row><entry>xz</entry><entry>application/xz</entry></row>
+<row><entry>zip</entry><entry>application/zip</entry></row>
+</tbody>
+</tgroup>
+</table>
+
+<para>If these defaults are problematic, use one of the existing configuration mechanisms
+to define the mapping you prefer.</para>
+
+<para>Also, if you have a different convention, perhaps using the extension
+“<literal>.schematron</literal>” for Schematron files or “<literal>.xs</literal>” for
+XML Schema documents, you will have to provide that mapping yourself. You will also
+want to provide mappings for other extensions you use.</para>
+
+</section>
+</section>
+</chapter>

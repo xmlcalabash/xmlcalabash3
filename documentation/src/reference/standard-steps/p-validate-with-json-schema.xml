@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?><refentry xmlns="http://docbook.org/ns/docbook" xmlns:p="http://www.w3.org/ns/xproc" xml:id="p-validate-with-json-schema">
+<?db filename="p-validate-with-json-schema"?>
+   <refnamediv>
+      <refname>p:validate-with-json-schema</refname>
+      <refpurpose>The standard p:validate-with-json-schema step</refpurpose>
+   </refnamediv>
+   <refsynopsisdiv>
+
+<refsection role="introduction">
+<title>Introduction</title>
+<para>The <tag>p:validate-with-json-schema</tag> step applies
+    a JSON schema validation (as defined in <biblioref linkend="jsonschema2020-12"/> and
+    other publications) to the <port>source</port> input.</para>
+</refsection>
+
+<refsection role="step-declaration">
+<title>Step declaration</title>
+<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="../../../../xmlcalabash/src/main/resources/com/xmlcalabash/library.xpl" xpointer="xpath(/*/*[@type='p:validate-with-json-schema'])"/>
+</refsection>
+
+<refsection role="errors"><title>Errors</title><para>
+<error code="C0163">It is a <glossterm>dynamic error</glossterm> 
+    if the selected version is not supported.</error>
+<error code="C0164">It is a <glossterm>dynamic error</glossterm> 
+    if the document supplied on <port>schema</port> port is not a valid JSON schema 
+    document in the selected version.</error>
+<error code="C0165">It is a <glossterm>dynamic error</glossterm>
+    if the <option>assert-valid</option> option on <tag>p:validate-with-json-schema</tag> 
+    is <literal>true</literal>
+    and the input document is not valid.</error>
+</para>
+</refsection>
+
+<refsection role="implementation-features"><title>Implementation-defined and -dependent features</title>
+<para>
+<impl>If
+  the schema does not specify a version and option <option>default-version</option>
+  is empty, the version used is <glossterm>implementation-defined</glossterm>.</impl>
+</para>
+</refsection>
+</refsynopsisdiv>
+
+   <refsection>
+      <title>Description</title>
+      <para>TBD.</para>
+   </refsection>
+</refentry>

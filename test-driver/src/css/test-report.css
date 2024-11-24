@@ -1,0 +1,76 @@
+:root {
+    --tableaux-border-color: #aaaaaa;
+    --focused-color: rgb(221,221,221);
+    font-size: 16pt;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: sans-serif;
+}
+
+a, a:visited {
+    color: inherit;
+}
+
+table {
+    width: 100%;
+    border: 1px solid var(--tableaux-border-color);
+    border-spacing: 0;
+    border-collapse: collapse;
+}
+
+table thead {
+    background-color: var(--focused-color);
+}
+
+table thead tr td,
+table thead tr th,
+table tbody tr td,
+table tbody tr th {
+    border-bottom: 1px dotted var(--tableaux-border-color);
+    border-right: 1px dotted var(--tableaux-border-color);
+    padding-left: 0.5em;
+    padding-right: 0.5em;
+    padding-top: 0.4em;
+    padding-bottom: 0.2em;
+}
+
+table tr td:nth-child(1),
+table tr td:nth-child(4) {
+    text-align: right;
+}
+
+
+table tbody tr:nth-child(even) td {
+    background-color: #eeeeee;
+}
+
+table tbody tr.pass td {
+    background-color: #eeffee;
+}
+
+table tbody tr.pass:nth-child(even) td {
+    background-color: #ddeedd;
+}
+
+table tbody tr.skip td {
+    background-color: #ffffee;
+}
+
+table tbody tr.skip:nth-child(even) td {
+    background-color: #eeeedd;
+}
+
+table tbody tr.fail td {
+    background-color: #ffeeee;
+}
+
+table tbody tr.fail:nth-child(even) td {
+    background-color: #eedddd;
+}
+
+div.toggles {
+  padding-left: 2em;
+  padding-bottom: 0.5em;
+  padding-top: 1em;
+}
