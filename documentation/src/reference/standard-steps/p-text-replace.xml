@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?><refentry xmlns="http://docbook.org/ns/docbook" xmlns:p="http://www.w3.org/ns/xproc" xml:id="p-text-replace">
+<?db filename="p-text-replace"?>
+   <refnamediv>
+      <refname>p:text-replace</refname>
+      <refpurpose>The standard p:text-replace step</refpurpose>
+   </refnamediv>
+   <refsynopsisdiv>
+
+<refsection role="introduction">
+<title>Introduction</title>
+<para>The <code>p:text-replace</code> step replaces all occurrences of substrings in a text document that match a
+    supplied regular expression with a given replacement string.</para>
+</refsection>
+
+<refsection role="step-declaration">
+<title>Step declaration</title>
+<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="../../../../xmlcalabash/src/main/resources/com/xmlcalabash/library.xpl" xpointer="xpath(/*/*[@type='p:text-replace'])"/>
+</refsection>
+
+<refsection role="errors"><title>Errors</title><para>
+<error code="C0147">It is a <glossterm>dynamic error</glossterm> if the specified value is not
+      a valid XPath regular expression.</error>
+</para>
+</refsection>
+
+<refsection role="implementation-features"><title>Implementation-defined and -dependent features</title>
+<para>
+</para>
+</refsection>
+</refsynopsisdiv>
+
+   <refsection>
+      <title>Description</title>
+      <para>TBD.</para>
+   </refsection>
+</refentry>

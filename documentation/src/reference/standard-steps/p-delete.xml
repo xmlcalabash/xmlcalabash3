@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?><refentry xmlns="http://docbook.org/ns/docbook" xmlns:p="http://www.w3.org/ns/xproc" xml:id="p-delete">
+<?db filename="p-delete"?>
+   <refnamediv>
+      <refname>p:delete</refname>
+      <refpurpose>The standard p:delete step</refpurpose>
+   </refnamediv>
+   <refsynopsisdiv>
+
+<refsection role="introduction">
+<title>Introduction</title>
+<para>The <code>p:delete</code> step deletes items specified by a <glossterm>selection pattern</glossterm> from the
+<code>source</code> input document and produces the resulting document,
+with the deleted items removed, on the <port>result</port> port.</para>
+</refsection>
+
+<refsection role="step-declaration">
+<title>Step declaration</title>
+<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="../../../../xmlcalabash/src/main/resources/com/xmlcalabash/library.xpl" xpointer="xpath(/*/*[@type='p:delete'])"/>
+</refsection>
+
+<refsection role="errors"><title>Errors</title><para>
+<error code="C0023">It is a <glossterm>dynamic error</glossterm> if the
+<option>match</option> option matches the document node.</error>
+<error code="C0062">It is a <glossterm>dynamic error</glossterm> if the
+<option>match</option> option matches a namespace node.</error>
+</para>
+</refsection>
+
+<refsection role="implementation-features"><title>Implementation-defined and -dependent features</title>
+<para>
+</para>
+</refsection>
+</refsynopsisdiv>
+
+   <refsection>
+      <title>Description</title>
+      <para>TBD.</para>
+   </refsection>
+
+<refsection>
+<title>Examples</title>
+
+<para>Applied to the <link linkend="running-example">running example</link>, this
+pipeline:</para>
+
+<programlisting language="xml"><xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="../../examples/xpl/delete-001.xpl" parse="text"/></programlisting>
+
+<para>Produces this output:</para>
+
+<variablelist role="panelset">
+<varlistentry><term>XML output</term>
+<listitem>
+<programlisting language="xml"><xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="../../../build/examples/results/delete-001.xml" parse="text"/></programlisting>
+</listitem>
+</varlistentry>
+<varlistentry role="diffs"><term>Changes</term>
+<listitem>
+<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="../../../build/examples/diff/delete-001.xml"/>
+</listitem>
+</varlistentry>
+<varlistentry><term>XML input</term>
+<listitem>
+<programlisting language="xml"><xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="../../examples/xml/default-input.xml" parse="text"/>
+</programlisting>
+</listitem>
+</varlistentry>
+</variablelist>
+
+<para>The <tag>p:delete</tag> step can also delete elements:</para>
+
+<programlisting language="xml"><xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="../../examples/xpl/delete-002.xpl" parse="text"/></programlisting>
+
+<para>Produces this output:</para>
+
+<variablelist role="panelset">
+<varlistentry><term>XML output</term>
+<listitem>
+<programlisting language="xml"><xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="../../../build/examples/results/delete-002.xml" parse="text"/></programlisting>
+</listitem>
+</varlistentry>
+<varlistentry role="diffs"><term>Changes</term>
+<listitem>
+<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="../../../build/examples/diff/delete-002.xml"/>
+</listitem>
+</varlistentry>
+<varlistentry><term>XML input</term>
+<listitem>
+<programlisting language="xml"><xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="../../examples/xml/default-input.xml" parse="text"/>
+</programlisting>
+</listitem>
+</varlistentry>
+</variablelist>
+
+
+</refsection>
+
+</refentry>

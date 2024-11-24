@@ -1,0 +1,38 @@
+:PROPERTIES:
+:ID:       433B1F59-8417-45C1-B4FC-B7CADB6D51DA
+:END:
+#+title: Implementation checklist
+#+date: 2024-03-05
+#+author: Norman Tovey-Walsh
+#+startup: showall
+
+* Notes
+:PROPERTIES:
+:CUSTOM_ID: h-DABFD552-0338-4DBB-86AF-D9B55FC3CF7A
+:END:
+
++ [ ] Could Kotlin delegates make the AbstractElement/DeclarationContainer
+  dichotomy less messy?
+
++ [X] If the subpipeline in p:try is a single group, don’t double-wrap it
++ [X] Use ANONYMOUS and ANONYMOUS_TYPE for name and type so they don’t have to be nullable
++ [X] Is the identify() method still useful?
++ [ ] Type check pipeline option values
++ [ ] Error reporting needs to include the location!
++ [ ] Undeclared variable in guard expression
++ [ ] Properties etc, not handled on an inline default input
++ [ ] Document not handled on a default input
++ [ ] Don’t run the steps necessary to generate default input if it isn’t needed
++ [X] The text-sort collation URI is wrong in the published library
++ [X] Capture Saxon stylesheet compilation messages (in, e.g., text-sort)
++ [X] Why isn’t the result port on p:compare primary?
++ [X] ab-cast-content-type-010.xml seems wrong
++ [X] Work out at statically, at the point of call, what steps are available
++ [ ] Apply static analysis (use/when) to pipeinfo
++ [ ] What about a use-when based on a static provided as an option
++ [X] What about an atomic declaration when resolving a use-when
+  + You can’t tell until after the use-when’s have been resolved
++ [ ] Resolve use-when on elements in an inline / expand TVTs
++ [ ] Static analysis on ExpressionBinding
++ [ ] Special case the content type filter for p:identity
++ [ ] p:inline document-propties (typo) not an error

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?><refentry xmlns="http://docbook.org/ns/docbook" xmlns:p="http://www.w3.org/ns/xproc" xml:id="p-www-form-urldecode">
+<?db filename="p-www-form-urldecode"?>
+   <refnamediv>
+      <refname>p:www-form-urldecode</refname>
+      <refpurpose>The standard p:www-form-urldecode step</refpurpose>
+   </refnamediv>
+   <refsynopsisdiv>
+
+<refsection role="introduction">
+<title>Introduction</title>
+<para>The <tag>p:www-form-urldecode</tag> step decodes a
+<literal>x-www-form-urlencoded</literal> string into a JSON representation.</para>
+</refsection>
+
+<refsection role="step-declaration">
+<title>Step declaration</title>
+<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="../../../../xmlcalabash/src/main/resources/com/xmlcalabash/library.xpl" xpointer="xpath(/*/*[@type='p:www-form-urldecode'])"/>
+</refsection>
+
+<refsection role="errors"><title>Errors</title><para>
+<error code="C0037">It is a
+<glossterm>dynamic error</glossterm> if the <option>value</option> provided
+is not a properly
+<literal>x-www-form-urlencoded</literal> value.</error>
+</para>
+</refsection>
+
+<refsection role="implementation-features"><title>Implementation-defined and -dependent features</title>
+<para>
+</para>
+</refsection>
+</refsynopsisdiv>
+
+   <refsection>
+      <title>Description</title>
+      <para>TBD.</para>
+   </refsection>
+</refentry>

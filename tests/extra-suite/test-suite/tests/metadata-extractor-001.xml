@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<t:test expected="pass"
+        xmlns:t="http://xproc.org/ns/testsuite/3.0"
+        xmlns:c="http://www.w3.org/ns/xproc-step">
+  <t:info>
+    <t:title>metadata-extractor-001</t:title>
+    <t:revision-history>
+      <t:revision>
+        <t:date>2024-10-26</t:date>
+        <t:author>
+          <t:name>Norm Tovey-Walsh</t:name>
+        </t:author>
+        <t:description xmlns="http://www.w3.org/1999/xhtml">
+          <p>Created test.</p>
+        </t:description>
+      </t:revision>
+    </t:revision-history>
+  </t:info>
+  <t:description xmlns="http://www.w3.org/1999/xhtml">
+    <p>Tests extracting metadata from a JPG image</p>
+  </t:description>
+  <t:pipeline>
+    <p:declare-step version="3.0"
+                    xmlns:cx="http://xmlcalabash.com/ns/extensions"
+                    xmlns:p="http://www.w3.org/ns/xproc">
+      <p:output port="result"/>
+      <p:import href="https://xmlcalabash.com/ext/library/metadata-extractor.xpl"/>
+      <cx:metadata-extractor>
+        <p:with-input href="../../../../ext/metadata-extractor/src/test/resources/amaryllis.jpg"/>
+      </cx:metadata-extractor>
+    </p:declare-step>
+  </t:pipeline>
+  <t:schematron>
+    <s:schema queryBinding="xslt2"
+              xmlns:s="http://purl.oclc.org/dsdl/schematron">
+      <s:ns prefix="c" uri="http://www.w3.org/ns/xproc-step"/>
+      <s:pattern>
+        <s:rule context="/">
+          <s:assert test="c:result">The document root is not c:result.</s:assert>
+          <s:assert test="c:result/c:tag[@type='0x0003'] = 'image/jpeg'"
+                    >The image is not identified as image/jpeg.</s:assert>
+          <s:assert test="c:result/c:tag[@name = 'Artist'] = 'Norman Walsh'"
+                    >The image artist is not correct.</s:assert>
+          <s:assert test="contains(c:result/c:tag[@name = 'Keywords'], 'flowers')"
+                    >The image does not have the “flowers” keyword.</s:assert>
+          <s:assert test="contains(c:result/c:tag[@name = 'Keywords'], 'red')"
+                    >The image does not have the “red” keyword.</s:assert>
+        </s:rule>
+      </s:pattern>
+    </s:schema>
+  </t:schematron>
+</t:test>

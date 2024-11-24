@@ -1,0 +1,50 @@
+:PROPERTIES:
+:ID:       619FD61A-F874-4D72-9286-5EAD456565A3
+:END:
+#+title: Use-When
+#+date: 2024-06-17
+#+author: Norman Tovey-Walsh
+#+startup: showall
+
++ Construct a tree
+  + Every node has:
+    + A type (node name)
+    + A set of attributes
+    + A use-when condition
+      + The variables it refers to
+      + The functions it refers to
+      + The step types it depends on
+    + A set of known in-scope-step types
+      + A flag about whether or not that is a closed set
+    + A set of in-scope-static options
+      + For each option, a flag about whether or not it is a closed value
+
++ Every node starts with an XML node and an open perimiter
+  + Get the node type and attributes
+  + If use-when:
+    + Is absent, expand its perimeter by expanding its children
+    + Is present, leave it
+
++ Node types:
+  + TreeNode
+  + StepContainerNode
+    + DeclareStepNode
+    + LibraryNode
+  + OptionNode
+  + ImportNode
+
++ StepContainerNode
+  + List of in-scope static options
+    + Can be repeats as long as at most one is resolved
+  + List of known in-scope step types
+    + Is that set closed?
+
++ Repeat
+  + Expand the perimeter
+  + If a use-when is encountered
+    + If it’s resolvable, resolve it
+  + If no use-when was encountered, we’re done
+  + If no use-when was resolved, error
+
+
+

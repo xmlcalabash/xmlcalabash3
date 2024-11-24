@@ -1,0 +1,34 @@
+<book xmlns="http://docbook.org/ns/docbook"
+      xmlns:h="http://www.w3.org/1999/xhtml"
+      xmlns:xi="http://www.w3.org/2001/XInclude"
+      xmlns:xlink="http://www.w3.org/1999/xlink"
+      xml:id="xmlcalabash-reference" version="5.2">
+<info>
+  <title>XML Calabash User Guide</title>
+  <author>
+    <personname>
+      <firstname>Norm</firstname>
+      <surname>Tovey-Walsh</surname>
+    </personname>
+    <email>ndw@nwalsh.com</email>
+  </author>
+  <copyright>
+    <year>2024</year>
+    <holder>Norman Walsh</holder>
+  </copyright>
+  <abstract>
+    <para>The XML Calabash 3.x user guide.</para>
+  </abstract>
+  <h:link href="./css/xmlcalabash.css" rel="stylesheet"/>
+  <h:link href="./css/xproc.css" rel="stylesheet"/>
+</info>
+<!--
+<xi:include href="preface.xml"/>
+-->
+<xi:include href="install.xml"/>
+<xi:include href="run.xml"/>
+
+<xi:include href="config.xml"/>
+<xi:include href="changelog.xml"/>
+
+</book>

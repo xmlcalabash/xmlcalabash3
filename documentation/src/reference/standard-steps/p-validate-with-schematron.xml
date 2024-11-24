@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?><refentry xmlns="http://docbook.org/ns/docbook" xmlns:p="http://www.w3.org/ns/xproc" xml:id="p-validate-with-schematron">
+<?db filename="p-validate-with-schematron"?>
+   <refnamediv>
+      <refname>p:validate-with-schematron</refname>
+      <refpurpose>The standard p:validate-with-schematron step</refpurpose>
+   </refnamediv>
+   <refsynopsisdiv>
+
+<refsection role="introduction">
+<title>Introduction</title>
+<para>The <tag>p:validate-with-schematron</tag> step applies
+<biblioref linkend="iso19757-3"/>
+processing to the <port>source</port> document.</para>
+</refsection>
+
+<refsection role="step-declaration">
+<title>Step declaration</title>
+<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="../../../../xmlcalabash/src/main/resources/com/xmlcalabash/library.xpl" xpointer="xpath(/*/*[@type='p:validate-with-schematron'])"/>
+</refsection>
+
+<refsection role="errors"><title>Errors</title><para>
+<error code="C0151">It is a <glossterm>dynamic error</glossterm> 
+  if the document supplied on <port>schema</port> port is not a valid Schematron 
+  document.</error>
+<error code="C0054">It is a <glossterm>dynamic error</glossterm>
+if the <option>assert-valid</option> option is <literal>true</literal>
+and any Schematron assertions fail.</error>
+</para>
+</refsection>
+
+<refsection role="implementation-features"><title>Implementation-defined and -dependent features</title>
+<para>
+<impl>How the Schematron implementation is selected is
+          <glossterm>implementation-defined</glossterm>.</impl>
+<impl>The list of supported Schematron implementations and
+        their associated values is <glossterm>implementation-defined</glossterm>.</impl>
+<impl>Which parameters the 
+        <literal>c:compile</literal> map supports for a given Schematron implementation is
+          <glossterm>implementation-defined</glossterm>.</impl>
+<impl>Which parameters this conversion from native reporting format to XVRL supports is
+          <glossterm>implementation-defined</glossterm>.</impl>
+</para>
+</refsection>
+</refsynopsisdiv>
+
+   <refsection>
+      <title>Description</title>
+      <para>TBD.</para>
+   </refsection>
+</refentry>

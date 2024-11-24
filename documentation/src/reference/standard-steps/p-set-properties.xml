@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?><refentry xmlns="http://docbook.org/ns/docbook" xmlns:p="http://www.w3.org/ns/xproc" xml:id="p-set-properties">
+<?db filename="p-set-properties"?>
+   <refnamediv>
+      <refname>p:set-properties</refname>
+      <refpurpose>The standard p:set-properties step</refpurpose>
+   </refnamediv>
+   <refsynopsisdiv>
+
+<refsection role="introduction">
+<title>Introduction</title>
+<para>The <tag>p:set-properties</tag> step sets document
+properties on the source document.</para>
+</refsection>
+
+<refsection role="step-declaration">
+<title>Step declaration</title>
+<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="../../../../xmlcalabash/src/main/resources/com/xmlcalabash/library.xpl" xpointer="xpath(/*/*[@type='p:set-properties'])"/>
+</refsection>
+
+<refsection role="errors"><title>Errors</title><para>
+<error code="D0070">It is a <glossterm>dynamic error</glossterm> if a value is 
+assigned to the <code>serialization</code> document property that cannot be converted 
+into <code>map(xs:QName, item()*)</code> according
+to the rules in section “QName handling” of <biblioref linkend="xproc31"/>.</error>
+<error code="C0069">It is a <glossterm>dynamic
+error</glossterm> if the <option>properties</option> map contains
+a key equal to the string “<literal>content-type</literal>”.</error>
+<error code="D0064">It is a <glossterm>dynamic 
+   error</glossterm> if the base URI is not both absolute and valid according 
+      to <biblioref linkend="rfc3986"/>.</error>
+</para>
+</refsection>
+
+<refsection role="implementation-features"><title>Implementation-defined and -dependent features</title>
+<para>
+</para>
+</refsection>
+</refsynopsisdiv>
+
+   <refsection>
+      <title>Description</title>
+      <para>TBD.</para>
+   </refsection>
+</refentry>

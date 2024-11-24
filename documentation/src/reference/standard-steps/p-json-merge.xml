@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?><refentry xmlns="http://docbook.org/ns/docbook" xmlns:p="http://www.w3.org/ns/xproc" xml:id="p-json-merge">
+<?db filename="p-json-merge"?>
+   <refnamediv>
+      <refname>p:json-merge</refname>
+      <refpurpose>The standard p:json-merge step</refpurpose>
+   </refnamediv>
+   <refsynopsisdiv>
+
+<refsection role="introduction">
+<title>Introduction</title>
+<para>The <tag>p:json-merge</tag> step merges the sequence of appearing
+on port <port>source</port> into a single JSON object appearing on port
+<port>result</port>. If the sequence on
+port <port>source</port> is empty, the empty sequence is returned on
+port <port>result</port>.</para>
+</refsection>
+
+<refsection role="step-declaration">
+<title>Step declaration</title>
+<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="../../../../xmlcalabash/src/main/resources/com/xmlcalabash/library.xpl" xpointer="xpath(/*/*[@type='p:json-merge'])"/>
+</refsection>
+
+<refsection role="errors"><title>Errors</title><para>
+<error code="C0106">It is a <glossterm>dynamic error</glossterm> if duplicate keys are encountered and 
+      option <option>duplicates</option> has value “<literal>reject</literal>”.</error>
+<error code="C0110">It is a <glossterm>dynamic error</glossterm> if the
+      evaluation of the XPath expression in option <option>key</option> for a given item returns either a
+      sequence, an array, a map, or a function.</error>
+<error code="C0107">
+    It is a <glossterm>dynamic error</glossterm> if a document of a not supported document type appears on 
+      port <port>source</port> of <code>p:json-merge</code>.</error>
+</para>
+</refsection>
+
+<refsection role="implementation-features"><title>Implementation-defined and -dependent features</title>
+<para>
+<impl>It is <glossterm>implementation-defined</glossterm> if <code>p:json-merge</code> is
+    able to process document types not mentioned yet, i.e. types of binary documents.</impl>
+</para>
+</refsection>
+</refsynopsisdiv>
+
+   <refsection>
+      <title>Description</title>
+      <para>TBD.</para>
+   </refsection>
+</refentry>

@@ -1,0 +1,177 @@
+<refentry xmlns:p="http://www.w3.org/ns/xproc"
+          xmlns:e="http://www.w3.org/1999/XSL/Spec/ElementSyntax"
+          xmlns:xi="http://www.w3.org/2001/XInclude"
+          xmlns:xlink="http://www.w3.org/1999/xlink"
+          xmlns="http://docbook.org/ns/docbook"
+          xml:id="cx-unique-id">
+<?db filename="cx-unique-id"?>
+   <refnamediv>
+      <refname>cx:unique-id</refname>
+      <refpurpose>A step for generating unique identifiers</refpurpose>
+   </refnamediv>
+   <refsynopsisdiv>
+     <xi:include href="../../../../ext/unique-id/src/main/resources/com/xmlcalabash/ext/unique-id.xpl"
+                 xpointer="xpath(/*/*[@type='cx:unique-id'])"/>
+   </refsynopsisdiv>
+   <refsection>
+      <title>Description</title>
+
+<para>The <tag>cx:unique-id</tag> step generates a unique identifier and injects
+it into the source document. UUID, ULID, and TypeID identifiers are supported.</para>
+
+<refsection>
+<title>Options</title>
+
+<para>There are four options. The <option>parameters</option> vary by
+<option>flavor</option>.</para>
+
+<variablelist>
+<varlistentry><term><option>match</option></term>
+<listitem>
+<para>The value of the <code>match</code> option must be an <emphasis>XSLTSelectionPattern</emphasis>.
+</para>
+
+<para>The matched nodes are specified with the selection pattern in the
+<code>match</code> option. For each matching node, the generated identifier is
+used in the output. Nodes that do not match are copied without change.</para>
+
+<para>If the expression given in the match option matches an attribute, the identifier
+is used as the new value of the attribute in the output. If the attribute is
+named <code>xml:base</code>, the base URI of the element must also be amended accordingly.
+</para>
+
+<para>If the document node is matched, the entire document is replaced by a text node
+with the identifier. What appears on port result is a text document with the text node
+wrapped in a document node.</para>
+
+<para>If the expression matches any other kind of node, the entire node (and not just
+its contents) is replaced by the identifier.</para>
+</listitem>
+</varlistentry>
+<varlistentry><term><option>flavor</option></term>
+<listitem>
+<para>The <code>flavor</code> option determines the flavor of identifier.</para>
+
+<variablelist>
+<varlistentry><term><literal>uuid</literal></term>
+<listitem>
+<para>If the UUID flavor is selected, the <code>parameters</code> map may contain a <code>version</code>
+parameter determines the version of the UUID that must be computed. It is a
+dynamic error (<code>err:XC0060</code>) if the processor does not support the specified
+version of the UUID algorithm. If the version is not specified, version 4
+UUIDs are computed.</para>
+
+<para>Seven UUID versions are supported.</para>
+
+<variablelist>
+<varlistentry><term>Version 1</term>
+<listitem>
+<para>Version 1 UUIDs are time based, no other parameters are used.</para>
+</listitem>
+</varlistentry>
+<varlistentry><term>Version 2</term>
+<listitem>
+<para>Version 2 UUIDs have two parameters: <code>domain</code> and
+<code>value</code>. The (integer) <code>value</code> is encoded using the
+<code>domain</code>. The <code>domain</code> value is either a byte or one of
+the special values <code>user</code>, <code>group</code> or <code>org</code> (or
+<code>organization</code>).</para>
+<para>The <code>sequential</code> option has no effect.</para>
+</listitem>
+</varlistentry>
+<varlistentry><term>Version 3</term>
+<listitem>
+<para>Version 3 UUIDs have two parameters, a <code>namespace</code> UUID and a
+<code>value</code>. The <code>value</code> is encoded using the
+<code>namespace</code> and hashed with MD5. The <code>namespace</code> value is
+either a UUID or one of the special values <code>url</code> (or
+<code>uri</code>), <code>dns</code>, <code>oid</code> (or <code>iso-oid</code>),
+or <code>x500</code>.</para>
+<para>The <code>sequential</code> option has no effect.</para>
+</listitem>
+</varlistentry>
+<varlistentry><term>Version 4</term>
+<listitem>
+<para>Version 4 UUIDs are random, no other parameters are used.
+</para>
+</listitem>
+</varlistentry>
+<varlistentry><term>Version 5</term>
+<listitem>
+<para>Version 5 UUIDs are just like version 3 UUIDs, except that they’re hashed
+using SHA1 instead of MD5.
+</para>
+</listitem>
+</varlistentry>
+<varlistentry><term>Version 6</term>
+<listitem>
+<para>Version 6 UUIDs are time based, no other parameters are used.
+</para>
+</listitem>
+</varlistentry>
+<varlistentry><term>Version 7</term>
+<listitem>
+<para>Version 7 UUIDs are time based, no other parameters are used.
+</para>
+</listitem>
+</varlistentry>
+</variablelist>
+</listitem>
+</varlistentry>
+<varlistentry><term><literal>ulid</literal></term>
+<listitem>
+<para>ULIDs have no parameters.</para>
+</listitem>
+</varlistentry>
+<varlistentry><term><literal>typeid</literal></term>
+<listitem>
+<para>TypeID identifiers have a <code>type</code> parameter which must be a string.
+</para>
+</listitem>
+</varlistentry>
+</variablelist>
+</listitem>
+</varlistentry>
+<varlistentry><term><option>sequential</option></term>
+<listitem>
+<para>If <code>sequential</code> is true, a different unique identifier will be
+generated for each match. Otherwise, the same identifier is used in each match.
+</para>
+</listitem>
+</varlistentry>
+</variablelist>
+</refsection>
+
+<refsection>
+<title>Document properties</title>
+
+<para>If the resulting document contains exactly one text node, the
+<code>content-type</code> property is changed to <code>text/plain</code> and the
+serialization property is removed, while all other document properties are
+preserved. For other document types, all document properties are preserved.
+</para>
+</refsection>
+
+<refsection>
+<title>References</title>
+
+<variablelist>
+<varlistentry><term>UUID</term>
+<listitem>
+<para><link xlink:href="https://datatracker.ietf.org/doc/html/rfc9562">RFC 9562</link>.</para>
+</listitem>
+</varlistentry>
+<varlistentry><term>ULID</term>
+<listitem>
+<para><link xlink:href="https://github.com/ulid/spec">ulid specification</link>.</para>
+</listitem>
+</varlistentry>
+<varlistentry><term>TypeID</term>
+<listitem>
+<para><link xlink:href="https://github.com/jetify-com/typeid/tree/main/spec">TypeID specification</link>.</para>
+</listitem>
+</varlistentry>
+</variablelist>
+</refsection>
+</refsection>
+</refentry>

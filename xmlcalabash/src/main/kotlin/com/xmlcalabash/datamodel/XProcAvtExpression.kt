@@ -1,0 +1,75 @@
+package com.xmlcalabash.datamodel
+
+import com.xmlcalabash.exceptions.XProcError
+import com.xmlcalabash.util.ValueTemplate
+import net.sf.saxon.s9api.*
+import net.sf.saxon.type.StringConverter.StringToUntypedAtomic
+
+class XProcAvtExpression private constructor(stepConfig: StepConfiguration, val avt: ValueTemplate, asType: SequenceType, values: List<XdmAtomicValue>): XProcExpression(stepConfig, asType, false, values) {
+    companion object {
+        fun newInstance(stepConfig: StepConfiguration, avt: ValueTemplate, asType: SequenceType = SequenceType.ANY, values: List<XdmAtomicValue> = emptyList()): XProcAvtExpression {
+            return XProcAvtExpression(stepConfig, avt, asType, values)
+        }
+    }
+
+    override fun cast(asType: SequenceType, values: List<XdmAtomicValue>): XProcExpression {
+        return avt(stepConfig, avt, asType, values)
+    }
+
+    override fun xevaluate(): () -> XdmValue {
+        return { evaluate() }
+    }
+
+    override fun evaluate(): XdmValue {
+        val sb = StringBuilder()
+
+        for (index in avt.value.indices) {
+            if (index % 2 == 0) {
+                sb.append(avt.value[index])
+            } else {
+                val compiler = stepConfig.processor.newXPathCompiler()
+                for ((prefix, uri) in stepConfig.inscopeNamespaces) {
+                    compiler.declareNamespace(prefix, uri.toString())
+                }
+                for (name in variableRefs) {
+                    compiler.declareVariable(name)
+                }
+
+                val selector = compiler.compile(avt.value[index]).load()
+                //selector.resourceResolver = stepConfiguration.pipelineConfig.documentManager
+
+                setupExecutionContext(selector)
+
+                for ((name, value) in variableBindings) {
+                    selector.setVariable(name, value)
+                }
+
+                val result = selector.evaluate()
+
+                teardownExecutionContext()
+
+                // Check that all the parts are ok, but rely on sequence construction from the top
+                // level (so that we get the correct separators, for example).
+                for (item in result.iterator()) {
+                    if (!(item is XdmNode || item is XdmAtomicValue)) {
+                        throw XProcError.xdInvalidAvtResult(avt.value[index]).exception()
+                    }
+                }
+
+                sb.append(result.underlyingValue.stringValue)
+            }
+        }
+
+        if (asType !== SequenceType.ANY || values.isNotEmpty()) {
+            // This must be an attribute, so treat the value as untyped atomic to begin with
+            val value = StringToUntypedAtomic().convert(XdmAtomicValue(sb.toString()).underlyingValue)
+            return stepConfig.checkType(null, XdmAtomicValue(value), asType, values)
+        }
+
+        return XdmAtomicValue(sb.toString())
+    }
+
+    override fun toString(): String {
+        return avt.toString()
+    }
+}

@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?><refentry xmlns="http://docbook.org/ns/docbook" xmlns:p="http://www.w3.org/ns/xproc" xml:id="p-markdown-to-html">
+<?db filename="p-markdown-to-html"?>
+   <refnamediv>
+      <refname>p:markdown-to-html</refname>
+      <refpurpose>Converts Markdown formatted text to HTML</refpurpose>
+   </refnamediv>
+   <refsynopsisdiv>
+
+<refsection role="introduction">
+<title>Introduction</title>
+<para>The <code>p:markdown-to-html</code> step converts a text document in Markdown to XHTML.</para>
+</refsection>
+
+<refsection role="step-declaration">
+<title>Step declaration</title>
+<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="../../../../xmlcalabash/src/main/resources/com/xmlcalabash/library.xpl" xpointer="xpath(/*/*[@type='p:markdown-to-html'])"/>
+</refsection>
+
+<refsection role="errors"><title>Errors</title><para>
+</para>
+</refsection>
+
+<refsection role="implementation-features"><title>Implementation-defined and -dependent features</title>
+<para>
+<impl>The flavor(s) of Markdown supported and the parameters allowed are
+<glossterm>implementation-defined</glossterm>.</impl>
+</para>
+</refsection>
+</refsynopsisdiv>
+
+   <refsection>
+      <title>Description</title>
+
+      <para>The XML Calabash implementation of <tag>p:markdown-to-html</tag> uses the
+      <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="https://github.com/vsch/flexmark-java">Flexmark-java</link> implementation
+      of <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="https://spec.commonmark.org/0.28">Commonmark</link>.</para>
+   </refsection>
+
+   <refsection>
+     <title>Extensions</title>
+
+     <para>This implementation supports many of the extensions provided by
+     <productname>Flexmark-java</productname>. Many properties of each extension
+     can be configured by providing a map in the <option>parameters</option> option.
+     The extensions map is identified in the <option>parameters</option> option with the
+     key <code>cx:extensions</code>. The value of that parameter must be a map.
+     Within that map, the key must be the name of the extension. The value must be a map between
+     the option property names and their values.
+     </para>
+
+     <para>It’s also possible to configure the step with a Java class.
+     See <xref linkend="java-config"/>.</para>
+
+     <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="../../../../tools/markdown-extensions.xml"/>
+   </refsection>
+
+   <refsection xml:id="java-config">
+<?db filename="java-config"?>
+     <title>Java configuration</title>
+
+     <para>Most extension properties are set with atomic values (strings, integers) or
+     simple data structures composed of those values, such as maps and lists.
+     A few extensions have properties that must be configured with instances of
+     more complex Java classes that can’t coneveniently be mapped from the
+     step <option>parameters</option>.</para>
+
+     <para>In those cases, you can provide a Java class to configure the extension.
+     The configurers are identified in the <option>parameters</option> option with the
+     key <code>cx:configurers</code>. The value of that parameter must be a map.
+     Within that map, the key is any arbitrary string, the value must be the fully
+     qualified name of the class to instantiate.</para>
+
+     <para>The class must implement the <interfacename>com.xmlcalabash.util.MarkdownConfigurer</interfacename>
+     interface and must have a zero argument constructor. If XML Calabash can successfully
+     instantiate the class with reflection, it will call the <methodname>configure</methodname> method,
+     passing the key value from the parameters map as the second argument.</para>
+   </refsection>
+</refentry>

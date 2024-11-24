@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?><refentry xmlns="http://docbook.org/ns/docbook" xmlns:p="http://www.w3.org/ns/xproc" xml:id="p-os-exec">
+<?db filename="p-os-exec"?>
+   <refnamediv>
+      <refname>p:os-exec</refname>
+      <refpurpose>The standard p:os-exec step</refpurpose>
+   </refnamediv>
+   <refsynopsisdiv>
+
+<refsection role="introduction">
+<title>Introduction</title>
+<para>The <tag>p:os-exec</tag> step runs an external command passing the
+input that arrives on its <port>source</port> port as standard input,
+reading <port>result</port> from standard output, and <port>error</port>
+from standard error.</para>
+</refsection>
+
+<refsection role="step-declaration">
+<title>Step declaration</title>
+<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="../../../../xmlcalabash/src/main/resources/com/xmlcalabash/library.xpl" xpointer="xpath(/*/*[@type='p:os-exec'])"/>
+</refsection>
+
+<refsection role="errors"><title>Errors</title><para>
+<error code="C0033">It is a <glossterm>dynamic
+error</glossterm> if the command cannot be run.</error>
+<error code="C0034">It is a <glossterm>dynamic
+error</glossterm> if the current working directory cannot be changed
+to the value of the <option>cwd</option> option.</error>
+<error code="C0063">It is a <glossterm>dynamic
+error</glossterm> if the <option>path-separator</option> option is
+specified and is not exactly one character long.</error>
+<error code="C0032">It is a <glossterm>dynamic error</glossterm> if more than
+one document appears on the <port>source</port> port of the
+<tag>p:os-exec</tag> step.</error>
+<error code="C0064">It is a <glossterm>dynamic
+error</glossterm> if the exit code from the command is greater than
+the specified <option>failure-threshold</option> value.</error>
+</para>
+</refsection>
+
+<refsection role="implementation-features"><title>Implementation-defined and -dependent features</title>
+<para>
+<impl>If <option>cwd</option> is not
+specified, the current working directory is
+<glossterm>implementation-defined</glossterm>.</impl>
+<impl>The specific exit status values returned by
+a process invoked with <tag>p:os-exec</tag> are
+<glossterm>implementation-dependent</glossterm>.</impl>
+</para>
+</refsection>
+</refsynopsisdiv>
+
+   <refsection>
+      <title>Description</title>
+      <para>TBD.</para>
+   </refsection>
+</refentry>

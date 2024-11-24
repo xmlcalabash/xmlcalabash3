@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?><refentry xmlns="http://docbook.org/ns/docbook" xmlns:p="http://www.w3.org/ns/xproc" xml:id="p-directory-list">
+<?db filename="p-directory-list"?>
+   <refnamediv>
+      <refname>p:directory-list</refname>
+      <refpurpose>The standard p:directory-list step</refpurpose>
+   </refnamediv>
+   <refsynopsisdiv>
+
+<refsection role="introduction">
+<title>Introduction</title>
+<para>The <code>p:directory-list</code> step produces a list of the contents
+      of a specified directory.</para>
+</refsection>
+
+<refsection role="step-declaration">
+<title>Step declaration</title>
+<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="../../../../xmlcalabash/src/main/resources/com/xmlcalabash/library.xpl" xpointer="xpath(/*/*[@type='p:directory-list'])"/>
+</refsection>
+
+<refsection role="errors"><title>Errors</title><para>
+<error code="C0090">It is a <glossterm>dynamic error</glossterm> if an
+        implementation does not support directory listing for a specified scheme.</error>
+<error code="D0064">It is a <glossterm>dynamic 
+        error</glossterm> if the base URI is not both absolute and valid according to <biblioref linkend="rfc3986"/>.</error>
+<error code="C0017">It is a
+        <glossterm>dynamic error</glossterm> if the absolute path does not
+        identify a directory.</error>
+<error code="C0012">It is a
+          <glossterm>dynamic error</glossterm> if the contents of the directory
+          path are not available to the step due to access restrictions in the
+          environment in which the pipeline is run.</error>
+<error code="C0147">It is a <glossterm>dynamic
+        error</glossterm> if a specified value is not a valid XPath regular
+        expression.</error>
+</para>
+</refsection>
+
+<refsection role="implementation-features"><title>Implementation-defined and -dependent features</title>
+<para>
+<impl>Conformant processors <rfc2119>must</rfc2119> support directory paths whose
+      scheme is <code>file</code>. It is
+      <glossterm>implementation-defined</glossterm> what other schemes are
+      supported by <tag>p:directory-list</tag>, and what the interpretation
+      of ‘directory’, ‘file’ and ‘contents’ is for those schemes.</impl>
+<impl>Any file or directory determined to be
+          special by the <tag>p:directory-list</tag> step may be output using a
+          <tag>c:other</tag> element but the criteria for marking a file as
+          special are <glossterm>implementation-defined</glossterm>.</impl>
+<impl>The precise meaning of the detailed properties are
+        <glossterm>implementation-defined</glossterm> and may vary according
+        to the URI scheme of the <option>path</option>.</impl>
+<impl>Any other attributes on
+        <tag>c:file</tag>, <tag>c:directory</tag>, or <tag>c:other</tag>
+        are <glossterm>implementation-defined</glossterm></impl>
+</para>
+</refsection>
+</refsynopsisdiv>
+
+   <refsection>
+      <title>Description</title>
+      <para>TBD.</para>
+   </refsection>
+</refentry>

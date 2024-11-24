@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?><refentry xmlns="http://docbook.org/ns/docbook" xmlns:p="http://www.w3.org/ns/xproc" xml:id="p-archive">
+<?db filename="p-archive"?>
+   <refnamediv>
+      <refname>p:archive</refname>
+      <refpurpose>The standard p:archive step</refpurpose>
+   </refnamediv>
+   <refsynopsisdiv>
+
+<refsection role="introduction">
+<title>Introduction</title>
+<para>The <code>p:archive</code> step outputs on its <port>result</port> port an archive (usually
+    binary) document, for instance a ZIP file. A specification of the contents of the archive may be
+    specified in a manifest XML document on the <port>manifest</port> port. The step produces a
+    report on the <port>report</port> port, which contains the manifest, amended with additional
+    information about the archiving.</para>
+</refsection>
+
+<refsection role="step-declaration">
+<title>Step declaration</title>
+<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="../../../../xmlcalabash/src/main/resources/com/xmlcalabash/library.xpl" xpointer="xpath(/*/*[@type='p:archive'])"/>
+</refsection>
+
+<refsection role="errors"><title>Errors</title><para>
+<error code="C0084">It is a
+              <glossterm>dynamic error</glossterm> if two or more documents appear on the <code>p:archive</code>
+            step's <port>source</port> port that have the same base URI or if any document that
+        appears on the <port>source</port> port has no base URI.</error>
+<error code="C0100">It is a <glossterm>dynamic error</glossterm> if the document on port
+              <port>manifest</port> does not conform to the given schema.</error>
+<error code="C0112">It is a <glossterm>dynamic error</glossterm> if more than one
+            document appears on the port <port>manifest</port>.</error>
+<error code="C0079">It is a <glossterm>dynamic error</glossterm> if the map
+              <option>parameters</option> contains an entry whose key is defined by the
+            implementation and whose value is not valid for that key.</error>
+<error code="D0064">It is a <glossterm>dynamic
+              error</glossterm> if the base URI is not both absolute and valid according to
+              <biblioref linkend="rfc3986"/>.</error>
+<error code="C0081">It is a <glossterm>dynamic error</glossterm> if the format of the
+          archive does not match the format as specified in the <option>format</option>
+          option.</error>
+<error code="C0085">It is a <glossterm>dynamic error</glossterm> if the format of the archive 
+    cannot be understood, determined and/or processed.</error>
+<error code="C0100">It is a <glossterm>dynamic error</glossterm> if an archive manifest is
+        invalid according to the specification.</error>
+<error code="D0011">It is a <glossterm>dynamic error</glossterm>
+                    if the resource referenced by the <option>href</option> option does not exist, cannot be
+                    accessed or is not a file.</error>
+<error code="C0080">It is a <glossterm>dynamic error</glossterm> if the number of
+        documents on the <port>archive</port> does not match the expected number of archive input
+        documents for the given <code>format</code> and <code>command</code>.</error>
+</para>
+</refsection>
+
+<refsection role="implementation-features"><title>Implementation-defined and -dependent features</title>
+<para>
+<impl>The list of formats
+      supported by the <tag>p:archive</tag> step is
+      <glossterm>implementation-defined</glossterm>.</impl>
+<impl>The list of archive formats that can be modified by <tag>p:archive</tag> is
+              <glossterm>implementation-defined</glossterm>.</impl>
+<impl>The semantics of any additional attributes,
+            elements and their values are
+          <glossterm>implementation-defined</glossterm>.</impl>
+<impl>It is
+              <glossterm>implementation-defined</glossterm> what other formats are
+          supported.</impl>
+<impl>It is
+            <glossterm>implementation-defined</glossterm> what other formats are supported.</impl>
+<impl>It is <glossterm>implementation-defined</glossterm> how the step determines
+          the archive's format.</impl>
+<impl>The <code>c:archive</code> root element may contain additional
+    <glossterm>implementation-defined</glossterm> attributes.</impl>
+<impl>If the format imposes constraints on the archive
+        comment (character set or length, for example), how the processor coerces the attribute value
+        to satisfy those constraints is <glossterm>implementation-dependent</glossterm>.</impl>
+<impl>The default compression method is <glossterm>implementation-defined</glossterm>.
+          </impl>
+<impl>It is <glossterm>implementation-defined</glossterm> what
+            other compression methods are supported.</impl>
+<impl>The default
+            compression method is <glossterm>implementation-defined</glossterm>. </impl>
+<impl>It is <glossterm>implementation-defined</glossterm> what compression levels are
+            supported.</impl>
+<impl>The <code>c:entry</code> elements may contain additional
+          <glossterm>implementation-defined</glossterm> attributes.</impl>
+<impl>The <tag>p:archive</tag> step may support additional,
+              <glossterm>implementation-defined</glossterm> commands for ZIP files.</impl>
+<impl>The actual parameter names supported by <tag>p:archive</tag> for a particular format
+        are <glossterm>implementation-defined</glossterm>.</impl>
+</para>
+</refsection>
+</refsynopsisdiv>
+
+   <refsection>
+      <title>Description</title>
+      <para>The <tag>p:archive</tag> step only supports Zip archives.</para>
+   </refsection>
+
+</refentry>

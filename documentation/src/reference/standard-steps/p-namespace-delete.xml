@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?><refentry xmlns="http://docbook.org/ns/docbook" xmlns:p="http://www.w3.org/ns/xproc" xml:id="p-namespace-delete">
+<?db filename="p-namespace-delete"?>
+   <refnamediv>
+      <refname>p:namespace-delete</refname>
+      <refpurpose>The standard p:namespace-delete step</refpurpose>
+   </refnamediv>
+   <refsynopsisdiv>
+
+<refsection role="introduction">
+<title>Introduction</title>
+<para>The <tag>p:namespace-delete</tag> step deletes all of the namespaces identified by the specified 
+      prefixes from the document appearing on port <port>source</port>.</para>
+</refsection>
+
+<refsection role="step-declaration">
+<title>Step declaration</title>
+<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="../../../../xmlcalabash/src/main/resources/com/xmlcalabash/library.xpl" xpointer="xpath(/*/*[@type='p:namespace-delete'])"/>
+</refsection>
+
+<refsection role="errors"><title>Errors</title><para>
+<error code="C0108">It is a <glossterm>dynamic error</glossterm> if any
+prefix is not in-scope at the point where the <code>p:namespace-delete</code> occurs.</error>
+<error code="C0109">It is a <glossterm>dynamic error</glossterm> if
+a namespace is to be removed from an attribute and the element already has an attribute
+with the resulting name.</error>
+</para>
+</refsection>
+
+<refsection role="implementation-features"><title>Implementation-defined and -dependent features</title>
+<para>
+</para>
+</refsection>
+</refsynopsisdiv>
+
+   <refsection>
+      <title>Description</title>
+      <para>TBD.</para>
+   </refsection>
+</refentry>

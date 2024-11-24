@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?><refentry xmlns="http://docbook.org/ns/docbook" xmlns:p="http://www.w3.org/ns/xproc" xml:id="p-hash">
+<?db filename="p-hash"?>
+   <refnamediv>
+      <refname>p:hash</refname>
+      <refpurpose>The standard p:hash step</refpurpose>
+   </refnamediv>
+   <refsynopsisdiv>
+
+<refsection role="introduction">
+<title>Introduction</title>
+<para>The <tag>p:hash</tag> step generates a hash, or digital “fingerprint”,
+for some value and injects it into the <port>source</port> document.</para>
+</refsection>
+
+<refsection role="step-declaration">
+<title>Step declaration</title>
+<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="../../../../xmlcalabash/src/main/resources/com/xmlcalabash/library.xpl" xpointer="xpath(/*/*[@type='p:hash'])"/>
+</refsection>
+
+<refsection role="errors"><title>Errors</title><para>
+<error code="C0036">It is a
+<glossterm>dynamic error</glossterm> if the requested hash algorithm is not
+one that the processor understands or if the value or parameters are
+not appropriate for that algorithm.</error>
+</para>
+</refsection>
+
+<refsection role="implementation-features"><title>Implementation-defined and -dependent features</title>
+<para>
+<impl>It is
+<glossterm>implementation-defined</glossterm> what other algorithms are
+supported.</impl>
+</para>
+</refsection>
+</refsynopsisdiv>
+
+   <refsection>
+      <title>Description</title>
+      <para>TBD.</para>
+   </refsection>
+   <refsection>
+     <title>Supported algorithms</title>
+     <para>The <code>crc</code>, <code>md</code>, and <code>sha</code> algorithms are supported
+     as well as <code>cx:hmac</code> and <code>cx:blake3</code>.
+     </para>
+
+     <refsection>
+       <title>crc</title>
+       <para>Generates a CRC-32 checksum.
+       The default, and only accepted, <option>version</option> for the <code>crc</code> algorithm
+       is “32”.</para>
+     </refsection>
+
+     <refsection>
+       <title>md</title>
+       <para>Generates an MD2 or MD5 digest.
+       The default <option>version</option> for the <code>md</code> algorithm is “5”.
+       XML Calabash defers implementation to the JVM <classname>MessageDigest</classname> class.</para>
+       <para>The MD2 digest algorithm is defined in <biblioref linkend="rfc1319"/>.
+       The MD5 digest algorithm is defined in <biblioref linkend="rfc1321"/>.</para>
+     </refsection>
+
+     <refsection>
+       <title>sha</title>
+       <para>Generates a SHA-1, SHA-224, SHA-256, SHA-384, SHA-512, SHA-512/224, or SHA-512/256
+       digest.
+       The default <option>version</option> for the <code>sha</code> algorithm is “1”.
+       XML Calabash defers implementation to the JVM <classname>MessageDigest</classname> class.</para>
+       <para>The digest algorithms are defined in <biblioref linkend="fips180-4"/>.</para>
+     </refsection>
+
+     <refsection>
+       <title>cx:hmac</title>
+       <para>Generates an HMAC signature with the HMAC SHA1 algorithm. The <option>version</option>
+       option is ignored. The algorithm requires an access key which must be provided in
+       the <code>access-key</code> property of the <option>parameters</option> option.</para>
+     </refsection>
+
+     <refsection>
+       <title>cx:blake3</title>
+       <para>Generates a Blake3 digest. The <option>version</option>
+       option is ignored. XML Calabash defers implementation to the
+       <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="https://commons.apache.org/proper/commons-codec/">Apache Commons Codec</link>
+       project.</para>
+       <itemizedlist>
+         <listitem>
+           <para>If no <option>parameters</option> are provided, a Blake3 hash is generated.</para>
+         </listitem>
+         <listitem>
+           <para>If a <code>key</code> property is provided in the <option>parameters</option> option,
+           a Blake3 keyed hash is generated.</para>
+           <para>If a <code>key</code> is provided, no other properties may be provided.</para>
+         </listitem>
+         <listitem>
+           <para>If a <code>shared-secret</code>, <code>sender-id</code>, and <code>recipient-id</code>
+           are all provided in the <option>parameters</option> option, a Blake3 key derivation
+           digest is generated.</para>
+           <para>If any of <code>shared-secret</code>, <code>sender-id</code>, or
+           <code>recipient-id</code> are provided, they must <emphasis>all</emphasis> be provided.
+           No other properties may be provided.</para>
+         </listitem>
+       </itemizedlist>
+       <para>No other algorithms are supported at this time.</para>
+     </refsection>
+
+   </refsection>
+
+
+</refentry>

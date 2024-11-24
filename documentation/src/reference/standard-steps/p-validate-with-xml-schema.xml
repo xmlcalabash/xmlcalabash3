@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?><refentry xmlns="http://docbook.org/ns/docbook" xmlns:p="http://www.w3.org/ns/xproc" xml:id="p-validate-with-xml-schema">
+<?db filename="p-validate-with-xml-schema"?>
+   <refnamediv>
+      <refname>p:validate-with-xml-schema</refname>
+      <refpurpose>The standard p:validate-with-xml-schema step</refpurpose>
+   </refnamediv>
+   <refsynopsisdiv>
+
+<refsection role="introduction">
+<title>Introduction</title>
+<para>The <tag>p:validate-with-xml-schema</tag> step applies
+<biblioref linkend="xmlschema-1"/>
+validity assessment to the <port>source</port> input.</para>
+</refsection>
+
+<refsection role="step-declaration">
+<title>Step declaration</title>
+<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="../../../../xmlcalabash/src/main/resources/com/xmlcalabash/library.xpl" xpointer="xpath(/*/*[@type='p:validate-with-xml-schema'])"/>
+</refsection>
+
+<refsection role="errors"><title>Errors</title><para>
+<error code="C0152">It is a <glossterm>dynamic error</glossterm> 
+if the document supplied on <port>schema</port> port is not a valid XML schema 
+document.</error>
+<error code="C0011">It is a
+<glossterm>dynamic error</glossterm> if the specified schema version
+is not available.</error>
+<error code="C0156">It is a <glossterm>dynamic error</glossterm>
+if the <option>assert-valid</option> option on <tag>p:validate-with-xml-schema</tag> 
+is <literal>true</literal>
+and the input document is not valid.</error>
+<error code="C0055">It is a <glossterm>dynamic error</glossterm>
+if the implementation does not support the specified mode.</error>
+</para>
+</refsection>
+
+<refsection role="implementation-features"><title>Implementation-defined and -dependent features</title>
+<para>
+<impl>It is
+<glossterm>implementation-defined</glossterm> if the documents supplied
+on the <port>schemas</port> port are considered when resolving
+<code>xs:include</code> elements in the schema documents provided.</impl>
+</para>
+</refsection>
+</refsynopsisdiv>
+
+   <refsection>
+      <title>Description</title>
+      <para>TBD.</para>
+   </refsection>
+</refentry>

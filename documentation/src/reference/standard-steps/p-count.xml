@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?><refentry xmlns="http://docbook.org/ns/docbook" xmlns:p="http://www.w3.org/ns/xproc" xml:id="p-count">
+<?db filename="p-count"?>
+   <refnamediv>
+      <refname>p:count</refname>
+      <refpurpose>The standard p:count step</refpurpose>
+   </refnamediv>
+   <refsynopsisdiv>
+
+<refsection role="introduction">
+<title>Introduction</title>
+<para>The <code>p:count</code> step counts the number of documents in
+the <code>source</code> input sequence and returns a single document
+on <code>result</code> containing that number. The generated document
+contains a single <tag>c:result</tag> element whose contents is the
+string representation of the number of documents in the
+sequence.</para>
+</refsection>
+
+<refsection role="step-declaration">
+<title>Step declaration</title>
+<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="../../../../xmlcalabash/src/main/resources/com/xmlcalabash/library.xpl" xpointer="xpath(/*/*[@type='p:count'])"/>
+</refsection>
+
+<refsection role="errors"><title>Errors</title><para>
+</para>
+</refsection>
+
+<refsection role="implementation-features"><title>Implementation-defined and -dependent features</title>
+<para>
+</para>
+</refsection>
+</refsynopsisdiv>
+
+   <refsection>
+      <title>Description</title>
+      <para>TBD.</para>
+   </refsection>
+</refentry>

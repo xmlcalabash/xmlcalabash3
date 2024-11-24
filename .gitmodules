@@ -1,0 +1,3 @@
+[submodule "tests/3.0-test-suite"]
+	path = tests/3.0-test-suite
+	url = https://github.com/xproc/3.0-test-suite.git

@@ -1,0 +1,2450 @@
+<?xml version="1.0" encoding="utf-8"?>
+<elements prefix="xsl" namespace="http://www.w3.org/1999/XSL/Transform">
+   <element name="package">
+      <attribute name="id" optional="true" type="string"/>
+      <attribute name="name" optional="true" type="string"/>
+      <attribute name="package-version" optional="true" type="string"/>
+      <attribute name="version" optional="true" type="string"/>
+      <attribute name="input-type-annotations" optional="true">
+         <value>preserve</value>
+         <value>strip</value>
+         <value>unspecified</value>
+      </attribute>
+      <attribute name="declared-modes" optional="true" type="boolean"/>
+      <attribute name="default-mode" optional="true" type="string"/>
+      <attribute name="default-validation" optional="true">
+         <value>preserve</value>
+         <value>strip</value>
+      </attribute>
+      <attribute name="default-collation" optional="true" type="string"/>
+      <attribute name="extension-element-prefixes" optional="true" type="string"/>
+      <attribute name="exclude-result-prefixes" optional="true" type="string"/>
+      <attribute name="expand-text" optional="true" type="boolean"/>
+      <attribute name="use-when" optional="true" type="string"/>
+      <attribute name="xpath-default-namespace" optional="true" type="string"/>
+      <group/>
+   </element>
+   <element name="use-package">
+      <attribute name="name" optional="true" type="string"/>
+      <attribute name="package-version" optional="true" type="string"/>
+      <group/>
+   </element>
+   <element name="expose">
+      <attribute name="component" optional="true">
+         <value>template</value>
+         <value>function</value>
+         <value>attribute-set</value>
+         <value>variable</value>
+         <value>mode</value>
+         <value>*</value>
+      </attribute>
+      <attribute name="names" optional="true" type="string"/>
+      <attribute name="visibility" optional="true">
+         <value>public</value>
+         <value>private</value>
+         <value>final</value>
+         <value>abstract</value>
+      </attribute>
+      <group/>
+   </element>
+   <element name="accept">
+      <attribute name="component" optional="false">
+         <value>template</value>
+         <value>function</value>
+         <value>attribute-set</value>
+         <value>variable</value>
+         <value>mode</value>
+         <value>*</value>
+      </attribute>
+      <attribute name="names" optional="false" type="string"/>
+      <attribute name="visibility" optional="false">
+         <value>public</value>
+         <value>private</value>
+         <value>final</value>
+         <value>abstract</value>
+         <value>hidden</value>
+      </attribute>
+      <group/>
+   </element>
+   <element name="override">
+      <group/>
+   </element>
+   <element name="stylesheet">
+      <attribute name="id" optional="true" type="string"/>
+      <attribute name="version" default="3.0" type="string"/>
+      <attribute name="default-mode" optional="true" type="string"/>
+      <attribute name="default-validation" optional="true">
+         <value>preserve</value>
+         <value>strip</value>
+      </attribute>
+      <attribute name="input-type-annotations" optional="true">
+         <value>preserve</value>
+         <value>strip</value>
+         <value>unspecified</value>
+      </attribute>
+      <attribute name="default-collation" optional="true" type="string"/>
+      <attribute name="extension-element-prefixes" optional="true" type="string"/>
+      <attribute name="exclude-result-prefixes" optional="true" type="string"/>
+      <attribute name="expand-text" optional="true" type="boolean"/>
+      <attribute name="use-when" optional="true" type="string"/>
+      <attribute name="xpath-default-namespace" optional="true" type="string"/>
+      <group>
+         <element name="use-package"/>
+         <element name="include"/>
+         <element name="import"/>
+         <element name="import-schema"/>
+         <element name="strip-space"/>
+         <element name="preserve-space"/>
+         <element name="decimal-format"/>
+         <element name="template"/>
+         <element name="mode"/>
+         <element name="global-context-item"/>
+         <element name="variable"/>
+         <element name="param"/>
+         <element name="attribute-set"/>
+         <element name="function"/>
+         <element name="namespace-alias"/>
+         <element name="accumulator"/>
+         <element name="key"/>
+         <element name="output"/>
+         <element name="character-map"/>
+      </group>
+   </element>
+   <element name="transform">
+      <attribute name="id" optional="true" type="string"/>
+      <attribute name="version" default="3.0" type="string"/>
+      <attribute name="default-mode" optional="true" type="string"/>
+      <attribute name="default-validation" optional="true">
+         <value>preserve</value>
+         <value>strip</value>
+      </attribute>
+      <attribute name="input-type-annotations" optional="true">
+         <value>preserve</value>
+         <value>strip</value>
+         <value>unspecified</value>
+      </attribute>
+      <attribute name="default-collation" optional="true" type="string"/>
+      <attribute name="extension-element-prefixes" optional="true" type="string"/>
+      <attribute name="exclude-result-prefixes" optional="true" type="string"/>
+      <attribute name="expand-text" optional="true" type="boolean"/>
+      <attribute name="use-when" optional="true" type="string"/>
+      <attribute name="xpath-default-namespace" optional="true" type="string"/>
+      <group>
+         <element name="use-package"/>
+         <element name="include"/>
+         <element name="import"/>
+         <element name="import-schema"/>
+         <element name="strip-space"/>
+         <element name="preserve-space"/>
+         <element name="decimal-format"/>
+         <element name="template"/>
+         <element name="mode"/>
+         <element name="global-context-item"/>
+         <element name="variable"/>
+         <element name="param"/>
+         <element name="attribute-set"/>
+         <element name="function"/>
+         <element name="namespace-alias"/>
+         <element name="accumulator"/>
+         <element name="key"/>
+         <element name="output"/>
+         <element name="character-map"/>
+      </group>
+   </element>
+   <element name="include">
+      <attribute name="href" optional="true" type="string"/>
+      <group/>
+   </element>
+   <element name="import">
+      <attribute name="href" optional="false" type="string"/>
+      <group/>
+   </element>
+   <element name="import-schema">
+      <attribute name="namespace" optional="true" type="string"/>
+      <attribute name="schema-location" optional="true" type="string"/>
+      <group/>
+   </element>
+   <element name="strip-space">
+      <attribute name="elements" optional="false" type="string"/>
+      <group/>
+   </element>
+   <element name="preserve-space">
+      <attribute name="elements" optional="false" type="string"/>
+      <group/>
+   </element>
+   <element name="decimal-format">
+      <attribute name="name" optional="true" type="string"/>
+      <attribute name="decimal-separator" optional="true" type="string"/>
+      <attribute name="grouping-separator" optional="true" type="string"/>
+      <attribute name="infinity" optional="true" type="string"/>
+      <attribute name="minus-sign" optional="true" type="string"/>
+      <attribute name="exponent-separator" optional="true" type="string"/>
+      <attribute name="NaN" optional="true" type="string"/>
+      <attribute name="percent" optional="true" type="string"/>
+      <attribute name="per-mille" optional="true" type="string"/>
+      <attribute name="zero-digit" optional="true" type="string"/>
+      <attribute name="digit" optional="true" type="string"/>
+      <attribute name="pattern-separator" optional="true" type="string"/>
+      <group/>
+   </element>
+   <element name="template">
+      <attribute name="match" optional="true" type="string"/>
+      <attribute name="name" optional="true" type="string"/>
+      <attribute name="priority" optional="true" type="string"/>
+      <attribute name="mode" optional="true" type="string"/>
+      <attribute name="as" optional="true" type="string"/>
+      <attribute name="visibility" optional="true">
+         <value>public</value>
+         <value>private</value>
+         <value>final</value>
+         <value>abstract</value>
+      </attribute>
+      <group>
+         <element name="context-item"/>
+         <element name="param"/>
+         <element name="apply-templates"/>
+         <element name="apply-imports"/>
+         <element name="next-match"/>
+         <element name="for-each"/>
+         <element name="iterate"/>
+         <element name="next-iteration"/>
+         <element name="break"/>
+         <element name="if"/>
+         <element name="choose"/>
+         <element name="try"/>
+         <element name="variable"/>
+         <element name="call-template"/>
+         <element name="evaluate"/>
+         <element name="element"/>
+         <element name="attribute"/>
+         <element name="text"/>
+         <element name="value-of"/>
+         <element name="document"/>
+         <element name="processing-instruction"/>
+         <element name="namespace"/>
+         <element name="comment"/>
+         <element name="copy"/>
+         <element name="copy-of"/>
+         <element name="sequence"/>
+         <element name="where-populated"/>
+         <element name="on-empty"/>
+         <element name="on-non-empty"/>
+         <element name="number"/>
+         <element name="perform-sort"/>
+         <element name="for-each-group"/>
+         <element name="merge"/>
+         <element name="fork"/>
+         <element name="analyze-string"/>
+         <element name="source-document"/>
+         <element name="map"/>
+         <element name="map-entry"/>
+         <element name="message"/>
+         <element name="assert"/>
+         <element name="fallback"/>
+         <element name="result-document"/>
+      </group>
+   </element>
+   <element name="apply-templates">
+      <attribute name="select" optional="true" type="string"/>
+      <attribute name="mode" optional="true" type="string"/>
+      <group/>
+   </element>
+   <element name="mode">
+      <attribute name="name" optional="true" type="string"/>
+      <attribute name="streamable" optional="true" type="boolean"/>
+      <attribute name="on-no-match" optional="true">
+         <value>deep-copy</value>
+         <value>shallow-copy</value>
+         <value>deep-skip</value>
+         <value>shallow-skip</value>
+         <value>text-only-copy</value>
+         <value>fail</value>
+      </attribute>
+      <attribute name="on-multiple-match" optional="true">
+         <value>use-last</value>
+         <value>fail</value>
+      </attribute>
+      <attribute name="warning-on-no-match" optional="true" type="boolean"/>
+      <attribute name="warning-on-multiple-match" optional="true" type="boolean"/>
+      <attribute name="typed" optional="true" type="boolean"/>
+      <attribute name="visibility" optional="true">
+         <value>public</value>
+         <value>private</value>
+         <value>final</value>
+      </attribute>
+      <attribute name="use-accumulators" optional="true" type="string"/>
+      <group/>
+   </element>
+   <element name="context-item">
+      <attribute name="as" optional="true" type="string"/>
+      <attribute name="use" optional="true">
+         <value>required</value>
+         <value>optional</value>
+         <value>absent</value>
+      </attribute>
+      <group/>
+   </element>
+   <element name="global-context-item">
+      <attribute name="as" optional="true" type="string"/>
+      <attribute name="use" optional="true">
+         <value>required</value>
+         <value>optional</value>
+         <value>absent</value>
+      </attribute>
+      <group/>
+   </element>
+   <element name="apply-imports">
+      <group/>
+   </element>
+   <element name="next-match">
+      <group/>
+   </element>
+   <element name="for-each">
+      <attribute name="select" optional="false" type="string"/>
+      <group>
+         <element name="sort"/>
+         <element name="apply-templates"/>
+         <element name="apply-imports"/>
+         <element name="next-match"/>
+         <element name="for-each"/>
+         <element name="iterate"/>
+         <element name="next-iteration"/>
+         <element name="break"/>
+         <element name="if"/>
+         <element name="choose"/>
+         <element name="try"/>
+         <element name="variable"/>
+         <element name="call-template"/>
+         <element name="evaluate"/>
+         <element name="element"/>
+         <element name="attribute"/>
+         <element name="text"/>
+         <element name="value-of"/>
+         <element name="document"/>
+         <element name="processing-instruction"/>
+         <element name="namespace"/>
+         <element name="comment"/>
+         <element name="copy"/>
+         <element name="copy-of"/>
+         <element name="sequence"/>
+         <element name="where-populated"/>
+         <element name="on-empty"/>
+         <element name="on-non-empty"/>
+         <element name="number"/>
+         <element name="perform-sort"/>
+         <element name="for-each-group"/>
+         <element name="merge"/>
+         <element name="fork"/>
+         <element name="analyze-string"/>
+         <element name="source-document"/>
+         <element name="map"/>
+         <element name="map-entry"/>
+         <element name="message"/>
+         <element name="assert"/>
+         <element name="fallback"/>
+         <element name="result-document"/>
+      </group>
+   </element>
+   <element name="iterate">
+      <attribute name="select" optional="false" type="string"/>
+      <group>
+         <element name="param"/>
+         <element name="on-completion"/>
+         <element name="apply-templates"/>
+         <element name="apply-imports"/>
+         <element name="next-match"/>
+         <element name="for-each"/>
+         <element name="iterate"/>
+         <element name="next-iteration"/>
+         <element name="break"/>
+         <element name="if"/>
+         <element name="choose"/>
+         <element name="try"/>
+         <element name="variable"/>
+         <element name="call-template"/>
+         <element name="evaluate"/>
+         <element name="element"/>
+         <element name="attribute"/>
+         <element name="text"/>
+         <element name="value-of"/>
+         <element name="document"/>
+         <element name="processing-instruction"/>
+         <element name="namespace"/>
+         <element name="comment"/>
+         <element name="copy"/>
+         <element name="copy-of"/>
+         <element name="sequence"/>
+         <element name="where-populated"/>
+         <element name="on-empty"/>
+         <element name="on-non-empty"/>
+         <element name="number"/>
+         <element name="perform-sort"/>
+         <element name="for-each-group"/>
+         <element name="merge"/>
+         <element name="fork"/>
+         <element name="analyze-string"/>
+         <element name="source-document"/>
+         <element name="map"/>
+         <element name="map-entry"/>
+         <element name="message"/>
+         <element name="assert"/>
+         <element name="fallback"/>
+         <element name="result-document"/>
+      </group>
+   </element>
+   <element name="next-iteration">
+      <group/>
+   </element>
+   <element name="break">
+      <attribute name="select" optional="false" type="string"/>
+      <group>
+         <element name="apply-templates"/>
+         <element name="apply-imports"/>
+         <element name="next-match"/>
+         <element name="for-each"/>
+         <element name="iterate"/>
+         <element name="next-iteration"/>
+         <element name="break"/>
+         <element name="if"/>
+         <element name="choose"/>
+         <element name="try"/>
+         <element name="variable"/>
+         <element name="call-template"/>
+         <element name="evaluate"/>
+         <element name="element"/>
+         <element name="attribute"/>
+         <element name="text"/>
+         <element name="value-of"/>
+         <element name="document"/>
+         <element name="processing-instruction"/>
+         <element name="namespace"/>
+         <element name="comment"/>
+         <element name="copy"/>
+         <element name="copy-of"/>
+         <element name="sequence"/>
+         <element name="where-populated"/>
+         <element name="on-empty"/>
+         <element name="on-non-empty"/>
+         <element name="number"/>
+         <element name="perform-sort"/>
+         <element name="for-each-group"/>
+         <element name="merge"/>
+         <element name="fork"/>
+         <element name="analyze-string"/>
+         <element name="source-document"/>
+         <element name="map"/>
+         <element name="map-entry"/>
+         <element name="message"/>
+         <element name="assert"/>
+         <element name="fallback"/>
+         <element name="result-document"/>
+      </group>
+   </element>
+   <element name="on-completion">
+      <attribute name="select" optional="true" type="string"/>
+      <group>
+         <element name="apply-templates"/>
+         <element name="apply-imports"/>
+         <element name="next-match"/>
+         <element name="for-each"/>
+         <element name="iterate"/>
+         <element name="next-iteration"/>
+         <element name="break"/>
+         <element name="if"/>
+         <element name="choose"/>
+         <element name="try"/>
+         <element name="variable"/>
+         <element name="call-template"/>
+         <element name="evaluate"/>
+         <element name="element"/>
+         <element name="attribute"/>
+         <element name="text"/>
+         <element name="value-of"/>
+         <element name="document"/>
+         <element name="processing-instruction"/>
+         <element name="namespace"/>
+         <element name="comment"/>
+         <element name="copy"/>
+         <element name="copy-of"/>
+         <element name="sequence"/>
+         <element name="where-populated"/>
+         <element name="on-empty"/>
+         <element name="on-non-empty"/>
+         <element name="number"/>
+         <element name="perform-sort"/>
+         <element name="for-each-group"/>
+         <element name="merge"/>
+         <element name="fork"/>
+         <element name="analyze-string"/>
+         <element name="source-document"/>
+         <element name="map"/>
+         <element name="map-entry"/>
+         <element name="message"/>
+         <element name="assert"/>
+         <element name="fallback"/>
+         <element name="result-document"/>
+      </group>
+   </element>
+   <element name="if">
+      <attribute name="test" optional="false" type="string"/>
+      <group>
+         <element name="apply-templates"/>
+         <element name="apply-imports"/>
+         <element name="next-match"/>
+         <element name="for-each"/>
+         <element name="iterate"/>
+         <element name="next-iteration"/>
+         <element name="break"/>
+         <element name="if"/>
+         <element name="choose"/>
+         <element name="try"/>
+         <element name="variable"/>
+         <element name="call-template"/>
+         <element name="evaluate"/>
+         <element name="element"/>
+         <element name="attribute"/>
+         <element name="text"/>
+         <element name="value-of"/>
+         <element name="document"/>
+         <element name="processing-instruction"/>
+         <element name="namespace"/>
+         <element name="comment"/>
+         <element name="copy"/>
+         <element name="copy-of"/>
+         <element name="sequence"/>
+         <element name="where-populated"/>
+         <element name="on-empty"/>
+         <element name="on-non-empty"/>
+         <element name="number"/>
+         <element name="perform-sort"/>
+         <element name="for-each-group"/>
+         <element name="merge"/>
+         <element name="fork"/>
+         <element name="analyze-string"/>
+         <element name="source-document"/>
+         <element name="map"/>
+         <element name="map-entry"/>
+         <element name="message"/>
+         <element name="assert"/>
+         <element name="fallback"/>
+         <element name="result-document"/>
+      </group>
+   </element>
+   <element name="choose">
+      <group>
+         <element name="when"/>
+         <element name="otherwise"/>
+      </group>
+   </element>
+   <element name="when">
+      <attribute name="test" optional="false" type="string"/>
+      <group>
+         <element name="apply-templates"/>
+         <element name="apply-imports"/>
+         <element name="next-match"/>
+         <element name="for-each"/>
+         <element name="iterate"/>
+         <element name="next-iteration"/>
+         <element name="break"/>
+         <element name="if"/>
+         <element name="choose"/>
+         <element name="try"/>
+         <element name="variable"/>
+         <element name="call-template"/>
+         <element name="evaluate"/>
+         <element name="element"/>
+         <element name="attribute"/>
+         <element name="text"/>
+         <element name="value-of"/>
+         <element name="document"/>
+         <element name="processing-instruction"/>
+         <element name="namespace"/>
+         <element name="comment"/>
+         <element name="copy"/>
+         <element name="copy-of"/>
+         <element name="sequence"/>
+         <element name="where-populated"/>
+         <element name="on-empty"/>
+         <element name="on-non-empty"/>
+         <element name="number"/>
+         <element name="perform-sort"/>
+         <element name="for-each-group"/>
+         <element name="merge"/>
+         <element name="fork"/>
+         <element name="analyze-string"/>
+         <element name="source-document"/>
+         <element name="map"/>
+         <element name="map-entry"/>
+         <element name="message"/>
+         <element name="assert"/>
+         <element name="fallback"/>
+         <element name="result-document"/>
+      </group>
+   </element>
+   <element name="otherwise">
+      <group>
+         <element name="apply-templates"/>
+         <element name="apply-imports"/>
+         <element name="next-match"/>
+         <element name="for-each"/>
+         <element name="iterate"/>
+         <element name="next-iteration"/>
+         <element name="break"/>
+         <element name="if"/>
+         <element name="choose"/>
+         <element name="try"/>
+         <element name="variable"/>
+         <element name="call-template"/>
+         <element name="evaluate"/>
+         <element name="element"/>
+         <element name="attribute"/>
+         <element name="text"/>
+         <element name="value-of"/>
+         <element name="document"/>
+         <element name="processing-instruction"/>
+         <element name="namespace"/>
+         <element name="comment"/>
+         <element name="copy"/>
+         <element name="copy-of"/>
+         <element name="sequence"/>
+         <element name="where-populated"/>
+         <element name="on-empty"/>
+         <element name="on-non-empty"/>
+         <element name="number"/>
+         <element name="perform-sort"/>
+         <element name="for-each-group"/>
+         <element name="merge"/>
+         <element name="fork"/>
+         <element name="analyze-string"/>
+         <element name="source-document"/>
+         <element name="map"/>
+         <element name="map-entry"/>
+         <element name="message"/>
+         <element name="assert"/>
+         <element name="fallback"/>
+         <element name="result-document"/>
+      </group>
+   </element>
+   <element name="try">
+      <attribute name="select" optional="true" type="string"/>
+      <attribute name="rollback-output" optional="true" type="boolean"/>
+      <group>
+         <element name="apply-templates"/>
+         <element name="apply-imports"/>
+         <element name="next-match"/>
+         <element name="for-each"/>
+         <element name="iterate"/>
+         <element name="next-iteration"/>
+         <element name="break"/>
+         <element name="if"/>
+         <element name="choose"/>
+         <element name="try"/>
+         <element name="variable"/>
+         <element name="call-template"/>
+         <element name="evaluate"/>
+         <element name="element"/>
+         <element name="attribute"/>
+         <element name="text"/>
+         <element name="value-of"/>
+         <element name="document"/>
+         <element name="processing-instruction"/>
+         <element name="namespace"/>
+         <element name="comment"/>
+         <element name="copy"/>
+         <element name="copy-of"/>
+         <element name="sequence"/>
+         <element name="where-populated"/>
+         <element name="on-empty"/>
+         <element name="on-non-empty"/>
+         <element name="number"/>
+         <element name="perform-sort"/>
+         <element name="for-each-group"/>
+         <element name="merge"/>
+         <element name="fork"/>
+         <element name="analyze-string"/>
+         <element name="source-document"/>
+         <element name="map"/>
+         <element name="map-entry"/>
+         <element name="message"/>
+         <element name="assert"/>
+         <element name="fallback"/>
+         <element name="result-document"/>
+         <element name="catch"/>
+      </group>
+   </element>
+   <element name="catch">
+      <attribute name="errors" optional="true" type="string"/>
+      <attribute name="select" optional="true" type="string"/>
+      <group>
+         <element name="apply-templates"/>
+         <element name="apply-imports"/>
+         <element name="next-match"/>
+         <element name="for-each"/>
+         <element name="iterate"/>
+         <element name="next-iteration"/>
+         <element name="break"/>
+         <element name="if"/>
+         <element name="choose"/>
+         <element name="try"/>
+         <element name="variable"/>
+         <element name="call-template"/>
+         <element name="evaluate"/>
+         <element name="element"/>
+         <element name="attribute"/>
+         <element name="text"/>
+         <element name="value-of"/>
+         <element name="document"/>
+         <element name="processing-instruction"/>
+         <element name="namespace"/>
+         <element name="comment"/>
+         <element name="copy"/>
+         <element name="copy-of"/>
+         <element name="sequence"/>
+         <element name="where-populated"/>
+         <element name="on-empty"/>
+         <element name="on-non-empty"/>
+         <element name="number"/>
+         <element name="perform-sort"/>
+         <element name="for-each-group"/>
+         <element name="merge"/>
+         <element name="fork"/>
+         <element name="analyze-string"/>
+         <element name="source-document"/>
+         <element name="map"/>
+         <element name="map-entry"/>
+         <element name="message"/>
+         <element name="assert"/>
+         <element name="fallback"/>
+         <element name="result-document"/>
+      </group>
+   </element>
+   <element name="variable">
+      <attribute name="name" optional="false" type="string"/>
+      <attribute name="select" optional="true" type="string"/>
+      <attribute name="as" optional="true" type="string"/>
+      <attribute name="static" optional="true" type="boolean"/>
+      <attribute name="visibility" optional="true">
+         <value>public</value>
+         <value>private</value>
+         <value>final</value>
+         <value>abstract</value>
+      </attribute>
+      <group>
+         <element name="apply-templates"/>
+         <element name="apply-imports"/>
+         <element name="next-match"/>
+         <element name="for-each"/>
+         <element name="iterate"/>
+         <element name="next-iteration"/>
+         <element name="break"/>
+         <element name="if"/>
+         <element name="choose"/>
+         <element name="try"/>
+         <element name="variable"/>
+         <element name="call-template"/>
+         <element name="evaluate"/>
+         <element name="element"/>
+         <element name="attribute"/>
+         <element name="text"/>
+         <element name="value-of"/>
+         <element name="document"/>
+         <element name="processing-instruction"/>
+         <element name="namespace"/>
+         <element name="comment"/>
+         <element name="copy"/>
+         <element name="copy-of"/>
+         <element name="sequence"/>
+         <element name="where-populated"/>
+         <element name="on-empty"/>
+         <element name="on-non-empty"/>
+         <element name="number"/>
+         <element name="perform-sort"/>
+         <element name="for-each-group"/>
+         <element name="merge"/>
+         <element name="fork"/>
+         <element name="analyze-string"/>
+         <element name="source-document"/>
+         <element name="map"/>
+         <element name="map-entry"/>
+         <element name="message"/>
+         <element name="assert"/>
+         <element name="fallback"/>
+         <element name="result-document"/>
+      </group>
+   </element>
+   <element name="param">
+      <attribute name="name" optional="false" type="string"/>
+      <attribute name="select" optional="true" type="string"/>
+      <attribute name="as" optional="true" type="string"/>
+      <attribute name="required" optional="true" type="boolean"/>
+      <attribute name="tunnel" optional="true" type="boolean"/>
+      <attribute name="static" optional="true" type="boolean"/>
+      <group>
+         <element name="apply-templates"/>
+         <element name="apply-imports"/>
+         <element name="next-match"/>
+         <element name="for-each"/>
+         <element name="iterate"/>
+         <element name="next-iteration"/>
+         <element name="break"/>
+         <element name="if"/>
+         <element name="choose"/>
+         <element name="try"/>
+         <element name="variable"/>
+         <element name="call-template"/>
+         <element name="evaluate"/>
+         <element name="element"/>
+         <element name="attribute"/>
+         <element name="text"/>
+         <element name="value-of"/>
+         <element name="document"/>
+         <element name="processing-instruction"/>
+         <element name="namespace"/>
+         <element name="comment"/>
+         <element name="copy"/>
+         <element name="copy-of"/>
+         <element name="sequence"/>
+         <element name="where-populated"/>
+         <element name="on-empty"/>
+         <element name="on-non-empty"/>
+         <element name="number"/>
+         <element name="perform-sort"/>
+         <element name="for-each-group"/>
+         <element name="merge"/>
+         <element name="fork"/>
+         <element name="analyze-string"/>
+         <element name="source-document"/>
+         <element name="map"/>
+         <element name="map-entry"/>
+         <element name="message"/>
+         <element name="assert"/>
+         <element name="fallback"/>
+         <element name="result-document"/>
+      </group>
+   </element>
+   <element name="with-param">
+      <attribute name="name" optional="false" type="string"/>
+      <attribute name="select" optional="true" type="string"/>
+      <attribute name="as" optional="true" type="string"/>
+      <attribute name="tunnel" optional="true" type="boolean"/>
+      <group>
+         <element name="apply-templates"/>
+         <element name="apply-imports"/>
+         <element name="next-match"/>
+         <element name="for-each"/>
+         <element name="iterate"/>
+         <element name="next-iteration"/>
+         <element name="break"/>
+         <element name="if"/>
+         <element name="choose"/>
+         <element name="try"/>
+         <element name="variable"/>
+         <element name="call-template"/>
+         <element name="evaluate"/>
+         <element name="element"/>
+         <element name="attribute"/>
+         <element name="text"/>
+         <element name="value-of"/>
+         <element name="document"/>
+         <element name="processing-instruction"/>
+         <element name="namespace"/>
+         <element name="comment"/>
+         <element name="copy"/>
+         <element name="copy-of"/>
+         <element name="sequence"/>
+         <element name="where-populated"/>
+         <element name="on-empty"/>
+         <element name="on-non-empty"/>
+         <element name="number"/>
+         <element name="perform-sort"/>
+         <element name="for-each-group"/>
+         <element name="merge"/>
+         <element name="fork"/>
+         <element name="analyze-string"/>
+         <element name="source-document"/>
+         <element name="map"/>
+         <element name="map-entry"/>
+         <element name="message"/>
+         <element name="assert"/>
+         <element name="fallback"/>
+         <element name="result-document"/>
+      </group>
+   </element>
+   <element name="call-template">
+      <attribute name="name" optional="false" type="string"/>
+      <group/>
+   </element>
+   <element name="attribute-set">
+      <attribute name="name" optional="false" type="string"/>
+      <attribute name="use-attribute-sets" optional="true" type="string"/>
+      <attribute name="visibility" optional="true">
+         <value>public</value>
+         <value>private</value>
+         <value>final</value>
+         <value>abstract</value>
+      </attribute>
+      <attribute name="streamable" optional="true" type="boolean"/>
+      <group/>
+   </element>
+   <element name="function">
+      <attribute name="name" optional="false" type="string"/>
+      <attribute name="as" optional="true" type="string"/>
+      <attribute name="visibility" optional="true">
+         <value>public</value>
+         <value>private</value>
+         <value>final</value>
+         <value>abstract</value>
+      </attribute>
+      <attribute name="streamability" optional="true" type="string"/>
+      <attribute name="override-extension-function" optional="true" type="boolean"/>
+      <attribute name="override" optional="true" type="boolean"/>
+      <attribute name="new-each-time" optional="true" type="boolean"/>
+      <attribute name="cache" optional="true" type="boolean"/>
+      <group>
+         <element name="param"/>
+         <element name="apply-templates"/>
+         <element name="apply-imports"/>
+         <element name="next-match"/>
+         <element name="for-each"/>
+         <element name="iterate"/>
+         <element name="next-iteration"/>
+         <element name="break"/>
+         <element name="if"/>
+         <element name="choose"/>
+         <element name="try"/>
+         <element name="variable"/>
+         <element name="call-template"/>
+         <element name="evaluate"/>
+         <element name="element"/>
+         <element name="attribute"/>
+         <element name="text"/>
+         <element name="value-of"/>
+         <element name="document"/>
+         <element name="processing-instruction"/>
+         <element name="namespace"/>
+         <element name="comment"/>
+         <element name="copy"/>
+         <element name="copy-of"/>
+         <element name="sequence"/>
+         <element name="where-populated"/>
+         <element name="on-empty"/>
+         <element name="on-non-empty"/>
+         <element name="number"/>
+         <element name="perform-sort"/>
+         <element name="for-each-group"/>
+         <element name="merge"/>
+         <element name="fork"/>
+         <element name="analyze-string"/>
+         <element name="source-document"/>
+         <element name="map"/>
+         <element name="map-entry"/>
+         <element name="message"/>
+         <element name="assert"/>
+         <element name="fallback"/>
+         <element name="result-document"/>
+      </group>
+   </element>
+   <element name="evaluate">
+      <attribute name="xpath" optional="false" type="string"/>
+      <attribute name="as" optional="true" type="string"/>
+      <attribute name="base-uri" optional="true" type="string"/>
+      <attribute name="with-params" optional="true" type="string"/>
+      <attribute name="context-item" optional="true" type="string"/>
+      <attribute name="namespace-context" optional="true" type="string"/>
+      <attribute name="schema-aware" optional="true" type="string"/>
+      <group/>
+   </element>
+   <element name="namespace-alias">
+      <attribute name="stylesheet-prefix" optional="false" type="string"/>
+      <attribute name="result-prefix" optional="false" type="string"/>
+      <group/>
+   </element>
+   <element name="element">
+      <attribute name="name" optional="false" type="string"/>
+      <attribute name="namespace" optional="true" type="string"/>
+      <attribute name="inherit-namespaces" optional="true" type="boolean"/>
+      <attribute name="use-attribute-sets" optional="true" type="string"/>
+      <attribute name="type" optional="true" type="string"/>
+      <attribute name="validation" optional="true">
+         <value>strict</value>
+         <value>lax</value>
+         <value>preserve</value>
+         <value>strip</value>
+      </attribute>
+      <group>
+         <element name="apply-templates"/>
+         <element name="apply-imports"/>
+         <element name="next-match"/>
+         <element name="for-each"/>
+         <element name="iterate"/>
+         <element name="next-iteration"/>
+         <element name="break"/>
+         <element name="if"/>
+         <element name="choose"/>
+         <element name="try"/>
+         <element name="variable"/>
+         <element name="call-template"/>
+         <element name="evaluate"/>
+         <element name="element"/>
+         <element name="attribute"/>
+         <element name="text"/>
+         <element name="value-of"/>
+         <element name="document"/>
+         <element name="processing-instruction"/>
+         <element name="namespace"/>
+         <element name="comment"/>
+         <element name="copy"/>
+         <element name="copy-of"/>
+         <element name="sequence"/>
+         <element name="where-populated"/>
+         <element name="on-empty"/>
+         <element name="on-non-empty"/>
+         <element name="number"/>
+         <element name="perform-sort"/>
+         <element name="for-each-group"/>
+         <element name="merge"/>
+         <element name="fork"/>
+         <element name="analyze-string"/>
+         <element name="source-document"/>
+         <element name="map"/>
+         <element name="map-entry"/>
+         <element name="message"/>
+         <element name="assert"/>
+         <element name="fallback"/>
+         <element name="result-document"/>
+      </group>
+   </element>
+   <element name="attribute">
+      <attribute name="name" optional="false" type="string"/>
+      <attribute name="namespace" optional="true" type="string"/>
+      <attribute name="select" optional="true" type="string"/>
+      <attribute name="separator" optional="true" type="string"/>
+      <attribute name="type" optional="true" type="string"/>
+      <attribute name="validation" optional="true">
+         <value>strict</value>
+         <value>lax</value>
+         <value>preserve</value>
+         <value>strip</value>
+      </attribute>
+      <group>
+         <element name="apply-templates"/>
+         <element name="apply-imports"/>
+         <element name="next-match"/>
+         <element name="for-each"/>
+         <element name="iterate"/>
+         <element name="next-iteration"/>
+         <element name="break"/>
+         <element name="if"/>
+         <element name="choose"/>
+         <element name="try"/>
+         <element name="variable"/>
+         <element name="call-template"/>
+         <element name="evaluate"/>
+         <element name="element"/>
+         <element name="attribute"/>
+         <element name="text"/>
+         <element name="value-of"/>
+         <element name="document"/>
+         <element name="processing-instruction"/>
+         <element name="namespace"/>
+         <element name="comment"/>
+         <element name="copy"/>
+         <element name="copy-of"/>
+         <element name="sequence"/>
+         <element name="where-populated"/>
+         <element name="on-empty"/>
+         <element name="on-non-empty"/>
+         <element name="number"/>
+         <element name="perform-sort"/>
+         <element name="for-each-group"/>
+         <element name="merge"/>
+         <element name="fork"/>
+         <element name="analyze-string"/>
+         <element name="source-document"/>
+         <element name="map"/>
+         <element name="map-entry"/>
+         <element name="message"/>
+         <element name="assert"/>
+         <element name="fallback"/>
+         <element name="result-document"/>
+      </group>
+   </element>
+   <element name="text" text-content="true">
+      <attribute name="disable-output-escaping" optional="true" type="boolean"/>
+   </element>
+   <element name="value-of">
+      <attribute name="select" optional="true" type="string"/>
+      <attribute name="separator" optional="true" type="string"/>
+      <attribute name="disable-output-escaping" optional="true" type="boolean"/>
+      <group>
+         <element name="apply-templates"/>
+         <element name="apply-imports"/>
+         <element name="next-match"/>
+         <element name="for-each"/>
+         <element name="iterate"/>
+         <element name="next-iteration"/>
+         <element name="break"/>
+         <element name="if"/>
+         <element name="choose"/>
+         <element name="try"/>
+         <element name="variable"/>
+         <element name="call-template"/>
+         <element name="evaluate"/>
+         <element name="element"/>
+         <element name="attribute"/>
+         <element name="text"/>
+         <element name="value-of"/>
+         <element name="document"/>
+         <element name="processing-instruction"/>
+         <element name="namespace"/>
+         <element name="comment"/>
+         <element name="copy"/>
+         <element name="copy-of"/>
+         <element name="sequence"/>
+         <element name="where-populated"/>
+         <element name="on-empty"/>
+         <element name="on-non-empty"/>
+         <element name="number"/>
+         <element name="perform-sort"/>
+         <element name="for-each-group"/>
+         <element name="merge"/>
+         <element name="fork"/>
+         <element name="analyze-string"/>
+         <element name="source-document"/>
+         <element name="map"/>
+         <element name="map-entry"/>
+         <element name="message"/>
+         <element name="assert"/>
+         <element name="fallback"/>
+         <element name="result-document"/>
+      </group>
+   </element>
+   <element name="document">
+      <attribute name="type" optional="true" type="string"/>
+      <attribute name="validation" optional="true">
+         <value>strict</value>
+         <value>lax</value>
+         <value>preserve</value>
+         <value>strip</value>
+      </attribute>
+      <group>
+         <element name="apply-templates"/>
+         <element name="apply-imports"/>
+         <element name="next-match"/>
+         <element name="for-each"/>
+         <element name="iterate"/>
+         <element name="next-iteration"/>
+         <element name="break"/>
+         <element name="if"/>
+         <element name="choose"/>
+         <element name="try"/>
+         <element name="variable"/>
+         <element name="call-template"/>
+         <element name="evaluate"/>
+         <element name="element"/>
+         <element name="attribute"/>
+         <element name="text"/>
+         <element name="value-of"/>
+         <element name="document"/>
+         <element name="processing-instruction"/>
+         <element name="namespace"/>
+         <element name="comment"/>
+         <element name="copy"/>
+         <element name="copy-of"/>
+         <element name="sequence"/>
+         <element name="where-populated"/>
+         <element name="on-empty"/>
+         <element name="on-non-empty"/>
+         <element name="number"/>
+         <element name="perform-sort"/>
+         <element name="for-each-group"/>
+         <element name="merge"/>
+         <element name="fork"/>
+         <element name="analyze-string"/>
+         <element name="source-document"/>
+         <element name="map"/>
+         <element name="map-entry"/>
+         <element name="message"/>
+         <element name="assert"/>
+         <element name="fallback"/>
+         <element name="result-document"/>
+      </group>
+   </element>
+   <element name="processing-instruction">
+      <attribute name="name" optional="false" type="string"/>
+      <attribute name="select" optional="true" type="string"/>
+      <group>
+         <element name="apply-templates"/>
+         <element name="apply-imports"/>
+         <element name="next-match"/>
+         <element name="for-each"/>
+         <element name="iterate"/>
+         <element name="next-iteration"/>
+         <element name="break"/>
+         <element name="if"/>
+         <element name="choose"/>
+         <element name="try"/>
+         <element name="variable"/>
+         <element name="call-template"/>
+         <element name="evaluate"/>
+         <element name="element"/>
+         <element name="attribute"/>
+         <element name="text"/>
+         <element name="value-of"/>
+         <element name="document"/>
+         <element name="processing-instruction"/>
+         <element name="namespace"/>
+         <element name="comment"/>
+         <element name="copy"/>
+         <element name="copy-of"/>
+         <element name="sequence"/>
+         <element name="where-populated"/>
+         <element name="on-empty"/>
+         <element name="on-non-empty"/>
+         <element name="number"/>
+         <element name="perform-sort"/>
+         <element name="for-each-group"/>
+         <element name="merge"/>
+         <element name="fork"/>
+         <element name="analyze-string"/>
+         <element name="source-document"/>
+         <element name="map"/>
+         <element name="map-entry"/>
+         <element name="message"/>
+         <element name="assert"/>
+         <element name="fallback"/>
+         <element name="result-document"/>
+      </group>
+   </element>
+   <element name="namespace">
+      <attribute name="name" optional="false" type="string"/>
+      <attribute name="select" optional="true" type="string"/>
+      <group>
+         <element name="apply-templates"/>
+         <element name="apply-imports"/>
+         <element name="next-match"/>
+         <element name="for-each"/>
+         <element name="iterate"/>
+         <element name="next-iteration"/>
+         <element name="break"/>
+         <element name="if"/>
+         <element name="choose"/>
+         <element name="try"/>
+         <element name="variable"/>
+         <element name="call-template"/>
+         <element name="evaluate"/>
+         <element name="element"/>
+         <element name="attribute"/>
+         <element name="text"/>
+         <element name="value-of"/>
+         <element name="document"/>
+         <element name="processing-instruction"/>
+         <element name="namespace"/>
+         <element name="comment"/>
+         <element name="copy"/>
+         <element name="copy-of"/>
+         <element name="sequence"/>
+         <element name="where-populated"/>
+         <element name="on-empty"/>
+         <element name="on-non-empty"/>
+         <element name="number"/>
+         <element name="perform-sort"/>
+         <element name="for-each-group"/>
+         <element name="merge"/>
+         <element name="fork"/>
+         <element name="analyze-string"/>
+         <element name="source-document"/>
+         <element name="map"/>
+         <element name="map-entry"/>
+         <element name="message"/>
+         <element name="assert"/>
+         <element name="fallback"/>
+         <element name="result-document"/>
+      </group>
+   </element>
+   <element name="comment">
+      <attribute name="select" optional="true" type="string"/>
+      <group>
+         <element name="apply-templates"/>
+         <element name="apply-imports"/>
+         <element name="next-match"/>
+         <element name="for-each"/>
+         <element name="iterate"/>
+         <element name="next-iteration"/>
+         <element name="break"/>
+         <element name="if"/>
+         <element name="choose"/>
+         <element name="try"/>
+         <element name="variable"/>
+         <element name="call-template"/>
+         <element name="evaluate"/>
+         <element name="element"/>
+         <element name="attribute"/>
+         <element name="text"/>
+         <element name="value-of"/>
+         <element name="document"/>
+         <element name="processing-instruction"/>
+         <element name="namespace"/>
+         <element name="comment"/>
+         <element name="copy"/>
+         <element name="copy-of"/>
+         <element name="sequence"/>
+         <element name="where-populated"/>
+         <element name="on-empty"/>
+         <element name="on-non-empty"/>
+         <element name="number"/>
+         <element name="perform-sort"/>
+         <element name="for-each-group"/>
+         <element name="merge"/>
+         <element name="fork"/>
+         <element name="analyze-string"/>
+         <element name="source-document"/>
+         <element name="map"/>
+         <element name="map-entry"/>
+         <element name="message"/>
+         <element name="assert"/>
+         <element name="fallback"/>
+         <element name="result-document"/>
+      </group>
+   </element>
+   <element name="copy">
+      <attribute name="select" optional="true" type="string"/>
+      <attribute name="copy-namespaces" optional="true" type="boolean"/>
+      <attribute name="inherit-namespaces" optional="true" type="boolean"/>
+      <attribute name="use-attribute-sets" optional="true" type="string"/>
+      <attribute name="type" optional="true" type="string"/>
+      <attribute name="validation" optional="true">
+         <value>strict</value>
+         <value>lax</value>
+         <value>preserve</value>
+         <value>strip</value>
+      </attribute>
+      <group>
+         <element name="apply-templates"/>
+         <element name="apply-imports"/>
+         <element name="next-match"/>
+         <element name="for-each"/>
+         <element name="iterate"/>
+         <element name="next-iteration"/>
+         <element name="break"/>
+         <element name="if"/>
+         <element name="choose"/>
+         <element name="try"/>
+         <element name="variable"/>
+         <element name="call-template"/>
+         <element name="evaluate"/>
+         <element name="element"/>
+         <element name="attribute"/>
+         <element name="text"/>
+         <element name="value-of"/>
+         <element name="document"/>
+         <element name="processing-instruction"/>
+         <element name="namespace"/>
+         <element name="comment"/>
+         <element name="copy"/>
+         <element name="copy-of"/>
+         <element name="sequence"/>
+         <element name="where-populated"/>
+         <element name="on-empty"/>
+         <element name="on-non-empty"/>
+         <element name="number"/>
+         <element name="perform-sort"/>
+         <element name="for-each-group"/>
+         <element name="merge"/>
+         <element name="fork"/>
+         <element name="analyze-string"/>
+         <element name="source-document"/>
+         <element name="map"/>
+         <element name="map-entry"/>
+         <element name="message"/>
+         <element name="assert"/>
+         <element name="fallback"/>
+         <element name="result-document"/>
+      </group>
+   </element>
+   <element name="copy-of">
+      <attribute name="select" optional="false" type="string"/>
+      <attribute name="copy-accumulators" optional="true" type="boolean"/>
+      <attribute name="copy-namespaces" optional="true" type="boolean"/>
+      <attribute name="type" optional="true" type="string"/>
+      <attribute name="validation" optional="true">
+         <value>strict</value>
+         <value>lax</value>
+         <value>preserve</value>
+         <value>strip</value>
+      </attribute>
+      <group/>
+   </element>
+   <element name="sequence">
+      <attribute name="select" optional="true" type="string"/>
+      <group>
+         <element name="apply-templates"/>
+         <element name="apply-imports"/>
+         <element name="next-match"/>
+         <element name="for-each"/>
+         <element name="iterate"/>
+         <element name="next-iteration"/>
+         <element name="break"/>
+         <element name="if"/>
+         <element name="choose"/>
+         <element name="try"/>
+         <element name="variable"/>
+         <element name="call-template"/>
+         <element name="evaluate"/>
+         <element name="element"/>
+         <element name="attribute"/>
+         <element name="text"/>
+         <element name="value-of"/>
+         <element name="document"/>
+         <element name="processing-instruction"/>
+         <element name="namespace"/>
+         <element name="comment"/>
+         <element name="copy"/>
+         <element name="copy-of"/>
+         <element name="sequence"/>
+         <element name="where-populated"/>
+         <element name="on-empty"/>
+         <element name="on-non-empty"/>
+         <element name="number"/>
+         <element name="perform-sort"/>
+         <element name="for-each-group"/>
+         <element name="merge"/>
+         <element name="fork"/>
+         <element name="analyze-string"/>
+         <element name="source-document"/>
+         <element name="map"/>
+         <element name="map-entry"/>
+         <element name="message"/>
+         <element name="assert"/>
+         <element name="fallback"/>
+         <element name="result-document"/>
+      </group>
+   </element>
+   <element name="where-populated">
+      <group>
+         <element name="apply-templates"/>
+         <element name="apply-imports"/>
+         <element name="next-match"/>
+         <element name="for-each"/>
+         <element name="iterate"/>
+         <element name="next-iteration"/>
+         <element name="break"/>
+         <element name="if"/>
+         <element name="choose"/>
+         <element name="try"/>
+         <element name="variable"/>
+         <element name="call-template"/>
+         <element name="evaluate"/>
+         <element name="element"/>
+         <element name="attribute"/>
+         <element name="text"/>
+         <element name="value-of"/>
+         <element name="document"/>
+         <element name="processing-instruction"/>
+         <element name="namespace"/>
+         <element name="comment"/>
+         <element name="copy"/>
+         <element name="copy-of"/>
+         <element name="sequence"/>
+         <element name="where-populated"/>
+         <element name="on-empty"/>
+         <element name="on-non-empty"/>
+         <element name="number"/>
+         <element name="perform-sort"/>
+         <element name="for-each-group"/>
+         <element name="merge"/>
+         <element name="fork"/>
+         <element name="analyze-string"/>
+         <element name="source-document"/>
+         <element name="map"/>
+         <element name="map-entry"/>
+         <element name="message"/>
+         <element name="assert"/>
+         <element name="fallback"/>
+         <element name="result-document"/>
+      </group>
+   </element>
+   <element name="on-empty">
+      <attribute name="select" optional="true" type="string"/>
+      <group>
+         <element name="apply-templates"/>
+         <element name="apply-imports"/>
+         <element name="next-match"/>
+         <element name="for-each"/>
+         <element name="iterate"/>
+         <element name="next-iteration"/>
+         <element name="break"/>
+         <element name="if"/>
+         <element name="choose"/>
+         <element name="try"/>
+         <element name="variable"/>
+         <element name="call-template"/>
+         <element name="evaluate"/>
+         <element name="element"/>
+         <element name="attribute"/>
+         <element name="text"/>
+         <element name="value-of"/>
+         <element name="document"/>
+         <element name="processing-instruction"/>
+         <element name="namespace"/>
+         <element name="comment"/>
+         <element name="copy"/>
+         <element name="copy-of"/>
+         <element name="sequence"/>
+         <element name="where-populated"/>
+         <element name="on-empty"/>
+         <element name="on-non-empty"/>
+         <element name="number"/>
+         <element name="perform-sort"/>
+         <element name="for-each-group"/>
+         <element name="merge"/>
+         <element name="fork"/>
+         <element name="analyze-string"/>
+         <element name="source-document"/>
+         <element name="map"/>
+         <element name="map-entry"/>
+         <element name="message"/>
+         <element name="assert"/>
+         <element name="fallback"/>
+         <element name="result-document"/>
+      </group>
+   </element>
+   <element name="on-non-empty">
+      <attribute name="select" optional="true" type="string"/>
+      <group>
+         <element name="apply-templates"/>
+         <element name="apply-imports"/>
+         <element name="next-match"/>
+         <element name="for-each"/>
+         <element name="iterate"/>
+         <element name="next-iteration"/>
+         <element name="break"/>
+         <element name="if"/>
+         <element name="choose"/>
+         <element name="try"/>
+         <element name="variable"/>
+         <element name="call-template"/>
+         <element name="evaluate"/>
+         <element name="element"/>
+         <element name="attribute"/>
+         <element name="text"/>
+         <element name="value-of"/>
+         <element name="document"/>
+         <element name="processing-instruction"/>
+         <element name="namespace"/>
+         <element name="comment"/>
+         <element name="copy"/>
+         <element name="copy-of"/>
+         <element name="sequence"/>
+         <element name="where-populated"/>
+         <element name="on-empty"/>
+         <element name="on-non-empty"/>
+         <element name="number"/>
+         <element name="perform-sort"/>
+         <element name="for-each-group"/>
+         <element name="merge"/>
+         <element name="fork"/>
+         <element name="analyze-string"/>
+         <element name="source-document"/>
+         <element name="map"/>
+         <element name="map-entry"/>
+         <element name="message"/>
+         <element name="assert"/>
+         <element name="fallback"/>
+         <element name="result-document"/>
+      </group>
+   </element>
+   <element name="number">
+      <attribute name="value" optional="true" type="string"/>
+      <attribute name="select" optional="true" type="string"/>
+      <attribute name="level" optional="true">
+         <value>single</value>
+         <value>multiple</value>
+         <value>any</value>
+      </attribute>
+      <attribute name="count" optional="true" type="string"/>
+      <attribute name="from" optional="true" type="string"/>
+      <attribute name="format" optional="true" type="string"/>
+      <attribute name="lang" optional="true" type="string"/>
+      <attribute name="letter-value" optional="true" type="string"/>
+      <attribute name="ordinal" optional="true" type="string"/>
+      <attribute name="start-at" optional="true" type="string"/>
+      <attribute name="grouping-separator" optional="true" type="string"/>
+      <attribute name="grouping-size" optional="true" type="string"/>
+      <group/>
+   </element>
+   <element name="sort">
+      <attribute name="select" optional="true" type="string"/>
+      <attribute name="lang" optional="true" type="string"/>
+      <attribute name="order" optional="true" type="string"/>
+      <attribute name="collation" optional="true" type="string"/>
+      <attribute name="stable" optional="true" type="string"/>
+      <attribute name="case-order" optional="true" type="string"/>
+      <attribute name="data-type" optional="true" type="string"/>
+      <group>
+         <element name="apply-templates"/>
+         <element name="apply-imports"/>
+         <element name="next-match"/>
+         <element name="for-each"/>
+         <element name="iterate"/>
+         <element name="next-iteration"/>
+         <element name="break"/>
+         <element name="if"/>
+         <element name="choose"/>
+         <element name="try"/>
+         <element name="variable"/>
+         <element name="call-template"/>
+         <element name="evaluate"/>
+         <element name="element"/>
+         <element name="attribute"/>
+         <element name="text"/>
+         <element name="value-of"/>
+         <element name="document"/>
+         <element name="processing-instruction"/>
+         <element name="namespace"/>
+         <element name="comment"/>
+         <element name="copy"/>
+         <element name="copy-of"/>
+         <element name="sequence"/>
+         <element name="where-populated"/>
+         <element name="on-empty"/>
+         <element name="on-non-empty"/>
+         <element name="number"/>
+         <element name="perform-sort"/>
+         <element name="for-each-group"/>
+         <element name="merge"/>
+         <element name="fork"/>
+         <element name="analyze-string"/>
+         <element name="source-document"/>
+         <element name="map"/>
+         <element name="map-entry"/>
+         <element name="message"/>
+         <element name="assert"/>
+         <element name="fallback"/>
+         <element name="result-document"/>
+      </group>
+   </element>
+   <element name="perform-sort">
+      <attribute name="select" optional="true" type="string"/>
+      <group>
+         <element name="sort"/>
+         <element name="apply-templates"/>
+         <element name="apply-imports"/>
+         <element name="next-match"/>
+         <element name="for-each"/>
+         <element name="iterate"/>
+         <element name="next-iteration"/>
+         <element name="break"/>
+         <element name="if"/>
+         <element name="choose"/>
+         <element name="try"/>
+         <element name="variable"/>
+         <element name="call-template"/>
+         <element name="evaluate"/>
+         <element name="element"/>
+         <element name="attribute"/>
+         <element name="text"/>
+         <element name="value-of"/>
+         <element name="document"/>
+         <element name="processing-instruction"/>
+         <element name="namespace"/>
+         <element name="comment"/>
+         <element name="copy"/>
+         <element name="copy-of"/>
+         <element name="sequence"/>
+         <element name="where-populated"/>
+         <element name="on-empty"/>
+         <element name="on-non-empty"/>
+         <element name="number"/>
+         <element name="perform-sort"/>
+         <element name="for-each-group"/>
+         <element name="merge"/>
+         <element name="fork"/>
+         <element name="analyze-string"/>
+         <element name="source-document"/>
+         <element name="map"/>
+         <element name="map-entry"/>
+         <element name="message"/>
+         <element name="assert"/>
+         <element name="fallback"/>
+         <element name="result-document"/>
+      </group>
+   </element>
+   <element name="for-each-group">
+      <attribute name="select" optional="false" type="string"/>
+      <attribute name="group-by" optional="true" type="string"/>
+      <attribute name="group-adjacent" optional="true" type="string"/>
+      <attribute name="group-starting-with" optional="true" type="string"/>
+      <attribute name="group-ending-with" optional="true" type="string"/>
+      <attribute name="composite" optional="true" type="boolean"/>
+      <attribute name="collation" optional="true" type="string"/>
+      <group>
+         <element name="sort"/>
+         <element name="apply-templates"/>
+         <element name="apply-imports"/>
+         <element name="next-match"/>
+         <element name="for-each"/>
+         <element name="iterate"/>
+         <element name="next-iteration"/>
+         <element name="break"/>
+         <element name="if"/>
+         <element name="choose"/>
+         <element name="try"/>
+         <element name="variable"/>
+         <element name="call-template"/>
+         <element name="evaluate"/>
+         <element name="element"/>
+         <element name="attribute"/>
+         <element name="text"/>
+         <element name="value-of"/>
+         <element name="document"/>
+         <element name="processing-instruction"/>
+         <element name="namespace"/>
+         <element name="comment"/>
+         <element name="copy"/>
+         <element name="copy-of"/>
+         <element name="sequence"/>
+         <element name="where-populated"/>
+         <element name="on-empty"/>
+         <element name="on-non-empty"/>
+         <element name="number"/>
+         <element name="perform-sort"/>
+         <element name="for-each-group"/>
+         <element name="merge"/>
+         <element name="fork"/>
+         <element name="analyze-string"/>
+         <element name="source-document"/>
+         <element name="map"/>
+         <element name="map-entry"/>
+         <element name="message"/>
+         <element name="assert"/>
+         <element name="fallback"/>
+         <element name="result-document"/>
+      </group>
+   </element>
+   <element name="merge">
+      <group>
+         <element name="merge-source"/>
+         <element name="merge-action"/>
+         <element name="fallback"/>
+      </group>
+   </element>
+   <element name="merge-source">
+      <attribute name="select" optional="false" type="string"/>
+      <attribute name="name" optional="true" type="string"/>
+      <attribute name="for-each-item" optional="true" type="string"/>
+      <attribute name="for-each-stream" optional="true" type="string"/>
+      <attribute name="streamable" optional="true" type="boolean"/>
+      <attribute name="use-accumulators" optional="true" type="string"/>
+      <attribute name="sort-before-merge" optional="true" type="boolean"/>
+      <attribute name="validation" optional="true">
+         <value>strict</value>
+         <value>lax</value>
+         <value>preserve</value>
+         <value>strip</value>
+      </attribute>
+      <attribute name="type" optional="true" type="string"/>
+      <attribute name="for-each-source" optional="true" type="string"/>
+      <group/>
+   </element>
+   <element name="merge-key">
+      <attribute name="select" optional="true" type="string"/>
+      <attribute name="lang" optional="true" type="string"/>
+      <attribute name="order" optional="true" type="string"/>
+      <attribute name="collation" optional="true" type="string"/>
+      <attribute name="case-order" optional="true" type="string"/>
+      <attribute name="data-type" optional="true" type="string"/>
+      <group>
+         <element name="apply-templates"/>
+         <element name="apply-imports"/>
+         <element name="next-match"/>
+         <element name="for-each"/>
+         <element name="iterate"/>
+         <element name="next-iteration"/>
+         <element name="break"/>
+         <element name="if"/>
+         <element name="choose"/>
+         <element name="try"/>
+         <element name="variable"/>
+         <element name="call-template"/>
+         <element name="evaluate"/>
+         <element name="element"/>
+         <element name="attribute"/>
+         <element name="text"/>
+         <element name="value-of"/>
+         <element name="document"/>
+         <element name="processing-instruction"/>
+         <element name="namespace"/>
+         <element name="comment"/>
+         <element name="copy"/>
+         <element name="copy-of"/>
+         <element name="sequence"/>
+         <element name="where-populated"/>
+         <element name="on-empty"/>
+         <element name="on-non-empty"/>
+         <element name="number"/>
+         <element name="perform-sort"/>
+         <element name="for-each-group"/>
+         <element name="merge"/>
+         <element name="fork"/>
+         <element name="analyze-string"/>
+         <element name="source-document"/>
+         <element name="map"/>
+         <element name="map-entry"/>
+         <element name="message"/>
+         <element name="assert"/>
+         <element name="fallback"/>
+         <element name="result-document"/>
+      </group>
+   </element>
+   <element name="merge-action">
+      <group>
+         <element name="apply-templates"/>
+         <element name="apply-imports"/>
+         <element name="next-match"/>
+         <element name="for-each"/>
+         <element name="iterate"/>
+         <element name="next-iteration"/>
+         <element name="break"/>
+         <element name="if"/>
+         <element name="choose"/>
+         <element name="try"/>
+         <element name="variable"/>
+         <element name="call-template"/>
+         <element name="evaluate"/>
+         <element name="element"/>
+         <element name="attribute"/>
+         <element name="text"/>
+         <element name="value-of"/>
+         <element name="document"/>
+         <element name="processing-instruction"/>
+         <element name="namespace"/>
+         <element name="comment"/>
+         <element name="copy"/>
+         <element name="copy-of"/>
+         <element name="sequence"/>
+         <element name="where-populated"/>
+         <element name="on-empty"/>
+         <element name="on-non-empty"/>
+         <element name="number"/>
+         <element name="perform-sort"/>
+         <element name="for-each-group"/>
+         <element name="merge"/>
+         <element name="fork"/>
+         <element name="analyze-string"/>
+         <element name="source-document"/>
+         <element name="map"/>
+         <element name="map-entry"/>
+         <element name="message"/>
+         <element name="assert"/>
+         <element name="fallback"/>
+         <element name="result-document"/>
+      </group>
+   </element>
+   <element name="fork">
+      <group>
+         <element name="fallback"/>
+         <element name="sequence"/>
+         <element name="for-each-group"/>
+      </group>
+   </element>
+   <element name="analyze-string">
+      <attribute name="select" optional="false" type="string"/>
+      <attribute name="regex" optional="false" type="string"/>
+      <attribute name="flags" optional="true" type="string"/>
+      <group>
+         <element name="matching-substring"/>
+         <element name="non-matching-substring"/>
+         <element name="fallback"/>
+      </group>
+   </element>
+   <element name="matching-substring">
+      <group>
+         <element name="apply-templates"/>
+         <element name="apply-imports"/>
+         <element name="next-match"/>
+         <element name="for-each"/>
+         <element name="iterate"/>
+         <element name="next-iteration"/>
+         <element name="break"/>
+         <element name="if"/>
+         <element name="choose"/>
+         <element name="try"/>
+         <element name="variable"/>
+         <element name="call-template"/>
+         <element name="evaluate"/>
+         <element name="element"/>
+         <element name="attribute"/>
+         <element name="text"/>
+         <element name="value-of"/>
+         <element name="document"/>
+         <element name="processing-instruction"/>
+         <element name="namespace"/>
+         <element name="comment"/>
+         <element name="copy"/>
+         <element name="copy-of"/>
+         <element name="sequence"/>
+         <element name="where-populated"/>
+         <element name="on-empty"/>
+         <element name="on-non-empty"/>
+         <element name="number"/>
+         <element name="perform-sort"/>
+         <element name="for-each-group"/>
+         <element name="merge"/>
+         <element name="fork"/>
+         <element name="analyze-string"/>
+         <element name="source-document"/>
+         <element name="map"/>
+         <element name="map-entry"/>
+         <element name="message"/>
+         <element name="assert"/>
+         <element name="fallback"/>
+         <element name="result-document"/>
+      </group>
+   </element>
+   <element name="non-matching-substring">
+      <group>
+         <element name="apply-templates"/>
+         <element name="apply-imports"/>
+         <element name="next-match"/>
+         <element name="for-each"/>
+         <element name="iterate"/>
+         <element name="next-iteration"/>
+         <element name="break"/>
+         <element name="if"/>
+         <element name="choose"/>
+         <element name="try"/>
+         <element name="variable"/>
+         <element name="call-template"/>
+         <element name="evaluate"/>
+         <element name="element"/>
+         <element name="attribute"/>
+         <element name="text"/>
+         <element name="value-of"/>
+         <element name="document"/>
+         <element name="processing-instruction"/>
+         <element name="namespace"/>
+         <element name="comment"/>
+         <element name="copy"/>
+         <element name="copy-of"/>
+         <element name="sequence"/>
+         <element name="where-populated"/>
+         <element name="on-empty"/>
+         <element name="on-non-empty"/>
+         <element name="number"/>
+         <element name="perform-sort"/>
+         <element name="for-each-group"/>
+         <element name="merge"/>
+         <element name="fork"/>
+         <element name="analyze-string"/>
+         <element name="source-document"/>
+         <element name="map"/>
+         <element name="map-entry"/>
+         <element name="message"/>
+         <element name="assert"/>
+         <element name="fallback"/>
+         <element name="result-document"/>
+      </group>
+   </element>
+   <element name="source-document">
+      <attribute name="href" optional="false" type="string"/>
+      <attribute name="use-accumulators" optional="true" type="string"/>
+      <attribute name="type" optional="true" type="string"/>
+      <attribute name="validation" optional="true">
+         <value>strict</value>
+         <value>lax</value>
+         <value>preserve</value>
+         <value>strip</value>
+      </attribute>
+      <attribute name="streamable" optional="true" type="boolean"/>
+      <group>
+         <element name="apply-templates"/>
+         <element name="apply-imports"/>
+         <element name="next-match"/>
+         <element name="for-each"/>
+         <element name="iterate"/>
+         <element name="next-iteration"/>
+         <element name="break"/>
+         <element name="if"/>
+         <element name="choose"/>
+         <element name="try"/>
+         <element name="variable"/>
+         <element name="call-template"/>
+         <element name="evaluate"/>
+         <element name="element"/>
+         <element name="attribute"/>
+         <element name="text"/>
+         <element name="value-of"/>
+         <element name="document"/>
+         <element name="processing-instruction"/>
+         <element name="namespace"/>
+         <element name="comment"/>
+         <element name="copy"/>
+         <element name="copy-of"/>
+         <element name="sequence"/>
+         <element name="where-populated"/>
+         <element name="on-empty"/>
+         <element name="on-non-empty"/>
+         <element name="number"/>
+         <element name="perform-sort"/>
+         <element name="for-each-group"/>
+         <element name="merge"/>
+         <element name="fork"/>
+         <element name="analyze-string"/>
+         <element name="source-document"/>
+         <element name="map"/>
+         <element name="map-entry"/>
+         <element name="message"/>
+         <element name="assert"/>
+         <element name="fallback"/>
+         <element name="result-document"/>
+      </group>
+   </element>
+   <element name="accumulator">
+      <attribute name="name" optional="false" type="string"/>
+      <attribute name="initial-value" optional="false" type="string"/>
+      <attribute name="as" optional="true" type="string"/>
+      <attribute name="streamable" optional="true" type="boolean"/>
+      <group/>
+   </element>
+   <element name="accumulator-rule">
+      <attribute name="match" optional="false" type="string"/>
+      <attribute name="phase" optional="true">
+         <value>start</value>
+         <value>end</value>
+      </attribute>
+      <attribute name="select" optional="true" type="string"/>
+      <group>
+         <element name="apply-templates"/>
+         <element name="apply-imports"/>
+         <element name="next-match"/>
+         <element name="for-each"/>
+         <element name="iterate"/>
+         <element name="next-iteration"/>
+         <element name="break"/>
+         <element name="if"/>
+         <element name="choose"/>
+         <element name="try"/>
+         <element name="variable"/>
+         <element name="call-template"/>
+         <element name="evaluate"/>
+         <element name="element"/>
+         <element name="attribute"/>
+         <element name="text"/>
+         <element name="value-of"/>
+         <element name="document"/>
+         <element name="processing-instruction"/>
+         <element name="namespace"/>
+         <element name="comment"/>
+         <element name="copy"/>
+         <element name="copy-of"/>
+         <element name="sequence"/>
+         <element name="where-populated"/>
+         <element name="on-empty"/>
+         <element name="on-non-empty"/>
+         <element name="number"/>
+         <element name="perform-sort"/>
+         <element name="for-each-group"/>
+         <element name="merge"/>
+         <element name="fork"/>
+         <element name="analyze-string"/>
+         <element name="source-document"/>
+         <element name="map"/>
+         <element name="map-entry"/>
+         <element name="message"/>
+         <element name="assert"/>
+         <element name="fallback"/>
+         <element name="result-document"/>
+      </group>
+   </element>
+   <element name="key">
+      <attribute name="name" optional="false" type="string"/>
+      <attribute name="match" optional="false" type="string"/>
+      <attribute name="use" optional="true" type="string"/>
+      <attribute name="composite" optional="true" type="boolean"/>
+      <attribute name="collation" optional="true" type="string"/>
+      <group>
+         <element name="apply-templates"/>
+         <element name="apply-imports"/>
+         <element name="next-match"/>
+         <element name="for-each"/>
+         <element name="iterate"/>
+         <element name="next-iteration"/>
+         <element name="break"/>
+         <element name="if"/>
+         <element name="choose"/>
+         <element name="try"/>
+         <element name="variable"/>
+         <element name="call-template"/>
+         <element name="evaluate"/>
+         <element name="element"/>
+         <element name="attribute"/>
+         <element name="text"/>
+         <element name="value-of"/>
+         <element name="document"/>
+         <element name="processing-instruction"/>
+         <element name="namespace"/>
+         <element name="comment"/>
+         <element name="copy"/>
+         <element name="copy-of"/>
+         <element name="sequence"/>
+         <element name="where-populated"/>
+         <element name="on-empty"/>
+         <element name="on-non-empty"/>
+         <element name="number"/>
+         <element name="perform-sort"/>
+         <element name="for-each-group"/>
+         <element name="merge"/>
+         <element name="fork"/>
+         <element name="analyze-string"/>
+         <element name="source-document"/>
+         <element name="map"/>
+         <element name="map-entry"/>
+         <element name="message"/>
+         <element name="assert"/>
+         <element name="fallback"/>
+         <element name="result-document"/>
+      </group>
+   </element>
+   <element name="map">
+      <group>
+         <element name="apply-templates"/>
+         <element name="apply-imports"/>
+         <element name="next-match"/>
+         <element name="for-each"/>
+         <element name="iterate"/>
+         <element name="next-iteration"/>
+         <element name="break"/>
+         <element name="if"/>
+         <element name="choose"/>
+         <element name="try"/>
+         <element name="variable"/>
+         <element name="call-template"/>
+         <element name="evaluate"/>
+         <element name="element"/>
+         <element name="attribute"/>
+         <element name="text"/>
+         <element name="value-of"/>
+         <element name="document"/>
+         <element name="processing-instruction"/>
+         <element name="namespace"/>
+         <element name="comment"/>
+         <element name="copy"/>
+         <element name="copy-of"/>
+         <element name="sequence"/>
+         <element name="where-populated"/>
+         <element name="on-empty"/>
+         <element name="on-non-empty"/>
+         <element name="number"/>
+         <element name="perform-sort"/>
+         <element name="for-each-group"/>
+         <element name="merge"/>
+         <element name="fork"/>
+         <element name="analyze-string"/>
+         <element name="source-document"/>
+         <element name="map"/>
+         <element name="map-entry"/>
+         <element name="message"/>
+         <element name="assert"/>
+         <element name="fallback"/>
+         <element name="result-document"/>
+      </group>
+   </element>
+   <element name="map-entry">
+      <attribute name="key" optional="false" type="string"/>
+      <attribute name="select" optional="true" type="string"/>
+      <group>
+         <element name="apply-templates"/>
+         <element name="apply-imports"/>
+         <element name="next-match"/>
+         <element name="for-each"/>
+         <element name="iterate"/>
+         <element name="next-iteration"/>
+         <element name="break"/>
+         <element name="if"/>
+         <element name="choose"/>
+         <element name="try"/>
+         <element name="variable"/>
+         <element name="call-template"/>
+         <element name="evaluate"/>
+         <element name="element"/>
+         <element name="attribute"/>
+         <element name="text"/>
+         <element name="value-of"/>
+         <element name="document"/>
+         <element name="processing-instruction"/>
+         <element name="namespace"/>
+         <element name="comment"/>
+         <element name="copy"/>
+         <element name="copy-of"/>
+         <element name="sequence"/>
+         <element name="where-populated"/>
+         <element name="on-empty"/>
+         <element name="on-non-empty"/>
+         <element name="number"/>
+         <element name="perform-sort"/>
+         <element name="for-each-group"/>
+         <element name="merge"/>
+         <element name="fork"/>
+         <element name="analyze-string"/>
+         <element name="source-document"/>
+         <element name="map"/>
+         <element name="map-entry"/>
+         <element name="message"/>
+         <element name="assert"/>
+         <element name="fallback"/>
+         <element name="result-document"/>
+      </group>
+   </element>
+   <element name="message">
+      <attribute name="select" optional="true" type="string"/>
+      <attribute name="terminate" optional="true" type="string"/>
+      <attribute name="error-code" optional="true" type="string"/>
+      <group>
+         <element name="apply-templates"/>
+         <element name="apply-imports"/>
+         <element name="next-match"/>
+         <element name="for-each"/>
+         <element name="iterate"/>
+         <element name="next-iteration"/>
+         <element name="break"/>
+         <element name="if"/>
+         <element name="choose"/>
+         <element name="try"/>
+         <element name="variable"/>
+         <element name="call-template"/>
+         <element name="evaluate"/>
+         <element name="element"/>
+         <element name="attribute"/>
+         <element name="text"/>
+         <element name="value-of"/>
+         <element name="document"/>
+         <element name="processing-instruction"/>
+         <element name="namespace"/>
+         <element name="comment"/>
+         <element name="copy"/>
+         <element name="copy-of"/>
+         <element name="sequence"/>
+         <element name="where-populated"/>
+         <element name="on-empty"/>
+         <element name="on-non-empty"/>
+         <element name="number"/>
+         <element name="perform-sort"/>
+         <element name="for-each-group"/>
+         <element name="merge"/>
+         <element name="fork"/>
+         <element name="analyze-string"/>
+         <element name="source-document"/>
+         <element name="map"/>
+         <element name="map-entry"/>
+         <element name="message"/>
+         <element name="assert"/>
+         <element name="fallback"/>
+         <element name="result-document"/>
+      </group>
+   </element>
+   <element name="assert">
+      <attribute name="test" optional="false" type="string"/>
+      <attribute name="select" optional="true" type="string"/>
+      <attribute name="error-code" optional="true" type="string"/>
+      <group>
+         <element name="apply-templates"/>
+         <element name="apply-imports"/>
+         <element name="next-match"/>
+         <element name="for-each"/>
+         <element name="iterate"/>
+         <element name="next-iteration"/>
+         <element name="break"/>
+         <element name="if"/>
+         <element name="choose"/>
+         <element name="try"/>
+         <element name="variable"/>
+         <element name="call-template"/>
+         <element name="evaluate"/>
+         <element name="element"/>
+         <element name="attribute"/>
+         <element name="text"/>
+         <element name="value-of"/>
+         <element name="document"/>
+         <element name="processing-instruction"/>
+         <element name="namespace"/>
+         <element name="comment"/>
+         <element name="copy"/>
+         <element name="copy-of"/>
+         <element name="sequence"/>
+         <element name="where-populated"/>
+         <element name="on-empty"/>
+         <element name="on-non-empty"/>
+         <element name="number"/>
+         <element name="perform-sort"/>
+         <element name="for-each-group"/>
+         <element name="merge"/>
+         <element name="fork"/>
+         <element name="analyze-string"/>
+         <element name="source-document"/>
+         <element name="map"/>
+         <element name="map-entry"/>
+         <element name="message"/>
+         <element name="assert"/>
+         <element name="fallback"/>
+         <element name="result-document"/>
+      </group>
+   </element>
+   <element name="fallback">
+      <group>
+         <element name="apply-templates"/>
+         <element name="apply-imports"/>
+         <element name="next-match"/>
+         <element name="for-each"/>
+         <element name="iterate"/>
+         <element name="next-iteration"/>
+         <element name="break"/>
+         <element name="if"/>
+         <element name="choose"/>
+         <element name="try"/>
+         <element name="variable"/>
+         <element name="call-template"/>
+         <element name="evaluate"/>
+         <element name="element"/>
+         <element name="attribute"/>
+         <element name="text"/>
+         <element name="value-of"/>
+         <element name="document"/>
+         <element name="processing-instruction"/>
+         <element name="namespace"/>
+         <element name="comment"/>
+         <element name="copy"/>
+         <element name="copy-of"/>
+         <element name="sequence"/>
+         <element name="where-populated"/>
+         <element name="on-empty"/>
+         <element name="on-non-empty"/>
+         <element name="number"/>
+         <element name="perform-sort"/>
+         <element name="for-each-group"/>
+         <element name="merge"/>
+         <element name="fork"/>
+         <element name="analyze-string"/>
+         <element name="source-document"/>
+         <element name="map"/>
+         <element name="map-entry"/>
+         <element name="message"/>
+         <element name="assert"/>
+         <element name="fallback"/>
+         <element name="result-document"/>
+      </group>
+   </element>
+   <element name="result-document">
+      <attribute name="format" optional="true" type="string"/>
+      <attribute name="href" optional="true" type="string"/>
+      <attribute name="type" optional="true" type="string"/>
+      <attribute name="validation" optional="true">
+         <value>strict</value>
+         <value>lax</value>
+         <value>preserve</value>
+         <value>strip</value>
+      </attribute>
+      <attribute name="method" optional="true" type="string"/>
+      <attribute name="allow-duplicate-names" optional="true" type="string"/>
+      <attribute name="build-tree" optional="true" type="string"/>
+      <attribute name="byte-order-mark" optional="true" type="string"/>
+      <attribute name="cdata-section-elements" optional="true" type="string"/>
+      <attribute name="doctype-public" optional="true" type="string"/>
+      <attribute name="doctype-system" optional="true" type="string"/>
+      <attribute name="encoding" optional="true" type="string"/>
+      <attribute name="escape-uri-attributes" optional="true" type="string"/>
+      <attribute name="html-version" optional="true" type="string"/>
+      <attribute name="include-content-type" optional="true" type="string"/>
+      <attribute name="indent" optional="true" type="string"/>
+      <attribute name="item-separator" optional="true" type="string"/>
+      <attribute name="json-node-output-method" optional="true" type="string"/>
+      <attribute name="media-type" optional="true" type="string"/>
+      <attribute name="normalization-form" optional="true" type="string"/>
+      <attribute name="omit-xml-declaration" optional="true" type="string"/>
+      <attribute name="parameter-document" optional="true" type="string"/>
+      <attribute name="standalone" optional="true" type="string"/>
+      <attribute name="suppress-indentation" optional="true" type="string"/>
+      <attribute name="undeclare-prefixes" optional="true" type="string"/>
+      <attribute name="use-character-maps" optional="true" type="string"/>
+      <attribute name="output-version" optional="true" type="string"/>
+      <group>
+         <element name="apply-templates"/>
+         <element name="apply-imports"/>
+         <element name="next-match"/>
+         <element name="for-each"/>
+         <element name="iterate"/>
+         <element name="next-iteration"/>
+         <element name="break"/>
+         <element name="if"/>
+         <element name="choose"/>
+         <element name="try"/>
+         <element name="variable"/>
+         <element name="call-template"/>
+         <element name="evaluate"/>
+         <element name="element"/>
+         <element name="attribute"/>
+         <element name="text"/>
+         <element name="value-of"/>
+         <element name="document"/>
+         <element name="processing-instruction"/>
+         <element name="namespace"/>
+         <element name="comment"/>
+         <element name="copy"/>
+         <element name="copy-of"/>
+         <element name="sequence"/>
+         <element name="where-populated"/>
+         <element name="on-empty"/>
+         <element name="on-non-empty"/>
+         <element name="number"/>
+         <element name="perform-sort"/>
+         <element name="for-each-group"/>
+         <element name="merge"/>
+         <element name="fork"/>
+         <element name="analyze-string"/>
+         <element name="source-document"/>
+         <element name="map"/>
+         <element name="map-entry"/>
+         <element name="message"/>
+         <element name="assert"/>
+         <element name="fallback"/>
+         <element name="result-document"/>
+      </group>
+   </element>
+   <element name="output">
+      <attribute name="name" optional="true" type="string"/>
+      <attribute name="method" optional="true" type="string"/>
+      <attribute name="allow-duplicate-names" optional="true" type="boolean"/>
+      <attribute name="build-tree" optional="true" type="boolean"/>
+      <attribute name="byte-order-mark" optional="true" type="boolean"/>
+      <attribute name="cdata-section-elements" optional="true" type="string"/>
+      <attribute name="doctype-public" optional="true" type="string"/>
+      <attribute name="doctype-system" optional="true" type="string"/>
+      <attribute name="encoding" optional="true" type="string"/>
+      <attribute name="escape-uri-attributes" optional="true" type="boolean"/>
+      <attribute name="html-version" optional="true" type="string"/>
+      <attribute name="include-content-type" optional="true" type="boolean"/>
+      <attribute name="indent" optional="true" type="boolean"/>
+      <attribute name="item-separator" optional="true" type="string"/>
+      <attribute name="json-node-output-method" optional="true" type="string"/>
+      <attribute name="media-type" optional="true" type="string"/>
+      <attribute name="normalization-form" optional="true" type="string"/>
+      <attribute name="omit-xml-declaration" optional="true" type="boolean"/>
+      <attribute name="parameter-document" optional="true" type="string"/>
+      <attribute name="standalone" optional="true" type="boolean"/>
+      <attribute name="suppress-indentation" optional="true" type="string"/>
+      <attribute name="undeclare-prefixes" optional="true" type="boolean"/>
+      <attribute name="use-character-maps" optional="true" type="string"/>
+      <attribute name="version" optional="true" type="string"/>
+      <group/>
+   </element>
+   <element name="character-map">
+      <attribute name="name" optional="false" type="string"/>
+      <attribute name="use-character-maps" optional="true" type="string"/>
+      <group/>
+   </element>
+   <element name="output-character">
+      <attribute name="character" optional="false" type="string"/>
+      <attribute name="string" optional="false" type="string"/>
+      <group/>
+   </element>
+</elements>

@@ -1,0 +1,12 @@
+<preface xmlns="http://docbook.org/ns/docbook"
+         xmlns:xlink="http://www.w3.org/1999/xlink"
+         xmlns:xi='http://www.w3.org/2001/XInclude'
+         version="5.2" xml:id="preface">
+<info>
+  <?db filename="preface"?>
+  <title>Preface</title>
+</info>
+
+<para>…</para>
+
+</preface>

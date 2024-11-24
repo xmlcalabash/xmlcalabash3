@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?><refentry xmlns="http://docbook.org/ns/docbook" xmlns:p="http://www.w3.org/ns/xproc" xml:id="p-unarchive">
+<?db filename="p-unarchive"?>
+   <refnamediv>
+      <refname>p:unarchive</refname>
+      <refpurpose>The standard p:unarchive step</refpurpose>
+   </refnamediv>
+   <refsynopsisdiv>
+
+<refsection role="introduction">
+<title>Introduction</title>
+<para>The <code>p:unarchive</code> step outputs on its <port>result</port> port specific entries
+    in an archive (for instance from a zip file).</para>
+</refsection>
+
+<refsection role="step-declaration">
+<title>Step declaration</title>
+<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="../../../../xmlcalabash/src/main/resources/com/xmlcalabash/library.xpl" xpointer="xpath(/*/*[@type='p:unarchive'])"/>
+</refsection>
+
+<refsection role="errors"><title>Errors</title><para>
+<error code="C0085">It is a <glossterm>dynamic error</glossterm> if the format of the archive 
+          does not match the specified format, cannot be understood, determined and/or processed.</error>
+<error code="C0079">It is a <glossterm>dynamic error</glossterm> if the map
+            <option>parameters</option> contains an entry whose key is defined by the implementation
+          and whose value is not valid for that key.</error>
+<error code="C0147">It is a <glossterm>dynamic
+              error</glossterm> if a specified value is not a valid XPath regular
+              expression.</error>
+<error code="C0120">It is a <glossterm>dynamic error</glossterm> if the 
+    <option>relative-to</option> option is not present and the document on the 
+    <port>source</port> port does not have a base URI.</error>
+<error code="D0064">It is a <glossterm>dynamic
+    error</glossterm> if the option is not a valid URI according to <biblioref linkend="rfc3986"/>.</error>
+</para>
+</refsection>
+
+<refsection role="implementation-features"><title>Implementation-defined and -dependent features</title>
+<para>
+<impl>It is
+                <glossterm>implementation-defined</glossterm> what other formats are
+              supported.</impl>
+<impl>It is
+                <glossterm>implementation-defined</glossterm> how the step determines the archive's
+              format.</impl>
+<impl>The semantics of the keys and the allowed values for these keys are
+            <glossterm>implementation-defined</glossterm>.</impl>
+</para>
+</refsection>
+</refsynopsisdiv>
+
+   <refsection>
+      <title>Description</title>
+      <para>TBD.</para>
+   </refsection>
+</refentry>

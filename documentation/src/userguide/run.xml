@@ -1,0 +1,329 @@
+<chapter xmlns="http://docbook.org/ns/docbook"
+         xmlns:xlink="http://www.w3.org/1999/xlink"
+         xmlns:xi='http://www.w3.org/2001/XInclude'
+         version="5.2" xml:id="running">
+<info>
+  <?db filename="running"?>
+  <title>Running XML Calabash</title>
+</info>
+
+<para>The easiest way to run XML Calabash is directly from the jar file:</para>
+
+<screen>java -jar xmlcalabash-<?version?>.jar <replaceable>options…</replaceable></screen>
+
+<para>Run this way, all of the dependencies included in the
+<filename class="directory">lib</filename> directory are automatically included on the classpath.</para>
+
+<para>You can also run the main class directly, for example in a build system or
+a shell script:</para>
+
+<screen>java com.xmlcalabash.app.Main <replaceable>options…</replaceable></screen>
+
+<para>But if you choose this form, you must ensure that the classpath contains
+both the XML Calabash jar file and all of the necessary dependencies.</para>
+
+<para>One feature of the second form is that it allows you to change or update the dependencies.
+For example, if you have a Saxon-EE license, put the Saxon-EE jar file on the class path
+<emphasis>instead of</emphasis> the Saxon-HE jar file.</para>
+
+<para>Elsewhere in this document, we assume that the command “<command>xmlcalabash</command>”
+runs XML Calabash. This can be replaced by the <command>java -jar …</command> version above or
+by your own script.</para>
+
+<para>XML Calabash has a command driven command-line interface. It supports
+three commands: <command linkend="run-run">run</command>, to run a pipeline;
+<command linkend="run-version">version</command>, to print the version, and
+<command linkend="run-help">help</command> to display help. If no command is
+given, the <command>run</command> command is assumed.</para>
+
+<section xml:id="run-run">
+<title>The <literal>run</literal> command</title>
+
+<cmdsynopsis>
+  <command>xmlcalabash</command>
+  <arg choice="opt">run</arg>
+  <arg rep="norepeat" linkend="cli-configuration">--configuration:<replaceable>configuration-file</replaceable></arg>
+  <sbr/>
+  <arg rep="repeat" linkend="cli-input">--input:<replaceable>port</replaceable>=<replaceable>uri</replaceable></arg>
+  <arg rep="repeat" linkend="cli-output">--output:<replaceable>port</replaceable>=<replaceable>filespec</replaceable></arg>
+  <sbr/>
+  <arg rep="repeat" linkend="cli-namespace">--namespace:<replaceable>prefix</replaceable>=<replaceable>uri</replaceable></arg>
+  <sbr/>
+  <arg rep="norepeat" linkend="cli-description">--description:<replaceable>description-file</replaceable></arg>
+  <arg rep="norepeat" linkend="cli-graph">--graph:<replaceable>graph-file</replaceable></arg>
+  <sbr/>
+  <arg rep="norepeat" linkend="cli-step">--step:<replaceable>step-name</replaceable></arg>
+  <sbr/>
+  <arg rep="norepeat" linkend="cli-verbosity">--verbosity:<replaceable>verbosity</replaceable></arg>
+  <sbr/>
+  <arg rep="norepeat" linkend="cli-schema-aware">--schema-aware</arg>
+  <arg rep="norepeat" linkend="cli-debug">--debug</arg>
+  <arg rep="norepeat" linkend="cli-help">--help</arg>
+  <sbr/>
+  <arg rep="repeat" linkend="cli-option"><replaceable>option</replaceable>=<replaceable>value</replaceable></arg>
+</cmdsynopsis>
+
+<para>Where the options and arguments are:</para>
+
+<variablelist>
+<varlistentry><term><option>run</option>, selects the run command</term>
+<listitem>
+<para>If the command is omitted, <literal>run</literal> is assumed.</para>
+</listitem>
+</varlistentry>
+
+<varlistentry xml:id="cli-configuration">
+  <term><option>--configuration:<replaceable>configuration-file</replaceable></option>, identifies
+  a configuration file</term>
+<listitem>
+<para>When XML Calabash begins, it reads configuration settings from
+<link linkend="configuration">a configuration file</link>. If you don’t specify
+a configuration file, it will search first for <filename>.xmlcalabash3</filename> in the current
+directory and then in your home directory.</para>
+</listitem>
+</varlistentry>
+
+<varlistentry xml:id="cli-input">
+  <term><option>--input:<replaceable>port</replaceable>=<replaceable>uri</replaceable></option>, identifies
+  an input</term>
+<listitem>
+<para>This option associates the resource identified by the <replaceable>uri</replaceable> with
+the input port named <replaceable>port</replaceable>. If the <option>--input</option> option
+is repeated for the same <replaceable>port</replaceable>, the resources become a sequence of
+documents on that port, in the order specified.</para>
+<para>The pipeline must have an input port named <replaceable>port</replaceable>.</para>
+</listitem>
+</varlistentry>
+
+<varlistentry xml:id="cli-output">
+  <term><option>--output:<replaceable>port</replaceable>=<replaceable>filespec</replaceable></option>, identifies
+  an output</term>
+<listitem>
+<para>In the simplest case, at most one document appears on the output <replaceable>port</replaceable>
+and <replaceable>filespec</replaceable> is just a filename. The <replaceable>filespec</replaceable> can
+also be a template.
+The output documents are numbered, starting at 1. Within the <replaceable>filespec</replaceable>,
+the string “<literal>%d</literal>” will be replaced by the document number.
+(The string “<literal>%h</literal>” will be replaced by the document number in hexadecimal and
+“<literal>%o</literal>” will be replaced by the document number in octal, for no good reason.)
+Zeros can be added to pad the value, “<literal>%00d</literal>” will produce a document number
+that is at least two digits long, padded on the left with 0’s if there are fewer than 10 documents.
+For completeness, a literal “%” can be added to the filename with “<literal>%%</literal>”
+in the <replaceable>filespec</replaceable>.</para>
+<para>If the <replaceable>filespec</replaceable> does not contain a number template, then all
+of the outputs on the port will be concatenated to the same file.
+You may not repeat the <option>--output</option> option for the same port.</para>
+<para>The pipeline must have an output port named <replaceable>port</replaceable>.</para>
+<para>If the pipeline writes to a port for which there is no corresponding
+<option>--output</option> option, the results will be written to “standard output”, usually
+the shell window. In this case, a header is added before the output identifying the port
+name, document number, and base URI. A line of equal signs appears as a separator between
+documents. (The header and separator are omitted if standard output is being redirected, for example, to a file. But beware that the check for “is being redirected” isn’t very sophisticated and may be wrong
+in some circumstances.)</para>
+</listitem>
+</varlistentry>
+
+<varlistentry xml:id="cli-namespace">
+  <term><option>--namespace:<replaceable>prefix</replaceable>=<replaceable>uri</replaceable></option>,
+  identifies a namespace binding</term>
+<listitem>
+<para>Binds the specified <replaceable>prefix</replaceable> to the <replaceable>uri</replaceable>.
+This has no effect on the pipeline; these bindings are only used when evaluating
+expressions used to define <phrase linkend="cli-option">options</phrase>.
+</para>
+<para>If no namespace bindings are provided, the default bindings are 
+<code>xs</code>, <code>fn</code>, <code>map</code>, <code>array</code>, and <code>math</code>
+to their traditional XML Schema and XPath URIs. The prefix
+<code>saxon</code> is also bound to the Saxon extension namespace,
+<literal>http://saxon.sf.net/</literal>.</para>
+</listitem>
+</varlistentry>
+
+<varlistentry xml:id="cli-description">
+  <term><option>--description:<replaceable>description-file</replaceable></option>, SVG pipeline output</term>
+<listitem>
+<para>If <phrase linkend="cc.graphviz">Graphviz</phrase> is configured, this
+option writes an SVG description of the pipeline to the <replaceable>description-file</replaceable>.
+</para>
+</listitem>
+</varlistentry>
+
+<varlistentry xml:id="cli-graph">
+  <term><option>--graph:<replaceable>graph-file</replaceable></option>, SVG graph output</term>
+<listitem>
+<para>The <option>--description</option> option generates a graphical depiction of the pipeline.
+That is a description of the <emphasis>input</emphasis> to the processor. The processor does
+a number of transformations and constructs a graph to execute. The <optional>--graph</optional>
+option writes an SVG description of the constructed graph to the <replaceable>graph-file</replaceable>.
+</para>
+</listitem>
+</varlistentry>
+
+<varlistentry xml:id="cli-step">
+  <term><option>--step:<replaceable>step-name</replaceable></option>, identifies a step</term>
+<listitem>
+<para>If the input pipeline document is a <tag>p:library</tag>, this option identifies a step
+within that library to run. <emphasis>NOT YET IMPLEMENTED.</emphasis></para>
+</listitem>
+</varlistentry>
+
+<varlistentry xml:id="cli-verbosity">
+  <term><option>--verbosity:<replaceable>verbosity</replaceable></option></term>
+<listitem>
+<para>There are five levels of verbosity. The level of verbosity determines how much
+detail is printed about the progress of a running pipeline.</para>
+<variablelist>
+<varlistentry>
+<term><literal>detail</literal></term>
+<listitem><para>Lots of detail, show everything.</para></listitem>
+</varlistentry>
+<varlistentry>
+<term><literal>progress</literal></term>
+<listitem><para>Show when the execution of each step begins.</para></listitem>
+</varlistentry>
+<varlistentry>
+<term><literal>normal</literal></term>
+<listitem><para>Show relevant status messages.</para></listitem>
+</varlistentry>
+<varlistentry>
+<term><literal>warning</literal></term>
+<listitem><para>Show only warnings and errors.</para></listitem>
+</varlistentry>
+<varlistentry>
+<term><literal>quiet</literal></term>
+<listitem><para>No messages except fatal errors</para></listitem>
+</varlistentry>
+</variablelist>
+<para>It’s all a bit random, but that’s the idea.</para>
+</listitem>
+</varlistentry>
+
+<varlistentry xml:id="cli-schema-aware">
+  <term><option>--schema-aware</option></term>
+<listitem>
+<para>Requests schema-aware processing.</para>
+<para>Schema-aware processing requires Saxon EE and a valid Saxon license.</para>
+</listitem>
+</varlistentry>
+
+<varlistentry xml:id="cli-debug">
+  <term><option>--debug</option></term>
+<listitem>
+<para>If debugging is enabled, the processor prints more, and sometimes more random seeming,
+messages about its progress.</para>
+</listitem>
+</varlistentry>
+
+<varlistentry xml:id="cli-help">
+  <term><option>--help</option></term>
+<listitem>
+<para>This is equivalent to issuing the <command linkend="run-help">help</command> command.
+It’s provided as an option for convenience.
+</para>
+</listitem>
+</varlistentry>
+
+<varlistentry xml:id="cli-option">
+  <term><option><replaceable>option</replaceable>=<replaceable>value</replaceable></option>, sets an option</term>
+<listitem>
+<para>You can provide values for pipeline options on the command line. These override any defaults
+declared in the pipeline. There must be a pipeline option named <replaceable>option</replaceable>.</para>
+
+<para>The option name can be an EQName or it can use a prefix
+previously defined with <option linkend="cli-namespace">--namespace</option>; if the option is a simple
+<type>NCName</type>, it is not in a namespace.</para>
+<para>If the <replaceable>value</replaceable> begins with “?”, what follows is taken to be
+an XPath expression. That expression is evaluated using the namespace bindings defined. The
+context item is undefined. The result of evaluating the expression is the value of the option.
+If the <replaceable>value</replaceable> does not begin with a “?”, the whole string
+becomes the value as an <type>xs:untypedAtomic</type>.</para>
+
+<para>If multiple assignments to the same <option>option</option>
+appear, the option’s value will be a sequence with those values in the order
+specified.</para>
+</listitem>
+</varlistentry>
+</variablelist>
+</section>
+
+<section xml:id="run-help">
+<title>The <literal>help</literal> command</title>
+
+<cmdsynopsis>
+  <command>xmlcalabash</command>
+  <arg choice="plain">help</arg>
+</cmdsynopsis>
+
+<para>Displays a short summary of the command line options and arguments, not
+dissimilar to the preceding section. If help is requested, all of the other
+command line arguments are ignored.</para>
+</section>
+
+<section xml:id="run-version">
+<title>The <literal>version</literal> command</title>
+
+<cmdsynopsis>
+  <command>xmlcalabash</command>
+  <arg choice="plain">version</arg>
+  <arg rep="norepeat" linkend="cli-verbosity">--verbosity:<replaceable>verbosity</replaceable></arg>
+  <arg rep="norepeat" linkend="cli-debug">--debug</arg>
+</cmdsynopsis>
+
+<para>Displays the XML Calabash version and the version of Saxon:</para>
+
+<screen><userinput><prompt>$</prompt> xmlcalabash version</userinput>
+<computeroutput>XML Calabash version <?version?> (build <?version build-hash?>, <?version build-date display?>)
+Running with Saxon EE version 12.5 (with a license)</computeroutput></screen>
+
+<para>Most options are ignored when the <command>version</command> command is
+used, but if the <literal>detail</literal> level of <option>--verbosity</option>
+is requested, the version summary will include details about third party
+dependenies such as the HTML parser and XML resolver:</para>
+
+<screen><userinput><prompt>$</prompt> xmlcalabash version --verbosity:detail</userinput>
+<computeroutput>XML Calabash version <?version?> (build <?version build-hash?>, <?version build-date display?>)
+Running with Saxon EE version 12.5 (with a license)
+
+Dependencies: brotliDec=0.1.2, commonsCodec=1.17.0, commonsCompress=1.27.1, 
+flexmarkAll=0.64.8, htmlparser=1.4.16, httpClient=5.3.1, jing=20220510, 
+jsonSchemaValidator=1.4.0, schxslt=1.9.5, sinclude=5.2.4, slf4j=2.0.13, 
+tukaaniXz=1.10, uuidCreator=6.0.0, xmlResolver=6.0.10</computeroutput></screen>
+
+<important>
+<para>These are the <emphasis>compile-time</emphasis> dependencies, the versions that
+the processor <emphasis>expected</emphasis>. The versions actually used are controlled by what appears on 
+the classpath.</para>
+</important>
+
+<para>If the <option>--debug</option> option is used, all of the version
+information is formatted in a way that can more easily be parsed, for example by
+a shell script:</para>
+
+<screen><userinput><prompt>$</prompt> xmlcalabash --debug</userinput>
+<computeroutput>PRODUCT_NAME=XML Calabash
+VERSION=<?version VERSION?>
+BUILD_DATE=<?version BUILD_DATE?>
+BUILD_HASH=<?version BUILD_HASH?>
+SAXON=<?version SAXON?>
+SAXON_LICENSE=<?version SAXON_LICENSE?>
+VENDOR_NAME=Norm Tovey-Walsh
+VENDOR_URI=https://xmlcalabash.com/
+DEPENDENCY_brotliDec=<?version DEPENDENCY_brotliDec?>
+DEPENDENCY_commonsCodec=<?version DEPENDENCY_commonsCodec?>
+DEPENDENCY_commonsCompress=<?version DEPENDENCY_commonsCompress?>
+DEPENDENCY_flexmarkAll=<?version DEPENDENCY_flexmarkAll?>
+DEPENDENCY_htmlparser=<?version DEPENDENCY_htmlparser?>
+DEPENDENCY_httpClient=<?version DEPENDENCY_httpClient?>
+DEPENDENCY_jing=<?version DEPENDENCY_jing?>
+DEPENDENCY_jsonSchemaValidator=<?version DEPENDENCY_jsonSchemaValidator?>
+DEPENDENCY_schxslt=<?version DEPENDENCY_schxslt?>
+DEPENDENCY_sinclude=<?version DEPENDENCY_sinclude?>
+DEPENDENCY_slf4j=<?version DEPENDENCY_slf4j?>
+DEPENDENCY_tukaaniXz=<?version DEPENDENCY_tukaaniXz?>
+DEPENDENCY_uuidCreator=<?version DEPENDENCY_uuidCreator?>
+DEPENDENCY_xmlResolver=<?version DEPENDENCY_xmlResolver?></computeroutput></screen>
+</section>
+
+
+
+</chapter>

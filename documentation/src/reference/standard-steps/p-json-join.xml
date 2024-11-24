@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?><refentry xmlns="http://docbook.org/ns/docbook" xmlns:p="http://www.w3.org/ns/xproc" xml:id="p-json-join">
+<?db filename="p-json-join"?>
+   <refnamediv>
+      <refname>p:json-join</refname>
+      <refpurpose>The standard p:json-join step</refpurpose>
+   </refnamediv>
+   <refsynopsisdiv>
+
+<refsection role="introduction">
+<title>Introduction</title>
+<para>The <code>p:json-join</code> step joins the sequence of documents on port <port>source</port>
+into a single JSON document (an array) appearing on port <port>result</port>. If the sequence on
+port <code>source</code> is empty, the empty sequence is returned on
+port <code>result</code>.</para>
+</refsection>
+
+<refsection role="step-declaration">
+<title>Step declaration</title>
+<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="../../../../xmlcalabash/src/main/resources/com/xmlcalabash/library.xpl" xpointer="xpath(/*/*[@type='p:json-join'])"/>
+</refsection>
+
+<refsection role="errors"><title>Errors</title><para>
+<error code="C0111">
+        It is a <glossterm>dynamic error</glossterm> if a document of an unsupported document type appears on 
+        port <port>source</port> of <code>p:json-join</code>.</error>
+<error code="C0119">It is a <glossterm>dynamic error</glossterm> if <option>flatten</option> is
+neither “<literal>unbounded</literal>”, nor a string that may be cast to a non-negative integer.</error>
+</para>
+</refsection>
+
+<refsection role="implementation-features"><title>Implementation-defined and -dependent features</title>
+<para>
+<impl>It is <glossterm>implementation-defined</glossterm> if <code>p:json-join</code> is
+      able to process document types not mentioned yet, i.e. types of binary documents.</impl>
+</para>
+</refsection>
+</refsynopsisdiv>
+
+   <refsection>
+      <title>Description</title>
+      <para>TBD.</para>
+   </refsection>
+</refentry>

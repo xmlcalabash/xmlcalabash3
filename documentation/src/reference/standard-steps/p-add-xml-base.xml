@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?><refentry xmlns="http://docbook.org/ns/docbook" xmlns:p="http://www.w3.org/ns/xproc" xml:id="p-add-xml-base">
+<?db filename="p-add-xml-base"?>
+   <refnamediv>
+      <refname>p:add-xml-base</refname>
+      <refpurpose>The standard p:add-xml-base step</refpurpose>
+   </refnamediv>
+   <refsynopsisdiv>
+
+<refsection role="introduction">
+<title>Introduction</title>
+<para>The <code>p:add-xml-base</code> step exposes the base URI via
+explicit <code>xml:base</code> attributes. The input document from the
+<port>source</port> port is replicated to the <port>result</port> port
+with <code>xml:base</code> attributes added to or corrected on each element as specified
+by the options on this step.</para>
+</refsection>
+
+<refsection role="step-declaration">
+<title>Step declaration</title>
+<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="../../../../xmlcalabash/src/main/resources/com/xmlcalabash/library.xpl" xpointer="xpath(/*/*[@type='p:add-xml-base'])"/>
+</refsection>
+
+<refsection role="errors"><title>Errors</title><para>
+<error code="C0058">It is a <glossterm>dynamic error</glossterm>
+if the <option>all</option> and <option>relative</option> options are
+<emphasis>both</emphasis> <literal>true</literal>.</error>
+</para>
+</refsection>
+
+<refsection role="implementation-features"><title>Implementation-defined and -dependent features</title>
+<para>
+</para>
+</refsection>
+</refsynopsisdiv>
+
+   <refsection>
+      <title>Description</title>
+      <para>TBD.</para>
+   </refsection>
+
+<refsection>
+<title>Examples</title>
+
+<para>The following pipeline constructs a document with a base URI of
+<uri>file:///path/to/examples/</uri>. The resulting document is inserted into
+a <tag>wrapper</tag>, once just as it was constructed, and once after
+running it through <tag>p:add-xml-base</tag>.</para>
+
+<para>With the wrapper, the base URI of the <tag>example</tag> element is
+preserved <emphasis>in both cases</emphasis>. If you resolved a URI against the
+base URI of either element, it would be resolved against
+<uri>file:///path/to/examples/</uri>.</para>
+
+<programlisting language="xml"><xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="../../examples/xpl/add-xml-base-001.xpl" parse="text"/></programlisting>
+
+<para>However, in the serialized the result, the base URI of the first
+<tag>example</tag> isn’t preserved. XML serialization does nothing to preserve
+base URIs.</para>
+
+<programlisting language="xml"><xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="../../../build/examples/results/add-xml-base-001.xml" parse="text"/></programlisting>
+
+<para>The
+<tag>p:add-base-uri</tag> step makes each element’s base URI explicit using
+<biblioref linkend="xml-base"/>. Consequently,
+the base URI of the second <tag>example</tag> has been recorded in
+an explicit <tag class="attribute">xml:base</tag> attribute.</para>
+
+<para>If the serialized document is re-parsed, the base URI of the second
+<tag>example</tag> will still be correct, while the base URI of the first
+has been lost.</para>
+
+<note>
+<para>Adding <tag class="attribute">xml:base</tag> attributes to your document may
+have other consequences, for example in validation. The <tag class="attribute">xml:base</tag>
+attribute is an attribute like any other, it must be declared in your schema and it will
+be visible to other processes.</para>
+</note>
+
+</refsection>
+</refentry>

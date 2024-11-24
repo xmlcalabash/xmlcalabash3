@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<t:test expected="pass"
+        xmlns:t="http://xproc.org/ns/testsuite/3.0">
+  <t:info>
+    <t:title>unique-id-009</t:title>
+    <t:revision-history>
+      <t:revision>
+        <t:date>2024-10-26</t:date>
+        <t:author>
+          <t:name>Norm Tovey-Walsh</t:name>
+        </t:author>
+        <t:description xmlns="http://www.w3.org/1999/xhtml">
+          <p>Created test.</p>
+        </t:description>
+      </t:revision>
+    </t:revision-history>
+  </t:info>
+  <t:description xmlns="http://www.w3.org/1999/xhtml">
+    <p>Tests creating TypeID.</p>
+  </t:description>
+  <t:pipeline>
+    <p:declare-step version="3.0"
+                    xmlns:cx="http://xmlcalabash.com/ns/extensions"
+                    xmlns:p="http://www.w3.org/ns/xproc">
+      <p:output port="result"/>
+      <p:import href="https://xmlcalabash.com/ext/library/unique-id.xpl"/>
+      <cx:unique-id match="/*/@typeid" flavor="typeid">
+        <p:with-input>
+          <doc typeid=""/>
+        </p:with-input>
+      </cx:unique-id>
+    </p:declare-step>
+  </t:pipeline>
+  <t:schematron>
+    <s:schema queryBinding="xslt2"
+              xmlns:s="http://purl.oclc.org/dsdl/schematron">
+      <s:pattern>
+        <s:rule context="/">
+          <s:assert test="doc">The document root is not doc.</s:assert>
+          <s:assert test="doc/@typeid">No “typeid” attribute on doc.</s:assert>
+          <s:assert test="string-length(doc/@typeid) eq 26">The “typeid” attribute is the wrong length.</s:assert>
+        </s:rule>
+      </s:pattern>
+    </s:schema>
+  </t:schematron>
+</t:test>

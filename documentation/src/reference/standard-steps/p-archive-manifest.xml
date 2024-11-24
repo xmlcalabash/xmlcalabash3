@@ -1,0 +1,231 @@
+<?xml version="1.0" encoding="utf-8"?><refentry xmlns="http://docbook.org/ns/docbook" xmlns:p="http://www.w3.org/ns/xproc" xml:id="p-archive-manifest">
+<?db filename="p-archive-manifest"?>
+   <refnamediv>
+      <refname>p:archive-manifest</refname>
+      <refpurpose>The standard p:archive-manifest step</refpurpose>
+   </refnamediv>
+   <refsynopsisdiv>
+
+<refsection role="introduction">
+<title>Introduction</title>
+<para>The <code>p:archive-manifest</code> creates an XML manifest file describing the contents of
+    the archive appearing on its <port>source</port> port.</para>
+</refsection>
+
+<refsection role="step-declaration">
+<title>Step declaration</title>
+<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="../../../../xmlcalabash/src/main/resources/com/xmlcalabash/library.xpl" xpointer="xpath(/*/*[@type='p:archive-manifest'])"/>
+</refsection>
+
+<refsection role="errors"><title>Errors</title><para>
+<error code="C0081">It is a <glossterm>dynamic error</glossterm> if the format of the
+          archive does not match the format as specified in the <option>format</option>
+          option.</error>
+<error code="C0085">It is a <glossterm>dynamic error</glossterm> if the format of the
+      archive cannot be understood, determined and/or processed.</error>
+<error code="C0079">It is a <glossterm>dynamic error</glossterm> if the map
+        <option>parameters</option> contains an entry whose key is defined by the implementation and
+      whose value is not valid for that key.</error>
+<error code="D0064">It is a <glossterm>dynamic
+        error</glossterm> if the base URI is not both absolute and valid according to <biblioref linkend="rfc3986"/>.</error>
+<error code="C0120">It is a <glossterm>dynamic error</glossterm> if the <option>relative-to</option>
+      option is not present and the document on the <port>source</port> port does not have a base
+      URI.</error>
+<error code="C0147">It is a <glossterm>dynamic
+              error</glossterm> if the specified value is not a valid XPath regular
+            expression.</error>
+<error code="D0079">It is a <glossterm>dynamic error</glossterm> if a supplied 
+            content-type is not a valid media type of the form 
+            “<literal><replaceable>type</replaceable>/<replaceable>subtype</replaceable>+<replaceable>ext</replaceable></literal>” 
+            or “<literal><replaceable>type</replaceable>/<replaceable>subtype</replaceable></literal>”.</error>
+<error code="C0146">It is a <glossterm>dynamic error</glossterm> if the specified value
+        for the <option>override-content-types</option> option is not an array of arrays, where the
+        inner arrays have exactly two members of type <code>xs:string</code>.</error>
+</para>
+</refsection>
+
+<refsection role="implementation-features"><title>Implementation-defined and -dependent features</title>
+<para>
+<impl>It is
+            <glossterm>implementation-defined</glossterm> what other formats are supported.</impl>
+<impl>It is <glossterm>implementation-defined</glossterm> how the step determines
+          the archive's format.</impl>
+<impl>The semantics of the keys and the allowed values for these
+      keys are <glossterm>implementation-defined</glossterm>.</impl>
+<impl>Additional information provided for entries in <tag>p:archive-manifest</tag> is
+        <glossterm>implementation-defined</glossterm>.</impl>
+</para>
+</refsection>
+</refsynopsisdiv>
+
+   <refsection>
+      <title>Description</title>
+      <para>Compression is supported by the third party
+Apache Commons Compress™ library.</para>
+   </refsection>
+
+   <refsection>
+     <title>Supported formats</title>
+
+<para>The following formats are supported using the Apache Commons
+Compress™ library version <?dep commonsCompress?>.</para>
+
+<informaltable pgwide="1">
+<tgroup cols="3">
+<thead>
+  <row>
+    <entry>Archive format</entry>
+    <entry>Content type</entry>
+    <entry>Common file extensions</entry>
+  </row>
+</thead>
+<tbody>
+  <row>
+    <entry>7z</entry>
+    <entry><literal>application/x-7z-compressed</literal></entry>
+    <entry><filename class="extension">.7z</filename></entry>
+  </row>
+  <row>
+    <entry>AR</entry>
+    <entry><literal>application/x-archive</literal></entry>
+    <entry><filename class="extension">.a</filename>,
+       <filename class="extension">.lib</filename>,
+    <filename class="extension">.ar</filename></entry>
+  </row>
+  <row>
+    <entry>ARJ</entry>
+    <entry><emphasis>None</emphasis></entry>
+    <entry><filename class="extension">.arj</filename></entry>
+  </row>
+  <row>
+    <entry>Jar</entry>
+    <entry><literal>application/java-archive</literal></entry>
+    <entry><filename class="extension">.jar</filename></entry>
+  </row>
+  <row>
+    <entry>Tar</entry>
+    <entry><literal>application/x-tar</literal></entry>
+    <entry><filename class="extension">.tar</filename></entry>
+  </row>
+  <row>
+    <entry>Zip</entry>
+    <entry><literal>application/zip</literal></entry>
+    <entry><filename class="extension">.zip</filename></entry>
+  </row>
+</tbody>
+</tgroup>
+</informaltable>
+
+<refsection>
+<title>7z Archives</title>
+
+<para>Entries for 7z archives have the following format:</para>
+
+<rng-pattern schema="../../build/archive-manifest.rng"
+             name="c.sevenzEntry" format="table"/>
+
+<para>The possible compression methods are
+“<literal>none</literal>” (no compression),
+“<literal>lzma</literal>”,
+“<literal>lzma2</literal>”,
+“<literal>deflate</literal>”,
+“<literal>deflate64</literal>”,
+“<literal>bzip2</literal>”, or
+“<literal>unknown</literal>” (if the method was not recognized).</para>
+
+<note>
+<para>The 7z format calls the compression method that does no compression “copy”.
+It’s renamed to “none” here for consistency with the XProc archive format.</para>
+</note>
+</refsection>
+
+<refsection>
+<title>AR Archives</title>
+
+<para>Entries for AR archives have the following format:</para>
+
+<rng-pattern schema="../../build/archive-manifest.rng"
+             name="c.arEntry" format="table"/>
+
+</refsection>
+
+<refsection>
+<title>ARJ Archives</title>
+
+<para>Entries for ARJ archives have the following format:</para>
+
+<rng-pattern schema="../../build/archive-manifest.rng"
+             name="c.arjEntry" format="table"/>
+
+<para>The host operating system values are
+“<literal>Amiga</literal>”,
+“<literal>Apple IIGS</literal>”,
+“<literal>Atari ST</literal>”,
+“<literal>DOS</literal>”,
+“<literal>MacOS</literal>”,
+“<literal>Next</literal>”,
+“<literal>OS/2</literal>”,
+“<literal>PRIMOS</literal>”,
+“<literal>Unix</literal>”,
+“<literal>VAX/VMS</literal>”,
+“<literal>Windows</literal>”, or
+“<literal>Windows95</literal>”.</para>
+</refsection>
+
+<refsection>
+<title>Tar Archives</title>
+
+<para>Entries for tar archives have the following format:</para>
+
+<rng-pattern schema="../../build/archive-manifest.rng"
+             name="c.tarEntry" format="table"/>
+
+<para>The <tag class="attribute">cx:dev-major</tag> and <tag class="attribute">cx:dev-minor</tag>
+attributes are omited if they have a value of zero. 
+The <tag class="attribute">cx:link-flag</tag> is only present if it isn’t 0 (or ‘0’, 0x30).
+The <tag class="attribute">cx:link-name</tag> is only present if it isn’t null or blank.
+</para>
+
+<para>An entry with a <tag class="attribute">cx:link-flag</tag> of ‘5’ is assumed to be a directory
+and is omited from the manifest.</para>
+
+<para>Sparse tar entries are not supported.</para>
+</refsection>
+
+<refsection>
+<title>Zip (and Jar) Archives</title>
+
+<para>Jar archive files are just Zip archives with a different filename extension.
+Entries have the following format:
+</para>
+
+<rng-pattern schema="../../build/archive-manifest.rng"
+             name="c.zipEntry" format="table"/>
+
+<para>The <tag class="attribute">cx:mode</tag> and <tag class="attribute">cx:mode-string</tag>
+attributes are omited if the mode value is zero.
+The possible compression methods are
+“<literal>none</literal>” (no compression),
+“<literal>deflated</literal>”, or
+“<literal>unknown</literal>” (if the method was not recognized).</para>
+</refsection>
+
+<refsection>
+<title>Notes</title>
+<orderedlist>
+<listitem>
+<para>Support for the 7z format requires the
+<package>org.tukaani:xz:<?dep tukaaniXz?></package> package on the classpath.</para>
+</listitem>
+<listitem>
+<para>The <tag class="attribute">cx:mode-string</tag> attribute contains a string representation
+of the traditional Unix mode bits. For example, <literal>-rw-r-----</literal> for a file that is
+readable and writable by the owner, readable by members of the same group, and not accessible by
+others.</para>
+<para>Generally, the <tag class="attribute">cx:mode</tag> and <tag class="attribute">cx:mode-string</tag>
+attributes will either both be present or neither will be present.</para>
+</listitem>
+</orderedlist>
+</refsection>
+   </refsection>
+</refentry>

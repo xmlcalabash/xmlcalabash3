@@ -1,0 +1,169 @@
+:PROPERTIES:
+:ID:       43DF9F3C-7C6D-423F-AD41-528571F60120
+:END:
+#+title: Unique ID step
+#+date: 2024-05-23
+#+author: Norman Tovey-Walsh
+
+The ~cx:unique-id~ step generates a unique identifier and injects it into the source
+document. UUID, ULID, and TypeID identifiers are supported.
+
+#+BEGIN_SRC xml
+<p:declare-step type="cx:unique-id">
+     <p:input port="source" primary="true" content-types="xml html"/>
+     <p:output port="result" content-types="text xml html"/>
+     <p:option name="match" as="xs:string" select="'/*'"/>  <!-- XSLTSelectionPattern -->
+     <p:option name="flavor" as="xs:string" select='uuid' values="('uuid','ulid','typeid')"/>
+     <p:option name="sequential" as="xs:boolean" select='false'/>
+     <p:option name="parameters" as="map(xs:QName,item()*)?"/> 
+</p:declare-step>
+#+END_SRC
+
+* Options
+:PROPERTIES:
+:CUSTOM_ID: options
+:END:
+
+There are four options. The ~parameters~ vary by ~flavor~.
+
+** match
+:PROPERTIES:
+:CUSTOM_ID: match
+:END:
+
+The value of the ~match~ option must be an /XSLTSelectionPattern/.
+
+The matched nodes are specified with the selection pattern in the ~match~
+option. For each matching node, the generated identifier is used in the output.
+Nodes that do not match are copied without change.
+
+If the expression given in the match option matches an attribute, the identifier
+is used as the new value of the attribute in the output. If the attribute is
+named “ ~xml:base~ ”, the base URI of the element must also be amended accordingly.
+
+If the document node is matched, the entire document is replaced by a text node
+with the identifier. What appears on port result is a text document with the text node
+wrapped in a document node.
+
+If the expression matches any other kind of node, the entire node (and not just
+its contents) is replaced by the identifier.
+
+** flavor
+:PROPERTIES:
+:CUSTOM_ID: flavor
+:END:
+
+The ~flavor~ option determines the flavor of identifier.
+
+*** uuid
+:PROPERTIES:
+:CUSTOM_ID: uuid
+:END:
+
+If the UUID flavor is selected, the ~parameters~ map may contain a ~version~
+parameter determines the version of the UUID that must be computed. It is a
+dynamic error (~err:XC0060~) if the processor does not support the specified
+version of the UUID algorithm. If the version is not specified, version 4
+UUIDs are computed.
+
+Seven UUID versions are supported.
+
+**** Version 1
+:PROPERTIES:
+:CUSTOM_ID: uuid-version-1
+:END:
+
+Version 1 UUIDs are time based, no other parameters are used.
+
+**** Version 2
+:PROPERTIES:
+:CUSTOM_ID: uuid-version-2
+:END:
+
+Version 2 UUIDs have two parameters: ~domain~ and ~value~. The (integer) ~value~
+is encoded using the ~domain~. The ~domain~ value is either a byte or one of the
+special values ~user~, ~group~ or ~org~ (or ~organization~).
+
+The ~sequential~ option has no effect.
+
+**** Version 3
+:PROPERTIES:
+:CUSTOM_ID: uuid-version-3
+:END:
+
+Version 3 UUIDs have two parameters, a ~namespace~ UUID and a ~value~. The
+~value~ is encoded using the ~namespace~ and hashed with MD5. The ~namespace~
+value is either a UUID or one of the special values ~url~ (or ~uri~), ~dns~,
+~oid~ (or ~iso-oid~), or ~x500~.
+
+The ~sequential~ option has no effect.
+
+**** Version 4
+:PROPERTIES:
+:CUSTOM_ID: uuid-version-4
+:END:
+
+Version 4 UUIDs are random, no other parameters are used.
+
+**** Version 5
+:PROPERTIES:
+:CUSTOM_ID: uuid-version-5
+:END:
+
+Version 5 UUIDs are just like version 3 UUIDs, except that they’re hashed using
+SHA1 instead of MD5.
+
+**** Version 6
+:PROPERTIES:
+:CUSTOM_ID: uuid-version-6
+:END:
+
+Version 6 UUIDs are time based, no other parameters are used.
+
+**** Version 7
+:PROPERTIES:
+:CUSTOM_ID: uuid-version-7
+:END:
+
+Version 7 UUIDs are time based, no other parameters are used.
+
+*** ulid
+:PROPERTIES:
+:CUSTOM_ID: ulid
+:END:
+
+ULIDs have no parameters.
+
+*** typeid
+:PROPERTIES:
+:CUSTOM_ID: typeid
+:END:
+
+TypeID identifiers have a ~type~ parameter which must be a string.
+
+** sequential
+:PROPERTIES:
+:CUSTOM_ID: sequential
+:END:
+
+If ~sequential~ is true, a different unique identifier will be generated for
+each match. Otherwise, the same identifier is used in each match.
+
+* Document properties
+:PROPERTIES:
+:CUSTOM_ID: unique-id-properties
+:END:
+
+If the resulting document contains exactly one text node, the ~content-type~
+property is changed to ~text/plain~ and the serialization property is removed,
+while all other document properties are preserved. For other document types, all
+document properties are preserved.
+
+* References
+:PROPERTIES:
+:CUSTOM_ID: unique-id-references
+:END:
+
++ UUID, [[https://datatracker.ietf.org/doc/html/rfc9562][RFC 9562]]
++ ULID, [[https://github.com/ulid/spec][ulid specification]]
++ TypeID, [[https://github.com/jetify-com/typeid/tree/main/spec]]

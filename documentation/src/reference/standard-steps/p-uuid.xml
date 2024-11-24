@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?><refentry xmlns="http://docbook.org/ns/docbook" xmlns:p="http://www.w3.org/ns/xproc" xml:id="p-uuid">
+<?db filename="p-uuid"?>
+   <refnamediv>
+      <refname>p:uuid</refname>
+      <refpurpose>The standard p:uuid step</refpurpose>
+   </refnamediv>
+   <refsynopsisdiv>
+
+<refsection role="introduction">
+<title>Introduction</title>
+<para>The <tag>p:uuid</tag> step generates a
+<biblioref linkend="bib.uuid"/> and injects it into
+the <port>source</port> document.</para>
+</refsection>
+
+<refsection role="step-declaration">
+<title>Step declaration</title>
+<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="../../../../xmlcalabash/src/main/resources/com/xmlcalabash/library.xpl" xpointer="xpath(/*/*[@type='p:uuid'])"/>
+</refsection>
+
+<refsection role="errors"><title>Errors</title><para>
+<error code="C0060">It is a <glossterm>dynamic
+error</glossterm> if the processor does not support the specified
+<option>version</option> of the UUID algorithm.</error>
+</para>
+</refsection>
+
+<refsection role="implementation-features"><title>Implementation-defined and -dependent features</title>
+<para>
+<impl>If the
+<option>version</option> is not specified, the version of UUID
+computed is
+<glossterm>implementation-defined</glossterm>.</impl>
+<impl>Support for other versions of UUID
+is <glossterm>implementation-defined</glossterm>.</impl>
+<impl>The names and values of <option>parameters</option> to <tag>p:uuid</tag>
+are <glossterm>implementation-defined</glossterm>.</impl>
+</para>
+</refsection>
+</refsynopsisdiv>
+
+   <refsection>
+      <title>Description</title>
+      <para>TBD.</para>
+   </refsection>
+
+   <refsection>
+      <title>Supported versions</title>
+      <para>If no <option>version</option> is provided, version 4 is assumed.</para>
+      <para>Only version 4 UUIDs are supported and no parameters are used.</para>
+   </refsection>
+
+   <refsection>
+      <title>See also</title>
+      <para>The <xref linkend="cx-unique-id"/> step can generate version 1 through 7 UUIDs and other
+      forms of unique identifier.</para>
+   </refsection>
+</refentry>

@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?><refentry xmlns="http://docbook.org/ns/docbook" xmlns:p="http://www.w3.org/ns/xproc" xml:id="p-load">
+<?db filename="p-load"?>
+   <refnamediv>
+      <refname>p:load</refname>
+      <refpurpose>The standard p:load step</refpurpose>
+   </refnamediv>
+   <refsynopsisdiv>
+
+<refsection role="introduction">
+<title>Introduction</title>
+<para>The <code>p:load</code> step has no inputs but produces as its
+result a document specified by an IRI.</para>
+</refsection>
+
+<refsection role="step-declaration">
+<title>Step declaration</title>
+<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="../../../../xmlcalabash/src/main/resources/com/xmlcalabash/library.xpl" xpointer="xpath(/*/*[@type='p:load'])"/>
+</refsection>
+
+<refsection role="errors"><title>Errors</title><para>
+<error code="D0064">It is a <glossterm>dynamic 
+      error</glossterm> if the base URI is not both absolute and valid according to <biblioref linkend="rfc3986"/>.</error>
+<error code="D0011">It is a <glossterm>dynamic error</glossterm>
+if the resource referenced by a <code>p:load</code> element does not exist
+or cannot be accessed.</error>
+<error code="D0079">It is a <glossterm>dynamic error</glossterm> if a supplied content-type is not 
+    a valid media type of the form 
+    “<literal><replaceable>type</replaceable>/<replaceable>subtype</replaceable>+<replaceable>ext</replaceable></literal>” 
+    or “<literal><replaceable>type</replaceable>/<replaceable>subtype</replaceable></literal>”.</error>
+<error code="D0062">It is a <glossterm>dynamic error</glossterm>
+if the <tag class="attribute">content-type</tag> is specified and the
+document-properties has a “<code>content-type</code>” that is not the
+same.</error>
+<error code="D0049">It is a <glossterm>dynamic error</glossterm> if
+the loaded content is not a well-formed XML document.</error>
+<error code="D0023">It is a <glossterm>dynamic error</glossterm> if a DTD validation
+is performed and either the document is not valid or no DTD is found.</error>
+<error code="D0043">It is a <glossterm>dynamic error</glossterm>
+if the <option>dtd-validate</option> parameter is <literal>true</literal> and
+the processor does not support DTD validation.</error>
+<error code="D0060">It is a <glossterm>dynamic error</glossterm> if the
+<option>content-type</option> specifies an encoding, which is not supported
+by the processor.</error>
+<error code="D0057">It is a <glossterm>dynamic error</glossterm> if the loaded content
+does not conform to the JSON grammar, unless the parameter <option>liberal</option> is
+<literal>true</literal> and the processor chooses to accept the deviation.</error>
+<error code="D0058">It is a <glossterm>dynamic error</glossterm> if the parameter
+<option>duplicates</option> is <literal>reject</literal> and the value of
+loaded content contains a JSON object with duplicate keys.</error>
+<error code="D0059">It is a <glossterm>dynamic error</glossterm> if the parameter
+map contains an entry whose key is defined in the specification of
+<code>fn:parse-json</code> and whose value is not valid for that key, or if it contains
+an entry with the key fallback when the parameter <option>escape</option> with
+<literal>true()</literal> is also present.</error>
+<error code="D0078">It is a <glossterm>dynamic error</glossterm>
+if the loaded document cannot be represented as an HTML document in
+the XPath data model.</error>
+</para>
+</refsection>
+
+<refsection role="implementation-features"><title>Implementation-defined and -dependent features</title>
+<para>
+<impl>In the absence of an explicit type, the content
+type is <glossterm>implementation-defined</glossterm></impl>
+<impl>Additional XML parameters are <glossterm>implementation-defined</glossterm>.
+</impl>
+<impl>Text parameters are <glossterm>implementation-defined</glossterm>.
+</impl>
+<impl>Additional JSON parameters are <glossterm>implementation-defined</glossterm>.
+</impl>
+<impl>The precise way in which HTML documents are parsed into the
+XPath data model is <glossterm>implementation-defined</glossterm>.</impl>
+<impl>HTML parameters are <glossterm>implementation-defined</glossterm>.
+</impl>
+<impl>How a
+processor interprets other media types is <glossterm>implementation-defined</glossterm>.
+</impl>
+<impl>Parameters for other media types
+are <glossterm>implementation-defined</glossterm>.
+</impl>
+</para>
+</refsection>
+</refsynopsisdiv>
+
+   <refsection>
+      <title>Description</title>
+      <para>TBD.</para>
+   </refsection>
+</refentry>

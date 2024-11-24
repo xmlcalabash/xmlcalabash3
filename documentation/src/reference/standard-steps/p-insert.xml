@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?><refentry xmlns="http://docbook.org/ns/docbook" xmlns:p="http://www.w3.org/ns/xproc" xml:id="p-insert">
+<?db filename="p-insert"?>
+   <refnamediv>
+      <refname>p:insert</refname>
+      <refpurpose>The standard p:insert step</refpurpose>
+   </refnamediv>
+   <refsynopsisdiv>
+
+<refsection role="introduction">
+<title>Introduction</title>
+<para>The <code>p:insert</code> step inserts the
+<code>insertion</code> port's document into the <port>source</port>
+port's document relative to the matching elements in the
+<code>source</code> port's document.</para>
+</refsection>
+
+<refsection role="step-declaration">
+<title>Step declaration</title>
+<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="../../../../xmlcalabash/src/main/resources/com/xmlcalabash/library.xpl" xpointer="xpath(/*/*[@type='p:insert'])"/>
+</refsection>
+
+<refsection role="errors"><title>Errors</title><para>
+<error code="C0023">It
+is a <glossterm>dynamic error</glossterm> if that pattern matches
+an attribute or a namespace node.</error>
+<error code="C0025">It is a <glossterm>dynamic error</glossterm>
+if the <glossterm>selection pattern</glossterm> matches anything other than an element or a document
+node and the value of the <option>position</option> option is
+“<literal>first-child</literal>” or
+“<literal>last-child</literal>”.</error>
+<error code="C0024">It is a
+<glossterm>dynamic error</glossterm> if the <glossterm>selection pattern</glossterm> matches a document
+node and the value of the <option>position</option> is “<literal>before</literal>” or
+“<literal>after</literal>”.</error>
+</para>
+</refsection>
+
+<refsection role="implementation-features"><title>Implementation-defined and -dependent features</title>
+<para>
+</para>
+</refsection>
+</refsynopsisdiv>
+
+   <refsection>
+      <title>Description</title>
+      <para>TBD.</para>
+   </refsection>
+</refentry>

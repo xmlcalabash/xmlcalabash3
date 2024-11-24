@@ -1,0 +1,167 @@
+:root {
+    --tableaux-border-color: #aaaaaa;
+    --revadded-before: "";
+    --revadded-after: "";
+    --revadded-background-color: #fffff8;
+    --revadded-color: rgb(0, 158, 115);
+
+    --revdeleted-background-color: #fffff8;
+    --revdeleted-color: rgb(213, 94, 0);
+
+    --revchanged-background-color: #fffff8;
+    --revchanged-color: rgb(230, 159, 0);
+
+    --revchanged-before: "";
+    --revchanged-after: "";
+    --revdeleted-before: "";
+    --revdeleted-after: "";
+}
+
+/* Shamelessly stolen from
+   https://steemit.com/unicode/@markgritter/why-did-unicode-reject-the-external-link-symbol
+*/
+.exlink::after {
+    content: "";
+    background-size: cover;
+    display: inline-block;
+    width: 0.6em;
+    height: 0.75em;
+    position: relative;
+    top: 0.05em;
+    left: 0.2em;
+    margin-right: 0.3em;
+    background-image: url(data:image/svg+xml;utf8;base64,IDxzdmcgaGVpZ2h0PSIxMDI0IiB3aWR0aD0iNzY4IiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGQ9Ik02NDAgNzY4SDEyOFYyNTcuOTA1OTk5OTk5OTk5OTVMMjU2IDI1NlYxMjhIMHY3NjhoNzY4VjU3Nkg2NDBWNzY4ek0zODQgMTI4bDEyOCAxMjhMMzIwIDQ0OGwxMjggMTI4IDE5Mi0xOTIgMTI4IDEyOFYxMjhIMzg0eiIgZmlsbD0iIzc4ODE4NyIvPjwvc3ZnPg==);
+}
+
+.revadded {
+    font-weight: bold;
+}
+
+.revdeleted {
+    font-style: italic;
+    text-decoration: line-through;
+    text-decoration-thickness: 1.5px;
+}
+
+.revchanged {
+    font-style: italic;
+    font-weight: bold;
+}
+
+pre.language-none {
+    background-color: var(--verbatim-even-background-color);
+    padding: 0.5em;
+}
+
+.cmdsynopsis-wrap {
+    border: 1px solid var(--tableaux-border-color);
+    padding-left: 0.5em;
+    padding-right: 0.5em;
+    border-radius: 0.5em;
+}
+
+code.literal {
+    border: none;
+    background-color: inherit;
+    border: none;
+    padding: 0;
+    margin: 0;
+    font-size: inherit;
+}
+
+.cover .fill .copyright {
+    padding-bottom: 0;
+    margin-bottom: 0;
+}
+
+.docslink a,
+.docslink a:visited {
+    color: #7f7f7f;
+    text-decoration: none;
+}
+
+.docslink::before {
+    color: #7f7f7f;
+    content: "← ";
+}
+
+/* ============================================================ */
+
+.element-syntax {
+    padding: 4px;
+    line-height: 1.25;
+    white-space: nowrap;
+    overflow-x: scroll;
+}
+
+.element-syntax { color: #000000; }
+.element-syntax .attr { color: #000000; }
+.element-syntax .value { color: rgb(9,70,138); }
+.element-syntax .comment,
+.element-syntax .opt-type { color: #948695; }
+.element-syntax { border-radius: 0.25em; }
+
+.element-syntax-language-construct      {
+    border: 1px solid black;
+    background-color: var(--secondary-color);
+ }
+
+p.element-syntax code {
+    font-size: inherit;
+    border: none;
+    background-color: inherit;
+}
+
+/* ============================================================ */
+
+.panelset.variablelist {
+    margin-bottom: 1em;
+}
+
+p.nodiff {
+    background-color: #ffeeee;
+    border-radius: 0.5em;
+    border: 1px solid #ff0000;
+    padding-left: 1em;
+    padding-right: 1em;
+}
+
+/* ============================================================ */
+
+.book header {
+    min-height: 420px;
+}
+
+.book header .cover img {
+    float: left;
+}
+
+.book header .date {
+    margin-top: 1em;
+}
+
+.book header .docversion {
+    margin-top: 0em;
+    margin-bottom: 8em;
+}
+
+.book header h1 {
+    text-align: right;
+}
+
+.cover .fill {
+    text-align: right;
+    padding-right: 1em;
+}
+
+.screen-wrap {
+    border-radius: 0.25em;
+}   
+
+main {
+    padding-bottom: 2rem;
+}
+
+.footnote-body {
+    font-size: 90%;
+}

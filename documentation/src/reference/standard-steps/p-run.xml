@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?><refentry xmlns="http://docbook.org/ns/docbook" xmlns:p="http://www.w3.org/ns/xproc" xml:id="p-run">
+<?db filename="p-run"?>
+   <refnamediv>
+      <refname>p:run</refname>
+      <refpurpose>The standard p:run step</refpurpose>
+   </refnamediv>
+   <refsynopsisdiv>
+
+<refsection role="introduction">
+<title>Introduction</title>
+
+</refsection>
+
+<refsection role="step-declaration">
+<title>Step declaration</title>
+<refsection role="introduction">
+<title>Introduction</title>
+<para>The <tag>p:run</tag> step runs a dynamically loaded pipeline.</para>
+</refsection><refsection role="step-declaration">
+<title>Step declaration</title>
+<para>TBD.</para>
+</refsection><refsection role="errors"><title>Errors</title>
+<error code="C0200">It is a <glossterm>dynamic error</glossterm>
+if the pipeline input to the <tag>p:run</tag> step is not a
+valid pipeline.</error>
+<error code="C0206">It is a <glossterm>dynamic error</glossterm>
+if the dynamically executed pipeline implicitly or explicitly declares a primary input port with 
+a different name than implicitly or explicitly specified in the <tag>p:run</tag> invocation.</error>
+<error code="C0207">It is a <glossterm>dynamic error</glossterm>
+if the dynamically executed pipeline implicitly or explicitly declares a primary output port with 
+a different name than implicitly or explicitly specified in the <tag>p:run</tag> invocation.</error>
+</refsection><refsection role="implementation-features"><title>Implementation-defined and -dependent features</title>
+</refsection>
+</refsection>
+
+<refsection role="errors"><title>Errors</title><para>
+<error code="C0200">It is a <glossterm>dynamic error</glossterm>
+if the pipeline input to the <tag>p:run</tag> step is not a
+valid pipeline.</error>
+<error code="C0206">It is a <glossterm>dynamic error</glossterm>
+if the dynamically executed pipeline implicitly or explicitly declares a primary input port with 
+a different name than implicitly or explicitly specified in the <tag>p:run</tag> invocation.</error>
+<error code="C0207">It is a <glossterm>dynamic error</glossterm>
+if the dynamically executed pipeline implicitly or explicitly declares a primary output port with 
+a different name than implicitly or explicitly specified in the <tag>p:run</tag> invocation.</error>
+</para>
+</refsection>
+
+<refsection role="implementation-features"><title>Implementation-defined and -dependent features</title>
+<para>
+</para>
+</refsection>
+</refsynopsisdiv>
+
+
+   <refsection>
+      <title>Description</title>
+      <para>TBD.</para>
+   </refsection>
+</refentry>

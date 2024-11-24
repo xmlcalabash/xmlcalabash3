@@ -1,0 +1,23 @@
+<appendix xmlns="http://docbook.org/ns/docbook"
+          xmlns:xlink="http://www.w3.org/1999/xlink"
+          xmlns:xi='http://www.w3.org/2001/XInclude'
+          version="5.2" xml:id="changelog">
+<info>
+  <?db filename="changelog"?>
+  <title>Change log</title>
+</info>
+
+<para>This section documents the significant changes made in each release.
+See the commits and pull requests on
+<link xlink:href="https://github.com/xmlcalabash/xmlcalabash3/">the repository</link> for
+finer detail.</para>
+
+<section xml:id="r300-alpha1">
+<info>
+  <title>Changes in version 3.0.0-alpha1</title>
+  <productnumber>3.0.0-alpha1</productnumber>
+  <date>2024-11-18</date> <!--tbd-->
+</info>
+<para>Initial publication.</para>
+</section>
+</appendix>

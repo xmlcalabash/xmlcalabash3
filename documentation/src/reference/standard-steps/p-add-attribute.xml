@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?><refentry xmlns="http://docbook.org/ns/docbook" xmlns:p="http://www.w3.org/ns/xproc" xml:id="p-add-attribute">
+<?db filename="p-add-attribute"?>
+<refnamediv>
+   <refname>p:add-attribute</refname>
+   <refpurpose>The standard p:add-attribute step</refpurpose>
+</refnamediv>
+<refsynopsisdiv>
+
+<refsection role="introduction">
+<title>Introduction</title>
+<para>The <code>p:add-attribute</code> step adds a single attribute to
+a set of matching elements. The input document specified on the
+  <code>source</code> is processed for matches specified by the 
+    <glossterm>selection pattern</glossterm> in the <option>match</option> option. For each of these
+matches, the attribute whose name is specified by the
+<option>attribute-name</option> option is set to the attribute value
+specified by the <option>attribute-value</option> option.
+</para><para>The resulting document is produced on the <code>result</code>
+output port and consists of a exact copy of the input with the
+exception of the matched elements. Each of the matched elements is
+copied to the output with the addition of the specified attribute
+with the specified value.
+</para>
+</refsection>
+
+<refsection role="step-declaration">
+<title>Step declaration</title>
+<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="../../../../xmlcalabash/src/main/resources/com/xmlcalabash/library.xpl" xpointer="xpath(/*/*[@type='p:add-attribute'])"/>
+</refsection>
+
+<refsection role="errors"><title>Errors</title><para>
+<error code="C0023">It
+is a <glossterm>dynamic error</glossterm> if the <glossterm>selection pattern</glossterm> matches a node
+which is not an element.</error>
+<error code="C0059">It is a <glossterm>dynamic error</glossterm> if the QName
+value in the <option>attribute-name</option> option is “<code>xmlns</code>” or uses the prefix
+“<literal>xmlns</literal>”
+or any other prefix that resolves to the namespace name
+<uri>http://www.w3.org/2000/xmlns/</uri>.
+</error>
+</para>
+</refsection>
+
+<refsection role="implementation-features"><title>Implementation-defined and -dependent features</title>
+<para>
+</para>
+</refsection>
+</refsynopsisdiv>
+
+<refsection>
+   <title>Description</title>
+   <para>TBD.</para>
+</refsection>
+
+<refsection>
+<title>Examples</title>
+
+<para>Applied to the <link linkend="running-example">running example</link>, this
+pipeline:</para>
+
+<programlisting language="xml"><xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="../../examples/xpl/add-attribute-001.xpl" parse="text"/></programlisting>
+
+<para>Produces this output:</para>
+
+<variablelist role="panelset">
+<varlistentry><term>XML output</term>
+<listitem>
+<programlisting language="xml"><xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="../../../build/examples/results/add-attribute-001.xml" parse="text"/></programlisting>
+</listitem>
+</varlistentry>
+<varlistentry role="diffs"><term>Changes</term>
+<listitem>
+<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="../../../build/examples/diff/add-attribute-001.xml"/>
+</listitem>
+</varlistentry>
+<varlistentry><term>XML input</term>
+<listitem>
+<programlisting language="xml"><xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="../../examples/xml/default-input.xml" parse="text"/>
+</programlisting>
+</listitem>
+</varlistentry>
+</variablelist>
+</refsection>
+</refentry>
