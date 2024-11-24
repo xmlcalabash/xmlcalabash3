@@ -1,0 +1,204 @@
+name: build-branch
+on: push
+
+jobs:
+  check_branch:
+    runs-on: ubuntu-latest
+    outputs:
+      branch: ${{ steps.check_step.outputs.branch }}
+      reponame: ${{ steps.check_step.outputs.reponame }}
+      tag: ${{ steps.check_step.outputs.tag }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Get branch name, etc.
+        id: check_step
+        run: |
+          raw=${{ github.repository }}
+          reponame=${raw##*/}
+          echo "reponame=$reponame" >> $GITHUB_OUTPUT
+          raw=$(git branch -r --contains ${{ github.ref }})
+          branch=${raw##*/}
+          echo "branch=$branch" >> $GITHUB_OUTPUT
+          tag=""
+          if [ ${{ github.ref_type }} = "tag" ]; then
+            tag=${{ github.ref_name }}
+            echo "Running in $reponame on $branch for $tag"
+          else
+            echo "Running in $reponame on $branch"
+          fi
+          echo "tag=$tag" >> $GITHUB_OUTPUT
+
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    needs: check_branch
+    env:
+      HAVE_ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN != '' }}
+      HAVE_LIBRARIES: ${{ secrets.LIBURI != '' }}
+      HAVE_DOCS: ${{ secrets.DOCS_REPOSITORY != '' }}
+      HAVE_WWW: ${{ secrets.WWW_REPOSITORY != '' }}
+      CAN_PUBLISH: ${{ secrets.ACCESS_TOKEN != '' }}
+      XMLCALABASH_TEST_WEASY: "true"
+      CIWORKFLOW: "yes"
+      CI_SHA1: ${{ github.sha }}
+      CI_BUILD_NUM: ${{ github.run_number }}
+      CI_PROJECT_USERNAME: ${{ github.repository_owner }}
+      CI_PROJECT_REPONAME: ${{ needs.check_branch.outputs.reponame }}
+      CI_BRANCH: ${{ needs.check_branch.outputs.branch }}
+      CI_TAG: ${{ needs.check_branch.outputs.tag }}
+    steps:
+      - name: Install dependencies
+        run: |
+          sudo apt-get install -y weasyprint
+
+      - name: Setup GraalVM
+        uses: graalvm/setup-graalvm@v1
+        with:
+          java-version: '21'
+          distribution: 'graalvm-community'
+
+      - name: Checkout sources
+        uses: actions/checkout@v4
+
+      - name: Setup submodules
+        run: |
+          git submodule init
+          git submodule update
+
+      - name: Start the test container
+        run: |
+          cd tests/3.0-test-suite/docker && docker compose up -d
+
+      - name: Setup private libraries
+        if: ${{ env.HAVE_LIBRARIES == 'true' }}
+        run: |
+            curl -s ${{ secrets.LIBURI }} | openssl enc -aes-256-cbc -salt -pbkdf2 -d -k ${{ secrets.PASSPHRASE }} | tar zxf -
+
+      - name: What are we running?
+        run: |
+          echo "GRAALVM_HOME: $GRAALVM_HOME"
+          echo "JAVA_HOME: $JAVA_HOME"
+          java --version
+          native-image --version
+
+      - name: Build and test XML Calabash
+        run: |
+          ./gradlew --info test
+          ./gradlew --warning-mode all release
+
+      - name: Build the test report
+        run: |
+          ./gradlew -PrequirePass=false test-driver:test-report
+
+      - name: Build the documentation
+        run: |
+          ./gradlew documentation:reference documentation:userguide xmlcalabash:apidocs
+
+      - name: Publish tagged release
+        uses: softprops/action-gh-release@v1
+        if: ${{ env.HAVE_ACCESS_TOKEN == 'true' && env.CI_BRANCH == 'main' && env.CI_TAG != '' }}
+        with:
+          draft: false
+          prerelease: false
+          fail_on_unmatched_files: true
+          files: |
+            app/build/distributions/xmlcalabash-${{ env.CI_TAG }}.zip
+
+      - name: Checkout www
+        if: ${{ env.HAVE_WWW == 'true' && env.HAVE_ACCESS_TOKEN == 'true' && env.CI_BRANCH == 'main' }}
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ secrets.WWW_REPOSITORY }}
+          path: "www"
+          ref: "gh-pages"
+
+      - name: Update test-report
+        if: ${{ env.HAVE_ACCESS_TOKEN == 'true' && env.CI_BRANCH == 'main' && env.CI_TAG != '' }}
+        run: |
+          PRODUCTVER=`cat gradle.properties | grep xmlcalabashVersion | cut -f2 -d= | xargs`
+          rm -rf www/docs/test-report/current
+          rm -rf www/docs/test-report/$PRODUCTVER
+          mkdir -p www/docs/test-report/current
+          mkdir -p www/docs/test-report/$PRODUCTVER
+          rsync -ar test-driver/build/test-report/ www/docs/test-report/current/
+          rsync -ar test-driver/build/test-report/ www/docs/test-report/$PRODUCTVER/
+
+      - name: Deploy updated test report
+        if: ${{ env.HAVE_ACCESS_TOKEN == 'true' && env.CI_BRANCH == 'main' && env.CI_TAG != '' }}
+        uses: JamesIves/github-pages-deploy-action@v4.6.4
+        with:
+          folder: www/docs/test-report
+          token: ${{ secrets.ACCESS_TOKEN }}
+          repository-name: ${{ github.repository_owner}}/www
+          branch: gh-pages
+          target-folder: /docs/test-report
+
+      - name: Checkout docs
+        if: ${{ env.HAVE_DOCS == 'true' && env.HAVE_ACCESS_TOKEN == 'true' && env.CI_BRANCH == 'main' }}
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ secrets.DOCS_REPOSITORY }}
+          path: "docs"
+          ref: "gh-pages"
+
+      - name: Update user guide
+        run: |
+          GUIDEVER=`jq -r .version documentation/build/userguide/details.json`
+          rm -rf docs/docs/userguide/current
+          rm -rf docs/docs/userguide/$GUIDEVER
+          mkdir -p docs/docs/userguide/current
+          mkdir -p docs/docs/userguide/$GUIDEVER
+          rsync -ar documentation/build/userguide/ docs/docs/userguide/current/
+          rsync -ar documentation/build/userguide/ docs/docs/userguide/$GUIDEVER/
+
+      - name: Update reference
+        run: |
+          REFVER=`jq -r .version documentation/build/reference/details.json`
+          rm -rf docs/docs/reference/current
+          rm -rf docs/docs/reference/$REFVER
+          mkdir -p docs/docs/reference/current
+          mkdir -p docs/docs/reference/$REFVER
+          rsync -ar documentation/build/reference/ docs/docs/reference/current/
+          rsync -ar documentation/build/reference/ docs/docs/reference/$REFVER/
+
+      - name: Update api docs
+        run: |
+          APIVER=`jq -r .version xmlcalabash/build/dokka/javadoc/details.json`
+          rm -rf docs/docs/apidocs/current
+          rm -rf docs/docs/apidocs/$APIVER
+          mkdir -p docs/docs/apidocs/current
+          mkdir -p docs/docs/apidocs/$APIVER
+          rsync -ar xmlcalabash/build/dokka/javadoc/ docs/docs/apidocs/current/
+          rsync -ar xmlcalabash/build/dokka/javadoc/ docs/docs/apidocs/$APIVER/
+
+      - name: Deploy the updated user guide
+        if: ${{ env.HAVE_DOCS == 'true' && env.HAVE_ACCESS_TOKEN == 'true' && env.CI_BRANCH == 'main' }}
+        uses: JamesIves/github-pages-deploy-action@v4.6.4
+        with:
+          folder: docs/docs/userguide
+          token: ${{ secrets.ACCESS_TOKEN }}
+          repository-name: ${{ secrets.DOCS_REPOSITORY }}
+          branch: gh-pages
+          target-folder: /docs/userguide
+
+      - name: Deploy the updated reference
+        if: ${{ env.HAVE_DOCS == 'true' && env.HAVE_ACCESS_TOKEN == 'true' && env.CI_BRANCH == 'main' }}
+        uses: JamesIves/github-pages-deploy-action@v4.6.4
+        with:
+          folder: docs/docs/reference
+          token: ${{ secrets.ACCESS_TOKEN }}
+          repository-name: ${{ secrets.DOCS_REPOSITORY }}
+          branch: gh-pages
+          target-folder: /docs/reference
+
+      - name: Deploy the updated api docs
+        if: ${{ env.HAVE_DOCS == 'true' && env.HAVE_ACCESS_TOKEN == 'true' && env.CI_BRANCH == 'main' }}
+        uses: JamesIves/github-pages-deploy-action@v4.6.4
+        with:
+          folder: docs/docs/apidocs
+          token: ${{ secrets.ACCESS_TOKEN }}
+          repository-name: ${{ secrets.DOCS_REPOSITORY }}
+          branch: gh-pages
+          target-folder: /docs/apidocs
