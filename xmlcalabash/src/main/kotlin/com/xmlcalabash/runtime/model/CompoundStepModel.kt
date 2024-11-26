@@ -23,7 +23,7 @@ class CompoundStepModel(runtime: XProcRuntime, model: CompoundModel): StepModel(
     val edges = mutableListOf<ModelEdge>()
 
     init {
-        //staticOptions.putAll(model.step.staticOptions)
+        staticOptions.putAll(model.step.staticOptions)
         extensionAttributes.putAll(model.step.extensionAttributes)
     }
 

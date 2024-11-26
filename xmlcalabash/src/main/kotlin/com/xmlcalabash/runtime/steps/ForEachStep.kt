@@ -39,6 +39,7 @@ open class ForEachStep(yconfig: RuntimeStepConfiguration, compound: CompoundStep
                 exec.iterationPosition = position
                 if (position > 1) {
                     head.reset()
+                    head.showMessage = false
                     foot.reset()
                     for (step in stepsToRun) {
                         step.reset()

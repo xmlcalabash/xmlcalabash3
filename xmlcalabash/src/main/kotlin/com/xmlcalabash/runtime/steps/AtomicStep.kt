@@ -2,12 +2,15 @@ package com.xmlcalabash.runtime.steps
 
 import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.exceptions.XProcError
+import com.xmlcalabash.namespace.Ns
+import com.xmlcalabash.namespace.NsP
 import com.xmlcalabash.runtime.LazyValue
 import com.xmlcalabash.runtime.RuntimeStepConfiguration
 import com.xmlcalabash.runtime.api.Receiver
 import com.xmlcalabash.runtime.model.AtomicBuiltinStepModel
 import com.xmlcalabash.runtime.parameters.RuntimeStepParameters
 import com.xmlcalabash.steps.AbstractAtomicStep
+import net.sf.saxon.s9api.XdmValue
 
 open class AtomicStep(yconfig: RuntimeStepConfiguration, atomic: AtomicBuiltinStepModel): AbstractStep(yconfig, atomic), Receiver {
     final override val params = RuntimeStepParameters(atomic.type, atomic.name, atomic.location,
@@ -16,6 +19,7 @@ open class AtomicStep(yconfig: RuntimeStepConfiguration, atomic: AtomicBuiltinSt
     val inputPorts = mutableSetOf<String>()
     val initiallyOpenPorts = mutableSetOf<String>()
     val openPorts = mutableSetOf<String>()
+    private var message: XdmValue? = null
     private val rteContext = yconfig.rteContext
     private val inputErrors = mutableListOf<XProcError>()
 
@@ -47,7 +51,12 @@ open class AtomicStep(yconfig: RuntimeStepConfiguration, atomic: AtomicBuiltinSt
         if (error == null) {
             if (port.startsWith("Q{")) {
                 val name = stepConfig.parseQName(port)
-                implementation.option(name, LazyValue(doc.context, doc.value))
+                if ((type.namespaceUri == NsP.namespace && name == Ns.message)
+                    || (type.namespaceUri != NsP.namespace && name == NsP.message)) {
+                    message = doc.value
+                } else {
+                    implementation.option(name, LazyValue(doc.context, doc.value))
+                }
                 return
             }
             implementation.input(port, doc)
@@ -79,6 +88,20 @@ open class AtomicStep(yconfig: RuntimeStepConfiguration, atomic: AtomicBuiltinSt
     }
 
     override fun run() {
+        for ((name, details) in staticOptions) {
+            if ((type.namespaceUri == NsP.namespace && name == Ns.message)
+                || (type.namespaceUri != NsP.namespace && name == NsP.message)) {
+                message = details.staticValue.evaluate()
+            } else {
+                implementation.option(name, LazyValue(details.stepConfig, details.staticValue))
+            }
+        }
+
+        if (message != null) {
+            println(message)
+            message = null
+        }
+
         if (inputErrors.isNotEmpty()) {
             throw inputErrors.first().exception()
         }
@@ -103,10 +126,6 @@ open class AtomicStep(yconfig: RuntimeStepConfiguration, atomic: AtomicBuiltinSt
                     throw XProcError.xdInputSequenceForbidden(portName).exception()
                 }
             }
-        }
-
-        for ((name, details) in staticOptions) {
-            implementation.option(name, LazyValue(details.stepConfig, details.staticValue))
         }
 
         val stepConfig = (implementation as AbstractAtomicStep).stepConfig

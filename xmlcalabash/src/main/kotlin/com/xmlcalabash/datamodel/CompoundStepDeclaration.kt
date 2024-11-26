@@ -5,6 +5,7 @@ import com.xmlcalabash.namespace.Ns
 import com.xmlcalabash.namespace.NsCx
 import com.xmlcalabash.namespace.NsP
 import net.sf.saxon.s9api.QName
+import net.sf.saxon.s9api.SequenceType
 
 abstract class CompoundStepDeclaration(parent: XProcInstruction?, stepConfig: StepConfiguration, instructionType: QName): StepDeclaration(parent, stepConfig, instructionType) {
     internal val anySteps = mapOf(
@@ -397,6 +398,13 @@ abstract class CompoundStepDeclaration(parent: XProcInstruction?, stepConfig: St
         val output = OutputInstruction(this, port, primary, sequence)
         addInstruction(output)
         return output
+    }
+
+    open fun message(message: XProcAvtExpression) {
+        val option = WithOptionInstruction(this, Ns.message, stepConfig.copy())
+        option.select = message
+        option.asType = SequenceType.ANY
+        _children.add(option)
     }
 
     open fun variable(name: QName): VariableInstruction {

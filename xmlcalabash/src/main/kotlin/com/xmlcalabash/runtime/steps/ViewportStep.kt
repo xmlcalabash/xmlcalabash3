@@ -58,6 +58,7 @@ open class ViewportStep(yconfig: RuntimeStepConfiguration, compound: CompoundSte
                 exec.iterationPosition = position
                 if (!firstTime) {
                     head.reset()
+                    head.showMessage = false
                     foot.reset()
                     for (step in stepsToRun) {
                         step.reset()

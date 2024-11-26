@@ -12,6 +12,10 @@ import java.net.URI
 abstract class XProcInstruction internal constructor(initialParent: XProcInstruction?, val stepConfig: StepConfiguration, val instructionType: QName) {
     internal lateinit var builder: PipelineBuilder
     internal var _parent = initialParent
+
+    val id = stepConfig.nextId
+    var expandText: Boolean? = null
+
     val parent: XProcInstruction?
         get() = _parent
 
@@ -19,10 +23,16 @@ abstract class XProcInstruction internal constructor(initialParent: XProcInstruc
         if (initialParent != null) {
             builder = initialParent.builder
         }
-    }
 
-    val id = stepConfig.nextId
-    var expandText: Boolean? = null
+        var p: XProcInstruction? = parent
+        while (expandText == null && p != null) {
+            if (p.expandText != null) {
+                expandText = p.expandText
+            }
+            p = p.parent
+        }
+        expandText = expandText ?: true
+    }
 
     internal val _children = mutableListOf<XProcInstruction>()
     val children: List<XProcInstruction>

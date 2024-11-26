@@ -1,7 +1,9 @@
 package com.xmlcalabash.datamodel
 
 import com.xmlcalabash.exceptions.XProcError
+import com.xmlcalabash.namespace.Ns
 import com.xmlcalabash.namespace.NsCx
+import com.xmlcalabash.namespace.NsP
 import net.sf.saxon.ma.map.MapType
 import net.sf.saxon.s9api.QName
 import net.sf.saxon.s9api.SequenceType
@@ -90,6 +92,11 @@ open class AtomicStepInstruction(parent: XProcInstruction, instructionType: QNam
 
         val options = mutableMapOf<QName, WithOptionInstruction>()
         for (opt in children.filterIsInstance<WithOptionInstruction>()) {
+            if ((instructionType.namespaceUri == NsP.namespace && opt.name == Ns.message)
+                || (instructionType.namespaceUri != NsP.namespace && opt.name == NsP.message)) {
+                continue
+            }
+
             val dopt = decl.getOption(opt.name)
             if (dopt == null) {
                 throw XProcError.xsNoSuchOption(opt.name).exception()
@@ -150,7 +157,7 @@ open class AtomicStepInstruction(parent: XProcInstruction, instructionType: QNam
     }
 
     open fun withOption(name: QName, expr: XProcExpression?): WithOptionInstruction {
-        if (children.filterIsInstance<WithOptionInstruction>().filter { it.name == name }.isNotEmpty()) {
+        if (children.filterIsInstance<WithOptionInstruction>().any { it.name == name }) {
             throw XProcError.xsDuplicateOption(name).exception()
         }
 

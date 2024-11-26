@@ -48,6 +48,7 @@ abstract class CompoundStep(yconfig: RuntimeStepConfiguration, compound: Compoun
 
     init {
         inputPorts.addAll(compound.inputs.keys)
+        head.staticOptions.putAll(staticOptions)
 
         runnableProviders[compound.head] = { head }
         runnableProviders[compound.foot] = { foot }
