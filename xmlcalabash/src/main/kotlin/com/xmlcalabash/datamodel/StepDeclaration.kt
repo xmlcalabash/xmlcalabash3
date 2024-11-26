@@ -160,6 +160,10 @@ abstract class StepDeclaration(parent: XProcInstruction?, stepConfig: StepConfig
                         }
                     }
                 } else {
+                    // Empty steps were created to complete the graph, generating
+                    // no input where a p:empty was bound. I don't *believe* they
+                    // are necessary anymore.
+                    /*
                     val emptyStep = AtomicEmptyStepInstruction(this)
                     emptyStep.elaborateAtomicStep()
                     result.add(emptyStep)
@@ -169,6 +173,7 @@ abstract class StepDeclaration(parent: XProcInstruction?, stepConfig: StepConfig
                     val readablePort = emptyStep.primaryOutput()!!
                     val pipe = wi.pipe()
                     pipe.setReadablePort(readablePort)
+                     */
                 }
 
                 variableBindings(option.select!!, exprStep)
