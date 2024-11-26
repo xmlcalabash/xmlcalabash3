@@ -79,6 +79,7 @@ open class ChooseInstruction(parent: XProcInstruction, tag: QName = NsP.choose):
         for (child in children) {
             when (child) {
                 is WithInputInstruction, is InputInstruction, is OutputInstruction -> Unit
+                is WithOptionInstruction -> Unit
                 is StepDeclaration -> {
                     child.elaborateInstructions()
                 }

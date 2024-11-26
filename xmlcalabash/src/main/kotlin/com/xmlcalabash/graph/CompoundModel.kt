@@ -97,6 +97,9 @@ open class CompoundModel internal constructor(graph: Graph, parent: Model?, step
                     outputs[child.port] = ModelPort(this, child)
                 }
                 is RunOptionInstruction -> Unit // only on p:run which is only a quasi-compound step
+                is WithOptionInstruction -> {
+                    options[child.name] = ModelOption(this, child)
+                }
                 else -> TODO("Unexpected child: ${child}")
             }
         }

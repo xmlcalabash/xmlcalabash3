@@ -21,7 +21,6 @@ abstract class StepDeclaration(parent: XProcInstruction?, stepConfig: StepConfig
 
     val location = stepConfig.location
 
-    internal var message: XProcExpression? = null
     internal var depends = mutableSetOf<String>()
     internal val _staticOptions = mutableMapOf<QName, StaticOptionDetails>()
     val staticOptions: Map<QName, StaticOptionDetails>
@@ -129,7 +128,10 @@ abstract class StepDeclaration(parent: XProcInstruction?, stepConfig: StepConfig
             input._children.addAll(newChildren)
         }
 
-        for (option in children.filterIsInstance<WithOptionInstruction>()) {
+        val options = mutableListOf<WithOptionInstruction>()
+        options.addAll(children.filterIsInstance<WithOptionInstruction>())
+
+        for (option in options) {
             if (option.canBeResolvedStatically()) {
                 _staticOptions[option.name] = builder.staticOptionsManager.get(option)
             } else {
@@ -198,13 +200,6 @@ abstract class StepDeclaration(parent: XProcInstruction?, stepConfig: StepConfig
                 pipe.setReadablePort(exprStep.primaryOutput()!!)
             }
         }
-    }
-
-    fun message(msg: String) {
-        if (message != null) {
-            throw XProcError.xiImpossible("Multiple messages provided").exception()
-        }
-        message = XProcExpression.avt(stepConfig, msg)
     }
 
     fun depends(steplist: String) {

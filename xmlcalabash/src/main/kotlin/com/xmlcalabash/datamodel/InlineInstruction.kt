@@ -49,17 +49,6 @@ class InlineInstruction(parent: XProcInstruction, xmlDocument: XdmNode): Connect
     val valueTemplateFilter: ValueTemplateFilter
         get() = _valueTemplateFilter
 
-    init {
-        var p: XProcInstruction? = parent
-        while (expandText == null && p != null) {
-            if (p.expandText != null) {
-                expandText = p.expandText
-            }
-            p = p.parent
-        }
-        expandText = expandText ?: true
-    }
-
     override fun elaborateInstructions() {
         if (_documentProperties == null) {
             val stype = "map(Q{${NsXs.namespace}}QName, item()*)"

@@ -4,6 +4,9 @@ import com.xmlcalabash.datamodel.Location
 import com.xmlcalabash.datamodel.StaticOptionDetails
 import com.xmlcalabash.graph.Model
 import com.xmlcalabash.graph.ModelInputPort
+import com.xmlcalabash.namespace.Ns
+import com.xmlcalabash.namespace.NsP
+import com.xmlcalabash.runtime.LazyValue
 import com.xmlcalabash.runtime.XProcRuntime
 import com.xmlcalabash.runtime.RuntimeStepConfiguration
 import com.xmlcalabash.runtime.api.RuntimeOption
@@ -50,7 +53,11 @@ abstract class StepModel(val runtime: XProcRuntime, model: Model) {
 
         val roptions = mutableMapOf<QName, RuntimeOption>()
         for ((name, option) in model.options) {
-            roptions[name] = RuntimeOption(name, option.asType, option.values, option.staticValue)
+            // Don't report [p:]messages as options
+            if ((type.namespaceUri == NsP.namespace && name != Ns.message)
+                || (type.namespaceUri != NsP.namespace && name != NsP.message)) {
+                roptions[name] = RuntimeOption(name, option.asType, option.values, option.staticValue)
+            }
         }
         options = roptions.toMap()
     }

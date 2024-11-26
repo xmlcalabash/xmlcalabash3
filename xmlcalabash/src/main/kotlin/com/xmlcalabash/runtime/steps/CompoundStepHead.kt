@@ -2,12 +2,15 @@ package com.xmlcalabash.runtime.steps
 
 import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.exceptions.XProcError
+import com.xmlcalabash.namespace.Ns
 import com.xmlcalabash.namespace.NsCx
 import com.xmlcalabash.namespace.NsP
+import com.xmlcalabash.runtime.LazyValue
 import com.xmlcalabash.runtime.RuntimeStepConfiguration
 import com.xmlcalabash.runtime.model.HeadModel
 import com.xmlcalabash.runtime.parameters.RuntimeStepParameters
 import net.sf.saxon.s9api.QName
+import net.sf.saxon.s9api.XdmValue
 import kotlin.collections.component1
 import kotlin.collections.component2
 import kotlin.collections.iterator
@@ -18,6 +21,8 @@ class CompoundStepHead(yconfig: RuntimeStepConfiguration, step: HeadModel): Abst
     val defaultInputs = step.defaultInputs
     val openPorts = mutableSetOf<String>()
     internal val unboundInputs = mutableSetOf<String>()
+    private var message: XdmValue? = null
+    internal var showMessage = true
     private val _cache = mutableMapOf<String, MutableList<XProcDocument>>()
     private val _options = mutableMapOf<QName, MutableList<XProcDocument>>()
     private val inputErrors = mutableListOf<XProcError>()
@@ -77,9 +82,15 @@ class CompoundStepHead(yconfig: RuntimeStepConfiguration, step: HeadModel): Abst
         // N.B. inputs and outputs are swapped in the head
         if (port.startsWith("Q{")) {
             val name = stepConfig.parseQName(port)
-            val olist = _options[name] ?: mutableListOf()
-            olist.add(doc)
-            _options[name] = olist
+
+            if ((type.namespaceUri == NsP.namespace && name == Ns.message)
+                || (type.namespaceUri != NsP.namespace && name == NsP.message)) {
+                message = doc.value
+            } else {
+                val olist = _options[name] ?: mutableListOf()
+                olist.add(doc)
+                _options[name] = olist
+            }
             return
         }
 
@@ -111,6 +122,19 @@ class CompoundStepHead(yconfig: RuntimeStepConfiguration, step: HeadModel): Abst
     }
 
     override fun run() {
+        for ((name, details) in staticOptions) {
+            if ((type.namespaceUri == NsP.namespace && name == Ns.message)
+                || (type.namespaceUri != NsP.namespace && name == NsP.message)) {
+                message = details.staticValue.evaluate()
+            }
+        }
+
+        if (showMessage && message != null) {
+            println(message)
+            message = null
+            showMessage = false
+        }
+
         // Work out what should appear on each input...
         for ((port, output) in params.outputs) {
             if (output.weldedShut) {
@@ -202,15 +226,12 @@ class CompoundStepHead(yconfig: RuntimeStepConfiguration, step: HeadModel): Abst
         _cache.clear()
     }
 
-    private fun runtimeInputs(port: String) {
-
-    }
-
     override fun reset() {
         super.reset()
         openPorts.clear()
         openPorts.addAll(params.outputs.keys)
         _cache.clear()
         inputCount.clear()
+        showMessage = true
     }
 }

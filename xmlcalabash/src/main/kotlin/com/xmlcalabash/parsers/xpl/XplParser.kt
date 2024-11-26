@@ -14,6 +14,7 @@ import net.sf.saxon.om.*
 import net.sf.saxon.s9api.Axis
 import net.sf.saxon.s9api.QName
 import net.sf.saxon.s9api.SequenceType
+import net.sf.saxon.s9api.XdmAtomicValue
 import net.sf.saxon.s9api.XdmNode
 import net.sf.saxon.type.Untyped
 import java.net.URI
@@ -824,6 +825,20 @@ class XplParser(val builder: PipelineBuilder) {
                             instruction.expandText = parseStaticBoolean(instruction.stepConfig, value)
                         }
                     }
+                } else if (instruction is CompoundStepDeclaration && (name == Ns.message || name == NsP.message)) {
+                    if (name == Ns.message) {
+                        if (node.node.nodeName.namespaceUri != NsP.namespace) {
+                            errors.add(XProcError.xsAttributeForbidden(name).exception())
+                        } else {
+                            instruction.message(XProcExpression.avt(instruction.stepConfig, value))
+                        }
+                    } else {
+                        if (node.node.nodeName.namespaceUri == NsP.namespace) {
+                            errors.add(XProcError.xsAttributeNotAllowed(name).exception())
+                        } else {
+                            instruction.message(XProcExpression.avt(instruction.stepConfig, value))
+                        }
+                    }
                 } else {
                     if (instruction is StepDeclaration) {
                         when (name) {
@@ -910,10 +925,19 @@ class XplParser(val builder: PipelineBuilder) {
                         throw XProcError.xsNoSuchOption(NsP.inlineExpandText).exception()
                     }
                     else -> {
-                        if (name.namespaceUri != NamespaceUri.NULL) {
-                            atomic.setExtensionAttribute(name, value)
-                        } else {
+                        if ((atomic.instructionType.namespaceUri == NsP.namespace && name == Ns.message)
+                            || (atomic.instructionType.namespaceUri != NsP.namespace && name == NsP.message)) {
                             atomic.withOption(name, XProcExpression.avt(atomic.stepConfig, value))
+                        } else {
+                            if (name.namespaceUri != NamespaceUri.NULL) {
+                                atomic.setExtensionAttribute(name, value)
+                            } else {
+                                if (atomic.expandText == true) {
+                                    atomic.withOption(name, XProcExpression.avt(atomic.stepConfig, value))
+                                } else {
+                                    atomic.withOption(name, XProcExpression.constant(atomic.stepConfig, XdmAtomicValue(value)))
+                                }
+                            }
                         }
                     }
                 }
