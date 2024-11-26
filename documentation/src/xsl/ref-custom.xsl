@@ -37,10 +37,8 @@
           </div>
 -->
           <div class="docversion">
-            <a href="#r{replace($VERSION?refVersion, '\.', '')}">
-              <xsl:text>Version </xsl:text>
-              <xsl:sequence select="$VERSION?refVersion"/>
-            </a>
+            <xsl:text>Version </xsl:text>
+            <xsl:sequence select="$VERSION?refVersion"/>
           </div>
           <div class="version">
             <xsl:text>for XML Calabash </xsl:text>

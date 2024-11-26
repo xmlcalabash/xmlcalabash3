@@ -1,17 +1,14 @@
 package com.xmlcalabash.util
 
 import java.net.URI
+import java.nio.file.Paths
 
 class UriUtils {
     companion object {
         fun homeAsUri(): URI = dirAsUri(System.getProperty("user.home"))
         fun cwdAsUri(): URI = dirAsUri(System.getProperty("user.dir"))
         fun dirAsUri(dir: String): URI {
-            if (dir.endsWith("/")) {
-                return URI("file:${dir}")
-            } else {
-                return URI("file:${dir}/")
-            }
+            return Paths.get(dir).toUri()
         }
         fun makeRelativeTo(base: URI, relative: URI): URI {
             if (relative.isOpaque || base.scheme != relative.scheme || base.authority != relative.authority) {

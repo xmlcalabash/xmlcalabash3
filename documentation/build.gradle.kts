@@ -50,8 +50,11 @@ plugins {
 }
 
 val saxonVersion = project.properties["saxonVersion"].toString()
-val refVersion = project.findProperty("refVersion").toString()
-val guideVersion = project.findProperty("guideVersion").toString()
+
+val refVersion = (project.findProperty("refVersion")
+                      ?: project.findProperty("xmlcalabashVersion")).toString()
+val guideVersion = (project.findProperty("guideVersion")
+                        ?: project.findProperty("xmlcalabashVersion")).toString()
 
 val xmlbuild = the<XmlCalabashBuildExtension>()
 
