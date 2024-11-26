@@ -12,11 +12,36 @@ See the commits and pull requests on
 <link xlink:href="https://github.com/xmlcalabash/xmlcalabash3/">the repository</link> for
 finer detail.</para>
 
+<section xml:id="r300-alpha2">
+<info>
+  <title>Changes in version 3.0.0-alpha2</title>
+  <productnumber>3.0.0-alpha2</productnumber>
+  <date>2024-11-26</date>
+</info>
+<itemizedlist>
+<listitem>
+<para>Fixed
+<link xlink:href="https://github.com/xmlcalabash/xmlcalabash3/issues/3">issue #3</link>,
+<literal>[p:]message</literal> attributes were not supported on steps.
+</para>
+</listitem>
+<listitem>
+<para>Attempted to fix
+<link xlink:href="https://github.com/xmlcalabash/xmlcalabash3/issues/2">issue #2</link>,
+XML Calabash failed on startup on Windows. The problem, correctly identified by Martin,
+was in the attempt to create a URI from a path. On Windows, paths contain <literal>\</literal>
+and those are forbidden in URIs.</para>
+<para>I’ve adopted the solution suggested by Martin, and tested that it passes a “smoke test”
+on Windows. But I’m not highly confident that this is the end of the Windows path issues.</para>
+</listitem>
+</itemizedlist>
+</section>
+
 <section xml:id="r300-alpha1">
 <info>
   <title>Changes in version 3.0.0-alpha1</title>
   <productnumber>3.0.0-alpha1</productnumber>
-  <date>2024-11-18</date> <!--tbd-->
+  <date>2024-11-24</date>
 </info>
 <para>Initial publication.</para>
 </section>

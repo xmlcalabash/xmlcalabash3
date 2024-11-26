@@ -33,6 +33,17 @@
 
 <xsl:variable name="VERSION" select="parse-json(unparsed-text('../../build/version.json'))"/>
 
+<xsl:param name="chunk-exclude"
+           select="('self::db:partintro',
+                    'self::*[ancestor::db:partintro]',
+                    'self::db:section')"/>
+
+<xsl:param name="sections-inherit-from" select="'component section'"/>
+
+<xsl:param name="section-toc-depth" select="1"/>
+<xsl:param name="footnote-numeration" select="('*', '**', '†','‡', '§', '1')"/>
+<xsl:param name="use-id-as-filename" select="'true'"/>
+
 <!-- ============================================================ -->
 
 <xsl:template match="db:port">
