@@ -34,6 +34,12 @@ and those are forbidden in URIs.</para>
 <para>I’ve adopted the solution suggested by Martin, and tested that it passes a “smoke test”
 on Windows. But I’m not highly confident that this is the end of the Windows path issues.</para>
 </listitem>
+<listitem>
+<para>Removed “empty steps” from the runtime graph. These are steps that
+generate no output, designed to model <tag>p:empty</tag> bindings. They clutter
+the graph and I don’t think they’re required any more. An unbound input is now
+“welded shut” so that no inputs are expected.</para>
+</listitem>
 </itemizedlist>
 </section>
 
