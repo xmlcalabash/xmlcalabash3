@@ -10,6 +10,6 @@ include("xmlcalabash", "app", "test-driver",
         "ixml-coffeepress", "send-mail",
         "paged-media:weasyprint", "paged-media:prince",
         "paged-media:antenna-house", "paged-media:fop",
-        "ext:unique-id", "ext:metadata-extractor",
+        "ext:unique-id", "ext:metadata-extractor", "ext:cache",
         "template:kotlin", "template:java",
     )

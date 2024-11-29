@@ -72,12 +72,6 @@
   </header>
 </xsl:template>
 
-<xsl:template match="db:error">
-  <span class="error">
-    <xsl:apply-templates/>
-  </span>
-</xsl:template>
-
 <xsl:template match="db:impl">
   <span class="impl">
     <xsl:apply-templates/>

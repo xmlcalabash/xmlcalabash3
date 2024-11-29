@@ -26,6 +26,7 @@ val antennahouseRelease by configurations.dependencyScope("antennahouseRelease")
 val fopRelease by configurations.dependencyScope("fopRelease")
 val uniqueidRelease by configurations.dependencyScope("uniqueidRelease")
 val metadataextractorRelease by configurations.dependencyScope("metadataextractorRelease")
+val cacheRelease by configurations.dependencyScope("cacheRelease")
 
 dependencies {
   xmlcalabashRelease(project(mapOf("path" to ":xmlcalabash",
@@ -46,6 +47,8 @@ dependencies {
                                 "configuration" to "releaseArtifacts")))
   metadataextractorRelease(project(mapOf("path" to ":ext:metadata-extractor",
                                          "configuration" to "releaseArtifacts")))
+  cacheRelease(project(mapOf("path" to ":ext:cache",
+                             "configuration" to "releaseArtifacts")))
 
   implementation(project(":xmlcalabash"))
   implementation(project(":ixml-coffeepress"))
@@ -56,6 +59,7 @@ dependencies {
   implementation(project(":paged-media:fop"))
   implementation(project(":ext:unique-id"))
   implementation(project(":ext:metadata-extractor"))
+  implementation(project(":ext:cache"))
 }
 
 val xmlcalabashJar = configurations.resolvable("xmlcalabashJar") {
@@ -84,6 +88,9 @@ val uniqueidJar = configurations.resolvable("uniqueidJar") {
 }
 val metadataextractorJar = configurations.resolvable("metadataextractorJar") {
   extendsFrom(metadataextractorRelease)
+}
+val cacheJar = configurations.resolvable("cacheJar") {
+  extendsFrom(cacheRelease)
 }
 
 application {
@@ -149,6 +156,7 @@ tasks.register("stage-release") {
   inputs.files(fopJar)
   inputs.files(uniqueidJar)
   inputs.files(metadataextractorJar)
+  inputs.files(cacheJar)
   dependsOn("jar")
 
   doLast {

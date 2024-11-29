@@ -1,0 +1,65 @@
+<refentry xmlns:p="http://www.w3.org/ns/xproc"
+          xmlns:e="http://www.w3.org/1999/XSL/Spec/ElementSyntax"
+          xmlns:xi="http://www.w3.org/2001/XInclude"
+          xmlns:xlink="http://www.w3.org/1999/xlink"
+          xmlns="http://docbook.org/ns/docbook"
+          xml:id="cx-cache-delete">
+<?db filename="cx-cache-delete"?>
+   <refnamediv>
+      <refname>cx:cache-delete</refname>
+      <refpurpose>A step for deleting documents from the runtime cache</refpurpose>
+   </refnamediv>
+   <refsynopsisdiv>
+     <xi:include href="../../../../ext/cache/src/main/resources/com/xmlcalabash/ext/cache.xpl"
+                 xpointer="xpath(/*/*[@type='cx:cache-delete'])"/>
+   </refsynopsisdiv>
+   <refsection>
+      <title>Description</title>
+
+<para>XML Calabash maintains a cache of documents. If a step attempts to load a
+URI, and that URI is present in the cache, the cached value will always be
+returned. Some steps use the cache implicitly (for example, the validate steps
+update it to hold schema documents).</para>
+
+<para>A pipeline can remove a document from the cache explicitly with <tag>cx:cache-delete</tag>.
+If the <option>href</option> option is provided, it is used as the URI for
+caching, otherwise the <port>source</port> document URI is used.
+<error code="I0030">It is a
+<glossterm>dynamic error</glossterm> if the <port>source</port> document does not have
+a base URI and the <option>href</option> option is not provided.</error>
+</para>
+
+<para>Irrespective of the cache URI, the step simply copies it’s <port>source</port>
+document to the <port>result</port> port. (It does not change the document’s base URI,
+even if an <option>href</option> option is provided to the <tag>cx:cache-add</tag> step.</para>
+
+<para><error code="I0038">It is a <glossterm>dynamic error</glossterm> if the
+<option>fail-if-not-in-cache</option> option is <literal>true</literal> and the
+cache does not contains a document with the URI being cached.</error></para>
+
+<refsection>
+<title>Options</title>
+
+<para>There are two  options.</para>
+
+<variablelist>
+<varlistentry><term><option>href</option></term>
+<listitem>
+<para>The URI to cache. Defaults to the <port>source</port> document URI.</para>
+</listitem>
+</varlistentry>
+<varlistentry><term><option>fail-if-not-in-cache</option></term>
+<listitem>
+<para>Determines whether the URI must already exist in the cache.</para>
+</listitem>
+</varlistentry>
+</variablelist>
+</refsection>
+
+<refsection>
+<title>Document properties</title>
+
+<para>No properties are changed.</para>
+</refsection>
+</refsection>
+</refentry>

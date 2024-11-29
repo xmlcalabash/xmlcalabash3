@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<t:test xmlns:cxerr="https://xmlcalabash.com/ns/error"
+        xmlns:t="http://xproc.org/ns/testsuite/3.0"
+        expected="fail" code="cxerr:XI0037">
+  <t:info>
+    <t:title>cache-004</t:title>
+    <t:revision-history>
+      <t:revision>
+        <t:date>2024-11-29</t:date>
+        <t:author>
+          <t:name>Norm Tovey-Walsh</t:name>
+        </t:author>
+        <t:description xmlns="http://www.w3.org/1999/xhtml">
+          <p>Created test.</p>
+        </t:description>
+      </t:revision>
+    </t:revision-history>
+  </t:info>
+  <t:description xmlns="http://www.w3.org/1999/xhtml">
+    <p>Tests that document replacement can raise an error.</p>
+  </t:description>
+  <t:pipeline>
+    <p:declare-step version="3.0"
+                    xmlns:err="http://www.w3.org/ns/xproc-error"
+                    xmlns:cx="http://xmlcalabash.com/ns/extensions"
+                    xmlns:p="http://www.w3.org/ns/xproc">
+      <p:output port="result"/>
+      <p:import href="https://xmlcalabash.com/ext/library/cache.xpl"/>
+
+      <cx:cache-add name="cache-pre-add"
+                    href="https://xmlcalabash.com/does/not/exist.xml">
+        <p:with-input>
+          <this-is-replaced/>
+        </p:with-input>
+      </cx:cache-add>
+
+      <cx:cache-add name="cache-add" p:depends="cache-pre-add"
+                    fail-if-in-cache="true"
+                    href="https://xmlcalabash.com/does/not/exist.xml">
+        <p:with-input>
+          <does-so/>
+        </p:with-input>
+      </cx:cache-add>
+
+      <p:try>
+        <p:xinclude depends="cache-add">
+          <p:with-input>
+            <doc xmlns:xi="http://www.w3.org/2001/XInclude">
+              <xi:include href="https://xmlcalabash.com/does/not/exist.xml"/>
+            </doc>
+          </p:with-input>
+        </p:xinclude>
+        <p:catch code="err:XC0029">
+          <p:identity>
+            <p:with-input>
+              <fail/>
+            </p:with-input>
+          </p:identity>
+        </p:catch>
+      </p:try>
+    </p:declare-step>
+  </t:pipeline>
+</t:test>
