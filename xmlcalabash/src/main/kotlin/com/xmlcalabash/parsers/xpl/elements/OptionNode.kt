@@ -28,8 +28,8 @@ class OptionNode(parent: AnyNode, node: XdmNode, val name: QName, val select: St
 
         if (context.staticOptions[this] == null) {
             if (useWhen == true) {
-                val value = if (context.builder.options.containsKey(name)) {
-                    context.builder.options[name]
+                val value = if (context.builder.staticOptionsManager.useWhenOptions.containsKey(name)) {
+                    context.builder.staticOptionsManager.useWhenOptions[name]
                 } else {
                     context.resolveExpression(stepConfig, select)
                 }

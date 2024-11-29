@@ -36,9 +36,11 @@ class PipelineBuilder private constructor(val saxonConfig: SaxonConfiguration) {
 
     val staticOptionsManager = StaticOptionsManager()
 
+    /*
     private val _options = mutableMapOf<QName, XdmValue>()
     val options: Map<QName, XdmValue>
         get() = _options
+     */
 
     private var started = false
 
@@ -60,15 +62,16 @@ class PipelineBuilder private constructor(val saxonConfig: SaxonConfiguration) {
             throw XProcError.xiTooLateForStaticOptions(name).exception()
         }
 
-        if (_options[name] != null) {
-            _options[name] = _options[name]!!.append(value)
+        var curValue : XdmValue? = staticOptionsManager.useWhenOptions[name]
+        if (curValue == null) {
+            staticOptionsManager.useWhenValue(name, value)
         } else {
-            _options[name] = value
+            staticOptionsManager.useWhenValue(name, curValue.append(value))
         }
     }
 
     fun newDeclareStep(): DeclareStepInstruction {
-        for ((optname, value) in options) {
+        for ((optname, value) in staticOptionsManager.useWhenOptions) {
             staticOptionsManager.compileTimeValue(optname, XProcExpression.constant(stepConfig, value))
         }
 
@@ -85,7 +88,7 @@ class PipelineBuilder private constructor(val saxonConfig: SaxonConfiguration) {
     }
 
     fun newLibrary(): LibraryInstruction {
-        for ((optname, value) in options) {
+        for ((optname, value) in staticOptionsManager.useWhenOptions) {
             staticOptionsManager.compileTimeValue(optname, XProcExpression.constant(stepConfig, value))
         }
         val decl = LibraryInstruction(stepConfig.copy())
