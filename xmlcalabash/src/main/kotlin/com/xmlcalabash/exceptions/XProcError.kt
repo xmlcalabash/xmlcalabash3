@@ -301,6 +301,7 @@ class XProcError private constructor(val code: QName, val variant: Int, val loca
         fun xcXmlSchemaInvalidSchema(uri: URI) = step(Pair(152, 2), uri)
         fun xcNotRelaxNG(message: String) = step(Pair(153,1), message)
         fun xcNotRelaxNG(uri: URI, message: String) = step(Pair(153,2), uri, message)
+        fun xcNotNvdl(message: String) = step(154, message)
         fun xcNotSchemaValidRelaxNG(message: String) = step(Pair(155,1), message)
         fun xcNotSchemaValidRelaxNG(uri: URI, message: String) = step(Pair(155,2), uri, message)
         fun xcNotSchemaValidXmlSchema(message: String) = step(Pair(156, 1), message)
@@ -344,6 +345,8 @@ class XProcError private constructor(val code: QName, val variant: Int, val loca
         fun xiUnwritableOutputFile(filename: String) = internal(33, filename)
         fun xiNoRunnableSteps() = internal(35)
         fun xiNotASpecialType(type: String) = internal(36, type)
+        fun xiDocumentInCache(href: URI) = internal(37, href)
+        fun xiDocumentNotInCache(href: URI) = internal(38, href)
 
         fun xiCliInvalidValue(option: String, value: String) = internal(200, option, value)
         fun xiCliValueRequired(option: String) = internal(202, option)
