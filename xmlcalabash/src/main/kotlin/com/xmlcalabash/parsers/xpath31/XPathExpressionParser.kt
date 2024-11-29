@@ -214,7 +214,7 @@ class XPathExpressionParser(val stepConfig: XProcStepConfiguration) {
             }
 
             val xmlResult = XdmDestination()
-            transformer!!.applyTemplates(builder.result, xmlResult)
+            transformer.applyTemplates(builder.result, xmlResult)
             return xmlResult.xdmNode.toString()
         }
 
@@ -277,7 +277,7 @@ class XPathExpressionParser(val stepConfig: XProcStepConfiguration) {
     private class Nonterminal(val name: String, parent: Tree): Tree() {
         override val squash: Boolean
             get() {
-                return (name != "VarRef" && name != "ArgumentList" && name != "ParamList"
+                return (name != "VarRef" && name != "ArgumentList" && name != "ParamList" && name != "UnaryLookup"
                         && children.size == 1 && children.first() is Nonterminal)
                         || name == "QName" || name == "EQName"
             }
