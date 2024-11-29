@@ -24,7 +24,6 @@ class UseWhenContext internal constructor(val builder: PipelineBuilder) {
     val contextId = ++id
 
     init {
-        //println("NEW USE WHEN CONTEXT: ${this}")
         for (child in builder.standardLibrary.children.filterIsInstance<DeclareStepInstruction>()) {
             if (child.type != null) {
                 stepTypes[child.type!!] = StepImplementation(true, child.stepConfig.rteContext.atomicStepAvailable(child.type!!))

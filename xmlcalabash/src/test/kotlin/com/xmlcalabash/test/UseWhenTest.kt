@@ -24,7 +24,9 @@ class UseWhenTest {
                 throw RuntimeException("Found a <no/>.")
             }
             for (child in node.children.filterIsInstance<ElementNode>()) {
-                ok = ok || findYes(child)
+                if (findYes(child)) {
+                    ok = true
+                }
             }
         }
         return ok
@@ -164,6 +166,4 @@ class UseWhenTest {
         val document = manager.load(UriUtils.cwdAsUri().resolve("src/test/resources/usewhen/declexcluded.xpl"))
         Assertions.assertTrue(findYes(document.rootNode))
     }
-
-
 }
