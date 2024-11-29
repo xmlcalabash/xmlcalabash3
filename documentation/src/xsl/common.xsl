@@ -58,6 +58,32 @@
   </span>
 </xsl:template>
 
+<xsl:template match="db:error">
+  <span class="pipeline-error">
+    <xsl:apply-templates/>
+  </span>
+</xsl:template>
+
+<xsl:template match="db:error/db:glossterm">
+  <span class="glossterm">
+    <xsl:next-match/>
+    <xsl:text> (</xsl:text>
+    <code>
+      <xsl:choose>
+        <xsl:when test="starts-with(../@code, 'I')">
+          <xsl:text>cxerr:X</xsl:text>
+          <xsl:value-of select="../@code"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:text>err:X</xsl:text>
+          <xsl:value-of select="../@code"/>
+        </xsl:otherwise>
+      </xsl:choose>
+    </code>
+    <xsl:text>)</xsl:text>
+  </span>
+</xsl:template>
+
 <xsl:template match="processing-instruction('version')">
   <xsl:variable name="ver"
                 select="if (normalize-space(.) = '')

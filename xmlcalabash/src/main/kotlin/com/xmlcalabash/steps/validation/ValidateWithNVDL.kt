@@ -61,7 +61,11 @@ open class ValidateWithNVDL(): AbstractAtomicStep() {
 
         try {
             driver.loadSchema(nvdl)
+        } catch (ex: Exception) {
+            throw XProcError.xcNotNvdl(ex.message ?: "").exception(ex)
+        }
 
+        try {
             if (!driver.validate(doc)) {
                 if (assertValid) {
                     throw XProcError.xcNotSchemaValidNVDL().exception()

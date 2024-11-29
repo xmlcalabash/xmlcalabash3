@@ -1,13 +1,15 @@
 package com.xmlcalabash.io
 
+import com.xmlcalabash.config.XProcStepConfiguration
 import com.xmlcalabash.documents.DocumentProperties
+import com.xmlcalabash.documents.XProcBinaryDocument
 import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.exceptions.XProcError
-import com.xmlcalabash.config.XProcStepConfiguration
 import com.xmlcalabash.spi.DocumentResolver
 import net.sf.saxon.lib.ModuleURIResolver
 import net.sf.saxon.lib.ResourceResolver
 import net.sf.saxon.s9api.QName
+import net.sf.saxon.s9api.XdmNode
 import net.sf.saxon.s9api.XdmValue
 import org.apache.logging.log4j.kotlin.logger
 import org.xml.sax.EntityResolver
@@ -17,9 +19,10 @@ import org.xmlresolver.ResourceRequest
 import org.xmlresolver.XMLResolver
 import org.xmlresolver.XMLResolverConfiguration
 import org.xmlresolver.sources.ResolverSAXSource
+import java.io.ByteArrayOutputStream
 import java.net.URI
 import javax.xml.transform.Source
-import javax.xml.transform.URIResolver
+import javax.xml.transform.sax.SAXSource
 import javax.xml.transform.stream.StreamSource
 
 class DocumentManager(): EntityResolver, EntityResolver2, ResourceResolver, ModuleURIResolver {
@@ -47,18 +50,6 @@ class DocumentManager(): EntityResolver, EntityResolver2, ResourceResolver, Modu
                 _resolver = XMLResolver(resolverConfiguration)
             }
             return _resolver!!
-        }
-    private val entityResolver: EntityResolver
-        get() {
-            return resolver.entityResolver
-        }
-    private val entityResolver2: EntityResolver2
-        get() {
-            return resolver.entityResolver2
-        }
-    private val uriResolver: URIResolver
-        get() {
-            return resolver.uriResolver
         }
 
     fun registerPrefix(prefix: String, resolver: DocumentResolver) {
@@ -106,7 +97,7 @@ class DocumentManager(): EntityResolver, EntityResolver2, ResourceResolver, Modu
         return resolved
     }
 
-    private fun getCached(href: URI): XProcDocument? {
+    fun getCached(href: URI): XProcDocument? {
         synchronized(_cache) {
             val doc = _cache[href]
             if (doc != null) {
@@ -150,11 +141,40 @@ class DocumentManager(): EntityResolver, EntityResolver2, ResourceResolver, Modu
         }
     }
 
+    private fun inputFromCache(href: URI): InputSource? {
+        val doc = getCached(href)
+        if (doc != null) {
+            val byteStream = if (doc is XProcBinaryDocument) {
+                doc.binaryValue.inputStream()
+            } else {
+                if (doc.value is XdmNode) {
+                    val byteStream = ByteArrayOutputStream()
+                    val serializer = XProcSerializer((doc.value as XdmNode).processor)
+                    serializer.write(doc, byteStream)
+                    byteStream.toByteArray().inputStream()
+                } else {
+                    doc.value.toString().toByteArray().inputStream()
+                }
+            }
+            val source = InputSource(byteStream)
+            source.systemId = doc.baseURI?.toString()
+            return source
+        }
+        return null
+    }
+
     override fun resolveEntity(name: String?, publicId: String?, baseURI: String?, systemId: String?): InputSource {
         return resolver.entityResolver2.resolveEntity(name, publicId, baseURI, systemId)
     }
 
     override fun resolveEntity(publicId: String?, systemId: String?): InputSource {
+        if (systemId != null) {
+            val source = inputFromCache(URI(systemId))
+            if (source != null) {
+                return source
+            }
+        }
+
         return resolver.entityResolver2.resolveEntity(publicId, systemId)
     }
 
@@ -165,6 +185,15 @@ class DocumentManager(): EntityResolver, EntityResolver2, ResourceResolver, Modu
     override fun resolve(saxonRequest: net.sf.saxon.lib.ResourceRequest?): Source? {
         if (saxonRequest == null) {
             return null
+        }
+
+        if (saxonRequest.uri != null) {
+            val inputSource = inputFromCache(URI(saxonRequest.uri))
+            if (inputSource != null) {
+                val source = SAXSource(inputSource)
+                source.systemId = saxonRequest.uri
+                return source
+            }
         }
 
         val request = ResourceRequest(resolverConfiguration, saxonRequest.nature, saxonRequest.purpose)
@@ -182,7 +211,25 @@ class DocumentManager(): EntityResolver, EntityResolver2, ResourceResolver, Modu
     }
 
     override fun resolve(moduleURI: String?, baseURI: String?, locations: Array<out String>?): Array<StreamSource>? {
-        // Not clear if I should be trying to do better here...
-        return null
+        var href = if (moduleURI == null) {
+            if (baseURI == null) {
+                return null
+            }
+            URI(baseURI)
+        } else {
+            if (baseURI == null) {
+                URI(moduleURI)
+            } else {
+                URI(baseURI).resolve(moduleURI)
+            }
+        }
+
+        val inputSource = inputFromCache(href)
+        if (inputSource == null) {
+            return null
+        }
+
+        val source = StreamSource(inputSource.byteStream, href.toString())
+        return arrayOf(source)
     }
 }

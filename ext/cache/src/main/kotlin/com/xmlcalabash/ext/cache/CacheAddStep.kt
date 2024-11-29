@@ -1,0 +1,49 @@
+package com.xmlcalabash.ext.cache
+
+import com.xmlcalabash.documents.DocumentProperties
+import com.xmlcalabash.documents.XProcDocument
+import com.xmlcalabash.exceptions.XProcError
+import com.xmlcalabash.namespace.Ns
+import com.xmlcalabash.steps.AbstractAtomicStep
+import net.sf.saxon.om.NamespaceUri
+import net.sf.saxon.s9api.QName
+
+class CacheAddStep(): AbstractAtomicStep() {
+    companion object {
+        val failIfInCache = QName(NamespaceUri.NULL, "fail-if-in-cache")
+    }
+    private lateinit var document: XProcDocument
+
+    override fun input(port: String, doc: XProcDocument) {
+        document = doc
+    }
+
+    override fun run() {
+        super.run()
+
+        val failIfCached = booleanBinding(failIfInCache)!!
+        val href = uriBinding(Ns.href)
+
+        if (href == null && document.baseURI == null) {
+            throw XProcError.xiBaseUriRequiredToCache().exception()
+        }
+
+        if (href != null) {
+            if (failIfCached && stepConfig.documentManager.getCached(href) != null) {
+                throw XProcError.xiDocumentInCache(href).exception()
+            }
+            val props = DocumentProperties(document.properties)
+            props.set(Ns.baseUri, href)
+            stepConfig.documentManager.cache(document.with(props))
+        } else {
+            if (failIfCached && stepConfig.documentManager.getCached(document.baseURI!!) != null) {
+                throw XProcError.xiDocumentInCache(document.baseURI!!).exception()
+            }
+            stepConfig.documentManager.cache(document)
+        }
+
+        receiver.output("result", document)
+    }
+
+    override fun toString(): String = "cx:cache-add"
+}

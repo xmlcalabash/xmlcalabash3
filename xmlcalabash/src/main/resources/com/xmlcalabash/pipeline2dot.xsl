@@ -318,11 +318,19 @@
                 from="cluster_{generate-id($from_step)}_foot" output="{generate-id($from_port)}_foot"/>
     </xsl:when>
     <xsl:otherwise>
-<!--
+
+    <!--
+      <xsl:message select="'FROM-STEP:', $from_step"/>
+      <xsl:message select="'FROM-PORT:', $from_port"/>
+      <xsl:message select="'TO-STEP:', $to_step"/>
+      <xsl:message select="'TO-STEP:', $to_port"/>
       <xsl:message>cluster_{generate-id($from_step)} . {generate-id($from_port)} → cluster_{generate-id($to_step)} . {generate-id($to_port)}</xsl:message>
--->
-      <dot:edge x="5" to="cluster_{generate-id($to_step)}" input="{generate-id($to_port)}"
-                from="cluster_{generate-id($from_step)}" output="{generate-id($from_port)}"/>
+    -->
+
+      <xsl:for-each select="$from_port">
+        <dot:edge x="5" to="cluster_{generate-id($to_step)}" input="{generate-id($to_port)}"
+                  from="cluster_{generate-id($from_step)}" output="{generate-id(.)}"/>
+      </xsl:for-each>
     </xsl:otherwise>
   </xsl:choose>
 </xsl:template>

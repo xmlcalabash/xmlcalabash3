@@ -6,6 +6,8 @@
   <title>Extension steps</title>
 </info>
 
+<xi:include href="cx-cache-add.xml"/>
+<xi:include href="cx-cache-delete.xml"/>
 <xi:include href="cx-metadata-extractor.xml"/>
 <xi:include href="cx-unique-id.xml"/>
 
