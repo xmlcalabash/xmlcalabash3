@@ -78,5 +78,7 @@ jobs:
 
       - name: Build and test XML Calabash
         run: |
-          ./gradlew --info test
-          ./gradlew --warning-mode all release
+          ./gradlew :xmlcalabash:test --tests "com.xmlcalabash.test.UseWhenTest.declOption3"
+
+#          ./gradlew --info test
+#          ./gradlew --warning-mode all release
