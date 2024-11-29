@@ -51,6 +51,9 @@ java {
 
 tasks.named<Test>("test") {
     useJUnitPlatform()
+    testLogging {
+        events("passed", "skipped", "failed", "standardOut", "standardError")
+    }
 }
 
 artifacts {

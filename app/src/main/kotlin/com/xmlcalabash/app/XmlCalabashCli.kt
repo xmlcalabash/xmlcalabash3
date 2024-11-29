@@ -121,7 +121,7 @@ class XmlCalabashCli private constructor() {
 
             optionManifold.putAll(pipeline.optionManifold)
             //val staticOpts = runtime.pipeline!!.staticOptions
-            for ((name, value) in xprocParser.builder.options) {
+            for ((name, value) in xprocParser.builder.staticOptionsManager.useWhenOptions) {
                 //if (name !in staticOpts) {
                 //    runtime.option(name, value)
                 //}
