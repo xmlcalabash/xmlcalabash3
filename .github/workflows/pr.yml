@@ -59,8 +59,10 @@ jobs:
           java-version: '21'
           distribution: 'graalvm-community'
 
-      - name: Checkout sources
+      - name: Get the pull request
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
 
       - name: Setup submodules
         run: |
