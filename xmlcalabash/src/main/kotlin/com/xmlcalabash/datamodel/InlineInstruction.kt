@@ -84,7 +84,7 @@ class InlineInstruction(parent: XProcInstruction, xmlDocument: XdmNode): Connect
         for ((name, value) in stepConfig.inscopeVariables) {
             if (value.canBeResolvedStatically()) {
                 val details = builder.staticOptionsManager.get(value)
-                staticBindings[name] = value.select!!
+                staticBindings[name] = details.staticValue
                 documentProperties.setStaticBinding(name, details.staticValue)
             }
         }

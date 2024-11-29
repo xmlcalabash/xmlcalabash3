@@ -5,12 +5,16 @@ import com.xmlcalabash.runtime.RuntimeStepStaticContextImpl
 import com.xmlcalabash.runtime.steps.RuntimeStepStaticContext
 import net.sf.saxon.om.NamespaceUri
 import net.sf.saxon.s9api.QName
+import net.sf.saxon.s9api.XdmValue
 
-class InstructionStaticContextImpl(val rtContext: RuntimeStepStaticContextImpl): RuntimeStepStaticContext by rtContext, InstructionStaticContext {
+class InstructionStaticContextImpl(val rtContext: RuntimeStepStaticContextImpl)
+    : RuntimeStepStaticContext by rtContext, InstructionStaticContext {
 
     private var _stepName: String? = null
     private val _inscopeStepNames = mutableMapOf<String, StepDeclaration>()
     private val _inscopeVariables = mutableMapOf<QName, VariableBindingContainer>()
+    private val _staticBindings = mutableMapOf<QName, XdmValue>()
+
     private var _drp: PortBindingContainer? = null
 
     override val xmlCalabash = saxonConfig.xmlCalabash
@@ -20,6 +24,9 @@ class InstructionStaticContextImpl(val rtContext: RuntimeStepStaticContextImpl):
         get() = _inscopeStepNames
     override val inscopeVariables: Map<QName, VariableBindingContainer>
         get() = _inscopeVariables
+    override val staticBindings: Map<QName, XdmValue>
+        get() = _staticBindings
+
     override var drp: PortBindingContainer?
         get() = _drp
         set(value) {
@@ -41,6 +48,7 @@ class InstructionStaticContextImpl(val rtContext: RuntimeStepStaticContextImpl):
         stepConfig._stepName = null
         stepConfig._inscopeStepNames.putAll(_inscopeStepNames)
         stepConfig._inscopeVariables.putAll(_inscopeVariables)
+        stepConfig._staticBindings.putAll(_staticBindings)
         stepConfig._drp = drp
         return stepConfig
     }
@@ -55,6 +63,10 @@ class InstructionStaticContextImpl(val rtContext: RuntimeStepStaticContextImpl):
 
     fun with(inscopeNamespaces: Map<String, NamespaceUri>): InstructionStaticContextImpl {
         return InstructionStaticContextImpl(rtContext.with(inscopeNamespaces))
+    }
+
+    override fun addStaticBinding(name: QName, value: XdmValue) {
+        _staticBindings[name] = value
     }
 
     override fun addVisibleStepName(decl: StepDeclaration) {

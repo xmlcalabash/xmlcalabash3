@@ -61,7 +61,7 @@ open class AtomicBuiltinStepModel(runtime: XProcRuntime, val model: AtomicModel)
                 for (name in step.expression.variableRefs) {
                     if (name in step.inscopeVariables) {
                         val expr = step.inscopeVariables[name]!!
-                        inscopeOptions[name] = RuntimeOption(name, expr.asType ?: SequenceType.ANY, emptyList(), expr.select!!)
+                        inscopeOptions[name] = RuntimeOption(name, expr.asType ?: SequenceType.ANY, emptyList(), false, expr.select!!)
                     }
                 }
 

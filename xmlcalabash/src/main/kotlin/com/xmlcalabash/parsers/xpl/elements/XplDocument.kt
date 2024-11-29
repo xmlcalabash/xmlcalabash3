@@ -34,41 +34,52 @@ class XplDocument(val builder: PipelineBuilder, val xml: XdmNode) {
     }
 
     private fun constructTree(tree: AnyNode) {
+        var inline = false
+        var tnode: AnyNode? = tree
+        while (!inline && tnode != null) {
+            inline = tnode.node.nodeName == NsP.inline
+            tnode = tnode.parent
+        }
+
         for (node in tree.node.axisIterator(Axis.CHILD)) {
             val child = if (node.nodeKind == XdmNodeKind.ELEMENT) {
-                when (node.nodeName) {
-                    NsP.declareStep -> DeclareStepNode(tree, node)
-                    NsP.library -> LibraryNode(tree, node)
-                    NsP.import -> {
-                        if (node.getAttributeValue(Ns.href) != null) {
-                            ImportNode(tree, node)
-                        } else {
-                            ElementNode(tree, node)
-                        }
-                    }
-                    NsP.importFunctions -> {
-                        if (node.getAttributeValue(Ns.href) != null) {
-                            ImportFunctionsNode(tree, node)
-                        } else {
-                            ElementNode(tree, node)
-                        }
-                    }
-                    NsP.option -> {
-                        if (node.getAttributeValue(Ns.name) != null
-                            && node.getAttributeValue(Ns.select) != null
-                            && node.getAttributeValue(Ns.static) != null
-                            && parseBoolean(node.getAttributeValue(Ns.static))) {
-                            try {
-                                val name = tree.stepConfig.parseQName(node.getAttributeValue(Ns.name))
-                                OptionNode(tree, node, name, node.getAttributeValue(Ns.select)!!)
-                            } catch (ex: Exception) {
+                if (inline) {
+                    ElementNode(tree, node)
+                } else {
+                    when (node.nodeName) {
+                        NsP.declareStep -> DeclareStepNode(tree, node)
+                        NsP.library -> LibraryNode(tree, node)
+                        NsP.import -> {
+                            if (node.getAttributeValue(Ns.href) != null) {
+                                ImportNode(tree, node)
+                            } else {
                                 ElementNode(tree, node)
                             }
-                        } else {
-                            ElementNode(tree, node)
                         }
+                        NsP.importFunctions -> {
+                            if (node.getAttributeValue(Ns.href) != null) {
+                                ImportFunctionsNode(tree, node)
+                            } else {
+                                ElementNode(tree, node)
+                            }
+                        }
+                        NsP.option -> {
+                            if (node.getAttributeValue(Ns.name) != null
+                                && node.getAttributeValue(Ns.select) != null
+                                && node.getAttributeValue(Ns.static) != null
+                                && parseBoolean(node.getAttributeValue(Ns.static))) {
+                                try {
+                                    val name = tree.stepConfig.parseQName(node.getAttributeValue(Ns.name))
+                                    OptionNode(tree, node, name, node.getAttributeValue(Ns.select)!!)
+                                } catch (ex: Exception) {
+                                    ElementNode(tree, node)
+                                }
+                            } else {
+                                ElementNode(tree, node)
+                            }
+                        }
+                        else -> ElementNode(tree, node)
                     }
-                    else -> ElementNode(tree, node)
                 }
             } else {
                 if (node.nodeKind == XdmNodeKind.TEXT) {
