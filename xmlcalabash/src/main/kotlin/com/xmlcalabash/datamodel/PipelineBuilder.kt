@@ -71,6 +71,11 @@ class PipelineBuilder private constructor(val saxonConfig: SaxonConfiguration) {
         for ((optname, value) in options) {
             staticOptionsManager.compileTimeValue(optname, XProcExpression.constant(stepConfig, value))
         }
+
+        for ((optname, value) in staticOptionsManager.useWhenOptions) {
+            stepConfig.addStaticBinding(optname, value)
+        }
+
         val decl = DeclareStepInstruction(null, stepConfig.copy())
         if (version != null) {
             decl.version = version

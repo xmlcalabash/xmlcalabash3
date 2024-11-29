@@ -389,7 +389,7 @@ class XplParser(val builder: PipelineBuilder) {
         val stepConfig = withOption.stepConfig
         withOption.stepConfig.updateWith(node.node)
 
-        val attributeMapping = mapOf<QName, (String) -> Unit>(
+        val attributeMapping = mutableMapOf<QName, (String) -> Unit>(
             Ns.name to { _ -> },
             Ns.asType to { value -> withOption.asType = stepConfig.parseSequenceType(value) },
             Ns.select to { value -> withOption.select = XProcExpression.select(stepConfig, value) },
@@ -398,6 +398,10 @@ class XplParser(val builder: PipelineBuilder) {
             Ns.pipe to { value -> withOption.pipe = value },
             Ns.excludeInlinePrefixes to { value -> stepConfig.parseExcludeInlinePrefixes(value) }
         )
+
+        if (node.node.nodeName == NsP.runOption) {
+            attributeMapping[Ns.static] = { value -> (withOption as RunOptionInstruction).static = stepConfig.parseBoolean(value) }
+        }
 
         processAttributes(node, withOption, attributeMapping)
 
@@ -1102,6 +1106,11 @@ class XplParser(val builder: PipelineBuilder) {
                 var adjBaseUri = baseUri
                 val attrMap = mutableMapOf<QName,String>()
                 for (attr in node.node.axisIterator(Axis.ATTRIBUTE)) {
+                    if ((node.node.nodeName.namespaceUri == NsP.namespace && attr.nodeName == Ns.useWhen)
+                        || (node.node.nodeName.namespaceUri != NsP.namespace && attr.nodeName == NsP.useWhen)) {
+                        continue
+                    }
+
                     if (attr.nodeName.namespaceUri == NamespaceUri.NULL) {
                         attrMap[attr.nodeName] = attr.stringValue
                     } else {

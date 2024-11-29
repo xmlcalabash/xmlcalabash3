@@ -251,22 +251,4 @@ class StepConfiguration private constructor(
     override fun forceQNameKeys(inputMap: XdmMap): XdmMap {
         return converter.forceQNameKeys(inputMap, inscopeNamespaces)
     }
-
-    /*
-    override fun evaluateExpression(expression: String, bindings: Map<QName, XdmValue>): XdmValue {
-        val compiler = processor.newXPathCompiler()
-        for ((prefix, uri) in inscopeNamespaces) {
-            compiler.declareNamespace(prefix, uri.toString())
-        }
-        for ((name, _) in bindings) {
-            compiler.declareVariable(name)
-        }
-        val exec = compiler.compile(expression)
-        val select = exec.load()
-        for ((name, value) in bindings) {
-            select.setVariable(name, value)
-        }
-        return select.evaluate()
-    }
-     */
 }

@@ -30,6 +30,11 @@ open class RunStep(yconfig: RuntimeStepConfiguration, compound: CompoundStepMode
         stepConfig.newExecutionContext(stepConfig)
 
         val parser = stepConfig.xmlCalabash.newXProcParser()
+        for ((name, option) in runParams.options) {
+            if (option.static) {
+                parser.builder.staticOptionsManager.compileTimeValue(name, option.staticValue!!)
+            }
+        }
 
         val decl = try {
             parser.parse(cache["!source"]!!.first().value as XdmNode)
@@ -69,6 +74,7 @@ open class RunStep(yconfig: RuntimeStepConfiguration, compound: CompoundStepMode
                 }
             }
         }
+
         if (okPrimary != runParams.primaryOutput) {
             throw XProcError.xcRunOutputPrimaryMismatch(okPrimary ?: runParams.primaryOutput!!).exception()
         }
@@ -77,9 +83,10 @@ open class RunStep(yconfig: RuntimeStepConfiguration, compound: CompoundStepMode
             var value = if (staticOptions[option.name] != null) {
                 val sopt = staticOptions[option.name]!!
                 sopt.staticValue.evaluate()
-            } else if (runParams.options[option.name] != null) {
-                val sopt = runParams.options[option.name]!!
-                sopt.staticValue!!.evaluate()
+            } else if (head.options[option.name] != null) {
+                listToValue(head.options[option.name] ?: emptyList())
+            } else if (option.static) {
+                continue
             } else {
                 var defaultApplies = false
                 val portName = "Q{{${option.name.namespaceUri}}${option.name.localName}"
@@ -97,12 +104,7 @@ open class RunStep(yconfig: RuntimeStepConfiguration, compound: CompoundStepMode
                     continue
                 }
 
-                var value: XdmValue = XdmEmptySequence.getInstance()
-                val documents = cache[portName] ?: emptyList()
-                for (doc in documents) {
-                    value = value.append(doc.value)
-                }
-                value
+                listToValue(cache[portName] ?: emptyList())
             }
 
             // Apply the QName magic to maps...
@@ -137,6 +139,14 @@ open class RunStep(yconfig: RuntimeStepConfiguration, compound: CompoundStepMode
         foot.run()
 
         stepConfig.releaseExecutionContext()
+    }
+
+    private fun listToValue(documents: List<XProcDocument>): XdmValue {
+        var value: XdmValue = XdmEmptySequence.getInstance()
+        for (doc in documents) {
+            value = value.append(doc.value)
+        }
+        return value
     }
 
     inner class PassthroughReceiver(): Receiver {

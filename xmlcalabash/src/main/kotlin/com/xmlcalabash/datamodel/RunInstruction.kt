@@ -18,12 +18,10 @@ class RunInstruction(parent: XProcInstruction): CompoundStepDeclaration(parent, 
             poption._select = option.select
             poption.asType = option.asType
             poption.collection = option.collection
-
+            poption.static = option.static == true
             if (option.canBeResolvedStatically()) {
                 _staticOptions[option.name] = StaticOptionDetails(option)
-                poption.static = true
             }
-
             options.add(poption)
         }
 

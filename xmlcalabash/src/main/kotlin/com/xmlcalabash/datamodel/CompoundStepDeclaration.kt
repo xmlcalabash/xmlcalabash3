@@ -374,7 +374,7 @@ abstract class CompoundStepDeclaration(parent: XProcInstruction?, stepConfig: St
         when (contentModel[type]) {
             null, '0' -> throw XProcError.xsInvalidElement(type).exception()
             '?', '1' -> {
-                if (children.filter { it.instructionType == type }.isNotEmpty()) {
+                if (children.any { it.instructionType == type }) {
                     throw XProcError.xsInvalidElement(type).exception()
                 } else {
                     _children.add(instruction)

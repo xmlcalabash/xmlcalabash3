@@ -72,7 +72,11 @@ open class OptionInstruction(parent: XProcInstruction, name: QName, stepConfig: 
                         SequenceType.ANY, false)
                 }
             } else {
-                select = XProcExpression.constant(stepConfig, XdmEmptySequence.getInstance(), asType ?: SequenceType.ANY, values)
+                if (static && stepConfig.staticBindings.contains(name)) {
+                    select = XProcExpression.constant(stepConfig, stepConfig.staticBindings[name]!!, asType ?: SequenceType.ANY, values)
+                } else {
+                    select = XProcExpression.constant(stepConfig, XdmEmptySequence.getInstance(), asType ?: SequenceType.ANY, values)
+                }
             }
         } else {
             if (required == true) {

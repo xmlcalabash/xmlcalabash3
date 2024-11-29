@@ -61,7 +61,10 @@ class XProcPipeline(pipeline: CompoundStepModel) {
             }
         }
 
-        throw XProcError.xiImpossible("No option step for option?").exception()
+        // Static options won't have runnables, so they're okay.
+        if (!option.static) {
+            throw XProcError.xiImpossible("No option step for option?").exception()
+        }
     }
 
     fun run() {

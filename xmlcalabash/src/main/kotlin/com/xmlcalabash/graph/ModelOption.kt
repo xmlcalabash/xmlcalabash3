@@ -30,7 +30,7 @@ class ModelOption private constructor(val parent: Model, val name: QName) {
     constructor(parent: Model, option: OptionInstruction): this(parent, option.name) {
         _static = option.static
         _asType = option.asType!!
-        _values = option.values ?: emptyList()
+        _values = option.values
         if (option.canBeResolvedStatically()) {
             _staticValue = option.select!!
         }
