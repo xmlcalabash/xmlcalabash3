@@ -1,8 +1,6 @@
 package com.xmlcalabash.datamodel
 
-import com.thaiopensource.resolver.Input
 import com.xmlcalabash.exceptions.XProcError
-import com.xmlcalabash.namespace.Ns
 import net.sf.saxon.s9api.QName
 
 open class PortBindingContainer(parent: XProcInstruction, stepConfig: StepConfiguration, instructionType: QName): BindingContainer(parent, stepConfig, instructionType) {
@@ -25,11 +23,6 @@ open class PortBindingContainer(parent: XProcInstruction, stepConfig: StepConfig
         set(value) {
             checkOpen()
             val pname = stepConfig.parseNCName(value)
-            for (pdecl in parent!!.children.filterIsInstance<PortBindingContainer>().filter { port == pname }) {
-                if (pdecl !== this) {
-                    println("DUPLICATE PORT: $port")
-                }
-            }
             _port = pname
         }
 

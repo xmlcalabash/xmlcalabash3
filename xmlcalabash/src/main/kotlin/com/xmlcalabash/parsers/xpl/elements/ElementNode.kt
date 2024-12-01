@@ -32,11 +32,7 @@ open class ElementNode(parent: AnyNode?, stepConfig: StepConfiguration, node: Xd
         }
     }
 
-    internal open fun resolveUseWhen(context: UseWhenContext) {
-        if (useWhen == false) {
-            return
-        }
-
+    internal fun computeUseWhenOnThisElement(context: UseWhenContext) {
         if (useWhen == null) {
             context.useWhen.add(this)
             val resolved = context.resolveUseWhen(stepConfig, conditional!!)
@@ -55,6 +51,14 @@ open class ElementNode(parent: AnyNode?, stepConfig: StepConfiguration, node: Xd
                 }
             }
         }
+    }
+
+    internal open fun resolveUseWhen(context: UseWhenContext) {
+        if (useWhen == false) {
+            return
+        }
+
+        computeUseWhenOnThisElement(context)
 
         if (useWhen == true) {
             var inline = false
@@ -62,21 +66,6 @@ open class ElementNode(parent: AnyNode?, stepConfig: StepConfiguration, node: Xd
             while (!inline && tnode != null) {
                 inline = tnode.node.nodeName == NsP.inline
                 tnode = tnode.parent
-            }
-
-            if (!inline && node.nodeName == NsP.option) {
-                val isStatic =  stepConfig.parseBoolean(attributes[Ns.static] ?: "false")
-                if (isStatic) {
-                    val name = stepConfig.parseQName(attributes[Ns.name]!!)
-                    if (!context.builder.staticOptionsManager.useWhenOptions.contains(name)) {
-                        val select = if (Ns.select in attributes) {
-                            attributes[Ns.select]!!
-                        } else {
-                            "()"
-                        }
-                        context.builder.staticOptionsManager.useWhenValue(name, context.resolveExpression(stepConfig, select)!!)
-                    }
-                }
             }
 
             for (child in children.filterIsInstance<ElementNode>()) {

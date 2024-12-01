@@ -84,7 +84,10 @@ open class AtomicStepInstruction(parent: XProcInstruction, instructionType: QNam
 
         for (output in decl.getOutputs()) {
             val wo = withOutput()
-            wo.port = output.port
+            if (!output.portDefined) {
+                output._port = "!result"
+            }
+            wo._port = output.port
             wo.primary = output.primary
             wo.sequence = output.sequence
             wo.contentTypes = output.contentTypes

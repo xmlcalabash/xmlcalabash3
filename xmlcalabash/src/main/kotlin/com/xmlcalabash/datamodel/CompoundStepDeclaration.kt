@@ -204,7 +204,8 @@ abstract class CompoundStepDeclaration(parent: XProcInstruction?, stepConfig: St
         for (option in children.filterIsInstance<OptionInstruction>()) {
             option.elaborateInstructions()
             if (option.static) {
-                _staticOptions[option.name] = builder.staticOptionsManager.get(option)
+                _staticOptions[option.name] = StaticOptionDetails(option)
+                stepConfig.addStaticBinding(option.name, option.select!!.staticValue!!)
             }
         }
 
