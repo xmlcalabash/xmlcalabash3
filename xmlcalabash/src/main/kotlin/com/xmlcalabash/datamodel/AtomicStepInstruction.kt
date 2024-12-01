@@ -161,7 +161,7 @@ open class AtomicStepInstruction(parent: XProcInstruction, instructionType: QNam
 
     open fun withOption(name: QName, expr: XProcExpression?): WithOptionInstruction {
         if (children.filterIsInstance<WithOptionInstruction>().any { it.name == name }) {
-            throw XProcError.xsDuplicateOption(name).exception()
+            throw XProcError.xsDuplicateWithOption(name).exception()
         }
 
         val withOption = WithOptionInstruction(this, name, stepConfig.copy())
