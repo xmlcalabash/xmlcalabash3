@@ -13,6 +13,12 @@ class OutputInstruction(parent: XProcInstruction): PortBindingContainer(parent, 
         this._sequence = sequence
     }
 
+    init {
+        // Output ports don't have to have a name. Make sure they get the
+        // "right" unusable name if none is specified.
+        _port = "!result"
+    }
+
     private var _serialization: XProcExpression? = null
     var serialization: XProcExpression
         get() = _serialization!!
