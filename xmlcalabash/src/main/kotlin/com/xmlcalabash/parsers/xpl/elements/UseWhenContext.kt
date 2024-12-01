@@ -88,14 +88,19 @@ class UseWhenContext internal constructor(val builder: PipelineBuilder) {
         for ((prefix, uri) in stepConfig.inscopeNamespaces) {
             compiler.declareNamespace(prefix, uri.toString())
         }
-        for ((name, value) in builder.staticOptionsManager.useWhenOptions) {
-            compiler.declareVariable(name)
+        for ((option, value) in staticOptions) {
+            if (value != null) {
+                compiler.declareVariable(option.name)
+            }
         }
 
         val selector = compiler.compile(expr).load()
-        for ((name, value) in builder.staticOptionsManager.useWhenOptions) {
-            selector.setVariable(name, value)
+        for ((option, value) in staticOptions) {
+            if (value != null) {
+                selector.setVariable(option.name, value)
+            }
         }
+
         return selector
     }
 

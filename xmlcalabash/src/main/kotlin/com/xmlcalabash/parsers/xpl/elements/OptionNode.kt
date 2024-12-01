@@ -24,7 +24,7 @@ class OptionNode(parent: AnyNode, node: XdmNode, val name: QName, val select: St
             return
         }
 
-        super.resolveUseWhen(context)
+        computeUseWhenOnThisElement(context)
 
         if (context.staticOptions[this] == null) {
             if (useWhen == true) {
@@ -42,6 +42,7 @@ class OptionNode(parent: AnyNode, node: XdmNode, val name: QName, val select: St
 
                 context.staticOptions[this] = value
             } else {
+                useWhen = null // try again next time
                 context.staticOptions[this] = null
             }
         }
