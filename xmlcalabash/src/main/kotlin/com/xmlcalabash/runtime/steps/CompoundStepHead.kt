@@ -10,6 +10,9 @@ import com.xmlcalabash.runtime.RuntimeStepConfiguration
 import com.xmlcalabash.runtime.model.HeadModel
 import com.xmlcalabash.runtime.parameters.RuntimeStepParameters
 import net.sf.saxon.s9api.QName
+import net.sf.saxon.s9api.XdmFunctionItem
+import net.sf.saxon.s9api.XdmNode
+import net.sf.saxon.s9api.XdmNodeKind
 import net.sf.saxon.s9api.XdmValue
 import kotlin.collections.component1
 import kotlin.collections.component2
@@ -150,6 +153,12 @@ class CompoundStepHead(yconfig: RuntimeStepConfiguration, step: HeadModel): Abst
                                 default.select.contextItem = document
                                 val selected = default.select.evaluate()
                                 for (item in selected) {
+                                    if (item is XdmNode && item.nodeKind == XdmNodeKind.ATTRIBUTE) {
+                                        throw XProcError.xdInvalidSelection(item.nodeName).exception()
+                                    }
+                                    if (item is XdmFunctionItem) {
+                                        throw XProcError.xdInvalidFunctionSelection().exception()
+                                    }
                                     val itemdoc = XProcDocument.ofValue(
                                         item,
                                         document.context,
