@@ -116,7 +116,9 @@ open class LibraryInstruction(stepConfig: StepConfiguration): XProcInstruction(n
                             throw XProcError.xsDuplicateOption(name).exception()
                         }
                         newBindings[name] = opt
-                        _exportedOptions[name] = opt
+                        if (opt.visibility != Visibility.PRIVATE) {
+                            _exportedOptions[name] = opt
+                        }
                     }
 
                     for ((type, decl) in import.exportedSteps) {
@@ -124,7 +126,9 @@ open class LibraryInstruction(stepConfig: StepConfiguration): XProcInstruction(n
                             throw XProcError.xsDuplicateStepType(type).exception()
                         }
                         newStepTypes[type] = decl
-                        _exportedSteps[type] = decl
+                        if (decl.visibility != Visibility.PRIVATE) {
+                            _exportedSteps[type] = decl
+                        }
                     }
                 }
                 else -> throw XProcError.xiImpossible("Unexpected imported type: ${import}").exception()

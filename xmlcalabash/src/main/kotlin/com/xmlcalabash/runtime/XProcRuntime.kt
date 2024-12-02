@@ -32,7 +32,7 @@ class XProcRuntime private constructor(private val start: DeclareStepInstruction
 
     private lateinit var pipelines: Map<DeclareStepInstruction, SubpipelineModel>
     private lateinit var pipelineStep: CompoundStepModel
-    internal val yrunnables = mutableMapOf<QName, CompoundStepModel>()
+    internal val runnables = mutableMapOf<Long, CompoundStepModel>()
 
     fun executable(): XProcPipeline {
         return XProcPipeline(pipelineStep)
@@ -68,11 +68,13 @@ class XProcRuntime private constructor(private val start: DeclareStepInstruction
 
         for ((decl, model) in pipelines) {
             val graph = model.graph
-            val smodel = graph.models.filterIsInstance<SubpipelineModel>().filter { it.model is PipelineModel }.first()
+            val smodel = graph.models.filterIsInstance<SubpipelineModel>().first { it.model is PipelineModel }
 
             val ypipelineUserStep = CompoundStepModel(this, smodel.model)  // YAtomicCompoundStep(this, smodel)
-            // There can be at most one anonymous pipeline (the start one)
-            yrunnables[decl.type ?: anonymous] = ypipelineUserStep
+            runnables[smodel.step.id] = ypipelineUserStep
+            if (decl.type == start.type) {
+                pipelineStep = ypipelineUserStep
+            }
 
             ypipelineModels[smodel.model] = ypipelineUserStep
         }
@@ -80,8 +82,6 @@ class XProcRuntime private constructor(private val start: DeclareStepInstruction
         for ((model, step) in ypipelineModels) {
             step.initialize(model)
         }
-
-        pipelineStep = yrunnables[start.type ?: anonymous]!!
     }
 
     private fun findUsedSteps(start: DeclareStepInstruction, seen: MutableSet<DeclareStepInstruction> = mutableSetOf()): Set<DeclareStepInstruction> {

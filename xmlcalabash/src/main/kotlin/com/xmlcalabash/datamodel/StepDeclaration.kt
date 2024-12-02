@@ -12,6 +12,7 @@ abstract class StepDeclaration(parent: XProcInstruction?, stepConfig: StepConfig
         stepConfig.stepName = "!${instructionType.localName}_${stepConfig.nextId}"
     }
 
+    internal var declId: Long = -1
     var name: String
         get() = stepConfig.stepName
         set(value) {

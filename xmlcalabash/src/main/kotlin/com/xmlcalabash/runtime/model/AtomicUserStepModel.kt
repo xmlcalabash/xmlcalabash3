@@ -49,6 +49,9 @@ class AtomicUserStepModel(runtime: XProcRuntime, model: AtomicModel, private val
             }
 
             val instance = CompoundStep.newInstance(yconfig, impl)
+            instance.stepType = stepType
+            instance.stepName = name
+
             impl._inputs.clear()
             impl._inputs.putAll(saveCompoundInputs)
 

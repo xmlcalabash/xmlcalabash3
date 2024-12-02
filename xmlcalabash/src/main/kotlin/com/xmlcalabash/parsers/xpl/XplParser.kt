@@ -171,9 +171,9 @@ class XplParser(val builder: PipelineBuilder) {
             if (Ns.select !in node.attributes) {
                 errors.add(XProcError.xsMissingRequiredAttribute(Ns.select).exception())
             }
-            if (Ns.name in node.attributes && Ns.select in node.attributes) {
-                throw XProcError.xiImpossible("p:option is not an OptionNode?").exception()
-            }
+            // If we got here, it's an option that isn't static... (it would
+            // be an OptionNode if it was static...)
+            throw XProcError.xsLibraryOptionsMustBeStatic(node.node.nodeName).exception()
         }
     }
 
