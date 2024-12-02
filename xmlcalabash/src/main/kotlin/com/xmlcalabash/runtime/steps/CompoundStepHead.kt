@@ -243,4 +243,8 @@ class CompoundStepHead(yconfig: RuntimeStepConfiguration, step: HeadModel): Abst
         inputCount.clear()
         showMessage = true
     }
+
+    override fun toString(): String {
+        return "(compound step head ${id})"
+    }
 }

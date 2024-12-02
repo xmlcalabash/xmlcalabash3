@@ -31,6 +31,7 @@ open class AtomicStepInstruction(parent: XProcInstruction, instructionType: QNam
         val decl = declaration()
             ?: throw XProcError.xsMissingStepDeclaration(instructionType).exception()
 
+        declId = decl.id
         val seenPorts = mutableSetOf<String>()
         for (input in children.filterIsInstance<WithInputInstruction>()) {
             if (input.port.startsWith("Q{")) {

@@ -10,7 +10,7 @@ class ConditionalExecutionContext(stepConfig: StepConfiguration, val context: Us
             val impl = context.stepTypes[name]!!
             if (impl.resolved) {
                 //println("${name} resolved in ${context}: ${impl.isImplemented}")
-                return impl.isImplemented
+                return impl.isImplemented()
             }
             //println("${name} unresolved in ${context}")
             throw ConditionalStepException("${name}")

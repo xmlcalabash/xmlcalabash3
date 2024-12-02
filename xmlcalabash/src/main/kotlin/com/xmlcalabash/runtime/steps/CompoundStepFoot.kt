@@ -72,4 +72,8 @@ class CompoundStepFoot(yconfig: RuntimeStepConfiguration, step: FootModel): Abst
         super.reset()
         cache.clear()
     }
+
+    override fun toString(): String {
+        return "(compound step foot {$id})"
+    }
 }

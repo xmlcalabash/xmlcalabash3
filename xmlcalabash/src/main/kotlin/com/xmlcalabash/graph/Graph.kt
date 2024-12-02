@@ -62,13 +62,6 @@ class Graph private constructor() {
                 is CompoundStepDeclaration -> CompoundModel(this, node, child)
                 is AtomicExpressionStepInstruction -> {
                     AtomicModel(this, node, child as AtomicStepInstruction)
-                    /*
-                    if (child.externalName == null) {
-                        AtomicModel(this, node, child as AtomicStepInstruction)
-                    } else {
-                        AtomicOptionModel(this, node, child)
-                    }
-                     */
                 }
                 else -> AtomicModel(this, node, child as AtomicStepInstruction)
             }

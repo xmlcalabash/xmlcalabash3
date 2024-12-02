@@ -40,15 +40,6 @@ open class ElementNode(parent: AnyNode?, stepConfig: StepConfiguration, node: Xd
                 useWhen = resolved
                 context.useWhen.remove(this)
                 context.resolvedCount++
-
-                if (this is DeclareStepNode && this.type != null) {
-                    val impl = context.stepTypes[this.type]!!
-                    impl.resolved = useWhen != null
-                    if (impl.resolved) {
-                        impl.isImplemented = resolved
-                        //println("RESOLVED ${this.type} in $context")
-                    }
-                }
             }
         }
     }

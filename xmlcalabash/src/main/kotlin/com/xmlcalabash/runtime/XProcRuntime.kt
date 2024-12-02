@@ -5,17 +5,13 @@ import com.xmlcalabash.datamodel.DeclareStepInstruction
 import com.xmlcalabash.datamodel.PipelineVisualization
 import com.xmlcalabash.datamodel.StepDeclaration
 import com.xmlcalabash.graph.*
-import com.xmlcalabash.namespace.NsCx
 import com.xmlcalabash.namespace.NsDescription
 import com.xmlcalabash.runtime.model.CompoundStepModel
 import com.xmlcalabash.util.SaxonTreeBuilder
-import net.sf.saxon.s9api.QName
 import net.sf.saxon.s9api.XdmNode
 
 class XProcRuntime private constructor(private val start: DeclareStepInstruction) {
     companion object {
-        private val anonymous = QName(NsCx.namespace, "cx:anonymous")
-
         fun newInstance(start: DeclareStepInstruction): XProcRuntime {
             val runtime = XProcRuntime(start)
             val usedSteps = runtime.findUsedSteps(start)
@@ -32,7 +28,7 @@ class XProcRuntime private constructor(private val start: DeclareStepInstruction
 
     private lateinit var pipelines: Map<DeclareStepInstruction, SubpipelineModel>
     private lateinit var pipelineStep: CompoundStepModel
-    internal val yrunnables = mutableMapOf<QName, CompoundStepModel>()
+    internal val runnables = mutableMapOf<Long, CompoundStepModel>()
 
     fun executable(): XProcPipeline {
         return XProcPipeline(pipelineStep)
@@ -64,24 +60,24 @@ class XProcRuntime private constructor(private val start: DeclareStepInstruction
     private fun initialize(start: DeclareStepInstruction, pipelines: Map<DeclareStepInstruction, SubpipelineModel>) {
         this.pipelines = pipelines
 
-        val ypipelineModels = mutableMapOf<CompoundModel, CompoundStepModel>()
+        val pipelineModels = mutableMapOf<CompoundModel, CompoundStepModel>()
 
         for ((decl, model) in pipelines) {
             val graph = model.graph
-            val smodel = graph.models.filterIsInstance<SubpipelineModel>().filter { it.model is PipelineModel }.first()
+            val smodel = graph.models.filterIsInstance<SubpipelineModel>().first { it.model is PipelineModel }
 
-            val ypipelineUserStep = CompoundStepModel(this, smodel.model)  // YAtomicCompoundStep(this, smodel)
-            // There can be at most one anonymous pipeline (the start one)
-            yrunnables[decl.type ?: anonymous] = ypipelineUserStep
+            val pipelineUserStep = CompoundStepModel(this, smodel.model)  // YAtomicCompoundStep(this, smodel)
+            runnables[smodel.step.id] = pipelineUserStep
+            if (decl.type == start.type) {
+                pipelineStep = pipelineUserStep
+            }
 
-            ypipelineModels[smodel.model] = ypipelineUserStep
+            pipelineModels[smodel.model] = pipelineUserStep
         }
 
-        for ((model, step) in ypipelineModels) {
+        for ((model, step) in pipelineModels) {
             step.initialize(model)
         }
-
-        pipelineStep = yrunnables[start.type ?: anonymous]!!
     }
 
     private fun findUsedSteps(start: DeclareStepInstruction, seen: MutableSet<DeclareStepInstruction> = mutableSetOf()): Set<DeclareStepInstruction> {

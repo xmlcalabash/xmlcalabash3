@@ -8,12 +8,6 @@ import com.xmlcalabash.runtime.RuntimeStepConfiguration
 import com.xmlcalabash.runtime.model.CompoundStepModel
 
 class PipelineStep(yconfig: RuntimeStepConfiguration, compound: CompoundStepModel): GroupStep(yconfig,compound) {
-    /*
-    init {
-        println("create pipeline for ${compound}")
-    }
-     */
-
     override fun runStep() {
         if (runnables.isEmpty()) {
             instantiate()

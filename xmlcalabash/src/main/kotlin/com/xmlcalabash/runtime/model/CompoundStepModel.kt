@@ -85,7 +85,7 @@ class CompoundStepModel(runtime: XProcRuntime, model: CompoundModel): StepModel(
         for (child in cmodel.children) {
             val step = when (child) {
                 is AtomicModel -> {
-                    val userStep = runtime.yrunnables[child.step.instructionType]
+                    val userStep = runtime.runnables[child.step.declId]
                     if (userStep == null) {
                         val atomic = if (child.step is AtomicExpressionStepInstruction && child.step.externalName != null) {
                             AtomicBuiltinOptionModel(runtime, child)

@@ -42,6 +42,8 @@ abstract class CompoundStep(yconfig: RuntimeStepConfiguration, compound: Compoun
     internal val runnables = mutableListOf<AbstractStep>()
     internal val head = CompoundStepHead(yconfig, compound.head)
     internal val foot = CompoundStepFoot(yconfig, compound.foot)
+    internal var stepName: String? = null
+    internal var stepType: QName? = null
 
     override val readyToRun: Boolean
         get() = head.readyToRun
@@ -157,4 +159,9 @@ abstract class CompoundStep(yconfig: RuntimeStepConfiguration, compound: Compoun
         return stepsToRun
     }
 
+    override fun toString(): String {
+        val dispType = stepType ?: type
+        val dispName = stepName ?: name
+        return "${dispType}/${dispName} (${id})"
+    }
 }
