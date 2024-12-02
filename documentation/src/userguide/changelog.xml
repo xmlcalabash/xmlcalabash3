@@ -16,7 +16,7 @@ finer detail.</para>
 <info>
   <title>Changes in version 3.0.0-alpha3</title>
   <productnumber>3.0.0-alpha3</productnumber>
-  <date>2024-11-29</date>
+  <date>2024-12-02</date>
 </info>
 <itemizedlist>
 <listitem>
@@ -34,8 +34,15 @@ Updated the <tag>p:xinclude</tag> step so that it looks in the cache.
 authors update the cache.</para>
 </listitem>
 <listitem>
-<para>Made a bunch of improvements to static option handling. This fixed a few more tests,
-in particular the remaining <tag>p:run</tag> tests.</para>
+<para>Made a bunch of improvements to static option handling.</para>
+</listitem>
+<listitem>
+<para>Resolved the situation where two steps with the same type (private steps in different
+libraries, for example) would not work correctly.</para>
+</listitem>
+<listitem>
+<para>These changes resolved the remaining input, option, with-option, step-available, and
+<tag>p:run</tag> tests.</para>
 </listitem>
 </itemizedlist>
 </section>
