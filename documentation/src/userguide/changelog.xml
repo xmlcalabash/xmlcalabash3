@@ -12,6 +12,41 @@ See the commits and pull requests on
 <link xlink:href="https://github.com/xmlcalabash/xmlcalabash3/">the repository</link> for
 finer detail.</para>
 
+<section xml:id="r300-alpha3">
+<info>
+  <title>Changes in version 3.0.0-alpha3</title>
+  <productnumber>3.0.0-alpha3</productnumber>
+  <date>2024-12-02</date>
+</info>
+<itemizedlist>
+<listitem>
+<para>Fixed
+<link xlink:href="https://github.com/xmlcalabash/xmlcalabash3/issues/9">issue #9</link>,
+which reveals that the XPath parser is still a bit too ad hoc.</para>
+</listitem>
+<listitem>
+<para>Fixed a couple of NVDL tests by sorting out the cache for schemas.
+Updated the <tag>p:xinclude</tag> step so that it looks in the cache.
+</para>
+</listitem>
+<listitem>
+<para>Added <tag>cx:cache-add</tag> and <tag>cx:cache-delete</tag> to let pipeline
+authors update the cache.</para>
+</listitem>
+<listitem>
+<para>Made a bunch of improvements to static option handling.</para>
+</listitem>
+<listitem>
+<para>Resolved the situation where two steps with the same type (private steps in different
+libraries, for example) would not work correctly.</para>
+</listitem>
+<listitem>
+<para>These changes resolved the remaining input, option, with-option, step-available, and
+<tag>p:run</tag> tests.</para>
+</listitem>
+</itemizedlist>
+</section>
+
 <section xml:id="r300-alpha2">
 <info>
   <title>Changes in version 3.0.0-alpha2</title>
