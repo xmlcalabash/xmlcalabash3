@@ -31,7 +31,7 @@ a base URI and the <option>href</option> option is not provided.</error>
 
 <para>Irrespective of the cache URI, the step simply copies it’s <port>source</port>
 document to the <port>result</port> port. (It does not change the document’s base URI,
-even if an <option>href</option> option is provided to the <tag>cx:cache-add</tag> step.</para>
+even if an <option>href</option> option is provided to the <tag>cx:cache-add</tag> step.)</para>
 
 <para><error code="I0037">It is a <glossterm>dynamic error</glossterm> if the
 <option>fail-if-in-cache</option> option is <literal>true</literal> and the
