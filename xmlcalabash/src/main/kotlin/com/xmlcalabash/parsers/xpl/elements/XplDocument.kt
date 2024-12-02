@@ -130,11 +130,9 @@ class XplDocument(val builder: PipelineBuilder, val xml: XdmNode) {
                 decl.visible = true // visibility is ignored if the declare step is at the top level
                 if (decl.type != null) {
                     val impl = if (decl.useWhen == null) {
-                        StepImplementation(false, false)
+                        StepImplementation(false, { false })
                     } else {
-                        val available = decl.useWhen == true
-                                && (!decl.isAtomic || decl.stepConfig.rteContext.atomicStepAvailable(decl.type!!))
-                        StepImplementation(true, available)
+                        StepImplementation(true, { (decl.useWhen == true) && (!decl.isAtomic || decl.stepConfig.rteContext.atomicStepAvailable(decl.type!!)) })
                     }
                     exportedStepTypes[decl.type!!] = impl
                 }
@@ -150,11 +148,9 @@ class XplDocument(val builder: PipelineBuilder, val xml: XdmNode) {
                 for (child in decl.children.filterIsInstance<DeclareStepNode>()) {
                     if (child.visible && child.type != null) {
                         val impl = if (child.useWhen == null) {
-                            StepImplementation(false, false)
+                            StepImplementation(false, { false })
                         } else {
-                            val available = child.useWhen == true
-                                    && (!child.isAtomic || decl.stepConfig.rteContext.atomicStepAvailable(child.type!!))
-                            StepImplementation(true, available)
+                            StepImplementation(true, { (child.useWhen == true) && (!child.isAtomic || decl.stepConfig.rteContext.atomicStepAvailable(child.type!!)) })
                         }
                         exportedStepTypes[child.type!!] = impl
                     }
