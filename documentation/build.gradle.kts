@@ -326,6 +326,7 @@ tasks.register<SaxonXsltTask>("userguide") {
   dependsOn("copyUserguideResources")
   dependsOn("validateUserguide")
   dependsOn("xmlCalabashVersion")
+  finalizedBy(tasks.named("changelog"))
 
   inputs.file(layout.buildDirectory.file("version.json"))
   inputs.dir(layout.projectDirectory.dir("src/xsl"))
@@ -357,6 +358,35 @@ tasks.register<SaxonXsltTask>("userguide") {
     stream.println("{\"version\": \"${guideVersion}\", \"pubdate\": \"${xmlbuild.buildTime.get()}\"}")
     stream.close()
   }
+}
+
+tasks.register<SaxonXsltTask>("changelog_html") {
+  dependsOn("validateUserguide")
+  dependsOn("xmlCalabashVersion")
+
+  inputs.file(layout.buildDirectory.file("version.json"))
+  inputs.file(layout.projectDirectory.file("tools/changelog.xsl"))
+  outputs.file(layout.buildDirectory.file("changes.html"))
+
+  input(validateUserguide.get().outputs.getFiles().getSingleFile())
+  stylesheet(layout.projectDirectory.file("tools/changelog.xsl"))
+  output(layout.buildDirectory.file("changes.html").get())
+  parameters (
+      mapOf("version" to "r" + guideVersion.replace(".", ""))
+  )
+}
+
+tasks.register<SaxonXsltTask>("changelog") {
+  dependsOn("changelog_html")
+  inputs.file(layout.projectDirectory.file("tools/html2txt.xsl"))
+
+  doFirst {
+    Html5Parser.parse(layout.buildDirectory.file("changes.html").get().asFile,
+                      layout.buildDirectory.file("changes.xhtml").get().asFile)
+  }
+  input(layout.buildDirectory.file("changes.xhtml").get())
+  output(layout.buildDirectory.file("changes.txt").get())
+  stylesheet(layout.projectDirectory.dir("tools/html2txt.xsl"))
 }
 
 tasks.register("copyUserguideJarResources") {
