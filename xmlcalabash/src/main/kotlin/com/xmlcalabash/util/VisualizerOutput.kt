@@ -34,24 +34,20 @@ class VisualizerOutput {
                 }
             }
 
-            if (pipeCount == 1) {
-                toSvg(graphviz, root, "${basename}.pipeline.svg", "/com/xmlcalabash/pipeline2dot.xsl", 1)
-            } else {
-                for (count in 1..pipeCount) {
-                    toSvg(graphviz, root, "${basename}.pipeline.${count}.svg", "/com/xmlcalabash/pipeline2dot.xsl", count)
-                }
+            val dot = mutableListOf<String>()
+            for (count in 1..pipeCount) {
+                dot.add(toDot(root, "/com/xmlcalabash/pipeline2dot.xsl", count))
             }
+            dotSvg(graphviz, dot, "${basename}.pipeline.svg")
 
-            if (graphCount == 1) {
-                toSvg(graphviz, root, "${basename}.graph.svg", "/com/xmlcalabash/graph2dot.xsl", 1)
-            } else {
-                for (count in 1..pipeCount) {
-                    toSvg(graphviz, root, "${basename}.graph.${count}.svg", "/com/xmlcalabash/graph2dot.xsl", count)
-                }
+            //dot.clear()
+            for (count in 1..pipeCount) {
+                dot.add(toDot(root, "/com/xmlcalabash/graph2dot.xsl", count))
             }
+            dotSvg(graphviz, dot, "${basename}.graph.svg")
         }
 
-        private fun toSvg(graphviz: String, node: XdmNode, filename: String, stylesheet: String, number: Int) {
+        private fun toDot(node: XdmNode, stylesheet: String, number: Int): String {
             val builder = SaxonTreeBuilder(node.processor)
             builder.startDocument(null)
             builder.addSubtree(node)
@@ -75,18 +71,25 @@ class VisualizerOutput {
             xsltExec = xsltCompiler.compile(styleSource)
 
             transformer = xsltExec.load30()
-            val textResult = RawDestination()
+            val textResult = XdmDestination()
             transformer.applyTemplates(dotxml.asSource(), textResult)
 
+            return textResult.xdmNode.underlyingNode.stringValue
+        }
+
+        private fun dotSvg(graphviz: String, dotFiles: List<String>, filename: String) {
             val tempFile = File.createTempFile("xmlcalabash-", ".dot")
             tempFile.deleteOnExit()
 
             val dot = PrintStream(tempFile)
-            val iter = textResult.xdmValue.iterator()
-            while (iter.hasNext()) {
-                dot.print(iter.next().stringValue)
+            dot.println("digraph {")
+            dot.println("compound=true")
+            dot.println("rankdir=TB")
+            dot.println()
+            for (text in dotFiles) {
+                dot.println(text)
             }
-            dot.close()
+            dot.println("}")
 
             val rt = Runtime.getRuntime()
             val args = arrayOf(graphviz, "-Tsvg", tempFile.getAbsolutePath().toString(), "-o", filename)

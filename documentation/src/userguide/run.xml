@@ -140,21 +140,23 @@ to their traditional XML Schema and XPath URIs. The prefix
 </varlistentry>
 
 <varlistentry xml:id="cli-description">
-  <term><option>--description:<replaceable>description-file</replaceable></option>, SVG pipeline output</term>
+  <term><option>--description:<replaceable>description-file</replaceable></option>, pipeline description</term>
 <listitem>
-<para>If <phrase linkend="cc.graphviz">Graphviz</phrase> is configured, this
-option writes an SVG description of the pipeline to the <replaceable>description-file</replaceable>.
+<para>This option writes an XML description of the pipeline and the corresponding graphs
+to <filename><replaceable>description-file</replaceable>.xml</filename>.
 </para>
 </listitem>
 </varlistentry>
 
 <varlistentry xml:id="cli-graph">
-  <term><option>--graph:<replaceable>graph-file</replaceable></option>, SVG graph output</term>
+  <term><option>--graph:<replaceable>graph-file</replaceable></option>, SVG graph outputs</term>
 <listitem>
-<para>The <option>--description</option> option generates a graphical depiction of the pipeline.
-That is a description of the <emphasis>input</emphasis> to the processor. The processor does
-a number of transformations and constructs a graph to execute. The <optional>--graph</optional>
-option writes an SVG description of the constructed graph to the <replaceable>graph-file</replaceable>.
+<para>This option writes two SVG descriptions of the pipeline. The first, named
+<filename><replaceable>graph-file</replaceable>.pipeline.svg</filename>, is a “boxes and arrows”
+diagram of the pipeline(s) to run, as interpreted by XML Calabash. The second, named
+<filename><replaceable>graph-file</replaceable>.graph.svg</filename>, is a diagram
+of the graph(s) that were constructed from the pipeline(s). The XML Calabash runtime executes
+the graphs, not the pipelines.
 </para>
 </listitem>
 </varlistentry>
