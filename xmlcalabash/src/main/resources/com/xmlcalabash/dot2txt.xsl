@@ -16,13 +16,19 @@
 <xsl:variable name="nl" select="'&#10;'"/>
 
 <xsl:template match="dot:digraph">
+<!-- The digraph {} wrapper is added by the caller because
+     it may be combining several graphs into one. -->
+<!--
   <xsl:text>digraph </xsl:text>
   <xsl:value-of select="@xml:id"/>
   <xsl:text> {{&#10;</xsl:text>
   <xsl:text>compound=true{$nl}</xsl:text>
   <xsl:text>rankdir=TB{$nl}</xsl:text>
+-->
   <xsl:apply-templates/>
+<!--
   <xsl:text>}}&#10;</xsl:text>
+-->
 </xsl:template>
 
 <xsl:template match="dot:subgraph[table]">
