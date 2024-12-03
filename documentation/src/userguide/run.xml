@@ -165,7 +165,7 @@ the graphs, not the pipelines.
   <term><option>--step:<replaceable>step-name</replaceable></option>, identifies a step</term>
 <listitem>
 <para>If the input pipeline document is a <tag>p:library</tag>, this option identifies a step
-within that library to run. <emphasis>NOT YET IMPLEMENTED.</emphasis></para>
+within that library to run.</para>
 </listitem>
 </varlistentry>
 

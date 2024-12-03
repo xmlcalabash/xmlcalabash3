@@ -85,10 +85,13 @@ class XplParser(val builder: PipelineBuilder) {
             val decl = if (stepName == null) {
                 library.children.filterIsInstance<DeclareStepInstruction>().firstOrNull()
             } else {
-                library.children.filterIsInstance<DeclareStepInstruction>().filter { it.name == stepName }.firstOrNull()
+                library.children.filterIsInstance<DeclareStepInstruction>().firstOrNull { it.name == stepName }
             }
             if (decl == null) {
-                throw XProcError.xiImpossible("Failed to find step named ${stepName} in library").exception()
+                if (stepName == null) {
+                    throw XProcError.xiNoPipelineInLibrary(stepContainer.stepConfig.baseUri?.toString() ?: "-").exception()
+                }
+                throw XProcError.xiNoPipelineInLibrary(stepName, stepContainer.stepConfig.baseUri?.toString() ?: "-").exception()
             }
             return decl
         }
