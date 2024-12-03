@@ -15,6 +15,14 @@ val distributionClasspath by configurations.creating {
 
 val releaseArtifacts by configurations.consumable("releaseArtifacts")
 
+configurations.all {
+  resolutionStrategy.eachDependency {
+    if (requested.group == "xerces" && requested.name == "xercesImpl") {
+      useVersion("2.12.2")
+    }
+  }
+}
+
 dependencies {
   //implementation("net.sf.saxon:Saxon-HE:12.5")
   implementation("com.saxonica:Saxon-EE:${project.findProperty("saxonVersion")}")
