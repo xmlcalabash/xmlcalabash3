@@ -1342,6 +1342,18 @@ No runnable steps.
 cxerr:XI0036
 Invalid type value: “$1”.
 
+cxerr:XI0037
+Document already in cache: “$1”.
+
+cxerr:XI0038
+Document not in cache: “$1”.
+
+cxerr:XI0039/1
+No steps in library (“$1”).
+
+cxerr:XI0039/2
+No step named “$1” in library (“$2”).
+
 cxerr:XI0200
 Invalid command line option: $1=$2.
 

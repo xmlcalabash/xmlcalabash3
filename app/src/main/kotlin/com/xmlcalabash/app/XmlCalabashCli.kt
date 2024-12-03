@@ -91,7 +91,7 @@ class XmlCalabashCli private constructor() {
 
             evaluateOptions(xprocParser.builder, commandLine)
 
-            val declstep = xprocParser.parse(commandLine.pipeline!!.toURI())
+            val declstep = xprocParser.parse(commandLine.pipeline!!.toURI(), commandLine.step)
             val runtime = declstep.runtime()
             val pipeline = runtime.executable()
 
