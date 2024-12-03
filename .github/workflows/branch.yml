@@ -103,6 +103,7 @@ jobs:
           draft: false
           prerelease: false
           fail_on_unmatched_files: true
+          body_path: documentation/build/changes.txt
           files: |
             app/build/distributions/xmlcalabash-${{ env.CI_TAG }}.zip
 
