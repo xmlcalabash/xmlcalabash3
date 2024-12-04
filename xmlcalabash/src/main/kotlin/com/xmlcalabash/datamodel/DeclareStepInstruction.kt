@@ -194,7 +194,7 @@ class DeclareStepInstruction(parent: XProcInstruction?, stepConfig: StepConfigur
                 is DeclareStepInstruction -> {
                     import.findDeclarations(stepTypes, emptyMap(), bindings)
                     if (import.type != null && import.visibility != Visibility.PRIVATE) {
-                        if (newStepTypes.containsKey(import.type)) {
+                        if (newStepTypes.containsKey(import.type) && import !== newStepTypes[import.type]) {
                             throw XProcError.xsDuplicateStepType(import.type!!).exception()
                         }
                         newStepTypes[import.type!!] = import
@@ -203,14 +203,14 @@ class DeclareStepInstruction(parent: XProcInstruction?, stepConfig: StepConfigur
                 is LibraryInstruction -> {
                     import.findDeclarations(stepTypes, emptyMap(), bindings)
                     for ((name, opt) in import.exportedOptions) {
-                        if (newBindings.containsKey(name)) {
+                        if (newBindings.containsKey(name) && opt !== newBindings[name]) {
                             throw XProcError.xsDuplicateOption(name).exception()
                         }
                         newBindings[name] = opt
                     }
 
                     for ((type, decl) in import.exportedSteps) {
-                        if (newStepTypes.containsKey(type)) {
+                        if (newStepTypes.containsKey(type) && decl !== newStepTypes[type]) {
                             throw XProcError.xsDuplicateStepType(type).exception()
                         }
                         newStepTypes[type] = decl
