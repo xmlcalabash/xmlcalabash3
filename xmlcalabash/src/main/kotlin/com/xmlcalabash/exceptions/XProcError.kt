@@ -375,6 +375,7 @@ class XProcError private constructor(val code: QName, val variant: Int, val loca
         _throwable = error.throwable
         stackTrace.addAll(error.stackTrace)
     }
+
     private constructor(error: XProcError, location: Location, inputLocation: Location): this(error.code, error.variant, location, inputLocation, *error.details) {
         _throwable = error.throwable
         stackTrace.addAll(error.stackTrace)
@@ -448,6 +449,10 @@ class XProcError private constructor(val code: QName, val variant: Int, val loca
         // N.B. mutates the object, doesn't make a copy
         stackTrace.push(frame)
         return this
+    }
+
+    fun with(newCode: QName): XProcError {
+        return XProcError(newCode, 1, location, inputLocation)
     }
 
     fun exception(): XProcException {
