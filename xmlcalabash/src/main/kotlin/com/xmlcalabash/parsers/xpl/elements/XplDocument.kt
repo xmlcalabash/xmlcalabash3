@@ -65,12 +65,12 @@ class XplDocument(val builder: PipelineBuilder, val xml: XdmNode) {
                         }
                         NsP.option -> {
                             if (node.getAttributeValue(Ns.name) != null
-                                && node.getAttributeValue(Ns.select) != null
                                 && node.getAttributeValue(Ns.static) != null
                                 && parseBoolean(node.getAttributeValue(Ns.static))) {
                                 try {
                                     val name = tree.stepConfig.parseQName(node.getAttributeValue(Ns.name))
-                                    OptionNode(tree, node, name, node.getAttributeValue(Ns.select)!!)
+                                    var defaultValue = node.getAttributeValue(Ns.select) ?: "()"
+                                    OptionNode(tree, node, name, defaultValue)
                                 } catch (ex: Exception) {
                                     ElementNode(tree, node)
                                 }
