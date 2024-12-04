@@ -37,8 +37,13 @@ Cannot read URI “$1”: “$2”.
 It is a dynamic error if the resource referenced by the href option does not
 exist, cannot be accessed or is not a file.
 
-XD0015
+XD0015/1
 Invalid QName: “$1”.
+It is a dynamic error if a QName is specified and it cannot be resolved with the
+in-scope namespace declarations.
+
+XD0015/2
+No namespace binding in scope: $1
 It is a dynamic error if a QName is specified and it cannot be resolved with the
 in-scope namespace declarations.
 

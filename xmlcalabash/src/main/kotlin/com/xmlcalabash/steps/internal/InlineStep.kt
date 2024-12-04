@@ -36,6 +36,9 @@ open class InlineStep(val params: InlineStepParameters): AbstractAtomicStep() {
             try {
                 params.filter.expandValueTemplates(contextItem, options)
             } catch (ex: SaxonApiException) {
+                if (ex.message != null && ex.message!!.contains("Namespace prefix") && ex.message!!.contains("has not been declared")) {
+                    throw XProcError.xdNoBindingInScope(ex.message!!).exception()
+                }
                 throw XProcError.xsXPathStaticError(ex.message ?: "").exception(ex)
             }
         }
