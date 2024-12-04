@@ -59,7 +59,7 @@ class RuntimeExecutionContext(val xmlCalabash: XmlCalabash): ExecutionContext {
     override val vendor = XmlCalabashBuildConfig.VENDOR_NAME
     override val vendorUri = XmlCalabashBuildConfig.VENDOR_URI
     override val version = "3.0"
-    override val xpathVersion = "3.0"
+    override val xpathVersion = "3.1"
 
     // N.B. This relies on proper initialization of the thread-local episode on XmlCalabash
     override val episode: String
