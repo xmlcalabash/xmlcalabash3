@@ -1,6 +1,7 @@
 package com.xmlcalabash.testdriver
 
 import com.xmlcalabash.config.XmlCalabash
+import com.xmlcalabash.exceptions.XProcException
 import com.xmlcalabash.util.SaxonTreeBuilder
 import net.sf.saxon.s9api.QName
 import java.io.*
@@ -286,6 +287,17 @@ class TestDriver(val testOptions: TestOptions, val exclusions: Map<String, Strin
             } else {
                 if (test.status.status == "fail") {
                     report.addStartElement(NsReport.failure)
+                    if (test.status.error != null) {
+                        if (test.status.expectedCodes.isNotEmpty()) {
+                            if (test.status.expectedCodes.size == 1) {
+                                report.addText("Expected ${test.status.expectedCodes[0]}, raised ${test.status.error!!.code}")
+                            } else {
+                                report.addText("Expected ${test.status.expectedCodes}, raised ${test.status.error!!.code}")
+                            }
+                        } else {
+                            report.addText("Expected pass, raised ${test.status.error!!.code}")
+                        }
+                    }
                     report.addEndElement()
                 }
 
