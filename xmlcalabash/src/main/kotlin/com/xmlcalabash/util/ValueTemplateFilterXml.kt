@@ -115,6 +115,23 @@ class ValueTemplateFilterXml(val stepConfig: StepConfiguration, val originalNode
                     NsP.inlineExpandText
                 }
 
+                // Do the attributes before evaluating the new expand-text value because
+                // changing the value only applies to descendants...
+                val attrMap = mutableMapOf<QName, String?>()
+                if (onlyChecking) {
+                    attrMap[NsP.inlineExpandText] = expand.toString()
+                }
+                node.axisIterator(Axis.ATTRIBUTE).forEach { attr ->
+                    if (attr.nodeName != inlineAttribute && attr.nodeName != NsP.inlineExpandText) {
+                        val value = if (expand) {
+                            considerValueTemplates(node, attr.stringValue)
+                        } else {
+                            attr.stringValue
+                        }
+                        attrMap[attr.nodeName] = value
+                    }
+                }
+
                 val newExpand = if (onlyChecking) {
                     node.getAttributeValue(inlineAttribute)
                 } else {
@@ -135,21 +152,6 @@ class ValueTemplateFilterXml(val stepConfig: StepConfiguration, val originalNode
                 }
 
                 expandText.push(expand)
-
-                val attrMap = mutableMapOf<QName, String?>()
-                if (onlyChecking) {
-                    attrMap[NsP.inlineExpandText] = expand.toString()
-                }
-                node.axisIterator(Axis.ATTRIBUTE).forEach { attr ->
-                    if (attr.nodeName != inlineAttribute && attr.nodeName != NsP.inlineExpandText) {
-                        val value = if (expand) {
-                            considerValueTemplates(node, attr.stringValue)
-                        } else {
-                            attr.stringValue
-                        }
-                        attrMap[attr.nodeName] = value
-                    }
-                }
 
                 builder.addStartElement(node, stepConfig.attributeMap(attrMap))
                 node.axisIterator(Axis.CHILD).forEach { filterValueTemplates(builder, it) }
