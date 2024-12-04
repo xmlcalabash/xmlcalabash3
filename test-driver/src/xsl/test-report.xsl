@@ -166,7 +166,9 @@
         <xsl:otherwise>{format-number($time, '0.0000')}</xsl:otherwise>
       </xsl:choose>
     </td>
-    <td></td>
+    <td>
+      <xsl:value-of select="failure"/>
+    </td>
   </tr>
 </xsl:template>
 
