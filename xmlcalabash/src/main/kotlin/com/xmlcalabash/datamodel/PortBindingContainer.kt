@@ -53,6 +53,15 @@ open class PortBindingContainer(parent: XProcInstruction, stepConfig: StepConfig
                 _select = null
             } else {
                 _select = value.cast(parent!!.stepConfig.parseSequenceType("item()*"))
+                for (name in _select!!.details.variableRefs) {
+                    val ref = inscopeVariables[name]
+                    if (ref == null) {
+                        throw XProcError.xsXPathStaticError(name).exception()
+                    }
+                    if (ref.canBeResolvedStatically()) {
+                        _select!!.setStaticBinding(name, ref.select!!)
+                    }
+                }
             }
         }
 
