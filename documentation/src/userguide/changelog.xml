@@ -22,6 +22,11 @@ finer detail.</para>
 <listitem>
 <para>T.B.D.</para>
 </listitem>
+<listitem>
+<para>Resolved the remaining <tag>p:validate-with-json-schema</tag> test failures. Updated
+to <link xlink:href="https://github.com/networknt/json-schema-validator">json-schema-validator</link>
+version 1.5.4. This required adding a dependency on GraalVM’s polyglot JavaScript library.
+</para>
 </itemizedlist>
 </section>
 

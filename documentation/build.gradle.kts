@@ -229,7 +229,8 @@ tasks.register<SaxonXsltTask>("reference") {
           "dep_tukaaniXz" to project.findProperty("tukaaniXz").toString(),
           "dep_flexmarkAll" to project.findProperty("flexmarkAll").toString(),
           "dep_uuidCreator" to project.findProperty("uuidCreator").toString(),
-          "dep_jsonSchemaValidator" to project.findProperty("jsonSchemaValidator").toString()
+          "dep_jsonSchemaValidator" to project.findProperty("jsonSchemaValidator").toString(),
+          "dep_graalvmJS" to project.findProperty("graalvmJS").toString()
       )
   )
 

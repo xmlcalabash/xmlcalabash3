@@ -38,6 +38,7 @@ val dep_htmlparser = project.findProperty("htmlparser").toString()
 val dep_httpClient = project.findProperty("httpClient").toString()
 val dep_jing = project.findProperty("jing").toString()
 val dep_jsonSchemaValidator = project.findProperty("jsonSchemaValidator").toString()
+val dep_graalvmJS = project.findProperty("graalvmJS").toString()
 val dep_schxslt = project.findProperty("schxslt").toString()
 val dep_sinclude = project.findProperty("sinclude").toString()
 val dep_slf4j = project.findProperty("slf4j").toString()
@@ -67,6 +68,7 @@ dependencies {
     exclude(group="net.sf.saxon", module="Saxon-HE")
   }
   implementation("com.networknt:json-schema-validator:${dep_jsonSchemaValidator}")
+  implementation("org.graalvm.polyglot:js:${dep_graalvmJS}")
   implementation("org.xmlresolver:xmlresolver:${dep_xmlResolver}")
 
   // I was using log4j but httpclient5 uses slf4j.
@@ -105,6 +107,7 @@ buildConfig {
                   "httpClient",
                   "jing",
                   "jsonSchemaValidator",
+                  "graalvmJS",
                   "schxslt",
                   "sinclude",
                   "slf4j",

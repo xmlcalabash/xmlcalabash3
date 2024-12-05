@@ -309,6 +309,8 @@ class XProcError private constructor(val code: QName, val variant: Int, val loca
         fun xcNotSchemaValidXmlSchema(uri: URI, message: String) = step(Pair(156, 2), uri, message)
         fun xcCopyDirectoryToFile(source: URI, target: URI) = step(157, source, target)
         fun xcMoveDirectoryToFile(source: URI, target: URI) = step(158, source, target)
+        fun xcJsonSchemaNotSupported() = step(Pair(163, 1))
+        fun xcJsonSchemaNotSupported(uri: URI) = step(Pair(163, 2), uri)
         fun xcJsonSchemaInvalid() = step(Pair(164, 1))
         fun xcJsonSchemaInvalid(uri: URI) = step(Pair(164, 2), uri)
         fun xcNotSchemaValidJson() = step(Pair(165, 1))
