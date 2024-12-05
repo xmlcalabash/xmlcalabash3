@@ -40,7 +40,7 @@ class VisualizerOutput {
             }
             dotSvg(graphviz, dot, "${basename}.pipeline.svg")
 
-            //dot.clear()
+            dot.clear()
             for (count in 1..pipeCount) {
                 dot.add(toDot(root, "/com/xmlcalabash/graph2dot.xsl", count))
             }
