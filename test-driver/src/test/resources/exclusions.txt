@@ -22,7 +22,5 @@ ab-import-functions-028 because XQuery function imports require a namespace
 ab-import-functions-029 because XQuery function imports require a namespace
 ab-import-functions-030 because XQuery function imports require a namespace
 ab-import-functions-031 because XQuery function imports require a namespace
-ab-override-content-types-005 because https://github.com/xproc/3.0-test-suite/issues/747
-ab-override-content-types-015 because https://github.com/xproc/3.0-test-suite/issues/747
 ab-step-available-061 because I think it should raise err:XS0115
 ab-step-available-064 because I think it should raise err:XS0115 (dup of 061?)
