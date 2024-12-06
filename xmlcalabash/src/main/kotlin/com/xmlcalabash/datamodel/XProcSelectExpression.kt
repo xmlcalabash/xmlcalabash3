@@ -1,11 +1,14 @@
 package com.xmlcalabash.datamodel
 
 import com.xmlcalabash.exceptions.XProcError
+import com.xmlcalabash.exceptions.XProcException
+import com.xmlcalabash.namespace.NsErr
 import com.xmlcalabash.util.XProcCollectionFinder
 import net.sf.saxon.s9api.SaxonApiException
 import net.sf.saxon.s9api.SequenceType
 import net.sf.saxon.s9api.XdmAtomicValue
 import net.sf.saxon.s9api.XdmValue
+import net.sf.saxon.type.BuiltInAtomicType
 
 class XProcSelectExpression private constructor(stepConfig: StepConfiguration, val select: String, asType: SequenceType, collection: Boolean, values: List<XdmAtomicValue>): XProcExpression(stepConfig, asType, collection, values) {
     companion object {
@@ -87,7 +90,14 @@ class XProcSelectExpression private constructor(stepConfig: StepConfiguration, v
         teardownExecutionContext()
 
         if (asType !== SequenceType.ANY || values.isNotEmpty()) {
-            return stepConfig.checkType(null, result, asType, values)
+            try {
+                return stepConfig.checkType(null, result, asType, values)
+            } catch (ex: XProcException) {
+                if (ex.error.code == NsErr.xd(36) && asType.underlyingSequenceType.primaryType == BuiltInAtomicType.QNAME) {
+                    throw ex.error.with(NsErr.xd(61)).exception()
+                }
+                throw ex
+            }
         }
 
         computedValue = result

@@ -55,21 +55,13 @@ class SaxonValueConverter(val processor: Processor): ValueConverter {
 
         val pos = name.indexOf(":")
         if (pos < 0) {
-            try {
-                return QName(defaultNamespace, parseNCName(name))
-            } catch (ex: XProcException) {
-                throw ex.error.with(NsErr.xd(61)).exception()
-            }
+            return QName(defaultNamespace, parseNCName(name))
         }
 
         val prefix = parseNCName(name.substring(0, pos))
         if (inscopeNamespaces.containsKey(prefix)) {
             parseNCName(name.substring(pos+1)) // check that the local name is an NCName
-            try {
-                return QName(inscopeNamespaces[prefix], name)
-            } catch (ex: XProcException) {
-                throw ex.error.with(NsErr.xd(61)).exception()
-            }
+            return QName(inscopeNamespaces[prefix], name)
         } else {
             throw XProcError.xdInvalidPrefix(name, prefix).exception()
         }
