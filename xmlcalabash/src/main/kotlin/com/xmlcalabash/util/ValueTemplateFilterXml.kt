@@ -263,6 +263,10 @@ class ValueTemplateFilterXml(val stepConfig: StepConfiguration, val originalNode
                             when (ex) {
                                 is XProcException -> throw ex
                                 is SaxonApiException -> {
+                                    val message = ex.message ?: ""
+                                    if (message.contains("Cannot find a") && message.contains("function named")) {
+                                        throw XProcError.xsXPathStaticError(message).exception(ex)
+                                    }
                                     throw XProcError.xdValueTemplateError(ex.message ?: "").exception(ex)
                                 }
                                 else -> {
