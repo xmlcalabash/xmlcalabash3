@@ -265,7 +265,7 @@ class TestDriver(val testOptions: TestOptions, val exclusions: Map<String, Strin
         val rte = saxonConfig.rteContext
         property(report, "processor", rte.productName)
         property(report, "version", rte.productVersion)
-        property(report, "githash", rte.gitHash)
+        property(report, "gitHash", rte.gitHash)
         property(report, "saxonVersion", "${saxonConfig.processor.saxonProductVersion}/${saxonConfig.processor.saxonEdition}")
         property(report, "vendor", rte.vendor)
         property(report, "vendorURI", rte.vendorUri)
