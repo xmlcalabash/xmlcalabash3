@@ -940,7 +940,7 @@ class XplParser(val builder: PipelineBuilder) {
                                 atomic.setExtensionAttribute(name, value)
                             } else {
                                 if (atomic.expandText == true) {
-                                    atomic.withOption(name, XProcExpression.avt(atomic.stepConfig, value))
+                                    atomic.withOption(name, XProcExpression.shortcut(atomic.stepConfig, value))
                                 } else {
                                     atomic.withOption(name, XProcExpression.constant(atomic.stepConfig, XdmAtomicValue(value)))
                                 }

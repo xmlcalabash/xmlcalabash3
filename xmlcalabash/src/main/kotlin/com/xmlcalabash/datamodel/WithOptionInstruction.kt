@@ -3,6 +3,7 @@ package com.xmlcalabash.datamodel
 import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.namespace.Ns
 import com.xmlcalabash.namespace.NsP
+import net.sf.saxon.ma.arrays.ArrayItemType
 import net.sf.saxon.ma.map.MapType
 import net.sf.saxon.s9api.QName
 import net.sf.saxon.s9api.XdmAtomicValue
@@ -17,13 +18,19 @@ open class WithOptionInstruction(parent: XProcInstruction, name: QName, stepConf
         } else {
             asType = asType ?: stepConfig.parseSequenceType("item()*")
 
-            // This is a hack. When parsing an XProc grammar, we don't know the types of the options.
-            // An option shortcut is an AVT, *unless* the underlying type is a map or array.
-            // Now we know the underlying type, patch if we have to.
-            if (asType!!.underlyingSequenceType.primaryType is MapType && select is XProcAvtExpression) {
-                val avt = select as XProcAvtExpression
-                val expr = XProcExpression.select(avt.stepConfig, avt.toString(), asType!!, avt.collection, optionValues)
-                _select = expr
+            if (select is XProcShortcutExpression) {
+                val shortcut = select as XProcShortcutExpression
+                // This is a hack. When parsing an XProc grammar, we don't know the types of the options.
+                // An option shortcut is an AVT, *unless* the underlying type is a map or array.
+                // Now we know the underlying type...
+                val primaryType = asType!!.underlyingSequenceType.primaryType
+                if (primaryType is MapType || primaryType is ArrayItemType) {
+                    val expr = XProcExpression.select(shortcut.stepConfig, shortcut.shortcut, asType!!, shortcut.collection, optionValues)
+                    _select = expr
+                } else {
+                    val avt = XProcExpression.avt(shortcut.stepConfig, shortcut.shortcut, asType!!, optionValues)
+                    _select = avt
+                }
             }
 
             select = select!!.cast(asType!!, optionValues)

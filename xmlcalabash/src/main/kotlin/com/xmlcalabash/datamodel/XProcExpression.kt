@@ -25,6 +25,10 @@ abstract class XProcExpression(val stepConfig: StepConfiguration, val asType: Se
             return avt(stepConfig, ValueTemplateParser.parse(avt), asType, values)
         }
 
+        fun shortcut(stepConfig: StepConfiguration, shortcut: String, asType: SequenceType = SequenceType.ANY, values: List<XdmAtomicValue> = emptyList()): XProcShortcutExpression {
+            return XProcShortcutExpression.newInstance(stepConfig, shortcut, asType, values)
+        }
+
         internal fun avt(stepConfig: StepConfiguration, avt: ValueTemplate, asType: SequenceType = SequenceType.ANY, values: List<XdmAtomicValue> = emptyList()): XProcAvtExpression {
             val expr = XProcAvtExpression.newInstance(stepConfig, avt, asType, values)
 
