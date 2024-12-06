@@ -510,7 +510,7 @@ class XplParser(val builder: PipelineBuilder) {
     private fun parseImportFunctions(instruction: StepContainerInterface, node: ElementNode) {
         val href = node.attributes[Ns.href] ?: throw XProcError.xsMissingRequiredAttribute(Ns.href).exception()
         val contentType = node.attributes[Ns.contentType]?.let { MediaType.parse(it) }
-        val namespace = node.attributes[Ns.namespace]?.let { NamespaceUri.of(it) }
+        val namespace = node.attributes[Ns.namespace]
 
         val stepConfig = (instruction as XProcInstruction).stepConfig
         val uri = stepConfig.resolve(href)

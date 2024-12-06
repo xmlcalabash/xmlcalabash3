@@ -16,7 +16,7 @@ class ImportFunctionsNode(parent: AnyNode, node: XdmNode): ElementNode(parent, n
         try {
             val import = ImportFunctionsInstruction(null, parent.stepConfig, href)
             contentType?.let { import.contentType = MediaType.parse(it) }
-            namespace?.let { import.namespace = NamespaceUri.of(it) }
+            namespace?.let { import.namespace = it }
             import.prefetch()
         } catch (ex: Exception) {
             logger.debug { "Prefetch of p:import-functions in XPL parse failed: ${ex.message}" }

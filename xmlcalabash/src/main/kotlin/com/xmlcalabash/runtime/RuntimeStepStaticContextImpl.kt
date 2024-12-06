@@ -55,7 +55,7 @@ open class RuntimeStepStaticContextImpl(
     }
 
     private fun copyNew(config: SaxonConfiguration): RuntimeStepStaticContextImpl {
-        val stepConfig = RuntimeStepStaticContextImpl(config, config.rteContext, standardSteps)
+        val stepConfig = RuntimeStepStaticContextImpl(config.newConfiguration(), config.rteContext, standardSteps)
         stepConfig._location = location
         stepConfig._inscopeStepTypes.putAll(_inscopeStepTypes)
         stepConfig._inscopeNamespaces.putAll(_inscopeNamespaces)
