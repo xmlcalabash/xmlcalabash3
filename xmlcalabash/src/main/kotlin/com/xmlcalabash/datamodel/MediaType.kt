@@ -19,6 +19,8 @@ class MediaType private constructor(val mediaType: String, val mediaSubtype: Str
         val XHTML = MediaType("application", "xhtml+xml")
         val ZIP = MediaType("application", "zip")
         val PDF = MediaType("application", "pdf")
+        val XSLT = MediaType("application", "xslt+xml")
+        val XQUERY = MediaType("application", "xquery")
         val MULTIPART = MediaType("multipart", "*")
         val MULTIPART_MIXED = MediaType("multipart", "mixed")
 

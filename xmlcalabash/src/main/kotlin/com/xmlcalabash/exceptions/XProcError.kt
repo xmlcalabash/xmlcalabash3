@@ -126,6 +126,7 @@ class XProcError private constructor(val code: QName, val variant: Int, val loca
         fun xsInvalidAttribute(name: QName) = static(Pair(100, 3), name)
         fun xsInvalidValues(value: String) = static(101, value)
         fun xsDifferentPrimaryOutputs() = static(102)
+        fun xsUnknownFunctionMediaType(type: String) = static(104, type)
         fun xsImportFunctionsUnloadable(uri: URI) = static(106, uri)
         fun xsXPathStaticError(msg: String) = static(Pair(107,1), msg)
         fun xsXPathStaticError(name: QName) = static(Pair(107,2), name)

@@ -45,21 +45,21 @@ class ImportFunctionsInstruction(parent: XProcInstruction?, stepConfig: StepConf
         }
 
         val ctype = if (contentType == null) {
-            stepConfig.mimeTypes.getContentType(href.toString())
+            MediaType.parse(stepConfig.mimeTypes.getContentType(href.toString()))
         } else {
-            contentType.toString()
+            contentType!!
         }
-
-        val ns = namespace?.toString()
 
         try {
             val url = href.toURL()
             val conn = url.openConnection()
 
-            _functionLibrary = if (ctype.contains("xsl")) {
-                loadXsltLibrary(conn)
-            } else {
-                loadXQueryLibrary(conn)
+            _functionLibrary = when (ctype) {
+                MediaType.XSLT -> loadXsltLibrary(conn)
+                MediaType.XQUERY -> loadXQueryLibrary(conn)
+                else -> {
+                    throw XProcError.xsUnknownFunctionMediaType(ctype.toString()).exception()
+                }
             }
 
             if (functionLibrary != null) {
