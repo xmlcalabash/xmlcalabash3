@@ -1,7 +1,9 @@
 package com.xmlcalabash.util
 
 import com.xmlcalabash.exceptions.XProcError
+import com.xmlcalabash.exceptions.XProcException
 import com.xmlcalabash.namespace.Ns
+import com.xmlcalabash.namespace.NsErr
 import com.xmlcalabash.namespace.NsFn
 import com.xmlcalabash.namespace.NsXs
 import com.xmlcalabash.runtime.ValueConverter
@@ -53,13 +55,21 @@ class SaxonValueConverter(val processor: Processor): ValueConverter {
 
         val pos = name.indexOf(":")
         if (pos < 0) {
-            return QName(defaultNamespace, parseNCName(name))
+            try {
+                return QName(defaultNamespace, parseNCName(name))
+            } catch (ex: XProcException) {
+                throw ex.error.with(NsErr.xd(61)).exception()
+            }
         }
 
         val prefix = parseNCName(name.substring(0, pos))
         if (inscopeNamespaces.containsKey(prefix)) {
             parseNCName(name.substring(pos+1)) // check that the local name is an NCName
-            return QName(inscopeNamespaces[prefix], name)
+            try {
+                return QName(inscopeNamespaces[prefix], name)
+            } catch (ex: XProcException) {
+                throw ex.error.with(NsErr.xd(61)).exception()
+            }
         } else {
             throw XProcError.xdInvalidPrefix(name, prefix).exception()
         }

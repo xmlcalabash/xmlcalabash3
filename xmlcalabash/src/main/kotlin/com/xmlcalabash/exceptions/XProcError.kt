@@ -162,6 +162,7 @@ class XProcError private constructor(val code: QName, val variant: Int, val loca
         fun xdBadBase64Input() = dynamic(40)
         fun xdBadOutputContentType(port: String, type: String) = dynamic(42, port, type)
         fun xdNotWellFormed() = dynamic(49)
+        fun xdValueTemplateError(message: String) = dynamic(50, message)
         fun xdInvalidAvtResult(result: String) = dynamic(51, result)
         fun xdEncodingWithXmlOrHtml(encoding: String) = dynamic(54, encoding)
         fun xdEncodingRequired(charset: String) = dynamic(55, charset)

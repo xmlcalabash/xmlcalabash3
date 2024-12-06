@@ -263,10 +263,7 @@ class ValueTemplateFilterXml(val stepConfig: StepConfiguration, val originalNode
                             when (ex) {
                                 is XProcException -> throw ex
                                 is SaxonApiException -> {
-                                    if (ex.message?.contains("cannot be converted") == true) {
-                                        throw XProcError.xdBadType(ex.message!!).exception()
-                                    }
-                                    throw ex
+                                    throw XProcError.xdValueTemplateError(ex.message ?: "").exception(ex)
                                 }
                                 else -> {
                                     throw XProcError.xdInvalidAvtResult(avt.value[index]).exception(ex)
