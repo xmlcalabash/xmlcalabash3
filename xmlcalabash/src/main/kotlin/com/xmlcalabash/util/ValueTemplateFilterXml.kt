@@ -257,6 +257,11 @@ class ValueTemplateFilterXml(val stepConfig: StepConfiguration, val originalNode
                         builder.addSubtree(value)
                     } catch (ex: Exception) {
                         if (onlyChecking) {
+                            val message = ex.message ?: ""
+                            // An unknown function is always a static error...
+                            if (message.contains("Cannot find a") && message.contains("argument function named")) {
+                                throw XProcError.xsXPathStaticError(message).exception(ex)
+                            }
                             static = false
                             builder.addText("{${avt.value[index]}}")
                         } else {
