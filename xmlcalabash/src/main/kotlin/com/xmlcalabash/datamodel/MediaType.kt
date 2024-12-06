@@ -16,10 +16,10 @@ class MediaType private constructor(val mediaType: String, val mediaSubtype: Str
         val JSON = MediaType("application", "json")
         val YAML = MediaType("application", "vnd.yaml")
         val HTML = MediaType("text", "html")
-        val XHTML = MediaType("application", "xhtml+xml")
+        val XHTML = MediaType("application", "xhtml", "xml")
         val ZIP = MediaType("application", "zip")
         val PDF = MediaType("application", "pdf")
-        val XSLT = MediaType("application", "xslt+xml")
+        val XSLT = MediaType("application", "xslt", "xml")
         val XQUERY = MediaType("application", "xquery")
         val MULTIPART = MediaType("multipart", "*")
         val MULTIPART_MIXED = MediaType("multipart", "mixed")
@@ -378,7 +378,9 @@ class MediaType private constructor(val mediaType: String, val mediaSubtype: Str
 
     override fun equals(other: Any?): Boolean {
         return when (other) {
-            is MediaType -> return mediaType == other.mediaType && mediaSubtype == other.mediaSubtype
+            is MediaType -> {
+                return mediaType == other.mediaType && mediaSubtype == other.mediaSubtype
+            }
             else -> false
         }
     }
