@@ -41,8 +41,7 @@ class CompoundStepModel(runtime: XProcRuntime, model: CompoundModel): StepModel(
                 val finputs = mutableMapOf<String, RuntimePort>()
                 finputs.putAll(inputs)
                 //finputs.remove("!source")
-                params = ViewportStepParameters(type, name, location, finputs, outputs, options,
-                    (cmodel.step as ViewportInstruction).match)
+                params = ViewportStepParameters(type, name, location, finputs, outputs, options)
             }
             NsP.catch -> {
                 params = TryCatchStepParameters(type, name, location, inputs, outputs, options,

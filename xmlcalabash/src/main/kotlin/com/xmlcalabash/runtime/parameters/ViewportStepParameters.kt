@@ -11,6 +11,5 @@ open class ViewportStepParameters(
     location: Location,
     inputManifold: Map<String, RuntimePort>,
     outputManifold: Map<String, RuntimePort>,
-    optionManifold: Map<QName, RuntimeOption>,
-    val match: String
+    optionManifold: Map<QName, RuntimeOption>
 ): RuntimeStepParameters(stepType, stepName, location, inputManifold, outputManifold, optionManifold)

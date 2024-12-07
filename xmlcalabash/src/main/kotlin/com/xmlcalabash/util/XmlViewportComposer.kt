@@ -1,14 +1,14 @@
 package com.xmlcalabash.util
 
+import com.xmlcalabash.config.XProcStepConfiguration
 import com.xmlcalabash.datamodel.MediaType
-import com.xmlcalabash.namespace.Ns
+import com.xmlcalabash.documents.DocumentProperties
 import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.exceptions.XProcError
+import com.xmlcalabash.namespace.Ns
 import com.xmlcalabash.namespace.NsCx
 import com.xmlcalabash.runtime.ProcessMatch
 import com.xmlcalabash.runtime.ProcessMatchingNodes
-import com.xmlcalabash.documents.DocumentProperties
-import com.xmlcalabash.config.XProcStepConfiguration
 import net.sf.saxon.om.AttributeMap
 import net.sf.saxon.s9api.QName
 import net.sf.saxon.s9api.XdmNode

@@ -679,7 +679,7 @@ class XplParser(val builder: PipelineBuilder) {
 
         val attributeMapping = mapOf<QName, (String) -> Unit>(
             Ns.name to { value -> viewport.name = value },
-            Ns.match to { value -> viewport.match = value }
+            Ns.match to { value -> viewport.match = XProcExpression.match(viewport.stepConfig, value) }
         )
 
         processAttributes(node, viewport, attributeMapping)

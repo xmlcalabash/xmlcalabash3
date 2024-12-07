@@ -25,12 +25,7 @@ class XProcSelectExpression private constructor(stepConfig: StepConfiguration, v
         return { evaluate() }
     }
 
-    private var computedValue: XdmValue? = null
     override fun evaluate(): XdmValue {
-        if (computedValue != null) {
-            return computedValue!!
-        }
-
         val compiler = stepConfig.processor.newXPathCompiler()
         if (stepConfig.processor.isSchemaAware) {
             compiler.isSchemaAware = true
@@ -100,7 +95,6 @@ class XProcSelectExpression private constructor(stepConfig: StepConfiguration, v
             }
         }
 
-        computedValue = result
         return result
     }
 

@@ -18,22 +18,28 @@ open class WithOptionInstruction(parent: XProcInstruction, name: QName, stepConf
         } else {
             asType = asType ?: stepConfig.parseSequenceType("item()*")
 
-            if (select is XProcShortcutExpression) {
-                val shortcut = select as XProcShortcutExpression
-                // This is a hack. When parsing an XProc grammar, we don't know the types of the options.
-                // An option shortcut is an AVT, *unless* the underlying type is a map or array.
-                // Now we know the underlying type...
-                val primaryType = asType!!.underlyingSequenceType.primaryType
-                if (primaryType is MapType || primaryType is ArrayItemType) {
-                    val expr = XProcExpression.select(shortcut.stepConfig, shortcut.shortcut, asType!!, shortcut.collection, optionValues)
-                    _select = expr
-                } else {
-                    val avt = XProcExpression.avt(shortcut.stepConfig, shortcut.shortcut, asType!!, optionValues)
-                    _select = avt
+            when (select) {
+                is XProcShortcutExpression -> {
+                    val shortcut = select as XProcShortcutExpression
+                    // This is a hack. When parsing an XProc grammar, we don't know the types of the options.
+                    // An option shortcut is an AVT, *unless* the underlying type is a map or array.
+                    // Now we know the underlying type...
+                    val primaryType = asType!!.underlyingSequenceType.primaryType
+                    if (primaryType is MapType || primaryType is ArrayItemType) {
+                        val expr = XProcExpression.select(shortcut.stepConfig, shortcut.shortcut, asType!!, shortcut.collection, optionValues)
+                        _select = expr.cast(asType!!, optionValues)
+                    } else {
+                        val avt = XProcExpression.avt(shortcut.stepConfig, shortcut.shortcut, asType!!, optionValues)
+                        _select = avt.cast(asType!!, optionValues)
+                    }
+                }
+                is XProcMatchExpression -> {
+                    // nop
+                }
+                else -> {
+                    _select = _select!!.cast(asType!!, optionValues)
                 }
             }
-
-            select = select!!.cast(asType!!, optionValues)
         }
 
         super.elaborateInstructions()
