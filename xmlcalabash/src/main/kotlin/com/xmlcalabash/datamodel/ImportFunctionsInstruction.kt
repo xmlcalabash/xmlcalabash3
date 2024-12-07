@@ -6,8 +6,11 @@ import net.sf.saxon.functions.ExecutableFunctionLibrary
 import net.sf.saxon.functions.FunctionLibrary
 import net.sf.saxon.functions.FunctionLibraryList
 import net.sf.saxon.om.NamespaceUri
+import net.sf.saxon.query.XQueryFunctionLibrary
+import net.sf.saxon.trans.XPathException
 import org.apache.logging.log4j.kotlin.logger
 import org.xml.sax.InputSource
+import java.io.InputStream
 import java.net.URI
 import java.net.URLConnection
 import javax.xml.transform.sax.SAXSource
@@ -65,11 +68,11 @@ class ImportFunctionsInstruction(parent: XProcInstruction?, stepConfig: StepConf
             if (functionLibrary != null) {
                 stepConfig.saxonConfig.addFunctionLibrary(href, functionLibrary!!)
             }
+
+            return functionLibrary
         } catch (ex: Exception) {
             throw XProcError.xsImportFunctionsUnloadable(href).exception(ex)
         }
-
-        return functionLibrary
     }
 
     private fun loadXsltLibrary(conn: URLConnection): FunctionLibrary? {
@@ -134,33 +137,105 @@ class ImportFunctionsInstruction(parent: XProcInstruction?, stepConfig: StepConf
             knownLibraries.add(library.moduleNamespace)
         }
 
-        context.compileLibrary(conn.getInputStream(), "utf-8")
+        try {
+            context.compileLibrary(conn.inputStream, "utf-8")
 
-        var newns: NamespaceUri? = null
-        for (library in context.compiledLibraries) {
-            if (library.moduleNamespace !in knownLibraries) {
-                newns = library.moduleNamespace
+            var newns: NamespaceUri? = null
+            for (library in context.compiledLibraries) {
+                if (library.moduleNamespace !in knownLibraries) {
+                    newns = library.moduleNamespace
+                    break
+                }
+            }
+
+            if (newns == null) {
+                throw XProcError.xsImportFunctionsUnloadable(href).exception()
+            }
+
+            if (namespace != null) {
+                var useThisNamespace = false
+                for (ns in namespace!!.split("\\s")) {
+                    if (newns == NamespaceUri.of(ns)) {
+                        useThisNamespace = true
+                        break
+                    }
+                }
+
+                // Nope. Nothing here for us.
+                if (!useThisNamespace) {
+                    return null
+                }
+            }
+
+            val expression = context.compileQuery("import module namespace f='${newns}';.")
+            val module = expression.mainModule
+            return module.globalFunctionLibrary
+        } catch (ex: XPathException) {
+            val message = ex.message ?: ""
+            val notQueryModule =
+                message.contains("imported for module") && message.contains("is not a valid XQuery library module")
+            if (!notQueryModule) {
+                throw ex
+            }
+        }
+
+        // Maybe it's not a library module, maybe it's a main module?
+        // Re-open the stream...
+        val url = href.toURL()
+        val conn = url.openConnection()
+
+        return loadXQueryMainModule(conn.inputStream)
+    }
+
+    private fun loadXQueryMainModule(bufstream: InputStream): FunctionLibrary? {
+        val compiler = stepConfig.processor.newXQueryCompiler()
+        compiler.setSchemaAware(false) // FIXME:
+        val exec = compiler.compile(bufstream)
+        val loaded = exec.underlyingCompiledQuery.executable.functionLibrary
+
+        // Find the one we just loaded. This is a bit of a hack...
+        var allFunctionsLib: XQueryFunctionLibrary? = null
+        for (lib in loaded.libraryList.filter { it is XQueryFunctionLibrary }) {
+            val elib = lib as XQueryFunctionLibrary
+            var empty = true
+            for (item in lib.functionDefinitions) {
+                empty = false
+                break
+            }
+            if (!empty) {
+                allFunctionsLib = elib
                 break
             }
         }
 
-        if (newns == null) {
-            throw XProcError.xsImportFunctionsUnloadable(href).exception()
-        }
+        if (allFunctionsLib != null) {
+            if (namespace == null) {
+                return allFunctionsLib
+            }
 
-        if (namespace != null) {
-            for (ns in namespace!!.split("\\s")) {
-                if (newns == NamespaceUri.of(ns)) {
-                    break
+            val functionLibrary = XQueryFunctionLibrary(stepConfig.saxonConfig.configuration)
+            val namespaceSet = mutableSetOf<NamespaceUri>()
+            for (ns in namespace!!.split("\\s+")) {
+                namespaceSet.add(NamespaceUri.of(ns))
+            }
+            for (function in allFunctionsLib.functionDefinitions) {
+                if (function.functionName.namespaceUri in namespaceSet) {
+                    functionLibrary.declareFunction(function)
                 }
             }
-            // Nope. Nothing here for us.
-            return null
+
+            val newList = FunctionLibraryList()
+            for (lib in loaded.libraryList) {
+                if (lib === allFunctionsLib) {
+                    newList.addFunctionLibrary(functionLibrary)
+                } else {
+                    newList.addFunctionLibrary(lib)
+                }
+            }
+
+            return newList
         }
 
-        val expression = context.compileQuery("import module namespace f='${newns}';.")
-        val module = expression.mainModule
-        return module.globalFunctionLibrary
+        return null
     }
-
 }
