@@ -13,16 +13,27 @@ abstract class XProcExpression(val stepConfig: StepConfiguration, val asType: Se
         fun select(stepConfig: StepConfiguration, select: String, asType: SequenceType = SequenceType.ANY, collection: Boolean = false, values: List<XdmAtomicValue> = emptyList()): XProcSelectExpression {
             val expr = XProcSelectExpression.newInstance(stepConfig, select, asType, collection, values)
             expr._details = XPathExpressionParser(stepConfig).parse(select)
-
             if (expr.details.error != null) {
                 throw XProcError.xsXPathStaticError(expr.details.error?.message ?: "").exception(expr.details.error!!)
             }
-
             return expr
         }
 
         fun avt(stepConfig: StepConfiguration, avt: String, asType: SequenceType = SequenceType.ANY, values: List<XdmAtomicValue> = emptyList()): XProcAvtExpression {
             return avt(stepConfig, ValueTemplateParser.parse(avt), asType, values)
+        }
+
+        fun shortcut(stepConfig: StepConfiguration, shortcut: String, asType: SequenceType = SequenceType.ANY, values: List<XdmAtomicValue> = emptyList()): XProcShortcutExpression {
+            return XProcShortcutExpression.newInstance(stepConfig, shortcut, asType, values)
+        }
+
+        fun match(stepConfig: StepConfiguration, match: String): XProcMatchExpression {
+            val expr = XProcMatchExpression.newInstance(stepConfig, match)
+            expr._details = XPathExpressionParser(stepConfig).parse(match)
+            if (expr.details.error != null) {
+                throw XProcError.xsXPathStaticError(expr.details.error?.message ?: "").exception(expr.details.error!!)
+            }
+            return expr
         }
 
         internal fun avt(stepConfig: StepConfiguration, avt: ValueTemplate, asType: SequenceType = SequenceType.ANY, values: List<XdmAtomicValue> = emptyList()): XProcAvtExpression {

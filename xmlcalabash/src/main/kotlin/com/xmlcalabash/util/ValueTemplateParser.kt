@@ -184,6 +184,14 @@ class ValueTemplateParser private constructor(val expr: String) {
                 }
                 State.COMMENT -> {
                     when (current) {
+                        "(" -> {
+                            if (peek(":")) {
+                                commentDepth += 1
+                            }
+                            acc.append(current)
+                            pos += 1
+                            moreString = more
+                        }
                         ":" -> {
                             if (peek(")")) {
                                 commentDepth -= 1

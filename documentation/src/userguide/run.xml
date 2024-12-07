@@ -287,9 +287,9 @@ dependenies such as the HTML parser and XML resolver:</para>
 Running with Saxon EE version 12.5 (with a license)
 
 Dependencies: brotliDec=0.1.2, commonsCodec=1.17.0, commonsCompress=1.27.1, 
-flexmarkAll=0.64.8, htmlparser=1.4.16, httpClient=5.3.1, jing=20220510, 
-jsonSchemaValidator=1.4.0, schxslt=1.9.5, sinclude=5.2.4, slf4j=2.0.13, 
-tukaaniXz=1.10, uuidCreator=6.0.0, xmlResolver=6.0.10</computeroutput></screen>
+flexmarkAll=0.64.8, graalvmJS=23.1.5, htmlparser=1.4.16, httpClient=5.3.1, 
+jing=20220510, jsonSchemaValidator=1.5.4, schxslt=1.9.5, sinclude=5.2.4, 
+slf4j=2.0.13, tukaaniXz=1.10, uuidCreator=6.0.0, xmlResolver=6.0.10</computeroutput></screen>
 
 <important>
 <para>These are the <emphasis>compile-time</emphasis> dependencies, the versions that
@@ -314,6 +314,7 @@ DEPENDENCY_brotliDec=<?version DEPENDENCY_brotliDec?>
 DEPENDENCY_commonsCodec=<?version DEPENDENCY_commonsCodec?>
 DEPENDENCY_commonsCompress=<?version DEPENDENCY_commonsCompress?>
 DEPENDENCY_flexmarkAll=<?version DEPENDENCY_flexmarkAll?>
+DEPENDENCY_graalvmJS=<?version DEPENDENCY_graalvmJS?>
 DEPENDENCY_htmlparser=<?version DEPENDENCY_htmlparser?>
 DEPENDENCY_httpClient=<?version DEPENDENCY_httpClient?>
 DEPENDENCY_jing=<?version DEPENDENCY_jing?>
@@ -325,7 +326,4 @@ DEPENDENCY_tukaaniXz=<?version DEPENDENCY_tukaaniXz?>
 DEPENDENCY_uuidCreator=<?version DEPENDENCY_uuidCreator?>
 DEPENDENCY_xmlResolver=<?version DEPENDENCY_xmlResolver?></computeroutput></screen>
 </section>
-
-
-
 </chapter>

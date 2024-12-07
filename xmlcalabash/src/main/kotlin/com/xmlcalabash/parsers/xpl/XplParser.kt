@@ -510,7 +510,7 @@ class XplParser(val builder: PipelineBuilder) {
     private fun parseImportFunctions(instruction: StepContainerInterface, node: ElementNode) {
         val href = node.attributes[Ns.href] ?: throw XProcError.xsMissingRequiredAttribute(Ns.href).exception()
         val contentType = node.attributes[Ns.contentType]?.let { MediaType.parse(it) }
-        val namespace = node.attributes[Ns.namespace]?.let { NamespaceUri.of(it) }
+        val namespace = node.attributes[Ns.namespace]
 
         val stepConfig = (instruction as XProcInstruction).stepConfig
         val uri = stepConfig.resolve(href)
@@ -679,7 +679,7 @@ class XplParser(val builder: PipelineBuilder) {
 
         val attributeMapping = mapOf<QName, (String) -> Unit>(
             Ns.name to { value -> viewport.name = value },
-            Ns.match to { value -> viewport.match = value }
+            Ns.match to { value -> viewport.match = XProcExpression.match(viewport.stepConfig, value) }
         )
 
         processAttributes(node, viewport, attributeMapping)
@@ -940,7 +940,7 @@ class XplParser(val builder: PipelineBuilder) {
                                 atomic.setExtensionAttribute(name, value)
                             } else {
                                 if (atomic.expandText == true) {
-                                    atomic.withOption(name, XProcExpression.avt(atomic.stepConfig, value))
+                                    atomic.withOption(name, XProcExpression.shortcut(atomic.stepConfig, value))
                                 } else {
                                     atomic.withOption(name, XProcExpression.constant(atomic.stepConfig, XdmAtomicValue(value)))
                                 }

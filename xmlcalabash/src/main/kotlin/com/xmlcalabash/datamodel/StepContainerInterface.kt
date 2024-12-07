@@ -12,6 +12,6 @@ interface StepContainerInterface {
     fun option(name: QName): OptionInstruction
     fun option(name: QName, staticValue: XProcExpression): OptionInstruction
     fun declareStep(): DeclareStepInstruction
-    fun importFunctions(href: URI, contentType: MediaType?, namespace: NamespaceUri?): ImportFunctionsInstruction
+    fun importFunctions(href: URI, contentType: MediaType?, namespace: String?): ImportFunctionsInstruction
     fun import(import: StepContainerInterface)
 }

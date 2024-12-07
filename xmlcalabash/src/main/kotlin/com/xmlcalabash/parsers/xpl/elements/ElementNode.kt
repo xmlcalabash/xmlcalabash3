@@ -32,7 +32,7 @@ open class ElementNode(parent: AnyNode?, stepConfig: StepConfiguration, node: Xd
         }
     }
 
-    internal fun computeUseWhenOnThisElement(context: UseWhenContext) {
+    internal open fun computeUseWhenOnThisElement(context: UseWhenContext) {
         if (useWhen == null) {
             context.useWhen.add(this)
             val resolved = context.resolveUseWhen(stepConfig, conditional!!)

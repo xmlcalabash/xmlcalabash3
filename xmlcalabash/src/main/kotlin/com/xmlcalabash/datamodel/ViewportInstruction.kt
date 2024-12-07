@@ -6,25 +6,24 @@ import com.xmlcalabash.namespace.NsP
 import com.xmlcalabash.runtime.ProcessMatch
 import com.xmlcalabash.runtime.ProcessMatchingNodes
 import net.sf.saxon.om.AttributeMap
-import net.sf.saxon.s9api.SaxonApiException
-import net.sf.saxon.s9api.XdmNode
+import net.sf.saxon.s9api.*
 
 class ViewportInstruction(parent: XProcInstruction): CompoundLoopDeclaration(parent, NsP.viewport) {
-    companion object {
-        private val INVALID_MATCH = "*** no match pattern specified ***"
-    }
-
     override val contentModel = anySteps + mapOf(NsP.withInput to '1', NsP.output to '1')
+    private var _match: XProcMatchExpression? = null
 
     val matchDefined: Boolean
         get() {
-            return match != INVALID_MATCH
+            return _match != null
         }
 
-    var match: String = INVALID_MATCH
+    var match: XProcMatchExpression
+        get() {
+            return _match!!
+        }
         set(value) {
             checkOpen()
-            field = value
+            _match = value
         }
 
     override fun elaborateInstructions() {
@@ -32,9 +31,22 @@ class ViewportInstruction(parent: XProcInstruction): CompoundLoopDeclaration(par
             throw XProcError.xsMissingRequiredAttribute(Ns.match).exception()
         }
 
+        val withOption = WithOptionInstruction(this, Ns.match, match.stepConfig)
+        withOption.select = match
+        _children.add(withOption)
+
         try {
-            val matcher = ProcessMatch(stepConfig, DummyProcessor(), stepConfig.inscopeNamespaces, emptyMap())
-            matcher.compilePattern(match)
+            val variables = mutableMapOf<QName, XdmValue>()
+            for (name in match.details.variableRefs) {
+                val binding = stepConfig.inscopeVariables[name]
+                if (binding != null) {
+                    variables[name] = XdmAtomicValue(0) // value is irrelevant for this compile test
+                } else {
+                    throw XProcError.xsXPathStaticError(name).exception()
+                }
+            }
+            val matcher = ProcessMatch(stepConfig, DummyProcessor(), stepConfig.inscopeNamespaces, variables)
+            matcher.compilePattern(match.match)
         } catch (ex: SaxonApiException) {
             throw XProcError.xsXPathStaticError("Invalid match pattern: ${match}").exception(ex)
         }

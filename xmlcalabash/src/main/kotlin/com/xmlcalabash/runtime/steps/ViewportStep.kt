@@ -3,22 +3,20 @@ package com.xmlcalabash.runtime.steps
 import com.xmlcalabash.datamodel.MediaType
 import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.exceptions.XProcError
-import com.xmlcalabash.runtime.ProcessMatch
-import com.xmlcalabash.runtime.ProcessMatchingNodes
+import com.xmlcalabash.namespace.Ns
 import com.xmlcalabash.runtime.RuntimeStepConfiguration
 import com.xmlcalabash.runtime.model.CompoundStepModel
-import com.xmlcalabash.runtime.parameters.ViewportStepParameters
 import com.xmlcalabash.util.S9Api
 import com.xmlcalabash.util.XmlViewportComposer
-import net.sf.saxon.om.AttributeMap
+import net.sf.saxon.ma.map.MapItem
 import net.sf.saxon.s9api.QName
-import net.sf.saxon.s9api.SaxonApiException
+import net.sf.saxon.s9api.XdmMap
 import net.sf.saxon.s9api.XdmNode
 import net.sf.saxon.s9api.XdmValue
+import net.sf.saxon.value.QNameValue
+import net.sf.saxon.value.StringValue
 
 open class ViewportStep(yconfig: RuntimeStepConfiguration, compound: CompoundStepModel): CompoundStep(yconfig, compound) {
-    val match = (params as ViewportStepParameters).match
-
     init {
         head.openPorts.remove("current") // doesn't count as an open port from the outside
     }
@@ -38,7 +36,34 @@ open class ViewportStep(yconfig: RuntimeStepConfiguration, compound: CompoundSte
         sequence.addAll(cache["!source"] ?: emptyList())
         cache.remove("!source")
 
+        var match = ""
         val bindings = mutableMapOf<QName, XdmValue>()
+
+        if (head.options.containsKey(Ns.match)) {
+            val matchMap = head.options[Ns.match]!!.first().value as XdmMap
+            for (key in matchMap.keySet()) {
+                val value = matchMap.get(key)
+                val qkey = key.underlyingValue
+                if (qkey is QNameValue) {
+                    val lexical = if (qkey.prefix == null || qkey.prefix == "") {
+                        qkey.localName
+                    } else {
+                        "${qkey.prefix}:${qkey.localName}"
+                    }
+                    bindings[QName(qkey.namespaceURI, lexical)] = value
+                } else {
+                    match = value.underlyingValue.stringValue
+                }
+            }
+        } else {
+            // It must have been resolved statically
+            val matchMap = params.options[Ns.match]!!.staticValue!!.evaluate().underlyingValue as MapItem
+            match = matchMap.get(StringValue("match")).stringValue
+            if (matchMap.size() != 1) {
+                throw XProcError.xiImpossible("Unexpected values in static match expression").exception()
+            }
+        }
+
         val composer = XmlViewportComposer(stepConfig, match, bindings)
 
         val stepsToRun = mutableListOf<AbstractStep>()

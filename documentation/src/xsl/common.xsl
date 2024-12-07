@@ -120,6 +120,7 @@
     <xsl:when test="$dep = 'flexmarkAll'">{$dep_flexmarkAll}</xsl:when>
     <xsl:when test="$dep = 'uuidCreator'">{$dep_uuidCreator}</xsl:when>
     <xsl:when test="$dep = 'jsonSchemaValidator'">{$dep_jsonSchemaValidator}</xsl:when>
+    <xsl:when test="$dep = 'graalvmJS'">{$dep_graalvmJS}</xsl:when>
     <xsl:otherwise>
       <xsl:message select="'Unrecognized dependency: ' || $dep"/>
       <xsl:sequence select="'UNRECOGNIZED'"/>

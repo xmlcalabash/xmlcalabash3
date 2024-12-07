@@ -1,7 +1,9 @@
 package com.xmlcalabash.util
 
 import com.xmlcalabash.exceptions.XProcError
+import com.xmlcalabash.exceptions.XProcException
 import com.xmlcalabash.namespace.Ns
+import com.xmlcalabash.namespace.NsErr
 import com.xmlcalabash.namespace.NsFn
 import com.xmlcalabash.namespace.NsXs
 import com.xmlcalabash.runtime.ValueConverter

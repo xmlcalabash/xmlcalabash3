@@ -6,6 +6,8 @@ import com.xmlcalabash.exceptions.XProcException
 import net.sf.saxon.s9api.XdmNode
 
 abstract class RootNode(parent: AnyNode?, parentConfig: StepConfiguration, node: XdmNode): ElementNode(parent, parentConfig, node) {
+    var firstPass = true
+
     internal open fun resolve(manager: XplDocumentManager, context: UseWhenContext) {
         var done = false
         val localContext = context.copy()
@@ -63,8 +65,13 @@ abstract class RootNode(parent: AnyNode?, parentConfig: StepConfiguration, node:
             if (localContext.resolvedCount > 0 && localContext.useWhen.isNotEmpty()) {
                 done = false
             } else {
-                context.useWhen.addAll(localContext.useWhen)
-                context.staticOptions.putAll(localContext.staticOptions)
+                if (firstPass) {
+                    firstPass = false
+                    done = false
+                } else {
+                    context.useWhen.addAll(localContext.useWhen)
+                    context.staticOptions.putAll(localContext.staticOptions)
+                }
             }
         }
     }

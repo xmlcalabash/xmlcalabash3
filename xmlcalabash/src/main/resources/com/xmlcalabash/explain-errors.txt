@@ -37,8 +37,13 @@ Cannot read URI “$1”: “$2”.
 It is a dynamic error if the resource referenced by the href option does not
 exist, cannot be accessed or is not a file.
 
-XD0015
+XD0015/1
 Invalid QName: “$1”.
+It is a dynamic error if a QName is specified and it cannot be resolved with the
+in-scope namespace declarations.
+
+XD0015/2
+No namespace binding in scope: $1
 It is a dynamic error if a QName is specified and it cannot be resolved with the
 in-scope namespace declarations.
 
@@ -577,6 +582,10 @@ It is a static error if the values list is not an XPath sequence of atomic value
 XS0102
 Alternative subpipelines must have the same primary output port.
 It is a static error if alternative subpipelines have different primary output ports.
+
+XS0104
+Unexpected media type for function loading: “$1”.
+Only XSLT and XQuery function libraries can be loaded by p:import-functions.
 
 XS0106
 Functions cannot be imported: “$1”.

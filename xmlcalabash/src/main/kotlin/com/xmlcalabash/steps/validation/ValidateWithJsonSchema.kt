@@ -8,8 +8,6 @@ import com.xmlcalabash.namespace.Ns
 import com.xmlcalabash.namespace.NsXvrl
 import com.xmlcalabash.steps.AbstractAtomicStep
 import com.xmlcalabash.util.SaxonTreeBuilder
-import net.sf.saxon.om.AttributeMap
-import net.sf.saxon.om.EmptyAttributeMap
 import java.io.ByteArrayOutputStream
 import java.nio.charset.StandardCharsets
 
@@ -38,29 +36,38 @@ open class ValidateWithJsonSchema(): AbstractAtomicStep() {
         }
 
         val jsonSchemaFactory = JsonSchemaFactory.getInstance(SpecVersion.VersionFlag.V202012)
-        val config = SchemaValidatorsConfig()
-        config.pathType = PathType.JSON_POINTER
-        config.isEcma262Validator = true
+        val config = SchemaValidatorsConfig.builder().build()
 
         val jserializer = XProcSerializer(stepConfig)
         var jbytes = ByteArrayOutputStream()
         jserializer.write(schema, jbytes)
         val jschema = jbytes.toString(StandardCharsets.UTF_8)
 
-        val schema = try {
+        val jsonSchema = try {
             jsonSchemaFactory.getSchema(jschema)
         } catch (ex: Exception) {
-            if (schema.baseURI == null) {
-                throw XProcError.xcJsonSchemaInvalid().exception(ex)
+            val message = ex.message ?: ""
+            val err = if (schema.baseURI == null) {
+                if (message.contains("UnsupportedOperationException")) {
+                    XProcError.xcJsonSchemaInvalid()
+                } else {
+                    XProcError.xcJsonSchemaNotSupported()
+                }
+            } else {
+                if (message.contains("UnsupportedOperationException")) {
+                    XProcError.xcJsonSchemaInvalid(schema.baseURI!!)
+                } else {
+                    XProcError.xcJsonSchemaNotSupported(schema.baseURI!!)
+                }
             }
-            throw XProcError.xcJsonSchemaInvalid(schema.baseURI!!).exception(ex)
+            throw err.exception(ex)
         }
 
         jbytes = ByteArrayOutputStream()
         jserializer.write(document, jbytes)
         val jinput = jbytes.toString(StandardCharsets.UTF_8)
 
-        val assertions = schema.validate(jinput, InputFormat.JSON) {
+        val assertions = jsonSchema.validate(jinput, InputFormat.JSON) {
             executionContext: ExecutionContext -> executionContext.executionConfig.formatAssertionsEnabled = true
         }
 

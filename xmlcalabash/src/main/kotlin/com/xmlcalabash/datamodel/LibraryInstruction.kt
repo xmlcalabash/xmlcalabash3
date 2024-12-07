@@ -298,7 +298,7 @@ open class LibraryInstruction(stepConfig: StepConfiguration): XProcInstruction(n
     }
 */
 
-    override fun importFunctions(href: URI, contentType: MediaType?, namespace: NamespaceUri?): ImportFunctionsInstruction {
+    override fun importFunctions(href: URI, contentType: MediaType?, namespace: String?): ImportFunctionsInstruction {
         val import = ImportFunctionsInstruction(this, stepConfig.copy(), href)
         import.contentType = contentType
         import.namespace = namespace

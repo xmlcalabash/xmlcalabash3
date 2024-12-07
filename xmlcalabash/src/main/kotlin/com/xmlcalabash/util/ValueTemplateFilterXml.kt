@@ -9,6 +9,7 @@ import com.xmlcalabash.namespace.NsP
 import com.xmlcalabash.datamodel.StepConfiguration
 import com.xmlcalabash.runtime.LazyValue
 import net.sf.saxon.s9api.*
+import org.apache.logging.log4j.kotlin.logger
 import java.net.URI
 import java.util.*
 
@@ -26,6 +27,15 @@ class ValueTemplateFilterXml(val stepConfig: StepConfiguration, val originalNode
     private val expandText = Stack<Boolean>()
 
     private var contextItem: Any? = null
+
+    override fun containsMarkup(): Boolean {
+        val compiler = stepConfig.processor.newXPathCompiler()
+        val exec = compiler.compile("//*")
+        val selector = exec.load()
+        selector.contextItem = originalNode
+        val value = selector.evaluate()
+        return value !== XdmEmptySequence.getInstance()
+    }
 
     override fun getNode(): XdmNode {
         return xmlNode
@@ -115,6 +125,23 @@ class ValueTemplateFilterXml(val stepConfig: StepConfiguration, val originalNode
                     NsP.inlineExpandText
                 }
 
+                // Do the attributes before evaluating the new expand-text value because
+                // changing the value only applies to descendants...
+                val attrMap = mutableMapOf<QName, String?>()
+                if (onlyChecking) {
+                    attrMap[NsP.inlineExpandText] = expand.toString()
+                }
+                node.axisIterator(Axis.ATTRIBUTE).forEach { attr ->
+                    if (attr.nodeName != inlineAttribute && attr.nodeName != NsP.inlineExpandText) {
+                        val value = if (expand) {
+                            considerValueTemplates(node, attr.stringValue)
+                        } else {
+                            attr.stringValue
+                        }
+                        attrMap[attr.nodeName] = value
+                    }
+                }
+
                 val newExpand = if (onlyChecking) {
                     node.getAttributeValue(inlineAttribute)
                 } else {
@@ -135,21 +162,6 @@ class ValueTemplateFilterXml(val stepConfig: StepConfiguration, val originalNode
                 }
 
                 expandText.push(expand)
-
-                val attrMap = mutableMapOf<QName, String?>()
-                if (onlyChecking) {
-                    attrMap[NsP.inlineExpandText] = expand.toString()
-                }
-                node.axisIterator(Axis.ATTRIBUTE).forEach { attr ->
-                    if (attr.nodeName != inlineAttribute && attr.nodeName != NsP.inlineExpandText) {
-                        val value = if (expand) {
-                            considerValueTemplates(node, attr.stringValue)
-                        } else {
-                            attr.stringValue
-                        }
-                        attrMap[attr.nodeName] = value
-                    }
-                }
 
                 builder.addStartElement(node, stepConfig.attributeMap(attrMap))
                 node.axisIterator(Axis.CHILD).forEach { filterValueTemplates(builder, it) }
@@ -255,16 +267,22 @@ class ValueTemplateFilterXml(val stepConfig: StepConfiguration, val originalNode
                         builder.addSubtree(value)
                     } catch (ex: Exception) {
                         if (onlyChecking) {
+                            val message = ex.message ?: ""
+                            // An unknown function is always a static error...
+                            if (message.contains("Cannot find a") && message.contains("argument function named")) {
+                                throw XProcError.xsXPathStaticError(message).exception(ex)
+                            }
                             static = false
                             builder.addText("{${avt.value[index]}}")
                         } else {
                             when (ex) {
                                 is XProcException -> throw ex
                                 is SaxonApiException -> {
-                                    if (ex.message?.contains("cannot be converted") == true) {
-                                        throw XProcError.xdBadType(ex.message!!).exception()
+                                    val message = ex.message ?: ""
+                                    if (message.contains("Cannot find a") && message.contains("function named")) {
+                                        throw XProcError.xsXPathStaticError(message).exception(ex)
                                     }
-                                    throw ex
+                                    throw XProcError.xdValueTemplateError(ex.message ?: "").exception(ex)
                                 }
                                 else -> {
                                     throw XProcError.xdInvalidAvtResult(avt.value[index]).exception(ex)

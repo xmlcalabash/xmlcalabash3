@@ -10,6 +10,10 @@ import net.sf.saxon.s9api.XdmValue
 import java.net.URI
 
 class ValueTemplateFilterNone(val stepConfig: StepConfiguration, val encodedNode: XdmNode, val baseUri: URI): ValueTemplateFilter {
+    override fun containsMarkup(): Boolean {
+        return false
+    }
+
     override fun getNode(): XdmNode {
         return encodedNode
     }

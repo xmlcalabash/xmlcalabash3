@@ -8,9 +8,11 @@ import com.xmlcalabash.util.ValueTemplateFilter
 import com.xmlcalabash.util.ValueTemplateFilterNone
 import com.xmlcalabash.util.ValueTemplateFilterXml
 import net.sf.saxon.s9api.QName
+import net.sf.saxon.s9api.XdmEmptySequence
 import net.sf.saxon.s9api.XdmMap
 import net.sf.saxon.s9api.XdmNode
 import net.sf.saxon.s9api.XdmValue
+import org.apache.logging.log4j.kotlin.logger
 import java.lang.IllegalStateException
 
 class InlineInstruction(parent: XProcInstruction, xmlDocument: XdmNode): ConnectionInstruction(parent, NsP.inline) {
@@ -90,6 +92,10 @@ class InlineInstruction(parent: XProcInstruction, xmlDocument: XdmNode): Connect
         }
 
         _xml = _valueTemplateFilter.expandStaticValueTemplates(expandText!!, staticBindings)
+
+        if (!(contentType!!.xmlContentType() || contentType!!.htmlContentType()) && _valueTemplateFilter.containsMarkup()) {
+            logger.warn { "Markup detected in ${contentType} inline" }
+        }
 
         val usesContext = _valueTemplateFilter.usesContext()
         variables.addAll(_valueTemplateFilter.usesVariables())

@@ -239,6 +239,7 @@ class CompoundStepHead(yconfig: RuntimeStepConfiguration, step: HeadModel): Abst
         super.reset()
         openPorts.clear()
         openPorts.addAll(params.outputs.keys)
+        openPorts.addAll(params.inputs.keys)
         _cache.clear()
         inputCount.clear()
         showMessage = true

@@ -3,11 +3,7 @@ package com.xmlcalabash.test
 import com.xmlcalabash.config.XmlCalabash
 import com.xmlcalabash.datamodel.XProcExpression
 import com.xmlcalabash.exceptions.XProcException
-import com.xmlcalabash.namespace.Ns
-import com.xmlcalabash.namespace.NsCx
-import com.xmlcalabash.namespace.NsErr
-import com.xmlcalabash.namespace.NsP
-import com.xmlcalabash.namespace.NsXs
+import com.xmlcalabash.namespace.*
 import com.xmlcalabash.runtime.XProcPipeline
 import com.xmlcalabash.util.BufferingReceiver
 import net.sf.saxon.om.NamespaceUri
@@ -843,7 +839,7 @@ class BuilderApiTest {
         //declStep.debugPipelineGraph = "/tmp/graph.xml"
 
         val viewport = declStep.viewport()
-        viewport.match = "/doc/*"
+        viewport.match = XProcExpression.match(viewport.stepConfig, "/doc/*")
         val addattr = viewport.atomicStep(NsP.addAttribute)
         addattr.withOption(Ns.attributeName, "success")
         addattr.withOption(Ns.attributeValue, XProcExpression.avt(addattr.stepConfig, "{p:iteration-position()}"))

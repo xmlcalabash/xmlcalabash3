@@ -92,4 +92,11 @@ internal class ValueTemplateParserTest {
             // pass
         }
     }
+
+    @Test
+    fun parseTest13() {
+        val template = ValueTemplateParser.parse("{ (:(: :) } :) 3 (: { :) }")
+        assertEquals(ValueTemplate(listOf("", " (:(: :) } :) 3 (: { :) ")), template)
+    }
+
 }

@@ -16,6 +16,7 @@ interface ExecutionContext {
     val locale: String
     val productName: String
     val productVersion: String
+    val gitHash: String
     val vendor: String
     val vendorUri: String
     val version: String

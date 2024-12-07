@@ -166,11 +166,6 @@ class CommandLine private constructor(val args: Array<out String>) {
         }
 
         for ((index, opt) in args.withIndex()) {
-            if (index == 0 && opt in validCommands) {
-                _command = opt
-                continue
-            }
-
             val pos = opt.indexOf(':')
             val option = if (pos >= 0) {
                 opt.substring(0, pos)
@@ -238,10 +233,14 @@ class CommandLine private constructor(val args: Array<out String>) {
                     if (_pipeline != null) {
                         _errors.add(XProcError.xiCliMoreThanOnePipeline(_pipeline.toString(), opt).exception())
                     } else {
-                        try {
-                            _pipeline = parseFile(opt)
-                        } catch (ex: XProcException) {
-                            _errors.add(ex)
+                        if (opt in validCommands) {
+                            _command = opt
+                        } else {
+                            try {
+                                _pipeline = parseFile(opt)
+                            } catch (ex: XProcException) {
+                                _errors.add(ex)
+                            }
                         }
                     }
                 }
