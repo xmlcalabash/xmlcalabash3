@@ -89,7 +89,7 @@ class SaxonConfiguration private constructor(
             return _xpathTransformer!!
         }
 
-    private val functionLibraries = mutableMapOf<URI, FunctionLibrary>()
+    private val functionLibraries = mutableListOf<Pair<URI,FunctionLibrary>>()
     private val standardExtensionFunctions = listOf<(SaxonConfiguration) -> ExtensionFunctionDefinition>(
         { config -> DocumentPropertyFunction(config) },
         { config -> DocumentPropertiesFunction(config) },
@@ -112,7 +112,7 @@ class SaxonConfiguration private constructor(
         saxon._xmlCalabash = xmlCalabash
         saxon.configurationFile = configurationFile
         saxon.configurationProperties.putAll(configurationProperties)
-        saxon.functionLibraries.putAll(functionLibraries)
+        saxon.functionLibraries.addAll(functionLibraries)
         saxon.configureProcessor(processor)
         return saxon
     }
@@ -124,10 +124,13 @@ class SaxonConfiguration private constructor(
     }
 
     internal fun addFunctionLibrary(href: URI, flib: FunctionLibrary) {
-        if (functionLibraries.containsKey(href)) {
-            return
+        for (current in functionLibraries) {
+            if (current.first == href) {
+                return
+            }
         }
-        functionLibraries[href] = flib
+
+        functionLibraries.add(Pair(href,flib))
         loadFunctionLibrary(href, flib)
     }
 
@@ -146,8 +149,9 @@ class SaxonConfiguration private constructor(
             processor.registerExtensionFunction(function(this))
         }
 
-        for ((href, flib) in functionLibraries) {
-            loadFunctionLibrary(href, flib)
+        // So that libraries loaded later "come first" when searching...
+        for (flib in functionLibraries.reversed()) {
+            loadFunctionLibrary(flib.first, flib.second)
         }
     }
 }
