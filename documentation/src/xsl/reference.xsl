@@ -37,6 +37,7 @@
 <xsl:param name="dep_flexmarkAll" select="'UNCONFIGURED'"/>
 <xsl:param name="dep_uuidCreator" select="'UNCONFIGURED'"/>
 <xsl:param name="dep_jsonSchemaValidator" select="'UNCONFIGURED'"/>
+<xsl:param name="dep_graalvmJS" select="'UNCONFIGURED'"/>
 
 <!-- ============================================================ -->
 
