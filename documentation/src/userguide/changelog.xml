@@ -16,17 +16,50 @@ finer detail.</para>
 <info>
   <title>Changes in version 3.0.0-alpha4</title>
   <productnumber>3.0.0-alpha4</productnumber>
-  <date>2024-12-04</date>
+  <date>2024-12-07</date>
 </info>
 <itemizedlist>
-<listitem>
-<para>T.B.D.</para>
-</listitem>
 <listitem>
 <para>Resolved the remaining <tag>p:validate-with-json-schema</tag> test failures. Updated
 to <link xlink:href="https://github.com/networknt/json-schema-validator">json-schema-validator</link>
 version 1.5.4. This required adding a dependency on GraalVM’s polyglot JavaScript library.
 </para>
+</listitem>
+<listitem>
+<para>Updated the build script to use a more recent version of XercesImpl.</para>
+</listitem>
+<listitem>
+<para>Fixed several bugs related to the way static options are resolved.</para>
+</listitem>
+<listitem>
+<para>Fixed a bug where <code>[p:]inline-expand-text</code> was incorrectly controlling
+AVTs in attributes on the element where it occurred.</para>
+</listitem>
+<listitem>
+<para>Made many improvements to <tag>p:import-functions</tag> support.</para>
+</listitem>
+<listitem>
+<para>Added <link xlink:href="https://github.com/xproc/3.0-test-suite/pull/774">special
+handling</link> for <tag class="attribute">use-when</tag> on <tag>p:import</tag>.</para>
+</listitem>
+<listitem>
+<para>Support variables in <tag class="attribute">match</tag> expressions on
+<tag>p:viewport</tag>.</para>
+</listitem>
+<listitem>
+<para>Fixed error codes for several tests. Correctly report static errors in more cases.</para>
+</listitem>
+<listitem>
+<para>Reworked SVG output so that there’s one file for all the pipelines and
+one file for all the graphs (instead of multiple files for each).</para>
+</listitem>
+<listitem>
+<para>Added support for the <option>--step</option> option.</para>
+</listitem>
+<listitem>
+<para>Fixed a bug in the attribute value template parser. It failed to handle
+nested comments correctly.</para>
+</listitem>
 </itemizedlist>
 </section>
 
