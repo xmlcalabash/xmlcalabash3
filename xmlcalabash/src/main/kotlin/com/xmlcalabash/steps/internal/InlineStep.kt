@@ -65,8 +65,16 @@ open class InlineStep(val params: InlineStepParameters): AbstractAtomicStep() {
             props[Ns.contentType] = params.contentType
         }
 
-        val markup = containsMarkup(xml)
         val ctype = MediaType.parse(props[Ns.contentType]!!.underlyingValue.stringValue)
+
+        // This is about whether the original inline contains markup
+        if (params.filter.containsMarkup() && !(ctype.xmlContentType() || ctype.htmlContentType())) {
+            throw XProcError.xdMarkupForbidden(ctype.toString()).exception()
+        }
+
+        // This is about whether the constructed output contains markup
+        val markup = containsMarkup(xml)
+
         if (params.encoding == null) {
             if (ctype.charset() != null) {
                 throw XProcError.xdEncodingRequired(ctype.charset()!!).exception()

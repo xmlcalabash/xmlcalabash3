@@ -9,6 +9,7 @@ import net.sf.saxon.s9api.XdmNode
 interface ValueTemplateFilter {
     fun expandStaticValueTemplates(initialExpand: Boolean, staticBindings: Map<QName, XProcExpression>): XdmNode
     fun expandValueTemplates(contextItem: XProcDocument?, bindings: Map<QName, LazyValue>): XdmNode
+    fun containsMarkup(): Boolean
     fun getNode(): XdmNode
     fun isStatic(): Boolean
     fun usesContext(): Boolean

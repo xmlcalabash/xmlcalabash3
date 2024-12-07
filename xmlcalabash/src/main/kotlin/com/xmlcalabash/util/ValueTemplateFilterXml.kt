@@ -9,6 +9,7 @@ import com.xmlcalabash.namespace.NsP
 import com.xmlcalabash.datamodel.StepConfiguration
 import com.xmlcalabash.runtime.LazyValue
 import net.sf.saxon.s9api.*
+import org.apache.logging.log4j.kotlin.logger
 import java.net.URI
 import java.util.*
 
@@ -26,6 +27,15 @@ class ValueTemplateFilterXml(val stepConfig: StepConfiguration, val originalNode
     private val expandText = Stack<Boolean>()
 
     private var contextItem: Any? = null
+
+    override fun containsMarkup(): Boolean {
+        val compiler = stepConfig.processor.newXPathCompiler()
+        val exec = compiler.compile("//*")
+        val selector = exec.load()
+        selector.contextItem = originalNode
+        val value = selector.evaluate()
+        return value !== XdmEmptySequence.getInstance()
+    }
 
     override fun getNode(): XdmNode {
         return xmlNode
