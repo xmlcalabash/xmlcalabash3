@@ -7,7 +7,7 @@ import com.xmlcalabash.exceptions.XProcException
 import com.xmlcalabash.namespace.Ns
 import com.xmlcalabash.namespace.NsCx
 import com.xmlcalabash.runtime.LazyValue
-import com.xmlcalabash.runtime.RuntimeStepConfiguration
+import com.xmlcalabash.runtime.XProcStepConfiguration
 import com.xmlcalabash.runtime.api.RuntimePort
 import com.xmlcalabash.runtime.model.StepModel
 import com.xmlcalabash.runtime.parameters.DocumentStepParameters
@@ -20,7 +20,7 @@ import com.xmlcalabash.util.Verbosity
 import net.sf.saxon.s9api.QName
 import org.apache.logging.log4j.kotlin.logger
 
-abstract class AbstractStep(val stepConfig: RuntimeStepConfiguration, step: StepModel): Consumer {
+abstract class AbstractStep(val stepConfig: XProcStepConfiguration, step: StepModel): Consumer {
     val id: String = step.id
     val name: String = step.name
     val type: QName = step.type
@@ -148,7 +148,7 @@ abstract class AbstractStep(val stepConfig: RuntimeStepConfiguration, step: Step
                 inlineStep.setup(binding.stepConfig, inlineReceiver, inlineStepParams)
 
                 if (binding.documentProperties.canBeResolvedStatically()) {
-                    inlineStep.option(Ns.documentProperties, LazyValue(binding.stepConfig, binding.documentProperties))
+                    inlineStep.option(Ns.documentProperties, LazyValue(binding.stepConfig, binding.documentProperties, stepConfig))
                 } else {
                     throw XProcError.xiImpossible("Default binding can't resolve document-properties statically?").exception()
                 }
@@ -164,19 +164,19 @@ abstract class AbstractStep(val stepConfig: RuntimeStepConfiguration, step: Step
                 documentStep.setup(binding.stepConfig, documentReceiver, documentStepParameters)
 
                 if (binding.href.canBeResolvedStatically()) {
-                    documentStep.option(Ns.href, LazyValue(binding.stepConfig, binding.href))
+                    documentStep.option(Ns.href, LazyValue(binding.stepConfig, binding.href, stepConfig))
                 } else {
                     throw XProcError.xiImpossible("Input default document href isn't static?").exception()
                 }
 
                 if (binding.documentProperties.canBeResolvedStatically()) {
-                    documentStep.option(Ns.documentProperties, LazyValue(binding.stepConfig, binding.documentProperties))
+                    documentStep.option(Ns.documentProperties, LazyValue(binding.stepConfig, binding.documentProperties, stepConfig))
                 } else {
                     throw XProcError.xiImpossible("Default binding can't resolve document-properties statically?").exception()
                 }
 
                 if (binding.parameters.canBeResolvedStatically()) {
-                    documentStep.option(Ns.parameters, LazyValue(binding.stepConfig, binding.parameters))
+                    documentStep.option(Ns.parameters, LazyValue(binding.stepConfig, binding.parameters, stepConfig))
                 } else {
                     throw XProcError.xiImpossible("Default binding can't resolve document-properties statically?").exception()
                 }

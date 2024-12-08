@@ -48,7 +48,7 @@ class DocumentPropertiesFunction(private val config: SaxonConfiguration): Extens
         }
 
         override fun call(context: XPathContext?, arguments: Array<out Sequence>?): Sequence {
-            val dynamicContext = config.getExecutionContext()
+            val dynamicContext = config.environment.getExecutionContext()
 
             val item = arguments!![0].head()
             val map = if (item is GroundedValue) {

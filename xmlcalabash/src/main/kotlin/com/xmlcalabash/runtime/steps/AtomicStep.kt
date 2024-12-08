@@ -5,14 +5,14 @@ import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.namespace.Ns
 import com.xmlcalabash.namespace.NsP
 import com.xmlcalabash.runtime.LazyValue
-import com.xmlcalabash.runtime.RuntimeStepConfiguration
+import com.xmlcalabash.runtime.XProcStepConfiguration
 import com.xmlcalabash.runtime.api.Receiver
 import com.xmlcalabash.runtime.model.AtomicBuiltinStepModel
 import com.xmlcalabash.runtime.parameters.RuntimeStepParameters
 import com.xmlcalabash.steps.AbstractAtomicStep
 import net.sf.saxon.s9api.XdmValue
 
-open class AtomicStep(yconfig: RuntimeStepConfiguration, atomic: AtomicBuiltinStepModel): AbstractStep(yconfig, atomic), Receiver {
+open class AtomicStep(config: XProcStepConfiguration, atomic: AtomicBuiltinStepModel): AbstractStep(config, atomic), Receiver {
     final override val params = RuntimeStepParameters(atomic.type, atomic.name, atomic.location,
         atomic.inputs, atomic.outputs, atomic.options)
     val implementation = atomic.provider()
@@ -20,7 +20,7 @@ open class AtomicStep(yconfig: RuntimeStepConfiguration, atomic: AtomicBuiltinSt
     val initiallyOpenPorts = mutableSetOf<String>()
     val openPorts = mutableSetOf<String>()
     private var message: XdmValue? = null
-    private val rteContext = yconfig.rteContext
+    //private val rteContext = yconfig.rteContext
     private val inputErrors = mutableListOf<XProcError>()
 
     init {
@@ -55,7 +55,7 @@ open class AtomicStep(yconfig: RuntimeStepConfiguration, atomic: AtomicBuiltinSt
                     || (type.namespaceUri != NsP.namespace && name == NsP.message)) {
                     message = doc.value
                 } else {
-                    implementation.option(name, LazyValue(doc.context, doc.value))
+                    implementation.option(name, LazyValue(doc.context, doc.value, stepConfig))
                 }
                 return
             }
@@ -91,9 +91,9 @@ open class AtomicStep(yconfig: RuntimeStepConfiguration, atomic: AtomicBuiltinSt
         for ((name, details) in staticOptions) {
             if ((type.namespaceUri == NsP.namespace && name == Ns.message)
                 || (type.namespaceUri != NsP.namespace && name == NsP.message)) {
-                message = details.staticValue.evaluate()
+                message = details.staticValue.evaluate(stepConfig)
             } else {
-                implementation.option(name, LazyValue(details.stepConfig, details.staticValue))
+                implementation.option(name, LazyValue(details.stepConfig, details.staticValue, stepConfig))
             }
         }
 
@@ -129,9 +129,9 @@ open class AtomicStep(yconfig: RuntimeStepConfiguration, atomic: AtomicBuiltinSt
         }
 
         val stepConfig = (implementation as AbstractAtomicStep).stepConfig
-        rteContext.newExecutionContext(stepConfig)
+        stepConfig.environment.xmlCalabash.newExecutionContext(stepConfig)
         runImplementation()
-        rteContext.releaseExecutionContext()
+        stepConfig.environment.xmlCalabash.releaseExecutionContext()
 
         for ((_, rpair) in receiver) {
             rpair.first.close(rpair.second)

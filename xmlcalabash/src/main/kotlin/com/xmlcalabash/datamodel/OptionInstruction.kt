@@ -12,7 +12,7 @@ import net.sf.saxon.s9api.XdmNode
 import net.sf.saxon.s9api.XdmValue
 import net.sf.saxon.trans.SymbolicName
 
-open class OptionInstruction(parent: XProcInstruction, name: QName, stepConfig: StepConfiguration): VariableBindingContainer(parent, name, stepConfig, NsP.option) {
+open class OptionInstruction(parent: XProcInstruction, name: QName, stepConfig: InstructionConfiguration): VariableBindingContainer(parent, name, stepConfig, NsP.option) {
     private val _values = mutableListOf<XdmAtomicValue>()
     var values: List<XdmAtomicValue>
         get() = _values

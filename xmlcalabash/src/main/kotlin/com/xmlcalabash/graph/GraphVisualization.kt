@@ -1,6 +1,6 @@
 package com.xmlcalabash.graph
 
-import com.xmlcalabash.datamodel.StepConfiguration
+import com.xmlcalabash.datamodel.InstructionConfiguration
 import com.xmlcalabash.namespace.NsDescription
 import com.xmlcalabash.util.SaxonTreeBuilder
 import net.sf.saxon.s9api.XdmNode
@@ -16,7 +16,7 @@ class   GraphVisualization private constructor(val graph: Graph) {
         private var sinkid = 0
     }
 
-    private lateinit var stepConfig: StepConfiguration
+    private lateinit var stepConfig: InstructionConfiguration
     private val nodes = mutableListOf<Node>()
     private val modelMap = mutableMapOf<Model,Node>()
     private val edges = mutableListOf<Edge>()

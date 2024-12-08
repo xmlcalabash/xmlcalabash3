@@ -7,7 +7,6 @@ import net.sf.saxon.s9api.XdmNode
 import java.io.File
 
 class TestSuite(val xmlCalabash: XmlCalabash, val options: TestOptions) {
-    val builder = xmlCalabash.newPipelineBuilder()
     val testCases = mutableMapOf<TestCase, TestStatus>()
 
     fun loadTest(testFile: File) {

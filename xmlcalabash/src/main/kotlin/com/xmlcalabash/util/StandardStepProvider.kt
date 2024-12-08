@@ -2,7 +2,6 @@ package com.xmlcalabash.util
 
 import com.xmlcalabash.api.XProcStep
 import com.xmlcalabash.config.SaxonConfiguration
-import com.xmlcalabash.datamodel.StepConfiguration
 import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.namespace.NsCx
 import com.xmlcalabash.namespace.NsP

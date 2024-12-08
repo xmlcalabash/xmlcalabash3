@@ -25,7 +25,7 @@ class StaticOptionsManager() {
 
     fun compileTimeValue(name: QName, value: XProcExpression) {
         compileTimeOptions[name] = value
-        _useWhenOptions[name] = value.evaluate()
+        _useWhenOptions[name] = value.evaluate(value.stepConfig)
     }
 
     fun useWhenValue(name: QName, value: XdmValue) {
@@ -41,7 +41,7 @@ class StaticOptionsManager() {
                 else -> throw XProcError.xiImpossible("Unexpected static option type").exception()
             }
             if (compileTimeOptions.containsKey(variable.name)) {
-                details.override(compileTimeOptions[variable.name]!!.evaluate())
+                details.override(compileTimeOptions[variable.name]!!.evaluate(variable.stepConfig))
             }
             options[variable] = details
         }

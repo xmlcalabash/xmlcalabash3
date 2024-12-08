@@ -31,7 +31,7 @@ class ViewportInstruction(parent: XProcInstruction): CompoundLoopDeclaration(par
             throw XProcError.xsMissingRequiredAttribute(Ns.match).exception()
         }
 
-        val withOption = WithOptionInstruction(this, Ns.match, match.stepConfig)
+        val withOption = WithOptionInstruction(this, Ns.match, stepConfig)
         withOption.select = match
         _children.add(withOption)
 

@@ -1,10 +1,10 @@
 package com.xmlcalabash.runtime.steps
 
 import com.xmlcalabash.documents.XProcDocument
-import com.xmlcalabash.runtime.RuntimeStepConfiguration
+import com.xmlcalabash.runtime.XProcStepConfiguration
 import com.xmlcalabash.runtime.model.CompoundStepModel
 
-open class ChooseStep(yconfig: RuntimeStepConfiguration, compound: CompoundStepModel): CompoundStep(yconfig, compound) {
+open class ChooseStep(config: XProcStepConfiguration, compound: CompoundStepModel): CompoundStep(config, compound) {
     init {
         head.openPorts.remove("!context") // doesn't count as an open port from the outside
     }
@@ -22,7 +22,7 @@ open class ChooseStep(yconfig: RuntimeStepConfiguration, compound: CompoundStepM
         val stepsToRun = mutableListOf<AbstractStep>()
         stepsToRun.addAll(runnables.filter { it !is ChooseWhenStep })
 
-        stepConfig.newExecutionContext(stepConfig)
+        stepConfig.environment.newExecutionContext(stepConfig)
 
         head.cacheInputs(cache)
         for (doc in context) {
@@ -45,7 +45,7 @@ open class ChooseStep(yconfig: RuntimeStepConfiguration, compound: CompoundStepM
         }
 
         foot.runStep()
-        stepConfig.releaseExecutionContext()
+        stepConfig.environment.releaseExecutionContext()
     }
 
     override fun reset() {

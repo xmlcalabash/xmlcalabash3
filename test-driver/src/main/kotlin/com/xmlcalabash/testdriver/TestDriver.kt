@@ -1,12 +1,16 @@
 package com.xmlcalabash.testdriver
 
 import com.xmlcalabash.config.XmlCalabash
-import com.xmlcalabash.exceptions.XProcException
 import com.xmlcalabash.util.SaxonTreeBuilder
+import net.sf.saxon.event.ReceiverOption
+import net.sf.saxon.om.AttributeInfo
+import net.sf.saxon.om.AttributeMap
+import net.sf.saxon.om.EmptyAttributeMap
+import net.sf.saxon.om.FingerprintedQName
 import net.sf.saxon.s9api.QName
+import net.sf.saxon.type.BuiltInAtomicType
 import java.io.*
 import java.net.InetAddress
-import java.text.DecimalFormat
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import kotlin.system.exitProcess
@@ -259,18 +263,18 @@ class TestDriver(val testOptions: TestOptions, val exclusions: Map<String, Strin
         map[NsReport.errors] = fail.toString()
         map[NsReport.skipped] = notrun.toString()
 
-        report.addStartElement(NsReport.testsuite, saxonConfig.valueConverter.attributeMap(map))
+        report.addStartElement(NsReport.testsuite, attributeMap(map))
 
         report.addStartElement(NsReport.properties)
-        val rte = saxonConfig.rteContext
-        property(report, "processor", rte.productName)
-        property(report, "version", rte.productVersion)
-        property(report, "gitHash", rte.gitHash)
+        val env = saxonConfig.environment
+        property(report, "processor", env.productName)
+        property(report, "version", env.productVersion)
+        property(report, "gitHash", env.gitHash)
         property(report, "saxonVersion", "${saxonConfig.processor.saxonProductVersion}/${saxonConfig.processor.saxonEdition}")
-        property(report, "vendor", rte.vendor)
-        property(report, "vendorURI", rte.vendorUri)
+        property(report, "vendor", env.vendor)
+        property(report, "vendorURI", env.vendorUri)
         property(report, "xprocVersion", "3.1")
-        property(report, "xpathVersion", rte.xpathVersion)
+        property(report, "xpathVersion", env.xpathVersion)
         property(report, "psviSupported", xmlCalabash.xmlCalabashConfig.schemaAware.toString())
         report.addEndElement()
 
@@ -279,7 +283,7 @@ class TestDriver(val testOptions: TestOptions, val exclusions: Map<String, Strin
             map[NsReport.name] = test.testFile.name
             map[NsReport.time] = String.format("%1.4f", test.elapsedSeconds)
 
-            report.addStartElement(NsReport.testcase, saxonConfig.valueConverter.attributeMap(map))
+            report.addStartElement(NsReport.testcase, attributeMap(map))
 
             if (test.status.status == "skip") {
                 report.addStartElement(NsReport.skipped)
@@ -328,11 +332,27 @@ class TestDriver(val testOptions: TestOptions, val exclusions: Map<String, Strin
         stream.close()
     }
 
+    private fun attributeMap(attr: Map<QName, String?>): AttributeMap {
+        var map: AttributeMap = EmptyAttributeMap.getInstance()
+        for ((name, value) in attr) {
+            if (value != null) {
+                map = map.put(attributeInfo(name, value))
+            }
+        }
+        return map
+    }
+
+    private fun attributeInfo(name: QName, value: String, location: net.sf.saxon.s9api.Location? = null): AttributeInfo {
+        return AttributeInfo(fqName(name), BuiltInAtomicType.UNTYPED_ATOMIC, value, location, ReceiverOption.NONE)
+    }
+
+    private fun fqName(name: QName): FingerprintedQName = FingerprintedQName(name.prefix, name.namespaceUri, name.localName)
+
     private fun property(report: SaxonTreeBuilder, key: String, value: String) {
         val saxonConfig = xmlCalabash.saxonConfig
 
         val map = mapOf( NsReport.name to key, NsReport.value to value )
-        report.addStartElement(NsReport.property, saxonConfig.valueConverter.attributeMap(map))
+        report.addStartElement(NsReport.property, attributeMap(map))
         report.addEndElement()
     }
 

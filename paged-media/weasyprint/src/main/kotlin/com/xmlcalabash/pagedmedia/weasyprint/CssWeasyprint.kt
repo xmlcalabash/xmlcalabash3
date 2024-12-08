@@ -6,7 +6,7 @@ import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.io.XProcSerializer
 import com.xmlcalabash.namespace.NsC
-import com.xmlcalabash.config.XProcStepConfiguration
+import com.xmlcalabash.runtime.XProcStepConfiguration
 import com.xmlcalabash.util.SaxonTreeBuilder
 import net.sf.saxon.s9api.QName
 import net.sf.saxon.s9api.XdmValue

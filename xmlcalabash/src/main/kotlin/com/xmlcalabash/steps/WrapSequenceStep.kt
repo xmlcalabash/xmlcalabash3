@@ -1,6 +1,5 @@
 package com.xmlcalabash.steps
 
-import com.xmlcalabash.datamodel.StepConfiguration
 import com.xmlcalabash.documents.DocumentContext
 import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.namespace.Ns
@@ -88,7 +87,7 @@ open class WrapSequenceStep(): AbstractAtomicStep() {
                 lastValue = thisValue
                 inGroup = true
                 builder = SaxonTreeBuilder(stepConfig)
-                builder.startDocument(stepConfig.uniqueUri(stepConfig.baseUri.toString()))
+                builder.startDocument(stepConfig.environment.uniqueUri(stepConfig.baseUri.toString()))
                 builder.addStartElement(wrapperName)
                 builder.addSubtree(doc.value)
             }

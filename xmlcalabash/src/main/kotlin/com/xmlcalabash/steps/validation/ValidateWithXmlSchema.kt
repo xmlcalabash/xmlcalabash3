@@ -75,7 +75,7 @@ open class ValidateWithXmlSchema(): AbstractAtomicStep() {
             val schemaHint = sourceNode.getAttributeValue(NsXsi.schemaLocation)
             if (nonsSchemaHint != null) {
                 val uri = sourceNode.baseURI.resolve(nonsSchemaHint)
-                val docManager = stepConfig.documentManager
+                val docManager = stepConfig.environment.documentManager
                 val doc = docManager.load(uri, stepConfig)
                 schemaDocuments.add(doc.value as XdmNode)
             }
@@ -84,7 +84,7 @@ open class ValidateWithXmlSchema(): AbstractAtomicStep() {
                 var idx = 1
                 while (idx < parts.size) {
                     val uri = sourceNode.baseURI.resolve(parts[idx])
-                    val docManager = stepConfig.documentManager
+                    val docManager = stepConfig.environment.documentManager
                     try {
                         val schema = docManager.load(uri, stepConfig)
                         schemaDocuments.add(schema.value as XdmNode)
@@ -99,7 +99,7 @@ open class ValidateWithXmlSchema(): AbstractAtomicStep() {
         if (tryNamespaces) {
             val ns = sourceNode.nodeName.namespaceUri
             if (ns != NamespaceUri.NULL) {
-                val docManager = stepConfig.documentManager
+                val docManager = stepConfig.environment.documentManager
                 val doc = docManager.load(URI(ns.toString()), stepConfig)
                 schemaDocuments.add(doc.value as XdmNode)
             }

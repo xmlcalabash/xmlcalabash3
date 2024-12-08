@@ -4,10 +4,10 @@ import com.xmlcalabash.datamodel.MediaType
 import com.xmlcalabash.documents.DocumentProperties
 import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.exceptions.XProcError
-import com.xmlcalabash.runtime.RuntimeStepConfiguration
+import com.xmlcalabash.runtime.XProcStepConfiguration
 import com.xmlcalabash.runtime.model.CompoundStepModel
 
-class PipelineStep(yconfig: RuntimeStepConfiguration, compound: CompoundStepModel): GroupStep(yconfig,compound) {
+class PipelineStep(config: XProcStepConfiguration, compound: CompoundStepModel): GroupStep(config,compound) {
     override fun runStep() {
         if (runnables.isEmpty()) {
             instantiate()
@@ -21,7 +21,7 @@ class PipelineStep(yconfig: RuntimeStepConfiguration, compound: CompoundStepMode
             }
 
             if (step.externalName in staticOptions) {
-                val value = staticOptions[step.externalName]!!.staticValue.evaluate()
+                val value = staticOptions[step.externalName]!!.staticValue.evaluate(stepConfig)
                 val document = XProcDocument.ofValue(value, stepConfig, MediaType.OCTET_STREAM, DocumentProperties())
                 step.externalValue = document
             } else if (step.externalName in head.options) {

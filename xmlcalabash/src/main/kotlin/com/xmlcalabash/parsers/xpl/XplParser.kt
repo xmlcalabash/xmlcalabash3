@@ -606,7 +606,7 @@ class XplParser(val builder: PipelineBuilder) {
         processElements(node, whenInstr, elementMapping)
     }
 
-    private fun parseStaticBoolean(stepConfig: StepConfiguration, value: String): Boolean {
+    private fun parseStaticBoolean(stepConfig: InstructionConfiguration, value: String): Boolean {
         try {
             return stepConfig.parseBoolean(value)
         } catch (ex: XProcException) {
@@ -1020,7 +1020,7 @@ class XplParser(val builder: PipelineBuilder) {
         }
     }
 
-    private fun parseCodes(stepConfig: StepConfiguration, value: String): List<QName> {
+    private fun parseCodes(stepConfig: InstructionConfiguration, value: String): List<QName> {
         if (value.trim().isEmpty()) {
             throw XProcError.xsInvalidAttribute(Ns.code).exception()
         }
@@ -1068,7 +1068,7 @@ class XplParser(val builder: PipelineBuilder) {
         }
     }
 
-    private fun inlineXml(stepConfig: StepConfiguration, node: ElementNode, nodes: List<AnyNode>): XdmNode {
+    private fun inlineXml(stepConfig: InstructionConfiguration, node: ElementNode, nodes: List<AnyNode>): XdmNode {
         val builder = SaxonTreeBuilder(stepConfig)
         builder.startDocument(node.baseUri)
 
@@ -1095,7 +1095,7 @@ class XplParser(val builder: PipelineBuilder) {
         return builder.result
     }
 
-    private fun filterXml(builder: SaxonTreeBuilder, stepConfig: StepConfiguration, node: AnyNode, excludeNamespaceUris: Set<NamespaceUri>, baseUri: URI?) {
+    private fun filterXml(builder: SaxonTreeBuilder, stepConfig: InstructionConfiguration, node: AnyNode, excludeNamespaceUris: Set<NamespaceUri>, baseUri: URI?) {
         when (node) {
             is ElementNode -> {
                 val includeNS = mutableMapOf<String, NamespaceUri>()
@@ -1151,7 +1151,7 @@ class XplParser(val builder: PipelineBuilder) {
         }
     }
 
-    private fun excludeNamespaces(stepConfig: StepConfiguration, excludeNamespaceUris: MutableSet<NamespaceUri>, child: AnyNode) {
+    private fun excludeNamespaces(stepConfig: InstructionConfiguration, excludeNamespaceUris: MutableSet<NamespaceUri>, child: AnyNode) {
         if (child is ElementNode && child.node.nodeName.namespaceUri == NsP.namespace
             && child.attributes.contains(Ns.excludeInlinePrefixes)) {
             val prefixes = child.attributes[Ns.excludeInlinePrefixes]!!

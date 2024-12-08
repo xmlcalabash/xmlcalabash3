@@ -1,25 +1,61 @@
-package com.xmlcalabash.util
+package com.xmlcalabash.runtime
 
+import com.xmlcalabash.config.SaxonConfiguration
+import com.xmlcalabash.runtime.XProcStepConfiguration
+import com.xmlcalabash.config.XmlCalabash
+import com.xmlcalabash.datamodel.DeclareStepInstruction
+import com.xmlcalabash.datamodel.Location
+import com.xmlcalabash.datamodel.PipelineEnvironment
+import com.xmlcalabash.documents.DocumentContext
 import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.exceptions.XProcException
 import com.xmlcalabash.namespace.Ns
 import com.xmlcalabash.namespace.NsErr
 import com.xmlcalabash.namespace.NsFn
 import com.xmlcalabash.namespace.NsXs
-import com.xmlcalabash.runtime.ValueConverter
 import net.sf.saxon.event.ReceiverOption
 import net.sf.saxon.expr.parser.XPathParser
 import net.sf.saxon.ma.arrays.ArrayItemType
 import net.sf.saxon.ma.map.MapItem
 import net.sf.saxon.ma.map.MapType
-import net.sf.saxon.om.*
+import net.sf.saxon.om.AttributeInfo
+import net.sf.saxon.om.AttributeMap
+import net.sf.saxon.om.EmptyAttributeMap
+import net.sf.saxon.om.FingerprintedQName
+import net.sf.saxon.om.NamespaceUri
 import net.sf.saxon.s9api.*
-import net.sf.saxon.s9api.SequenceType
 import net.sf.saxon.sxpath.IndependentContext
 import net.sf.saxon.type.BuiltInAtomicType
-import net.sf.saxon.value.*
+import net.sf.saxon.value.AnyURIValue
+import net.sf.saxon.value.AtomicValue
+import net.sf.saxon.value.Base64BinaryValue
+import net.sf.saxon.value.BooleanValue
+import net.sf.saxon.value.DateTimeValue
+import net.sf.saxon.value.DateValue
+import net.sf.saxon.value.DayTimeDurationValue
+import net.sf.saxon.value.DecimalValue
+import net.sf.saxon.value.DoubleValue
+import net.sf.saxon.value.DurationValue
+import net.sf.saxon.value.FloatValue
+import net.sf.saxon.value.GDayValue
+import net.sf.saxon.value.GMonthDayValue
+import net.sf.saxon.value.GMonthValue
+import net.sf.saxon.value.GYearMonthValue
+import net.sf.saxon.value.GYearValue
+import net.sf.saxon.value.HexBinaryValue
+import net.sf.saxon.value.Int64Value
+import net.sf.saxon.value.QNameValue
+import net.sf.saxon.value.StringValue
+import net.sf.saxon.value.TimeValue
+import net.sf.saxon.value.YearMonthDurationValue
+import java.net.URI
 
-class SaxonValueConverter(val processor: Processor): ValueConverter {
+open class XProcStepConfigurationImpl internal constructor(
+    override val environment: PipelineEnvironment,
+    override val saxonConfig: SaxonConfiguration,
+    location: Location
+): XProcStepConfiguration, DocumentContext
+{
     companion object {
         private val parsedXsTypes = mutableMapOf<String, SequenceType>()
         private var vara = QName("a")
@@ -35,16 +71,393 @@ class SaxonValueConverter(val processor: Processor): ValueConverter {
             return _itemTypeFactory!!
         }
 
+    protected var _location: Location = location
+    override val location: Location
+        get() = _location
+
+    override val xmlCalabash: XmlCalabash
+        get() = environment.xmlCalabash
+    override val processor: Processor
+        get() = saxonConfig.processor
+
+    protected val _inscopeNamespaces = mutableMapOf<String, NamespaceUri>()
+    protected val _inscopeStepTypes = mutableMapOf<QName, DeclareStepInstruction>()
+
+    override val inscopeNamespaces: Map<String, NamespaceUri>
+        get() = _inscopeNamespaces
+    override val inscopeStepTypes: Map<QName, DeclareStepInstruction>
+        get() = _inscopeStepTypes
+
+    private var _stepName: String? = null
+    override var stepName: String
+        get() = _stepName!!
+        set(value) {
+            _stepName = value
+        }
+
+    override val baseUri: URI?
+        get() = _location.baseURI
+
+    private var _nextId: String? = null
+    override val nextId: String
+        get() {
+            if (_nextId == null) {
+                _nextId = environment.nextId
+            }
+            return _nextId!!
+        }
+
+    override fun copy(): XProcStepConfiguration {
+        val copy = XProcStepConfigurationImpl(environment, saxonConfig, location)
+        copy._inscopeNamespaces.putAll(_inscopeNamespaces)
+        copy._inscopeStepTypes.putAll(_inscopeStepTypes)
+        copy._stepName = _stepName
+        return copy
+    }
+
+    override fun copyNew(): XProcStepConfiguration {
+        val copy = XProcStepConfigurationImpl(environment, saxonConfig.newConfiguration(), location)
+        copy._inscopeNamespaces.putAll(_inscopeNamespaces)
+        copy._inscopeStepTypes.putAll(_inscopeStepTypes)
+        copy._stepName = _stepName
+        return copy
+    }
+
+    override fun copy(config: XProcStepConfiguration): XProcStepConfiguration {
+        return config.copy()
+    }
+
+    override fun putNamespace(prefix: String, uri: NamespaceUri) {
+        _inscopeNamespaces[prefix] = uri
+    }
+
+    override fun putAllNamespaces(namespaces: Map<String, NamespaceUri>) {
+        _inscopeNamespaces.putAll(namespaces)
+    }
+
+    override fun putStepType(type: QName, decl: DeclareStepInstruction) {
+        _inscopeStepTypes[type] = decl
+    }
+
+    override fun putAllStepTypes(types: Map<QName, DeclareStepInstruction>) {
+        _inscopeStepTypes.putAll(types)
+    }
+
+    override fun setLocation(location: Location) {
+        _location = location
+    }
+
+    override fun newXPathCompiler(): XPathCompiler {
+        val compiler = processor.newXPathCompiler()
+        for ((prefix, value) in inscopeNamespaces) {
+            compiler.declareNamespace(prefix, value.toString())
+        }
+        return compiler
+    }
+
+    override fun stepDeclaration(name: QName): DeclareStepInstruction? {
+        return _inscopeStepTypes[name] ?: environment.standardSteps[name]
+    }
+
+    override fun stepAvailable(name: QName): Boolean {
+        val decl = stepDeclaration(name)
+        if (decl != null) {
+            return !decl.isAtomic || environment.commonEnvironment.atomicStepAvailable(name)
+        }
+        return false
+    }
+
+    fun parseAsType(value: String, type: SequenceType, inscopeNamespaces: Map<String, NamespaceUri>): XdmValue {
+        val compiler = processor.newXPathCompiler()
+        for ((prefix, uri) in inscopeNamespaces) {
+            compiler.declareNamespace(prefix, uri.toString())
+        }
+        val exec = compiler.compile(value)
+        val selector = exec.load()
+        val result = selector.evaluate()
+        return validateAsType(result, type.underlyingSequenceType, inscopeNamespaces)
+    }
+
+    fun castAtomicAs(value: XdmAtomicValue, seqType: SequenceType?, inscopeNamespaces: Map<String, NamespaceUri>): XdmAtomicValue {
+        if (seqType == null) {
+            return value
+        }
+        return castAtomicAs(value, seqType.itemType, inscopeNamespaces)
+    }
+
+    fun castAtomicAs(value: XdmAtomicValue, xsdtype: ItemType, inscopeNamespaces: Map<String, NamespaceUri>): XdmAtomicValue {
+        if (xsdtype == ItemType.UNTYPED_ATOMIC || xsdtype == ItemType.STRING || xsdtype == ItemType.ANY_ITEM) {
+            return value
+        }
+
+        if (xsdtype == ItemType.QNAME) {
+            val qname = when (value.primitiveTypeName) {
+                NsXs.string, NsXs.untypedAtomic -> XdmAtomicValue(parseQName(value.stringValue, inscopeNamespaces))
+                NsXs.QName -> value
+                else -> throw XProcError.xdBadType(value.stringValue, xsdtype).exception()
+            }
+            return qname
+        }
+
+        try {
+            return XdmAtomicValue(value.stringValue, xsdtype)
+        } catch (ex: Exception) {
+            when (ex) {
+                is SaxonApiException -> {
+                    if (ex.message!!.contains("Invalid URI")) {
+                        throw XProcError.xdInvalidUri(value.stringValue).exception()
+                    }
+                    throw XProcError.xdBadType(value.stringValue, xsdtype).exception()
+
+                }
+                else -> throw ex
+            }
+        }
+    }
+
+    fun xpathInstanceOf(value: XdmValue, type: QName): Boolean {
+        if (type.namespaceUri != NsXs.namespace) {
+            throw XProcError.xiImpossible("Attempt to cast to non-xs type").exception()
+        }
+
+        val compiler = processor.newXPathCompiler()
+        compiler.declareVariable(vara)
+        val exec = compiler.compile("\$a instance of Q{${NsXs.namespace}}${type.localName}")
+        val selector = exec.load()
+        selector.setVariable(vara, value)
+        return selector.effectiveBooleanValue()
+    }
+
+    fun xpathCastAs(value: XdmValue, type: QName): XdmValue {
+        if (type.namespaceUri != NsXs.namespace) {
+            throw XProcError.xiImpossible("Attempt to cast to non-xs type").exception()
+        }
+
+        val compiler = processor.newXPathCompiler()
+        compiler.declareVariable(vara)
+        val exec = compiler.compile("\$a cast as Q{${NsXs.namespace}}${type.localName}")
+        val selector = exec.load()
+        selector.setVariable(vara, value)
+        return selector.evaluate()
+    }
+
+    fun xpathTreatAs(value: XdmValue, type: QName): XdmValue {
+        if (type.namespaceUri != NsXs.namespace) {
+            throw XProcError.xiImpossible("Attempt to cast to non-xs type").exception()
+        }
+
+        val compiler = processor.newXPathCompiler()
+        compiler.declareVariable(vara)
+        val exec = compiler.compile("\$a treat as Q{${NsXs.namespace}}${type.localName}")
+        val selector = exec.load()
+        selector.setVariable(vara, value)
+        try {
+            return selector.evaluate()
+        } catch (ex: Exception) {
+            throw XProcError.xdBadType(ex.message ?: "").exception(ex)
+        }
+    }
+
+    fun xpathPromote(value: XdmValue, type: QName): XdmValue {
+        if (type.namespaceUri != NsXs.namespace) {
+            throw XProcError.xiImpossible("Attempt to cast to non-xs type").exception()
+        }
+        if (value.underlyingValue !is AtomicValue) {
+            throw XProcError.xiImpossible("Attempt to promote non-atomic: ${value}").exception()
+        }
+
+        val curType = (value.underlyingValue as AtomicValue).primitiveType
+
+        if (curType == BuiltInAtomicType.ANY_ATOMIC || curType == BuiltInAtomicType.UNTYPED_ATOMIC) {
+            return xpathCastAs(value, type)
+        }
+
+        if (curType.isNumericType && (type in NsXs.numericTypes)) {
+            return xpathCastAs(value, type)
+        }
+
+        if (curType == BuiltInAtomicType.ANY_URI && type == NsXs.string) {
+            return xpathCastAs(value, type)
+        }
+
+        if (curType == BuiltInAtomicType.STRING && type == NsXs.anyURI) {
+            return xpathCastAs(value, type)
+        }
+
+        return xpathTreatAs(value, type)
+    }
+
+    override fun checkType(
+        varName: QName?,
+        value: XdmValue,
+        sequenceType: SequenceType?,
+        values: List<XdmAtomicValue>
+    ): XdmValue {
+        return checkType(varName, value, sequenceType, inscopeNamespaces, values)
+    }
+
+    override fun checkType(
+        varName: QName?,
+        value: XdmValue,
+        sequenceType: SequenceType?,
+        inscopeNamespaces: Map<String, NamespaceUri>,
+        values: List<XdmAtomicValue>
+    ): XdmValue {
+        var newValue = value
+        if (sequenceType != null) {
+            val code = sequenceType.itemType.underlyingItemType.basicAlphaCode
+
+            if (value === XdmEmptySequence.getInstance()) {
+                if (sequenceType.occurrenceIndicator == OccurrenceIndicator.ZERO
+                    || sequenceType.occurrenceIndicator == OccurrenceIndicator.ZERO_OR_ONE
+                    || sequenceType.occurrenceIndicator == OccurrenceIndicator.ZERO_OR_MORE) {
+                    return value
+                }
+                throw XProcError.xdBadType("Empty sequence not allowed").exception()
+                /*
+                if (code == "AB") {
+                    return XdmAtomicValue(false)
+                }
+                if (varName == null) {
+                    throw XProcError.xdBadType(value.underlyingValue.stringValue, sequenceType.underlyingSequenceType.toString()).exception()
+                } else {
+                    throw XProcError.xdBadType(varName, value.toString(), sequenceType.underlyingSequenceType.toString()).exception()
+                }
+                 */
+            }
+
+            // We've got a bit of a hack here. If the input is a string, but the type is a
+            // map or array, attempt to parse the string. For simple atomic values, like strings
+            // or numbers, we don't have to do this
+            newValue = if (value.underlyingValue is StringValue && (code == "FA" || code == "FM")) {
+                parseAsType(value.underlyingValue.stringValue, sequenceType, inscopeNamespaces)
+            } else {
+                validateAsType(value, sequenceType.underlyingSequenceType, inscopeNamespaces)
+            }
+        }
+
+        if (values.isNotEmpty()) {
+            for (item in newValue) {
+                checkType(item, values)
+            }
+        }
+
+        return newValue
+    }
+
+    private fun checkType(value: XdmValue, values: List<XdmAtomicValue>) {
+        for (alt in values) {
+            if (xpathEq(value, alt)) {
+                return
+            }
+        }
+        throw XProcError.xdValueNotAllowed(value, values).exception()
+    }
+
+    override fun forceQNameKeys(inputMap: MapItem): XdmMap {
+        return forceQNameKeys(inputMap, inscopeNamespaces)
+    }
+
+    override fun forceQNameKeys(
+        inputMap: MapItem,
+        inscopeNamespaces: Map<String, NamespaceUri>
+    ): XdmMap {
+        var map = XdmMap()
+        for (pair in inputMap.keyValuePairs()) {
+            when (pair.key.itemType) {
+                BuiltInAtomicType.STRING -> {
+                    val qname = parseQName(pair.key.stringValue, inscopeNamespaces)
+                    map = map.put(XdmAtomicValue(qname), XdmValue.wrap(pair.value))
+                }
+
+                BuiltInAtomicType.QNAME -> {
+                    val qvalue = pair.key as QNameValue
+                    val key = QName(qvalue.prefix, qvalue.namespaceURI.toString(), qvalue.localName)
+                    map = map.put(XdmAtomicValue(key), XdmValue.wrap(pair.value))
+                }
+
+                else -> {
+                    throw RuntimeException("key isn't string or qname?")
+                }
+            }
+        }
+        return map
+    }
+
+    override fun forceQNameKeys(inputMap: XdmMap): XdmMap {
+        return forceQNameKeys(inputMap, inscopeNamespaces)
+    }
+
+    override fun forceQNameKeys(
+        inputMap: XdmMap,
+        inscopeNamespaces: Map<String, NamespaceUri>
+    ): XdmMap {
+        var map = XdmMap()
+        for (key in inputMap.keySet()) {
+            val value = inputMap.get(key)
+            val mapkey = when (key.underlyingValue.itemType) {
+                BuiltInAtomicType.STRING -> parseQName(key.stringValue, inscopeNamespaces)
+                BuiltInAtomicType.QNAME -> {
+                    val qvalue = key.underlyingValue as QNameValue
+                    QName(qvalue.prefix, qvalue.namespaceURI.toString(), qvalue.localName)
+                }
+
+                else -> throw RuntimeException("key isn't string or qname?")
+            }
+
+            if (mapkey == Ns.serialization) {
+                if (value is XdmMap) {
+                    try {
+                        map = map.put(XdmAtomicValue(mapkey), forceQNameKeys(value, inscopeNamespaces))
+                    } catch (ex: XProcException) {
+                        if (ex.error.code == NsErr.xd(36)) {
+                            val name = ex.error.details.getOrNull(0)
+                            if (name is String) {
+                                XProcError.xdInvalidSerialization(name).exception()
+                            }
+                            throw XProcError.xdInvalidSerialization().exception()
+                        }
+                    }
+                } else {
+                    throw XProcError.xdInvalidSerialization().exception()
+                }
+            } else {
+                map = map.put(XdmAtomicValue(mapkey), value)
+            }
+        }
+        return map
+    }
+
+    override fun exception(error: XProcError): XProcException {
+        // TODO: add more context to the error
+        return error.at(location).exception()
+    }
+
+    override fun exception(error: XProcError, cause: Throwable): XProcException {
+        return XProcException(error.at(location), cause)
+    }
+
     override fun parseBoolean(bool: String): Boolean {
         val value = castAtomicAs(XdmAtomicValue(bool), ItemType.BOOLEAN, mapOf())
         return value.booleanValue
     }
 
-    override fun parseQName(name: String, inscopeNamespaces: Map<String, NamespaceUri>): QName {
+    override fun parseQName(name: String): QName {
         return parseQName(name, inscopeNamespaces, NamespaceUri.NULL)
     }
 
-    override fun parseQName(name: String, inscopeNamespaces: Map<String, NamespaceUri>, defaultNamespace: NamespaceUri): QName {
+    override fun parseQName(
+        name: String,
+        inscopeNamespaces: Map<String, NamespaceUri>
+    ): QName {
+        return parseQName(name, inscopeNamespaces, NamespaceUri.NULL)
+    }
+
+    override fun parseQName(
+        name: String,
+        inscopeNamespaces: Map<String, NamespaceUri>,
+        defaultNamespace: NamespaceUri
+    ): QName {
         if (name.startsWith("Q{")) {
             val pos = name.indexOf("}")
             if (pos < 0) {
@@ -70,56 +483,6 @@ class SaxonValueConverter(val processor: Processor): ValueConverter {
     override fun parseNCName(name: String): String {
         val value = castAtomicAs(XdmAtomicValue(name), ItemType.NCNAME, mapOf())
         return value.stringValue
-    }
-
-    override fun forceQNameKeys(inputMap: MapItem, inscopeNamespaces: Map<String, NamespaceUri>): XdmMap {
-        var map = XdmMap()
-        for (pair in inputMap.keyValuePairs()) {
-            when (pair.key.itemType) {
-                BuiltInAtomicType.STRING -> {
-                    val qname = parseQName(pair.key.stringValue, inscopeNamespaces)
-                    map = map.put(XdmAtomicValue(qname), XdmValue.wrap(pair.value))
-                }
-
-                BuiltInAtomicType.QNAME -> {
-                    val qvalue = pair.key as QNameValue
-                    val key = QName(qvalue.prefix, qvalue.namespaceURI.toString(), qvalue.localName)
-                    map = map.put(XdmAtomicValue(key), XdmValue.wrap(pair.value))
-                }
-
-                else -> {
-                    throw RuntimeException("key isn't string or qname?")
-                }
-            }
-        }
-        return map
-    }
-
-    override fun forceQNameKeys(inputMap: XdmMap, inscopeNamespaces: Map<String, NamespaceUri>): XdmMap {
-        var map = XdmMap()
-        for (key in inputMap.keySet()) {
-            val value = inputMap.get(key)
-            val mapkey = when (key.underlyingValue.itemType) {
-                BuiltInAtomicType.STRING -> parseQName(key.stringValue, inscopeNamespaces)
-                BuiltInAtomicType.QNAME -> {
-                    val qvalue = key.underlyingValue as QNameValue
-                    QName(qvalue.prefix, qvalue.namespaceURI.toString(), qvalue.localName)
-                }
-
-                else -> throw RuntimeException("key isn't string or qname?")
-            }
-
-            if (mapkey == Ns.serialization) {
-                if (value is XdmMap) {
-                    map = map.put(XdmAtomicValue(mapkey), forceQNameKeys(value, inscopeNamespaces))
-                } else {
-                    throw XProcError.xdInvalidSerialization().exception()
-                }
-            } else {
-                map = map.put(XdmAtomicValue(mapkey), value)
-            }
-        }
-        return map
     }
 
     override fun stringAttributeMap(attr: Map<String, String?>): AttributeMap {
@@ -224,177 +587,14 @@ class SaxonValueConverter(val processor: Processor): ValueConverter {
         return selector.effectiveBooleanValue()
     }
 
-    fun xpathInstanceOf(value: XdmValue, type: QName): Boolean {
-        if (type.namespaceUri != NsXs.namespace) {
-            throw XProcError.xiImpossible("Attempt to cast to non-xs type").exception()
+    override fun resolve(href: String): URI {
+        if (baseUri == null) {
+            return URI(href)
         }
-
-        val compiler = processor.newXPathCompiler()
-        compiler.declareVariable(vara)
-        val exec = compiler.compile("\$a instance of Q{${NsXs.namespace}}${type.localName}")
-        val selector = exec.load()
-        selector.setVariable(vara, value)
-        return selector.effectiveBooleanValue()
+        return baseUri!!.resolve(href)
     }
 
-    fun xpathCastAs(value: XdmValue, type: QName): XdmValue {
-        if (type.namespaceUri != NsXs.namespace) {
-            throw XProcError.xiImpossible("Attempt to cast to non-xs type").exception()
-        }
-
-        val compiler = processor.newXPathCompiler()
-        compiler.declareVariable(vara)
-        val exec = compiler.compile("\$a cast as Q{${NsXs.namespace}}${type.localName}")
-        val selector = exec.load()
-        selector.setVariable(vara, value)
-        return selector.evaluate()
-    }
-
-    fun xpathTreatAs(value: XdmValue, type: QName): XdmValue {
-        if (type.namespaceUri != NsXs.namespace) {
-            throw XProcError.xiImpossible("Attempt to cast to non-xs type").exception()
-        }
-
-        val compiler = processor.newXPathCompiler()
-        compiler.declareVariable(vara)
-        val exec = compiler.compile("\$a treat as Q{${NsXs.namespace}}${type.localName}")
-        val selector = exec.load()
-        selector.setVariable(vara, value)
-        try {
-            return selector.evaluate()
-        } catch (ex: Exception) {
-            throw XProcError.xdBadType(ex.message ?: "").exception(ex)
-        }
-    }
-
-    fun xpathPromote(value: XdmValue, type: QName): XdmValue {
-        if (type.namespaceUri != NsXs.namespace) {
-            throw XProcError.xiImpossible("Attempt to cast to non-xs type").exception()
-        }
-        if (value.underlyingValue !is AtomicValue) {
-            throw XProcError.xiImpossible("Attempt to promote non-atomic: ${value}").exception()
-        }
-
-        val curType = (value.underlyingValue as AtomicValue).primitiveType
-
-        if (curType == BuiltInAtomicType.ANY_ATOMIC || curType == BuiltInAtomicType.UNTYPED_ATOMIC) {
-            return xpathCastAs(value, type)
-        }
-
-        if (curType.isNumericType && (type in NsXs.numericTypes)) {
-            return xpathCastAs(value, type)
-        }
-
-        if (curType == BuiltInAtomicType.ANY_URI && type == NsXs.string) {
-            return xpathCastAs(value, type)
-        }
-
-        if (curType == BuiltInAtomicType.STRING && type == NsXs.anyURI) {
-            return xpathCastAs(value, type)
-        }
-
-        return xpathTreatAs(value, type)
-    }
-
-    override fun checkType(varName: QName?, value: XdmValue, sequenceType: SequenceType?, inscopeNamespaces: Map<String, NamespaceUri>, values: List<XdmAtomicValue>): XdmValue {
-        var newValue = value
-        if (sequenceType != null) {
-            val code = sequenceType.itemType.underlyingItemType.basicAlphaCode
-
-            if (value === XdmEmptySequence.getInstance()) {
-                if (sequenceType.occurrenceIndicator == OccurrenceIndicator.ZERO
-                    || sequenceType.occurrenceIndicator == OccurrenceIndicator.ZERO_OR_ONE
-                    || sequenceType.occurrenceIndicator == OccurrenceIndicator.ZERO_OR_MORE) {
-                    return value
-                }
-                throw XProcError.xdBadType("Empty sequence not allowed").exception()
-                /*
-                if (code == "AB") {
-                    return XdmAtomicValue(false)
-                }
-                if (varName == null) {
-                    throw XProcError.xdBadType(value.underlyingValue.stringValue, sequenceType.underlyingSequenceType.toString()).exception()
-                } else {
-                    throw XProcError.xdBadType(varName, value.toString(), sequenceType.underlyingSequenceType.toString()).exception()
-                }
-                 */
-            }
-
-            // We've got a bit of a hack here. If the input is a string, but the type is a
-            // map or array, attempt to parse the string. For simple atomic values, like strings
-            // or numbers, we don't have to do this
-            newValue = if (value.underlyingValue is StringValue && (code == "FA" || code == "FM")) {
-                parseAsType(value.underlyingValue.stringValue, sequenceType, inscopeNamespaces)
-            } else {
-                validateAsType(value, sequenceType.underlyingSequenceType, inscopeNamespaces)
-            }
-        }
-
-        if (values.isNotEmpty()) {
-            for (item in newValue) {
-                checkType(item, values)
-            }
-        }
-
-        return newValue
-    }
-
-    private fun checkType(value: XdmValue, values: List<XdmAtomicValue>) {
-        for (alt in values) {
-            if (xpathEq(value, alt)) {
-                return
-            }
-        }
-        throw XProcError.xdValueNotAllowed(value, values).exception()
-    }
-
-    fun parseAsType(value: String, type: SequenceType, inscopeNamespaces: Map<String, NamespaceUri>): XdmValue {
-        val compiler = processor.newXPathCompiler()
-        for ((prefix, uri) in inscopeNamespaces) {
-            compiler.declareNamespace(prefix, uri.toString())
-        }
-        val exec = compiler.compile(value)
-        val selector = exec.load()
-        val result = selector.evaluate()
-        return validateAsType(result, type.underlyingSequenceType, inscopeNamespaces)
-    }
-
-    fun castAtomicAs(value: XdmAtomicValue, seqType: SequenceType?, inscopeNamespaces: Map<String, NamespaceUri>): XdmAtomicValue {
-        if (seqType == null) {
-            return value
-        }
-        return castAtomicAs(value, seqType.itemType, inscopeNamespaces)
-    }
-
-    fun castAtomicAs(value: XdmAtomicValue, xsdtype: ItemType, inscopeNamespaces: Map<String, NamespaceUri>): XdmAtomicValue {
-        if (xsdtype == ItemType.UNTYPED_ATOMIC || xsdtype == ItemType.STRING || xsdtype == ItemType.ANY_ITEM) {
-            return value
-        }
-
-        if (xsdtype == ItemType.QNAME) {
-            val qname = when (value.primitiveTypeName) {
-                NsXs.string, NsXs.untypedAtomic -> XdmAtomicValue(parseQName(value.stringValue, inscopeNamespaces))
-                NsXs.QName -> value
-                else -> throw XProcError.xdBadType(value.stringValue, xsdtype).exception()
-            }
-            return qname
-        }
-
-        try {
-            return XdmAtomicValue(value.stringValue, xsdtype)
-        } catch (ex: Exception) {
-            when (ex) {
-                is SaxonApiException -> {
-                    if (ex.message!!.contains("Invalid URI")) {
-                        throw XProcError.xdInvalidUri(value.stringValue).exception()
-                    }
-                    throw XProcError.xdBadType(value.stringValue, xsdtype).exception()
-
-                }
-                else -> throw ex
-            }
-        }
-    }
+    // ============================================================
 
     private fun attributeInfo(name: QName, value: String, location: net.sf.saxon.s9api.Location? = null): AttributeInfo {
         return AttributeInfo(fqName(name), BuiltInAtomicType.UNTYPED_ATOMIC, value, location, ReceiverOption.NONE)
@@ -748,4 +948,5 @@ class SaxonValueConverter(val processor: Processor): ValueConverter {
         //val itemType = itemTypeFactory.getAtomicType(typeName)
         return xpathPromote(value, typeName)
     }
+
 }

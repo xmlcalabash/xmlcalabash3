@@ -1,7 +1,7 @@
 package com.xmlcalabash.util
 
 import com.xmlcalabash.namespace.NsXs
-import com.xmlcalabash.config.XProcStepConfiguration
+import com.xmlcalabash.runtime.XProcStepConfiguration
 import net.sf.saxon.lib.ResourceRequest
 import net.sf.saxon.lib.ResourceResolver
 import net.sf.saxon.om.NamespaceUri

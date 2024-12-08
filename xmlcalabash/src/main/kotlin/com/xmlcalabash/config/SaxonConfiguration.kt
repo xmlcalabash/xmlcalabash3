@@ -1,10 +1,8 @@
 package com.xmlcalabash.config
 
+import com.xmlcalabash.datamodel.PipelineEnvironment
 import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.functions.*
-import com.xmlcalabash.runtime.RuntimeExecutionContext
-import com.xmlcalabash.runtime.ValueConverter
-import com.xmlcalabash.util.SaxonValueConverter
 import net.sf.saxon.Configuration
 import net.sf.saxon.functions.FunctionLibrary
 import net.sf.saxon.lib.ExtensionFunctionDefinition
@@ -17,25 +15,23 @@ import java.net.URI
 import javax.xml.transform.sax.SAXSource
 
 class SaxonConfiguration private constructor(
+    val environment: PipelineEnvironment,
     val configuration: Configuration,
-    val rteContext: RuntimeExecutionContext,
-    val valueConverter: ValueConverter,
     val processor: Processor
-): ExecutionContext by rteContext, ValueConverter by valueConverter {
+) {
     companion object {
         private var _id = 0
-        fun newInstance(xmlCalabash: XmlCalabash, rteContext: RuntimeExecutionContext): SaxonConfiguration {
+        fun newInstance(environment: PipelineEnvironment): SaxonConfiguration {
             // There's a little bit of chicken-and-egg here as I want to make a SaxonValueConverter,
             // but I need a Processor to do that.
-            val newConfiguration = newConfiguration(xmlCalabash)
+            val newConfiguration = newConfiguration(environment.xmlCalabash)
             val processor = Processor(newConfiguration)
-            val converter = SaxonValueConverter(processor)
 
-            val saxon = SaxonConfiguration(newConfiguration, rteContext, converter, processor)
+            val saxon = SaxonConfiguration(environment, newConfiguration, processor)
 
-            saxon._xmlCalabash = xmlCalabash
-            saxon.configurationFile = xmlCalabash.xmlCalabashConfig.saxonConfigurationFile
-            saxon.configurationProperties.putAll(xmlCalabash.xmlCalabashConfig.saxonConfigurationProperties)
+            saxon._xmlCalabash = environment.xmlCalabash
+            saxon.configurationFile = environment.xmlCalabash.xmlCalabashConfig.saxonConfigurationFile
+            saxon.configurationProperties.putAll(environment.xmlCalabash.xmlCalabashConfig.saxonConfigurationProperties)
             saxon.configureProcessor(processor)
             return saxon
         }
@@ -103,9 +99,13 @@ class SaxonConfiguration private constructor(
     )
 
     fun newConfiguration(): SaxonConfiguration {
+        return newConfiguration(environment)
+    }
+
+    fun newConfiguration(environment: PipelineEnvironment): SaxonConfiguration {
         val newConfig = newConfiguration(xmlCalabash)
         val processor = Processor(newConfig)
-        val saxon = SaxonConfiguration(newConfig, rteContext, SaxonValueConverter(processor), processor)
+        val saxon = SaxonConfiguration(environment, newConfig, processor)
         saxon.configuration.namePool = configuration.namePool
         saxon.configuration.documentNumberAllocator = configuration.documentNumberAllocator
 

@@ -103,7 +103,7 @@ open class ArchiveStep(): AbstractArchiveStep() {
                     entry.document = sourceMap[entry.href]!!
                     sourceMap.remove(entry.href)
                 } else {
-                    val manager = stepConfig.documentManager
+                    val manager = stepConfig.environment.documentManager
                     try {
                         entry.document = manager.load(entry.href, stepConfig)
                     } catch (ex: XProcException) {

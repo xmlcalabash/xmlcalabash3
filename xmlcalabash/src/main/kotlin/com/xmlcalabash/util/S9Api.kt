@@ -4,7 +4,7 @@ import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.io.XProcSerializer
 import com.xmlcalabash.namespace.NsXml
-import com.xmlcalabash.config.XProcStepConfiguration
+import com.xmlcalabash.runtime.XProcStepConfiguration
 import net.sf.saxon.s9api.*
 import net.sf.saxon.serialize.SerializationProperties
 import net.sf.saxon.str.UnicodeBuilder

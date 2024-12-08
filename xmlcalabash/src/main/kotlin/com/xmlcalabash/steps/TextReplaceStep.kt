@@ -22,7 +22,7 @@ open class TextReplaceStep(): AbstractTextStep() {
 
         try {
             val selector = compiler.compile("replace(\$text, \$pattern, \$replacement, \$flags)").load()
-            selector.resourceResolver = stepConfig.documentManager
+            selector.resourceResolver = stepConfig.environment.documentManager
             selector.setVariable(Ns.pattern, XdmAtomicValue(pattern))
             selector.setVariable(Ns.replacement, XdmAtomicValue(replacement))
             selector.setVariable(Ns.text, XdmAtomicValue(text))

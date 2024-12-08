@@ -1,5 +1,6 @@
 package com.xmlcalabash.datamodel
 
+import com.xmlcalabash.runtime.XProcStepConfiguration
 import com.xmlcalabash.exceptions.XProcError
 import net.sf.saxon.s9api.QName
 import net.sf.saxon.s9api.SequenceType
@@ -8,7 +9,7 @@ import net.sf.saxon.s9api.XdmValue
 abstract class VariableBindingContainer(
     parent: XProcInstruction,
     val name: QName,
-    stepConfig: StepConfiguration,
+    stepConfig: InstructionConfiguration,
     instructionType: QName
 ): BindingContainer(parent, stepConfig, instructionType) {
 
@@ -124,6 +125,12 @@ abstract class VariableBindingContainer(
                     val details = builder.staticOptionsManager.get(value)
                     select!!.setStaticBinding(name, details.staticValue)
                 }
+            }
+
+            val eager = stepConfig.environment.commonEnvironment.eagerEvaluation
+            if (eager) {
+                // Make sure it doesn't throw an exception
+                select!!.computeStaticValue(stepConfig)
             }
         }
     }

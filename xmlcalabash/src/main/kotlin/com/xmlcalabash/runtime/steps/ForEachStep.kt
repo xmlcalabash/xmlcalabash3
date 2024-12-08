@@ -1,10 +1,10 @@
 package com.xmlcalabash.runtime.steps
 
 import com.xmlcalabash.documents.XProcDocument
-import com.xmlcalabash.runtime.RuntimeStepConfiguration
+import com.xmlcalabash.runtime.XProcStepConfiguration
 import com.xmlcalabash.runtime.model.CompoundStepModel
 
-open class ForEachStep(yconfig: RuntimeStepConfiguration, compound: CompoundStepModel): CompoundStep(yconfig, compound) {
+open class ForEachStep(config: XProcStepConfiguration, compound: CompoundStepModel): CompoundStep(config, compound) {
     init {
         head.openPorts.remove("current") // doesn't count as an open port from the outside
         foot.alwaysAllowSequences = true
@@ -28,7 +28,7 @@ open class ForEachStep(yconfig: RuntimeStepConfiguration, compound: CompoundStep
         val stepsToRun = mutableListOf<AbstractStep>()
         stepsToRun.addAll(runnables)
 
-        val exec = stepConfig.newExecutionContext(stepConfig)
+        val exec = stepConfig.environment.newExecutionContext(stepConfig)
         exec.iterationSize = sequence.size.toLong()
 
         if (sequence.isEmpty()) {
@@ -62,7 +62,7 @@ open class ForEachStep(yconfig: RuntimeStepConfiguration, compound: CompoundStep
         }
 
         cache.clear()
-        stepConfig.releaseExecutionContext()
+        stepConfig.environment.releaseExecutionContext()
     }
 
     override fun reset() {

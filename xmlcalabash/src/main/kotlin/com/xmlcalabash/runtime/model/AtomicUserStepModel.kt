@@ -4,7 +4,7 @@ import com.xmlcalabash.datamodel.StaticOptionDetails
 import com.xmlcalabash.graph.AtomicModel
 import com.xmlcalabash.graph.Model
 import com.xmlcalabash.runtime.XProcRuntime
-import com.xmlcalabash.runtime.RuntimeStepConfiguration
+import com.xmlcalabash.runtime.XProcStepConfiguration
 import com.xmlcalabash.runtime.api.RuntimePort
 import com.xmlcalabash.runtime.steps.AbstractStep
 import com.xmlcalabash.runtime.steps.CompoundStep
@@ -28,7 +28,7 @@ class AtomicUserStepModel(runtime: XProcRuntime, model: AtomicModel, private val
         }
     }
 
-    override fun runnable(yconfig: RuntimeStepConfiguration): () -> AbstractStep {
+    override fun runnable(config: XProcStepConfiguration): () -> AbstractStep {
         // In this one case, the compound step's model inputs aren't the
         // important ones, *this* step's model inputs are the important ones.
         // What a lot of hackery.
@@ -48,7 +48,7 @@ class AtomicUserStepModel(runtime: XProcRuntime, model: AtomicModel, private val
                 impl.head._outputs[name] = impl.inputs[name]!!
             }
 
-            val instance = CompoundStep.newInstance(yconfig, impl)
+            val instance = CompoundStep.newInstance(config, impl)
             instance.stepType = stepType
             instance.stepName = name
 

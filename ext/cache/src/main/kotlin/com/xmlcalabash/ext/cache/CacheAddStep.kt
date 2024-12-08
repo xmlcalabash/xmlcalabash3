@@ -29,17 +29,17 @@ class CacheAddStep(): AbstractAtomicStep() {
         }
 
         if (href != null) {
-            if (failIfCached && stepConfig.documentManager.getCached(href) != null) {
+            if (failIfCached && stepConfig.environment.documentManager.getCached(href) != null) {
                 throw XProcError.xiDocumentInCache(href).exception()
             }
             val props = DocumentProperties(document.properties)
             props.set(Ns.baseUri, href)
-            stepConfig.documentManager.cache(document.with(props))
+            stepConfig.environment.documentManager.cache(document.with(props))
         } else {
-            if (failIfCached && stepConfig.documentManager.getCached(document.baseURI!!) != null) {
+            if (failIfCached && stepConfig.environment.documentManager.getCached(document.baseURI!!) != null) {
                 throw XProcError.xiDocumentInCache(document.baseURI!!).exception()
             }
-            stepConfig.documentManager.cache(document)
+            stepConfig.environment.documentManager.cache(document)
         }
 
         receiver.output("result", document)

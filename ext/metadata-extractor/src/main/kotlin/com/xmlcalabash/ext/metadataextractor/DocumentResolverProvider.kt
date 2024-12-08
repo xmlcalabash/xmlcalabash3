@@ -4,7 +4,7 @@ import com.xmlcalabash.datamodel.MediaType
 import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.io.DocumentLoader
 import com.xmlcalabash.io.DocumentManager
-import com.xmlcalabash.config.XProcStepConfiguration
+import com.xmlcalabash.runtime.XProcStepConfiguration
 import com.xmlcalabash.spi.DocumentResolver
 import com.xmlcalabash.spi.DocumentResolverProvider
 import java.io.IOException

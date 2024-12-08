@@ -3,7 +3,7 @@ package com.xmlcalabash.runtime.steps
 import com.xmlcalabash.documents.DocumentProperties
 import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.exceptions.XProcError
-import com.xmlcalabash.runtime.RuntimeStepConfiguration
+import com.xmlcalabash.runtime.XProcStepConfiguration
 import com.xmlcalabash.runtime.api.Receiver
 import com.xmlcalabash.runtime.model.CompoundStepModel
 import com.xmlcalabash.runtime.parameters.RunStepStepParameters
@@ -14,7 +14,7 @@ import net.sf.saxon.s9api.XdmNode
 import net.sf.saxon.s9api.XdmValue
 import net.sf.saxon.type.BuiltInAtomicType
 
-open class RunStep(yconfig: RuntimeStepConfiguration, compound: CompoundStepModel): CompoundStep(yconfig, compound) {
+open class RunStep(config: XProcStepConfiguration, compound: CompoundStepModel): CompoundStep(config, compound) {
     val runParams = compound.params as RunStepStepParameters
 
     override fun run() {
@@ -27,7 +27,7 @@ open class RunStep(yconfig: RuntimeStepConfiguration, compound: CompoundStepMode
         cache.putAll(head.cache)
         head.cacheClear()
 
-        stepConfig.newExecutionContext(stepConfig)
+        stepConfig.environment.newExecutionContext(stepConfig)
 
         val parser = stepConfig.xmlCalabash.newXProcParser()
         for ((name, option) in runParams.options) {
@@ -82,7 +82,7 @@ open class RunStep(yconfig: RuntimeStepConfiguration, compound: CompoundStepMode
         for (option in decl.options) {
             var value = if (staticOptions[option.name] != null) {
                 val sopt = staticOptions[option.name]!!
-                sopt.staticValue.evaluate()
+                sopt.staticValue.evaluate(stepConfig)
             } else if (head.options[option.name] != null) {
                 listToValue(head.options[option.name] ?: emptyList())
             } else if (option.static) {
@@ -138,7 +138,7 @@ open class RunStep(yconfig: RuntimeStepConfiguration, compound: CompoundStepMode
 
         foot.run()
 
-        stepConfig.releaseExecutionContext()
+        stepConfig.environment.releaseExecutionContext()
     }
 
     private fun listToValue(documents: List<XProcDocument>): XdmValue {

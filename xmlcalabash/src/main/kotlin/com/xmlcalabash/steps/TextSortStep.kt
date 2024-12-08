@@ -81,7 +81,7 @@ open class TextSortStep(): AbstractTextStep() {
         try {
             val errorReporter = ErrorLogger()
             val compiler = stepConfig.processor.newXsltCompiler()
-            compiler.resourceResolver = stepConfig.documentManager
+            compiler.resourceResolver = stepConfig.environment.documentManager
             compiler.setErrorReporter(errorReporter)
 
             val destination = XdmDestination()

@@ -3,7 +3,7 @@ package com.xmlcalabash.datamodel
 import com.xmlcalabash.exceptions.XProcError
 import net.sf.saxon.s9api.QName
 
-open class PortBindingContainer(parent: XProcInstruction, stepConfig: StepConfiguration, instructionType: QName): BindingContainer(parent, stepConfig, instructionType) {
+open class PortBindingContainer(parent: XProcInstruction, stepConfig: InstructionConfiguration, instructionType: QName): BindingContainer(parent, stepConfig, instructionType) {
     companion object {
         val UNSPECIFIED_PORT_NAME = "*** unspecified port name ***"
     }

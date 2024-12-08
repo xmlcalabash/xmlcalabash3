@@ -1,7 +1,7 @@
 package com.xmlcalabash.test
 
 import com.xmlcalabash.config.XmlCalabash
-import com.xmlcalabash.datamodel.StepConfiguration
+import com.xmlcalabash.datamodel.InstructionConfiguration
 import com.xmlcalabash.namespace.NsFn
 import com.xmlcalabash.parsers.XPathExpressionDetails
 import com.xmlcalabash.parsers.xpath31.XPathExpressionParser
@@ -23,7 +23,7 @@ class XPathParserTest {
         val ex_f_1 = Pair(QName(NamespaceUri.of("http://example.com/"), "f"), 1)
     }
 
-    lateinit var stepConfig: StepConfiguration
+    lateinit var stepConfig: InstructionConfiguration
 
     @BeforeAll
     fun init() {

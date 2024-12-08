@@ -1,8 +1,8 @@
 package com.xmlcalabash.parsers.xpl.elements
 
 import com.xmlcalabash.datamodel.DeclareStepInstruction
+import com.xmlcalabash.datamodel.InstructionConfiguration
 import com.xmlcalabash.datamodel.PipelineBuilder
-import com.xmlcalabash.datamodel.StepConfiguration
 import com.xmlcalabash.exceptions.XProcError
 import net.sf.saxon.s9api.QName
 import net.sf.saxon.s9api.SaxonApiException
@@ -24,10 +24,9 @@ class UseWhenContext internal constructor(val builder: PipelineBuilder) {
     val contextId = ++id
 
     init {
-        for (child in builder.standardLibrary.children.filterIsInstance<DeclareStepInstruction>()) {
-            if (child.type != null) {
-                stepTypes[child.type!!] = StepImplementation(true, { child.stepConfig.rteContext.atomicStepAvailable(child.type!!) })
-            }
+        val environment = builder.pipelineContext
+        for ((type, decl) in environment.standardSteps) {
+            stepTypes[type] = StepImplementation(true, { environment.commonEnvironment.atomicStepAvailable(type) })
         }
     }
 
@@ -41,11 +40,11 @@ class UseWhenContext internal constructor(val builder: PipelineBuilder) {
         return context
     }
 
-    fun resolveExpression(stepConfig: StepConfiguration, expr: String): XdmValue? {
+    fun resolveExpression(stepConfig: InstructionConfiguration, expr: String): XdmValue? {
         return resolveExpressionInternal(stepConfig, expr, false)
     }
 
-    fun resolveUseWhen(stepConfig: StepConfiguration, expr: String): Boolean? {
+    fun resolveUseWhen(stepConfig: InstructionConfiguration, expr: String): Boolean? {
         val result = resolveExpressionInternal(stepConfig, expr, true)
         if (result != null) {
             return (result.underlyingValue as BooleanValue).booleanValue
@@ -53,9 +52,9 @@ class UseWhenContext internal constructor(val builder: PipelineBuilder) {
         return null
     }
 
-    private fun resolveExpressionInternal(stepConfig: StepConfiguration, expr: String, ebv: Boolean): XdmValue? {
+    private fun resolveExpressionInternal(stepConfig: InstructionConfiguration, expr: String, ebv: Boolean): XdmValue? {
         val context = ConditionalExecutionContext(stepConfig, this)
-        stepConfig.setExecutionContext(context)
+        stepConfig.environment.xmlCalabash.setExecutionContext(context)
         try {
             val selector = makeSelector(stepConfig, expr)
             if (ebv) {
@@ -76,12 +75,12 @@ class UseWhenContext internal constructor(val builder: PipelineBuilder) {
                 else -> Unit // Just assume this will work better next time...
             }
         } finally {
-            stepConfig.releaseExecutionContext()
+            stepConfig.environment.xmlCalabash.releaseExecutionContext()
         }
         return null
     }
 
-    private fun makeSelector(stepConfig: StepConfiguration, expr: String): XPathSelector {
+    private fun makeSelector(stepConfig: InstructionConfiguration, expr: String): XPathSelector {
         val processor = stepConfig.saxonConfig.processor
 
         val compiler = processor.newXPathCompiler()
@@ -104,7 +103,7 @@ class UseWhenContext internal constructor(val builder: PipelineBuilder) {
         return selector
     }
 
-    private fun conditionalOption(stepConfig: StepConfiguration, ex: SaxonApiException): Boolean {
+    private fun conditionalOption(stepConfig: InstructionConfiguration, ex: SaxonApiException): Boolean {
         val cause = ex.cause
         val message = ex.message
         if (cause is XPathException && message != null) {

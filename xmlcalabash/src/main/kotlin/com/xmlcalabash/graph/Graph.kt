@@ -9,10 +9,10 @@ import net.sf.saxon.s9api.XdmNode
 import java.io.PrintStream
 import java.util.*
 
-class Graph private constructor() {
+class Graph private constructor(val environment: PipelineEnvironment) {
     companion object {
-        fun build(decl: DeclareStepInstruction): PipelineModel {
-            val graph = Graph()
+        fun build(decl: DeclareStepInstruction, environment: PipelineEnvironment): PipelineModel {
+            val graph = Graph(environment)
             return graph.build(decl)
         }
     }

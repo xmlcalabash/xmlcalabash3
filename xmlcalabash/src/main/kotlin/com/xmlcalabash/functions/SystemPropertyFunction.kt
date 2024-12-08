@@ -43,19 +43,22 @@ class SystemPropertyFunction(private val config: SaxonConfiguration): ExtensionF
             val lexicalQName = (arguments!![0].head() as Item).stringValue
             val structuredQName = StructuredQName.fromLexicalQName(lexicalQName, false, true, staticContext?.namespaceResolver)
             val propertyName = QName(structuredQName.namespaceUri, structuredQName.localPart)
+            val dynamicContext = config.environment.getExecutionContext()
+            val env = dynamicContext.stepConfig.environment
 
             val value = when (propertyName) {
-                NsP.episode -> config.episode
-                NsP.locale -> config.locale
-                NsP.productName -> config.productName
-                NsP.productVersion -> config.productVersion
-                NsP.vendor -> config.vendor
-                NsP.vendorUri -> config.vendorUri
-                NsP.version -> config.version
-                NsP.xpathVersion -> config.xpathVersion
+                NsP.episode -> env.episode
+                NsP.locale -> env.locale
+                NsP.productName -> env.productName
+                NsP.productVersion -> env.productVersion
+                NsP.vendor -> env.vendor
+                NsP.vendorUri -> env.vendorUri
+                NsP.version -> env.version
+                NsP.xpathVersion -> env.xpathVersion
                 NsP.psviSupported -> config.processor.isSchemaAware.toString()
                 NsCx.saxonVersion -> config.processor.saxonProductVersion
                 NsCx.saxonEdition -> config.processor.saxonEdition
+                NsCx.productBuild -> env.gitHash
                 else -> ""
             }
 

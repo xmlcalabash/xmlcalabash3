@@ -1,14 +1,15 @@
 package com.xmlcalabash.datamodel
 
+import com.xmlcalabash.runtime.XProcStepConfiguration
 import net.sf.saxon.ma.arrays.ArrayItem
 import net.sf.saxon.ma.map.MapItem
 import net.sf.saxon.s9api.SequenceType
 import net.sf.saxon.s9api.XdmAtomicValue
 import net.sf.saxon.s9api.XdmValue
 
-class XProcConstantExpression private constructor(stepConfig: StepConfiguration, value: XdmValue, asType: SequenceType, values: List<XdmAtomicValue>): XProcExpression(stepConfig, asType, false, values) {
+class XProcConstantExpression private constructor(stepConfig: XProcStepConfiguration, value: XdmValue, asType: SequenceType, values: List<XdmAtomicValue>): XProcExpression(stepConfig, asType, false, values) {
     companion object {
-        fun newInstance(stepConfig: StepConfiguration, value: XdmValue, asType: SequenceType = SequenceType.ANY, values: List<XdmAtomicValue> = emptyList()): XProcConstantExpression {
+        fun newInstance(stepConfig: XProcStepConfiguration, value: XdmValue, asType: SequenceType = SequenceType.ANY, values: List<XdmAtomicValue> = emptyList()): XProcConstantExpression {
             if (asType !== SequenceType.ANY || values.isNotEmpty()) {
                 stepConfig.checkType(null, value, asType, values)
             }
@@ -24,15 +25,15 @@ class XProcConstantExpression private constructor(stepConfig: StepConfiguration,
         return constant(stepConfig, staticValue!!, asType, values)
     }
 
-    override fun xevaluate(): () -> XdmValue {
+    override fun xevaluate(config: XProcStepConfiguration): () -> XdmValue {
         return { staticValue!! }
     }
 
-    override fun evaluate(): XdmValue {
-        return stepConfig.checkType(null, staticValue!!, asType, values)
+    override fun evaluate(config: XProcStepConfiguration): XdmValue {
+        return config.checkType(null, staticValue!!, asType, values)
     }
 
-    override fun computeStaticValue(stepConfig: StepConfiguration): XdmValue {
+    override fun computeStaticValue(stepConfig: InstructionConfiguration): XdmValue {
         checkedStatic = true
         return staticValue!!
     }

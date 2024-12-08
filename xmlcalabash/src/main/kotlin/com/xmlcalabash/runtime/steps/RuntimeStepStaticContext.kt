@@ -4,8 +4,10 @@ import com.xmlcalabash.config.SaxonConfiguration
 import com.xmlcalabash.config.XmlCalabash
 import com.xmlcalabash.datamodel.DeclareStepInstruction
 import com.xmlcalabash.datamodel.Location
+import com.xmlcalabash.datamodel.PipelineEnvironment
 import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.exceptions.XProcException
+import com.xmlcalabash.runtime.PipelineContext
 import net.sf.saxon.om.NamespaceUri
 import net.sf.saxon.s9api.Processor
 import net.sf.saxon.s9api.QName
@@ -14,6 +16,7 @@ import java.net.URI
 
 interface RuntimeStepStaticContext {
     val xmlCalabash: XmlCalabash
+    val pipelineContext: PipelineEnvironment
 
     val saxonConfig: SaxonConfiguration
     val processor: Processor

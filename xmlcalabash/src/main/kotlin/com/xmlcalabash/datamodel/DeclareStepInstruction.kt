@@ -1,5 +1,6 @@
 package com.xmlcalabash.datamodel
 
+import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.namespace.NsP
 import com.xmlcalabash.runtime.XProcPipeline
@@ -9,7 +10,7 @@ import net.sf.saxon.s9api.QName
 import net.sf.saxon.s9api.XdmNode
 import java.net.URI
 
-class DeclareStepInstruction(parent: XProcInstruction?, stepConfig: StepConfiguration): CompoundStepDeclaration(parent, stepConfig, NsP.declareStep), StepContainerInterface {
+class DeclareStepInstruction(parent: XProcInstruction?, stepConfig: InstructionConfiguration): CompoundStepDeclaration(parent, stepConfig, NsP.declareStep), StepContainerInterface {
     internal constructor(builder: PipelineBuilder, type: QName): this(null, builder.stepConfig.copy()) {
         this.builder = builder
         this.standardStep = true
@@ -24,6 +25,7 @@ class DeclareStepInstruction(parent: XProcInstruction?, stepConfig: StepConfigur
     private var compiled = false
     override val contentModel = anySteps + mapOf(NsP.input to '*', NsP.output to '*', NsP.declareStep to '*', NsP.option to '*')
     internal val declaredSteps = mutableListOf<DeclareStepInstruction>()
+    var eagerEval = false
 
     override var psviRequired: Boolean? = null
         set(value) {
@@ -97,7 +99,7 @@ class DeclareStepInstruction(parent: XProcInstruction?, stepConfig: StepConfigur
                 throw XProcError.xsDuplicateStepType(child.type!!).exception()
             }
 
-            if (!child.isAtomic || stepConfig.rteContext.atomicStepAvailable(child.type!!)) {
+            if (!child.isAtomic || stepConfig.environment.commonEnvironment.atomicStepAvailable(child.type!!)) {
                 child.type?.let { newStepTypes[it] = child }
                 stepConfig.addVisibleStepType(child)
             }
@@ -175,7 +177,7 @@ class DeclareStepInstruction(parent: XProcInstruction?, stepConfig: StepConfigur
                     throw XProcError.xsDuplicateStepType(type!!).exception()
                 }
             }
-            if (!isAtomic || stepConfig.rteContext.atomicStepAvailable(type!!)) {
+            if (!isAtomic || stepConfig.environment.commonEnvironment.atomicStepAvailable(type!!)) {
                 stepConfig.addVisibleStepType(this)
                 newStepTypes[type!!] = this
             }

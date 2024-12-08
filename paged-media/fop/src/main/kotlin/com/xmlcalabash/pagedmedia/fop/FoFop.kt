@@ -4,7 +4,7 @@ import com.xmlcalabash.api.FoProcessor
 import com.xmlcalabash.datamodel.MediaType
 import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.exceptions.XProcError
-import com.xmlcalabash.config.XProcStepConfiguration
+import com.xmlcalabash.runtime.XProcStepConfiguration
 import com.xmlcalabash.util.S9Api
 import net.sf.saxon.s9api.QName
 import net.sf.saxon.s9api.XdmValue

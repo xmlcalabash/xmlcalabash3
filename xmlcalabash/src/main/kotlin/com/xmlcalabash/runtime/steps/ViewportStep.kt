@@ -4,7 +4,7 @@ import com.xmlcalabash.datamodel.MediaType
 import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.namespace.Ns
-import com.xmlcalabash.runtime.RuntimeStepConfiguration
+import com.xmlcalabash.runtime.XProcStepConfiguration
 import com.xmlcalabash.runtime.model.CompoundStepModel
 import com.xmlcalabash.util.S9Api
 import com.xmlcalabash.util.XmlViewportComposer
@@ -16,7 +16,7 @@ import net.sf.saxon.s9api.XdmValue
 import net.sf.saxon.value.QNameValue
 import net.sf.saxon.value.StringValue
 
-open class ViewportStep(yconfig: RuntimeStepConfiguration, compound: CompoundStepModel): CompoundStep(yconfig, compound) {
+open class ViewportStep(config: XProcStepConfiguration, compound: CompoundStepModel): CompoundStep(config, compound) {
     init {
         head.openPorts.remove("current") // doesn't count as an open port from the outside
     }
@@ -57,7 +57,7 @@ open class ViewportStep(yconfig: RuntimeStepConfiguration, compound: CompoundSte
             }
         } else {
             // It must have been resolved statically
-            val matchMap = params.options[Ns.match]!!.staticValue!!.evaluate().underlyingValue as MapItem
+            val matchMap = params.options[Ns.match]!!.staticValue!!.evaluate(stepConfig).underlyingValue as MapItem
             match = matchMap.get(StringValue("match")).stringValue
             if (matchMap.size() != 1) {
                 throw XProcError.xiImpossible("Unexpected values in static match expression").exception()
@@ -69,7 +69,7 @@ open class ViewportStep(yconfig: RuntimeStepConfiguration, compound: CompoundSte
         val stepsToRun = mutableListOf<AbstractStep>()
         stepsToRun.addAll(runnables)
 
-        val exec = stepConfig.newExecutionContext(stepConfig)
+        val exec = stepConfig.environment.newExecutionContext(stepConfig)
         var firstTime = true
 
         while (sequence.isNotEmpty()) {
@@ -132,7 +132,7 @@ open class ViewportStep(yconfig: RuntimeStepConfiguration, compound: CompoundSte
         }
 
         cache.clear()
-        stepConfig.releaseExecutionContext()
+        stepConfig.environment.releaseExecutionContext()
     }
 
     override fun reset() {

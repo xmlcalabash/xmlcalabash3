@@ -7,7 +7,7 @@
     });
   } 
 
-  function add_checkbox(table, div, type, label) {
+  function add_checkbox(table, div, type, label, startChecked) {
     if (div.children.length != 0) {
       div.appendChild(document.createTextNode("; "))
     }
@@ -15,7 +15,9 @@
     const check = document.createElement("input");
     check.setAttribute("type", "checkbox");
     check.setAttribute("id", `chk.${type}_${tableid}`);
-    check.setAttribute("checked", "checked");
+    if (startChecked) {
+      check.setAttribute("checked", "checked");
+    }
     div.appendChild(check);
     div.appendChild(document.createTextNode(label));
     check.addEventListener('change', (event) => {
@@ -32,44 +34,24 @@
     if (skip.length > 0 || fail.length > 0) {
       const div = document.createElement("div");
       div.setAttribute("class", "toggles");
-      add_checkbox(table, div, "pass", " show passed");
+      add_checkbox(table, div, "pass", " show passed", skip.length == 0 && fail.length == 0);
       if (skip.length > 0) {
-        add_checkbox(table, div, "skip", " show skipped");
+        add_checkbox(table, div, "skip", " show skipped", fail.length == 0);
       }
       if (fail.length > 0) {
-        add_checkbox(table, div, "fail", " show failed");
+        add_checkbox(table, div, "fail", " show failed", true);
       }
-
-/*
-      let span1 = `<input type='checkbox' id='chk.pass_${tableid}' checked='checked'/> show passed`;
-      let span2 = '';
-      let span3 = '';
-
-      if (skip.length > 0) {
-        span2 = `; <input type='checkbox' id='chk.skip_${tableid}' checked='checked'/> show skipped`;
-      }
-
-      if (fail.length > 0) {
-        span3 = `; <input type='checkbox' id='chk.fail_${tableid}' checked='checked'/> show failed`;
-      }
-
-      div.innerHTML = span1 + span2 + span3 + "."
-*/
 
       table.parentNode.insertBefore(div, table)
+    }
 
-      
-
+    if (skip.length > 0 || fail.length > 0) {
+      toggle(table, "pass", false)
+    }
+    if (skip.length > 0 && fail.length > 0) {
+      toggle(table, "skip", false)
     }
   }
-
-/*
-    <div>
-      <input type="checkbox" id="chk.pass" checked="checked"/> show passed;
-      <input type="checkbox" id="chk.skip" checked="checked"/> show skipped;
-      <input type="checkbox" id="chk.fail" checked="checked"/> show failed
-    </div>
-*/
 
   document.querySelectorAll("table").forEach(table => {
     filter(table)

@@ -58,11 +58,15 @@ open class ExpressionStep(val params: ExpressionStepParameters): AbstractAtomicS
         // Any options that haven't been passed, may have statically computed values
         for ((name, option) in params.options) {
             if (name !in options) {
-                expression.setBinding(name, option.staticValue!!.evaluate())
+                expression.setBinding(name, option.staticValue!!.evaluate(stepConfig))
             }
         }
 
-        val eager = params.extensionAttr[NsCx.eager]?.let { stepConfig.parseBoolean(it) } ?: false
+        val eager = if (params.extensionAttr.containsKey(NsCx.eager)) {
+            stepConfig.parseBoolean(params.extensionAttr[NsCx.eager]!!)
+        } else {
+            stepConfig.environment.commonEnvironment.eagerEvaluation
+        }
 
         val canBeLazy = !eager
                 && !expression.functionRefs.contains(Pair(NsP.iterationPosition,0))
@@ -72,7 +76,7 @@ open class ExpressionStep(val params: ExpressionStepParameters): AbstractAtomicS
 
         val lazy: () -> XdmValue = {
             try {
-                expression.evaluate()
+                expression.evaluate(stepConfig)
             } catch (ex: SaxonApiException) {
                 if (ex.message != null && ex.message!!.contains("context item is absent")) {
                     if (contextItems.size > 1) {

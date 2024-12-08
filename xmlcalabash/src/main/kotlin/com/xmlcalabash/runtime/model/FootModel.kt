@@ -2,7 +2,7 @@ package com.xmlcalabash.runtime.model
 
 import com.xmlcalabash.graph.Model
 import com.xmlcalabash.runtime.XProcRuntime
-import com.xmlcalabash.runtime.RuntimeStepConfiguration
+import com.xmlcalabash.runtime.XProcStepConfiguration
 import com.xmlcalabash.runtime.steps.AbstractStep
 
 class FootModel(runtime: XProcRuntime, model: Model): StepModel(runtime, model) {
@@ -10,7 +10,7 @@ class FootModel(runtime: XProcRuntime, model: Model): StepModel(runtime, model) 
         // nop
     }
 
-    override fun runnable(yconfig: RuntimeStepConfiguration): () -> AbstractStep {
+    override fun runnable(config: XProcStepConfiguration): () -> AbstractStep {
         throw UnsupportedOperationException("You can't make a runnable from a foot")
     }
 

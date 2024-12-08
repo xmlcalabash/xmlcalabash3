@@ -3,7 +3,7 @@ package com.xmlcalabash.runtime.model
 import com.xmlcalabash.graph.Head
 import com.xmlcalabash.graph.Model
 import com.xmlcalabash.runtime.XProcRuntime
-import com.xmlcalabash.runtime.RuntimeStepConfiguration
+import com.xmlcalabash.runtime.XProcStepConfiguration
 import com.xmlcalabash.runtime.steps.AbstractStep
 
 class HeadModel(runtime: XProcRuntime, model: Model): StepModel(runtime, model) {
@@ -13,7 +13,7 @@ class HeadModel(runtime: XProcRuntime, model: Model): StepModel(runtime, model) 
         // nop
     }
 
-    override fun runnable(yconfig: RuntimeStepConfiguration): () -> AbstractStep {
+    override fun runnable(yconfig: XProcStepConfiguration): () -> AbstractStep {
         throw UnsupportedOperationException("You can't make a runnable from a head")
     }
 

@@ -1,7 +1,7 @@
 package com.xmlcalabash.steps
 
 import com.xmlcalabash.api.XProcStep
-import com.xmlcalabash.config.XProcStepConfiguration
+import com.xmlcalabash.runtime.XProcStepConfiguration
 import com.xmlcalabash.datamodel.MediaType
 import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.exceptions.XProcError
@@ -75,7 +75,7 @@ abstract class AbstractAtomicStep(): XProcStep {
     }
 
     override fun run() {
-        stepConfig.messageReporter.progress { "Running ${this} (${stepParams.stepName}/${nodeId})" }
+        stepConfig.environment.messageReporter.progress { "Running ${this} (${stepParams.stepName}/${nodeId})" }
         logger.debug { "Running ${this} (${stepParams.stepName}/${nodeId})" }
     }
 

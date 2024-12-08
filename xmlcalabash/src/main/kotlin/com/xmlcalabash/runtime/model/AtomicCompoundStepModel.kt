@@ -6,7 +6,7 @@ import com.xmlcalabash.graph.PipelineModel
 import com.xmlcalabash.graph.SubpipelineModel
 import com.xmlcalabash.namespace.NsCx
 import com.xmlcalabash.runtime.XProcRuntime
-import com.xmlcalabash.runtime.RuntimeStepConfiguration
+import com.xmlcalabash.runtime.XProcStepConfiguration
 import com.xmlcalabash.runtime.steps.AbstractStep
 import com.xmlcalabash.runtime.steps.CompoundStep
 import net.sf.saxon.s9api.QName
@@ -30,8 +30,8 @@ class AtomicCompoundStepModel(runtime: XProcRuntime, model: SubpipelineModel): A
         }
     }
 
-    override fun runnable(yconfig: RuntimeStepConfiguration): () -> AbstractStep {
-        return { CompoundStep.newInstance(yconfig, impl) }
+    override fun runnable(config: XProcStepConfiguration): () -> AbstractStep {
+        return { CompoundStep.newInstance(config.copy(stepConfig), impl) }
     }
 
     override fun toString(): String {

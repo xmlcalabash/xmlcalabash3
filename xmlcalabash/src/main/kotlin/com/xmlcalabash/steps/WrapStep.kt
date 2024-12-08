@@ -1,6 +1,5 @@
 package com.xmlcalabash.steps
 
-import com.xmlcalabash.datamodel.StepConfiguration
 import com.xmlcalabash.documents.DocumentContext
 import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.exceptions.XProcError
@@ -154,7 +153,7 @@ class WrapStep(): AbstractAtomicStep(), ProcessMatchingNodes {
 
         val exec = compiler.compile(groupAdjacent!!)
         val selector = exec.load()
-        selector.resourceResolver = stepConfig.documentManager
+        selector.resourceResolver = stepConfig.environment.documentManager
         selector.contextItem = node
 
         val values = selector.iterator()

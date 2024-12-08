@@ -1,8 +1,6 @@
 package com.xmlcalabash.datamodel
 
-import net.sf.saxon.om.NamespaceUri
 import net.sf.saxon.s9api.QName
-import net.sf.saxon.s9api.XdmValue
 import java.net.URI
 
 interface StepContainerInterface {

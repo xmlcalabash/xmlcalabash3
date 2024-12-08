@@ -51,7 +51,7 @@ open class LoadStep(): AbstractAtomicStep() {
             }
         }
 
-        val manager = stepConfig.documentManager
+        val manager = stepConfig.environment.documentManager
         val document = manager.load(href!!, stepConfig, properties, parameters)
 
         receiver.output("result", document)

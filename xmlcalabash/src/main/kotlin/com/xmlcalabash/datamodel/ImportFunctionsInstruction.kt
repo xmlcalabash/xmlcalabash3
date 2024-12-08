@@ -15,7 +15,7 @@ import java.net.URI
 import java.net.URLConnection
 import javax.xml.transform.sax.SAXSource
 
-class ImportFunctionsInstruction(parent: XProcInstruction?, stepConfig: StepConfiguration, val inputHref: URI): XProcInstruction(parent, stepConfig, NsP.importFunctions) {
+class ImportFunctionsInstruction(parent: XProcInstruction?, stepConfig: InstructionConfiguration, val inputHref: URI): XProcInstruction(parent, stepConfig, NsP.importFunctions) {
     val href: URI
         get() {
             val uri = stepConfig.baseUri
@@ -48,7 +48,7 @@ class ImportFunctionsInstruction(parent: XProcInstruction?, stepConfig: StepConf
         }
 
         val ctype = if (contentType == null) {
-            MediaType.parse(stepConfig.mimeTypes.getContentType(href.toString()))
+            MediaType.parse(stepConfig.environment.mimeTypes.getContentType(href.toString()))
         } else {
             contentType!!
         }

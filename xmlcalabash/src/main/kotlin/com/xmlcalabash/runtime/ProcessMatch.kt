@@ -1,6 +1,6 @@
 package com.xmlcalabash.runtime
 
-import com.xmlcalabash.config.XProcStepConfiguration
+import com.xmlcalabash.runtime.XProcStepConfiguration
 import com.xmlcalabash.util.SaxonTreeBuilder
 import net.sf.saxon.om.*
 import net.sf.saxon.s9api.*
@@ -242,7 +242,7 @@ class ProcessMatch(val stepConfig: XProcStepConfiguration,
         try {
             val matcher = xcomp.compilePattern(pattern)
             val selector = matcher.load()
-            selector.resourceResolver = stepConfig.documentManager
+            selector.resourceResolver = stepConfig.environment.documentManager
 
             for ((name, value) in bindings) {
                 selector.setVariable(name, value)

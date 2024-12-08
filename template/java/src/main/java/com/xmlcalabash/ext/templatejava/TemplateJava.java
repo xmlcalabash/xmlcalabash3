@@ -4,7 +4,7 @@ package com.xmlcalabash.ext.templatejava;
 import com.xmlcalabash.datamodel.MediaType;
 import com.xmlcalabash.documents.XProcBinaryDocument;
 import com.xmlcalabash.documents.XProcDocument;
-import com.xmlcalabash.config.XProcStepConfiguration;
+import com.xmlcalabash.runtime.XProcStepConfiguration;
 import com.xmlcalabash.steps.AbstractAtomicStep;
 import com.xmlcalabash.util.SaxonTreeBuilder;
 import com.xmlcalabash.util.XAttributeMap;

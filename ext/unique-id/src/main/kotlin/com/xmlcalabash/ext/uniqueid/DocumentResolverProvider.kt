@@ -6,7 +6,7 @@ import com.xmlcalabash.io.DocumentLoader
 import com.xmlcalabash.io.DocumentManager
 import com.xmlcalabash.spi.DocumentResolver
 import com.xmlcalabash.spi.DocumentResolverProvider
-import com.xmlcalabash.config.XProcStepConfiguration
+import com.xmlcalabash.runtime.XProcStepConfiguration
 import java.io.IOException
 import java.net.URI
 

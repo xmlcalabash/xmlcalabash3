@@ -2,7 +2,7 @@ package com.xmlcalabash.api
 
 import com.xmlcalabash.datamodel.MediaType
 import com.xmlcalabash.documents.XProcDocument
-import com.xmlcalabash.config.XProcStepConfiguration
+import com.xmlcalabash.runtime.XProcStepConfiguration
 import net.sf.saxon.s9api.QName
 import net.sf.saxon.s9api.XdmValue
 import java.io.OutputStream

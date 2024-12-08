@@ -4,13 +4,13 @@ import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.exceptions.XProcException
 import com.xmlcalabash.namespace.NsC
 import com.xmlcalabash.namespace.NsCx
-import com.xmlcalabash.runtime.RuntimeStepConfiguration
+import com.xmlcalabash.runtime.XProcStepConfiguration
 import com.xmlcalabash.runtime.model.CompoundStepModel
 import com.xmlcalabash.util.SaxonTreeBuilder
 import net.sf.saxon.om.NamespaceMap
 import org.apache.logging.log4j.kotlin.logger
 
-open class TryStep(yconfig: RuntimeStepConfiguration, compound: CompoundStepModel): CompoundStep(yconfig, compound) {
+open class TryStep(config: XProcStepConfiguration, compound: CompoundStepModel): CompoundStep(config, compound) {
     override fun run() {
         if (runnables.isEmpty()) {
             instantiate()
@@ -29,7 +29,7 @@ open class TryStep(yconfig: RuntimeStepConfiguration, compound: CompoundStepMode
             }
         }
 
-        stepConfig.newExecutionContext(stepConfig)
+        stepConfig.environment.newExecutionContext(stepConfig)
         head.runStep()
 
         var errorDocument: XProcDocument? = null
@@ -81,7 +81,7 @@ open class TryStep(yconfig: RuntimeStepConfiguration, compound: CompoundStepMode
             }
         }
 
-        stepConfig.releaseExecutionContext()
+        stepConfig.environment.releaseExecutionContext()
 
         if (throwException != null) {
             throw throwException

@@ -16,7 +16,7 @@ class ExpressionSelectTest: Expressions() {
         val stepConfig = builder.stepConfig.copy()
         val asType = stepConfig.parseSequenceType(type("integer"))
         val expr = XProcExpression.select(stepConfig, "1+2", asType, false, emptyList())
-        val result = expr.evaluate()
+        val result = expr.evaluate(stepConfig)
         println(result)
     }
 
@@ -29,7 +29,7 @@ class ExpressionSelectTest: Expressions() {
         val expr = XProcExpression.select(stepConfig, "\$a+\$b", asType, false, emptyList())
         expr.setStaticBinding(QName("a"), XProcExpression.constant(stepConfig, XdmAtomicValue(17)))
         expr.setStaticBinding(QName("b"), XProcExpression.constant(stepConfig, XdmAtomicValue(3)))
-        val resultFunction = expr.xevaluate()
+        val resultFunction = expr.xevaluate(stepConfig)
 
         Assertions.assertTrue(expr.canBeResolvedStatically())
         val result = resultFunction()
@@ -44,7 +44,7 @@ class ExpressionSelectTest: Expressions() {
         val asType = stepConfig.parseSequenceType(type("integer"))
         val expr = XProcExpression.select(stepConfig, "\$a+\$b", asType, false, emptyList())
         expr.setStaticBinding(QName("a"), XProcExpression.constant(stepConfig, XdmAtomicValue(17)))
-        val resultFunction = expr.xevaluate()
+        val resultFunction = expr.xevaluate(stepConfig)
 
         Assertions.assertFalse(expr.canBeResolvedStatically())
         val result = if (expr.canBeResolvedStatically()) {

@@ -29,7 +29,7 @@ open class ValidateWithNVDL(): AbstractAtomicStep() {
     override fun run() {
         super.run()
 
-        val localDocumentManager = DocumentManager(stepConfig.documentManager)
+        val localDocumentManager = DocumentManager(stepConfig.environment.documentManager)
 
         val parameters = qnameMapBinding(Ns.parameters)
         val assertValid = booleanBinding(Ns.assertValid) ?: true

@@ -129,7 +129,7 @@ open class XsltStep(): AbstractAtomicStep() {
 
         val errorReporter = ErrorLogger()
         val compiler = processor.newXsltCompiler()
-        compiler.resourceResolver = stepConfig.documentManager
+        compiler.resourceResolver = stepConfig.environment.documentManager
         compiler.setSchemaAware(processor.isSchemaAware)
         compiler.setErrorReporter(errorReporter)
 
@@ -161,7 +161,7 @@ open class XsltStep(): AbstractAtomicStep() {
         }
 
         val transformer = exec.load30()
-        transformer.resourceResolver = stepConfig.documentManager
+        transformer.resourceResolver = stepConfig.environment.documentManager
         transformer.setResultDocumentHandler(DocumentHandler())
         transformer.setStylesheetParameters(parameters)
 

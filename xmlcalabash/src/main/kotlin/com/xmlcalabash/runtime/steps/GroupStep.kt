@@ -1,9 +1,9 @@
 package com.xmlcalabash.runtime.steps
 
-import com.xmlcalabash.runtime.RuntimeStepConfiguration
+import com.xmlcalabash.runtime.XProcStepConfiguration
 import com.xmlcalabash.runtime.model.CompoundStepModel
 
-open class GroupStep(yconfig: RuntimeStepConfiguration, compound: CompoundStepModel): CompoundStep(yconfig, compound) {
+open class GroupStep(config: XProcStepConfiguration, compound: CompoundStepModel): CompoundStep(config, compound) {
     override fun run() {
         if (runnables.isEmpty()) {
             instantiate()
@@ -12,7 +12,7 @@ open class GroupStep(yconfig: RuntimeStepConfiguration, compound: CompoundStepMo
         val stepsToRun = mutableListOf<AbstractStep>()
         stepsToRun.addAll(runnables)
 
-        stepConfig.newExecutionContext(stepConfig)
+        stepConfig.environment.newExecutionContext(stepConfig)
 
         head.runStep()
 
@@ -22,6 +22,6 @@ open class GroupStep(yconfig: RuntimeStepConfiguration, compound: CompoundStepMo
         }
 
         foot.runStep()
-        stepConfig.releaseExecutionContext()
+        stepConfig.environment.releaseExecutionContext()
     }
 }

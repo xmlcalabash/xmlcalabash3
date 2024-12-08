@@ -29,17 +29,17 @@ class CacheDeleteStep(): AbstractAtomicStep() {
         }
 
         if (href != null) {
-            if (failIfNotCached && stepConfig.documentManager.getCached(href) == null) {
+            if (failIfNotCached && stepConfig.environment.documentManager.getCached(href) == null) {
                 throw XProcError.xiDocumentNotInCache(href).exception()
             }
             val props = DocumentProperties(document.properties)
             props.set(Ns.baseUri, href)
-            stepConfig.documentManager.uncache(document.with(props))
+            stepConfig.environment.documentManager.uncache(document.with(props))
         } else {
-            if (failIfNotCached && stepConfig.documentManager.getCached(document.baseURI!!) == null) {
+            if (failIfNotCached && stepConfig.environment.documentManager.getCached(document.baseURI!!) == null) {
                 throw XProcError.xiDocumentNotInCache(document.baseURI!!).exception()
             }
-            stepConfig.documentManager.uncache(document)
+            stepConfig.environment.documentManager.uncache(document)
         }
 
         receiver.output("result", document)

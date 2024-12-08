@@ -1,23 +1,22 @@
 package com.xmlcalabash.runtime
 
-import com.xmlcalabash.datamodel.AtomicStepInstruction
-import com.xmlcalabash.datamodel.DeclareStepInstruction
-import com.xmlcalabash.datamodel.PipelineVisualization
-import com.xmlcalabash.datamodel.StepDeclaration
+import com.xmlcalabash.datamodel.*
 import com.xmlcalabash.graph.*
 import com.xmlcalabash.namespace.NsDescription
 import com.xmlcalabash.runtime.model.CompoundStepModel
 import com.xmlcalabash.util.SaxonTreeBuilder
 import net.sf.saxon.s9api.XdmNode
 
-class XProcRuntime private constructor(private val start: DeclareStepInstruction) {
+class XProcRuntime private constructor(private val start: DeclareStepInstruction, internal val config: XProcStepConfiguration) {
     companion object {
         fun newInstance(start: DeclareStepInstruction): XProcRuntime {
-            val runtime = XProcRuntime(start)
+            val environment = PipelineContext(start.stepConfig.environment as PipelineCompilerContext)
+            val config = XProcStepConfigurationImpl(environment, start.stepConfig.saxonConfig, start.location)
+            val runtime = XProcRuntime(start, config)
             val usedSteps = runtime.findUsedSteps(start)
             val pipelines = mutableMapOf<DeclareStepInstruction, SubpipelineModel>()
             for (decl in usedSteps) {
-                val model = SubpipelineModel(Graph.build(decl))
+                val model = SubpipelineModel(Graph.build(decl, config.environment))
                 model.init()
                 pipelines[decl] = model
             }
@@ -28,10 +27,19 @@ class XProcRuntime private constructor(private val start: DeclareStepInstruction
 
     private lateinit var pipelines: Map<DeclareStepInstruction, SubpipelineModel>
     private lateinit var pipelineStep: CompoundStepModel
-    internal val runnables = mutableMapOf<Long, CompoundStepModel>()
+    internal val runnables = mutableMapOf<String, CompoundStepModel>()
+    val environment = config.environment
+
+    fun stepConfiguration(instructionConfig: InstructionConfiguration): XProcStepConfiguration {
+        val impl = XProcStepConfigurationImpl(config.environment, instructionConfig.saxonConfig.newConfiguration(), instructionConfig.location)
+        impl.putAllNamespaces(instructionConfig.inscopeNamespaces)
+        impl.putAllStepTypes(instructionConfig.inscopeStepTypes)
+        return impl
+    }
 
     fun executable(): XProcPipeline {
-        return XProcPipeline(pipelineStep)
+        val config = config.copy()
+        return XProcPipeline(pipelineStep, config)
     }
 
     fun description(): XdmNode {

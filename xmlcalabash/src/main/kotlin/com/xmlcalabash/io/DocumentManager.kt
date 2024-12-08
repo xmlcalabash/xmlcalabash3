@@ -1,6 +1,6 @@
 package com.xmlcalabash.io
 
-import com.xmlcalabash.config.XProcStepConfiguration
+import com.xmlcalabash.runtime.XProcStepConfiguration
 import com.xmlcalabash.documents.DocumentProperties
 import com.xmlcalabash.documents.XProcBinaryDocument
 import com.xmlcalabash.documents.XProcDocument

@@ -15,7 +15,7 @@ open class UncacheDocument(): AbstractAtomicStep() {
         while (cache.isNotEmpty()) {
             val doc = cache.removeFirst()
             if (doc.baseURI != null) {
-                stepConfig.documentManager.uncache(doc)
+                stepConfig.environment.documentManager.uncache(doc)
             }
             receiver.output("result", doc);
         }

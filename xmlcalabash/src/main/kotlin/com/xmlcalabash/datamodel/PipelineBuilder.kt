@@ -8,33 +8,39 @@ import com.xmlcalabash.exceptions.XProcException
 import com.xmlcalabash.namespace.Ns
 import com.xmlcalabash.namespace.NsErr
 import com.xmlcalabash.namespace.NsP
+import com.xmlcalabash.runtime.PipelineContext
 import net.sf.saxon.s9api.QName
 import net.sf.saxon.s9api.XdmValue
 import java.net.URI
 
-class PipelineBuilder private constructor(val saxonConfig: SaxonConfiguration) {
+class PipelineBuilder private constructor(val pipelineContext: PipelineEnvironment, val saxonConfig: SaxonConfiguration) {
     companion object {
         fun newInstance(config: SaxonConfiguration): PipelineBuilder {
             return newInstance(config, null)
         }
 
         fun newInstance(config: SaxonConfiguration, version: Double?): PipelineBuilder {
-            val builder = PipelineBuilder(config)
+            val environment = PipelineCompilerContext(config.xmlCalabash)
+            val builder = PipelineBuilder(environment, config)
             builder.version = version
-            builder._stepConfig = StepConfiguration.newInstance(builder)
-            builder._standardLibrary = StandardLibrary.getInstance(builder)
+            builder._stepConfig = InstructionConfigurationImpl.newInstance(builder)
+            builder._stepConfig.putNamespace("p", NsP.namespace)
+            return builder
+        }
+
+        internal fun newInstance(environment: PipelineCompilerContext, config: SaxonConfiguration): PipelineBuilder {
+            val builder = PipelineBuilder(environment, config)
+            builder.version = null
+            builder._stepConfig = InstructionConfigurationImpl.newInstance(builder)
+            builder._stepConfig.putNamespace("p", NsP.namespace)
             return builder
         }
     }
 
     var version: Double? = null
 
-    lateinit private var _standardLibrary: LibraryInstruction
-    val standardLibrary: LibraryInstruction
-        get() = _standardLibrary
-
-    lateinit private var _stepConfig: StepConfiguration
-    val stepConfig: StepConfiguration
+    lateinit private var _stepConfig: InstructionConfiguration
+    val stepConfig: InstructionConfiguration
         get() = _stepConfig
 
     val staticOptionsManager = StaticOptionsManager()
@@ -54,7 +60,7 @@ class PipelineBuilder private constructor(val saxonConfig: SaxonConfiguration) {
         val properties = DocumentProperties()
         properties.set(Ns.contentType, "application/xml")
         try {
-            return stepConfig.documentManager.load(uri, stepConfig, properties)
+            return stepConfig.environment.documentManager.load(uri, stepConfig, properties)
         } catch (ex: XProcException) {
             if (ex.error.code == NsErr.xd(11)) {
                 throw ex.error.with(NsErr.xs(52)).exception()

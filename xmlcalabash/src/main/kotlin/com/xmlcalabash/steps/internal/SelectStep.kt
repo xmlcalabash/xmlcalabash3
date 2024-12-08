@@ -30,8 +30,8 @@ open class SelectStep(val params: SelectStepParameters): AbstractAtomicStep() {
                 }
             }
 
-            val result = params.select.evaluate()
-            for (doc in S9Api.makeDocuments(stepConfig, result)) {
+            val result = params.select.evaluate(params.select.stepConfig)
+            for (doc in S9Api.makeDocuments(params.select.stepConfig, result)) {
                 receiver.output("result", doc)
             }
         }

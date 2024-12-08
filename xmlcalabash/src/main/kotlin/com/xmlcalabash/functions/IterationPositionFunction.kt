@@ -37,8 +37,8 @@ class IterationPositionFunction(private val config: SaxonConfiguration): Extensi
         }
 
         override fun call(context: XPathContext?, arguments: Array<out Sequence>?): Sequence {
-            val dynamicContext = config.getExecutionContext()
-            return Int64Value(dynamicContext.iterationPosition ?: 1L)
+            val dynamicContext = config.environment.getExecutionContext()
+            return Int64Value(dynamicContext.iterationPosition)
         }
     }
 }

@@ -2,17 +2,14 @@ package com.xmlcalabash.datamodel
 
 import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.exceptions.XProcException
-import com.xmlcalabash.util.ValueTemplateFilter
 import net.sf.saxon.s9api.QName
-import net.sf.saxon.s9api.XdmValue
-import java.lang.RuntimeException
 
-abstract class StepDeclaration(parent: XProcInstruction?, stepConfig: StepConfiguration, instructionType: QName): XProcInstruction(parent, stepConfig, instructionType) {
+abstract class StepDeclaration(parent: XProcInstruction?, stepConfig: InstructionConfiguration, instructionType: QName): XProcInstruction(parent, stepConfig, instructionType) {
     init {
-        stepConfig.stepName = "!${instructionType.localName}_${stepConfig.nextId}"
+        stepConfig.stepName = "!${instructionType.localName}_${id}"
     }
 
-    internal var declId: Long = -1
+    internal var declId: String = ""
     var name: String
         get() = stepConfig.stepName
         set(value) {
@@ -26,6 +23,8 @@ abstract class StepDeclaration(parent: XProcInstruction?, stepConfig: StepConfig
     internal val _staticOptions = mutableMapOf<QName, StaticOptionDetails>()
     val staticOptions: Map<QName, StaticOptionDetails>
         get() = _staticOptions
+
+    // ========================================================================================
 
     protected fun elaborateInstructionInfo() {
         stepConfig.stepName = name
@@ -195,9 +194,9 @@ abstract class StepDeclaration(parent: XProcInstruction?, stepConfig: StepConfig
     open protected fun variableBindings(expr: XProcExpression, step: StepDeclaration) {
         for (name in expr.variableRefs) {
             //if (staticOptions[name] == null) {
-            if (!expr.stepConfig.inscopeVariables[name]!!.canBeResolvedStatically()) {
+            if (!step.stepConfig.inscopeVariables[name]!!.canBeResolvedStatically()) {
                 // What if it hasn't been promoted yet?
-                val exprStep = expr.stepConfig.inscopeVariables[name]!!.exprStep!!
+                val exprStep = step.stepConfig.inscopeVariables[name]!!.exprStep!!
                 val wi = step.withInput()
                 wi._port = "Q{${name.namespace}}${name.localName}"
                 wi.primary = false

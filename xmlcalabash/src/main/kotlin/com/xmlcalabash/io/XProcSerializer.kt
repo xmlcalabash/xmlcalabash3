@@ -5,7 +5,7 @@ import com.xmlcalabash.documents.XProcBinaryDocument
 import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.namespace.Ns
-import com.xmlcalabash.config.XProcStepConfiguration
+import com.xmlcalabash.runtime.XProcStepConfiguration
 import com.xmlcalabash.util.S9Api
 import net.sf.saxon.s9api.*
 import net.sf.saxon.value.QNameValue

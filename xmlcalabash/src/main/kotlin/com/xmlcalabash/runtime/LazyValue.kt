@@ -12,15 +12,15 @@ import net.sf.saxon.s9api.XdmValue
  * runtime. Perhaps a better solution would be to resolve the conflict between
  * StepConfiguration and RuntimeStepConfiguration, but we'll do this kludge for now.
  */
-class LazyValue(val context: DocumentContext) {
+class LazyValue private constructor(val context: DocumentContext, config: XProcStepConfiguration) {
     private var expression: XProcExpression? = null
     private var constant: XdmValue? = null
 
-    constructor(context: DocumentContext, expression: XProcExpression): this(context) {
+    constructor(context: DocumentContext, expression: XProcExpression, config: XProcStepConfiguration): this(context, config) {
         this.expression = expression
     }
 
-    constructor(context: DocumentContext, value: XdmValue): this(context) {
+    constructor(context: DocumentContext, value: XdmValue, config: XProcStepConfiguration): this(context, config) {
         this.constant = value
     }
 
@@ -28,7 +28,7 @@ class LazyValue(val context: DocumentContext) {
         if (constant != null) {
             constant!!
         } else {
-            expression!!.evaluate()
+            expression!!.evaluate(config)
         }
     }
 }
