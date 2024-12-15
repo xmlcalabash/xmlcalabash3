@@ -194,8 +194,10 @@ publishing {
   }
 
   publications {
-    register("mavenJava", MavenPublication::class) {
+    create<MavenPublication>("mavenXmlCalabash") {
       pom {
+        groupId = project.findProperty("xmlcalabashGroup").toString()
+        version = project.findProperty("xmlcalabashVersion").toString()
         name = "XML Calabash"
         packaging = "jar"
         description = "An XProc 3.0 processor"
@@ -209,8 +211,8 @@ publishing {
 
         licenses {
           license {
-            name = "Apache License, Version 2.0"
-            url = "https://www.apache.org/licenses/LICENSE-2.0"
+            name = "MIT License"
+            url = "http://www.opensource.org/licenses/mit-license.php"
             distribution = "repo"
           }
         }
