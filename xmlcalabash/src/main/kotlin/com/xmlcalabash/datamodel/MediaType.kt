@@ -402,6 +402,9 @@ class MediaType private constructor(val mediaType: String, val mediaSubtype: Str
 
     override fun toString(): String {
         val sb = StringBuilder()
+        if (!inclusive) {
+            sb.append("-")
+        }
         sb.append(toStringWithoutParameters())
 
         for (param in parameters) {
