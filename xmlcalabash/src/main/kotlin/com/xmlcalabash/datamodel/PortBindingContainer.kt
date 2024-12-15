@@ -2,6 +2,7 @@ package com.xmlcalabash.datamodel
 
 import com.xmlcalabash.exceptions.XProcError
 import net.sf.saxon.s9api.QName
+import org.apache.logging.log4j.kotlin.logger
 
 open class PortBindingContainer(parent: XProcInstruction, stepConfig: InstructionConfiguration, instructionType: QName): BindingContainer(parent, stepConfig, instructionType) {
     companion object {
@@ -119,6 +120,19 @@ open class PortBindingContainer(parent: XProcInstruction, stepConfig: Instructio
 
         pipe?.let { promotePipe(it) }
         pipe = null
+
+        if (contentTypes.isNotEmpty()) {
+            var acceptsSomething = false
+            for (ctype in contentTypes) {
+                acceptsSomething = acceptsSomething || ctype.inclusive
+                if (ctype.mediaType == "*" && ctype.mediaSubtype == "*" && !ctype.inclusive) {
+                    acceptsSomething = false
+                }
+            }
+            if (!acceptsSomething) {
+                logger.debug { "Content type constraints on port '${port}' excludes all documents" }
+            }
+        }
 
         var sawEmpty = false
         var welded = children.filterIsInstance<EmptyInstruction>().isNotEmpty()
