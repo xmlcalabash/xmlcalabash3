@@ -36,6 +36,7 @@ and things. Maybe when they’re a little a little more baked and a little less 
 <xi:include href="standard-steps/reference.xml"/>
 <xi:include href="extension-steps/reference.xml"/>
 
+<xi:include href="functions.xml"/>
 <xi:include href="glossary.xml"/>
 <xi:include href="bibliography.xml"/>
 
