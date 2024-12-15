@@ -1,0 +1,126 @@
+<appendix xmlns="http://docbook.org/ns/docbook"
+         xmlns:h="http://www.w3.org/1999/xhtml"
+         xmlns:xi="http://www.w3.org/2001/XInclude"
+         xmlns:xlink="http://www.w3.org/1999/xlink"
+         xml:id="xproc-functions" version="5.2">
+<title>XProc Functions</title>
+
+<para>XML Calabash supports the standard XProc extension functions:
+<function>p:document-properties</function>,
+<function>p:document-property</function>,
+<function>p:function-library-importable</function>,
+<function>p:iteration-position</function>,
+<function>p:iteration-size</function>,
+<function>p:lookup-uri</function>,
+<function>p:step-available</function>,
+<function>p:system-property</function>,
+<function>p:urify</function>,
+<function>p:version-available</function>, and
+<function>p:xpath-version-available</function>.
+</para>
+
+<para>Implementation specific details about selected functions follow.</para>
+
+<section xml:id="f.system-property">
+<title>System Properties</title>
+
+<para>XML Calabash supports the following property name:</para>
+
+<variablelist>
+  <varlistentry>
+    <term><varname>p:episode</varname></term>
+    <listitem>
+      <para>Returns a string of the form <literal>E-<replaceable>UUID</replaceable></literal>.
+      The string is unique for each pipeline.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><varname>p:locale</varname></term>
+    <listitem>
+      <para>Returns the default
+      <link xlink:href="https://docs.oracle.com/javase/8/docs/api/java/util/Locale.html">JVM locale</link>.
+      Underscores in the JVM locale are replaced by hyphens for compatiblity with XML language
+      identifiers.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><varname>p:product-name</varname></term>
+    <listitem>
+      <para>Returns “<literal><?version product-name?></literal>”.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><varname>p:product-version</varname></term>
+    <listitem>
+      <para>Returns “<literal><?version version?></literal>”.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><varname>p:vendor</varname></term>
+    <listitem>
+      <para>Returns “<literal><?version vendor-name?></literal>”.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><varname>p:vendor-uri</varname></term>
+    <listitem>
+      <para>Returns “<literal><?version vendor-uri?></literal>”.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><varname>p:version</varname></term>
+    <listitem>
+      <para>Returns “<literal>3.0 3.1</literal>”.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><varname>p:xpath-version</varname></term>
+    <listitem>
+      <para>Returns “<literal>3.1</literal>”.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><varname>p:psvi-supported</varname></term>
+    <listitem>
+      <para>Returns true if the processor was created using a Saxon configuration that
+      supports schema validation.</para>
+    </listitem>
+  </varlistentry>
+</variablelist>
+
+<para>XML Calabash also supports several additional properties:</para>
+
+<variablelist>
+  <varlistentry>
+    <term><varname>cx:saxon-version</varname></term>
+    <listitem>
+      <para>Returns the version of Saxon that XML Calabash is using.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><varname>cx:saxon-edition</varname></term>
+    <listitem>
+      <para>Returns the edition of Saxon that XML Calabash is using.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><varname>cx:product-build</varname></term>
+    <listitem>
+      <para>Returns the product build identifier, for example “<literal><?version build-hash?></literal>”.
+      </para>
+    </listitem>
+  </varlistentry>
+</variablelist>
+</section>
+
+<section xml:id="f.function-library-importable">
+  <title>Function library importable</title>
+
+  <para>The <function>p:function-library-importable</function> function
+  reports whether or not function libraries of a particular type can be imported.
+  </para>
+
+  <para>XML Calabash can import XSLT and XQuery function libraries. Importing function
+  libraries requires Saxon EE.</para>
+</section>
+</appendix>
