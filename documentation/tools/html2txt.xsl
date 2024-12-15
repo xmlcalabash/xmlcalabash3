@@ -43,6 +43,12 @@
   <xsl:text>`</xsl:text>
 </xsl:template>
 
+<xsl:template match="h:em">
+  <xsl:text>*</xsl:text>
+  <xsl:apply-templates/>
+  <xsl:text>*</xsl:text>
+</xsl:template>
+
 <xsl:template match="h:span">
   <xsl:apply-templates/>
 </xsl:template>
