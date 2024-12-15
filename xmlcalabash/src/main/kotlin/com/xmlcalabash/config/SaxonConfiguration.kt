@@ -95,7 +95,8 @@ class SaxonConfiguration private constructor(
         { config -> IterationSizeFunction(config) },
         { config -> StepAvailableFunction(config) },
         { config -> SystemPropertyFunction(config) },
-        { config -> UrifyFunction(config) }
+        { config -> UrifyFunction(config) },
+        { config -> LookupUri(config) }
     )
 
     fun newConfiguration(): SaxonConfiguration {
