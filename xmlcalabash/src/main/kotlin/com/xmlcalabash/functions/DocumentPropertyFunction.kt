@@ -1,7 +1,6 @@
 package com.xmlcalabash.functions
 
 import com.xmlcalabash.config.SaxonConfiguration
-import com.xmlcalabash.datamodel.StepConfiguration
 import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.exceptions.XProcException
 import com.xmlcalabash.namespace.Ns
@@ -48,7 +47,7 @@ class DocumentPropertyFunction(private val config: SaxonConfiguration): Extensio
         }
 
         override fun call(context: XPathContext?, arguments: Array<out Sequence>?): Sequence {
-            val dynamicContext = config.getExecutionContext()
+            val dynamicContext = config.environment.getExecutionContext()
 
             val item = arguments!![0].head()
             val propname = arguments[1].head()

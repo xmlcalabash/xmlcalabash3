@@ -18,9 +18,6 @@
 <!-- This is a horrifically cheap-and-cheerful stylesheet for processing
      stylized changelogs from DocBook to HTML. -->
 
-<xsl:output method="html" omit-xml-declaration="yes" indent="no"/>
-<xsl:strip-space elements="db:orderedlist db:itemizedlist db:listitem db:section"/>
-
 <xsl:param name="version" as="xs:string" required="yes"/>
 
 <xsl:template match="/">
@@ -28,20 +25,18 @@
 </xsl:template>
 
 <xsl:template match="db:appendix">
-  <xsl:variable name="revision" select="db:section[@xml:id=$version]"/>
+  <xsl:variable name="revision" select="db:revhistory/db:revision[@xml:id=$version]"/>
   <xsl:if test="count($revision) != 1">
     <xsl:message terminate="yes">Cannot find revision {$version} in changelog</xsl:message>
   </xsl:if>
-  <xsl:apply-templates select="$revision"/>
+  <xsl:apply-templates select="$revision/db:revdescription"/>
 </xsl:template>
 
-<xsl:template match="db:section">
+<xsl:template match="db:revdescription">
   <body>
     <xsl:apply-templates/>
   </body>
 </xsl:template>
-
-<xsl:template match="db:info"/>
 
 <xsl:template match="db:itemizedlist">
   <ul>
@@ -61,19 +56,6 @@
   </li>
 </xsl:template>
 
-<xsl:template match="db:listitem/db:para" priority="10">
-  <xsl:choose>
-    <xsl:when test="preceding-sibling::*">
-      <p>
-        <xsl:apply-templates/>
-      </p>
-    </xsl:when>
-    <xsl:otherwise>
-      <xsl:apply-templates/>
-    </xsl:otherwise>
-  </xsl:choose>
-</xsl:template>
-
 <xsl:template match="db:para">
   <p>
     <xsl:apply-templates/>
@@ -89,12 +71,12 @@
 </xsl:template>
 
 <xsl:template match="db:emphasis">
-  <em>
-    <xsl:apply-templates/>
-  </em>
+  <xsl:text>*</xsl:text>
+  <xsl:apply-templates/>
+  <xsl:text>*</xsl:text>
 </xsl:template>
 
-<xsl:template match="db:tag|db:code|db:literal|db:classname|db:option|db:filename">
+<xsl:template match="db:code|db:literal|db:classname|db:option|db:filename">
   <code>
     <xsl:apply-templates/>
   </code>

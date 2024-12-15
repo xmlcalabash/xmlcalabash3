@@ -46,11 +46,12 @@ class TestCase(val suite: TestSuite, val testFile: File) {
         val WRITABLE = QName("writable")
         val HIDDEN = QName("hidden")
 
-        val UNSUPPORTED_FEATURES = listOf("xslt-1", "xquery_1_0", "eager-eval")
+        val UNSUPPORTED_FEATURES = listOf("xslt-1", "xquery_1_0")
     }
 
     val config = suite.xmlCalabash
-    var testConfig = suite.builder.stepConfig.copy()
+    val builder = config.newPipelineBuilder()
+    var testConfig = builder.stepConfig.copy()
     //var graphviz: File? = config.xmlCalabashConfig.graphviz
     var graphviz: File? = File("/opt/homebrew/bin/dot") // FIXME:
 
@@ -94,6 +95,8 @@ class TestCase(val suite: TestSuite, val testFile: File) {
             }
         }
 
+        val eagerEval = "eager-eval" in features
+
         val saveOS = Urify.osname
         val saveSep = Urify.filesep
         val saveCwd = Urify.cwd
@@ -116,7 +119,8 @@ class TestCase(val suite: TestSuite, val testFile: File) {
         try {
             println(testFile.absolutePath)
 
-            val parser = config.newXProcParser(suite.builder)
+            config.commonEnvironment.eagerEvaluation = eagerEval
+            val parser = config.newXProcParser(builder)
             for ((name, value) in staticOptions) {
                 parser.builder.option(name, value)
             }
@@ -130,7 +134,6 @@ class TestCase(val suite: TestSuite, val testFile: File) {
             val decl = parser.parse(document)
             val runtime = decl.runtime()
             val pipeline = runtime.executable()
-            testConfig = pipeline.stepConfig
 
             if (suite.options.outputDescription != null || suite.options.outputGraph != null) {
                 val description = runtime.description()
@@ -400,9 +403,9 @@ class TestCase(val suite: TestSuite, val testFile: File) {
     }
 
     private fun loadOption(option: XdmNode) {
-        val localConfig = suite.builder.stepConfig.copy()
+        val localConfig = builder.stepConfig.copy()
         localConfig.updateWith(option)
-        localConfig.addNamespace("xs", NsXs.namespace)
+        localConfig.putNamespace(   "xs", NsXs.namespace)
 
         val name = option.getAttributeValue(Ns.name) ?: throw RuntimeException("No name on option?")
         val qname = localConfig.parseQName(name)
@@ -438,8 +441,8 @@ class TestCase(val suite: TestSuite, val testFile: File) {
         if (asType != null) {
             val seqtype = localConfig.parseSequenceType(asType)
 
-            var xxx = ExpressionTool.make(select, compiler.underlyingStaticContext, 0, Token.EOF, null)
-            val checker = localConfig.configuration.getTypeChecker(false)
+            val uncheckedExpr = ExpressionTool.make(select, compiler.underlyingStaticContext, 0, Token.EOF, null)
+            val checker = localConfig.saxonConfig.configuration.getTypeChecker(false)
 
             val role =
                 Supplier<RoleDiagnostic> {
@@ -451,7 +454,7 @@ class TestCase(val suite: TestSuite, val testFile: File) {
                     )
                 }
             val visitor = ExpressionVisitor.make(compiler.underlyingStaticContext)
-            xxx = checker.staticTypeCheck(xxx, seqtype.underlyingSequenceType, role, visitor)
+            checker.staticTypeCheck(uncheckedExpr, seqtype.underlyingSequenceType, role, visitor)
 
             result = localConfig.checkType(qname, result, seqtype, emptyList())
         }

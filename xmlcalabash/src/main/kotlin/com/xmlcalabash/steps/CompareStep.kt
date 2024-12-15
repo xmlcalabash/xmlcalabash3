@@ -97,7 +97,7 @@ open class CompareStep(): AbstractAtomicStep() {
         compiler.declareVariable(QName("b"))
         // In Saxon 12+, we have access to the 4.0 version of deep-equal...
         val selector = compiler.compile("deep-equal(\$a, \$b, default-collation(), map { 'debug': true() })").load()
-        selector.resourceResolver = stepConfig.documentManager
+        selector.resourceResolver = stepConfig.environment.documentManager
         selector.setErrorReporter(CompareReporter(this))
         selector.setVariable(QName("a"), source.value)
         selector.setVariable(QName("b"), alternate.value)

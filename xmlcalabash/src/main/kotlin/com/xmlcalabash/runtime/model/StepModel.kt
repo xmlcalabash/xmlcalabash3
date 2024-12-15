@@ -6,16 +6,15 @@ import com.xmlcalabash.graph.Model
 import com.xmlcalabash.graph.ModelInputPort
 import com.xmlcalabash.namespace.Ns
 import com.xmlcalabash.namespace.NsP
-import com.xmlcalabash.runtime.LazyValue
 import com.xmlcalabash.runtime.XProcRuntime
-import com.xmlcalabash.runtime.RuntimeStepConfiguration
+import com.xmlcalabash.runtime.XProcStepConfiguration
 import com.xmlcalabash.runtime.api.RuntimeOption
 import com.xmlcalabash.runtime.api.RuntimePort
 import com.xmlcalabash.runtime.steps.AbstractStep
 import net.sf.saxon.s9api.QName
 
 abstract class StepModel(val runtime: XProcRuntime, model: Model) {
-    val stepConfig = model.step.stepConfig.copy()
+    val stepConfig = runtime.stepConfiguration(model.step.stepConfig)
     val id: String = model.id
     val location: Location = model.step.location
     val name: String = model.step.name
@@ -63,7 +62,7 @@ abstract class StepModel(val runtime: XProcRuntime, model: Model) {
     }
 
     internal abstract fun initialize(model: Model)
-    internal abstract fun runnable(yconfig: RuntimeStepConfiguration): ()  -> AbstractStep
+    internal abstract fun runnable(config: XProcStepConfiguration): ()  -> AbstractStep
 
     override fun toString(): String {
         return "${type}"

@@ -5,7 +5,7 @@ import com.xmlcalabash.documents.XProcBinaryDocument
 import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.namespace.Ns
-import com.xmlcalabash.config.XProcStepConfiguration
+import com.xmlcalabash.runtime.XProcStepConfiguration
 import com.xmlcalabash.util.S9Api
 import net.sf.saxon.s9api.*
 import net.sf.saxon.value.QNameValue
@@ -21,7 +21,11 @@ class XProcSerializer(val processor: Processor) {
         val contentType =  overrideContentType ?: doc.contentType ?: MediaType.OCTET_STREAM
 
         if (contentType.htmlContentType()) {
-            serializeHtml(doc, stream, defaultProperties)
+            if (contentType == MediaType.XHTML) {
+                serializeXml(doc, stream, defaultProperties)
+            } else {
+                serializeHtml(doc, stream, defaultProperties)
+            }
             return
         }
 

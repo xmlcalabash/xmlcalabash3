@@ -1,7 +1,7 @@
 package com.xmlcalabash.steps.internal
 
 import com.xmlcalabash.documents.XProcDocument
-import com.xmlcalabash.config.XProcStepConfiguration
+import com.xmlcalabash.runtime.XProcStepConfiguration
 import com.xmlcalabash.runtime.api.Receiver
 import com.xmlcalabash.runtime.parameters.RuntimeStepParameters
 import com.xmlcalabash.steps.AbstractAtomicStep

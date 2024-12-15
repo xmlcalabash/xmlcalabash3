@@ -3,8 +3,8 @@ package com.xmlcalabash.datamodel
 import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.namespace.NsP
 
-open class WithInputInstruction(parent: XProcInstruction, stepConfig: StepConfiguration): InputBindingInstruction(parent, stepConfig, NsP.withInput) {
-    constructor(parent: XProcInstruction, stepConfig: StepConfiguration, port: String) : this(parent, stepConfig) {
+open class WithInputInstruction(parent: XProcInstruction, stepConfig: InstructionConfiguration): InputBindingInstruction(parent, stepConfig, NsP.withInput) {
+    constructor(parent: XProcInstruction, stepConfig: InstructionConfiguration, port: String) : this(parent, stepConfig) {
         this.port = port
     }
 

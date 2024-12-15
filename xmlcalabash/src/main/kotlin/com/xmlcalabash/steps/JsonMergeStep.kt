@@ -72,7 +72,7 @@ open class JsonMergeStep(): AbstractAtomicStep() {
         }
         compiler.declareVariable(indexName)
         val selector = compiler.compile(key).load()
-        selector.resourceResolver = stepConfig.documentManager
+        selector.resourceResolver = stepConfig.environment.documentManager
         selector.setVariable(indexName, XdmAtomicValue(index))
         selector.contextItem = item.itemAt(0) // ???
         val result = selector.evaluate()

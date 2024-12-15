@@ -2,7 +2,7 @@ package com.xmlcalabash.util
 
 import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.io.DocumentManager
-import com.xmlcalabash.config.XProcStepConfiguration
+import com.xmlcalabash.runtime.XProcStepConfiguration
 import com.xmlcalabash.spi.DocumentResolver
 import com.xmlcalabash.spi.DocumentResolverProvider
 import java.net.URI

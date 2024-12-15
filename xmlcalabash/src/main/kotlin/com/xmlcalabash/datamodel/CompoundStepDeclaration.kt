@@ -7,7 +7,7 @@ import com.xmlcalabash.namespace.NsP
 import net.sf.saxon.s9api.QName
 import net.sf.saxon.s9api.SequenceType
 
-abstract class CompoundStepDeclaration(parent: XProcInstruction?, stepConfig: StepConfiguration, instructionType: QName): StepDeclaration(parent, stepConfig, instructionType) {
+abstract class CompoundStepDeclaration(parent: XProcInstruction?, stepConfig: InstructionConfiguration, instructionType: QName): StepDeclaration(parent, stepConfig, instructionType) {
     internal val anySteps = mapOf(
         NsP.variable to '*',
         NsP.forEach to '*',

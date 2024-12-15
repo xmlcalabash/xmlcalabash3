@@ -125,7 +125,7 @@ open class LabelElementsStep(): AbstractAtomicStep(), ProcessMatchingNodes {
         }
         compiler.declareVariable(varname)
         val selector = compiler.compile(label).load()
-        selector.resourceResolver = stepConfig.documentManager
+        selector.resourceResolver = stepConfig.environment.documentManager
         selector.setVariable(varname, XdmAtomicValue(index))
         selector.contextItem = node
         val result = selector.evaluate()

@@ -66,6 +66,6 @@ abstract class AbstractArchiveStep(): AbstractAtomicStep() {
                 break
             }
         }
-        return MediaType.parse(stepConfig.mimeTypes.getContentType(name))
+        return MediaType.parse(stepConfig.environment.mimeTypes.getContentType(name))
     }
 }

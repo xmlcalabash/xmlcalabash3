@@ -1,6 +1,6 @@
 package com.xmlcalabash.parsers.xpath31
 
-import com.xmlcalabash.config.XProcStepConfiguration
+import com.xmlcalabash.runtime.XProcStepConfiguration
 import com.xmlcalabash.namespace.NsFn
 import com.xmlcalabash.namespace.NsP
 import com.xmlcalabash.parsers.XPath31

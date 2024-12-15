@@ -4,7 +4,7 @@ import com.xmlcalabash.namespace.Ns
 import com.xmlcalabash.namespace.NsC
 import com.xmlcalabash.namespace.NsFn
 import com.xmlcalabash.namespace.NsXvrl
-import com.xmlcalabash.config.XProcStepConfiguration
+import com.xmlcalabash.runtime.XProcStepConfiguration
 import com.xmlcalabash.util.SaxonTreeBuilder
 import net.sf.saxon.om.EmptyAttributeMap
 import net.sf.saxon.om.NamespaceMap

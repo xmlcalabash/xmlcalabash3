@@ -6,7 +6,7 @@ import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.namespace.Ns
 import com.xmlcalabash.runtime.ExpressionEvaluator
-import com.xmlcalabash.config.XProcStepConfiguration
+import com.xmlcalabash.runtime.XProcStepConfiguration
 import net.sf.saxon.om.NamespaceUri
 import net.sf.saxon.s9api.*
 import org.apache.hc.client5.http.auth.AuthScope
@@ -144,8 +144,8 @@ class InternetProtocolRequest(val stepConfig: XProcStepConfiguration, val uri: U
 
         builder.setRetryStrategy(DefaultHttpRequestRetryStrategy(3, TimeValue.ofSeconds(1)))
 
-        if (stepConfig.proxies[uri.scheme] != null) {
-            builder.setProxy(HttpHost.create(stepConfig.proxies[uri.scheme]))
+        if (stepConfig.environment.proxies[uri.scheme] != null) {
+            builder.setProxy(HttpHost.create(stepConfig.environment.proxies[uri.scheme]))
         }
 
         if (_usercreds != null) {

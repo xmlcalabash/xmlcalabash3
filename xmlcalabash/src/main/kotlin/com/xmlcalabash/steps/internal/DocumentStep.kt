@@ -69,7 +69,7 @@ open class DocumentStep(val params: DocumentStepParameters): AbstractAtomicStep(
             }
         }
 
-        val manager = stepConfig.documentManager
+        val manager = stepConfig.environment.documentManager
         val doc = manager.load(href, stepConfig, props, params)
         receiver.output("result", doc);
     }

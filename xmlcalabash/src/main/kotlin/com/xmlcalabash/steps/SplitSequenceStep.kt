@@ -37,7 +37,7 @@ open class SplitSequenceStep(): AbstractAtomicStep() {
             }
             val exec = compiler.compile(test)
             val select = exec.load()
-            select.resourceResolver = stepConfig.documentManager
+            select.resourceResolver = stepConfig.environment.documentManager
 
             val dyncontext = select.underlyingXPathContext
             val context = dyncontext.xPathContextObject

@@ -6,7 +6,7 @@ import com.xmlcalabash.namespace.NsP
 import net.sf.saxon.s9api.QName
 import java.net.URI
 
-open class VariableInstruction(parent: XProcInstruction, name: QName, stepConfig: StepConfiguration): VariableBindingContainer(parent, name, stepConfig, NsP.variable) {
+open class VariableInstruction(parent: XProcInstruction, name: QName, stepConfig: InstructionConfiguration): VariableBindingContainer(parent, name, stepConfig, NsP.variable) {
     override fun elaborateInstructions() {
         if (select == null) {
             throw XProcError.xsMissingRequiredAttribute(Ns.select).exception()

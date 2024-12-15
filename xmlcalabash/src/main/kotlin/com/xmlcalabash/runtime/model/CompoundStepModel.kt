@@ -2,11 +2,11 @@ package com.xmlcalabash.runtime.model
 
 import com.xmlcalabash.datamodel.AtomicExpressionStepInstruction
 import com.xmlcalabash.datamodel.CatchInstruction
-import com.xmlcalabash.datamodel.ViewportInstruction
 import com.xmlcalabash.graph.*
 import com.xmlcalabash.namespace.NsP
+import com.xmlcalabash.runtime.PipelineContext
 import com.xmlcalabash.runtime.XProcRuntime
-import com.xmlcalabash.runtime.RuntimeStepConfiguration
+import com.xmlcalabash.runtime.XProcStepConfiguration
 import com.xmlcalabash.runtime.api.RuntimePort
 import com.xmlcalabash.runtime.parameters.RunStepStepParameters
 import com.xmlcalabash.runtime.parameters.RuntimeStepParameters
@@ -123,7 +123,7 @@ class CompoundStepModel(runtime: XProcRuntime, model: CompoundModel): StepModel(
         }
     }
 
-    override fun runnable(yconfig: RuntimeStepConfiguration): () -> AbstractStep {
-        return { CompoundStep.newInstance(yconfig, this) }
+    override fun runnable(config: XProcStepConfiguration): () -> AbstractStep {
+        return { CompoundStep.newInstance(config, this) }
     }
 }

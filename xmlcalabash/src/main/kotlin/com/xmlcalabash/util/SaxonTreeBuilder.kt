@@ -1,6 +1,6 @@
 package com.xmlcalabash.util
 
-import com.xmlcalabash.datamodel.StepConfiguration
+import com.xmlcalabash.runtime.XProcStepConfiguration
 import com.xmlcalabash.documents.DocumentContext
 import com.xmlcalabash.xslt.XsltStylesheet
 import com.xmlcalabash.xslt.stylesheet
@@ -31,7 +31,7 @@ import java.net.URI
 
 open class SaxonTreeBuilder(val processor: Processor) {
     constructor (config: DocumentContext): this(config.processor)
-    constructor (config: StepConfiguration): this(config.processor)
+    constructor (config: XProcStepConfiguration): this(config.processor)
 
     protected val excludedNamespaces = mutableSetOf<NamespaceUri>()
     protected val controller = Controller(processor.underlyingConfiguration)

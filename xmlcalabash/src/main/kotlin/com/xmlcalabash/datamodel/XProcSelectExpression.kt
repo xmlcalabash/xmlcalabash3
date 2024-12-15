@@ -1,5 +1,6 @@
 package com.xmlcalabash.datamodel
 
+import com.xmlcalabash.runtime.XProcStepConfiguration
 import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.exceptions.XProcException
 import com.xmlcalabash.namespace.NsErr
@@ -10,9 +11,9 @@ import net.sf.saxon.s9api.XdmAtomicValue
 import net.sf.saxon.s9api.XdmValue
 import net.sf.saxon.type.BuiltInAtomicType
 
-class XProcSelectExpression private constructor(stepConfig: StepConfiguration, val select: String, asType: SequenceType, collection: Boolean, values: List<XdmAtomicValue>): XProcExpression(stepConfig, asType, collection, values) {
+class XProcSelectExpression private constructor(stepConfig: XProcStepConfiguration, val select: String, asType: SequenceType, collection: Boolean, values: List<XdmAtomicValue>): XProcExpression(stepConfig, asType, collection, values) {
     companion object {
-        fun newInstance(stepConfig: StepConfiguration, select: String, asType: SequenceType, collection: Boolean, values: List<XdmAtomicValue> = emptyList()): XProcSelectExpression {
+        fun newInstance(stepConfig: XProcStepConfiguration, select: String, asType: SequenceType, collection: Boolean, values: List<XdmAtomicValue> = emptyList()): XProcSelectExpression {
             return XProcSelectExpression(stepConfig, select, asType, collection, values)
         }
     }
@@ -21,23 +22,23 @@ class XProcSelectExpression private constructor(stepConfig: StepConfiguration, v
         return select(stepConfig, select, asType, collection, values)
     }
 
-    override fun xevaluate(): () -> XdmValue {
-        return { evaluate() }
+    override fun xevaluate(config: XProcStepConfiguration): () -> XdmValue {
+        return { evaluate(config) }
     }
 
-    override fun evaluate(): XdmValue {
-        val compiler = stepConfig.processor.newXPathCompiler()
-        if (stepConfig.processor.isSchemaAware) {
+    override fun evaluate(config: XProcStepConfiguration): XdmValue {
+        val compiler = config.processor.newXPathCompiler()
+        if (config.processor.isSchemaAware) {
             compiler.isSchemaAware = true
         }
 
         // Hack
-        val uri = stepConfig.baseUri
+        val uri = config.baseUri
         if (uri != null && !uri.toString().startsWith("?uniqueid")) {
             compiler.baseURI = uri
         }
 
-        for ((prefix, uri) in stepConfig.inscopeNamespaces) {
+        for ((prefix, uri) in config.inscopeNamespaces) {
             compiler.declareNamespace(prefix, uri.toString())
         }
         for (name in variableRefs) {
@@ -55,22 +56,22 @@ class XProcSelectExpression private constructor(stepConfig: StepConfiguration, v
             throw ex
         }
 
-        val config = stepConfig.saxonConfig.configuration
-        val defaultCollectionUri = config.defaultCollection
+        val sconfig = config.saxonConfig.configuration
+        val defaultCollectionUri = sconfig.defaultCollection
         val collectionFinder = XProcCollectionFinder(defaultCollection, selector.underlyingXPathContext.collectionFinder)
         selector.underlyingXPathContext.collectionFinder = collectionFinder
-        selector.resourceResolver = stepConfig.documentManager
-        config.defaultCollection = XProcCollectionFinder.DEFAULT
+        selector.resourceResolver = config.environment.documentManager
+        sconfig.defaultCollection = XProcCollectionFinder.DEFAULT
 
         for (name in variableRefs) {
             if (name in staticVariableBindings) {
-                selector.setVariable(name, staticVariableBindings[name]!!.evaluate())
+                selector.setVariable(name, staticVariableBindings[name]!!.evaluate(config))
             } else if (name in variableBindings) {
                 selector.setVariable(name, variableBindings[name]!!)
             }
         }
 
-        setupExecutionContext(selector)
+        setupExecutionContext(config, selector)
 
         val result = try {
             selector.evaluate()
@@ -80,13 +81,13 @@ class XProcSelectExpression private constructor(stepConfig: StepConfiguration, v
         }
 
         selector.underlyingXPathContext.collectionFinder = collectionFinder.chain
-        config.defaultCollection = defaultCollectionUri
+        sconfig.defaultCollection = defaultCollectionUri
 
         teardownExecutionContext()
 
         if (asType !== SequenceType.ANY || values.isNotEmpty()) {
             try {
-                return stepConfig.checkType(null, result, asType, values)
+                return config.checkType(null, result, asType, values)
             } catch (ex: XProcException) {
                 if (ex.error.code == NsErr.xd(36) && asType.underlyingSequenceType.primaryType == BuiltInAtomicType.QNAME) {
                     throw ex.error.with(NsErr.xd(61)).exception()
@@ -94,6 +95,8 @@ class XProcSelectExpression private constructor(stepConfig: StepConfiguration, v
                 throw ex
             }
         }
+
+        //println("${select} = ${result}")
 
         return result
     }

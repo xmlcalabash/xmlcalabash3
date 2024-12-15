@@ -8,7 +8,7 @@ import net.sf.saxon.ma.map.MapType
 import net.sf.saxon.s9api.QName
 import net.sf.saxon.s9api.XdmAtomicValue
 
-open class WithOptionInstruction(parent: XProcInstruction, name: QName, stepConfig: StepConfiguration): VariableBindingContainer(parent, name, stepConfig, NsP.withOption) {
+open class WithOptionInstruction(parent: XProcInstruction, name: QName, stepConfig: InstructionConfiguration): VariableBindingContainer(parent, name, stepConfig, NsP.withOption) {
     internal var optionValues: List<XdmAtomicValue> = emptyList()
     internal var initializer: String? = null
 

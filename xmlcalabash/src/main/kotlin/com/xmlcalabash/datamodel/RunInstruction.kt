@@ -97,7 +97,7 @@ class RunInstruction(parent: XProcInstruction): CompoundStepDeclaration(parent, 
     }
 
     fun runOption(name: QName, expr: XProcExpression?): RunOptionInstruction {
-        if (children.filterIsInstance<RunOptionInstruction>().filter { it.name == name }.isNotEmpty()) {
+        if (children.filterIsInstance<RunOptionInstruction>().any { it.name == name }) {
             throw XProcError.xsDuplicateWithOption(name).exception()
         }
 

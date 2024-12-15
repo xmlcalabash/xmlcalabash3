@@ -7,7 +7,7 @@ import com.xmlcalabash.datamodel.MediaType
 import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.io.XProcSerializer
-import com.xmlcalabash.config.XProcStepConfiguration
+import com.xmlcalabash.runtime.XProcStepConfiguration
 import net.sf.saxon.s9api.QName
 import net.sf.saxon.s9api.XdmValue
 import org.apache.logging.log4j.kotlin.logger

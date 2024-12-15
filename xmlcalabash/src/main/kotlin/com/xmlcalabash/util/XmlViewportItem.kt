@@ -1,6 +1,6 @@
 package com.xmlcalabash.util
 
-import com.xmlcalabash.config.XProcStepConfiguration
+import com.xmlcalabash.runtime.XProcStepConfiguration
 import net.sf.saxon.s9api.XdmNode
 
 class XmlViewportItem(val stepConfig: XProcStepConfiguration, val node: XdmNode) {

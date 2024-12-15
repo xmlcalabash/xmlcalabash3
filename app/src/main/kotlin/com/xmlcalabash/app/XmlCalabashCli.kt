@@ -4,9 +4,9 @@ import com.xmlcalabash.XmlCalabashBuildConfig
 import com.xmlcalabash.config.ConfigurationLoader
 import com.xmlcalabash.config.XmlCalabash
 import com.xmlcalabash.config.XmlCalabashConfiguration
+import com.xmlcalabash.datamodel.InstructionConfiguration
 import com.xmlcalabash.datamodel.MediaType
 import com.xmlcalabash.datamodel.PipelineBuilder
-import com.xmlcalabash.datamodel.StepConfiguration
 import com.xmlcalabash.documents.DocumentProperties
 import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.exceptions.DefaultErrorExplanation
@@ -45,7 +45,7 @@ class XmlCalabashCli private constructor() {
     lateinit private var xmlCalabash: XmlCalabash
     lateinit private var commandLine: CommandLine
     lateinit private var config: XmlCalabashConfiguration
-    lateinit private var stepConfig: StepConfiguration
+    lateinit private var stepConfig: InstructionConfiguration
 
     private fun run(args: Array<out String>) {
         var errorExplanation: ErrorExplanation = DefaultErrorExplanation()
@@ -87,7 +87,7 @@ class XmlCalabashCli private constructor() {
 
             val xprocParser = xmlCalabash.newXProcParser()
             stepConfig = xprocParser.builder.stepConfig
-            errorExplanation = stepConfig.errorExplanation
+            errorExplanation = stepConfig.environment.errorExplanation
 
             evaluateOptions(xprocParser.builder, commandLine)
 
@@ -114,7 +114,7 @@ class XmlCalabashCli private constructor() {
             outputManifold.putAll(pipeline.outputManifold)
             for ((port, uris) in commandLine.inputs) {
                 for (uri in uris) {
-                    val doc = stepConfig.documentManager.load(uri, pipeline.stepConfig)
+                    val doc = stepConfig.environment.documentManager.load(uri, pipeline.config)
                     pipeline.input(port, doc)
                 }
             }

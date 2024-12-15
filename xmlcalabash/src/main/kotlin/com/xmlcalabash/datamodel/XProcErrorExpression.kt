@@ -1,13 +1,13 @@
 package com.xmlcalabash.datamodel
 
-import com.xmlcalabash.exceptions.XProcError
+import com.xmlcalabash.runtime.XProcStepConfiguration
 import net.sf.saxon.s9api.SequenceType
 import net.sf.saxon.s9api.XdmAtomicValue
 import net.sf.saxon.s9api.XdmValue
 
-class XProcErrorExpression private constructor(stepConfig: StepConfiguration): XProcExpression(stepConfig, SequenceType.ANY, false, emptyList()) {
+class XProcErrorExpression private constructor(stepConfig: XProcStepConfiguration): XProcExpression(stepConfig, SequenceType.ANY, false, emptyList()) {
     companion object {
-        fun newInstance(stepConfig: StepConfiguration): XProcErrorExpression {
+        fun newInstance(stepConfig: XProcStepConfiguration): XProcErrorExpression {
             return XProcErrorExpression(stepConfig)
         }
     }
@@ -16,16 +16,16 @@ class XProcErrorExpression private constructor(stepConfig: StepConfiguration): X
         return error(stepConfig)
     }
 
-    override fun xevaluate(): () -> XdmValue {
-        return { evaluate() }
+    override fun xevaluate(config: XProcStepConfiguration): () -> XdmValue {
+        return { evaluate(config) }
     }
 
-    override fun evaluate(): XdmValue {
-        throw XProcError.xiImpossible("Attempt to evaluate error expression").exception()
+    override fun evaluate(config: XProcStepConfiguration): XdmValue {
+        throw UnsupportedOperationException("Attempt to evaluate error expression")
     }
 
-    override fun computeStaticValue(stepConfig: StepConfiguration): XdmValue? {
-        throw XProcError.xiImpossible("Attempt to find static value of error expression").exception()
+    override fun computeStaticValue(stepConfig: InstructionConfiguration): XdmValue? {
+        throw UnsupportedOperationException("Attempt to find static value of error expression")
     }
 
     override fun toString(): String {

@@ -10,6 +10,7 @@ abstract class Model(val graph: Graph, val parent: Model?, val step: StepDeclara
         "${step.name}_${step.id}"
     }
 
+    internal val saxonConfig = step.stepConfig.saxonConfig.newConfiguration(graph.environment)
     internal val inputs = mutableMapOf<String, ModelPort>()
     internal val outputs = mutableMapOf<String, ModelPort>()
     internal val options = mutableMapOf<QName, ModelOption>()

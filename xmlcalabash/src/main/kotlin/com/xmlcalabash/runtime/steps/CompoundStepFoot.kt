@@ -3,11 +3,11 @@ package com.xmlcalabash.runtime.steps
 import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.namespace.NsCx
-import com.xmlcalabash.runtime.RuntimeStepConfiguration
+import com.xmlcalabash.runtime.XProcStepConfiguration
 import com.xmlcalabash.runtime.model.FootModel
 import com.xmlcalabash.runtime.parameters.RuntimeStepParameters
 
-class CompoundStepFoot(yconfig: RuntimeStepConfiguration, step: FootModel): AbstractStep(yconfig, step) {
+class CompoundStepFoot(config: XProcStepConfiguration, step: FootModel): AbstractStep(config, step) {
     internal var alwaysAllowSequences = false
     val cache = mutableMapOf<String, MutableList<XProcDocument>>()
     val holdPorts = mutableSetOf<String>()

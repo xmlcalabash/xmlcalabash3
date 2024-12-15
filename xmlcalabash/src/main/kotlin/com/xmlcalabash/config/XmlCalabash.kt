@@ -1,19 +1,28 @@
 package com.xmlcalabash.config
 
+import com.xmlcalabash.datamodel.DeclareStepInstruction
 import com.xmlcalabash.datamodel.PipelineBuilder
+import com.xmlcalabash.datamodel.PipelineCompilerContext
+import com.xmlcalabash.datamodel.StandardLibrary
+import com.xmlcalabash.datamodel.Visibility
 import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.util.DefaultXmlCalabashConfiguration
 import com.xmlcalabash.parsers.xpl.XplParser
-import com.xmlcalabash.runtime.RuntimeExecutionContext
 import com.xmlcalabash.runtime.XProcExecutionContext
+import com.xmlcalabash.runtime.XProcStepConfiguration
 import java.util.*
+import kotlin.collections.set
 
 // XmlCalabash and SaxonConfiguration are intertwingled in an unappealing way
 class XmlCalabash private constructor(val xmlCalabashConfig: XmlCalabashConfiguration) {
     private lateinit var _saxonConfig: SaxonConfiguration
+    private lateinit var _commonEnvironment: CommonEnvironment
 
     val saxonConfig: SaxonConfiguration
         get() = _saxonConfig
+
+    val commonEnvironment: CommonEnvironment
+        get() = _commonEnvironment
 
     companion object {
         fun newInstance(): XmlCalabash {
@@ -22,10 +31,19 @@ class XmlCalabash private constructor(val xmlCalabashConfig: XmlCalabashConfigur
 
         fun newInstance(config: XmlCalabashConfiguration): XmlCalabash {
             val xmlCalabash = XmlCalabash(config)
-            val rteContext = RuntimeExecutionContext(xmlCalabash)
-            val saxonConfig = SaxonConfiguration.newInstance(xmlCalabash, rteContext)
+            xmlCalabash._commonEnvironment = CommonEnvironment(xmlCalabash)
+            val environment = PipelineCompilerContext(xmlCalabash)
+            val saxonConfig = SaxonConfiguration.newInstance(environment)
             xmlCalabash._saxonConfig = saxonConfig
             config.xmlCalabashConfigurer(xmlCalabash)
+
+            val library = StandardLibrary.getInstance(environment, saxonConfig)
+            for (decl in library.children.filterIsInstance<DeclareStepInstruction>()) {
+                if (decl.type != null && decl.visibility != Visibility.PRIVATE) {
+                    environment.commonEnvironment._standardSteps[decl.type!!] = decl
+                }
+            }
+
             return xmlCalabash
         }
     }

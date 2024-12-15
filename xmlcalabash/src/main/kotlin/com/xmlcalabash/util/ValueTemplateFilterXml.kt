@@ -1,19 +1,19 @@
 package com.xmlcalabash.util
 
+import com.xmlcalabash.runtime.XProcStepConfiguration
 import com.xmlcalabash.datamodel.XProcExpression
 import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.exceptions.XProcException
 import com.xmlcalabash.namespace.Ns
 import com.xmlcalabash.namespace.NsP
-import com.xmlcalabash.datamodel.StepConfiguration
 import com.xmlcalabash.runtime.LazyValue
 import net.sf.saxon.s9api.*
 import org.apache.logging.log4j.kotlin.logger
 import java.net.URI
 import java.util.*
 
-class ValueTemplateFilterXml(val stepConfig: StepConfiguration, val originalNode: XdmNode, val baseUri: URI): ValueTemplateFilter {
+class ValueTemplateFilterXml(val originalNode: XdmNode, val baseUri: URI): ValueTemplateFilter {
     private var xmlNode = originalNode
     private var static = true
     private var onlyChecking = false
@@ -28,8 +28,8 @@ class ValueTemplateFilterXml(val stepConfig: StepConfiguration, val originalNode
 
     private var contextItem: Any? = null
 
-    override fun containsMarkup(): Boolean {
-        val compiler = stepConfig.processor.newXPathCompiler()
+    override fun containsMarkup(config: XProcStepConfiguration): Boolean {
+        val compiler = config.processor.newXPathCompiler()
         val exec = compiler.compile("//*")
         val selector = exec.load()
         selector.contextItem = originalNode
@@ -57,7 +57,7 @@ class ValueTemplateFilterXml(val stepConfig: StepConfiguration, val originalNode
         return usesFunctions
     }
 
-    override fun expandStaticValueTemplates(initialExpand: Boolean, staticBindings: Map<QName, XProcExpression>): XdmNode {
+    override fun expandStaticValueTemplates(config: XProcStepConfiguration, initialExpand: Boolean, staticBindings: Map<QName, XProcExpression>): XdmNode {
         contextItem = null
         this.initialExpand = initialExpand
         expandText.clear()
@@ -68,18 +68,18 @@ class ValueTemplateFilterXml(val stepConfig: StepConfiguration, val originalNode
 
         static = true
         onlyChecking = true
-        var builder = SaxonTreeBuilder(stepConfig)
+        var builder = SaxonTreeBuilder(config)
         builder.startDocument(baseUri)
-        filterValueTemplates(builder, originalNode)
+        filterValueTemplates(config, builder, originalNode)
         builder.endDocument()
 
         expandText.pop()
 
         if (static) {
             val xml = builder.result
-            builder = SaxonTreeBuilder(stepConfig)
+            builder = SaxonTreeBuilder(config)
             builder.startDocument(baseUri)
-            removeInlineExpandText(builder, xml)
+            removeInlineExpandText(config, builder, xml)
             builder.endDocument()
             xmlNode = builder.result
         }
@@ -87,11 +87,11 @@ class ValueTemplateFilterXml(val stepConfig: StepConfiguration, val originalNode
         return xmlNode
     }
 
-    override fun expandValueTemplates(contextItem: XProcDocument?, bindings: Map<QName, LazyValue>): XdmNode {
-        return expandValueTemplatesAny(contextItem, bindings)
+    override fun expandValueTemplates(config: XProcStepConfiguration, contextItem: XProcDocument?, bindings: Map<QName, LazyValue>): XdmNode {
+        return expandValueTemplatesAny(config, contextItem, bindings)
     }
 
-    private fun expandValueTemplatesAny(contextItem: XProcDocument?, bindings: Map<QName, LazyValue>): XdmNode {
+    private fun expandValueTemplatesAny(config: XProcStepConfiguration, contextItem: XProcDocument?, bindings: Map<QName, LazyValue>): XdmNode {
         this.contextItem = contextItem
 
         expandText.clear()
@@ -103,9 +103,9 @@ class ValueTemplateFilterXml(val stepConfig: StepConfiguration, val originalNode
         }
 
         onlyChecking = false
-        val builder = SaxonTreeBuilder(stepConfig)
+        val builder = SaxonTreeBuilder(config)
         builder.startDocument(originalNode.baseURI)
-        filterValueTemplates(builder, originalNode)
+        filterValueTemplates(config, builder, originalNode)
         builder.endDocument()
 
         expandText.pop()
@@ -113,9 +113,9 @@ class ValueTemplateFilterXml(val stepConfig: StepConfiguration, val originalNode
         return builder.result
     }
 
-    private fun filterValueTemplates(builder: SaxonTreeBuilder, node: XdmNode) {
+    private fun filterValueTemplates(config: XProcStepConfiguration, builder: SaxonTreeBuilder, node: XdmNode) {
         when (node.nodeKind) {
-            XdmNodeKind.DOCUMENT -> node.axisIterator(Axis.CHILD).forEach { filterValueTemplates(builder, it) }
+            XdmNodeKind.DOCUMENT -> node.axisIterator(Axis.CHILD).forEach { filterValueTemplates(config, builder, it) }
             XdmNodeKind.ELEMENT -> {
                 var expand = expandText.peek()
 
@@ -134,7 +134,7 @@ class ValueTemplateFilterXml(val stepConfig: StepConfiguration, val originalNode
                 node.axisIterator(Axis.ATTRIBUTE).forEach { attr ->
                     if (attr.nodeName != inlineAttribute && attr.nodeName != NsP.inlineExpandText) {
                         val value = if (expand) {
-                            considerValueTemplates(node, attr.stringValue)
+                            considerValueTemplates(config, node, attr.stringValue)
                         } else {
                             attr.stringValue
                         }
@@ -163,15 +163,15 @@ class ValueTemplateFilterXml(val stepConfig: StepConfiguration, val originalNode
 
                 expandText.push(expand)
 
-                builder.addStartElement(node, stepConfig.attributeMap(attrMap))
-                node.axisIterator(Axis.CHILD).forEach { filterValueTemplates(builder, it) }
+                builder.addStartElement(node, config.attributeMap(attrMap))
+                node.axisIterator(Axis.CHILD).forEach { filterValueTemplates(config, builder, it) }
                 builder.addEndElement()
 
                 expandText.pop()
             }
             XdmNodeKind.TEXT -> {
                 if (expandText.peek()) {
-                    considerValueTemplates(builder, node.parent, node.stringValue)
+                    considerValueTemplates(config, builder, node.parent, node.stringValue)
                 } else {
                     builder.addSubtree(node)
                 }
@@ -180,9 +180,9 @@ class ValueTemplateFilterXml(val stepConfig: StepConfiguration, val originalNode
         }
     }
 
-    private fun removeInlineExpandText(builder: SaxonTreeBuilder, node: XdmNode) {
+    private fun removeInlineExpandText(config: XProcStepConfiguration, builder: SaxonTreeBuilder, node: XdmNode) {
         when (node.nodeKind) {
-            XdmNodeKind.DOCUMENT -> node.axisIterator(Axis.CHILD).forEach { removeInlineExpandText(builder, it) }
+            XdmNodeKind.DOCUMENT -> node.axisIterator(Axis.CHILD).forEach { removeInlineExpandText(config, builder, it) }
             XdmNodeKind.ELEMENT -> {
                 val attrMap = mutableMapOf<QName, String?>()
                 node.axisIterator(Axis.ATTRIBUTE).forEach { attr ->
@@ -190,15 +190,15 @@ class ValueTemplateFilterXml(val stepConfig: StepConfiguration, val originalNode
                         attrMap[attr.nodeName] = attr.stringValue
                     }
                 }
-                builder.addStartElement(node, stepConfig.attributeMap(attrMap))
-                node.axisIterator(Axis.CHILD).forEach { removeInlineExpandText(builder, it) }
+                builder.addStartElement(node, config.attributeMap(attrMap))
+                node.axisIterator(Axis.CHILD).forEach { removeInlineExpandText(config, builder, it) }
                 builder.addEndElement()
             }
             else -> builder.addSubtree(node)
         }
     }
 
-    private fun considerValueTemplates(context: XdmNode, text: String): String {
+    private fun considerValueTemplates(config: XProcStepConfiguration, context: XdmNode, text: String): String {
         val avt = ValueTemplateParser.parse(text)
 
         if (avt.value.size == 1) {
@@ -206,21 +206,21 @@ class ValueTemplateFilterXml(val stepConfig: StepConfiguration, val originalNode
             return avt.value[0]
         }
 
-        val avtConfig = stepConfig.copy()
-        avtConfig.updateWith(context)
+        //val avtConfig = stepConfig.copy()
+        //avtConfig.updateWith(context)
 
         val sb = StringBuilder()
         for (index in avt.value.indices) {
             if (index % 2 == 0) {
                 sb.append(avt.value[index])
             } else {
-                val expr = XProcExpression.select(avtConfig, avt.value[index])
+                val expr = XProcExpression.select(config, avt.value[index])
                 for ((name, value) in staticVariableBindings) {
                     expr.setStaticBinding(name, value)
                 }
 
                 if (expr.canBeResolvedStatically()) {
-                    val value = expr.evaluate()
+                    val value = expr.evaluate(config)
                     sb.append(value.underlyingValue.stringValue)
                 } else {
                     if (onlyChecking) {
@@ -230,7 +230,7 @@ class ValueTemplateFilterXml(val stepConfig: StepConfiguration, val originalNode
                         for ((name, value) in variableBindings) {
                             expr.setBinding(name, value)
                         }
-                        val value = expr.evaluate()
+                        val value = expr.evaluate(config)
                         sb.append(value.underlyingValue.stringValue)
                     }
                 }
@@ -240,11 +240,11 @@ class ValueTemplateFilterXml(val stepConfig: StepConfiguration, val originalNode
         return sb.toString()
     }
 
-    private fun considerValueTemplates(builder: SaxonTreeBuilder, context: XdmNode, text: String) {
+    private fun considerValueTemplates(config: XProcStepConfiguration, builder: SaxonTreeBuilder, context: XdmNode, text: String) {
         val avt = ValueTemplateParser.parse(text)
 
-        val avtConfig = stepConfig.copy()
-        avtConfig.updateWith(context)
+        //val avtConfig = stepConfig.copy()
+        //avtConfig.updateWith(context)
 
         if (avt.value.size == 1) {
             // There are no value templates in here.
@@ -256,14 +256,14 @@ class ValueTemplateFilterXml(val stepConfig: StepConfiguration, val originalNode
             if (index % 2 == 0) {
                 builder.addText(avt.value[index])
             } else {
-                val expr = XProcExpression.select(avtConfig, avt.value[index])
+                val expr = XProcExpression.select(config, avt.value[index])
                 for ((name, value) in staticVariableBindings) {
                     expr.setStaticBinding(name, value)
                 }
 
                 if (expr.canBeResolvedStatically()) {
                     try {
-                        val value = expr.evaluate()
+                        val value = expr.evaluate(config)
                         builder.addSubtree(value)
                     } catch (ex: Exception) {
                         if (onlyChecking) {
@@ -298,7 +298,7 @@ class ValueTemplateFilterXml(val stepConfig: StepConfiguration, val originalNode
                         for ((name, value) in variableBindings) {
                             expr.setBinding(name, value)
                         }
-                        val value = expr.evaluate()
+                        val value = expr.evaluate(config)
                         builder.addSubtree(value)
                     }
                 }

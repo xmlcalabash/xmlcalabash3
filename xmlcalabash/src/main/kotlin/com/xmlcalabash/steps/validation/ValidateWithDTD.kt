@@ -1,6 +1,5 @@
 package com.xmlcalabash.steps.validation
 
-import com.xmlcalabash.config.XProcStepConfiguration
 import com.xmlcalabash.datamodel.MediaType
 import com.xmlcalabash.documents.DocumentProperties
 import com.xmlcalabash.documents.XProcDocument
@@ -113,8 +112,8 @@ class ValidateWithDTD(): AbstractAtomicStep() {
         xvrl.addEndElement()
 
         xvrl.addStartElement(NsXvrl.creator, stepConfig.attributeMap(mapOf(
-            Ns.name to stepConfig.saxonConfig.productName,
-            Ns.version to stepConfig.saxonConfig.version,
+            Ns.name to stepConfig.saxonConfig.environment.productName,
+            Ns.version to stepConfig.saxonConfig.environment.version,
         )))
         xvrl.addEndElement()
 

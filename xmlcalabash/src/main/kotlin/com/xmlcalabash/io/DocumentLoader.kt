@@ -6,7 +6,7 @@ import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.namespace.Ns
 import com.xmlcalabash.namespace.NsCx
-import com.xmlcalabash.config.XProcStepConfiguration
+import com.xmlcalabash.runtime.XProcStepConfiguration
 import com.xmlcalabash.util.SaxonTreeBuilder
 import com.xmlcalabash.util.UriUtils
 import net.sf.saxon.om.NamespaceUri
@@ -92,7 +92,7 @@ class DocumentLoader(val context: XProcStepConfiguration,
         mediaType = if (documentProperties.has(Ns.contentType)) {
             MediaType.parse(documentProperties[Ns.contentType]!!.underlyingValue.stringValue)
         } else {
-            val fileMediaType = context.mimeTypes.getContentType(absURI.toString())
+            val fileMediaType = context.environment.mimeTypes.getContentType(absURI.toString())
             MediaType.parse(fileMediaType)
         }
 
@@ -203,7 +203,7 @@ class DocumentLoader(val context: XProcStepConfiguration,
         compiler.declareVariable(QName("a"))
         compiler.declareVariable(QName("opt"))
         val selector = compiler.compile("parse-json(\$a, \$opt)").load()
-        selector.resourceResolver = context.documentManager
+        selector.resourceResolver = context.environment.documentManager
         val inputjson = loadTextData(stream)
         selector.setVariable(QName("a"), XdmAtomicValue(inputjson))
 

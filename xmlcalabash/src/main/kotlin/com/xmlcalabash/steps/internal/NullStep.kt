@@ -3,7 +3,7 @@ package com.xmlcalabash.steps.internal
 import com.xmlcalabash.api.XProcStep
 import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.runtime.LazyValue
-import com.xmlcalabash.config.XProcStepConfiguration
+import com.xmlcalabash.runtime.XProcStepConfiguration
 import com.xmlcalabash.runtime.api.Receiver
 import com.xmlcalabash.runtime.parameters.RuntimeStepParameters
 import net.sf.saxon.s9api.QName

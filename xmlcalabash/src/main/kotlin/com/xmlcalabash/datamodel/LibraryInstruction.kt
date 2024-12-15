@@ -8,7 +8,7 @@ import net.sf.saxon.om.NamespaceUri
 import net.sf.saxon.s9api.QName
 import java.net.URI
 
-open class LibraryInstruction(stepConfig: StepConfiguration): XProcInstruction(null, stepConfig, NsP.library), StepContainerInterface {
+open class LibraryInstruction(stepConfig: InstructionConfiguration): XProcInstruction(null, stepConfig, NsP.library), StepContainerInterface {
     override var psviRequired: Boolean? = null
         set(value) {
             checkOpen()

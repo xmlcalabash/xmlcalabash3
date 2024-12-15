@@ -1,7 +1,7 @@
 package com.xmlcalabash.pagedmedia.antennahouse
 
 import com.xmlcalabash.datamodel.MediaType
-import com.xmlcalabash.config.XProcStepConfiguration
+import com.xmlcalabash.runtime.XProcStepConfiguration
 import jp.co.antenna.XfoJavaCtl.MessageListener
 import jp.co.antenna.XfoJavaCtl.XfoFormatPageListener
 import jp.co.antenna.XfoJavaCtl.XfoObj

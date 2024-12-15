@@ -5,6 +5,7 @@ import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.exceptions.ErrorExplanation
 import com.xmlcalabash.io.DocumentManager
 import com.xmlcalabash.runtime.XProcExecutionContext
+import com.xmlcalabash.runtime.XProcStepConfiguration
 import com.xmlcalabash.runtime.parameters.StepParameters
 import com.xmlcalabash.util.MessageReporter
 import net.sf.saxon.s9api.QName
@@ -27,6 +28,8 @@ interface ExecutionContext {
     val errorExplanation: ErrorExplanation
     val messageReporter: MessageReporter
     val proxies: Map<String, String>
+
+    var eagerEvaluation: Boolean
 
     fun stepProvider(params: StepParameters): () -> XProcStep
     fun atomicStepAvailable(type: QName): Boolean

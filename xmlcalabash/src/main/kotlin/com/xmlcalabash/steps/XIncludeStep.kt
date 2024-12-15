@@ -38,7 +38,7 @@ open class XIncludeStep(): AbstractAtomicStep() {
     inner class XiResolver(val defaultResolver: DocumentResolver): DocumentResolver {
         override fun resolveXml(base: XdmNode, uri: String, accept: String?, acceptLanguage: String?): XdmNode? {
             val href = base.baseURI.resolve(uri)
-            val cached = stepConfig.documentManager.getCached(href)
+            val cached = stepConfig.environment.documentManager.getCached(href)
             if (cached == null) {
                 return defaultResolver.resolveXml(base, uri, accept, acceptLanguage)
             }
@@ -52,7 +52,7 @@ open class XIncludeStep(): AbstractAtomicStep() {
 
         override fun resolveText(base: XdmNode, uri: String, encoding: String?, accept: String?, acceptLanguage: String?): XdmNode? {
             val href = base.baseURI.resolve(uri)
-            val cached = stepConfig.documentManager.getCached(href)
+            val cached = stepConfig.environment.documentManager.getCached(href)
             if (cached == null) {
                 return defaultResolver.resolveText(base, uri, encoding, accept, acceptLanguage)
             }

@@ -5,7 +5,7 @@ import com.xmlcalabash.datamodel.*
 import com.xmlcalabash.graph.AtomicModel
 import com.xmlcalabash.namespace.NsCx
 import com.xmlcalabash.runtime.XProcRuntime
-import com.xmlcalabash.runtime.RuntimeStepConfiguration
+import com.xmlcalabash.runtime.XProcStepConfiguration
 import com.xmlcalabash.runtime.api.RuntimeOption
 import com.xmlcalabash.runtime.parameters.*
 import com.xmlcalabash.runtime.steps.AbstractStep
@@ -26,26 +26,26 @@ open class AtomicBuiltinStepModel(runtime: XProcRuntime, val model: AtomicModel)
         provider = when (childStep.instructionType) {
             NsCx.empty -> {
                 params = EmptyStepParameters(name, location, inputs, outputs, options)
-                stepConfig.stepProvider(params)
+                runtime.environment.commonEnvironment.stepProvider(params)
             }
 
             NsCx.inline -> {
                 val step = childStep as AtomicInlineStepInstruction
                 params = InlineStepParameters(name, location, inputs, outputs, options,
                     step.filter, step.contentType, step.encoding)
-                stepConfig.stepProvider(params)
+                runtime.environment.commonEnvironment.stepProvider(params)
             }
 
             NsCx.document -> {
                 val step = childStep as AtomicDocumentStepInstruction
                 params = DocumentStepParameters(name, location, inputs, outputs, options, step.contentType)
-                stepConfig.stepProvider(params)
+                runtime.environment.commonEnvironment.stepProvider(params)
             }
 
             NsCx.select -> {
                 val step = childStep as AtomicSelectStepInstruction
                 val param = SelectStepParameters(name, location, inputs, outputs, options, step.select)
-                stepConfig.stepProvider(param)
+                runtime.environment.commonEnvironment.stepProvider(param)
             }
 
             NsCx.expression -> {
@@ -71,18 +71,18 @@ open class AtomicBuiltinStepModel(runtime: XProcRuntime, val model: AtomicModel)
                     ExpressionStepParameters(name, location, inputs, outputs, inscopeOptions, step)
                 }
 
-                stepConfig.stepProvider(params)
+                runtime.environment.commonEnvironment.stepProvider(params)
             }
 
             else -> {
                 params = RuntimeStepParameters(childStep.instructionType, childStep.name, childStep.location,
                     inputs, outputs, options)
-                stepConfig.stepProvider(params)
+                runtime.environment.commonEnvironment.stepProvider(params)
             }
         }
     }
 
-    override fun runnable(yconfig: RuntimeStepConfiguration): () -> AbstractStep {
-        return { AtomicStep(yconfig.newInstance(stepConfig), this) }
+    override fun runnable(config: XProcStepConfiguration): () -> AbstractStep {
+        return { AtomicStep(config.copy(stepConfig), this) }
     }
 }

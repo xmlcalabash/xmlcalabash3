@@ -307,7 +307,7 @@ class BuilderApiTest {
         val test_test2 = QName(testns, "test:test2")
 
         val library = builder.newLibrary()
-        library.stepConfig.addNamespace("test", testns)
+        library.stepConfig.putNamespace("test", testns)
         library.version = 3.1
 
         val t1 = library.declareStep()
@@ -627,7 +627,7 @@ class BuilderApiTest {
         val builder = calabash.newPipelineBuilder()
 
         val declStep = builder.newDeclareStep()
-        declStep.stepConfig.addNamespace("xs", NsXs.namespace)
+        declStep.stepConfig.putNamespace("xs", NsXs.namespace)
         declStep.name = "main"
         declStep.version = 3.1
         val input = declStep.input("source")
@@ -683,7 +683,7 @@ class BuilderApiTest {
         val builder = calabash.newPipelineBuilder()
 
         val declStep = builder.newDeclareStep()
-        declStep.stepConfig.addNamespace("xs", NsXs.namespace)
+        declStep.stepConfig.putNamespace("xs", NsXs.namespace)
         declStep.name = "main"
         declStep.version = 3.1
         val input = declStep.input("source")
@@ -737,8 +737,8 @@ class BuilderApiTest {
         val builder = calabash.newPipelineBuilder()
 
         val declStep = builder.newDeclareStep()
-        declStep.stepConfig.addNamespace("xs", NsXs.namespace)
-        declStep.stepConfig.addNamespace("cx", NsCx.errorNamespace)
+        declStep.stepConfig.putNamespace("xs", NsXs.namespace)
+        declStep.stepConfig.putNamespace("cx", NsCx.errorNamespace)
         declStep.name = "main"
         declStep.version = 3.1
         val input = declStep.input("source")
@@ -827,7 +827,7 @@ class BuilderApiTest {
         val builder = calabash.newPipelineBuilder()
 
         val declStep = builder.newDeclareStep()
-        declStep.stepConfig.addNamespace("xs", NsXs.namespace)
+        declStep.stepConfig.putNamespace("xs", NsXs.namespace)
         declStep.name = "main"
         declStep.version = 3.1
         val input = declStep.input("source")

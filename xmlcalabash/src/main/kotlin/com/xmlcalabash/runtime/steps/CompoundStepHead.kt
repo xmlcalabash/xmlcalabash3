@@ -5,8 +5,7 @@ import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.namespace.Ns
 import com.xmlcalabash.namespace.NsCx
 import com.xmlcalabash.namespace.NsP
-import com.xmlcalabash.runtime.LazyValue
-import com.xmlcalabash.runtime.RuntimeStepConfiguration
+import com.xmlcalabash.runtime.XProcStepConfiguration
 import com.xmlcalabash.runtime.model.HeadModel
 import com.xmlcalabash.runtime.parameters.RuntimeStepParameters
 import net.sf.saxon.s9api.QName
@@ -18,7 +17,7 @@ import kotlin.collections.component1
 import kotlin.collections.component2
 import kotlin.collections.iterator
 
-class CompoundStepHead(yconfig: RuntimeStepConfiguration, step: HeadModel): AbstractStep(yconfig, step) {
+class CompoundStepHead(config: XProcStepConfiguration, step: HeadModel): AbstractStep(config, step) {
     override val params = RuntimeStepParameters(NsCx.foot, "!head",
         step.location, step.inputs, step.outputs, step.options)
     val defaultInputs = step.defaultInputs
@@ -128,7 +127,7 @@ class CompoundStepHead(yconfig: RuntimeStepConfiguration, step: HeadModel): Abst
         for ((name, details) in staticOptions) {
             if ((type.namespaceUri == NsP.namespace && name == Ns.message)
                 || (type.namespaceUri != NsP.namespace && name == NsP.message)) {
-                message = details.staticValue.evaluate()
+                message = details.staticValue.evaluate(stepConfig)
             }
         }
 
@@ -151,7 +150,7 @@ class CompoundStepHead(yconfig: RuntimeStepConfiguration, step: HeadModel): Abst
                         for (document in defaultBindingDocuments(binding)) {
                             if (default.select != null) {
                                 default.select.contextItem = document
-                                val selected = default.select.evaluate()
+                                val selected = default.select.evaluate(stepConfig)
                                 for (item in selected) {
                                     if (item is XdmNode && item.nodeKind == XdmNodeKind.ATTRIBUTE) {
                                         throw XProcError.xdInvalidSelection(item.nodeName).exception()
@@ -199,7 +198,7 @@ class CompoundStepHead(yconfig: RuntimeStepConfiguration, step: HeadModel): Abst
 
             val rpair = receiver[port]
             if (rpair == null) {
-                if (stepConfig.staticContext.xmlCalabash.xmlCalabashConfig.debug) {
+                if (stepConfig.xmlCalabash.xmlCalabashConfig.debug) {
                     // Ultimately, I don't think these ever matter, but for debugging purposes...
                     if (((type == NsP.choose || type == NsP.`if`) && port == "!context")
                         || ((type == NsP.catch || type == NsP.finally) && port == "error")

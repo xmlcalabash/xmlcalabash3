@@ -34,7 +34,7 @@ open class InlineStep(val params: InlineStepParameters): AbstractAtomicStep() {
             params.filter.getNode()
         } else {
             try {
-                params.filter.expandValueTemplates(contextItem, options)
+                params.filter.expandValueTemplates(stepConfig, contextItem, options)
             } catch (ex: SaxonApiException) {
                 if (ex.message != null && ex.message!!.contains("Namespace prefix") && ex.message!!.contains("has not been declared")) {
                     throw XProcError.xdNoBindingInScope(ex.message!!).exception()
@@ -68,7 +68,7 @@ open class InlineStep(val params: InlineStepParameters): AbstractAtomicStep() {
         val ctype = MediaType.parse(props[Ns.contentType]!!.underlyingValue.stringValue)
 
         // This is about whether the original inline contains markup
-        if (params.filter.containsMarkup() && !(ctype.xmlContentType() || ctype.htmlContentType())) {
+        if (params.filter.containsMarkup(stepConfig) && !(ctype.xmlContentType() || ctype.htmlContentType())) {
             throw XProcError.xdMarkupForbidden(ctype.toString()).exception()
         }
 
@@ -161,7 +161,7 @@ open class InlineStep(val params: InlineStepParameters): AbstractAtomicStep() {
             val compiler = stepConfig.processor.newXPathCompiler()
             compiler.declareVariable(QName("a"))
             val selector = compiler.compile("parse-json(\$a)").load()
-            selector.resourceResolver = stepConfig.documentManager
+            selector.resourceResolver = stepConfig.environment.documentManager
             selector.setVariable(QName("a"), XdmAtomicValue(text))
             val result = selector.evaluate()
             return result

@@ -132,7 +132,7 @@ class XplDocument(val builder: PipelineBuilder, val xml: XdmNode) {
                     val impl = if (decl.useWhen == null) {
                         StepImplementation(false, { false })
                     } else {
-                        StepImplementation(true, { (decl.useWhen == true) && (!decl.isAtomic || decl.stepConfig.rteContext.atomicStepAvailable(decl.type!!)) })
+                        StepImplementation(true, { (decl.useWhen == true) && (!decl.isAtomic || decl.stepConfig.environment.commonEnvironment.atomicStepAvailable(decl.type!!)) })
                     }
                     exportedStepTypes[decl.type!!] = impl
                 }
@@ -150,7 +150,7 @@ class XplDocument(val builder: PipelineBuilder, val xml: XdmNode) {
                         val impl = if (child.useWhen == null) {
                             StepImplementation(false, { false })
                         } else {
-                            StepImplementation(true, { (child.useWhen == true) && (!child.isAtomic || decl.stepConfig.rteContext.atomicStepAvailable(child.type!!)) })
+                            StepImplementation(true, { (child.useWhen == true) && (!child.isAtomic || decl.stepConfig.environment.commonEnvironment.atomicStepAvailable(child.type!!)) })
                         }
                         exportedStepTypes[child.type!!] = impl
                     }

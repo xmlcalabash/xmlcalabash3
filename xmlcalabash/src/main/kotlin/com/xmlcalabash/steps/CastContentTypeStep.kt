@@ -133,14 +133,14 @@ open class CastContentTypeStep(): AbstractAtomicStep() {
         var compiler = stepConfig.processor.newXPathCompiler()
         compiler.declareVariable(QName("a"))
         var selector = compiler.compile("xml-to-json(\$a)").load()
-        selector.resourceResolver = stepConfig.documentManager
+        selector.resourceResolver = stepConfig.environment.documentManager
         selector.setVariable(QName("a"), document.value)
         var result = selector.evaluate()
 
         compiler = stepConfig.processor.newXPathCompiler()
         compiler.declareVariable(QName("a"))
         selector = compiler.compile("parse-json(\$a)").load()
-        selector.resourceResolver = stepConfig.documentManager
+        selector.resourceResolver = stepConfig.environment.documentManager
         selector.setVariable(QName("a"), result)
         result = selector.evaluate()
 

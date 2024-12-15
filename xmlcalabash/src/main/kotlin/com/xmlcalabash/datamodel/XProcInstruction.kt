@@ -2,14 +2,11 @@ package com.xmlcalabash.datamodel
 
 import com.xmlcalabash.documents.DocumentProperties
 import com.xmlcalabash.documents.XProcDocument
-import com.xmlcalabash.namespace.NsCx
 import net.sf.saxon.om.NamespaceUri
 import net.sf.saxon.s9api.QName
 import net.sf.saxon.s9api.XdmNode
-import net.sf.saxon.s9api.XdmValue
-import java.net.URI
 
-abstract class XProcInstruction internal constructor(initialParent: XProcInstruction?, val stepConfig: StepConfiguration, val instructionType: QName) {
+abstract class XProcInstruction internal constructor(initialParent: XProcInstruction?, val stepConfig: InstructionConfiguration, val instructionType: QName) {
     internal lateinit var builder: PipelineBuilder
     internal var _parent = initialParent
 
@@ -160,6 +157,7 @@ abstract class XProcInstruction internal constructor(initialParent: XProcInstruc
         return null
     }
 
+    /*
     internal fun addRewriteEmpty(step: StepDeclaration): AtomicStepInstruction {
         val emptyStep = AtomicStepInstruction(step, NsCx.empty)
         emptyStep.elaborateAtomicStep()
@@ -169,9 +167,10 @@ abstract class XProcInstruction internal constructor(initialParent: XProcInstruc
     fun fromUri(href: URI, properties: DocumentProperties = DocumentProperties(), parameters: Map<QName, XdmValue> = emptyMap()): XProcDocument {
         return stepConfig.fromUri(href, properties, parameters)
     }
+    */
 
     fun fromString(xml: String, properties: DocumentProperties = DocumentProperties()): XProcDocument {
-        return stepConfig.fromString(xml, properties)
+        return stepConfig.fromString(xml, properties, emptyMap())
     }
 
     override fun toString(): String {

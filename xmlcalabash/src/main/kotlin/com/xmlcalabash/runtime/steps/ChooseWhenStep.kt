@@ -2,11 +2,11 @@ package com.xmlcalabash.runtime.steps
 
 import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.namespace.NsCx
-import com.xmlcalabash.runtime.RuntimeStepConfiguration
+import com.xmlcalabash.runtime.XProcStepConfiguration
 import com.xmlcalabash.runtime.model.CompoundStepModel
 import com.xmlcalabash.steps.internal.GuardStep
 
-open class ChooseWhenStep(yconfig: RuntimeStepConfiguration, compound: CompoundStepModel): CompoundStep(yconfig, compound) {
+open class ChooseWhenStep(config: XProcStepConfiguration, compound: CompoundStepModel): CompoundStep(config, compound) {
     protected val stepsToRun = mutableListOf<AbstractStep>()
 
     open fun evaluateGuardExpression(): Boolean {
@@ -14,7 +14,7 @@ open class ChooseWhenStep(yconfig: RuntimeStepConfiguration, compound: CompoundS
             instantiate()
         }
 
-        stepConfig.newExecutionContext(stepConfig)
+        stepConfig.environment.newExecutionContext(stepConfig)
 
         stepsToRun.clear()
 
@@ -62,13 +62,13 @@ open class ChooseWhenStep(yconfig: RuntimeStepConfiguration, compound: CompoundS
             }
         }
 
-        stepConfig.releaseExecutionContext()
+        stepConfig.environment.releaseExecutionContext()
 
         return ((guardStep as AtomicStep).implementation as GuardStep).effectiveBooleanValue()
     }
 
     override fun run() {
-        stepConfig.newExecutionContext(stepConfig)
+        stepConfig.environment.newExecutionContext(stepConfig)
 
         val left = runStepsExhaustively(stepsToRun)
         if (left.isNotEmpty()) {
@@ -82,6 +82,6 @@ open class ChooseWhenStep(yconfig: RuntimeStepConfiguration, compound: CompoundS
         }
 
         foot.runStep()
-        stepConfig.releaseExecutionContext()
+        stepConfig.environment.releaseExecutionContext()
     }
 }

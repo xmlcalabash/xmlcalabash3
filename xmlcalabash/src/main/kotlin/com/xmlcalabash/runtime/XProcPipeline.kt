@@ -8,30 +8,19 @@ import com.xmlcalabash.runtime.steps.AtomicOptionStep
 import com.xmlcalabash.runtime.steps.CompoundStep
 import com.xmlcalabash.runtime.steps.Consumer
 import com.xmlcalabash.util.DefaultOutputReceiver
-import com.xmlcalabash.util.SaxonValueConverter
 import net.sf.saxon.s9api.QName
-import java.util.*
 
-class XProcPipeline(pipeline: CompoundStepModel) {
-    val stepConfig = pipeline.stepConfig
+class XProcPipeline internal constructor(pipeline: CompoundStepModel, val config: XProcStepConfiguration) {
     val inputManifold = pipeline.inputs
     val outputManifold = pipeline.outputs
     val optionManifold = pipeline.options
-    val yconfig: RuntimeStepConfiguration
     val runnable: CompoundStep
     var receiver: Receiver = DefaultOutputReceiver(pipeline.stepConfig.processor)
     private val setOptions = mutableSetOf<QName>()
     private val boundInputs = mutableSetOf<String>()
 
     init {
-        val context = RuntimeStepStaticContextImpl(pipeline.stepConfig)
-        val rteContext = RuntimeExecutionContext(pipeline.stepConfig)
-        val valueConverter = SaxonValueConverter(context.processor)
-
-        rteContext.xmlCalabash.setEpisode("E-${UUID.randomUUID()}")
-
-        yconfig = RuntimeStepConfiguration(context, rteContext, valueConverter)
-        runnable = pipeline.runnable(yconfig)() as CompoundStep
+        runnable = pipeline.runnable(config)() as CompoundStep
         runnable.instantiate()
     }
 
@@ -49,7 +38,7 @@ class XProcPipeline(pipeline: CompoundStepModel) {
             throw XProcError.xsDuplicateOption(name).exception() // not really exactly the right error
         }
         try {
-            stepConfig.checkType(name, value.value, option.asType, option.values)
+            config.checkType(name, value.value, option.asType, config.inscopeNamespaces, option.values)
         } catch (ex: Exception) {
             throw XProcError.xdBadType(value.value.toString(), option.asType.toString()).exception()
         }
@@ -82,7 +71,7 @@ class XProcPipeline(pipeline: CompoundStepModel) {
         try {
             runnable.runStep()
         } catch (e: Exception) {
-            stepConfig.rteContext.xmlCalabash.discardExecutionContext()
+            config.xmlCalabash.discardExecutionContext()
             throw e
         }
     }

@@ -1,11 +1,11 @@
 package com.xmlcalabash.parsers.xpl.elements
 
-import com.xmlcalabash.datamodel.StepConfiguration
+import com.xmlcalabash.datamodel.InstructionConfiguration
 import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.exceptions.XProcException
 import net.sf.saxon.s9api.XdmNode
 
-abstract class RootNode(parent: AnyNode?, parentConfig: StepConfiguration, node: XdmNode): ElementNode(parent, parentConfig, node) {
+abstract class RootNode(parent: AnyNode?, parentConfig: InstructionConfiguration, node: XdmNode): ElementNode(parent, parentConfig, node) {
     var firstPass = true
 
     internal open fun resolve(manager: XplDocumentManager, context: UseWhenContext) {
@@ -20,7 +20,7 @@ abstract class RootNode(parent: AnyNode?, parentConfig: StepConfiguration, node:
                     val impl = if (useWhen == null) {
                         StepImplementation(false, { false })
                     } else {
-                        StepImplementation(true, { (useWhen == true) && (!isAtomic || stepConfig.rteContext.atomicStepAvailable(type!!)) })
+                        StepImplementation(true, { (useWhen == true) && (!isAtomic || stepConfig.environment.commonEnvironment.atomicStepAvailable(type!!)) })
                     }
                     localContext.stepTypes[type!!] = impl
                 }
@@ -31,7 +31,7 @@ abstract class RootNode(parent: AnyNode?, parentConfig: StepConfiguration, node:
                     val impl = if (child.useWhen == null) {
                         StepImplementation(false, { false })
                     } else {
-                        StepImplementation(true, { (child.useWhen == true) && (!child.isAtomic || stepConfig.rteContext.atomicStepAvailable(child.type!!)) })
+                        StepImplementation(true, { (child.useWhen == true) && (!child.isAtomic || stepConfig.environment.commonEnvironment.atomicStepAvailable(child.type!!)) })
                     }
                     localContext.stepTypes[child.type!!] = impl
                 }

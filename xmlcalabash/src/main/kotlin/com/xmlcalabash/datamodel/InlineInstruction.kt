@@ -61,7 +61,7 @@ class InlineInstruction(parent: XProcInstruction, xmlDocument: XdmNode): Connect
 
         // Force inlines to have unique URIs because document-uri(). Bleh.
         val uri = xml.baseURI?.toString() ?: ""
-        val inlineBaseUri = stepConfig.uniqueUri(uri)
+        val inlineBaseUri = stepConfig.environment.uniqueUri(uri)
 
         if (contentType == null) {
             _contentType = MediaType.XML
@@ -77,9 +77,9 @@ class InlineInstruction(parent: XProcInstruction, xmlDocument: XdmNode): Connect
         }
 
         _valueTemplateFilter = if (encoding == null && !isRunPipeline) {
-            ValueTemplateFilterXml(stepConfig, xml, inlineBaseUri)
+            ValueTemplateFilterXml(xml, inlineBaseUri)
         } else {
-            ValueTemplateFilterNone(stepConfig, xml, inlineBaseUri)
+            ValueTemplateFilterNone(xml, inlineBaseUri)
         }
 
         val staticBindings = mutableMapOf<QName, XProcExpression>()
@@ -91,9 +91,9 @@ class InlineInstruction(parent: XProcInstruction, xmlDocument: XdmNode): Connect
             }
         }
 
-        _xml = _valueTemplateFilter.expandStaticValueTemplates(expandText!!, staticBindings)
+        _xml = _valueTemplateFilter.expandStaticValueTemplates(stepConfig, expandText!!, staticBindings)
 
-        if (!(contentType!!.xmlContentType() || contentType!!.htmlContentType()) && _valueTemplateFilter.containsMarkup()) {
+        if (!(contentType!!.xmlContentType() || contentType!!.htmlContentType()) && _valueTemplateFilter.containsMarkup(stepConfig)) {
             logger.warn { "Markup detected in ${contentType} inline" }
         }
 

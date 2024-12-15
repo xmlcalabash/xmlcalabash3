@@ -6,7 +6,7 @@ import com.xmlcalabash.documents.DocumentProperties
 import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.util.SaxonTreeBuilder
-import com.xmlcalabash.config.XProcStepConfiguration
+import com.xmlcalabash.runtime.XProcStepConfiguration
 import net.sf.saxon.om.NamespaceUri
 import net.sf.saxon.s9api.*
 
@@ -23,7 +23,7 @@ class ContentTypeConverter() {
 
             val selector = compiler.compile("parse-xml(\$a)").load()
             selector.setVariable(QName("a"), XdmAtomicValue(document.value.underlyingValue.stringValue))
-            selector.resourceResolver = context.documentManager
+            selector.resourceResolver = context.environment.documentManager
             val xml = selector.evaluate()
             return XProcDocument.ofXml(xml as XdmNode, context, contentType, newProps)
         }
@@ -72,7 +72,7 @@ class ContentTypeConverter() {
             compiler.declareVariable(QName("serprop"))
 
             val selector = compiler.compile("serialize(\$a, \$serprop)").load()
-            selector.resourceResolver = context.documentManager
+            selector.resourceResolver = context.environment.documentManager
 
             selector.setVariable(QName("a"), value)
             selector.setVariable(QName("serprop"), serprop)
@@ -106,7 +106,7 @@ class ContentTypeConverter() {
                 compiler.declareVariable(QName("a"))
                 compiler.declareVariable(QName("param"))
                 val selector = compiler.compile("parse-json(\$a, \$param)").load()
-                selector.resourceResolver = context.documentManager
+                selector.resourceResolver = context.environment.documentManager
                 selector.setVariable(QName("a"), XdmAtomicValue(text))
                 selector.setVariable(QName("param"), context.asXdmMap(parameters))
                 val result = selector.evaluate()
@@ -127,14 +127,14 @@ class ContentTypeConverter() {
             var compiler = context.processor.newXPathCompiler()
             compiler.declareVariable(QName("a"))
             var selector = compiler.compile("serialize(\$a, map{'method':'json'})").load()
-            selector.resourceResolver = context.documentManager
+            selector.resourceResolver = context.environment.documentManager
             selector.setVariable(QName("a"), value)
             val result = selector.evaluate()
 
             compiler = context.processor.newXPathCompiler()
             compiler.declareVariable(QName("a"))
             selector = compiler.compile("json-to-xml(\$a)").load()
-            selector.resourceResolver = context.documentManager
+            selector.resourceResolver = context.environment.documentManager
             selector.setVariable(QName("a"), result)
 
             return selector.evaluate() as XdmNode

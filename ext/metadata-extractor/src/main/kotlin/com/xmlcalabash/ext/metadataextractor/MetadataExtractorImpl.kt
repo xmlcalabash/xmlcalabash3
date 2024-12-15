@@ -8,7 +8,7 @@ import com.xmlcalabash.documents.XProcBinaryDocument
 import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.namespace.Ns
 import com.xmlcalabash.namespace.NsC
-import com.xmlcalabash.config.XProcStepConfiguration
+import com.xmlcalabash.runtime.XProcStepConfiguration
 import com.xmlcalabash.util.SaxonTreeBuilder
 import net.sf.saxon.om.NamespaceMap
 import net.sf.saxon.om.NamespaceUri

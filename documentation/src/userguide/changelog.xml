@@ -12,12 +12,33 @@ See the commits and pull requests on
 <link xlink:href="https://github.com/xmlcalabash/xmlcalabash3/">the repository</link> for
 finer detail.</para>
 
-<section xml:id="r300-alpha4">
-<info>
-  <title>Changes in version 3.0.0-alpha4</title>
-  <productnumber>3.0.0-alpha4</productnumber>
-  <date>2024-12-07</date>
-</info>
+<revhistory>
+<revision xml:id="r300-alpha5">
+<revnumber>3.0.0-alpha5</revnumber>
+<date>2024-12-15</date>
+<revdescription>
+<itemizedlist>
+<listitem>
+<para>Refactored the way context information is maintained both at compile time and run time.
+This is a re-refactor of the refactor I started back in June when I discovered that the Saxon
+configuration for each step can change. The problem I discovered shortly after releasing
+<link xlink:href="r300-alpha4">alpha4</link> was that the runtime context was still using
+the compile time environment when evaluating expressions. Mostly this manifested in the
+wrong value for the <literal>p:episode</literal> system property.</para>
+<para>It was all a bit of a mess so I threw it out and started over. Again. It’s better now,
+I think, but there’s still room for improvement.</para>
+</listitem>
+<listitem>
+<para>Updated the serializer to make sure that XHTML documents are serialized as XML, not HTML.</para>
+</listitem>
+</itemizedlist>
+</revdescription>
+</revision>
+
+<revision xml:id="r300-alpha4">
+<revnumber>3.0.0-alpha4</revnumber>
+<date>2024-12-07</date>
+<revdescription>
 <itemizedlist>
 <listitem>
 <para>Resolved the remaining <tag>p:validate-with-json-schema</tag> test failures. Updated
@@ -61,14 +82,13 @@ one file for all the graphs (instead of multiple files for each).</para>
 nested comments correctly.</para>
 </listitem>
 </itemizedlist>
-</section>
+</revdescription>
+</revision>
 
-<section xml:id="r300-alpha3">
-<info>
-  <title>Changes in version 3.0.0-alpha3</title>
-  <productnumber>3.0.0-alpha3</productnumber>
-  <date>2024-12-02</date>
-</info>
+<revision xml:id="r300-alpha3">
+<revnumber>3.0.0-alpha3</revnumber>
+<date>2024-12-02</date>
+<revdescription>
 <itemizedlist>
 <listitem>
 <para>Fixed
@@ -96,14 +116,13 @@ libraries, for example) would not work correctly.</para>
 <tag>p:run</tag> tests.</para>
 </listitem>
 </itemizedlist>
-</section>
+</revdescription>
+</revision>
 
-<section xml:id="r300-alpha2">
-<info>
-  <title>Changes in version 3.0.0-alpha2</title>
-  <productnumber>3.0.0-alpha2</productnumber>
-  <date>2024-11-26</date>
-</info>
+<revision xml:id="r300-alpha2">
+<revnumber>3.0.0-alpha2</revnumber>
+<date>2024-11-26</date>
+<revdescription>
 <itemizedlist>
 <listitem>
 <para>Fixed
@@ -127,14 +146,15 @@ the graph and I don’t think they’re required any more. An unbound input is n
 “welded shut” so that no inputs are expected.</para>
 </listitem>
 </itemizedlist>
-</section>
+</revdescription>
+</revision>
 
-<section xml:id="r300-alpha1">
-<info>
-  <title>Changes in version 3.0.0-alpha1</title>
-  <productnumber>3.0.0-alpha1</productnumber>
-  <date>2024-11-24</date>
-</info>
+<revision xml:id="r300-alpha1">
+<revnumber>3.0.0-alpha1</revnumber>
+<date>2024-11-24</date>
+<revdescription>
 <para>Initial publication.</para>
-</section>
+</revdescription>
+</revision>
+</revhistory>
 </appendix>

@@ -1,11 +1,11 @@
 package com.xmlcalabash.parsers.xpl.elements
 
-import com.xmlcalabash.datamodel.StepConfiguration
+import com.xmlcalabash.datamodel.InstructionConfiguration
 import com.xmlcalabash.namespace.NsP
 import net.sf.saxon.s9api.XdmNode
 import java.net.URI
 
-open class AnyNode(val parent: AnyNode?, parentConfig: StepConfiguration, val node: XdmNode) {
+open class AnyNode(val parent: AnyNode?, parentConfig: InstructionConfiguration, val node: XdmNode) {
     constructor(parent: AnyNode, node: XdmNode): this(parent, parent.stepConfig, node)
 
     internal val stepConfig = if (node.nodeName == NsP.declareStep || node.nodeName == NsP.library) {

@@ -2,7 +2,6 @@ package com.xmlcalabash.ext.sendmail
 
 import com.xmlcalabash.api.XProcStep
 import com.xmlcalabash.config.SaxonConfiguration
-import com.xmlcalabash.datamodel.StepConfiguration
 import com.xmlcalabash.namespace.NsP
 import com.xmlcalabash.runtime.parameters.StepParameters
 import com.xmlcalabash.spi.AtomicStepManager

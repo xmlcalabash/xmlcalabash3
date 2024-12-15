@@ -1,6 +1,6 @@
 package com.xmlcalabash.parsers.xpl.elements
 
-import com.xmlcalabash.datamodel.StepConfiguration
+import com.xmlcalabash.datamodel.InstructionConfiguration
 import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.namespace.Ns
 import com.xmlcalabash.namespace.NsP
@@ -8,7 +8,7 @@ import net.sf.saxon.s9api.Axis
 import net.sf.saxon.s9api.QName
 import net.sf.saxon.s9api.XdmNode
 
-open class ElementNode(parent: AnyNode?, stepConfig: StepConfiguration, node: XdmNode): AnyNode(parent, stepConfig, node) {
+open class ElementNode(parent: AnyNode?, stepConfig: InstructionConfiguration, node: XdmNode): AnyNode(parent, stepConfig, node) {
     constructor(parent: AnyNode, node: XdmNode): this(parent, parent.stepConfig, node)
 
     var conditional: String? = null

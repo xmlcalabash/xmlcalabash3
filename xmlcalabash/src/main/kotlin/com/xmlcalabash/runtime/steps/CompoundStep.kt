@@ -4,18 +4,16 @@ import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.namespace.NsP
 import com.xmlcalabash.runtime.LazyValue
-import com.xmlcalabash.runtime.RuntimeStepConfiguration
-import com.xmlcalabash.runtime.api.RuntimePort
+import com.xmlcalabash.runtime.XProcStepConfiguration
 import com.xmlcalabash.runtime.model.CompoundStepModel
 import com.xmlcalabash.runtime.model.StepModel
 import com.xmlcalabash.steps.internal.ExpressionStep
 import net.sf.saxon.s9api.QName
-import java.lang.UnsupportedOperationException
 
-abstract class CompoundStep(yconfig: RuntimeStepConfiguration, compound: CompoundStepModel): AbstractStep(yconfig, compound) {
+abstract class CompoundStep(config: XProcStepConfiguration, compound: CompoundStepModel): AbstractStep(config, compound) {
     companion object {
-        fun newInstance(yconfig: RuntimeStepConfiguration, compound: CompoundStepModel): CompoundStep {
-            val newConfig = yconfig.newInstance(compound.stepConfig)
+        fun newInstance(config: XProcStepConfiguration, compound: CompoundStepModel): CompoundStep {
+            val newConfig = config.copy(compound.stepConfig)
             when (compound.type) {
                 NsP.declareStep -> return PipelineStep(newConfig, compound)
                 NsP.group -> return GroupStep(newConfig, compound)
@@ -40,8 +38,8 @@ abstract class CompoundStep(yconfig: RuntimeStepConfiguration, compound: Compoun
     internal val runnableProviders = mutableMapOf<StepModel, () -> AbstractStep>()
     internal val edges = compound.edges
     internal val runnables = mutableListOf<AbstractStep>()
-    internal val head = CompoundStepHead(yconfig, compound.head)
-    internal val foot = CompoundStepFoot(yconfig, compound.foot)
+    internal val head = CompoundStepHead(config, compound.head)
+    internal val foot = CompoundStepFoot(config, compound.foot)
     internal var stepName: String? = null
     internal var stepType: QName? = null
 
@@ -55,7 +53,7 @@ abstract class CompoundStep(yconfig: RuntimeStepConfiguration, compound: Compoun
         runnableProviders[compound.head] = { head }
         runnableProviders[compound.foot] = { foot }
         for (step in compound.steps) {
-            val stepRunnable = step.runnable(yconfig)
+            val stepRunnable = step.runnable(config)
             runnableProviders[step] = stepRunnable
         }
     }
@@ -146,9 +144,9 @@ abstract class CompoundStep(yconfig: RuntimeStepConfiguration, compound: Compoun
                     runMe.atomicOptionValues.putAll(atomicOptionValues)
                     runMe.runStep()
                     if (runMe.externalValue == null) {
-                        atomicOptionValues[runMe.externalName] = LazyValue(runMe.stepConfig, (runMe.implementation as ExpressionStep).expression)
+                        atomicOptionValues[runMe.externalName] = LazyValue(runMe.stepConfig, (runMe.implementation as ExpressionStep).expression, stepConfig)
                     } else {
-                        atomicOptionValues[runMe.externalName] = LazyValue(runMe.stepConfig, runMe.externalValue!!.value)
+                        atomicOptionValues[runMe.externalName] = LazyValue(runMe.stepConfig, runMe.externalValue!!.value, stepConfig)
                     }
                 } else {
                     runMe.runStep()
