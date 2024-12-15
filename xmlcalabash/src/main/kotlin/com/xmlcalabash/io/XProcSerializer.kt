@@ -21,7 +21,11 @@ class XProcSerializer(val processor: Processor) {
         val contentType =  overrideContentType ?: doc.contentType ?: MediaType.OCTET_STREAM
 
         if (contentType.htmlContentType()) {
-            serializeHtml(doc, stream, defaultProperties)
+            if (contentType == MediaType.XHTML) {
+                serializeXml(doc, stream, defaultProperties)
+            } else {
+                serializeHtml(doc, stream, defaultProperties)
+            }
             return
         }
 
