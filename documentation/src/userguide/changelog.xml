@@ -19,17 +19,37 @@ finer detail.</para>
 <revdescription>
 <itemizedlist>
 <listitem>
-<para>Refactored the way context information is maintained both at compile time and run time.
-This is a re-refactor of the refactor I started back in June when I discovered that the Saxon
-configuration for each step can change. The problem I discovered shortly after releasing
-<link xlink:href="r300-alpha4">alpha4</link> was that the runtime context was still using
-the compile time environment when evaluating expressions. Mostly this manifested in the
-wrong value for the <literal>p:episode</literal> system property.</para>
+<para>Refactored the way context information is maintained both at
+compile time and run time. This is a re-refactor of the refactor I
+started back in June when I discovered that it must be possible for
+the Saxon configuration for each step to be different. The problem I
+discovered shortly after releasing <link linkend="r300-alpha4">alpha4</link> was that the runtime context
+was still using the compile time environment when evaluating
+expressions. Mostly this manifested in the wrong value for the
+<literal>p:episode</literal> system property.</para>
 <para>It was all a bit of a mess so I threw it out and started over. Again. It’s better now,
 I think, but there’s still room for improvement.</para>
 </listitem>
 <listitem>
 <para>Updated the serializer to make sure that XHTML documents are serialized as XML, not HTML.</para>
+</listitem>
+<listitem>
+<para>Added a stub implementation of <function>p:lookup-uri</function>.</para>
+</listitem>
+<listitem>
+<para>Fixed
+<link xlink:href="https://github.com/xmlcalabash/xmlcalabash3/issues/32">issue #32</link>
+by adding a (debug logging) warning if an input or output port
+trivially accepts no documents. That is, if it has a content-types
+constraint that includes no inclusive members or if
+<literal>*/*</literal> is the last exclusive member.</para>
+</listitem>
+<listitem>
+<para>Fixed
+<link xlink:href="https://github.com/xmlcalabash/xmlcalabash3/issues/31">issue #31</link>
+by amking some documentation improvements, including documenting the additional
+properties accepted by <function>p:system-property</function> in the
+<citetitle xlink:href="https://docs.xmlcalabash.com/reference/current/">Reference Guide</citetitle>.</para>
 </listitem>
 </itemizedlist>
 </revdescription>

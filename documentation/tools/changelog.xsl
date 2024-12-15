@@ -76,10 +76,16 @@
   <xsl:text>*</xsl:text>
 </xsl:template>
 
-<xsl:template match="db:code|db:literal|db:classname|db:option|db:filename">
+<xsl:template match="db:code|db:literal|db:classname|db:option|db:filename|db:tag">
   <code>
     <xsl:apply-templates/>
   </code>
+</xsl:template>
+
+<xsl:template match="db:citetitle|db:function">
+  <em>
+    <xsl:apply-templates/>
+  </em>
 </xsl:template>
 
 <xsl:template match="*">
