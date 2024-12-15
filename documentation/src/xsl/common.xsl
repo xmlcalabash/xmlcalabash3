@@ -25,6 +25,7 @@
 <xsl:param name="chunk" select="'index.html'"/>
 <xsl:param name="persistent-toc" select="'true'"/>
 <xsl:param name="docbook-transclusion" select="'true'"/>
+<xsl:param name="revhistory-style" select="'list'"/>
 
 <xsl:template match="*" mode="m:html-head-links">
   <xsl:next-match/>
