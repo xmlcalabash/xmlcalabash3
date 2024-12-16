@@ -9,7 +9,7 @@ import net.sf.saxon.s9api.XdmNode
 
 class XProcRuntime private constructor(private val start: DeclareStepInstruction, internal val config: XProcStepConfiguration) {
     companion object {
-        fun newInstance(start: DeclareStepInstruction): XProcRuntime {
+        internal fun newInstance(start: DeclareStepInstruction): XProcRuntime {
             val environment = PipelineContext(start.stepConfig.environment as PipelineCompilerContext)
             val config = XProcStepConfigurationImpl(environment, start.stepConfig.saxonConfig, start.location)
             val runtime = XProcRuntime(start, config)

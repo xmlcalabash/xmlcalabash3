@@ -19,7 +19,7 @@ import net.sf.saxon.s9api.XdmNode
 import net.sf.saxon.type.Untyped
 import java.net.URI
 
-class XplParser(val builder: PipelineBuilder) {
+class XplParser internal constructor(val builder: PipelineBuilder) {
     private val manager = XplDocumentManager(builder)
     private val parsedUris = mutableMapOf<URI, StepContainerInterface>()
     private val errors = mutableListOf<XProcException>()
