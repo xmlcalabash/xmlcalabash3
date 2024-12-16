@@ -13,6 +13,7 @@ import java.net.URI
 class DocumentResolverProvider:  DocumentResolverProvider, DocumentResolver {
     companion object {
         val MAGIC_URI = URI("https://xmlcalabash.com/ext/library/metadata-extractor.xpl")
+        val RESOURCE_PATH = "/com/xmlcalabash/ext/metadata-extractor.xpl"
         var library: XProcDocument? = null
     }
 
@@ -39,8 +40,8 @@ class DocumentResolverProvider:  DocumentResolverProvider, DocumentResolver {
             }
 
             val loader = DocumentLoader(context, MAGIC_URI)
-            val stream = DocumentResolverProvider::class.java.getResourceAsStream("/com/xmlcalabash/ext/metadata-extractor.xpl")
-                ?: throw IOException("Failed to find unique-id.xpl as a resource")
+            val stream = DocumentResolverProvider::class.java.getResourceAsStream(RESOURCE_PATH)
+                ?: throw IOException("Failed to find ${RESOURCE_PATH} as a resource")
             library = loader.load(MAGIC_URI, stream, MediaType.XML)
             return library
         }
