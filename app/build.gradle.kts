@@ -27,6 +27,7 @@ val fopRelease by configurations.dependencyScope("fopRelease")
 val uniqueidRelease by configurations.dependencyScope("uniqueidRelease")
 val metadataextractorRelease by configurations.dependencyScope("metadataextractorRelease")
 val cacheRelease by configurations.dependencyScope("cacheRelease")
+//val polyglotRelease by configurations.dependencyScope("polyglotRelease")
 
 dependencies {
   xmlcalabashRelease(project(mapOf("path" to ":xmlcalabash",
@@ -49,6 +50,8 @@ dependencies {
                                          "configuration" to "releaseArtifacts")))
   cacheRelease(project(mapOf("path" to ":ext:cache",
                              "configuration" to "releaseArtifacts")))
+//  polyglotRelease(project(mapOf("path" to ":ext:polyglot",
+//                                "configuration" to "releaseArtifacts")))
 
   implementation(project(":xmlcalabash"))
   implementation(project(":ixml-coffeepress"))
@@ -60,6 +63,7 @@ dependencies {
   implementation(project(":ext:unique-id"))
   implementation(project(":ext:metadata-extractor"))
   implementation(project(":ext:cache"))
+//  implementation(project(":ext:polyglot"))
 }
 
 val xmlcalabashJar = configurations.resolvable("xmlcalabashJar") {
@@ -92,6 +96,9 @@ val metadataextractorJar = configurations.resolvable("metadataextractorJar") {
 val cacheJar = configurations.resolvable("cacheJar") {
   extendsFrom(cacheRelease)
 }
+//val polyglotJar = configurations.resolvable("polyglotJar") {
+//  extendsFrom(polyglotRelease)
+//}
 
 application {
   // Define the main class for the application.
@@ -157,6 +164,7 @@ tasks.register("stage-release") {
   inputs.files(uniqueidJar)
   inputs.files(metadataextractorJar)
   inputs.files(cacheJar)
+//  inputs.files(polyglotJar)
   dependsOn("jar")
 
   doLast {
@@ -244,6 +252,18 @@ tasks.register("stage-release") {
       into(layout.buildDirectory.dir("stage/lib"))
     }
   }
+  doLast {
+    copy {
+      from(cacheJar)
+      into(layout.buildDirectory.dir("stage/lib"))
+    }
+  }
+//  doLast {
+//    copy {
+//      from(polyglotJar)
+//      into(layout.buildDirectory.dir("stage/lib"))
+//    }
+//  }
 }
 
 tasks.register<Zip>("release") {
@@ -254,15 +274,8 @@ tasks.register<Zip>("release") {
 }
 
 tasks.register("helloWorld") {
-  inputs.files(xmlcalabashJar)
   doLast {
-    val art = xmlcalabashJar
-    println(art.get().singleFile)
-//    println(xmlbuild.jarArchiveFilename())
-//    distClasspath().forEach { path ->
-//                      println(path)
-//                    }
-
+    println("Building with Java version ${System.getProperty("java.version")}")
   }
 }
 
