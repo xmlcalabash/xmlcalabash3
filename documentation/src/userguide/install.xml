@@ -116,17 +116,23 @@ resources, XML Calabash defines a pragmatically more useful default.</para>
 </row>
 </thead>
 <tbody>
+<row><entry>bmp</entry><entry>image/bmp</entry></row>
 <row><entry>bz2</entry><entry>application/bzip2</entry></row>
 <row><entry>css</entry><entry>text/plain</entry></row>
+<row><entry>eps</entry><entry>image/eps</entry></row>
 <row><entry>fo</entry><entry>application/xml</entry></row>
+<row><entry>gif</entry><entry>image/gif</entry></row>
 <row><entry>gz</entry><entry>application/gzip</entry></row>
 <row><entry>gzip</entry><entry>application/gzip</entry></row>
+<row><entry>jpg, jpeg</entry><entry>image/jpeg</entry></row>
 <row><entry>json</entry><entry>application/json</entry></row>
 <row><entry>lzma</entry><entry>application/lzma</entry></row>
 <row><entry>nvdl</entry><entry>application/nvdl+xml</entry></row>
+<row><entry>pdf</entry><entry>application/pdf</entry></row>
 <row><entry>rnc</entry><entry>application/relax-ng-compact-syntax</entry></row>
 <row><entry>rng</entry><entry>application/relax-ng+xml</entry></row>
 <row><entry>sch</entry><entry>application/schematron+xml</entry></row>
+<row><entry>svg</entry><entry>image/svg+xml</entry></row>
 <row><entry>text</entry><entry>text/plain</entry></row>
 <row><entry>txt</entry><entry>text/plain</entry></row>
 <row><entry>xml</entry><entry>application/xml</entry></row>
