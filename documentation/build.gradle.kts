@@ -202,7 +202,7 @@ val validateReference = tasks.register<RelaxNGValidateTask>("validateReference")
   output(layout.buildDirectory.file("refbuild/validated.xml").get())
 }
 
-tasks.register<SaxonXsltTask>("reference") {
+val reference = tasks.register<SaxonXsltTask>("reference") {
   dependsOn("copyReferenceResources")
   dependsOn("validateReference")
   dependsOn("xmlCalabashVersion")
@@ -323,7 +323,7 @@ val validateUserguide = tasks.register<RelaxNGValidateTask>("validateUserguide")
   output(layout.buildDirectory.file("ugbuild/validated.xml").get())
 }
 
-tasks.register<SaxonXsltTask>("userguide") {
+val userguide = tasks.register<SaxonXsltTask>("userguide") {
   dependsOn("copyUserguideResources")
   dependsOn("validateUserguide")
   dependsOn("xmlCalabashVersion")
@@ -388,6 +388,12 @@ tasks.register<SaxonXsltTask>("changelog") {
   input(layout.buildDirectory.file("changes.xhtml").get())
   output(layout.buildDirectory.file("changes.txt").get())
   stylesheet(layout.projectDirectory.dir("tools/html2txt.xsl"))
+}
+
+tasks.register("release") {
+  dependsOn(userguide)
+  dependsOn(reference)
+  // nop, just make sure the guides get built
 }
 
 tasks.register("copyUserguideJarResources") {
