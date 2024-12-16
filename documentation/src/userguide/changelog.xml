@@ -13,6 +13,14 @@ See the commits and pull requests on
 finer detail.</para>
 
 <revhistory>
+<revision xml:id="r300-alpha6">
+<revnumber>3.0.0-alpha6</revnumber>
+<date>2024-12-15</date>
+<revdescription>
+<para>T.B.D.</para>
+</revdescription>
+</revision>
+
 <revision xml:id="r300-alpha5">
 <revnumber>3.0.0-alpha5</revnumber>
 <date>2024-12-15</date>
