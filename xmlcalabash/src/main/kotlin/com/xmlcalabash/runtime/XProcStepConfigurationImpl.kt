@@ -280,7 +280,7 @@ open class XProcStepConfigurationImpl internal constructor(
             return xpathCastAs(value, type)
         }
 
-        if (curType == BuiltInAtomicType.STRING && type == NsXs.anyURI) {
+        if (curType == BuiltInAtomicType.STRING && (type == NsXs.anyURI || type == NsXs.NCName)) {
             return xpathCastAs(value, type)
         }
 
