@@ -168,7 +168,6 @@ tasks.register("stage-release") {
   dependsOn("jar")
 
   doLast {
-    println("Staging release...")
     mkdir(layout.buildDirectory.dir("stage"))
     mkdir(layout.buildDirectory.dir("stage/lib"))
     copy {
