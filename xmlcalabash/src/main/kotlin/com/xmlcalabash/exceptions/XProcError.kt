@@ -354,6 +354,7 @@ class XProcError private constructor(val code: QName, val variant: Int, val loca
         fun xiDocumentNotInCache(href: URI) = internal(38, href)
         fun xiNoPipelineInLibrary(href: String) = internal(Pair(39, 1), href)
         fun xiNoPipelineInLibrary(name: String, href: String) = internal(Pair(39, 2), name, href)
+        fun xiInitializerError(message: String) = internal(Pair(40, 1), message)
 
         fun xiCliInvalidValue(option: String, value: String) = internal(200, option, value)
         fun xiCliValueRequired(option: String) = internal(202, option)

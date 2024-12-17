@@ -47,7 +47,7 @@ class DefaultErrorExplanation(): ErrorExplanation {
             System.err.println("   in ${error.inputLocation}")
         }
         if (error.throwable != null && error.throwable?.message != null) {
-            System.err.println("   cause: ${error.throwable!!.message}")
+            System.err.println("   cause: ${error.throwable!!.toString()}")
         }
     }
 

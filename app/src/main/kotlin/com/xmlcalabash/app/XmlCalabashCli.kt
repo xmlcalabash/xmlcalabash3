@@ -18,6 +18,7 @@ import com.xmlcalabash.namespace.NsXs
 import com.xmlcalabash.runtime.api.RuntimeOption
 import com.xmlcalabash.runtime.api.RuntimePort
 import com.xmlcalabash.util.*
+import net.sf.saxon.lib.Initializer
 import net.sf.saxon.om.NamespaceUri
 import net.sf.saxon.s9api.*
 import org.apache.logging.log4j.kotlin.logger
@@ -74,6 +75,25 @@ class XmlCalabashCli private constructor() {
             if (commandLine.command == "version") {
                 version()
                 return
+            }
+
+            for (name in commandLine.initializers) {
+                try {
+                    val klass = Class.forName(name)
+                    val constructor = klass.getConstructor()
+                    val init = constructor.newInstance()
+                    if (init is Initializer) {
+                        init.initialize(xmlCalabash.saxonConfig.configuration)
+                    } else {
+                        throw XProcError.xiInitializerError("${name} is not a com.saxon.lib.Initializer").exception()
+                    }
+                } catch (ex: Exception) {
+                    if (ex is XProcException) {
+                        throw ex
+                    } else {
+                        throw XProcError.xiInitializerError(ex.toString()).exception(ex)
+                    }
+                }
             }
 
             val moon = Moon.illumination()

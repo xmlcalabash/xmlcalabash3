@@ -49,6 +49,7 @@ class CommandLine private constructor(val args: Array<out String>) {
     private var _outputs = mutableMapOf<String, OutputFilename>()
     private var _options = mutableMapOf<String,List<String>>()
     private var _namespaces = mutableMapOf<String, NamespaceUri>()
+    private var _initializers = mutableListOf<String>()
     private var _pipeline: File? = null
     private var _step: String? = null
 
@@ -125,6 +126,10 @@ class CommandLine private constructor(val args: Array<out String>) {
     val namespaces: Map<String, NamespaceUri>
         get() = _namespaces
 
+    /** Function initializers (--init initializers for Saxon) */
+    val initializers: List<String>
+        get() = _initializers
+
     /** The pipeline or library document containing the pipeline to run. */
     val pipeline: File?
         get() = _pipeline
@@ -140,6 +145,7 @@ class CommandLine private constructor(val args: Array<out String>) {
         ArgumentDescription("--input", listOf("-i"), ArgumentType.STRING) { it -> parseInput(it) },
         ArgumentDescription("--output", listOf("-o"), ArgumentType.STRING) { it -> parseOutput(it) },
         ArgumentDescription("--namespace", listOf("-ns"), ArgumentType.STRING) { it -> parseNamespace(it) },
+        ArgumentDescription("--init", listOf(), ArgumentType.STRING) { it -> _initializers.add(it) },
         ArgumentDescription("--configuration", listOf("-c", "--config"), ArgumentType.EXISTING_FILE) { it -> _config = File(it) },
         ArgumentDescription("--step", listOf(), ArgumentType.STRING) { it -> _step = it },
         ArgumentDescription("--graph", listOf(), ArgumentType.FILE) { it -> _pipelineGraph = it },
