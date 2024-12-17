@@ -48,6 +48,7 @@ given, the <command>run</command> command is assumed.</para>
   <arg rep="repeat" linkend="cli-output">--output:<replaceable>port</replaceable>=<replaceable>filespec</replaceable></arg>
   <sbr/>
   <arg rep="repeat" linkend="cli-namespace">--namespace:<replaceable>prefix</replaceable>=<replaceable>uri</replaceable></arg>
+  <arg rep="repeat" linkend="cli-init">--init:<replaceable>class-name</replaceable></arg>
   <sbr/>
   <arg rep="norepeat" linkend="cli-description">--description:<replaceable>description-file</replaceable></arg>
   <arg rep="norepeat" linkend="cli-graph">--graph:<replaceable>graph-file</replaceable></arg>
@@ -136,6 +137,18 @@ expressions used to define <phrase linkend="cli-option">options</phrase>.
 to their traditional XML Schema and XPath URIs. The prefix
 <code>saxon</code> is also bound to the Saxon extension namespace,
 <literal>http://saxon.sf.net/</literal>.</para>
+</listitem>
+</varlistentry>
+
+<varlistentry xml:id="cli-init">
+  <term><option>--init:<replaceable>class-name</replaceable></option>,
+  Saxon configuration initializer</term>
+<listitem>
+<para>Attempts to load and execute the class named <replaceable>class-name</replaceable>, which
+must be available on the class path and must implement the <classname>net.sf.saxon.lib.Initializer</classname>
+interface. (This is analagous to the <literal>-init:</literal> option on the Saxon command line
+API.)
+</para>
 </listitem>
 </varlistentry>
 

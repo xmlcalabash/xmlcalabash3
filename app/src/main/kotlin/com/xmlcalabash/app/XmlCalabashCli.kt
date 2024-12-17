@@ -85,7 +85,7 @@ class XmlCalabashCli private constructor() {
                     if (init is Initializer) {
                         init.initialize(xmlCalabash.saxonConfig.configuration)
                     } else {
-                        throw XProcError.xiInitializerError("${name} is not a com.saxon.lib.Initializer").exception()
+                        throw XProcError.xiInitializerError("${name} is not a net.sf.saxon.lib.Initializer").exception()
                     }
                 } catch (ex: Exception) {
                     if (ex is XProcException) {
