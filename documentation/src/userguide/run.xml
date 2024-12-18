@@ -61,6 +61,7 @@ given, the <command>run</command> command is assumed.</para>
   <arg rep="norepeat" linkend="cli-debug">--debug</arg>
   <arg rep="norepeat" linkend="cli-help">--help</arg>
   <sbr/>
+  <arg choice="plain" linkend="cli-pipeline"><replaceable>pipeline.xpl</replaceable></arg>
   <arg rep="repeat" linkend="cli-option"><replaceable>option</replaceable>=<replaceable>value</replaceable></arg>
 </cmdsynopsis>
 
@@ -235,6 +236,16 @@ messages about its progress.</para>
 <para>This is equivalent to issuing the <command linkend="run-help">help</command> command.
 It’s provided as an option for convenience.
 </para>
+</listitem>
+</varlistentry>
+
+<varlistentry xml:id="cli-pipeline">
+  <term><option><replaceable>pipeline.xpl</replaceable></option>, the pipeline to run</term>
+<listitem>
+<para>This identifies the pipeline to run. If the root element is 
+<tag>p:declare-step</tag>, then that pipeline will be run. If the root element is
+<tag>p:library</tag>, the first pipeline in the library will be run, unless the
+<option linkend="cli-step">step</option> option specifies an alternate pipeline.</para>
 </listitem>
 </varlistentry>
 
