@@ -17,27 +17,77 @@ import java.nio.file.Paths
 
 class CssWeasyprint: CssProcessor {
     companion object {
-        private val _exePath = QName("exePath")
-        private val _mediaType = QName("media-type")
-        private val _baseUrl = QName("base-url")
-        private val _attachment = QName("attachment")
-        private val _pdfIdentifier = QName("pdf-identifier")
-        private val _pdfVariant = QName("pdf-variant")
-        private val _pdfVersion = QName("pdf-version")
-        private val _pdfForms = QName("pdf-forms")
-        private val _uncompressedPdf = QName("uncompressed-pdf")
-        private val _customMetadata = QName("custom-metadata")
-        private val _presentationalHints = QName("presentational-hints")
-        private val _optimizeImages = QName("optimize-images")
-        private val _jpegQuality = QName("jpeg-quality")
-        private val _fullFonts = QName("full-fonts")
-        private val _hinting = QName("hinting")
-        private val _cacheFolder = QName("cache-folder")
-        private val _dpi = QName("dpi")
-        private val _verbose = QName("verbose")
-        private val _debug = QName("debug")
-        private val _quiet = QName("quiet")
-        private val _timeout = QName("timeout")
+        val _exePath = QName("exePath")
+        val _mediaType = QName("media-type")
+        val _baseUrl = QName("base-url")
+        val _attachment = QName("attachment")
+        val _pdfIdentifier = QName("pdf-identifier")
+        val _pdfVariant = QName("pdf-variant")
+        val _pdfVersion = QName("pdf-version")
+        val _pdfForms = QName("pdf-forms")
+        val _uncompressedPdf = QName("uncompressed-pdf")
+        val _customMetadata = QName("custom-metadata")
+        val _presentationalHints = QName("presentational-hints")
+        val _optimizeImages = QName("optimize-images")
+        val _jpegQuality = QName("jpeg-quality")
+        val _fullFonts = QName("full-fonts")
+        val _hinting = QName("hinting")
+        val _cacheFolder = QName("cache-folder")
+        val _dpi = QName("dpi")
+        val _verbose = QName("verbose")
+        val _debug = QName("debug")
+        val _quiet = QName("quiet")
+        val _timeout = QName("timeout")
+
+        val booleanOptions = listOf(_customMetadata, _debug, _fullFonts, _hinting, _optimizeImages, _pdfForms,
+            _presentationalHints, _quiet, _uncompressedPdf, _verbose)
+
+        val stringOptions = listOf(_exePath, _baseUrl, _attachment, _cacheFolder, _dpi, _jpegQuality, _mediaType,
+            _pdfIdentifier, _pdfVariant, _pdfVersion, _timeout)
+
+        val defaultBooleanOptions = mutableMapOf<QName,Boolean>()
+        val defaultStringOptions = mutableMapOf<QName,String>()
+
+        fun configure(formatter: URI, properties: Map<QName, String>) {
+            if (formatter != WeasyprintManager.weasyprintCssFormatter) {
+                throw IllegalArgumentException("Unsupported formatter: ${formatter}")
+            }
+
+            for ((key, value) in properties) {
+                if (key in stringOptions) {
+                    defaultStringOptions[key] = value
+                } else if (key in booleanOptions) {
+                    defaultBooleanOptions[key] = value.toBooleanStrict()
+                } else {
+                    logger.warn("Unsupported Weasyprint property: ${key}")
+                }
+            }
+
+            if (defaultStringOptions[_exePath] == null) {
+                val prop = System.getProperty("com.xmlcalabash.css.weasyprint.exepath")
+                if (prop != null) {
+                    defaultStringOptions[_exePath] = prop
+                } else {
+                    val exeName = if (System.getProperty("os.name").startsWith("Windows")) {
+                        "weasyprint.exe"
+                    } else {
+                        "weasyprint"
+                    }
+
+                    var found: String? = null
+                    for (path in System.getenv("PATH").split(File.pathSeparator)) {
+                        val exe = Paths.get(path, exeName).toFile()
+                        if (exe.exists() && exe.canExecute()) {
+                            found = exe.absolutePath
+                            break
+                        }
+                    }
+                    if (found != null) {
+                        defaultStringOptions[_exePath] = found
+                    }
+                }
+            }
+        }
     }
 
     lateinit var stepConfig: XProcStepConfiguration
@@ -60,32 +110,7 @@ class CssWeasyprint: CssProcessor {
         userSS.clear()
         tempFiles.clear()
 
-        exePath = if (options.containsKey(_exePath)) {
-            options[_exePath]!!.underlyingValue.stringValue
-        } else {
-            val prop = System.getProperty("com.xmlcalabash.css.weasyprint.exepath")
-            if (prop != null) {
-                prop
-            } else {
-                val exeName = if (System.getProperty("os.name").startsWith("Windows")) {
-                    "weasyprint.exe"
-                } else {
-                    "weasyprint"
-                }
-
-                var found = ""
-                for (path in System.getenv("PATH").split(File.pathSeparator)) {
-                    val exe = Paths.get(path, exeName).toFile()
-                    if (exe.exists() && exe.canExecute()) {
-                        found = exe.absolutePath
-                        break
-                    }
-                }
-
-                found
-            }
-        }
-
+        exePath = options[_exePath]?.underlyingValue?.stringValue ?: defaultStringOptions[_exePath] ?: ""
         if (exePath == "") {
             throw XProcError.xdStepFailed("Cannot find Weasyprint executable").exception()
         }
@@ -135,8 +160,10 @@ class CssWeasyprint: CssProcessor {
             commandLine.add(css)
         }
 
-        if (options.containsKey(_baseUrl)) {
-            stringOption(_baseUrl)
+        val baseURI = options[_baseUrl]?.underlyingValue?.stringValue ?: defaultStringOptions[_baseUrl]
+        if (baseURI != null) {
+            commandLine.add("--base-url")
+            commandLine.add(baseURI)
         } else {
             if (document.baseURI != null) {
                 commandLine.add("--base-url")
@@ -144,25 +171,22 @@ class CssWeasyprint: CssProcessor {
             }
         }
 
-        stringOption(_mediaType)
-        stringOption(_attachment)
-        stringOption(_pdfIdentifier)
-        stringOption(_pdfVariant)
-        stringOption(_pdfVariant)
-        booleanOption(_pdfForms)
-        booleanOption(_uncompressedPdf)
-        booleanOption(_customMetadata)
-        booleanOption(_presentationalHints)
-        booleanOption(_optimizeImages)
-        stringOption(_jpegQuality)
-        booleanOption(_fullFonts)
-        booleanOption(_hinting)
-        stringOption(_cacheFolder)
-        stringOption(_dpi)
-        booleanOption(_verbose)
-        booleanOption(_quiet)
-        booleanOption(_debug)
-        stringOption(_timeout)
+        for (name in booleanOptions) {
+            val value = options[name]?.underlyingValue?.effectiveBooleanValue() ?: defaultBooleanOptions[name]
+            if (value != null && value) {
+                commandLine.add("--${name.localName}")
+            }
+        }
+
+        for (name in stringOptions) {
+            if (name != _exePath && name != _baseUrl) {
+                val value = options[name]?.underlyingValue?.stringValue ?: defaultStringOptions[name]
+                if (value != null) {
+                    commandLine.add("--${name.localName}")
+                    commandLine.add(value)
+                }
+            }
+        }
 
         val tempXml = File.createTempFile("xmlcalabash-weasycss", ".xml")
         tempXml.deleteOnExit()
@@ -234,25 +258,6 @@ class CssWeasyprint: CssProcessor {
                 temp.delete()
             } catch (ex: Exception) {
                 // nop
-            }
-        }
-    }
-
-    protected fun stringOption(name: QName) {
-        if (options.containsKey(name)) {
-            val valueList = options[name]!!.underlyingValue
-            for (value in valueList.asIterable()) {
-                commandLine.add("--${name.localName}")
-                commandLine.add(value.toString())
-            }
-        }
-    }
-
-    protected fun booleanOption(name: QName) {
-        if (options.containsKey(name)) {
-            val value = options[name]!!.underlyingValue.effectiveBooleanValue()
-            if (value) {
-                commandLine.add("--${name.localName}")
             }
         }
     }

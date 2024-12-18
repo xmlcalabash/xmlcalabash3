@@ -8,6 +8,7 @@ import com.xmlcalabash.namespace.Ns
 import com.xmlcalabash.namespace.NsCx
 import com.xmlcalabash.spi.PagedMediaManager
 import com.xmlcalabash.spi.PagedMediaServiceProvider
+import com.xmlcalabash.util.NopPagedMediaProvider
 import com.xmlcalabash.util.UriUtils
 import net.sf.saxon.s9api.QName
 import org.apache.logging.log4j.kotlin.logger
@@ -40,42 +41,32 @@ open class CssFormatterStep(): AbstractAtomicStep() {
 
         val contentType = mediaTypeBinding(Ns.contentType, MediaType.PDF)
         val parameters = qnameMapBinding(Ns.parameters)
-
-        val managers = mutableListOf<PagedMediaManager>()
-        for (provider in PagedMediaServiceProvider.providers()) {
-            managers.add(provider.create())
-        }
         var cssManager: PagedMediaManager? = null
 
-        val procuri = if (extensionAttributes.containsKey(NsCx.processor)) {
-            logger.debug { "Searching for ${extensionAttributes[NsCx.processor]} css-formatter" }
-            URI("$genericCssFormatter/${extensionAttributes[NsCx.processor]}")
-        } else {
-            genericCssFormatter
-        }
-
-        for (manager in managers) {
-            if (manager.formatterAvailable(procuri)) {
-                cssManager = manager
-                break
-            }
-        }
-
-        if (cssManager == null && procuri != genericCssFormatter) {
-            val fallback = extensionAttributes[NsCx.fallback] ?: "true"
-            if (fallback == "true" || fallback == "false") {
-                if (fallback == "false") {
-                    throw XProcError.xdStepFailed("Could not locate ${extensionAttributes[NsCx.processor]} css-formatter").exception()
-                }
+        val formatters = mutableListOf<URI>()
+        if (extensionAttributes.containsKey(NsCx.processor)) {
+            val value = extensionAttributes[NsCx.processor]!!
+            if (value.contains("/")) {
+                formatters.add(URI.create(value))
             } else {
-                throw XProcError.xdBadType("cx:fallback must be 'true' or 'false'").exception()
+                formatters.add(URI.create("https://xmlcalabash.com/paged-media/css-formatter/${value}"))
             }
+        }
+        formatters.addAll(stepConfig.xmlCalabash.xmlCalabashConfig.pagedMediaCssProcessors)
+        if (formatters.isEmpty()) {
+            formatters.add(NopPagedMediaProvider.genericCssFormatter)
+        }
 
-            for (manager in managers) {
-                if (manager.formatterAvailable(genericCssFormatter)) {
+        for (formatter in formatters) {
+            logger.debug { "Searching for ${formatter} css-formatter" }
+            for (manager in stepConfig.xmlCalabash.xmlCalabashConfig.pagedMediaManagers) {
+                if (manager.formatterAvailable(formatter)) {
                     cssManager = manager
                     break
                 }
+            }
+            if (cssManager != null) {
+                break
             }
         }
 

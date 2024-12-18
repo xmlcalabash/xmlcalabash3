@@ -33,6 +33,7 @@ open class AtomicStep(config: XProcStepConfiguration, atomic: AtomicBuiltinStepM
         openPorts.addAll(initiallyOpenPorts)
 
         implementation.setup(stepConfig, this, params)
+        implementation.extensionAttributes(atomic.extensionAttributes)
     }
 
     override val readyToRun: Boolean

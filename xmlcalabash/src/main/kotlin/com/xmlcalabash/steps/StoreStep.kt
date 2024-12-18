@@ -1,6 +1,7 @@
 package com.xmlcalabash.steps
 
 import com.xmlcalabash.datamodel.MediaType
+import com.xmlcalabash.documents.XProcBinaryDocument
 import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.io.XProcSerializer
@@ -34,10 +35,10 @@ open class StoreStep(): AbstractAtomicStep() {
         val serialization = qnameMapBinding(Ns.serialization)
         val contentType = document!!.contentType
 
-        if (contentType == MediaType.XML) {
-            storeXml(href!!, serialization)
-        } else {
-            throw RuntimeException("Don't know how to stare ${contentType}")
+        when (contentType) {
+            MediaType.XML -> storeXml(href!!, serialization)
+            MediaType.PDF -> storeBinary(href!!)
+            else -> throw RuntimeException("Don't know how to store ${contentType}")
         }
 
         receiver.output("result", document!!)
@@ -55,6 +56,15 @@ open class StoreStep(): AbstractAtomicStep() {
         val outputFile = FileOutputStream(href.path)
         val serializer = XProcSerializer(stepConfig)
         serializer.write(document!!, outputFile, null, serialization)
+    }
+
+    private fun storeBinary(href: URI) {
+        if (document !is XProcBinaryDocument) {
+            throw RuntimeException("Don't know how to store ${document} (not binary?)")
+        }
+        val outputFile = FileOutputStream(href.path)
+        outputFile.write((document!! as XProcBinaryDocument).binaryValue)
+        outputFile.close()
     }
 
     override fun toString(): String = "p:store"

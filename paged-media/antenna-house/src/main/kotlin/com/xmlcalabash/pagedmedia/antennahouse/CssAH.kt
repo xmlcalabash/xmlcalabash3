@@ -14,6 +14,37 @@ import java.io.*
 import java.net.URI
 
 class CssAH(): AbstractAH(), CssProcessor {
+    companion object {
+        protected val defaultStringOptions = mutableMapOf<QName, String>()
+        protected val defaultIntOptions = mutableMapOf<QName, Int>()
+        protected val defaultBooleanOptions = mutableMapOf<QName, Boolean>()
+        protected var defaultEmbedAllFonts: String? = null
+
+        fun configure(formatter: URI, properties: Map<QName, String>) {
+            if (formatter != AhManager.ahCssFormatter) {
+                throw IllegalArgumentException("Unsupported formatter: ${formatter}")
+            }
+
+            for ((key, value) in properties) {
+                if (key == _EmbedAllFontsEx) {
+                    if (value == "part" || value == "base14" || value == "all") {
+                        defaultEmbedAllFonts = value
+                    } else {
+                        logger.warn("Ignoring unknown Antenna House CSS EmbedAllFontsEx option: ${value}")
+                    }
+                } else if (key in stringOptions) {
+                    defaultStringOptions[key] = value
+                } else if (key in intOptions) {
+                    defaultIntOptions[key] = value.toInt()
+                } else if (key in booleanOptions) {
+                    defaultBooleanOptions[key] = value.toBooleanStrict()
+                } else {
+                    logger.warn("Unsupported Antenna House CSS property: ${key}")
+                }
+            }
+        }
+    }
+
     var primarySS: String? = null
     val userSS = mutableListOf<String>()
     val tempFiles = mutableListOf<File>()
@@ -31,7 +62,7 @@ class CssAH(): AbstractAH(), CssProcessor {
 
         ah = XfoObj()
         ah.setFormatterType(XfoObj.S_FORMATTERTYPE_XMLCSS)
-        ahInitialize()
+        ahInitialize(defaultStringOptions, defaultIntOptions, defaultBooleanOptions, defaultEmbedAllFonts)
     }
 
     private fun addStylesheet(uri: URI) {

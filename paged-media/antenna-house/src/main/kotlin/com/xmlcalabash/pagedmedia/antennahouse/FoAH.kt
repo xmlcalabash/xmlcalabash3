@@ -17,6 +17,37 @@ import java.io.OutputStream
 import java.net.URI
 
 class FoAH(): AbstractAH(), FoProcessor {
+    companion object {
+        protected val defaultStringOptions = mutableMapOf<QName, String>()
+        protected val defaultIntOptions = mutableMapOf<QName, Int>()
+        protected val defaultBooleanOptions = mutableMapOf<QName, Boolean>()
+        protected var defaultEmbedAllFonts: String? = null
+
+        fun configure(formatter: URI, properties: Map<QName, String>) {
+            if (formatter != AhManager.ahXslFormatter) {
+                throw IllegalArgumentException("Unsupported formatter: ${formatter}")
+            }
+
+            for ((key, value) in properties) {
+                if (key == _EmbedAllFontsEx) {
+                    if (value == "part" || value == "base14" || value == "all") {
+                        defaultEmbedAllFonts = value
+                    } else {
+                        logger.warn("Ignoring unknown Antenna House CSS EmbedAllFontsEx option: ${value}")
+                    }
+                } else if (key in stringOptions) {
+                    defaultStringOptions[key] = value
+                } else if (key in intOptions) {
+                    defaultIntOptions[key] = value.toInt()
+                } else if (key in booleanOptions) {
+                    defaultBooleanOptions[key] = value.toBooleanStrict()
+                } else {
+                    logger.warn("Unsupported Antenna House XSL FO property: ${key}")
+                }
+            }
+        }
+    }
+
     override fun name(): String {
         return "Antenna House"
     }
@@ -27,7 +58,8 @@ class FoAH(): AbstractAH(), FoProcessor {
 
         ah = XfoObj()
         ah.setFormatterType(XfoObj.S_FORMATTERTYPE_XSLFO)
-        ahInitialize()
+
+        ahInitialize(defaultStringOptions, defaultIntOptions, defaultBooleanOptions, defaultEmbedAllFonts)
     }
 
     override fun format(document: XProcDocument, contentType: MediaType, out: OutputStream) {

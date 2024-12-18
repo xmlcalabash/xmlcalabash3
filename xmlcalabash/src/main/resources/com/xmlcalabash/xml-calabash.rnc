@@ -10,15 +10,16 @@ cc.xmlCalabash =
         attribute schema-aware { xsd:boolean }?,
         attribute debug { xsd:boolean }?,
         attribute verbosity { "detail" | "progress" | "normal" | "warning" | "quiet" }?,
-        (cc.systemProperty
-        | cc.proxy
-        | cc.threading
+        (cc.graphviz
         | cc.inline
-        | cc.graphviz
-        | cc.saxonConfigurationProperty
-        | cc.serialization
         | cc.mimetype
-        | cc.sendMail)*
+        | cc.pagedMedia
+        | cc.proxy
+        | cc.saxonConfigurationProperty
+        | cc.sendMail
+        | cc.serialization
+        | cc.systemProperty
+        | cc.threading)*
     }
 
 cc.systemProperty =
@@ -94,6 +95,14 @@ cc.mimetype =
     element cc:mimetype {
         attribute content-type { text },
         attribute extensions { text },
+        empty
+    }
+
+cc.pagedMedia =
+    element cc:mimetype {
+        attribute css-formatter { text }?,
+        attribute xsl-formatter { text }?,
+        attribute * { text },
         empty
     }
 

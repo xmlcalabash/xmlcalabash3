@@ -17,32 +17,81 @@ import java.nio.file.Paths
 
 class CssPrince: CssProcessor {
     companion object {
-        private val _exePath = QName("exePath")
-        private val _baseURL = QName("baseURL")
-        private val _compress = QName("compress")
-        private val _debug = QName("debug")
-        private val _embedFonts = QName("embedFonts")
-        private val _encrypt = QName("encrypt")
-        private val _keyBits = QName("keyBits")
-        private val _userPassword = QName("userPassword")
-        private val _ownerPassword = QName("ownerPassword")
-        private val _disallowPrint = QName("disallowPrint")
-        private val _disallowModify = QName("disallowModify")
-        private val _disallowCopy = QName("disallowCopy")
-        private val _disallowAnnotate = QName("disallowAnnotate")
-        private val _fileRoot = QName("fileRoot")
-        private val _html = QName("html")
-        private val _httpPassword = QName("httpPassword")
-        private val _httpUsername = QName("httpUsername")
-        private val _httpProxy = QName("httpProxy")
-        private val _inputType = QName("inputType")
-        private val _javascript = QName("javascript")
-        private val _log = QName("log")
-        private val _network = QName("network")
-        private val _subsetFonts = QName("subsetFonts")
-        private val _verbose = QName("verbose")
-        private val _XInclude = QName("XInclude")
-        private val _scripts = QName("scripts")
+        val _exePath = QName("exePath")
+        val _baseURL = QName("baseURL")
+        val _compress = QName("compress")
+        val _debug = QName("debug")
+        val _embedFonts = QName("embedFonts")
+        val _encrypt = QName("encrypt")
+        val _keyBits = QName("keyBits")
+        val _userPassword = QName("userPassword")
+        val _ownerPassword = QName("ownerPassword")
+        val _disallowPrint = QName("disallowPrint")
+        val _disallowModify = QName("disallowModify")
+        val _disallowCopy = QName("disallowCopy")
+        val _disallowAnnotate = QName("disallowAnnotate")
+        val _fileRoot = QName("fileRoot")
+        val _html = QName("html")
+        val _httpPassword = QName("httpPassword")
+        val _httpUsername = QName("httpUsername")
+        val _httpProxy = QName("httpProxy")
+        val _inputType = QName("inputType")
+        val _javascript = QName("javascript")
+        val _log = QName("log")
+        val _network = QName("network")
+        val _subsetFonts = QName("subsetFonts")
+        val _verbose = QName("verbose")
+        val _xinclude = QName("xinclude")
+        val _scripts = QName("scripts")
+
+        val stringOptions = listOf(_exePath, _baseURL, _keyBits, _userPassword, _ownerPassword,
+            _fileRoot, _httpPassword, _httpUsername, _httpProxy, _inputType, _log, _scripts)
+        val booleanOptions = listOf(_compress, _debug, _encrypt, _embedFonts, _html, _javascript, _network,
+            _subsetFonts, _verbose, _xinclude, _disallowAnnotate, _disallowCopy, _disallowModify, _disallowPrint)
+
+        val defaultBooleanOptions = mutableMapOf<QName,Boolean>()
+        val defaultStringOptions = mutableMapOf<QName,String>()
+
+        fun configure(formatter: URI, properties: Map<QName, String>) {
+            if (formatter != PrinceManager.princeCssFormatter) {
+                throw IllegalArgumentException("Unsupported formatter: ${formatter}")
+            }
+
+            for ((key, value) in properties) {
+                if (key in stringOptions) {
+                    defaultStringOptions[key] = value
+                } else if (key in booleanOptions) {
+                    defaultBooleanOptions[key] = value.toBooleanStrict()
+                } else {
+                    logger.warn("Unsupported Prince property: ${key}")
+                }
+            }
+
+            if (defaultStringOptions[_exePath] == null) {
+                val prop = System.getProperty("com.xmlcalabash.css.prince.exepath")
+                if (prop != null) {
+                    defaultStringOptions[_exePath] = prop
+                } else {
+                    val exeName = if (System.getProperty("os.name").startsWith("Windows")) {
+                        "prince.exe"
+                    } else {
+                        "prince"
+                    }
+
+                    var found: String? = null
+                    for (path in System.getenv("PATH").split(File.pathSeparator)) {
+                        val exe = Paths.get(path, exeName).toFile()
+                        if (exe.exists() && exe.canExecute()) {
+                            found = exe.absolutePath
+                            break
+                        }
+                    }
+                    if (found != null) {
+                        defaultStringOptions[_exePath] = found
+                    }
+                }
+            }
+        }
     }
 
     lateinit var stepConfig: XProcStepConfiguration
@@ -63,78 +112,63 @@ class CssPrince: CssProcessor {
         userSS.clear()
         tempFiles.clear()
 
-        val exePath = if (options.containsKey(_exePath)) {
-            options[_exePath]!!.underlyingValue.stringValue
-        } else {
-            val prop = System.getProperty("com.xmlcalabash.css.prince.exepath")
-            if (prop != null) {
-                prop
-            } else {
-                val exeName = if (System.getProperty("os.name").startsWith("Windows")) {
-                    "prince.exe"
-                } else {
-                    "prince"
-                }
-
-                var found = ""
-                for (path in System.getenv("PATH").split(File.pathSeparator)) {
-                    val exe = Paths.get(path, exeName).toFile()
-                    if (exe.exists() && exe.canExecute()) {
-                        found = exe.absolutePath
-                        break
-                    }
-                }
-
-                found
-            }
-        }
-
+        val exePath = options[_exePath]?.underlyingValue?.stringValue ?: defaultStringOptions[_exePath] ?: ""
         if (exePath == "") {
             throw XProcError.xdStepFailed("Cannot find Prince XML executable").exception()
         }
 
         prince = Prince(exePath, PrinceMessages())
 
-        stringOption(_baseURL) { prince.setBaseURL(it) }
-        stringOption(_fileRoot) { prince.setFileRoot(it) }
-        stringOption(_httpPassword) { prince.setHttpPassword(it) }
-        stringOption(_httpUsername) { prince.setHttpUsername(it) }
-        stringOption(_httpProxy) { prince.setHttpProxy(it) }
-        stringOption(_inputType) { prince.setInputType(it) }
-        stringOption(_log) { prince.setLog(it) }
+        for (key in stringOptions) {
+            val value = options[key]?.underlyingValue?.stringValue ?: defaultStringOptions[key]
+            if (value != null) {
+                when (key) {
+                    _baseURL -> prince.setBaseURL(value)
+                    _fileRoot -> prince.setFileRoot(value)
+                    _httpPassword -> prince.setHttpPassword(value)
+                    _httpUsername -> prince.setHttpUsername(value)
+                    _httpProxy -> prince.setHttpProxy(value)
+                    _inputType -> prince.setInputType(value)
+                    _log -> prince.setLog(value)
+                    else -> Unit
+                }
+            }
+        }
 
-        booleanOption(_compress) { prince.setCompress(it) }
-        booleanOption(_debug) { prince.setDebug(it) }
-        booleanOption(_embedFonts) { prince.setEmbedFonts(it) }
-        booleanOption(_html) { prince.setHTML(it) }
-        booleanOption(_javascript) { prince.setJavaScript(it) }
-        booleanOption(_network) { prince.setNetwork(it) }
-        booleanOption(_subsetFonts) { prince.setSubsetFonts(it) }
-        booleanOption(_verbose) { prince.setVerbose(it) }
-        booleanOption(_XInclude) { prince.setXInclude(it) }
+        for (key in booleanOptions) {
+            val value = options[key]?.underlyingValue?.effectiveBooleanValue() ?: defaultBooleanOptions[key]
+            if (value != null) {
+                when (key) {
+                    _compress -> prince.setCompress(value)
+                    _debug -> prince.setDebug(value)
+                    _embedFonts -> prince.setEmbedFonts(value)
+                    _html -> prince.setHTML(value)
+                    _javascript -> prince.setJavaScript(value)
+                    _network -> prince.setNetwork(value)
+                    _subsetFonts -> prince.setSubsetFonts(value)
+                    _verbose -> prince.setVerbose(value)
+                    _xinclude -> prince.setXInclude(value)
+                    _encrypt -> prince.setEncrypt(value)
+                    else -> Unit
+                }
+            }
+        }
 
-        booleanOption(_encrypt) { prince.setEncrypt(it) }
-        if (options.containsKey(_keyBits)) {
-            val keyBits = options[_keyBits]!!.underlyingValue.stringValue.toInt()
-            var up = ""
-            var op = ""
-            var dp = false
-            var dm = false
-            var dc = false
-            var da = false
-
-            stringOption(_userPassword) { up = it }
-            stringOption(_ownerPassword) { op = it }
-            booleanOption(_disallowPrint) { dp = it }
-            booleanOption(_disallowModify) { dm = it }
-            booleanOption(_disallowCopy) { dc = it }
-            booleanOption(_disallowAnnotate) { da = it }
-
+        val keyBitStr = options[_keyBits]?.underlyingValue?.stringValue ?: defaultStringOptions[_keyBits]
+        if (keyBitStr != null) {
+            val keyBits = keyBitStr.toInt()
+            var up = options[_userPassword]?.underlyingValue?.stringValue ?: defaultStringOptions[_userPassword] ?: ""
+            var op = options[_ownerPassword]?.underlyingValue?.stringValue ?: defaultStringOptions[_ownerPassword] ?: ""
+            var dp = options[_disallowPrint]?.underlyingValue?.effectiveBooleanValue() ?: defaultBooleanOptions[_disallowPrint] ?: false
+            var dm = options[_disallowModify]?.underlyingValue?.effectiveBooleanValue() ?: defaultBooleanOptions[_disallowModify] ?: false
+            var dc = options[_disallowCopy]?.underlyingValue?.effectiveBooleanValue() ?: defaultBooleanOptions[_disallowCopy] ?: false
+            var da = options[_disallowAnnotate]?.underlyingValue?.effectiveBooleanValue() ?: defaultBooleanOptions[_disallowAnnotate] ?: false
             prince.setEncryptInfo(keyBits, up, op, dp, dm, dc, da)
         }
 
-        if (options.containsKey(_scripts)) {
-            for (script in options[_scripts]!!.underlyingValue.stringValue.split("\\s+".toRegex())) {
+        val scripts = options[_scripts]?.underlyingValue?.stringValue ?: defaultStringOptions[_scripts]
+        if (scripts != null) {
+            for (script in scripts.split("\\s+".toRegex())) {
                 prince.addScript(script)
             }
         }
@@ -200,20 +234,6 @@ class CssPrince: CssProcessor {
             } catch (ex: Exception) {
                 // nop
             }
-        }
-    }
-
-    private fun stringOption(name: QName, setter: (String) -> Unit) {
-        if (options.containsKey(name)) {
-            val value = options[name]!!.underlyingValue.stringValue
-            setter(value)
-        }
-    }
-
-    private fun booleanOption(name: QName, setter: (Boolean) -> Unit) {
-        if (options.containsKey(name)) {
-            val value = options[name]!!.underlyingValue.effectiveBooleanValue()
-            setter(value)
         }
     }
 

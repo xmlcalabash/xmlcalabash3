@@ -172,6 +172,40 @@ server metadata) that end with
 <code>application/xml</code> content type.</para>
 </section>
 
+<section xml:id="cc.paged-media">
+<info>
+<?db filename="cc-paged-media"?>
+<title>cc:paged-media</title>
+</info>
+
+<para>Select and configure paged media providers.</para>
+
+<rng-pattern schema="../../build/xml-calabash.rng"
+             name="cc.pagedMedia"/>
+
+<para>At least one of <tag class="attribute">css-formatter</tag> or
+<tag class="attribute">xsl-formatter</tag> must be provided. The value of the 
+attribute should be the URI that identifies the processor that you want to select.
+</para>
+
+<para>When searching for a CSS or XSL FO formatter, XML Calabash will try to instantiate
+the processors in the order you specify them, selecting the first one that’s successfully
+instantiated. To indicate that <emphasis>any</emphasis> acceptable processor can be used,
+add a configuration element for the generic CSS processor,
+<literal>https://xmlcalabash.com/paged-media/css-formatter</literal> or XSL FO processor,
+<literal>https://xmlcalabash.com/paged-media/xsl-formatter</literal>.</para>
+
+<para>Any additional attribute/value pairs on the element are passed to the
+processor as configuration data. The accepted attributes and their valid values
+vary depending on the processor. No configuration properties are supported for the generic
+processors.</para>
+
+<para>See <tag xlink:href="https://docs.xmlcalabash.com/reference/p-css-formatter.html">p:css-formatter</tag>
+in the <citetitle xlink:href="https://docs.xmlcalabash.com/reference">Reference Guide</citetitle>
+for details.</para>
+
+</section>
+
 <section xml:id="cc.proxy">
 <info>
 <?db filename="cc-proxy"?>
