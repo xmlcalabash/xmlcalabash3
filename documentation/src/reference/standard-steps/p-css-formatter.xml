@@ -165,9 +165,12 @@ The following configuration options are supported:</para>
 </tgroup>
 </informaltable>
 
-<para>The <literal>exePath</literal> property is used to locate the <literal>prince</literal>
-executable. If it’s not specified, XML Calabash will search the user’s
-<envar>PATH</envar> environment variable.</para>
+<para>The <literal>exePath</literal> property is used to locate the
+<literal>prince</literal> executable. If it’s not specified, XML Calabash will
+first look for the system property
+<literal>com.xmlcalabash.css.prince.exepath</literal>, and if that doesn’t
+exist, it will search the user’s <envar>PATH</envar> environment
+variable.</para>
 
 <para>The <literal>keyBits</literal>, <literal>userPassword</literal>,
 <literal>ownerPassword</literal>, <literal>disallowPrint</literal>, <literal>disallowModify</literal>,
@@ -223,9 +226,12 @@ The following configuration options are supported:</para>
 </tgroup>
 </informaltable>
 
-<para>The <literal>exePath</literal> property is used to locate the <literal>prince</literal>
-executable. If it’s not specified, XML Calabash will search the user’s
-<envar>PATH</envar> environment variable.</para>
+<para>The <literal>exePath</literal> property is used to locate the
+<literal>weasyprint</literal> executable. If it’s not specified, XML Calabash will
+first look for the system property
+<literal>com.xmlcalabash.css.weasyprint.exepath</literal>, and if that doesn’t
+exist, it will search the user’s <envar>PATH</envar> environment
+variable.</para>
 
 <para>For more information about the properties, consult the WeasyPrint documentation.</para>
 
