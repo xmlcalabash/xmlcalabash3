@@ -1,10 +1,14 @@
-<?xml version="1.0" encoding="utf-8"?><refentry xmlns="http://docbook.org/ns/docbook" xmlns:p="http://www.w3.org/ns/xproc" xml:id="p-xsl-formatter">
+<?xml version="1.0" encoding="utf-8"?>
+<refentry xmlns="http://docbook.org/ns/docbook"
+          xmlns:p="http://www.w3.org/ns/xproc"
+          xmlns:xlink="http://www.w3.org/1999/xlink"
+          xml:id="p-xsl-formatter">
 <?db filename="p-xsl-formatter"?>
-   <refnamediv>
-      <refname>p:xsl-formatter</refname>
-      <refpurpose>The standard p:xsl-formatter step</refpurpose>
-   </refnamediv>
-   <refsynopsisdiv>
+<refnamediv>
+   <refname>p:xsl-formatter</refname>
+   <refpurpose>The standard p:xsl-formatter step</refpurpose>
+</refnamediv>
+<refsynopsisdiv>
 
 <refsection role="introduction">
 <title>Introduction</title>
@@ -43,8 +47,116 @@ are defined by the XSL implementation used and are
 </refsection>
 </refsynopsisdiv>
 
-   <refsection>
-      <title>Description</title>
-      <para>TBD.</para>
-   </refsection>
+<refsection>
+<title>Description</title>
+<para>XML Calabash supports several XSL formatter implementations. There is also
+a service provider interface so that additional implementations can be provided by
+third parties. Several <link linkend="p-css-formatter">CSS formatters</link> are
+also supported.</para>
+
+<refsection>
+<title>Antenna House</title>
+
+<para>In order to use the Antenna House formatter, you must install and configure
+<link xlink:href="https://www.antennahouse.com/formatter-v7">Antenna House Formatter</link>.</para>
+
+<para>You can configure the formatter with
+<link xlink:href="https://docs.xmlcalabash.com/userguide/configuration.html#cc.paged-media">a
+configuration property</link> or via the <option>parameters</option> option.
+The following configuration options are supported:</para>
+
+<informaltable>
+<tgroup cols="2">
+<thead>
+<row><entry>Property name</entry><entry>Type</entry></row>
+</thead>
+<tbody>
+<row><entry><literal>EmbedAllFontsEx</literal></entry><entry>string: “part”, “base14”, or “all”</entry></row>
+<row><entry><literal>ExitLevel</literal></entry><entry>integer</entry></row>
+<row><entry><literal>ImageCompression</literal></entry><entry>integer</entry></row>
+<row><entry><literal>NoAccessibility</literal></entry><entry>boolean</entry></row>
+<row><entry><literal>NoAddingOrChangingComments</literal></entry><entry>boolean</entry></row>
+<row><entry><literal>NoAssembleDoc</literal></entry><entry>boolean</entry></row>
+<row><entry><literal>NoChanging</literal></entry><entry>boolean</entry></row>
+<row><entry><literal>NoContentCopying</literal></entry><entry>boolean</entry></row>
+<row><entry><literal>NoFillForm</literal></entry><entry>boolean</entry></row>
+<row><entry><literal>NoPrinting</literal></entry><entry>boolean</entry></row>
+<row><entry><literal>OptionFileURI</literal></entry><entry>string</entry></row>
+<row><entry><literal>OwnersPassword</literal></entry><entry>string</entry></row>
+<row><entry><literal>TwoPassFormatting</literal></entry><entry>boolean</entry></row>
+</tbody>
+</tgroup>
+</informaltable>
+
+<para>For more information about these properties, consult the AH Formatter API documentation.</para>
+
+<para>The following <option>content-type</option>s are supported:</para>
+
+<informaltable>
+<tgroup cols="2">
+<thead>
+<row><entry>Content type</entry><entry>AH output format</entry></row>
+</thead>
+<tbody>
+<row><entry><literal>application/pdf</literal></entry><entry><literal>@PDF</literal></entry></row>
+<row><entry><literal>application/postscript</literal></entry><entry><literal>@PS</literal></entry></row>
+<row><entry><literal>application/vnd.inx</literal></entry><entry><literal>@INX</literal></entry></row>
+<row><entry><literal>application/vnd.mif</literal></entry><entry><literal>@MIF</literal></entry></row>
+<row><entry><literal>image/svg+xml</literal></entry><entry><literal>@SVG</literal></entry></row>
+<row><entry><literal>text/plain</literal></entry><entry><literal>@TEXT</literal></entry></row>
+</tbody>
+</tgroup>
+</informaltable>
+
+</refsection>
+
+<refsection>
+<title>Apache FOP</title>
+
+<para>You can configure the formatter with
+<link xlink:href="https://docs.xmlcalabash.com/userguide/configuration.html#cc.paged-media">a
+configuration property</link> or via the <option>parameters</option> option.
+The following configuration options are supported:</para>
+
+<informaltable>
+<tgroup cols="2">
+<thead>
+<row><entry>Property name</entry><entry>Type</entry></row>
+</thead>
+<tbody>
+<row><entry><literal>Accessibility</literal></entry><entry>boolean</entry></row>
+<row><entry><literal>Author</literal></entry><entry>string</entry></row>
+<row><entry><literal>Base14KerningEnabled</literal></entry><entry>boolean</entry></row>
+<row><entry><literal>BreakIndentInheritanceOnReferenceAreaBoundary</literal></entry><entry>boolean</entry></row>
+<row><entry><literal>ConserveMemoryPolicy</literal></entry><entry>boolean</entry></row>
+<row><entry><literal>CreationDate</literal></entry><entry>date</entry></row>
+<row><entry><literal>Creator</literal></entry><entry>string</entry></row>
+<row><entry><literal>Keywords</literal></entry><entry>string</entry></row>
+<row><entry><literal>LocatorEnabled</literal></entry><entry>boolean</entry></row>
+<row><entry><literal>PageHeight</literal></entry><entry>string</entry></row>
+<row><entry><literal>PageWidth</literal></entry><entry>string</entry></row>
+<row><entry><literal>Producer</literal></entry><entry>string</entry></row>
+<row><entry><literal>SourceResolution</literal></entry><entry>float</entry></row>
+<row><entry><literal>StrictFOValidation</literal></entry><entry>boolean</entry></row>
+<row><entry><literal>StrictUserConfigValidation</literal></entry><entry>boolean</entry></row>
+<row><entry><literal>StrictValidation</literal></entry><entry>boolean</entry></row>
+<row><entry><literal>Subject</literal></entry><entry>string</entry></row>
+<row><entry><literal>TargetResolution</literal></entry><entry>float</entry></row>
+<row><entry><literal>Title</literal></entry><entry>string</entry></row>
+<row><entry><literal>UseCache</literal></entry><entry>boolean</entry></row>
+<row><entry><literal>UserConfig</literal></entry><entry>string</entry></row>
+</tbody>
+</tgroup>
+</informaltable>
+
+<para>For more information about the properties, consult the FOP API documentation.</para>
+
+<para>The following <option>content-type</option>s are supported:
+<literal>application/pdf</literal>, <literal>application/postscript</literal>,
+<literal>application/x-afp</literal>, <literal>application/rtf</literal>,
+and <literal>text/plain</literal>.</para>
+
+</refsection>
+
+</refsection>
 </refentry>

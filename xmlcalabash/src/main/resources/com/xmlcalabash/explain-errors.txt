@@ -1321,8 +1321,14 @@ Unrecognized configuration property: “$1”.
 cxerr:XI0025
 Unrecognized configuration attribute “$2” on “$1”.
 
-cxerr:XI0026
+cxerr:XI0026/1
 Missing configuration attribute “$2” on “$1”.
+
+cxerr:XI0026/2
+Missing configuration attributes “$1”: $2.
+
+cxerr:XI0026/3
+Configuration attributes forbidden for generic processor: “$1”.
 
 cxerr:XI0027
 Unrecognized configuration value for “$2” on “$1”: “$3”.

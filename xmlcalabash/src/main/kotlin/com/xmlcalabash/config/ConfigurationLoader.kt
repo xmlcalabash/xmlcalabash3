@@ -3,7 +3,10 @@ package com.xmlcalabash.config
 import com.xmlcalabash.datamodel.MediaType
 import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.namespace.Ns
+import com.xmlcalabash.spi.PagedMediaManager
+import com.xmlcalabash.spi.PagedMediaServiceProvider
 import com.xmlcalabash.util.DefaultXmlCalabashConfiguration
+import com.xmlcalabash.util.NopPagedMediaProvider
 import com.xmlcalabash.util.S9Api
 import com.xmlcalabash.util.Verbosity
 import net.sf.saxon.lib.FeatureIndex
@@ -13,6 +16,7 @@ import org.apache.logging.log4j.kotlin.logger
 import org.xml.sax.InputSource
 import java.io.File
 import java.io.FileInputStream
+import java.net.URI
 import javax.xml.transform.sax.SAXSource
 
 class ConfigurationLoader private constructor(private val config: XmlCalabashConfiguration) {
@@ -28,6 +32,7 @@ class ConfigurationLoader private constructor(private val config: XmlCalabashCon
         private val ccSerialization = QName(ns, "cc:serialization")
         private val ccMimetype = QName(ns, "cc:mimetype")
         private val ccSendmail = QName(ns, "cc:send-mail")
+        private val ccPagedMedia = QName(ns, "cc:paged-media")
         private val _debug = QName("debug")
         private val _verbosity = QName("verbosity")
         private val _schemaAware = QName("schema-aware")
@@ -44,6 +49,8 @@ class ConfigurationLoader private constructor(private val config: XmlCalabashCon
         private val _username = QName("username")
         private val _password = QName("password")
         private val _mpt = QName("mpt")
+        private val _xslFormatter = QName("xsl-formatter")
+        private val _cssFormatter = QName("css-formatter")
 
         fun load(source: File): XmlCalabashConfiguration {
             return load(source, DefaultXmlCalabashConfiguration())
@@ -65,8 +72,8 @@ class ConfigurationLoader private constructor(private val config: XmlCalabashCon
         }
     }
 
-    lateinit private var configFile: String
-
+    private lateinit var configFile: String
+    private val uninitializedFormatters = mutableSetOf<URI>()
     private fun load(source: InputSource): XmlCalabashConfiguration {
         configFile = source.systemId ?: ""
 
@@ -81,7 +88,25 @@ class ConfigurationLoader private constructor(private val config: XmlCalabashCon
             throw XProcError.xiConfigurationInvalid(configFile).exception()
         }
 
-        return parse(root)
+        val managers = mutableListOf<PagedMediaManager>()
+        for (provider in PagedMediaServiceProvider.providers()) {
+            val manager = provider.create()
+            managers.add(manager)
+            uninitializedFormatters.addAll(manager.formatters())
+        }
+        config.pagedMediaManagers = managers
+
+        val config = parse(root)
+
+        for (manager in managers) {
+            for (formatter in manager.formatters()) {
+                if (formatter in uninitializedFormatters) {
+                    manager.configure(formatter, emptyMap())
+                }
+            }
+        }
+
+        return config
     }
 
     private fun parse(root: XdmNode): XmlCalabashConfiguration {
@@ -119,6 +144,7 @@ class ConfigurationLoader private constructor(private val config: XmlCalabashCon
                         ccSerialization -> parseSerialization(child)
                         ccMimetype -> parseMimetype(child)
                         ccSendmail -> parseSendmail(child)
+                        ccPagedMedia -> parsePagedMedia(child)
                         else -> throw XProcError.xiUnrecognizedConfigurationProperty(child.nodeName).exception()
                     }
                 }
@@ -264,6 +290,73 @@ class ConfigurationLoader private constructor(private val config: XmlCalabashCon
         }
 
         config.sendmail = sendmail
+    }
+
+    private fun parsePagedMedia(node: XdmNode) {
+        var cssFormatter: URI? = null
+        var xslFormatter: URI? = null
+        val properties = mutableMapOf<QName,String>()
+        for (attr in node.axisIterator(Axis.ATTRIBUTE)) {
+            when (attr.nodeName) {
+                _cssFormatter -> cssFormatter = pagedMediaProcessorUri("css-formatter", attr.stringValue)
+                _xslFormatter -> xslFormatter = pagedMediaProcessorUri("xsl-formatter", attr.stringValue)
+                else -> properties[attr.nodeName] = attr.stringValue
+            }
+        }
+
+        if (cssFormatter == null && xslFormatter == null) {
+            throw XProcError.xiMissingConfigurationAttributes(node.nodeName, "at least one of xsl-formatter or css-formatter is required").exception()
+        }
+
+        if (cssFormatter != null) {
+            val processors = mutableListOf<URI>()
+            processors.addAll(config.pagedMediaCssProcessors)
+            processors.add(cssFormatter)
+            config.pagedMediaCssProcessors = processors
+
+            if (cssFormatter == NopPagedMediaProvider.genericCssFormatter) {
+                if (properties.isNotEmpty()) {
+                    throw XProcError.xiForbiddenConfigurationAttributes(cssFormatter).exception()
+                }
+            } else {
+                uninitializedFormatters.remove(cssFormatter)
+                for (manager in config.pagedMediaManagers) {
+                    if (manager.formatterSupported(cssFormatter)) {
+                        manager.configure(cssFormatter, properties)
+                    }
+                }
+            }
+        }
+
+        if (xslFormatter != null) {
+            val processors = mutableListOf<URI>()
+            processors.addAll(config.pagedMediaXslProcessors)
+            processors.add(xslFormatter)
+            config.pagedMediaXslProcessors = processors
+
+            if (xslFormatter == NopPagedMediaProvider.genericXslFormatter) {
+                if (properties.isNotEmpty()) {
+                    throw XProcError.xiForbiddenConfigurationAttributes(xslFormatter).exception()
+                }
+            } else {
+                uninitializedFormatters.remove(xslFormatter)
+                for (manager in config.pagedMediaManagers) {
+                    if (manager.formatterSupported(xslFormatter)) {
+                        manager.configure(xslFormatter, properties)
+                    }
+                }
+            }
+        }
+    }
+
+    private fun pagedMediaProcessorUri(type: String, value: String?): URI? {
+        if (value == null) {
+            return null
+        }
+        if (value.contains("/")) {
+            return URI.create(value)
+        }
+        return URI.create("https://xmlcalabash.com/paged-media/${type}/${value}")
     }
 
     private fun checkAttributes(node: XdmNode, attributes: List<QName>, optionalAttributes: List<QName> = listOf()) {

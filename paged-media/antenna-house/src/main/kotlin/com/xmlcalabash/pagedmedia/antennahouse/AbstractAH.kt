@@ -1,6 +1,7 @@
 package com.xmlcalabash.pagedmedia.antennahouse
 
 import com.xmlcalabash.datamodel.MediaType
+import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.runtime.XProcStepConfiguration
 import jp.co.antenna.XfoJavaCtl.MessageListener
 import jp.co.antenna.XfoJavaCtl.XfoFormatPageListener
@@ -11,8 +12,7 @@ import org.apache.logging.log4j.kotlin.logger
 
 abstract class AbstractAH() {
     companion object {
-        @JvmStatic
-        protected val formatMap = mapOf(
+        val formatMap = mapOf(
             MediaType.PDF to "@PDF",
             MediaType.parse("application/postscript") to "@PS",
             MediaType.parse("application/vnd.inx") to "@INX",
@@ -21,89 +21,93 @@ abstract class AbstractAH() {
             MediaType.TEXT to "@TEXT"
         )
 
-        @JvmStatic
-        protected val _OptionFileURI = QName("OptionFileURI")
-        @JvmStatic
-        protected val _ExitLevel = QName("ExitLevel")
-        @JvmStatic
-        protected val _EmbedAllFontsEx = QName("EmbedAllFontsEx")
-        @JvmStatic
-        protected val _ImageCompression = QName("ImageCompression")
-        @JvmStatic
-        protected val _NoAccessibility = QName("NoAccessibility")
-        @JvmStatic
-        protected val _NoAddingOrChangingComments = QName("NoAddingOrChangingComments")
-        @JvmStatic
-        protected val _NoAssembleDoc = QName("NoAssembleDoc")
-        @JvmStatic
-        protected val _NoChanging = QName("NoChanging")
-        @JvmStatic
-        protected val _NoContentCopying = QName("NoContentCopying")
-        @JvmStatic
-        protected val _NoFillForm = QName("NoFillForm")
-        @JvmStatic
-        protected val _NoPrinting = QName("NoPrinting")
-        @JvmStatic
-        protected val _OwnersPassword = QName("OwnersPassword")
-        @JvmStatic
-        protected val _TwoPassFormatting = QName("TwoPassFormatting")
+        val _OptionFileURI = QName("OptionFileURI")
+        val _ExitLevel = QName("ExitLevel")
+        val _EmbedAllFontsEx = QName("EmbedAllFontsEx")
+        val _ImageCompression = QName("ImageCompression")
+        val _NoAccessibility = QName("NoAccessibility")
+        val _NoAddingOrChangingComments = QName("NoAddingOrChangingComments")
+        val _NoAssembleDoc = QName("NoAssembleDoc")
+        val _NoChanging = QName("NoChanging")
+        val _NoContentCopying = QName("NoContentCopying")
+        val _NoFillForm = QName("NoFillForm")
+        val _NoPrinting = QName("NoPrinting")
+        val _OwnersPassword = QName("OwnersPassword")
+        val _TwoPassFormatting = QName("TwoPassFormatting")
+
+        val stringOptions = listOf(_OptionFileURI, _OwnersPassword)
+        val intOptions = listOf(_ExitLevel, _ImageCompression)
+        val booleanOptions = listOf(_NoAccessibility, _NoAddingOrChangingComments, _NoAssembleDoc,
+            _NoChanging, _NoContentCopying, _NoFillForm, _NoPrinting, _TwoPassFormatting)
     }
 
     protected lateinit var stepConfig: XProcStepConfiguration
     protected lateinit var options: Map<QName, XdmValue>
     protected lateinit var ah: XfoObj
 
-    protected fun ahInitialize() {
-        ah.setMessageListener(FoMessages())
+    protected fun ahInitialize(defaultStringOptions: Map<QName, String>,
+                               defaultIntOptions: Map<QName, Int>,
+                               defaultBooleanOptions: Map<QName, Boolean>,
+                               defaultEmbedAllFonts: String?) {
+        ah.setMessageListener(AhMessages())
 
-        if (options.containsKey(_EmbedAllFontsEx)) {
-            val embed = options[_EmbedAllFontsEx]!!.underlyingValue.stringValue
+        for (key in options.keys) {
+            if (key != _EmbedAllFontsEx && key !in stringOptions && key !in intOptions && key !in booleanOptions) {
+                logger.warn("Unsupported Antenna House XSL FO property: ${key}")
+            }
+        }
+
+        val embed = options[_EmbedAllFontsEx] ?: defaultEmbedAllFonts
+        if (embed != null) {
             when (embed) {
                 "part" -> ah.setPdfEmbedAllFontsEx(XfoObj.S_PDF_EMBALLFONT_PART)
                 "base14" -> ah.setPdfEmbedAllFontsEx(XfoObj.S_PDF_EMBALLFONT_BASE14)
                 "all" -> ah.setPdfEmbedAllFontsEx(XfoObj.S_PDF_EMBALLFONT_ALL)
-                else -> logger.error("Ignoring unknown EmbedAllFontsEx option: ${embed}")
+                else -> logger.warn("Ignoring unknown Antennah House CSS EmbedAllFontsEx option: ${embed}")
             }
         }
 
-        stringOption(_OptionFileURI) { ah.setOptionFileURI(it) }
-        stringOption(_OwnersPassword) { ah.setPdfOwnerPassword(it) }
+        for (key in stringOptions) {
+            val value = options[key]?.underlyingValue?.stringValue ?: defaultStringOptions[key]
+            if (value != null) {
+                when (key) {
+                    _OptionFileURI -> ah.setOptionFileURI(value)
+                    _OwnersPassword -> ah.setPdfOwnerPassword(value)
+                    else -> throw XProcError.xiImpossible("Unexpected string option: ${key}").exception()
+                }
+            }
+        }
 
-        intOption(_ExitLevel) { ah.setExitLevel(it) }
-        intOption(_ImageCompression) { ah.setPdfImageCompression(it) }
+        for (key in intOptions) {
+            val value = options[key]?.underlyingValue?.stringValue?.toInt() ?: defaultIntOptions[key]
+            if (value != null) {
+                when (key) {
+                    _ExitLevel -> ah.setExitLevel(value)
+                    _ImageCompression -> ah.setPdfImageCompression(value)
+                    else -> throw XProcError.xiImpossible("Unexpected integer option: ${key}").exception()
+                }
+            }
+        }
 
-        booleanOption(_NoAccessibility) { ah.setPdfNoAccessibility(it) }
-        booleanOption(_NoAddingOrChangingComments) { ah.setPdfNoAddingOrChangingComments(it) }
-        booleanOption(_NoAssembleDoc) { ah.setPdfNoAssembleDoc(it) }
-        booleanOption(_NoChanging) { ah.setPdfNoChanging(it) }
-        booleanOption(_NoContentCopying) { ah.setPdfNoContentCopying(it) }
-        booleanOption(_NoFillForm) { ah.setPdfNoFillForm(it) }
-        booleanOption(_NoPrinting) { ah.setPdfNoPrinting(it) }
-        booleanOption(_TwoPassFormatting) { ah.setTwoPassFormatting(it) }
-    }
-
-    fun stringOption(name: QName, setter: (String) -> Unit) {
-        if (options.containsKey(name)) {
-            val value = options[name]!!.underlyingValue.stringValue
-            setter(value)
+        for (key in booleanOptions) {
+            val value = options[key]?.underlyingValue?.effectiveBooleanValue() ?: defaultBooleanOptions[key]
+            if (value != null) {
+                when (key) {
+                    _NoAccessibility -> ah.setPdfNoAccessibility(value)
+                    _NoAddingOrChangingComments -> ah.setPdfNoAddingOrChangingComments(value)
+                    _NoAssembleDoc -> ah.setPdfNoAssembleDoc(value)
+                    _NoChanging -> ah.setPdfNoChanging(value)
+                    _NoContentCopying -> ah.setPdfNoContentCopying(value)
+                    _NoFillForm -> ah.setPdfNoFillForm(value)
+                    _NoPrinting -> ah.setPdfNoPrinting(value)
+                    _TwoPassFormatting -> ah.setTwoPassFormatting(value)
+                    else -> throw XProcError.xiImpossible("Unexpected boolean option: ${key}").exception()
+                }
+            }
         }
     }
 
-    protected fun booleanOption(name: QName, setter: (Boolean) -> Unit) {
-        if (options.containsKey(name)) {
-            val value = options[name]!!.underlyingValue.effectiveBooleanValue()
-            setter(value)
-        }
-    }
-
-    protected fun intOption(name: QName, setter: (Int) -> Unit) {
-        if (options.containsKey(name)) {
-            val value = options[name]!!.underlyingValue.stringValue.toInt()
-            setter(value)
-        }
-    }
-
-    inner class FoMessages(): MessageListener, XfoFormatPageListener {
+    inner class AhMessages(): MessageListener, XfoFormatPageListener {
         override fun onMessage(errorLevel: Int, errorCode: Int, errorMessage: String?) {
             if (errorMessage == null) {
                 return

@@ -4,17 +4,30 @@ import com.xmlcalabash.api.CssProcessor
 import com.xmlcalabash.api.FoProcessor
 import com.xmlcalabash.spi.PagedMediaManager
 import com.xmlcalabash.spi.PagedMediaProvider
+import net.sf.saxon.s9api.QName
 import java.net.URI
 
 class FopManager: PagedMediaProvider, PagedMediaManager {
     companion object {
         private val genericXslFormatter = URI("https://xmlcalabash.com/paged-media/xsl-formatter")
-        private val fopXslFormatter = URI("https://xmlcalabash.com/paged-media/xsl-formatter/fop")
+        val fopXslFormatter = URI("https://xmlcalabash.com/paged-media/xsl-formatter/fop")
         private val pagedMediaProcessors = setOf(genericXslFormatter, fopXslFormatter)
+    }
+
+    override fun formatters(): List<URI> {
+        return listOf(fopXslFormatter)
     }
 
     override fun create(): PagedMediaManager {
         return this
+    }
+
+    override fun formatterSupported(formatter: URI): Boolean {
+        return pagedMediaProcessors.contains(formatter)
+    }
+
+    override fun configure(formatter: URI, properties: Map<QName, String>) {
+        FoFop.configure(formatter, properties)
     }
 
     override fun formatterAvailable(formatter: URI): Boolean {

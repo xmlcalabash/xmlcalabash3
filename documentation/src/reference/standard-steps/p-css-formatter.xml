@@ -1,10 +1,14 @@
-<?xml version="1.0" encoding="utf-8"?><refentry xmlns="http://docbook.org/ns/docbook" xmlns:p="http://www.w3.org/ns/xproc" xml:id="p-css-formatter">
+<?xml version="1.0" encoding="utf-8"?>
+<refentry xmlns="http://docbook.org/ns/docbook"
+          xmlns:p="http://www.w3.org/ns/xproc"
+          xmlns:xlink="http://www.w3.org/1999/xlink"
+          xml:id="p-css-formatter">
 <?db filename="p-css-formatter"?>
-   <refnamediv>
-      <refname>p:css-formatter</refname>
-      <refpurpose>The standard p:css-formatter step</refpurpose>
-   </refnamediv>
-   <refsynopsisdiv>
+<refnamediv>
+   <refname>p:css-formatter</refname>
+   <refpurpose>The standard p:css-formatter step</refpurpose>
+</refnamediv>
+<refsynopsisdiv>
 
 <refsection role="introduction">
 <title>Introduction</title>
@@ -51,8 +55,180 @@ are defined by the CSS implementation used and are
 </refsection>
 </refsynopsisdiv>
 
-   <refsection>
-      <title>Description</title>
-      <para>TBD.</para>
-   </refsection>
+<refsection>
+<title>Description</title>
+<para>XML Calabash supports several CSS formatter implementations. There is also
+a service provider interface so that additional implementations can be provided by
+third parties. Several <link linkend="p-xsl-formatter">XSL formatters</link> are
+also supported.</para>
+
+<refsection>
+<title>Antenna House</title>
+
+<para>In order to use the Antenna House formatter, you must install and configure
+<link xlink:href="https://www.antennahouse.com/formatter-v7">Antenna House Formatter</link>.</para>
+
+<para>You can configure the formatter with
+<link xlink:href="https://docs.xmlcalabash.com/userguide/configuration.html#cc.paged-media">a
+configuration property</link> or via the <option>parameters</option> option.
+The following configuration options are supported:</para>
+
+<informaltable>
+<tgroup cols="2">
+<thead>
+<row><entry>Property name</entry><entry>Type</entry></row>
+</thead>
+<tbody>
+<row><entry><literal>EmbedAllFontsEx</literal></entry><entry>string: “part”, “base14”, or “all”</entry></row>
+<row><entry><literal>ExitLevel</literal></entry><entry>integer</entry></row>
+<row><entry><literal>ImageCompression</literal></entry><entry>integer</entry></row>
+<row><entry><literal>NoAccessibility</literal></entry><entry>boolean</entry></row>
+<row><entry><literal>NoAddingOrChangingComments</literal></entry><entry>boolean</entry></row>
+<row><entry><literal>NoAssembleDoc</literal></entry><entry>boolean</entry></row>
+<row><entry><literal>NoChanging</literal></entry><entry>boolean</entry></row>
+<row><entry><literal>NoContentCopying</literal></entry><entry>boolean</entry></row>
+<row><entry><literal>NoFillForm</literal></entry><entry>boolean</entry></row>
+<row><entry><literal>NoPrinting</literal></entry><entry>boolean</entry></row>
+<row><entry><literal>OptionFileURI</literal></entry><entry>string</entry></row>
+<row><entry><literal>OwnersPassword</literal></entry><entry>string</entry></row>
+<row><entry><literal>TwoPassFormatting</literal></entry><entry>boolean</entry></row>
+</tbody>
+</tgroup>
+</informaltable>
+
+<para>For more information about these properties, consult the AH Formatter API documentation.</para>
+
+<para>The following <option>content-type</option>s are supported:</para>
+
+<informaltable>
+<tgroup cols="2">
+<thead>
+<row><entry>Content type</entry><entry>AH output format</entry></row>
+</thead>
+<tbody>
+<row><entry><literal>application/pdf</literal></entry><entry><literal>@PDF</literal></entry></row>
+<row><entry><literal>application/postscript</literal></entry><entry><literal>@PS</literal></entry></row>
+<row><entry><literal>application/vnd.inx</literal></entry><entry><literal>@INX</literal></entry></row>
+<row><entry><literal>application/vnd.mif</literal></entry><entry><literal>@MIF</literal></entry></row>
+<row><entry><literal>image/svg+xml</literal></entry><entry><literal>@SVG</literal></entry></row>
+<row><entry><literal>text/plain</literal></entry><entry><literal>@TEXT</literal></entry></row>
+</tbody>
+</tgroup>
+</informaltable>
+
+</refsection>
+
+<refsection>
+<title>PrinceXML</title>
+
+<para>In order to use the PrinceXML formatter, you must install and configure
+<link xlink:href="https://www.princexml.com/">Prince</link>.</para>
+
+<para>You can configure the formatter with
+<link xlink:href="https://docs.xmlcalabash.com/userguide/configuration.html#cc.paged-media">a
+configuration property</link> or via the <option>parameters</option> option.
+The following configuration options are supported:</para>
+
+<informaltable>
+<tgroup cols="2">
+<thead>
+<row><entry>Property name</entry><entry>Type</entry></row>
+</thead>
+<tbody>
+<row><entry><literal>exePath</literal></entry><entry>string</entry></row>
+<row><entry><literal>baseURL</literal></entry><entry>string</entry></row>
+<row><entry><literal>compress</literal></entry><entry>boolean</entry></row>
+<row><entry><literal>debug</literal></entry><entry>boolean</entry></row>
+<row><entry><literal>embedFonts</literal></entry><entry>boolean</entry></row>
+<row><entry><literal>encrypt</literal></entry><entry>boolean</entry></row>
+<row><entry><literal>keyBits</literal></entry><entry>string</entry></row>
+<row><entry><literal>userPassword</literal></entry><entry>string</entry></row>
+<row><entry><literal>ownerPassword</literal></entry><entry>string</entry></row>
+<row><entry><literal>disallowPrint</literal></entry><entry>boolean</entry></row>
+<row><entry><literal>disallowModify</literal></entry><entry>boolean</entry></row>
+<row><entry><literal>disallowCopy</literal></entry><entry>boolean</entry></row>
+<row><entry><literal>disallowAnnotate</literal></entry><entry>boolean</entry></row>
+<row><entry><literal>fileRoot</literal></entry><entry>string</entry></row>
+<row><entry><literal>html</literal></entry><entry>boolean</entry></row>
+<row><entry><literal>httpPassword</literal></entry><entry>string</entry></row>
+<row><entry><literal>httpUsername</literal></entry><entry>string</entry></row>
+<row><entry><literal>httpProxy</literal></entry><entry>string</entry></row>
+<row><entry><literal>inputType</literal></entry><entry>string</entry></row>
+<row><entry><literal>javascript</literal></entry><entry>boolean</entry></row>
+<row><entry><literal>log</literal></entry><entry>string</entry></row>
+<row><entry><literal>network</literal></entry><entry>boolean</entry></row>
+<row><entry><literal>subsetFonts</literal></entry><entry>boolean</entry></row>
+<row><entry><literal>verbose</literal></entry><entry>boolean</entry></row>
+<row><entry><literal>xinclude</literal></entry><entry>boolean</entry></row>
+<row><entry><literal>scripts</literal></entry><entry>string</entry></row>
+</tbody>
+</tgroup>
+</informaltable>
+
+<para>The <literal>exePath</literal> property is used to locate the <literal>prince</literal>
+executable. If it’s not specified, XML Calabash will search the user’s
+<envar>PATH</envar> environment variable.</para>
+
+<para>The <literal>keyBits</literal>, <literal>userPassword</literal>,
+<literal>ownerPassword</literal>, <literal>disallowPrint</literal>, <literal>disallowModify</literal>,
+<literal>disallowCopy</literal>, and <literal>disallowAnnotate</literal> values are combined
+to form the encryption information.</para>
+
+<para>The <literal>scripts</literal> property is a space delimited list of scripts.
+Each script will be added to the processor.</para>
+
+<para>For more information about the properties, consult the Prince API documentation.</para>
+
+</refsection>
+
+<refsection>
+<title>Weasyprint</title>
+
+<para>In order to use the Weasyprint formatter, you must install and configure
+<link xlink:href="https://weasyprint.org/">WeasyPrint</link>.</para>
+
+<para>You can configure the formatter with
+<link xlink:href="https://docs.xmlcalabash.com/userguide/configuration.html#cc.paged-media">a
+configuration property</link> or via the <option>parameters</option> option.
+The following configuration options are supported:</para>
+
+<informaltable>
+<tgroup cols="2">
+<thead>
+<row><entry>Property name</entry><entry>Type</entry></row>
+</thead>
+<tbody>
+<row><entry><literal>exePath</literal></entry><entry>string</entry></row>
+<row><entry><literal>mediaType</literal></entry><entry>string</entry></row>
+<row><entry><literal>baseUrl</literal></entry><entry>string</entry></row>
+<row><entry><literal>attachment</literal></entry><entry>string</entry></row>
+<row><entry><literal>pdfIdentifier</literal></entry><entry>string</entry></row>
+<row><entry><literal>pdfVariant</literal></entry><entry>string</entry></row>
+<row><entry><literal>pdfVersion</literal></entry><entry>string</entry></row>
+<row><entry><literal>pdfForms</literal></entry><entry>boolean</entry></row>
+<row><entry><literal>uncompressedPdf</literal></entry><entry>boolean</entry></row>
+<row><entry><literal>customMetadata</literal></entry><entry>boolean</entry></row>
+<row><entry><literal>presentationalHints</literal></entry><entry>boolean</entry></row>
+<row><entry><literal>optimizeImages</literal></entry><entry>boolean</entry></row>
+<row><entry><literal>jpegQuality</literal></entry><entry>string</entry></row>
+<row><entry><literal>fullFonts</literal></entry><entry>boolean</entry></row>
+<row><entry><literal>hinting</literal></entry><entry>boolean</entry></row>
+<row><entry><literal>cacheFolder</literal></entry><entry>string</entry></row>
+<row><entry><literal>dpi</literal></entry><entry>string</entry></row>
+<row><entry><literal>verbose</literal></entry><entry>boolean</entry></row>
+<row><entry><literal>debug</literal></entry><entry>boolean</entry></row>
+<row><entry><literal>quiet</literal></entry><entry>boolean</entry></row>
+<row><entry><literal>timeout</literal></entry><entry>string</entry></row>
+</tbody>
+</tgroup>
+</informaltable>
+
+<para>The <literal>exePath</literal> property is used to locate the <literal>prince</literal>
+executable. If it’s not specified, XML Calabash will search the user’s
+<envar>PATH</envar> environment variable.</para>
+
+<para>For more information about the properties, consult the WeasyPrint documentation.</para>
+
+</refsection>
+</refsection>
 </refentry>
