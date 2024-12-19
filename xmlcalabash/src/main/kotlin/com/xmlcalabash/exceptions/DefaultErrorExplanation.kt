@@ -140,27 +140,17 @@ class DefaultErrorExplanation(): ErrorExplanation {
                     explanation = ""
                 }
             } else {
-                var qcode: QName? = null
-                var match = Regex("^\\s*namespace\\s+(\\S+)\\s*=\\s*(.*)\\s*").find(line)
-                if (match != null) {
-                    val (prefix, uri) = match.destructured
-                    namespaces[prefix] = uri
-                } else {
-                    match = Regex("^([^{]\\S*):(\\S+)\\s*/\\s*(\\d+)\\s*$").find(line)
+                if (code == "") {
+                    var qcode: QName? = null
+                    var match = Regex("^\\s*namespace\\s+(\\S+)\\s*=\\s*(.*)\\s*").find(line)
                     if (match != null) {
-                        val (prefix, localName, vcode) = match.destructured
-                        variant = vcode.toInt()
-                        if (namespaces.containsKey(prefix)) {
-                            qcode = QName(prefix, namespaces[prefix], localName)
-                        } else {
-                            // TODO: log error
-                            qcode = QName("", namespaces[""], localName)
-                        }
+                        val (prefix, uri) = match.destructured
+                        namespaces[prefix] = uri
                     } else {
-                        match = Regex("^([^{]\\S*):(\\S+)\\s*$").find(line)
+                        match = Regex("^([^{]\\S*):(\\S+)\\s*/\\s*(\\d+)\\s*$").find(line)
                         if (match != null) {
-                            val (prefix, localName) = match.destructured
-                            variant = 1
+                            val (prefix, localName, vcode) = match.destructured
+                            variant = vcode.toInt()
                             if (namespaces.containsKey(prefix)) {
                                 qcode = QName(prefix, namespaces[prefix], localName)
                             } else {
@@ -168,28 +158,40 @@ class DefaultErrorExplanation(): ErrorExplanation {
                                 qcode = QName("", namespaces[""], localName)
                             }
                         } else {
-                            match = Regex("^([^:\\s]+)\\s*/\\s*(\\d+)\\s*$").find(line)
+                            match = Regex("^([^{]\\S*):(\\S+)\\s*$").find(line)
                             if (match != null) {
-                                val (bcode, vcode) = match.destructured
-                                variant = vcode.toInt()
-                                qcode = QName(NsErr.namespace, bcode)
-                            } else {
-                                match = Regex("^([^:\\s]+)\\s*$").find(line)
-                                if (match != null) {
-                                    variant = 1
-                                    qcode = QName(NsErr.namespace, line)
+                                val (prefix, localName) = match.destructured
+                                variant = 1
+                                if (namespaces.containsKey(prefix)) {
+                                    qcode = QName(prefix, namespaces[prefix], localName)
                                 } else {
-                                    match = Regex("^\\{(.*)}\\s*(\\S+)\\s*/\\s*(\\d+)\\s*$").find(line)
+                                    // TODO: log error
+                                    qcode = QName("", namespaces[""], localName)
+                                }
+                            } else {
+                                match = Regex("^([^:\\s]+)\\s*/\\s*(\\d+)\\s*$").find(line)
+                                if (match != null) {
+                                    val (bcode, vcode) = match.destructured
+                                    variant = vcode.toInt()
+                                    qcode = QName(NsErr.namespace, bcode)
+                                } else {
+                                    match = Regex("^([^:\\s]+)\\s*$").find(line)
                                     if (match != null) {
-                                        val (uri, localName, vcode) = match.destructured
-                                        variant = vcode.toInt()
-                                        qcode = QName(uri, localName)
+                                        variant = 1
+                                        qcode = QName(NsErr.namespace, line)
                                     } else {
-                                        match = Regex("^\\{(.*)}\\s*(\\S+)\\s*$").find(line)
+                                        match = Regex("^\\{(.*)}\\s*(\\S+)\\s*/\\s*(\\d+)\\s*$").find(line)
                                         if (match != null) {
-                                            val (uri, localName) = match.destructured
-                                            variant = 1
+                                            val (uri, localName, vcode) = match.destructured
+                                            variant = vcode.toInt()
                                             qcode = QName(uri, localName)
+                                        } else {
+                                            match = Regex("^\\{(.*)}\\s*(\\S+)\\s*$").find(line)
+                                            if (match != null) {
+                                                val (uri, localName) = match.destructured
+                                                variant = 1
+                                                qcode = QName(uri, localName)
+                                            }
                                         }
                                     }
                                 }
@@ -200,11 +202,13 @@ class DefaultErrorExplanation(): ErrorExplanation {
                     if (qcode != null) {
                         code = qcode.clarkName
                     } else {
-                        if (message == "") {
-                            message = line
-                        } else {
-                            explanation += line + "\n"
-                        }
+                        code = "????"
+                    }
+                } else {
+                    if (message == "") {
+                        message = line
+                    } else {
+                        explanation += line + "\n"
                     }
                 }
             }
