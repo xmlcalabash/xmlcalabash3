@@ -19,7 +19,7 @@ import kotlin.collections.component2
 import kotlin.collections.iterator
 
 class CompoundStepHead(config: XProcStepConfiguration, step: HeadModel): AbstractStep(config, step) {
-    override val params = RuntimeStepParameters(NsCx.foot, "!head",
+    override val params = RuntimeStepParameters(NsCx.head, "!head",
         step.location, step.inputs, step.outputs, step.options)
     val defaultInputs = step.defaultInputs
     val openPorts = mutableSetOf<String>()

@@ -145,11 +145,11 @@ open class PortBindingContainer(parent: XProcInstruction, stepConfig: Instructio
                 }
                 sawEmpty = true
             } else {
-                newChildren.add(child as ConnectionInstruction)
                 if (sawEmpty) {
                     throw XProcError.xsEmptyNotAllowed().exception()
                 }
             }
+            newChildren.add(child as ConnectionInstruction)
         }
 
         _children.clear()

@@ -49,6 +49,33 @@ class Graph private constructor(val environment: PipelineEnvironment) {
         addSplitters()
         addJoiners()
         patchEdges()
+
+        // Discard empty nodes; weld the ports shut...
+        val discardNodes = mutableListOf<Model>()
+        val discardEdges = mutableListOf<Edge>()
+        for (edge in edges.filter { it.from.step.instructionType == NsCx.empty }) {
+            val to = edge.to.inputs[edge.inputPort]!!
+            to.weldedShut = true
+            // Run is ... special
+            if (to.parent is CompoundModel) {
+                if (to.parent.step.instructionType == NsP.run) {
+                    // I'm dubious about this, but run is ... special
+                    to.parent.head.outputs[edge.inputPort]!!.weldedShut = true
+
+                } else {
+                    to.parent.head.inputs[edge.inputPort]!!.weldedShut = true
+                }
+            }
+            discardNodes.add(edge.from)
+            discardEdges.add(edge)
+        }
+        for (node in discardNodes) {
+            models.remove(node)
+        }
+        for (edge in discardEdges) {
+            edges.remove(edge)
+        }
+
         node.decompose()
         makeConnections()
 
@@ -65,7 +92,9 @@ class Graph private constructor(val environment: PipelineEnvironment) {
                 }
                 else -> AtomicModel(this, node, child as AtomicStepInstruction)
             }
-            node._children.add(cnode)
+            if (cnode.step.instructionType != NsCx.empty) {
+                node._children.add(cnode)
+            }
             instructionMap[child] = cnode
 
             if (cnode is CompoundModel) {
