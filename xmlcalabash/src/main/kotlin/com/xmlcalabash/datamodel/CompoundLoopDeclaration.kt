@@ -5,10 +5,13 @@ import net.sf.saxon.s9api.QName
 
 abstract class CompoundLoopDeclaration(parent: XProcInstruction, instructionType: QName): CompoundStepDeclaration(parent, parent.stepConfig.copy(), instructionType) {
     override fun findDefaultReadablePort(drp: PortBindingContainer?) {
-        // Make this one "by hand" because p:for-each can't have one input instructions
-        // It's a sequence because it might have zero inputs
-        val current = InputInstruction(this, "current", true, true)
-        _children.add(1, current)
+        if (children.filterIsInstance<InputInstruction>().isEmpty()) {
+            // Make this one "by hand" because p:for-each can't have one input instructions.
+            // But don't make it twice.
+            // It's a sequence because it might have zero inputs
+            val current = InputInstruction(this, "current", true, true)
+            _children.add(1, current)
+        }
 
         super.findDefaultReadablePort(drp)
     }

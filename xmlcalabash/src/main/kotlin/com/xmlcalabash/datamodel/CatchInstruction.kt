@@ -42,7 +42,11 @@ class CatchInstruction(parent: XProcInstruction): CompoundStepDeclaration(parent
 
         if (!found) {
             val error = InputInstruction(this, "error", true, true)
-            _children.add(1, error)
+            if (_children.isEmpty()) {
+                _children.add(error)
+            } else {
+                _children.add(1, error)
+            }
         }
 
         super.findDefaultReadablePort(drp)
