@@ -1373,7 +1373,7 @@ cxerr:XI0040/1
 Initializer failed: $1
 
 cxerr:XI0200
-Invalid command line option: $1=$2.
+Invalid option value “$2” for $1.
 
 cxerr:XI0202
 Value required for “$1”.

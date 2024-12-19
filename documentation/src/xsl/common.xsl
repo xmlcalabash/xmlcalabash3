@@ -112,16 +112,22 @@
   <xsl:variable name="dep" select="normalize-space(.)"/>
 
   <xsl:choose>
-    <xsl:when test="$dep = 'schxslt'">{$dep_schxslt}</xsl:when>
-    <xsl:when test="$dep = 'htmlparser'">{$dep_htmlparser}</xsl:when>
+    <xsl:when test="$dep = 'brotliDec'">{$dep_brotliDec}</xsl:when>
     <xsl:when test="$dep = 'commonsCodec'">{$dep_commonsCodec}</xsl:when>
     <xsl:when test="$dep = 'commonsCompress'">{$dep_commonsCompress}</xsl:when>
-    <xsl:when test="$dep = 'brotliDec'">{$dep_brotliDec}</xsl:when>
-    <xsl:when test="$dep = 'tukaaniXz'">{$dep_tukaaniXz}</xsl:when>
     <xsl:when test="$dep = 'flexmarkAll'">{$dep_flexmarkAll}</xsl:when>
-    <xsl:when test="$dep = 'uuidCreator'">{$dep_uuidCreator}</xsl:when>
-    <xsl:when test="$dep = 'jsonSchemaValidator'">{$dep_jsonSchemaValidator}</xsl:when>
     <xsl:when test="$dep = 'graalvmJS'">{$dep_graalvmJS}</xsl:when>
+    <xsl:when test="$dep = 'htmlparser'">{$dep_htmlparser}</xsl:when>
+    <xsl:when test="$dep = 'httpClient'">${dep_httpClient}</xsl:when>
+    <xsl:when test="$dep = 'jing'">${dep_jing}</xsl:when>
+    <xsl:when test="$dep = 'jsonSchemaValidator'">{$dep_jsonSchemaValidator}</xsl:when>
+    <xsl:when test="$dep = 'schxslt'">{$dep_schxslt}</xsl:when>
+    <xsl:when test="$dep = 'sinclude'">${dep_sinclude}</xsl:when>
+    <xsl:when test="$dep = 'slf4j'">${dep_slf4j}</xsl:when>
+    <xsl:when test="$dep = 'tukaaniXz'">{$dep_tukaaniXz}</xsl:when>
+    <xsl:when test="$dep = 'uuidCreator'">{$dep_uuidCreator}</xsl:when>
+    <xsl:when test="$dep = 'xercesImpl'">${dep_xercesImpl}</xsl:when>
+    <xsl:when test="$dep = 'xmlResolver'">${dep_xmlResolver}</xsl:when>
     <xsl:otherwise>
       <xsl:message select="'Unrecognized dependency: ' || $dep"/>
       <xsl:sequence select="'UNRECOGNIZED'"/>

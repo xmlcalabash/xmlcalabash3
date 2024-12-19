@@ -29,6 +29,8 @@ val metadataextractorRelease by configurations.dependencyScope("metadataextracto
 val cacheRelease by configurations.dependencyScope("cacheRelease")
 //val polyglotRelease by configurations.dependencyScope("polyglotRelease")
 
+val dep_slf4j = project.findProperty("slf4j").toString()
+
 dependencies {
   xmlcalabashRelease(project(mapOf("path" to ":xmlcalabash",
                                    "configuration" to "releaseArtifacts")))
@@ -64,6 +66,8 @@ dependencies {
   implementation(project(":ext:metadata-extractor"))
   implementation(project(":ext:cache"))
 //  implementation(project(":ext:polyglot"))
+
+  implementation("org.slf4j:slf4j-api:${dep_slf4j}")
 }
 
 val xmlcalabashJar = configurations.resolvable("xmlcalabashJar") {

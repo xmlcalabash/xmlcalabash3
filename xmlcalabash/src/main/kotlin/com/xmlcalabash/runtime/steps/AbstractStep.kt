@@ -30,7 +30,6 @@ abstract class AbstractStep(val stepConfig: XProcStepConfiguration, step: StepMo
     val outputCount = mutableMapOf<String, Int>()
     val staticOptions = step.staticOptions.toMutableMap()
     val verbosity = stepConfig.saxonConfig.xmlCalabash.xmlCalabashConfig.verbosity
-    val debug = stepConfig.saxonConfig.xmlCalabash.xmlCalabashConfig.debug
 
     abstract val params: RuntimeStepParameters
     abstract val readyToRun: Boolean
@@ -106,9 +105,7 @@ abstract class AbstractStep(val stepConfig: XProcStepConfiguration, step: StepMo
 
     open fun runStep() {
         logger.debug { "Running ${this}" }
-        if (debug || verbosity < Verbosity.NORMAL) {
-            println("Running ${this}")
-        }
+        stepConfig.environment.messageReporter.progress { "Running ${this}" }
 
         try {
             run()

@@ -28,16 +28,22 @@
 
 <!-- ============================================================ -->
 
-<xsl:param name="dep_schxslt" select="'UNCONFIGURED'"/>
-<xsl:param name="dep_htmlparser" select="'UNCONFIGURED'"/>
+<xsl:param name="dep_brotliDec" select="'UNCONFIGURED'"/>
 <xsl:param name="dep_commonsCodec" select="'UNCONFIGURED'"/>
 <xsl:param name="dep_commonsCompress" select="'UNCONFIGURED'"/>
-<xsl:param name="dep_brotliDec" select="'UNCONFIGURED'"/>
-<xsl:param name="dep_tukaaniXz" select="'UNCONFIGURED'"/>
 <xsl:param name="dep_flexmarkAll" select="'UNCONFIGURED'"/>
-<xsl:param name="dep_uuidCreator" select="'UNCONFIGURED'"/>
-<xsl:param name="dep_jsonSchemaValidator" select="'UNCONFIGURED'"/>
 <xsl:param name="dep_graalvmJS" select="'UNCONFIGURED'"/>
+<xsl:param name="dep_htmlparser" select="'UNCONFIGURED'"/>
+<xsl:param name="dep_httpClient" select="'UNCONFIGURED'"/>
+<xsl:param name="dep_jing" select="'UNCONFIGURED'"/>
+<xsl:param name="dep_jsonSchemaValidator" select="'UNCONFIGURED'"/>
+<xsl:param name="dep_schxslt" select="'UNCONFIGURED'"/>
+<xsl:param name="dep_sinclude" select="'UNCONFIGURED'"/>
+<xsl:param name="dep_slf4j" select="'UNCONFIGURED'"/>
+<xsl:param name="dep_tukaaniXz" select="'UNCONFIGURED'"/>
+<xsl:param name="dep_uuidCreator" select="'UNCONFIGURED'"/>
+<xsl:param name="dep_xercesImpl" select="'UNCONFIGURED'"/>
+<xsl:param name="dep_xmlResolver" select="'UNCONFIGURED'"/>
 
 <!-- ============================================================ -->
 

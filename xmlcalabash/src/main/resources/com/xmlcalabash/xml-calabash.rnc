@@ -9,7 +9,7 @@ cc.xmlCalabash =
         attribute saxon-configuration { text }?,
         attribute schema-aware { xsd:boolean }?,
         attribute debug { xsd:boolean }?,
-        attribute verbosity { "detail" | "progress" | "normal" | "warning" | "quiet" }?,
+        attribute verbosity { "trace" | "debug" | "progress" | "info" | "warn" | "error" }?,
         (cc.graphviz
         | cc.inline
         | cc.mimetype

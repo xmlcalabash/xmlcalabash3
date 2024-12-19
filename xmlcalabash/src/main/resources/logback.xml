@@ -1,0 +1,59 @@
+<configuration>
+  <!-- debugging the debug logger
+  <statusListener class="ch.qos.logback.core.status.OnConsoleStatusListener" />
+  -->
+
+  <turboFilter class="ch.qos.logback.classic.turbo.DynamicThresholdFilter">
+    <Key>LOG_LEVEL</Key>
+    <DefaultThreshold>INFO</DefaultThreshold>
+    <OnHigherOrEqual>ACCEPT</OnHigherOrEqual>
+    <OnLower>DENY</OnLower>
+    <MDCValueLevelPair>
+      <value>TRACE</value>
+      <level>TRACE</level>
+    </MDCValueLevelPair>
+    <MDCValueLevelPair>
+      <value>DEBUG</value>
+      <level>DEBUG</level>
+    </MDCValueLevelPair>
+    <MDCValueLevelPair>
+      <value>INFO</value>
+      <level>INFO</level>
+    </MDCValueLevelPair>
+    <MDCValueLevelPair>
+      <value>WARN</value>
+      <level>WARN</level>
+    </MDCValueLevelPair>
+    <MDCValueLevelPair>
+      <value>ERROR</value>
+      <level>ERROR</level>
+    </MDCValueLevelPair>
+  </turboFilter>
+
+  <appender name="STDERR" class="ch.qos.logback.core.ConsoleAppender">
+    <target>System.err</target>
+    <encoder>
+      <pattern>%-5level %msg%n</pattern>
+    </encoder>
+  </appender>
+
+<!-- this has to be commented out unless you refer to it below
+  <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <file>xmlcalabash.log</file>
+    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+      <fileNamePattern>/tmp/xmlcalabash.%d{yyyy-MM-dd}.log</fileNamePattern>
+      <maxHistory>5</maxHistory>
+    </rollingPolicy>
+    <encoder>
+      <pattern>%d{HH:mm:ss.SSS}  %-4relative [%thread] %-5level %logger{35} - %msg%n</pattern>
+    </encoder>
+  </appender>
+-->
+
+  <root level="info" additivity="false">
+    <appender-ref ref="STDERR"/>
+    <!-- Don't log to an output file by default
+    <appender-ref ref="FILE"/>
+    -->
+  </root>
+</configuration>

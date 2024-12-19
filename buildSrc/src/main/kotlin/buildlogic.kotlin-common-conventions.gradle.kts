@@ -15,10 +15,14 @@ val distributionClasspath by configurations.creating {
 
 val releaseArtifacts by configurations.consumable("releaseArtifacts")
 
+// Force some versions across all the projects
 configurations.all {
   resolutionStrategy.eachDependency {
     if (requested.group == "xerces" && requested.name == "xercesImpl") {
-      useVersion("2.12.2")
+      useVersion(project.findProperty("xercesImpl").toString())
+    }
+    if (requested.group == "org.slf4j" && requested.name == "slf4j-api") {
+      useVersion(project.findProperty("slf4j").toString())
     }
   }
 }

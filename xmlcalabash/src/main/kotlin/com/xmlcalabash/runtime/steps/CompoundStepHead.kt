@@ -8,6 +8,7 @@ import com.xmlcalabash.namespace.NsP
 import com.xmlcalabash.runtime.XProcStepConfiguration
 import com.xmlcalabash.runtime.model.HeadModel
 import com.xmlcalabash.runtime.parameters.RuntimeStepParameters
+import com.xmlcalabash.util.Verbosity
 import net.sf.saxon.s9api.QName
 import net.sf.saxon.s9api.XdmFunctionItem
 import net.sf.saxon.s9api.XdmNode
@@ -198,7 +199,7 @@ class CompoundStepHead(config: XProcStepConfiguration, step: HeadModel): Abstrac
 
             val rpair = receiver[port]
             if (rpair == null) {
-                if (stepConfig.xmlCalabash.xmlCalabashConfig.debug) {
+                if (stepConfig.xmlCalabash.xmlCalabashConfig.verbosity <= Verbosity.DEBUG) {
                     // Ultimately, I don't think these ever matter, but for debugging purposes...
                     if (((type == NsP.choose || type == NsP.`if`) && port == "!context")
                         || ((type == NsP.catch || type == NsP.finally) && port == "error")
