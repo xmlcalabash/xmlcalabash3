@@ -18,7 +18,7 @@ open class WithInputInstruction(parent: XProcInstruction, stepConfig: Instructio
                 pipe()
             } else {
                 if (defaultBindings.isEmpty()) {
-                    throw XProcError.xsNoConnection(port).exception()
+                    throw XProcError.xsNoConnection(port).at(stepConfig.location).exception()
                 }
             }
         }
