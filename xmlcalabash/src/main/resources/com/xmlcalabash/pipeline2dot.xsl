@@ -10,7 +10,7 @@
 <xsl:output method="xml" encoding="utf-8" indent="yes"
             omit-xml-declaration="yes"/>
 
-<xsl:param name="number" select="1" as="xs:integer"/>
+<xsl:param name="number" select="0" as="xs:integer"/>
 
 <xsl:param name="debug" select="0"/>
 <xsl:param name="arrows-to-subpipelines" select="'false'"/>
@@ -22,12 +22,26 @@
 <xsl:variable name="nl" select="'&#10;'"/>
 
 <xsl:template match="ns:description">
-  <xsl:variable name="pipeline" as="document-node()">
-    <xsl:document>
-      <xsl:sequence select="ns:declare-step[position() = $number]"/>
-    </xsl:document>
-  </xsl:variable>
-  <xsl:apply-templates select="$pipeline"/>
+  <xsl:choose>
+    <xsl:when test="$number = 0">
+      <xsl:for-each select="ns:declare-step">
+        <xsl:variable name="pipeline" as="document-node()">
+          <xsl:document>
+            <xsl:sequence select="."/>
+          </xsl:document>
+        </xsl:variable>
+        <xsl:apply-templates select="$pipeline"/>
+      </xsl:for-each>
+    </xsl:when>
+    <xsl:otherwise>
+      <xsl:variable name="pipeline" as="document-node()">
+        <xsl:document>
+          <xsl:sequence select="ns:declare-step[position() = $number]"/>
+        </xsl:document>
+      </xsl:variable>
+      <xsl:apply-templates select="$pipeline"/>
+    </xsl:otherwise>
+  </xsl:choose>
 </xsl:template>
 
 <xsl:template match="ns:declare-step|ns:library">
@@ -295,18 +309,20 @@
   <xsl:choose>
     <xsl:when test="($from_step/self::ns:compound-step or $from_step/self::ns:declare-step)
                     and $from_port/self::ns:input">
-<!--
+
       <xsl:message>cluster_{generate-id($from_step)}_head . {generate-id($from_port)}_head_output → cluster_{generate-id($to_step)} . {generate-id($to_port)}</xsl:message>
--->
+
 
 <!--
 <xsl:message select="'STEP:', @step/string()"/>
 <xsl:message select="'FROM:', $from_step, ' :: ', $from_port"/>
 <xsl:message select="'TO:', $to_step, ' :: ', $to_port"/>
+<xsl:message select="count($to_step), count($to_port), count($from_step), count($from_port)"/>
 -->
 
-      <dot:edge x="3" to="cluster_{generate-id($to_step)}" input="{generate-id($to_port)}"
-                from="cluster_{generate-id($from_step)}_head" output="{generate-id($from_port)}_head_output"/>
+  <dot:edge x="3" to="cluster_{generate-id($to_step)}" input="{generate-id($to_port)}"
+            from="cluster_{generate-id($from_step)}_head" output="{generate-id($from_port)}_head_output"/>
+
     </xsl:when>
     <xsl:when test="($from_step/self::ns:compound-step or $from_step/self::ns:declare-step)
                     and $from_port/self::ns:output">
