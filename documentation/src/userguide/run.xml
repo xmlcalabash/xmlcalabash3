@@ -190,27 +190,33 @@ within that library to run.</para>
 detail is printed about the progress of a running pipeline.</para>
 <variablelist>
 <varlistentry>
-<term><literal>detail</literal></term>
+<term><literal>trace</literal></term>
 <listitem><para>Lots of detail, show everything.</para></listitem>
+</varlistentry>
+<varlistentry>
+<term><literal>debug</literal></term>
+<listitem><para>Lots of detail</para></listitem>
 </varlistentry>
 <varlistentry>
 <term><literal>progress</literal></term>
 <listitem><para>Show when the execution of each step begins.</para></listitem>
 </varlistentry>
 <varlistentry>
-<term><literal>normal</literal></term>
+<term><literal>info</literal></term>
 <listitem><para>Show relevant status messages.</para></listitem>
 </varlistentry>
 <varlistentry>
-<term><literal>warning</literal></term>
+<term><literal>warn</literal></term>
 <listitem><para>Show only warnings and errors.</para></listitem>
 </varlistentry>
 <varlistentry>
-<term><literal>quiet</literal></term>
+<term><literal>error</literal></term>
 <listitem><para>No messages except fatal errors</para></listitem>
 </varlistentry>
 </variablelist>
-<para>It’s all a bit random, but that’s the idea.</para>
+<para>Setting the verbosity also sets the logging level.
+The “progress” setting is really the same as “info” except that the
+progress of execution (when each step starts running) will be shown.</para>
 </listitem>
 </varlistentry>
 
@@ -225,8 +231,13 @@ detail is printed about the progress of a running pipeline.</para>
 <varlistentry xml:id="cli-debug">
   <term><option>--debug</option></term>
 <listitem>
-<para>If debugging is enabled, the processor prints more, and sometimes more random seeming,
-messages about its progress.</para>
+<para>If debugging is enabled, the verbosity is set to at least the
+<literal>debug</literal> level <emphasis>and</emphasis> the backend logging
+framework’s “log level” is set to the verbosity.</para>
+<para>This produces a lot of messages, typically on the standard error
+output. XML Calabash uses <link xlink:href="https://www.slf4j.org/">SLF4J</link>
+and <link xlink:href="https://logback.qos.ch/">Logback</link> for logging.
+You can configure it in the usual ways.</para>
 </listitem>
 </varlistentry>
 
@@ -302,28 +313,10 @@ command line arguments are ignored.</para>
 Running with Saxon EE version 12.5 (with a license)</computeroutput></screen>
 
 <para>Most options are ignored when the <command>version</command> command is
-used, but if the <literal>detail</literal> level of <option>--verbosity</option>
+used, but if the <literal>debug</literal> level of <option>--verbosity</option>
 is requested, the version summary will include details about third party
-dependenies such as the HTML parser and XML resolver:</para>
-
-<screen><userinput><prompt>$</prompt> xmlcalabash version --verbosity:detail</userinput>
-<computeroutput>XML Calabash version <?version?> (build <?version build-hash?>, <?version build-date display?>)
-Running with Saxon EE version 12.5 (with a license)
-
-Dependencies: brotliDec=0.1.2, commonsCodec=1.17.0, commonsCompress=1.27.1, 
-flexmarkAll=0.64.8, graalvmJS=23.1.5, htmlparser=1.4.16, httpClient=5.3.1, 
-jing=20220510, jsonSchemaValidator=1.5.4, schxslt=1.9.5, sinclude=5.2.4, 
-slf4j=2.0.13, tukaaniXz=1.10, uuidCreator=6.0.0, xmlResolver=6.0.10</computeroutput></screen>
-
-<important>
-<para>These are the <emphasis>compile-time</emphasis> dependencies, the versions that
-the processor <emphasis>expected</emphasis>. The versions actually used are controlled by what appears on 
-the classpath.</para>
-</important>
-
-<para>If the <option>--debug</option> option is used, all of the version
-information is formatted in a way that can more easily be parsed, for example by
-a shell script:</para>
+dependencies such as the HTML parser and XML resolver. In this case, the output
+is formatted in a way that can more easily be parsed, for example by a shell script.</para>
 
 <screen><userinput><prompt>$</prompt> xmlcalabash --debug</userinput>
 <computeroutput>PRODUCT_NAME=XML Calabash
@@ -348,6 +341,13 @@ DEPENDENCY_sinclude=<?version DEPENDENCY_sinclude?>
 DEPENDENCY_slf4j=<?version DEPENDENCY_slf4j?>
 DEPENDENCY_tukaaniXz=<?version DEPENDENCY_tukaaniXz?>
 DEPENDENCY_uuidCreator=<?version DEPENDENCY_uuidCreator?>
+DEPENDENCY_xercesImpl=<?version DEPENDENCY_xercesImpl?>
 DEPENDENCY_xmlResolver=<?version DEPENDENCY_xmlResolver?></computeroutput></screen>
+
+<important>
+<para>These are the <emphasis>compile-time</emphasis> dependencies, the versions that
+the processor <emphasis>expected</emphasis>. The versions actually used are controlled by what appears on 
+the classpath at runtime.</para>
+</important>
 </section>
 </chapter>

@@ -4,13 +4,13 @@ class DefaultMessageReporter(initialThreshold: Verbosity): MessageReporter {
     override var threshold = initialThreshold
 
     override fun warn(message: () -> String) {
-        if (threshold <= Verbosity.WARNING) {
+        if (threshold <= Verbosity.WARN) {
             println(message())
         }
     }
 
     override fun info(message: () -> String) {
-        if (threshold <= Verbosity.NORMAL) {
+        if (threshold <= Verbosity.INFO) {
             println(message())
         }
     }
@@ -22,7 +22,7 @@ class DefaultMessageReporter(initialThreshold: Verbosity): MessageReporter {
     }
 
     override fun detail(message: () -> String) {
-        if (threshold <= Verbosity.DETAIL) {
+        if (threshold <= Verbosity.DEBUG) {
             println(message())
         }
     }

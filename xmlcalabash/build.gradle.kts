@@ -75,7 +75,8 @@ dependencies {
   // Could I get httpclient5 to use log4j? Maybe. ¯\_(ツ)_/¯
   // But I got tired of trying to figure it out so I did this instead.
   implementation("org.slf4j:slf4j-api:${dep_slf4j}")
-  implementation("org.slf4j:slf4j-simple:${dep_slf4j}")
+  //implementation("org.slf4j:slf4j-simple:${dep_slf4j}")
+  implementation("ch.qos.logback:logback-classic:1.5.13")
   implementation("org.apache.logging.log4j:log4j-to-slf4j:2.23.1")
 
   implementation("org.apache.httpcomponents.client5:httpclient5:${dep_httpClient}")
@@ -113,6 +114,7 @@ buildConfig {
                   "slf4j",
                   "tukaaniXz",
                   "uuidCreator",
+                  "xercesImpl",
                   "xmlResolver"
   ).forEach { dep ->
     sb.append("  \"").append(dep).append("\" to ")

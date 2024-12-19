@@ -17,11 +17,18 @@ import com.xmlcalabash.namespace.NsFn
 import com.xmlcalabash.namespace.NsXs
 import com.xmlcalabash.runtime.api.RuntimeOption
 import com.xmlcalabash.runtime.api.RuntimePort
-import com.xmlcalabash.util.*
+import com.xmlcalabash.util.DefaultXmlCalabashConfiguration
+import com.xmlcalabash.util.UriUtils
+import com.xmlcalabash.util.Verbosity
+import com.xmlcalabash.util.VisualizerOutput
 import net.sf.saxon.lib.Initializer
 import net.sf.saxon.om.NamespaceUri
-import net.sf.saxon.s9api.*
+import net.sf.saxon.s9api.ItemType
+import net.sf.saxon.s9api.QName
+import net.sf.saxon.s9api.XdmAtomicValue
+import net.sf.saxon.s9api.XdmValue
 import org.apache.logging.log4j.kotlin.logger
+import org.slf4j.MDC
 import java.io.BufferedReader
 import java.io.File
 import java.io.InputStreamReader
@@ -59,10 +66,21 @@ class XmlCalabashCli private constructor() {
             abort(errorExplanation, commandLine.errors)
         }
 
+        if (commandLine.debug == true) {
+            when (commandLine.verbosity) {
+                null -> Unit
+                Verbosity.TRACE -> MDC.put("LOG_LEVEL", "TRACE")
+                Verbosity.DEBUG -> MDC.put("LOG_LEVEL", "DEBUG")
+                Verbosity.PROGRESS -> MDC.put("LOG_LEVEL", "INFO")
+                Verbosity.INFO -> MDC.put("LOG_LEVEL", "INFO")
+                Verbosity.WARN -> MDC.put("LOG_LEVEL", "WARN")
+                Verbosity.ERROR -> MDC.put("LOG_LEVEL", "ERROR")
+            }
+        }
+
         try {
             config = loadConfiguration(commandLine.config)
 
-            config.debug = commandLine.debug ?: config.debug
             config.verbosity = commandLine.verbosity ?: config.verbosity
 
             xmlCalabash = XmlCalabash.newInstance(config)
@@ -152,7 +170,7 @@ class XmlCalabashCli private constructor() {
 
             pipeline.run()
         } catch (ex: Exception) {
-            if (commandLine.debug == true) {
+            if (commandLine.verbosity != null && commandLine.verbosity!! <= Verbosity.DEBUG) {
                 ex.printStackTrace()
             }
             if (ex is XProcException) {
@@ -229,14 +247,16 @@ class XmlCalabashCli private constructor() {
     }
 
     private fun abort(errorExplanation: ErrorExplanation, errors: List<XProcException>) {
+        val verbosity = commandLine.verbosity ?: Verbosity.INFO
+
         for (error in errors) {
             errorExplanation.message(error.error)
-            if (commandLine.verbosity == Verbosity.DETAIL) {
+            if (verbosity <= Verbosity.PROGRESS) {
                 errorExplanation.explanation(error.error)
             }
         }
 
-        if (commandLine.debug == true) {
+        if (verbosity <= Verbosity.DEBUG) {
             errors[0].printStackTrace()
         }
 
@@ -259,7 +279,7 @@ class XmlCalabashCli private constructor() {
         val proc = xmlCalabash.saxonConfig.processor
         val deplist = XmlCalabashBuildConfig.DEPENDENCIES.keys.toList().sorted()
 
-        if (xmlCalabash.xmlCalabashConfig.debug) {
+        if (xmlCalabash.xmlCalabashConfig.verbosity <= Verbosity.DEBUG) {
             println("PRODUCT_NAME=${XmlCalabashBuildConfig.PRODUCT_NAME}")
             println("VERSION=${XmlCalabashBuildConfig.VERSION}")
             println("BUILD_DATE=${XmlCalabashBuildConfig.BUILD_DATE}")
@@ -288,26 +308,6 @@ class XmlCalabashCli private constructor() {
                     print(" (without a license)")
                 }
             }
-            println()
-            
-            if (xmlCalabash.xmlCalabashConfig.verbosity == Verbosity.DETAIL) {
-                var sb = StringBuilder()
-                sb.append("\nDependencies: ")
-                for ((index, name) in deplist.withIndex()) {
-                    sb.append(name).append("=").append(XmlCalabashBuildConfig.DEPENDENCIES[name]!!)
-                    if (index < deplist.size - 1) {
-                        sb.append(", ")
-                    }
-                    if (sb.toString().length > 64) {
-                        println(sb.toString())
-                        sb = StringBuilder()
-                    }
-                }
-                if (sb.toString().isNotEmpty()) {
-                    println(sb.toString())
-                }
-            }
         }
     }
-
 }

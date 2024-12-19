@@ -75,7 +75,7 @@ class CommandLine private constructor(val args: Array<out String>) {
     val pipelineDescription: String?
         get() = _pipelineDescription
 
-    /** Enable debugging output? */
+    /** Enable debugging output? Adjust the logging level accordingly. */
     val debug: Boolean?
         get() = _debug
 
@@ -154,14 +154,15 @@ class CommandLine private constructor(val args: Array<out String>) {
         ArgumentDescription("--debug", listOf("-D"), ArgumentType.BOOLEAN, "true") { it -> _debug = it == "true" },
         ArgumentDescription("--help", listOf(), ArgumentType.BOOLEAN, "true") { it -> _help = it == "true" },
         ArgumentDescription("--verbosity", listOf("-V"),
-            ArgumentType.STRING, "detail", listOf("quiet", "detail", "progress", "normal", "warning")) { it ->
+            ArgumentType.STRING, "detail", listOf("trace", "debug", "progress", "info", "warn", "error")) { it ->
             _verbosity = when(it) {
-                "quiet" -> Verbosity.QUIET
-                "detail" -> Verbosity.DETAIL
+                "error" -> Verbosity.ERROR
+                "warn" -> Verbosity.WARN
+                "info" -> Verbosity.INFO
                 "progress" -> Verbosity.PROGRESS
-                "normal" -> Verbosity.NORMAL
-                "warning" -> Verbosity.WARNING
-                else -> Verbosity.NORMAL
+                "debug" -> Verbosity.DEBUG
+                "trace" -> Verbosity.TRACE
+                else -> Verbosity.INFO
             }}
     )
 
@@ -171,7 +172,7 @@ class CommandLine private constructor(val args: Array<out String>) {
             return
         }
 
-        for ((index, opt) in args.withIndex()) {
+        for (opt in args) {
             val pos = opt.indexOf(':')
             val option = if (pos >= 0) {
                 opt.substring(0, pos)
@@ -187,6 +188,8 @@ class CommandLine private constructor(val args: Array<out String>) {
             var processed = false
             for (arg in arguments) {
                 if (option == arg.name || arg.synonyms.contains(option)) {
+                    processed = true
+
                     var value = suppliedValue ?: arg.default
                     if (value == null) {
                         _errors.add(XProcError.xiCliValueRequired(option).exception())
@@ -224,7 +227,6 @@ class CommandLine private constructor(val args: Array<out String>) {
                             value = UriUtils.cwdAsUri().resolve(value).toString()
                         }
                     }
-                    processed = true
                     arg.process(value)
                     break
                 }
@@ -251,6 +253,10 @@ class CommandLine private constructor(val args: Array<out String>) {
                     }
                 }
             }
+        }
+
+        if (_debug == true && (verbosity == null || verbosity!! > Verbosity.DEBUG)) {
+            _verbosity = Verbosity.DEBUG
         }
     }
 

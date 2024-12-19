@@ -13,8 +13,7 @@ abstract class XmlCalabashConfiguration {
     abstract fun saxonConfigurer(saxon: Configuration)
     abstract fun xmlCalabashConfigurer(xmlCalabash: XmlCalabash)
 
-    var debug = false
-    var verbosity = Verbosity.NORMAL
+    var verbosity = Verbosity.INFO
     var saxonConfigurationFile: File? = null
     var saxonConfigurationProperties: Map<String,String> = emptyMap()
     var uniqueInlineUris: Boolean = true

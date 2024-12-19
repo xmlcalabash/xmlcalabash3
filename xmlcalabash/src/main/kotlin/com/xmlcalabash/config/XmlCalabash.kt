@@ -67,14 +67,6 @@ class XmlCalabash private constructor(val xmlCalabashConfig: XmlCalabashConfigur
     private val executables = mutableMapOf<Long, Stack<XProcExecutionContext>>()
     private val episodes = mutableMapOf<Long,String>()
 
-    internal fun getEpisode(): String {
-        return episodes[Thread.currentThread().id] ?: ""
-    }
-
-    internal fun setEpisode(episode: String) {
-        episodes[Thread.currentThread().id] = episode
-    }
-
     internal fun newExecutionContext(stepConfig: XProcStepConfiguration): XProcExecutionContext {
         synchronized(executables) {
             var stack = executables[Thread.currentThread().id]

@@ -128,7 +128,6 @@ class ConfigurationLoader private constructor(private val config: XmlCalabashCon
         }
 
         config.schemaAware = booleanAttribute(root.getAttributeValue(_schemaAware), "schema-aware")
-        config.debug = booleanAttribute(root.getAttributeValue(_debug), "debug")
         config.verbosity = verbosityAttribute(root.getAttributeValue(_verbosity))
 
         for (child in root.axisIterator(Axis.CHILD)) {
@@ -170,12 +169,13 @@ class ConfigurationLoader private constructor(private val config: XmlCalabashCon
 
     private fun verbosityAttribute(value: String?): Verbosity {
         return when (value) {
-            null -> Verbosity.NORMAL
-            "quiet" -> Verbosity.QUIET
-            "detail" -> Verbosity.DETAIL
+            null -> Verbosity.INFO
+            "error" -> Verbosity.ERROR
+            "warn", "warning", "warnings" -> Verbosity.WARN
+            "info" -> Verbosity.INFO
             "progress" -> Verbosity.PROGRESS
-            "normal" -> Verbosity.NORMAL
-            "warning" -> Verbosity.WARNING
+            "debug" -> Verbosity.DEBUG
+            "trace" -> Verbosity.TRACE
             else -> throw XProcError.xiConfigurationInvalid(configFile, "invalid verbose setting: ${value}").exception()
         }
     }

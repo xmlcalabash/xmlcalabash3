@@ -129,6 +129,8 @@ val xmlCalabashVersion = tasks.register<JavaExec>("xmlCalabashVersion") {
 
   val stdout = ByteArrayOutputStream()
   standardOutput = stdout
+  val stderr = ByteArrayOutputStream()
+  errorOutput = stderr
   classpath = configurations.named("documentation").get()
   mainClass = "com.xmlcalabash.app.Main"
   args("version", "--debug")
@@ -145,7 +147,8 @@ val xmlCalabashVersion = tasks.register<JavaExec>("xmlCalabashVersion") {
       }
     }
     stream.println("\"refVersion\": \"${refVersion}\",")
-    stream.println("\"guideVersion\": \"${guideVersion}\"}")
+    stream.println("\"guideVersion\": \"${guideVersion}\"")
+    stream.println("}")
     stream.close()
   }
 }
@@ -221,16 +224,22 @@ val reference = tasks.register<SaxonXsltTask>("reference") {
       mapOf(
           "mediaobject-input-base-uri" to "file:${layout.buildDirectory.get()}/xml/",
           "chunk-output-base-uri" to "${layout.buildDirectory.get()}/reference/",
-          "dep_schxslt" to project.findProperty("schxslt").toString(),
-          "dep_htmlparser" to project.findProperty("htmlparser").toString(),
+          "dep_brotliDec" to project.findProperty("brotliDec").toString(),
           "dep_commonsCodec" to project.findProperty("commonsCodec").toString(),
           "dep_commonsCompress" to project.findProperty("commonsCompress").toString(),
-          "dep_brotliDec" to project.findProperty("brotliDec").toString(),
-          "dep_tukaaniXz" to project.findProperty("tukaaniXz").toString(),
           "dep_flexmarkAll" to project.findProperty("flexmarkAll").toString(),
-          "dep_uuidCreator" to project.findProperty("uuidCreator").toString(),
+          "dep_graalvmJS" to project.findProperty("graalvmJS").toString(),
+          "dep_htmlparser" to project.findProperty("htmlparser").toString(),
+          "dep_httpClient" to project.findProperty("httpClient").toString(),
+          "dep_jing" to project.findProperty("jing").toString(),
           "dep_jsonSchemaValidator" to project.findProperty("jsonSchemaValidator").toString(),
-          "dep_graalvmJS" to project.findProperty("graalvmJS").toString()
+          "dep_schxslt" to project.findProperty("schxslt").toString(),
+          "dep_sinclude" to project.findProperty("sinclude").toString(),
+          "dep_slf4j" to project.findProperty("slf4j").toString(),
+          "dep_tukaaniXz" to project.findProperty("tukaaniXz").toString(),
+          "dep_uuidCreator" to project.findProperty("uuidCreator").toString(),
+          "dep_xercesImpl" to project.findProperty("xercesImpl").toString(),
+          "dep_xmlResolver" to project.findProperty("xmlResolver").toString()
       )
   )
 
@@ -342,15 +351,22 @@ val userguide = tasks.register<SaxonXsltTask>("userguide") {
       mapOf(
           "mediaobject-input-base-uri" to "file:${layout.buildDirectory.get()}/xml/",
           "chunk-output-base-uri" to "${layout.buildDirectory.get()}/userguide/",
-          "dep_schxslt" to project.findProperty("schxslt").toString(),
-          "dep_htmlparser" to project.findProperty("htmlparser").toString(),
+          "dep_brotliDec" to project.findProperty("brotliDec").toString(),
           "dep_commonsCodec" to project.findProperty("commonsCodec").toString(),
           "dep_commonsCompress" to project.findProperty("commonsCompress").toString(),
-          "dep_brotliDec" to project.findProperty("brotliDec").toString(),
-          "dep_tukaaniXz" to project.findProperty("tukaaniXz").toString(),
           "dep_flexmarkAll" to project.findProperty("flexmarkAll").toString(),
+          "dep_graalvmJS" to project.findProperty("graalvmJS").toString(),
+          "dep_htmlparser" to project.findProperty("htmlparser").toString(),
+          "dep_httpClient" to project.findProperty("httpClient").toString(),
+          "dep_jing" to project.findProperty("jing").toString(),
+          "dep_jsonSchemaValidator" to project.findProperty("jsonSchemaValidator").toString(),
+          "dep_schxslt" to project.findProperty("schxslt").toString(),
+          "dep_sinclude" to project.findProperty("sinclude").toString(),
+          "dep_slf4j" to project.findProperty("slf4j").toString(),
+          "dep_tukaaniXz" to project.findProperty("tukaaniXz").toString(),
           "dep_uuidCreator" to project.findProperty("uuidCreator").toString(),
-          "dep_jsonSchemaValidator" to project.findProperty("jsonSchemaValidator").toString()
+          "dep_xercesImpl" to project.findProperty("xercesImpl").toString(),
+          "dep_xmlResolver" to project.findProperty("xmlResolver").toString()
       )
   )
 

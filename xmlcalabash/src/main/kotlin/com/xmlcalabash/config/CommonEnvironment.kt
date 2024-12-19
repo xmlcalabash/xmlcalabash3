@@ -61,7 +61,7 @@ class CommonEnvironment(private val xmlCalabash: XmlCalabash) {
     private var _documentManager: DocumentManager = DocumentManager()
     private var _mimeTypes = MimetypesFileTypeMap()
     private var _errorExplanation: ErrorExplanation = DefaultErrorExplanation()
-    private var _messageReporter: MessageReporter = DefaultMessageReporter(Verbosity.NORMAL)
+    private var _messageReporter: MessageReporter = DefaultMessageReporter(Verbosity.INFO)
     private var _proxies = mutableMapOf<String, String>()
     internal val _standardSteps = mutableMapOf<QName, DeclareStepInstruction>()
 
@@ -76,7 +76,7 @@ class CommonEnvironment(private val xmlCalabash: XmlCalabash) {
 
         for ((ext, contentType) in defaultContentTypes) {
             if (_mimeTypes.getContentType("test.${ext}") == "application/octet-stream") {
-                logger.debug { "Assigning default content type to '.${ext}' files: ${contentType}" }
+                logger.trace { "Assigning default content type to '.${ext}' files: ${contentType}" }
                 _mimeTypes.addMimeTypes("${contentType} ${ext}")
             }
         }
