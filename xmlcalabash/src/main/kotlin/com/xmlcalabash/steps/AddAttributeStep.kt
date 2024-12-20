@@ -45,12 +45,12 @@ class AddAttributeStep(): AbstractAtomicStep(), ProcessMatchingNodes {
     }
 
     override fun startDocument(node: XdmNode): Boolean {
-        throw XProcError.xcInvalidSelection(matchPattern, "document node").at(node).exception()
+        throw stepConfig.exception(XProcError.xcInvalidSelection(matchPattern, "document node").at(node))
     }
 
     override fun endDocument(node: XdmNode) {
         // I don't think this is technically possible...
-        throw XProcError.xcInvalidSelection(matchPattern, "document node").exception()
+        throw stepConfig.exception(XProcError.xcInvalidSelection(matchPattern, "document node"))
     }
 
     override fun startElement(node: XdmNode, attributes: AttributeMap): Boolean {
@@ -96,7 +96,7 @@ class AddAttributeStep(): AbstractAtomicStep(), ProcessMatchingNodes {
         matchingAttributes: AttributeMap,
         nonMatchingAttributes: AttributeMap
     ): AttributeMap? {
-        throw XProcError.xcInvalidSelection(matchPattern, "attribute").exception()
+        throw stepConfig.exception(XProcError.xcInvalidSelection(matchPattern, "attribute"))
     }
 
     override fun endElement(node: XdmNode) {
@@ -104,15 +104,15 @@ class AddAttributeStep(): AbstractAtomicStep(), ProcessMatchingNodes {
     }
 
     override fun text(node: XdmNode) {
-        throw XProcError.xcInvalidSelection(matchPattern, "text").exception()
+        throw stepConfig.exception(XProcError.xcInvalidSelection(matchPattern, "text"))
     }
 
     override fun comment(node: XdmNode) {
-        throw XProcError.xcInvalidSelection(matchPattern, "comment").exception()
+        throw stepConfig.exception(XProcError.xcInvalidSelection(matchPattern, "comment"))
     }
 
     override fun pi(node: XdmNode) {
-        throw XProcError.xcInvalidSelection(matchPattern, "processing-instruction").exception()
+        throw stepConfig.exception(XProcError.xcInvalidSelection(matchPattern, "processing-instruction"))
     }
 
     override fun toString(): String = "p:add-attribute"

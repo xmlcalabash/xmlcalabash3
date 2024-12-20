@@ -42,7 +42,7 @@ open class ValidateWithSchematron(): AbstractAtomicStep() {
         val reportFormat = stringBinding(Ns.reportFormat) ?: "svrl"
 
         if (reportFormat != "svrl" && reportFormat != "xvrl") {
-            throw XProcError.xcUnsupportedReportFormat(reportFormat).exception()
+            throw stepConfig.exception(XProcError.xcUnsupportedReportFormat(reportFormat))
         }
 
         val impl = SchematronImpl(stepConfig)
@@ -50,7 +50,7 @@ open class ValidateWithSchematron(): AbstractAtomicStep() {
 
         val tron = S9Api.documentElement(schema.value as XdmNode)
         if (tron.nodeName != s_schematron) {
-            throw XProcError.xcNotSchematronSchema(tron.nodeName).exception()
+            throw stepConfig.exception(XProcError.xcNotSchematronSchema(tron.nodeName))
         }
 
         var report = impl.report(document.value as XdmNode, schema.value as XdmNode, phase)
@@ -73,9 +73,9 @@ open class ValidateWithSchematron(): AbstractAtomicStep() {
             if (failed.isNotEmpty()) {
                 val doc = XProcDocument.ofXml(report, document.context)
                 if (document.baseURI == null) {
-                    throw XProcError.xcNotSchemaValidSchematron(doc).exception()
+                    throw stepConfig.exception(XProcError.xcNotSchemaValidSchematron(doc))
                 }
-                throw XProcError.xcNotSchemaValidSchematron(doc, document.baseURI!!).exception()
+                throw stepConfig.exception(XProcError.xcNotSchemaValidSchematron(doc, document.baseURI!!))
             }
         }
 

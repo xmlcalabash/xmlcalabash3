@@ -94,7 +94,7 @@ class CssAH(): AbstractAH(), CssProcessor {
 
     override fun format(document: XProcDocument, contentType: MediaType, out: OutputStream) {
         val outputFormat = formatMap[contentType]
-            ?: throw XProcError.xcUnsupportedContentType(contentType).exception()
+            ?: throw stepConfig.exception(XProcError.xcUnsupportedContentType(contentType))
 
         if (primarySS == null) {
             logger.error { "No CSS stylesheet provided for p:css-formatter" }
@@ -131,7 +131,7 @@ class CssAH(): AbstractAH(), CssProcessor {
         try {
             ah.render(fis, out, outputFormat)
         } catch (ex: Exception) {
-            throw XProcError.xdStepFailed(ex.message ?: "AH failed").exception(ex)
+            throw stepConfig.exception(XProcError.xdStepFailed(ex.message ?: "AH failed"), ex)
 
         } finally {
             ah.releaseObjectEx()

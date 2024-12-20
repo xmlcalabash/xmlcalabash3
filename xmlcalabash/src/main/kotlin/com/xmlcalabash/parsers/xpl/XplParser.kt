@@ -128,7 +128,7 @@ class XplParser internal constructor(val builder: PipelineBuilder) {
             Ns.psviRequired to { value -> library.psviRequired = stepConfig.parseBoolean(value) },
             Ns.xpathVersion to { value -> library.xpathVersion = value.toDouble() },
             Ns.excludeInlinePrefixes to { value -> stepConfig.parseExcludeInlinePrefixes(value) },
-            Ns.version to { value -> library.version = parseVersion(value) },
+            Ns.version to { value -> library.version = parseVersion(node, value) },
         )
 
         processAttributes(node, library, attributeMapping)
@@ -165,18 +165,18 @@ class XplParser internal constructor(val builder: PipelineBuilder) {
             processElements(node, option, emptyMap())
 
             if (!option.static) {
-                throw XProcError.xsLibraryOptionsMustBeStatic(node.name).exception()
+                throw stepConfig.exception(XProcError.xsLibraryOptionsMustBeStatic(node.name))
             }
         } else {
             if (Ns.name !in node.attributes) {
-                errors.add(XProcError.xsMissingRequiredAttribute(Ns.name).exception())
+                errors.add(library.stepConfig.exception(XProcError.xsMissingRequiredAttribute(Ns.name)))
             }
             if (Ns.select !in node.attributes) {
-                errors.add(XProcError.xsMissingRequiredAttribute(Ns.select).exception())
+                errors.add(library.stepConfig.exception(XProcError.xsMissingRequiredAttribute(Ns.select)))
             }
             // If we got here, it's an option that isn't static... (it would
             // be an OptionNode if it was static...)
-            throw XProcError.xsLibraryOptionsMustBeStatic(node.node.nodeName).exception()
+            throw library.stepConfig.exception(XProcError.xsLibraryOptionsMustBeStatic(node.node.nodeName))
         }
     }
 
@@ -203,7 +203,7 @@ class XplParser internal constructor(val builder: PipelineBuilder) {
             Ns.psviRequired to { value -> decl.psviRequired = stepConfig.parseBoolean(value) },
             Ns.xpathVersion to { value -> decl.xpathVersion = value.toDouble() },
             Ns.excludeInlinePrefixes to { value -> stepConfig.parseExcludeInlinePrefixes(value) },
-            Ns.version to { value -> decl.version = parseVersion(value) },
+            Ns.version to { value -> decl.version = parseVersion(node, value) },
             Ns.visibility to { value -> decl.visibility = stepConfig.parseVisibility(value) },
         )
 
@@ -260,7 +260,7 @@ class XplParser internal constructor(val builder: PipelineBuilder) {
         // children away in defaultInputs, so we have to do those tests here too...
         if (input.href != null) {
             if (input.defaultBindings.isNotEmpty()) {
-                throw XProcError.xsHrefAndChildren().exception()
+                throw stepConfig.exception(XProcError.xsHrefAndChildren())
             }
             val doc = DocumentInstruction(input, input.href!!)
             input.defaultBindings.add(doc)
@@ -306,13 +306,13 @@ class XplParser internal constructor(val builder: PipelineBuilder) {
             node.attributes[Ns.name]?.let { decl.stepConfig.parseQName(it) }
         } catch (ex: XProcException) {
             when (ex.error.code) {
-                NsErr.xd(69) -> throw XProcError.xsUnboundPrefix(node.attributes[Ns.name]!!).exception()
-                NsErr.xd(36) -> throw XProcError.xsValueDoesNotSatisfyType(node.attributes[Ns.name]!!, "xs:QName").exception()
+                NsErr.xd(69) -> throw decl.stepConfig.exception(XProcError.xsUnboundPrefix(node.attributes[Ns.name]!!))
+                NsErr.xd(36) -> throw decl.stepConfig.exception(XProcError.xsValueDoesNotSatisfyType(node.attributes[Ns.name]!!, "xs:QName"))
                 else -> throw ex
             }
         }
         if (name == null) {
-            throw XProcError.xsMissingRequiredAttribute(Ns.name).exception()
+            throw decl.stepConfig.exception(XProcError.xsMissingRequiredAttribute(Ns.name))
         }
 
         val option = decl.option(name)
@@ -340,7 +340,7 @@ class XplParser internal constructor(val builder: PipelineBuilder) {
             throw ex.error.asStatic().exception()
         }
         if (name == null) {
-            throw XProcError.xsMissingRequiredAttribute(Ns.name).exception()
+            throw decl.stepConfig.exception(XProcError.xsMissingRequiredAttribute(Ns.name))
         }
 
         val variable = decl.variable(name)
@@ -381,7 +381,7 @@ class XplParser internal constructor(val builder: PipelineBuilder) {
     private fun parseWithOption(decl: StepDeclaration, node: ElementNode) {
         val name = node.attributes[Ns.name]?.let { decl.stepConfig.parseQName(it) }
         if (name == null) {
-            throw XProcError.xsMissingRequiredAttribute(Ns.name).exception()
+            throw decl.stepConfig.exception(XProcError.xsMissingRequiredAttribute(Ns.name))
         }
 
         val withOption = if (decl is RunInstruction) {
@@ -426,7 +426,7 @@ class XplParser internal constructor(val builder: PipelineBuilder) {
     }
 
     private fun parseDocument(container: BindingContainer, node: ElementNode) {
-        val href = node.attributes[Ns.href] ?: throw XProcError.xsMissingRequiredAttribute(Ns.href).exception()
+        val href = node.attributes[Ns.href] ?: throw container.stepConfig.exception(XProcError.xsMissingRequiredAttribute(Ns.href))
 
         val dconfig = container.stepConfig.with(Location(node.node))
         val document = container.document(XProcExpression.avt(dconfig, href))
@@ -474,7 +474,7 @@ class XplParser internal constructor(val builder: PipelineBuilder) {
 
         val documentElement = S9Api.firstElement(xml)
         if (documentElement != null && documentElement.nodeName.namespaceUri == NsP.namespace) {
-            throw XProcError.xsInvalidElement(documentElement.nodeName).exception()
+            throw container.stepConfig.exception(XProcError.xsInvalidElement(documentElement.nodeName))
         }
 
         container.inline(xml)
@@ -483,9 +483,9 @@ class XplParser internal constructor(val builder: PipelineBuilder) {
     private fun parseImport(instruction: StepContainerInterface, node: ElementNode) {
         if (node !is ImportNode) {
             if (Ns.href !in node.attributes) {
-                errors.add(XProcError.xsMissingRequiredAttribute(Ns.href).exception())
+                errors.add(XProcError.xsMissingRequiredAttribute(Ns.href).at(node.node).exception())
             } else {
-                throw XProcError.xiImpossible("p:import is not an ImportNode?").exception()
+                throw XProcError.xiImpossible("p:import is not an ImportNode?").at(node.node).exception()
             }
             return
         }
@@ -508,7 +508,7 @@ class XplParser internal constructor(val builder: PipelineBuilder) {
     }
 
     private fun parseImportFunctions(instruction: StepContainerInterface, node: ElementNode) {
-        val href = node.attributes[Ns.href] ?: throw XProcError.xsMissingRequiredAttribute(Ns.href).exception()
+        val href = node.attributes[Ns.href] ?: throw XProcError.xsMissingRequiredAttribute(Ns.href).at(node.node).exception()
         val contentType = node.attributes[Ns.contentType]?.let { MediaType.parse(it) }
         val namespace = node.attributes[Ns.namespace]
 
@@ -802,7 +802,7 @@ class XplParser internal constructor(val builder: PipelineBuilder) {
             NsP.withInput to { child -> parseWithInput(runStep, child) },
             NsP.runInput to { child -> parseWithInput(runStep, child) },
             NsP.runOption to { child -> parseWithOption(runStep, child) },
-            NsP.output to { child -> parseOutput(runStep as RunInstruction, child) },
+            NsP.output to { child -> parseOutput(runStep, child) },
         )
 
         processElements(node, runStep, elementMapping)
@@ -821,13 +821,13 @@ class XplParser internal constructor(val builder: PipelineBuilder) {
                 if (name == Ns.expandText || name == NsP.expandText) {
                     if (name == Ns.expandText) {
                         if (node.node.nodeName.namespaceUri != NsP.namespace) {
-                            errors.add(XProcError.xsAttributeForbidden(name).exception())
+                            errors.add(XProcError.xsAttributeForbidden(name).at(node.node).exception())
                         } else {
                             instruction.expandText = parseStaticBoolean(instruction.stepConfig, value)
                         }
                     } else {
                         if (node.node.nodeName.namespaceUri == NsP.namespace) {
-                            errors.add(XProcError.xsAttributeNotAllowed(name).exception())
+                            errors.add(XProcError.xsAttributeNotAllowed(name).at(node.node).exception())
                         } else {
                             instruction.expandText = parseStaticBoolean(instruction.stepConfig, value)
                         }
@@ -835,13 +835,13 @@ class XplParser internal constructor(val builder: PipelineBuilder) {
                 } else if (instruction is CompoundStepDeclaration && (name == Ns.message || name == NsP.message)) {
                     if (name == Ns.message) {
                         if (node.node.nodeName.namespaceUri != NsP.namespace) {
-                            errors.add(XProcError.xsAttributeForbidden(name).exception())
+                            errors.add(XProcError.xsAttributeForbidden(name).at(node.node).exception())
                         } else {
                             instruction.message(XProcExpression.avt(instruction.stepConfig, value))
                         }
                     } else {
                         if (node.node.nodeName.namespaceUri == NsP.namespace) {
-                            errors.add(XProcError.xsAttributeNotAllowed(name).exception())
+                            errors.add(XProcError.xsAttributeNotAllowed(name).at(node.node).exception())
                         } else {
                             instruction.message(XProcExpression.avt(instruction.stepConfig, value))
                         }
@@ -853,12 +853,12 @@ class XplParser internal constructor(val builder: PipelineBuilder) {
                                 if (node.node.nodeName.namespaceUri == NsP.namespace) {
                                     instruction.depends(value)
                                 } else {
-                                    errors.add(XProcError.xsAttributeForbidden(name).exception())
+                                    errors.add(XProcError.xsAttributeForbidden(name).at(node.node).exception())
                                 }
                             }
                             NsP.depends -> {
                                 if (node.node.nodeName.namespaceUri == NsP.namespace) {
-                                    throw XProcError.xsAttributeNotAllowed(name).exception()
+                                    throw XProcError.xsAttributeNotAllowed(name).at(node.node).exception()
                                 }
                                 instruction.depends(value)
                             }
@@ -866,7 +866,7 @@ class XplParser internal constructor(val builder: PipelineBuilder) {
                                 if (name.namespaceUri != NamespaceUri.NULL) {
                                     instruction.setExtensionAttribute(name, value)
                                 } else {
-                                    errors.add(XProcError.xsAttributeForbidden(name).exception())
+                                    errors.add(XProcError.xsAttributeForbidden(name).at(node.node).exception())
                                 }
                             }
                         }
@@ -874,7 +874,7 @@ class XplParser internal constructor(val builder: PipelineBuilder) {
                         if (name.namespaceUri != NamespaceUri.NULL) {
                             instruction.setExtensionAttribute(name, value)
                         } else {
-                            errors.add(XProcError.xsAttributeForbidden(name).exception())
+                            errors.add(XProcError.xsAttributeForbidden(name).at(node.node).exception())
                         }
                     }
                 }
@@ -902,13 +902,13 @@ class XplParser internal constructor(val builder: PipelineBuilder) {
                     }
                     NsP.depends -> {
                         if (node.node.nodeName.namespaceUri == NsP.namespace) {
-                            throw XProcError.xsAttributeNotAllowed(name).exception()
+                            throw XProcError.xsAttributeNotAllowed(name).at(node.node).exception()
                         }
                         atomic.depends(value)
                     }
                     Ns.expandText -> {
                         if (node.node.nodeName.namespaceUri != NsP.namespace) {
-                            errors.add(XProcError.xsAttributeForbidden(name).exception())
+                            errors.add(XProcError.xsAttributeForbidden(name).at(node.node).exception())
                         } else {
                             try {
                                 atomic.expandText = parseStaticBoolean(atomic.stepConfig, value)
@@ -919,7 +919,7 @@ class XplParser internal constructor(val builder: PipelineBuilder) {
                     }
                     NsP.expandText -> {
                         if (node.node.nodeName.namespaceUri == NsP.namespace) {
-                            errors.add(XProcError.xsAttributeForbidden(name).exception())
+                            errors.add(XProcError.xsAttributeForbidden(name).at(node.node).exception())
                         } else {
                             try {
                                 atomic.expandText = parseStaticBoolean(atomic.stepConfig, value)
@@ -929,7 +929,7 @@ class XplParser internal constructor(val builder: PipelineBuilder) {
                         }
                     }
                     NsP.inlineExpandText -> {
-                        throw XProcError.xsNoSuchOption(NsP.inlineExpandText).exception()
+                        throw XProcError.xsNoSuchOption(NsP.inlineExpandText).at(node.node).exception()
                     }
                     else -> {
                         if ((atomic.instructionType.namespaceUri == NsP.namespace && name == Ns.message)
@@ -988,29 +988,29 @@ class XplParser internal constructor(val builder: PipelineBuilder) {
 
                         if (instruction is PortBindingContainer) {
                             if (explicitBinding && implicitInline != null) {
-                                throw XProcError.xsInvalidImplicitInline(implicitInline).exception()
+                                throw XProcError.xsInvalidImplicitInline(implicitInline).at(node.node).exception()
                             }
 
                             if (commentOrPi && implicitInline != null) {
-                                throw XProcError.xsInvalidImplicitInlineSiblings().exception()
+                                throw XProcError.xsInvalidImplicitInlineSiblings().at(node.node).exception()
                             }
                         }
 
                         if (mapping != null) {
                             mapping(child)
                         } else {
-                            errors.add(XProcError.xsInvalidElement(child.node.nodeName).exception())
+                            errors.add(XProcError.xsInvalidElement(child.node.nodeName).at(node.node).exception())
                         }
                     }
                     is TextNode -> {
                         if (child.node.stringValue.trim().isNotEmpty()) {
-                            errors.add(XProcError.xsTextNotAllowed(child.node.stringValue).exception())
+                            errors.add(XProcError.xsTextNotAllowed(child.node.stringValue).at(node.node).exception())
                         }
                     }
                     else -> {
                         commentOrPi = true
                         if (instruction is PortBindingContainer && implicitInline != null) {
-                            throw XProcError.xsInvalidImplicitInlineSiblings().exception()
+                            throw XProcError.xsInvalidImplicitInlineSiblings().at(node.node).exception()
                         }
                     }
                 }
@@ -1022,7 +1022,7 @@ class XplParser internal constructor(val builder: PipelineBuilder) {
 
     private fun parseCodes(stepConfig: InstructionConfiguration, value: String): List<QName> {
         if (value.trim().isEmpty()) {
-            throw XProcError.xsInvalidAttribute(Ns.code).exception()
+            throw stepConfig.exception(XProcError.xsInvalidAttribute(Ns.code))
         }
 
         val codes = mutableListOf<QName>()
@@ -1031,7 +1031,7 @@ class XplParser internal constructor(val builder: PipelineBuilder) {
                 codes.add(stepConfig.parseQName(codeValue))
             } catch (ex: Exception) {
                 if (ex is XProcException) {
-                    throw XProcError.xsCatchCodesNotEQName(codeValue).exception()
+                    throw stepConfig.exception(XProcError.xsCatchCodesNotEQName(codeValue))
                 }
                 throw ex
             }
@@ -1041,11 +1041,11 @@ class XplParser internal constructor(val builder: PipelineBuilder) {
 
     }
 
-    private fun parseVersion(version: String): Double {
+    private fun parseVersion(node: ElementNode, version: String): Double {
         try {
             version.toDouble()
         } catch (ex: NumberFormatException) {
-            throw XProcError.xsVersionMustBeDecimal(version).exception()
+            throw XProcError.xsVersionMustBeDecimal(version).at(node.node).exception()
         }
 
         val pos = version.indexOf(".")
@@ -1053,7 +1053,7 @@ class XplParser internal constructor(val builder: PipelineBuilder) {
             if (version.toInt() == 3) {
                 return 3.0
             }
-            throw XProcError.xsUnsupportedVersion(version).exception()
+            throw XProcError.xsUnsupportedVersion(version).at(node.node).exception()
         } else {
             val units = version.substring(0, pos).toInt()
             val frac = version.substring(pos + 1).toInt()
@@ -1064,7 +1064,7 @@ class XplParser internal constructor(val builder: PipelineBuilder) {
                     else -> Unit
                 }
             }
-            throw XProcError.xsUnsupportedVersion(version).exception()
+            throw XProcError.xsUnsupportedVersion(version).at(node.node).exception()
         }
     }
 

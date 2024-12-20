@@ -153,7 +153,7 @@ class FoFop(): FoProcessor {
 
     override fun format(document: XProcDocument, contentType: MediaType, out: OutputStream) {
         if (!supportedContentTypes.contains(contentType)) {
-            throw XProcError.xcUnsupportedContentType(contentType).exception()
+            throw stepConfig.exception(XProcError.xcUnsupportedContentType(contentType))
         }
 
         val fodoc = S9Api.xdmToInputSource(stepConfig, document)

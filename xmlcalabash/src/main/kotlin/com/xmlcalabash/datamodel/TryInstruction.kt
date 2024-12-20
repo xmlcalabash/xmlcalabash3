@@ -73,16 +73,16 @@ class TryInstruction(parent: XProcInstruction): CompoundStepDeclaration(parent, 
                 is CatchInstruction -> {
                     if (child.code.isEmpty()) {
                         if (catchWithoutCode) {
-                            throw XProcError.xsMultipleCatchWithoutCodes().exception()
+                            throw stepConfig.exception(XProcError.xsMultipleCatchWithoutCodes())
                         }
                         catchWithoutCode = true
                     } else {
                         if (catchWithoutCode) {
-                            throw XProcError.xsCatchWithoutCodesNotLast().exception()
+                            throw stepConfig.exception(XProcError.xsCatchWithoutCodesNotLast())
                         }
                         for (code in child.code) {
                             if (seenCodes.contains(code)) {
-                                throw XProcError.xsCatchWithDuplicateCode(code).exception()
+                                throw stepConfig.exception(XProcError.xsCatchWithDuplicateCode(code))
                             }
                             seenCodes.add(code)
                         }
@@ -92,7 +92,7 @@ class TryInstruction(parent: XProcInstruction): CompoundStepDeclaration(parent, 
                 }
                 is FinallyInstruction -> {
                     if (finally != null) {
-                        throw XProcError.xsTryWithMoreThanOneFinally().exception()
+                        throw stepConfig.exception(XProcError.xsTryWithMoreThanOneFinally())
                     }
                     finally = child
                     child.elaborateInstructions()
@@ -102,13 +102,13 @@ class TryInstruction(parent: XProcInstruction): CompoundStepDeclaration(parent, 
                     child.elaborateInstructions()
                 }
                 else -> {
-                    throw XProcError.xiImpossible("Unexpected child: ${child}").exception()
+                    throw stepConfig.exception(XProcError.xiImpossible("Unexpected child: ${child}"))
                 }
             }
         }
 
         if (children.filterIsInstance<CatchInstruction>().isEmpty() && finally == null) {
-            throw XProcError.xsTryWithoutCatchOrFinally().exception()
+            throw stepConfig.exception(XProcError.xsTryWithoutCatchOrFinally())
         }
 
         val outputs = mutableSetOf<String>()
@@ -121,15 +121,15 @@ class TryInstruction(parent: XProcInstruction): CompoundStepDeclaration(parent, 
             } else {
                 if ((primaryOutput == null && child.primaryOutput() != null)
                     || (primaryOutput != null && child.primaryOutput() == null)) {
-                    throw XProcError.xsDifferentPrimaryOutputs().exception()
+                    throw stepConfig.exception(XProcError.xsDifferentPrimaryOutputs())
                 }
                 if (primaryOutput != null && child.primaryOutput()!!.port != primaryOutput.port) {
-                    throw XProcError.xsDifferentPrimaryOutputs().exception()
+                    throw stepConfig.exception(XProcError.xsDifferentPrimaryOutputs())
                 }
             }
             for (output in child.children.filterIsInstance<OutputInstruction>()) {
                 if (child is FinallyInstruction && outputs.contains(output.port)) {
-                    throw XProcError.xsFinallyWithConflictingOutputs(output.port).exception()
+                    throw stepConfig.exception(XProcError.xsFinallyWithConflictingOutputs(output.port))
                 }
                 outputs.add(output.port)
             }
@@ -137,11 +137,11 @@ class TryInstruction(parent: XProcInstruction): CompoundStepDeclaration(parent, 
 
         if (finally != null) {
             if (finally.primaryOutput() != null) {
-                throw XProcError.xsPrimaryOutputOnFinally(finally.primaryOutput()!!.port).exception()
+                throw stepConfig.exception(XProcError.xsPrimaryOutputOnFinally(finally.primaryOutput()!!.port))
             }
             for (output in finally.children.filterIsInstance<OutputInstruction>()) {
                 if (outputs.contains(output.port)) {
-                    throw XProcError.xsFinallyWithConflictingOutputs(output.port).exception()
+                    throw stepConfig.exception(XProcError.xsFinallyWithConflictingOutputs(output.port))
                 }
                 outputs.add(output.port)
             }
@@ -200,7 +200,7 @@ class TryInstruction(parent: XProcInstruction): CompoundStepDeclaration(parent, 
     }
 
     override fun withInput(port: String?): WithInputInstruction {
-        throw XProcError.xsInvalidElement(instructionType).exception()
+        throw stepConfig.exception(XProcError.xsInvalidElement(instructionType))
     }
 
     override fun output(port: String?): OutputInstruction {
@@ -256,10 +256,10 @@ class TryInstruction(parent: XProcInstruction): CompoundStepDeclaration(parent, 
 
     fun catch(): CatchInstruction {
         if (group == null) {
-            throw XProcError.xsTryWithoutSubpipeline().exception()
+            throw stepConfig.exception(XProcError.xsTryWithoutSubpipeline())
         }
         if (children.filterIsInstance<FinallyInstruction>().isNotEmpty()) {
-            throw XProcError.xsTryWithMoreThanOneFinally().exception()
+            throw stepConfig.exception(XProcError.xsTryWithMoreThanOneFinally())
         }
         val catch = CatchInstruction(this)
         _children.add(catch)
@@ -268,10 +268,10 @@ class TryInstruction(parent: XProcInstruction): CompoundStepDeclaration(parent, 
 
     fun finally(): FinallyInstruction {
         if (group == null) {
-            throw XProcError.xsTryWithoutSubpipeline().exception()
+            throw stepConfig.exception(XProcError.xsTryWithoutSubpipeline())
         }
         if (children.filterIsInstance<FinallyInstruction>().isNotEmpty()) {
-            throw XProcError.xsTryWithMoreThanOneFinally().exception()
+            throw stepConfig.exception(XProcError.xsTryWithMoreThanOneFinally())
         }
         val finally = FinallyInstruction(this)
         _children.add(finally)

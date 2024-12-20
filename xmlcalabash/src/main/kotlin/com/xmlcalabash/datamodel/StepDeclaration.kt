@@ -30,13 +30,13 @@ abstract class StepDeclaration(parent: XProcInstruction?, stepConfig: Instructio
         stepConfig.stepName = name
 
         for (name in depends) {
-            val dependsOn = stepConfig.inscopeStepNames[name] ?: throw XProcError.xsDependsNotAStep(name).exception()
+            val dependsOn = stepConfig.inscopeStepNames[name] ?: throw stepConfig.exception(XProcError.xsDependsNotAStep(name))
 
             // Generally, the children of a container are in scope. But that's not true for [p:]depends
             var p: XProcInstruction? = dependsOn
             while (p != null) {
                 if (p === this) {
-                    throw XProcError.xsDependsNotAllowed(name).exception()
+                    throw stepConfig.exception(XProcError.xsDependsNotAllowed(name))
                 }
                 p = p.parent
             }
@@ -63,7 +63,7 @@ abstract class StepDeclaration(parent: XProcInstruction?, stepConfig: Instructio
     open fun checkInputBindings() {
         for (child in children.filterIsInstance<InputBindingInstruction>()) {
             if (!child.weldedShut && (child.children.isEmpty() && child.defaultBindings.isEmpty())) {
-                throw XProcError.xsNotConnected(child.port).exception()
+                throw stepConfig.exception(XProcError.xsNotConnected(child.port))
             }
         }
     }
@@ -209,7 +209,7 @@ abstract class StepDeclaration(parent: XProcInstruction?, stepConfig: Instructio
 
     fun depends(steplist: String) {
         if (steplist.trim().isEmpty()) {
-            throw XProcError.xsValueDoesNotSatisfyType(steplist, "xs:NCName+").exception()
+            throw stepConfig.exception(XProcError.xsValueDoesNotSatisfyType(steplist, "xs:NCName+"))
         }
         for (depend in steplist.split("\\s+".toRegex())) {
             try {

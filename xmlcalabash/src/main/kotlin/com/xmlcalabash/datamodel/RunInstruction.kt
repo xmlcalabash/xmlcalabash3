@@ -33,7 +33,7 @@ class RunInstruction(parent: XProcInstruction): CompoundStepDeclaration(parent, 
         for (child in children.filterIsInstance<WithInputInstruction>()) {
             if (child is RunInputInstruction) {
                 if (child.port in seenPorts) {
-                    throw XProcError.xsDuplicatePortDeclaration(child.port).exception()
+                    throw stepConfig.exception(XProcError.xsDuplicatePortDeclaration(child.port))
                 }
                 seenPorts.add(child.port)
                 inputCount++
@@ -70,7 +70,7 @@ class RunInstruction(parent: XProcInstruction): CompoundStepDeclaration(parent, 
         for (input in list) {
             if (input.primary == true) {
                 if (primaryPort != "") {
-                    throw XProcError.xiImpossible("fixme: error for duplicate primary input on run").exception()
+                    throw stepConfig.exception(XProcError.xiImpossible("fixme: error for duplicate primary input on run"))
                 }
                 primaryPort = input.port
             }
@@ -98,7 +98,7 @@ class RunInstruction(parent: XProcInstruction): CompoundStepDeclaration(parent, 
 
     fun runOption(name: QName, expr: XProcExpression?): RunOptionInstruction {
         if (children.filterIsInstance<RunOptionInstruction>().any { it.name == name }) {
-            throw XProcError.xsDuplicateWithOption(name).exception()
+            throw stepConfig.exception(XProcError.xsDuplicateWithOption(name))
         }
 
         val runOption = RunOptionInstruction(this, name, stepConfig.copy())

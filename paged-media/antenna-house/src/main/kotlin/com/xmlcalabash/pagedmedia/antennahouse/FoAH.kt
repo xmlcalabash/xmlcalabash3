@@ -64,7 +64,7 @@ class FoAH(): AbstractAH(), FoProcessor {
 
     override fun format(document: XProcDocument, contentType: MediaType, out: OutputStream) {
         val outputFormat = formatMap[contentType]
-            ?: throw XProcError.xdInvalidContentType(contentType.toString()).exception()
+            ?: throw stepConfig.exception(XProcError.xdInvalidContentType(contentType.toString()))
 
         val temp = File.createTempFile("xmlcalabash-ahfo", ".xml")
         temp.deleteOnExit()

@@ -32,7 +32,7 @@ open class UuidStep(): AbstractAtomicStep(), ProcessMatchingNodes {
         if (version == 4) {
             uuid = java.util.UUID.randomUUID().toString()
         } else {
-            throw XProcError.xcUnsupportedUuidVersion(version).exception()
+            throw stepConfig.exception(XProcError.xcUnsupportedUuidVersion(version))
         }
 
         matcher = ProcessMatch(stepConfig, this, valueBinding(Ns.match).context.inscopeNamespaces)

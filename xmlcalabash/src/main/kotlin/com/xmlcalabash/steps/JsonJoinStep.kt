@@ -28,10 +28,10 @@ open class JsonJoinStep(): AbstractAtomicStep() {
                 try {
                     intval = flatten.toInt()
                 } catch (ex: NumberFormatException) {
-                    throw XProcError.xcInvalidFlatten(flatten).exception()
+                    throw stepConfig.exception(XProcError.xcInvalidFlatten(flatten))
                 }
                 if (intval < 0) {
-                    throw XProcError.xcInvalidFlatten(flatten).exception()
+                    throw stepConfig.exception(XProcError.xcInvalidFlatten(flatten))
                 }
                 intval
             }
@@ -44,7 +44,7 @@ open class JsonJoinStep(): AbstractAtomicStep() {
                 is XdmAtomicValue -> value = value.addMember(input.value)
                 is XdmArray -> value = addArray(value, input.value as XdmArray, depth)
                 is XdmNode -> value = value.addMember(input.value)
-                else -> throw XProcError.xcUnsupportedForJoin().exception()
+                else -> throw stepConfig.exception(XProcError.xcUnsupportedForJoin())
             }
         }
 
@@ -60,7 +60,7 @@ open class JsonJoinStep(): AbstractAtomicStep() {
                     is XdmAtomicValue -> newValue = newValue.addMember(item)
                     is XdmArray -> newValue = addArray(newValue, item, depth - 1)
                     is XdmNode -> newValue = newValue.addMember(XdmAtomicValue(item.stringValue))
-                    else -> throw XProcError.xcUnsupportedForJoin().exception()
+                    else -> throw stepConfig.exception(XProcError.xcUnsupportedForJoin())
                 }
             }
             return newValue

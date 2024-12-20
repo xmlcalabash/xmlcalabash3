@@ -28,7 +28,7 @@ open class TextSortStep(): AbstractTextStep() {
         val lang = try {
             stringBinding(Ns.lang)
         } catch (ex: SaxonApiException) {
-            throw XProcError.xdBadType("Invalid language").exception(ex)
+            throw stepConfig.exception(XProcError.xdBadType("Invalid language"), ex)
         }
 
         // We accidentally published collations starting with https://www.w3.org/ in the specs :-(

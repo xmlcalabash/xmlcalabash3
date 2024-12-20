@@ -19,27 +19,27 @@ abstract class FileCopyOrMove(stepType: QName): FileStep(stepType) {
         val href = try {
             uriBinding(Ns.href)!!
         } catch (ex: Exception) {
-            throw XProcError.xdInvalidUri(options[Ns.href].toString()).exception(ex)
+            throw stepConfig.exception(XProcError.xdInvalidUri(options[Ns.href].toString()), ex)
         }
 
         if (href.scheme != "file") {
             if (stepType == NsP.fileCopy) {
-                throw XProcError.xcUnsupportedFileCopyScheme(href.scheme).exception()
+                throw stepConfig.exception(XProcError.xcUnsupportedFileCopyScheme(href.scheme))
             }
-            throw XProcError.xcUnsupportedFileMoveScheme(href.scheme).exception()
+            throw stepConfig.exception(XProcError.xcUnsupportedFileMoveScheme(href.scheme))
         }
 
         val targetHref = try {
             uriBinding(Ns.target)!!
         } catch (ex: Exception) {
-            throw XProcError.xdInvalidUri(options[Ns.target].toString()).exception(ex)
+            throw stepConfig.exception(XProcError.xdInvalidUri(options[Ns.target].toString()), ex)
         }
 
         if (targetHref.scheme != "file") {
             if (stepType == NsP.fileCopy) {
-                throw XProcError.xcUnsupportedFileCopyScheme(href.scheme).exception()
+                throw stepConfig.exception(XProcError.xcUnsupportedFileCopyScheme(href.scheme))
             }
-            throw XProcError.xcUnsupportedFileMoveScheme(href.scheme).exception()
+            throw stepConfig.exception(XProcError.xcUnsupportedFileMoveScheme(href.scheme))
         }
 
         failOnError = booleanBinding(Ns.failOnError) ?: true

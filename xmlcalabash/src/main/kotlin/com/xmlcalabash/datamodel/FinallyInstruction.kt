@@ -10,7 +10,7 @@ class FinallyInstruction(parent: XProcInstruction): CompoundStepDeclaration(pare
 
     override fun elaborateInstructions() {
         if (depends.isNotEmpty()) {
-            throw XProcError.xsAttributeForbidden(Ns.depends).exception()
+            throw stepConfig.exception(XProcError.xsAttributeForbidden(Ns.depends))
         }
         // Make this one "by hand" because p:finally can't have an input instructions
         _children.add(1, errorPort)
@@ -20,7 +20,7 @@ class FinallyInstruction(parent: XProcInstruction): CompoundStepDeclaration(pare
     override fun checkInputBindings() {
         for (child in children.filterIsInstance<InputBindingInstruction>()) {
             if (child.port != "error" && child.children.isEmpty()) {
-                throw XProcError.xsNotConnected(child.port).exception()
+                throw stepConfig.exception(XProcError.xsNotConnected(child.port))
             }
         }
     }

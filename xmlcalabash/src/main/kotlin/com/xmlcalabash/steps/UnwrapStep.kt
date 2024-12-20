@@ -60,7 +60,7 @@ class UnwrapStep(): AbstractAtomicStep(), ProcessMatchingNodes {
         matchingAttributes: AttributeMap,
         nonMatchingAttributes: AttributeMap
     ): AttributeMap? {
-        throw XProcError.xcInvalidSelection(pattern, "attribute").exception()
+        throw stepConfig.exception(XProcError.xcInvalidSelection(pattern, "attribute"))
     }
 
     override fun endElement(node: XdmNode) {
@@ -68,15 +68,15 @@ class UnwrapStep(): AbstractAtomicStep(), ProcessMatchingNodes {
     }
 
     override fun text(node: XdmNode) {
-        throw XProcError.xcInvalidSelection(pattern, "text").exception()
+        throw stepConfig.exception(XProcError.xcInvalidSelection(pattern, "text"))
     }
 
     override fun comment(node: XdmNode) {
-        throw XProcError.xcInvalidSelection(pattern, "comment").exception()
+        throw stepConfig.exception(XProcError.xcInvalidSelection(pattern, "comment"))
     }
 
     override fun pi(node: XdmNode) {
-        throw XProcError.xcInvalidSelection(pattern, "processing-instruction").exception()
+        throw stepConfig.exception(XProcError.xcInvalidSelection(pattern, "processing-instruction"))
     }
 
     override fun toString(): String = "p:unwrap"

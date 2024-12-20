@@ -51,11 +51,11 @@ class SetAttributesStep(): AbstractAtomicStep(), ProcessMatchingNodes {
     }
 
     override fun startDocument(node: XdmNode): Boolean {
-        throw XProcError.xcInvalidSelection(matchPattern).exception()
+        throw stepConfig.exception(XProcError.xcInvalidSelection(matchPattern))
     }
 
     override fun endDocument(node: XdmNode) {
-        throw XProcError.xcInvalidSelection(matchPattern).exception()
+        throw stepConfig.exception(XProcError.xcInvalidSelection(matchPattern))
     }
 
     override fun startElement(node: XdmNode, attributes: AttributeMap): Boolean {
@@ -73,7 +73,7 @@ class SetAttributesStep(): AbstractAtomicStep(), ProcessMatchingNodes {
         matchingAttributes: AttributeMap,
         nonMatchingAttributes: AttributeMap
     ): AttributeMap? {
-        throw XProcError.xcInvalidSelection(matchPattern).exception()
+        throw stepConfig.exception(XProcError.xcInvalidSelection(matchPattern))
     }
 
     override fun endElement(node: XdmNode) {
@@ -81,15 +81,15 @@ class SetAttributesStep(): AbstractAtomicStep(), ProcessMatchingNodes {
     }
 
     override fun text(node: XdmNode) {
-        throw XProcError.xcInvalidSelection(matchPattern).exception()
+        throw stepConfig.exception(XProcError.xcInvalidSelection(matchPattern))
     }
 
     override fun comment(node: XdmNode) {
-        throw XProcError.xcInvalidSelection(matchPattern).exception()
+        throw stepConfig.exception(XProcError.xcInvalidSelection(matchPattern))
     }
 
     override fun pi(node: XdmNode) {
-        throw XProcError.xcInvalidSelection(matchPattern).exception()
+        throw stepConfig.exception(XProcError.xcInvalidSelection(matchPattern))
     }
 
     override fun toString(): String = "p:set-attributes"

@@ -29,7 +29,7 @@ open class XIncludeStep(): AbstractAtomicStep() {
         try {
             receiver.output("result", document.with(xincluder.expandXIncludes(document.value as XdmNode)))
         } catch (ex: Exception) {
-            throw XProcError.xcXIncludeError(ex.message!!).exception(ex)
+            throw stepConfig.exception(XProcError.xcXIncludeError(ex.message!!), ex)
         }
     }
 
@@ -47,7 +47,7 @@ open class XIncludeStep(): AbstractAtomicStep() {
                 return cached.value as XdmNode
             }
 
-            throw XProcError.xcXIncludeError("Cached document is not XML: ${href}").exception()
+            throw stepConfig.exception(XProcError.xcXIncludeError("Cached document is not XML: ${href}"))
         }
 
         override fun resolveText(base: XdmNode, uri: String, encoding: String?, accept: String?, acceptLanguage: String?): XdmNode? {
@@ -61,7 +61,7 @@ open class XIncludeStep(): AbstractAtomicStep() {
                 return cached.value as XdmNode
             }
 
-            throw XProcError.xcXIncludeError("Cached document is not a node: ${href}").exception()
+            throw stepConfig.exception(XProcError.xcXIncludeError("Cached document is not a node: ${href}"))
         }
     }
 }

@@ -73,11 +73,11 @@ class SendMail(): AbstractAtomicStep() {
         val email = if (mainMessage.value is XdmNode) {
             S9Api.documentElement(mainMessage.value as XdmNode)
         } else {
-            throw XProcError.step(161, "p:send-mail source is not XML").exception()
+            throw stepConfig.exception(XProcError.step(161, "p:send-mail source is not XML"))
         }
 
         if (email.nodeName != em_Message) {
-            throw XProcError.step(161, "p:send-mail source is not an em:Message").exception()
+            throw stepConfig.exception(XProcError.step(161, "p:send-mail source is not an em:Message"))
         }
 
         setProperty("mail.smtp.host", parameters[_host]?.underlyingValue?.stringValue ?: sendmail["host"])
@@ -125,7 +125,7 @@ class SendMail(): AbstractAtomicStep() {
                             val addrs = parseAddresses(field)
                             msg.setRecipients(Message.RecipientType.BCC, addrs)
                         }
-                        else -> throw XProcError.step(161, "Unexpected RFC 822 element: ${field.nodeName.localName}").exception()
+                        else -> throw stepConfig.exception(XProcError.step(161, "Unexpected RFC 822 element: ${field.nodeName.localName}"))
                     }
                 } else if (field.nodeName == em_content) {
                     // What kind of content is this?
@@ -180,7 +180,7 @@ class SendMail(): AbstractAtomicStep() {
                         msg.setContent(content, contentType)
                     }
                 } else {
-                    throw XProcError.step(161, "Unexpected element: ${field.nodeName.localName}").exception()
+                    throw stepConfig.exception(XProcError.step(161, "Unexpected element: ${field.nodeName.localName}"))
                 }
             }
 
@@ -211,7 +211,7 @@ class SendMail(): AbstractAtomicStep() {
 
             Transport.send(msg)
         } catch (ex: Exception) {
-            throw XProcError.xdStepFailed("p:send-mail failed").exception(ex)
+            throw stepConfig.exception(XProcError.xdStepFailed("p:send-mail failed"), ex)
         }
 
         val builder = SaxonTreeBuilder(stepConfig)
@@ -247,10 +247,10 @@ class SendMail(): AbstractAtomicStep() {
                 if (email == null) {
                     email = parseEmail(addr)
                 } else {
-                    throw XProcError.step(161, "Expected only a single email address in ${field.nodeName}").exception()
+                    throw stepConfig.exception(XProcError.step(161, "Expected only a single email address in ${field.nodeName}"))
                 }
             } else {
-                throw XProcError.step(161, "Only <em:Address> is supported in ${field.nodeName}").exception()
+                throw stepConfig.exception(XProcError.step(161, "Only <em:Address> is supported in ${field.nodeName}"))
             }
         }
 
@@ -267,7 +267,7 @@ class SendMail(): AbstractAtomicStep() {
             if (addr.nodeName == em_Address) {
                 emails.add(parseEmail(addr))
             } else {
-                throw XProcError.step(161, "Only <em:Address> is supported in ${field.nodeName}").exception()
+                throw stepConfig.exception(XProcError.step(161, "Only <em:Address> is supported in ${field.nodeName}"))
             }
         }
 
@@ -288,12 +288,12 @@ class SendMail(): AbstractAtomicStep() {
             } else if (em_adrs.equals(addr.nodeName)) {
                 email_addr = addr.stringValue
             } else {
-                throw XProcError.step(161, "Only <em:name> and <em:adrs> are supported in ${address.nodeName}").exception()
+                throw stepConfig.exception(XProcError.step(161, "Only <em:name> and <em:adrs> are supported in ${address.nodeName}"))
             }
         }
 
         if (email_addr == null) {
-            throw XProcError.step(161, "Email address specified without an <em:adrs>").exception()
+            throw stepConfig.exception(XProcError.step(161, "Email address specified without an <em:adrs>"))
         }
 
         if (email_addr.startsWith("mailto:")) {

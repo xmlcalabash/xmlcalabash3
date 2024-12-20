@@ -17,11 +17,11 @@ class FileDeleteStep(): FileStep(NsP.fileDelete) {
         val href = try {
             uriBinding(Ns.href)!!
         } catch (ex: Exception) {
-            throw XProcError.xdInvalidUri(options[Ns.href].toString()).exception(ex)
+            throw stepConfig.exception(XProcError.xdInvalidUri(options[Ns.href].toString()), ex)
         }
 
         if (href.scheme != "file") {
-            throw XProcError.xcUnsupportedFileDeleteScheme(href.scheme).exception()
+            throw stepConfig.exception(XProcError.xcUnsupportedFileDeleteScheme(href.scheme))
         }
 
         val recursive = booleanBinding(Ns.recursive) ?: false

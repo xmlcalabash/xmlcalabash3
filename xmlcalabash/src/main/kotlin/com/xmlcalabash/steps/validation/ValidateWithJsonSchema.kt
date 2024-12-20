@@ -32,7 +32,7 @@ open class ValidateWithJsonSchema(): AbstractAtomicStep() {
         val reportFormat = stringBinding(Ns.reportFormat) ?: "xvrl"
 
         if (reportFormat != "xvrl") {
-            throw XProcError.xcUnsupportedReportFormat(reportFormat).exception()
+            throw stepConfig.exception(XProcError.xcUnsupportedReportFormat(reportFormat))
         }
 
         val jsonSchemaFactory = JsonSchemaFactory.getInstance(SpecVersion.VersionFlag.V202012)
@@ -90,9 +90,9 @@ open class ValidateWithJsonSchema(): AbstractAtomicStep() {
 
         if (assertValid) {
             if (document.baseURI == null) {
-                throw XProcError.xcNotSchemaValidJson().exception()
+                throw stepConfig.exception(XProcError.xcNotSchemaValidJson())
             }
-            throw XProcError.xcNotSchemaValidJson(document.baseURI!!).exception()
+            throw stepConfig.exception(XProcError.xcNotSchemaValidJson(document.baseURI!!))
         }
 
         receiver.output("result", document)

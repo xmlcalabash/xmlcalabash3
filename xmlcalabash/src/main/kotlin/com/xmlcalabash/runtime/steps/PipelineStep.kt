@@ -27,7 +27,7 @@ class PipelineStep(config: XProcStepConfiguration, compound: CompoundStepModel):
             } else if (step.externalName in head.options) {
                 val list = head.options[step.externalName]!!
                 if (list.size != 1) {
-                    throw XProcError.xiImpossible("Dynamic option is a collection?").exception()
+                    throw stepConfig.exception(XProcError.xiImpossible("Dynamic option is a collection?"))
                 }
                 step.externalValue = list.first()
             }

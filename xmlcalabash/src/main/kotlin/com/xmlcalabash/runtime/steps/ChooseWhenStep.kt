@@ -57,7 +57,7 @@ open class ChooseWhenStep(config: XProcStepConfiguration, compound: CompoundStep
                 }
 
                 if (!more) {
-                    throw XProcError.xiNoRunnableSteps().exception()
+                    throw stepConfig.exception(XProcError.xiNoRunnableSteps())
                 }
             }
         }

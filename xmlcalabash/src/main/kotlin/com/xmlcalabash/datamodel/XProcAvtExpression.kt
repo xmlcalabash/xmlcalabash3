@@ -53,7 +53,7 @@ class XProcAvtExpression private constructor(stepConfig: XProcStepConfiguration,
                 // level (so that we get the correct separators, for example).
                 for (item in result.iterator()) {
                     if (!(item is XdmNode || item is XdmAtomicValue)) {
-                        throw XProcError.xdInvalidAvtResult(avt.value[index]).exception()
+                        throw stepConfig.exception(XProcError.xdInvalidAvtResult(avt.value[index]))
                     }
                 }
 

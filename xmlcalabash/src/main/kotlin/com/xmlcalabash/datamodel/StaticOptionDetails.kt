@@ -14,15 +14,15 @@ class StaticOptionDetails(val stepConfig: XProcStepConfiguration, val name: QNam
 
     internal fun override(value: XdmValue) {
         if (!asType.matches(value)) {
-            throw XProcError.xsValueDoesNotSatisfyType(value.toString(), asType.toString()).exception()
+            throw stepConfig.exception(XProcError.xsValueDoesNotSatisfyType(value.toString(), asType.toString()))
         }
 
         if (values.isNotEmpty()) {
             if (value !is XdmAtomicValue) {
-                throw XProcError.xsValueDoesNotSatisfyType(value.toString(), asType.toString()).exception()
+                throw stepConfig.exception(XProcError.xsValueDoesNotSatisfyType(value.toString(), asType.toString()))
             }
             if (!values.contains(value)) {
-                throw XProcError.xsValueDoesNotSatisfyType(value.toString(), values.toString()).exception()
+                throw stepConfig.exception(XProcError.xsValueDoesNotSatisfyType(value.toString(), values.toString()))
             }
         }
 

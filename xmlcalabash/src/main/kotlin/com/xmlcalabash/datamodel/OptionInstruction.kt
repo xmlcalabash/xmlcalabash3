@@ -56,7 +56,7 @@ open class OptionInstruction(parent: XProcInstruction, name: QName, stepConfig: 
         visibility = visibility ?: Visibility.PUBLIC
 
         if (required == true && static) {
-            throw XProcError.xsRequiredAndStatic(name).exception()
+            throw stepConfig.exception(XProcError.xsRequiredAndStatic(name))
         }
 
         if (select == null) {
@@ -80,7 +80,7 @@ open class OptionInstruction(parent: XProcInstruction, name: QName, stepConfig: 
             }
         } else {
             if (required == true) {
-                throw XProcError.xsRequiredAndDefaulted(name).exception()
+                throw stepConfig.exception(XProcError.xsRequiredAndDefaulted(name))
             }
             asType = asType ?: stepConfig.parseSequenceType("item()*")
             select = select!!.cast(asType!!)
@@ -89,7 +89,7 @@ open class OptionInstruction(parent: XProcInstruction, name: QName, stepConfig: 
         // If an option contains variable references, they can only be to preceding options
         for (name in select!!.variableRefs) {
             if (name !in stepConfig.inscopeVariables) {
-                throw XProcError.xsXPathStaticError("There is no \$${name} option in scope").exception()
+                throw stepConfig.exception(XProcError.xsXPathStaticError("There is no \$${name} option in scope"))
             }
         }
 
@@ -101,7 +101,7 @@ open class OptionInstruction(parent: XProcInstruction, name: QName, stepConfig: 
                 var found = stepConfig.saxonConfig.configuration.getSystemFunction(sqname, func.second) != null
                 found = found || ourSet.getFunctionItem(SymbolicName.F(sqname, func.second), compiler.underlyingStaticContext) != null
                 if (!found) {
-                    throw XProcError.xsXPathStaticError(func.first).exception()
+                    throw stepConfig.exception(XProcError.xsXPathStaticError(func.first))
                 }
             }
         }
@@ -109,7 +109,7 @@ open class OptionInstruction(parent: XProcInstruction, name: QName, stepConfig: 
         if (static) {
             val inScope = stepConfig.inscopeVariables[name]
             if (inScope is OptionInstruction && inScope.static) {
-                throw XProcError.xsShadowStaticOption(name).exception()
+                throw stepConfig.exception(XProcError.xsShadowStaticOption(name))
             }
             select!!.computeStaticValue(stepConfig)
             stepConfig.addStaticBinding(name, select!!.staticValue!!)
@@ -119,18 +119,18 @@ open class OptionInstruction(parent: XProcInstruction, name: QName, stepConfig: 
     }
 
     override fun empty(): EmptyInstruction {
-        throw XProcError.xsInvalidElement(NsP.empty).exception()
+        throw stepConfig.exception(XProcError.xsInvalidElement(NsP.empty))
     }
 
     override fun document(href: XProcExpression): DocumentInstruction {
-        throw XProcError.xsInvalidElement(NsP.document).exception()
+        throw stepConfig.exception(XProcError.xsInvalidElement(NsP.document))
     }
 
     override fun pipe(): PipeInstruction {
-        throw XProcError.xsInvalidElement(NsP.pipe).exception()
+        throw stepConfig.exception(XProcError.xsInvalidElement(NsP.pipe))
     }
 
     override fun inline(documentNode: XdmNode): InlineInstruction {
-        throw XProcError.xsInvalidElement(NsP.inline).exception()
+        throw stepConfig.exception(XProcError.xsInvalidElement(NsP.inline))
     }
 }

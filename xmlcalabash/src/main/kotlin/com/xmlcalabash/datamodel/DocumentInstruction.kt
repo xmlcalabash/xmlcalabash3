@@ -50,11 +50,11 @@ class DocumentInstruction private constructor(parent: XProcInstruction): Connect
         }
 
         for (child in children) {
-            throw XProcError.xsInvalidElement(child.instructionType).exception()
+            throw stepConfig.exception(XProcError.xsInvalidElement(child.instructionType))
         }
 
         if ((parameters.contextRef || documentProperties.contextRef) && stepConfig.drp == null) {
-            throw XProcError.xsNoPortPortNotReadable().exception()
+            throw stepConfig.exception(XProcError.xsNoPortPortNotReadable())
         }
 
         variables.addAll(href.variableRefs)

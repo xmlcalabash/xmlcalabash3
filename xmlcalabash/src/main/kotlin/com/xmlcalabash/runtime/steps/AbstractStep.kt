@@ -86,16 +86,16 @@ abstract class AbstractStep(val stepConfig: XProcStepConfiguration, step: StepMo
         if (!flange.sequence && count != 1) {
             if (type == NsCx.select) {
                 // This is really an error on the input we're feeding into
-                throw XProcError.xdInputSequenceForbidden(port).exception()
+                throw stepConfig.exception(XProcError.xdInputSequenceForbidden(port))
             }
-            throw XProcError.xdOutputSequenceForbidden(port).exception()
+            throw stepConfig.exception(XProcError.xdOutputSequenceForbidden(port))
         }
 
         if (flange.contentTypes.isNotEmpty()) {
             val mtype = doc.contentType ?: MediaType.ANY
             val match = mtype.matchingMediaType(flange.contentTypes)
             if (match == null || !match.inclusive) {
-                throw XProcError.xdBadOutputContentType(port, mtype.toString()).exception()
+                throw stepConfig.exception(XProcError.xdBadOutputContentType(port, mtype.toString()))
             }
         }
 
@@ -118,9 +118,9 @@ abstract class AbstractStep(val stepConfig: XProcStepConfiguration, step: StepMo
                 else -> {
                     val msg = ex.message ?: ""
                     if (msg.contains("cannot be cast")) {
-                        throw XProcError.xdBadType(msg).at(type,name).exception()
+                        throw stepConfig.exception(XProcError.xdBadType(msg).at(type,name))
                     }
-                    throw XProcError.xdStepFailed(msg).at(type, name).exception()
+                    throw stepConfig.exception(XProcError.xdStepFailed(msg).at(type, name))
                 }
             }
         }
@@ -147,7 +147,7 @@ abstract class AbstractStep(val stepConfig: XProcStepConfiguration, step: StepMo
                 if (binding.documentProperties.canBeResolvedStatically()) {
                     inlineStep.option(Ns.documentProperties, LazyValue(binding.stepConfig, binding.documentProperties, stepConfig))
                 } else {
-                    throw XProcError.xiImpossible("Default binding can't resolve document-properties statically?").exception()
+                    throw stepConfig.exception(XProcError.xiImpossible("Default binding can't resolve document-properties statically?"))
                 }
 
                 inlineStep.run()
@@ -163,19 +163,19 @@ abstract class AbstractStep(val stepConfig: XProcStepConfiguration, step: StepMo
                 if (binding.href.canBeResolvedStatically()) {
                     documentStep.option(Ns.href, LazyValue(binding.stepConfig, binding.href, stepConfig))
                 } else {
-                    throw XProcError.xiImpossible("Input default document href isn't static?").exception()
+                    throw stepConfig.exception(XProcError.xiImpossible("Input default document href isn't static?"))
                 }
 
                 if (binding.documentProperties.canBeResolvedStatically()) {
                     documentStep.option(Ns.documentProperties, LazyValue(binding.stepConfig, binding.documentProperties, stepConfig))
                 } else {
-                    throw XProcError.xiImpossible("Default binding can't resolve document-properties statically?").exception()
+                    throw stepConfig.exception(XProcError.xiImpossible("Default binding can't resolve document-properties statically?"))
                 }
 
                 if (binding.parameters.canBeResolvedStatically()) {
                     documentStep.option(Ns.parameters, LazyValue(binding.stepConfig, binding.parameters, stepConfig))
                 } else {
-                    throw XProcError.xiImpossible("Default binding can't resolve document-properties statically?").exception()
+                    throw stepConfig.exception(XProcError.xiImpossible("Default binding can't resolve document-properties statically?"))
                 }
 
                 documentStep.run()
@@ -185,7 +185,7 @@ abstract class AbstractStep(val stepConfig: XProcStepConfiguration, step: StepMo
                 return emptyList()
             }
             else -> {
-                throw XProcError.xiImpossible("Unexpected default binding: ${binding}").exception()
+                throw stepConfig.exception(XProcError.xiImpossible("Unexpected default binding: ${binding}"))
             }
         }
     }

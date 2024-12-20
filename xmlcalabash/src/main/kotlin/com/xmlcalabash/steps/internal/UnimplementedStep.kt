@@ -12,7 +12,7 @@ open class UnimplementedStep(val params: UnimplementedStepParameters): AbstractA
 
     override fun run() {
         super.run()
-        throw XProcError.xsMissingStepDeclaration(params.unimplemented).exception()
+        throw stepConfig.exception(XProcError.xsMissingStepDeclaration(params.unimplemented))
     }
 
     override fun toString(): String = params.unimplemented.toString()

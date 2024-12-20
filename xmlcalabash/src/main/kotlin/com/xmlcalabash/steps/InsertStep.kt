@@ -53,7 +53,7 @@ class InsertStep(): AbstractAtomicStep(), ProcessMatchingNodes {
 
     override fun startDocument(node: XdmNode): Boolean {
         if (position == BEFORE || position == AFTER) {
-            throw XProcError.xcBadPosition(pattern, position).at(node).exception()
+            throw stepConfig.exception(XProcError.xcBadPosition(pattern, position).at(node))
         }
         if (position == FIRST_CHILD) {
             doInsert()
@@ -85,7 +85,7 @@ class InsertStep(): AbstractAtomicStep(), ProcessMatchingNodes {
     override fun attributes(node: XdmNode,
                             matchingAttributes: AttributeMap,
                             nonMatchingAttributes: AttributeMap): AttributeMap? {
-        throw XProcError.xcInvalidSelection(pattern, "attribute").at(node).exception()
+        throw stepConfig.exception(XProcError.xcInvalidSelection(pattern, "attribute").at(node))
     }
 
     override fun endElement(node: XdmNode) {
@@ -127,7 +127,7 @@ class InsertStep(): AbstractAtomicStep(), ProcessMatchingNodes {
             XdmNodeKind.COMMENT -> matcher.addComment(node.stringValue)
             XdmNodeKind.PROCESSING_INSTRUCTION -> matcher.addPI(node.nodeName.localName, node.stringValue)
             XdmNodeKind.TEXT -> matcher.addText(node.stringValue)
-            else -> throw XProcError.xiImpossibleNodeType(node.nodeKind).at(node).exception()
+            else -> throw stepConfig.exception(XProcError.xiImpossibleNodeType(node.nodeKind).at(node))
         }
 
         if (position == AFTER) {
@@ -135,7 +135,7 @@ class InsertStep(): AbstractAtomicStep(), ProcessMatchingNodes {
         }
 
         if (position == FIRST_CHILD || position == LAST_CHILD) {
-            throw XProcError.xcBadTextPosition(pattern, position).at(node).exception()
+            throw stepConfig.exception(XProcError.xcBadTextPosition(pattern, position).at(node))
         }
     }
 

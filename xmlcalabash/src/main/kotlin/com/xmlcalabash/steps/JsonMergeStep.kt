@@ -31,7 +31,7 @@ open class JsonMergeStep(): AbstractAtomicStep() {
                 is XdmAtomicValue -> value = addValue(value, input.value)
                 is XdmArray -> value = addValue(value, input.value)
                 is XdmNode -> value = addValue(value, input.value)
-                else -> throw XProcError.xcUnsupportedForJsonMerge().exception()
+                else -> throw stepConfig.exception(XProcError.xcUnsupportedForJsonMerge())
             }
         }
 
@@ -43,7 +43,7 @@ open class JsonMergeStep(): AbstractAtomicStep() {
         for (key in map.keySet()) {
             if (newValue.containsKey(key)) {
                 when (duplicates) {
-                    "reject" -> throw XProcError.xcDuplicateKeyInJsonMerge(key).exception()
+                    "reject" -> throw stepConfig.exception(XProcError.xcDuplicateKeyInJsonMerge(key))
                     "use-first" -> Unit
                     "use-last" -> newValue = newValue.put(key, map.get(key))
                     "use-any" -> Unit // first will do
@@ -77,18 +77,18 @@ open class JsonMergeStep(): AbstractAtomicStep() {
         selector.contextItem = item.itemAt(0) // ???
         val result = selector.evaluate()
         if (result.size() != 1) {
-            throw XProcError.xcInvalidKeyForJsonMerge().exception()
+            throw stepConfig.exception(XProcError.xcInvalidKeyForJsonMerge())
         }
 
         val key = when (result) {
             is XdmAtomicValue -> result
-            is XdmMap, is XdmArray, is XdmFunctionItem -> throw XProcError.xcInvalidKeyForJsonMerge().exception()
+            is XdmMap, is XdmArray, is XdmFunctionItem -> throw stepConfig.exception(XProcError.xcInvalidKeyForJsonMerge())
             else -> XdmAtomicValue(result.underlyingValue.stringValue)
         }
 
         if (newValue.containsKey(key)) {
             when (duplicates) {
-                "reject" -> throw XProcError.xcDuplicateKeyInJsonMerge(key).exception()
+                "reject" -> throw stepConfig.exception(XProcError.xcDuplicateKeyInJsonMerge(key))
                 "use-first" -> Unit
                 "use-last" -> newValue = newValue.put(key, item)
                 "use-any" -> Unit // first will do

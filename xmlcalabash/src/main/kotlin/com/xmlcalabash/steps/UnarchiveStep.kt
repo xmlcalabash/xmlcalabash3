@@ -24,11 +24,11 @@ open class UnarchiveStep(): AbstractArchiveStep() {
         val relativeTo = relativeTo()
 
         if (format != Ns.zip) {
-            throw XProcError.xcInvalidArchiveFormat(format).exception()
+            throw stepConfig.exception(XProcError.xcInvalidArchiveFormat(format))
         }
 
         if (format != Ns.zip) {
-            throw XProcError.xcUnsupportedArchiveFormat(format).exception()
+            throw stepConfig.exception(XProcError.xcUnsupportedArchiveFormat(format))
         }
 
         // Setup access to the ZIP data...
@@ -67,7 +67,7 @@ open class UnarchiveStep(): AbstractArchiveStep() {
 
             val baseUri = if (relativeTo == null) {
                 if (archive.baseURI == null) {
-                    throw XProcError.xcNoUnarchiveBaseUri().exception()
+                    throw stepConfig.exception(XProcError.xcNoUnarchiveBaseUri())
                 }
                 URI(Urify.urify(entry.name, archive.baseURI.toString() + "/"))
             } else {

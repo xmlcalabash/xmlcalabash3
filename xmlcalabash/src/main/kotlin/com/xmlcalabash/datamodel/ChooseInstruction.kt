@@ -83,12 +83,12 @@ open class ChooseInstruction(parent: XProcInstruction, tag: QName = NsP.choose):
                 is StepDeclaration -> {
                     child.elaborateInstructions()
                 }
-                else -> throw XProcError.xiImpossible("Unexpected child: ${child}").exception()
+                else -> throw stepConfig.exception(XProcError.xiImpossible("Unexpected child: ${child}"))
             }
         }
 
         if (children.filterIsInstance<CompoundStepDeclaration>().isEmpty()) {
-            throw XProcError.xsWhenOrOtherwiseRequired().exception()
+            throw stepConfig.exception(XProcError.xsWhenOrOtherwiseRequired())
         }
 
         val outputs = mutableSetOf<String>()
@@ -101,14 +101,14 @@ open class ChooseInstruction(parent: XProcInstruction, tag: QName = NsP.choose):
             } else {
                 if (primaryOutput == null) {
                     if (child.primaryOutput() != null) {
-                        throw XProcError.xsDifferentPrimaryOutputs().exception()
+                        throw stepConfig.exception(XProcError.xsDifferentPrimaryOutputs())
                     }
                 } else {
                     if (child.primaryOutput() == null) {
-                        throw XProcError.xsDifferentPrimaryOutputs().exception()
+                        throw stepConfig.exception(XProcError.xsDifferentPrimaryOutputs())
                     }
                     if (child.primaryOutput() == null || child.primaryOutput()!!.port != primaryOutput.port) {
-                        throw XProcError.xsDifferentPrimaryOutputs().exception()
+                        throw stepConfig.exception(XProcError.xsDifferentPrimaryOutputs())
                     }
                 }
             }

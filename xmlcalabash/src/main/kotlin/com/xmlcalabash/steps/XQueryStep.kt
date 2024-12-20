@@ -50,7 +50,7 @@ open class XQueryStep(): AbstractAtomicStep() {
         when (version) {
             "3.1" -> xquery31()
             "3.0" -> xquery30()
-            else -> throw XProcError.xcXQueryVersionNotAvailable(version).exception()
+            else -> throw stepConfig.exception(XProcError.xcXQueryVersionNotAvailable(version))
         }
     }
 
@@ -58,16 +58,16 @@ open class XQueryStep(): AbstractAtomicStep() {
         for (doc in sources) {
             val ctype = doc.contentType ?: MediaType.OCTET_STREAM
             if (!ctype.xmlContentType() && !ctype.htmlContentType() && !ctype.textContentType()) {
-                throw XProcError.xcXQueryInputNot30Compatible(ctype).exception()
+                throw stepConfig.exception(XProcError.xcXQueryInputNot30Compatible(ctype))
             }
         }
 
         for ((name, value) in parameters) {
             when (value) {
                 is XdmAtomicValue, is XdmNode -> Unit
-                is XdmMap -> throw XProcError.xcXQueryInvalidParameterType(name, "map").exception()
-                is XdmArray -> throw XProcError.xcXQueryInvalidParameterType(name, "array").exception()
-                is XdmFunctionItem -> throw XProcError.xcXQueryInvalidParameterType(name, "function").exception()
+                is XdmMap -> throw stepConfig.exception(XProcError.xcXQueryInvalidParameterType(name, "map"))
+                is XdmArray -> throw stepConfig.exception(XProcError.xcXQueryInvalidParameterType(name, "array"))
+                is XdmFunctionItem -> throw stepConfig.exception(XProcError.xcXQueryInvalidParameterType(name, "function"))
                 else -> logger.debug { "Unexpected parameter type: ${value} passed to p:xquery"}
             }
         }
@@ -140,7 +140,7 @@ open class XQueryStep(): AbstractAtomicStep() {
         try {
             queryEval.run()
         } catch (ex: Throwable) {
-            throw XProcError.xcXQueryEvalError(ex.message ?: "null").exception(ex)
+            throw stepConfig.exception(XProcError.xcXQueryEvalError(ex.message ?: "null"), ex)
         }
 
         try {

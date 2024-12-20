@@ -54,10 +54,10 @@ class DeclareStepInstruction(parent: XProcInstruction?, stepConfig: InstructionC
                 return
             }
             if (value.namespaceUri == NamespaceUri.NULL) {
-                throw XProcError.xsStepTypeInNoNamespace(value).exception()
+                throw stepConfig.exception(XProcError.xsStepTypeInNoNamespace(value))
             }
             if (!this.standardStep && value.namespaceUri == NsP.namespace) {
-                throw XProcError.xsStepTypeNotAllowed(value).exception()
+                throw stepConfig.exception(XProcError.xsStepTypeNotAllowed(value))
             }
             _type = value
         }
@@ -96,7 +96,7 @@ class DeclareStepInstruction(parent: XProcInstruction?, stepConfig: InstructionC
                 continue
             }
             if (existing != null) {
-                throw XProcError.xsDuplicateStepType(child.type!!).exception()
+                throw stepConfig.exception(XProcError.xsDuplicateStepType(child.type!!))
             }
 
             if (!child.isAtomic || stepConfig.environment.commonEnvironment.atomicStepAvailable(child.type!!)) {
@@ -120,7 +120,7 @@ class DeclareStepInstruction(parent: XProcInstruction?, stepConfig: InstructionC
         for (child in children.filterIsInstance<InputInstruction>() + children.filterIsInstance<OutputInstruction>()) {
             if (child.portDefined) {
                 if (child.port in portNames) {
-                    throw XProcError.xsDuplicatePortName(child.port).exception()
+                    throw stepConfig.exception(XProcError.xsDuplicatePortName(child.port))
                 }
                 portNames.add(child.port)
             }
@@ -132,7 +132,7 @@ class DeclareStepInstruction(parent: XProcInstruction?, stepConfig: InstructionC
         val optnames = mutableSetOf<QName>()
         for (option in _children.filterIsInstance<OptionInstruction>()) {
             if (optnames.contains(option.name)) {
-                throw XProcError.xsDuplicateOption(option.name).exception()
+                throw stepConfig.exception(XProcError.xsDuplicateOption(option.name))
             }
             optnames.add(option.name)
         }
@@ -145,7 +145,7 @@ class DeclareStepInstruction(parent: XProcInstruction?, stepConfig: InstructionC
                 is LibraryInstruction -> {
                     import.coherentStepDeclarations()
                 }
-                else -> throw XProcError.xiImpossible("Unexpected imported type: ${import}").exception()
+                else -> throw stepConfig.exception(XProcError.xiImpossible("Unexpected imported type: ${import}"))
             }
         }
 
@@ -174,7 +174,7 @@ class DeclareStepInstruction(parent: XProcInstruction?, stepConfig: InstructionC
             val decl = stepConfig.inscopeStepTypes[type]
             if (decl != null) {
                 if (decl !== this) {
-                    throw XProcError.xsDuplicateStepType(type!!).exception()
+                    throw stepConfig.exception(XProcError.xsDuplicateStepType(type!!))
                 }
             }
             if (!isAtomic || stepConfig.environment.commonEnvironment.atomicStepAvailable(type!!)) {
@@ -185,7 +185,7 @@ class DeclareStepInstruction(parent: XProcInstruction?, stepConfig: InstructionC
 
         if (!name.startsWith("!")) {
             if (stepConfig.inscopeStepNames.contains(name)) {
-                throw XProcError.xsDuplicateStepName(name).exception()
+                throw stepConfig.exception(XProcError.xsDuplicateStepName(name))
             }
             newStepNames[name] = this
         }
@@ -197,7 +197,7 @@ class DeclareStepInstruction(parent: XProcInstruction?, stepConfig: InstructionC
                     import.findDeclarations(stepTypes, emptyMap(), bindings)
                     if (import.type != null && import.visibility != Visibility.PRIVATE) {
                         if (newStepTypes.containsKey(import.type) && import !== newStepTypes[import.type]) {
-                            throw XProcError.xsDuplicateStepType(import.type!!).exception()
+                            throw stepConfig.exception(XProcError.xsDuplicateStepType(import.type!!))
                         }
                         newStepTypes[import.type!!] = import
                     }
@@ -206,19 +206,19 @@ class DeclareStepInstruction(parent: XProcInstruction?, stepConfig: InstructionC
                     import.findDeclarations(stepTypes, emptyMap(), bindings)
                     for ((name, opt) in import.exportedOptions) {
                         if (newBindings.containsKey(name) && opt !== newBindings[name]) {
-                            throw XProcError.xsDuplicateOption(name).exception()
+                            throw stepConfig.exception(XProcError.xsDuplicateOption(name))
                         }
                         newBindings[name] = opt
                     }
 
                     for ((type, decl) in import.exportedSteps) {
                         if (newStepTypes.containsKey(type) && decl !== newStepTypes[type]) {
-                            throw XProcError.xsDuplicateStepType(type).exception()
+                            throw stepConfig.exception(XProcError.xsDuplicateStepType(type))
                         }
                         newStepTypes[type] = decl
                     }
                 }
-                else -> throw XProcError.xiImpossible("Unexpected imported type: ${import}").exception()
+                else -> throw stepConfig.exception(XProcError.xiImpossible("Unexpected imported type: ${import}"))
             }
         }
 
@@ -259,10 +259,10 @@ class DeclareStepInstruction(parent: XProcInstruction?, stepConfig: InstructionC
 
         if (parent == null) {
             if (version == null) {
-                throw XProcError.xsMissingVersion().exception()
+                throw stepConfig.exception(XProcError.xsMissingVersion())
             } else {
                 if (version != 3.0 && version != 3.1) {
-                    throw XProcError.xsUnsupportedVersion(version!!.toString()).exception()
+                    throw stepConfig.exception(XProcError.xsUnsupportedVersion(version!!.toString()))
                 }
             }
         }
@@ -275,7 +275,7 @@ class DeclareStepInstruction(parent: XProcInstruction?, stepConfig: InstructionC
             when (import) {
                 is DeclareStepInstruction -> import.validate()
                 is LibraryInstruction -> import.validate()
-                else -> throw XProcError.xiImpossible("Import not a library or declared step?").exception()
+                else -> throw stepConfig.exception(XProcError.xiImpossible("Import not a library or declared step?"))
             }
         }
 
@@ -445,7 +445,7 @@ class DeclareStepInstruction(parent: XProcInstruction?, stepConfig: InstructionC
             _children.add(instruction)
             return
         }
-        throw XProcError.xsInvalidElement(instruction.instructionType).exception()
+        throw stepConfig.exception(XProcError.xsInvalidElement(instruction.instructionType))
     }
 
     fun input(): InputInstruction {
@@ -462,7 +462,7 @@ class DeclareStepInstruction(parent: XProcInstruction?, stepConfig: InstructionC
 
     override fun option(name: QName): OptionInstruction {
         if (name.namespaceUri == NsP.namespace) {
-            throw XProcError.xsOptionInXProcNamespace(name).exception()
+            throw stepConfig.exception(XProcError.xsOptionInXProcNamespace(name))
         }
         val option = OptionInstruction(this, name, stepConfig.copy())
         _children.add(option)
@@ -472,7 +472,7 @@ class DeclareStepInstruction(parent: XProcInstruction?, stepConfig: InstructionC
 
     override fun option(name: QName, staticValue: XProcExpression): OptionInstruction {
         if (name.namespaceUri == NsP.namespace) {
-            throw XProcError.xsOptionInXProcNamespace(name).exception()
+            throw stepConfig.exception(XProcError.xsOptionInXProcNamespace(name))
         }
         val option = OptionInstruction(this, name, stepConfig.copy())
         option._select = staticValue
@@ -486,7 +486,7 @@ class DeclareStepInstruction(parent: XProcInstruction?, stepConfig: InstructionC
         if (last != null && last !is ImportFunctionsInstruction
             && last !is InputInstruction && last !is OutputInstruction && last !is OptionInstruction
             && last !is DeclareStepInstruction) {
-            throw XProcError.xsInvalidElement(NsP.declareStep).exception()
+            throw stepConfig.exception(XProcError.xsInvalidElement(NsP.declareStep))
         }
 
         val decl = DeclareStepInstruction(this, stepConfig.copyNew())

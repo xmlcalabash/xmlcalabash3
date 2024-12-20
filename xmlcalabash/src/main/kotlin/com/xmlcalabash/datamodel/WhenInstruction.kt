@@ -40,11 +40,11 @@ class WhenInstruction(parent: ChooseInstruction): CompoundStepDeclaration(parent
         elaborated = true
 
         if (depends.isNotEmpty()) {
-            throw XProcError.xsAttributeForbidden(Ns.depends).exception()
+            throw stepConfig.exception(XProcError.xsAttributeForbidden(Ns.depends))
         }
 
         if (test == INVALID_TEST) {
-            throw XProcError.xsMissingRequiredAttribute(Ns.test).exception()
+            throw stepConfig.exception(XProcError.xsMissingRequiredAttribute(Ns.test))
         }
 
         testExpression = XProcExpression.select(stepConfig, test, stepConfig.parseXsSequenceType("xs:boolean?"), collection == true)
@@ -59,7 +59,7 @@ class WhenInstruction(parent: ChooseInstruction): CompoundStepDeclaration(parent
             explicitBinding = true
 
             if (withInput.portDefined) {
-                throw XProcError.xsPortNameNotAllowed().exception()
+                throw stepConfig.exception(XProcError.xsPortNameNotAllowed())
             }
 
             withInput._port = "!source"

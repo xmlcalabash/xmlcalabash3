@@ -34,7 +34,7 @@ class PipeInstruction(parent: XProcInstruction): ConnectionInstruction(parent, N
     override fun elaborateInstructions() {
         val fromStep = if (step == null) {
             if (stepConfig.drp == null) {
-                throw XProcError.xsNoStepPortNotReadable().exception()
+                throw stepConfig.exception(XProcError.xsNoStepPortNotReadable())
             }
             stepConfig.drp!!.parent as StepDeclaration
         } else {
@@ -54,7 +54,7 @@ class PipeInstruction(parent: XProcInstruction): ConnectionInstruction(parent, N
 
             if (decl == null) {
                 if (readablePort == null) {
-                    throw XProcError.xsPortNotReadable(step!!).exception()
+                    throw stepConfig.exception(XProcError.xsPortNotReadable(step!!))
                 }
 
                 // If we're in the middle of rewriting things, the step might not
@@ -79,11 +79,11 @@ class PipeInstruction(parent: XProcInstruction): ConnectionInstruction(parent, N
                     val pp = p.parent
                     if (pp != null && pp.children.contains(fromStep)) {
                         if (step != null && port != null) {
-                            throw XProcError.xsPortNotReadable(step!!, port!!).exception()
+                            throw stepConfig.exception(XProcError.xsPortNotReadable(step!!, port!!))
                         } else if (step != null) {
-                            throw XProcError.xsPortNotReadable(step!!).exception()
+                            throw stepConfig.exception(XProcError.xsPortNotReadable(step!!))
                         } else {
-                            throw XProcError.xsNoStepPortNotReadable().exception() // I don't think this is actualy possible
+                            throw stepConfig.exception(XProcError.xsNoStepPortNotReadable()) // I don't think this is actualy possible
                         }
                     }
                 }
@@ -109,9 +109,9 @@ class PipeInstruction(parent: XProcInstruction): ConnectionInstruction(parent, N
 
         if (fromPort == null) {
             if (port == null) {
-                throw XProcError.xsNoPortPortNotReadable().exception()
+                throw stepConfig.exception(XProcError.xsNoPortPortNotReadable())
             } else {
-                throw XProcError.xsPortNotReadable(port!!).exception()
+                throw stepConfig.exception(XProcError.xsPortNotReadable(port!!))
             }
         } else {
             _port = fromPort.port
@@ -119,7 +119,7 @@ class PipeInstruction(parent: XProcInstruction): ConnectionInstruction(parent, N
         }
 
         if (fromStep !is CompoundStepDeclaration && fromStep == parent?.parent) {
-            throw XProcError.xsOutputPortNotReadable(step ?: "", port ?: "").exception()
+            throw stepConfig.exception(XProcError.xsOutputPortNotReadable(step ?: "", port ?: ""))
         }
 
         super.elaborateInstructions()

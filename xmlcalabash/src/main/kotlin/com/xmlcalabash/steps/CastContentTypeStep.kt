@@ -72,28 +72,28 @@ open class CastContentTypeStep(): AbstractAtomicStep() {
                     }
                     return XProcDocument.ofJson(map, document.context, contentType, patchProperties(true))
                 }
-                throw XProcError.xiNotImplemented("xml to json").exception()
+                throw stepConfig.exception(XProcError.xiNotImplemented("xml to json"))
             }
             MediaType.TEXT -> return ContentTypeConverter.toText(stepConfig, document, contentType)
             else -> {
                 val node = S9Api.documentElement(document.value as XdmNode)
                 if (node.nodeName == NsC.data) {
                     val dataContentTypeAttr = node.getAttributeValue(Ns.contentType)
-                        ?: throw XProcError.xcContentTypeRequired().exception()
+                        ?: throw stepConfig.exception(XProcError.xcContentTypeRequired())
                     val dataContentType = MediaType.parse(dataContentTypeAttr)
                     if (contentType != dataContentType) {
-                        throw XProcError.xcDifferentContentTypes(contentType, dataContentType).exception()
+                        throw stepConfig.exception(XProcError.xcDifferentContentTypes(contentType, dataContentType))
                     }
 
                     val bytes = try {
                         Base64.getDecoder().decode(node.stringValue)
                     } catch (ex: IllegalArgumentException) {
-                        throw XProcError.xcNotBase64(ex.message ?: "Base64 decoding error").exception()
+                        throw stepConfig.exception(XProcError.xcNotBase64(ex.message ?: "Base64 decoding error"))
                     }
 
                     return XProcDocument.ofBinary(bytes, document.context, contentType, patchProperties(true))
                 } else {
-                    throw XProcError.xiNotImplemented("xml to other").exception()
+                    throw stepConfig.exception(XProcError.xiNotImplemented("xml to other"))
                 }
             }
         }
@@ -103,10 +103,10 @@ open class CastContentTypeStep(): AbstractAtomicStep() {
         when (contentType.classification()) {
             MediaType.XML -> return document.with(contentType, true)
             MediaType.HTML -> return document.with(contentType)
-            MediaType.JSON -> throw XProcError.xiNotImplemented("html to json").exception()
+            MediaType.JSON -> throw stepConfig.exception(XProcError.xiNotImplemented("html to json"))
             MediaType.TEXT ->  return ContentTypeConverter.toText(stepConfig, document, contentType)
             else -> {
-                throw XProcError.xiNotImplemented("html to other").exception()
+                throw stepConfig.exception(XProcError.xiNotImplemented("html to other"))
             }
         }
     }
@@ -118,12 +118,12 @@ open class CastContentTypeStep(): AbstractAtomicStep() {
                 return ContentTypeConverter.jsonToXml(stepConfig, document, contentType)
             }
             MediaType.HTML -> {
-                throw XProcError.xiNotImplemented("json to html").exception()
+                throw stepConfig.exception(XProcError.xiNotImplemented("json to html"))
             }
             MediaType.JSON -> return document.with(contentType)
             MediaType.TEXT -> return ContentTypeConverter.toText(stepConfig, document, contentType)
             else -> {
-                throw XProcError.xiNotImplemented("json to other").exception()
+                throw stepConfig.exception(XProcError.xiNotImplemented("json to other"))
             }
         }
     }
@@ -173,7 +173,7 @@ open class CastContentTypeStep(): AbstractAtomicStep() {
             }
             MediaType.TEXT -> return document.with(contentType)
             else -> {
-                throw XProcError.xiNotImplemented("text to other").exception()
+                throw stepConfig.exception(XProcError.xiNotImplemented("text to other"))
             }
         }
     }
@@ -200,7 +200,7 @@ open class CastContentTypeStep(): AbstractAtomicStep() {
                 if (contentType == MediaType.OCTET_STREAM) {
                     return document.with(contentType)
                 }
-                throw XProcError.xiNotImplemented("other to ${contentType}").exception()
+                throw stepConfig.exception(XProcError.xiNotImplemented("other to ${contentType}"))
             }
         }
     }

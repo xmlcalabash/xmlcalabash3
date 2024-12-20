@@ -208,7 +208,11 @@ class DefaultErrorExplanation(): ErrorExplanation {
                     if (message == "") {
                         message = line
                     } else {
-                        explanation += line + "\n"
+                        if (explanation == "") {
+                            explanation = line
+                        } else {
+                            explanation += "\n${line}"
+                        }
                     }
                 }
             }

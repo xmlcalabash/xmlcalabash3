@@ -22,7 +22,7 @@ open class LoadStep(): AbstractAtomicStep() {
             when (ex) {
                 is URISyntaxException, is IllegalArgumentException -> {
                     val badURI = options[Ns.href]!!.value.underlyingValue.stringValue
-                    throw XProcError.xdInvalidUri(badURI).exception(ex)
+                    throw stepConfig.exception(XProcError.xdInvalidUri(badURI), ex)
                 }
                 else -> throw ex
             }

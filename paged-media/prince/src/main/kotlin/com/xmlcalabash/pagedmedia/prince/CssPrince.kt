@@ -114,7 +114,7 @@ class CssPrince: CssProcessor {
 
         val exePath = options[_exePath]?.underlyingValue?.stringValue ?: defaultStringOptions[_exePath] ?: ""
         if (exePath == "") {
-            throw XProcError.xdStepFailed("Cannot find Prince XML executable").exception()
+            throw stepConfig.exception(XProcError.xdStepFailed("Cannot find Prince XML executable"))
         }
 
         prince = Prince(exePath, PrinceMessages())
@@ -203,7 +203,7 @@ class CssPrince: CssProcessor {
 
     override fun format(document: XProcDocument, contentType: MediaType, out: OutputStream) {
         if (contentType != MediaType.PDF) {
-            throw XProcError.xcUnsupportedContentType(contentType).exception()
+            throw stepConfig.exception(XProcError.xcUnsupportedContentType(contentType))
         }
 
         if (primarySS != null) {

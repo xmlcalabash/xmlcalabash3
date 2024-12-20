@@ -79,7 +79,7 @@ open class XsltStep(): AbstractAtomicStep() {
             "3.0" -> xslt30()
             "2.0" -> xslt20()
             "1.0" -> xslt10()
-            else -> throw XProcError.xcVersionNotAvailable(version ?: "null").exception()
+            else -> throw stepConfig.exception(XProcError.xcVersionNotAvailable(version ?: "null"))
         }
     }
 
@@ -98,19 +98,19 @@ open class XsltStep(): AbstractAtomicStep() {
 
         for (doc in sources) {
             if (doc.contentType == null) {
-                throw XProcError.xcXsltInputNot20Compatible().exception()
+                throw stepConfig.exception(XProcError.xcXsltInputNot20Compatible())
             }
             if (!doc.contentType!!.textContentType() && !doc.contentType!!.htmlContentType() && !doc.contentType!!.xmlContentType()) {
-                throw XProcError.xcXsltInputNot20Compatible(doc.contentType!!).exception()
+                throw stepConfig.exception(XProcError.xcXsltInputNot20Compatible(doc.contentType!!))
             }
         }
 
         for ((name, value) in parameters) {
             when (value) {
                 is XdmAtomicValue, is XdmNode -> Unit
-                is XdmMap -> throw XProcError.xcXsltParameterNot20Compatible(name, "map").exception()
-                is XdmArray -> throw XProcError.xcXsltParameterNot20Compatible(name, "array").exception()
-                is XdmFunctionItem -> throw XProcError.xcXsltParameterNot20Compatible(name, "function").exception()
+                is XdmMap -> throw stepConfig.exception(XProcError.xcXsltParameterNot20Compatible(name, "map"))
+                is XdmArray -> throw stepConfig.exception(XProcError.xcXsltParameterNot20Compatible(name, "array"))
+                is XdmFunctionItem -> throw stepConfig.exception(XProcError.xcXsltParameterNot20Compatible(name, "function"))
                 else -> {
                     logger.debug { "Unexpected parameter type: ${value} passed to p:xslt (2.0)"}
                 }
@@ -152,12 +152,12 @@ open class XsltStep(): AbstractAtomicStep() {
 
             when (cause) {
                 null -> Unit
-                NsFn.errXTMM9000 -> throw XProcError.xcXsltUserTermination(sae.message!!).exception()
-                NsFn.errXTDE0040 -> throw XProcError.xcXsltNoTemplate(templateName!!).exception()
-                else -> throw XProcError.xcXsltRuntimeError(sae.message!!).exception()
+                NsFn.errXTMM9000 -> throw stepConfig.exception(XProcError.xcXsltUserTermination(sae.message!!))
+                NsFn.errXTDE0040 -> throw stepConfig.exception(XProcError.xcXsltNoTemplate(templateName!!))
+                else -> throw stepConfig.exception(XProcError.xcXsltRuntimeError(sae.message!!))
             }
 
-            throw XProcError.xcXsltCompileError(sae.message!!, sae).exception()
+            throw stepConfig.exception(XProcError.xcXsltCompileError(sae.message!!, sae))
         }
 
         val transformer = exec.load30()
@@ -219,7 +219,7 @@ open class XsltStep(): AbstractAtomicStep() {
             try {
                 transformer.setInitialMode(initialMode!!)
             } catch (sae: SaxonApiException) {
-                throw XProcError.xcXsltNoMode(initialMode!!, sae.message!!).exception()
+                throw stepConfig.exception(XProcError.xcXsltNoMode(initialMode!!, sae.message!!))
             }
         }
 
@@ -281,10 +281,10 @@ open class XsltStep(): AbstractAtomicStep() {
                     if (terminationError != null) {
                         throw terminationError!!.exception(ex)
                     }
-                    throw XProcError.xcXsltUserTermination(ex.message ?: "").exception(ex)
+                    throw stepConfig.exception(XProcError.xcXsltUserTermination(ex.message ?: ""), ex)
                 }
-                NsFn.errXTDE0040 -> throw XProcError.xcXsltNoTemplate(templateName!!).exception(ex)
-                else -> throw XProcError.xcXsltRuntimeError(ex.message!!).exception(ex)
+                NsFn.errXTDE0040 -> throw stepConfig.exception(XProcError.xcXsltNoTemplate(templateName!!), ex)
+                else -> throw stepConfig.exception(XProcError.xcXsltRuntimeError(ex.message!!), ex)
             }
         }
 
@@ -427,7 +427,7 @@ open class XsltStep(): AbstractAtomicStep() {
     }
 
     private fun xslt10() {
-        XProcError.xcVersionNotAvailable(version ?: "null").exception()
+        stepConfig.exception(XProcError.xcVersionNotAvailable(version ?: "null"))
     }
 
     override fun toString(): String = "p:xslt"

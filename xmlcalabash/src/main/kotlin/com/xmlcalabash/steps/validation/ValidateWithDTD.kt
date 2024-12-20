@@ -82,7 +82,7 @@ class ValidateWithDTD(): AbstractAtomicStep() {
             return
         } catch (ex: Exception) {
             if (assertValid) {
-                throw XProcError.xcDtdValidationFailed().exception()
+                throw stepConfig.exception(XProcError.xcDtdValidationFailed())
             }
 
             xvrlReport(ex)

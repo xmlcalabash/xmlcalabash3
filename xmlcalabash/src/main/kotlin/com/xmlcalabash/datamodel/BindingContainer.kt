@@ -28,7 +28,7 @@ open class BindingContainer(parent: XProcInstruction, stepConfig: InstructionCon
                 val step = token.substring(pos + 1)
 
                 if (step.isEmpty()) {
-                    throw XProcError.xsInvalidPipeAttribute(token).exception()
+                    throw stepConfig.exception(XProcError.xsInvalidPipeAttribute(token))
                 }
 
                 if (port.isEmpty()) {

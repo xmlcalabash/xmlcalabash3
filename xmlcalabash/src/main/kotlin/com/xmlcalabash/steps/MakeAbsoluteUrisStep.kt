@@ -42,11 +42,11 @@ open class MakeAbsoluteUrisStep(): AbstractAtomicStep(), ProcessMatchingNodes {
     }
 
     override fun startDocument(node: XdmNode): Boolean {
-        throw XProcError.xcInvalidSelection(matchPattern).exception()
+        throw stepConfig.exception(XProcError.xcInvalidSelection(matchPattern))
     }
 
     override fun endDocument(node: XdmNode) {
-        throw XProcError.xcInvalidSelection(matchPattern).exception()
+        throw stepConfig.exception(XProcError.xcInvalidSelection(matchPattern))
     }
 
     override fun startElement(node: XdmNode, attributes: AttributeMap): Boolean {
@@ -89,15 +89,15 @@ open class MakeAbsoluteUrisStep(): AbstractAtomicStep(), ProcessMatchingNodes {
     }
 
     override fun text(node: XdmNode) {
-        throw XProcError.xcInvalidSelection(matchPattern).exception()
+        throw stepConfig.exception(XProcError.xcInvalidSelection(matchPattern))
     }
 
     override fun comment(node: XdmNode) {
-        throw XProcError.xcInvalidSelection(matchPattern).exception()
+        throw stepConfig.exception(XProcError.xcInvalidSelection(matchPattern))
     }
 
     override fun pi(node: XdmNode) {
-        throw XProcError.xcInvalidSelection(matchPattern).exception()
+        throw stepConfig.exception(XProcError.xcInvalidSelection(matchPattern))
     }
 
     override fun toString(): String = "p:make-absolute-uris"

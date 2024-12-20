@@ -59,7 +59,7 @@ open class CompressStep(): AbstractAtomicStep() {
             Ns.deflate -> DeflateCompressorOutputStream(buf)
             Ns.lzma -> LZMACompressorOutputStream(buf)
             Ns.xz -> XZCompressorOutputStream(buf)
-            else -> throw XProcError.xcUnsupportedCompressionFormat(format).exception()
+            else -> throw stepConfig.exception(XProcError.xcUnsupportedCompressionFormat(format))
         }
 
         compressor.write(bytes, 0, bytes.size)

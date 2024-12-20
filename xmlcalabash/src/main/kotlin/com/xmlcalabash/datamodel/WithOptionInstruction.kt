@@ -14,7 +14,7 @@ open class WithOptionInstruction(parent: XProcInstruction, name: QName, stepConf
 
     override fun elaborateInstructions() {
         if (select == null) {
-            throw XProcError.xsMissingRequiredAttribute(Ns.select).exception()
+            throw stepConfig.exception(XProcError.xsMissingRequiredAttribute(Ns.select))
         } else {
             asType = asType ?: stepConfig.parseSequenceType("item()*")
 

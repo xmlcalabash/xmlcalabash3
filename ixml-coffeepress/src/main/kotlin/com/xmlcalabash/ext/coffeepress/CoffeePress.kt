@@ -38,7 +38,7 @@ class CoffeePress(): AbstractAtomicStep() {
         val invisibleXml = InvisibleXml()
         val parser = if (grammar.isNotEmpty()) {
             if (grammar.size != 1) {
-                throw XProcError.xcAtMostOneGrammar().exception()
+                throw stepConfig.exception(XProcError.xcAtMostOneGrammar())
             }
             val theGrammar = grammar.first()
             if (theGrammar.contentType != null && theGrammar.contentType!!.textContentType()) {
@@ -52,12 +52,12 @@ class CoffeePress(): AbstractAtomicStep() {
 
         if (source.contentType != null && source.contentType!!.textContentType()) {
             if (!parser.constructed()) {
-                throw XProcError.xcInvalidIxmlGrammar().exception()
+                throw stepConfig.exception(XProcError.xcInvalidIxmlGrammar())
             }
 
             val doc = parser.parse(source.value.underlyingValue.stringValue)
             if (!doc.succeeded() && failOnError) {
-                throw XProcError.Companion.step(205).exception()
+                throw stepConfig.exception(XProcError.Companion.step(205))
             }
 
             val builder = stepConfig.processor.newDocumentBuilder()

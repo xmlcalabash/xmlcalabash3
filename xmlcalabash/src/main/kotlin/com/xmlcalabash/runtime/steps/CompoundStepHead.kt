@@ -154,10 +154,10 @@ class CompoundStepHead(config: XProcStepConfiguration, step: HeadModel): Abstrac
                                 val selected = default.select.evaluate(stepConfig)
                                 for (item in selected) {
                                     if (item is XdmNode && item.nodeKind == XdmNodeKind.ATTRIBUTE) {
-                                        throw XProcError.xdInvalidSelection(item.nodeName).exception()
+                                        throw stepConfig.exception(XProcError.xdInvalidSelection(item.nodeName))
                                     }
                                     if (item is XdmFunctionItem) {
-                                        throw XProcError.xdInvalidFunctionSelection().exception()
+                                        throw stepConfig.exception(XProcError.xdInvalidFunctionSelection())
                                     }
                                     val itemdoc = XProcDocument.ofValue(
                                         item,

@@ -45,7 +45,7 @@ open class ValidateWithRelaxNG(): AbstractAtomicStep() {
         val parameters = qnameMapBinding(Ns.parameters)
 
         if (reportFormat != "xvrl") {
-            throw XProcError.xcUnsupportedReportFormat(reportFormat).exception()
+            throw stepConfig.exception(XProcError.xcUnsupportedReportFormat(reportFormat))
         }
 
         val report = Errors(stepConfig, reportFormat)
@@ -82,16 +82,16 @@ open class ValidateWithRelaxNG(): AbstractAtomicStep() {
             driver.loadSchema(schemaInputSource)
         } catch (ex: Exception) {
             if (document.baseURI == null) {
-                throw XProcError.xcNotRelaxNG("Error loading schema").exception(ex)
+                throw stepConfig.exception(XProcError.xcNotRelaxNG("Error loading schema"), ex)
             }
-            throw XProcError.xcNotRelaxNG(document.baseURI!!, "Error loading schema").exception(ex)
+            throw stepConfig.exception(XProcError.xcNotRelaxNG(document.baseURI!!, "Error loading schema"), ex)
         }
 
         if (!loaded) {
             if (document.baseURI == null) {
-                throw XProcError.xcNotRelaxNG("Error loading schema").exception()
+                throw stepConfig.exception(XProcError.xcNotRelaxNG("Error loading schema"))
             }
-            throw XProcError.xcNotRelaxNG(document.baseURI!!, "Error loading schema").exception()
+            throw stepConfig.exception(XProcError.xcNotRelaxNG(document.baseURI!!, "Error loading schema"))
         }
 
         val din = S9Api.xdmToInputSource(stepConfig, document)

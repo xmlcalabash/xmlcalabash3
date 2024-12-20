@@ -31,7 +31,7 @@ open class NamespaceDeleteStep(): AbstractAtomicStep(), ProcessMatchingNodes {
 
         for (prefix in prefixes.split("\\s+".toRegex())) {
             val uri = prefixesContext.inscopeNamespaces[prefix]
-                ?: throw XProcError.xcNoNamespaceBindingForPrefix(prefix).exception()
+                ?: throw stepConfig.exception(XProcError.xcNoNamespaceBindingForPrefix(prefix))
             excludeNamespaces.add(uri)
         }
 
@@ -41,11 +41,11 @@ open class NamespaceDeleteStep(): AbstractAtomicStep(), ProcessMatchingNodes {
     }
 
     override fun startDocument(node: XdmNode): Boolean {
-        throw XProcError.xiImpossible("p:namespace-delete matched start document").exception()
+        throw stepConfig.exception(XProcError.xiImpossible("p:namespace-delete matched start document"))
     }
 
     override fun endDocument(node: XdmNode) {
-        throw XProcError.xiImpossible("p:namespace-delete matched end document").exception()
+        throw stepConfig.exception(XProcError.xiImpossible("p:namespace-delete matched end document"))
     }
 
     override fun startElement(node: XdmNode, attributes: AttributeMap): Boolean {
@@ -63,7 +63,7 @@ open class NamespaceDeleteStep(): AbstractAtomicStep(), ProcessMatchingNodes {
                 QName(attr.nodeName.prefix, attr.nodeName.namespaceUri.toString(), attr.nodeName.localPart)
             }
             if (newMap.contains(attrName)) {
-                throw XProcError.xcAttributeNameCollision(attrName).exception()
+                throw stepConfig.exception(XProcError.xcAttributeNameCollision(attrName))
             }
             newMap[attrName] = attr.value
         }
@@ -77,7 +77,7 @@ open class NamespaceDeleteStep(): AbstractAtomicStep(), ProcessMatchingNodes {
         matchingAttributes: AttributeMap,
         nonMatchingAttributes: AttributeMap
     ): AttributeMap? {
-        throw XProcError.xiImpossible("p:namespace-delete matched attribute").exception()
+        throw stepConfig.exception(XProcError.xiImpossible("p:namespace-delete matched attribute"))
     }
 
     override fun endElement(node: XdmNode) {
@@ -85,15 +85,15 @@ open class NamespaceDeleteStep(): AbstractAtomicStep(), ProcessMatchingNodes {
     }
 
     override fun text(node: XdmNode) {
-        throw XProcError.xiImpossible("p:namespace-delete matched text").exception()
+        throw stepConfig.exception(XProcError.xiImpossible("p:namespace-delete matched text"))
     }
 
     override fun comment(node: XdmNode) {
-        throw XProcError.xiImpossible("p:namespace-delete matched comment").exception()
+        throw stepConfig.exception(XProcError.xiImpossible("p:namespace-delete matched comment"))
     }
 
     override fun pi(node: XdmNode) {
-        throw XProcError.xiImpossible("p:namespace-delete matched processing-instruction").exception()
+        throw stepConfig.exception(XProcError.xiImpossible("p:namespace-delete matched processing-instruction"))
     }
 
     override fun toString(): String = "p:namespace-delete"

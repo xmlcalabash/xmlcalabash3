@@ -45,7 +45,7 @@ abstract class AbstractArchiveStep(): AbstractAtomicStep() {
         } catch (ex: Exception) {
             when (ex) {
                 is URISyntaxException, is IllegalArgumentException -> {
-                    throw XProcError.xdInvalidRelativeTo(stringBinding(Ns.relativeTo)!!).exception()
+                    throw stepConfig.exception(XProcError.xdInvalidRelativeTo(stringBinding(Ns.relativeTo)!!))
                 }
                 else -> throw ex
             }
@@ -56,7 +56,7 @@ abstract class AbstractArchiveStep(): AbstractAtomicStep() {
         if (archive is XProcBinaryDocument) {
             return archive.binaryValue
         }
-        throw XProcError.xcUnsupportedArchiveFormat(format).exception()
+        throw stepConfig.exception(XProcError.xcUnsupportedArchiveFormat(format))
     }
 
     protected fun contentType(name: String): MediaType {

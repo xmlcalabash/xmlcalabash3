@@ -32,11 +32,11 @@ class InputInstruction(parent: XProcInstruction): InputBindingInstruction(parent
 
     override fun elaborateInstructions() {
         if (!portDefined) {
-            throw XProcError.xsMissingRequiredAttribute(Ns.port).exception()
+            throw stepConfig.exception(XProcError.xsMissingRequiredAttribute(Ns.port))
         }
 
         if (pipe != null) {
-            throw XProcError.xsAttributeForbidden(Ns.pipe).exception()
+            throw stepConfig.exception(XProcError.xsAttributeForbidden(Ns.pipe))
         }
 
         for (child in defaultBindings) {
@@ -67,19 +67,19 @@ class InputInstruction(parent: XProcInstruction): InputBindingInstruction(parent
     }
 
     override fun pipe(): PipeInstruction {
-        throw XProcError.xsInvalidElement(NsP.pipe).exception()
+        throw stepConfig.exception(XProcError.xsInvalidElement(NsP.pipe))
     }
 
     override fun pipe(step: String?, port: String?): PipeInstruction {
-        throw XProcError.xsInvalidElement(NsP.pipe).exception()
+        throw stepConfig.exception(XProcError.xsInvalidElement(NsP.pipe))
     }
 
     override fun pipe(input: InputInstruction): PipeInstruction {
-        throw XProcError.xsInvalidElement(NsP.pipe).exception()
+        throw stepConfig.exception(XProcError.xsInvalidElement(NsP.pipe))
     }
 
     override fun pipe(step: StepDeclaration, port: String?): PipeInstruction {
-        throw XProcError.xsInvalidElement(NsP.pipe).exception()
+        throw stepConfig.exception(XProcError.xsInvalidElement(NsP.pipe))
     }
 
     override fun inline(document: XProcDocument): InlineInstruction {

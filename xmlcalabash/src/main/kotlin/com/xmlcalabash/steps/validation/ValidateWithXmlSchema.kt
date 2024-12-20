@@ -54,11 +54,11 @@ open class ValidateWithXmlSchema(): AbstractAtomicStep() {
         val reportFormat = stringBinding(Ns.reportFormat) ?: "xvrl"
 
         if (reportFormat != "xvrl") {
-            throw XProcError.xcUnsupportedReportFormat(reportFormat).exception()
+            throw stepConfig.exception(XProcError.xcUnsupportedReportFormat(reportFormat))
         }
 
         if (version != "1.0" && version != "1.1") {
-            throw XProcError.xcXmlSchemaVersionNotAvailable(version).exception()
+            throw stepConfig.exception(XProcError.xcXmlSchemaVersionNotAvailable(version))
         }
 
         val schemaDocuments = mutableListOf<XdmNode>()
@@ -89,7 +89,7 @@ open class ValidateWithXmlSchema(): AbstractAtomicStep() {
                         val schema = docManager.load(uri, stepConfig)
                         schemaDocuments.add(schema.value as XdmNode)
                     } catch (ex: Exception) {
-                        throw XProcError.xcNotSchemaValidXmlSchema(ex.message ?: "No message given").exception(ex)
+                        throw stepConfig.exception(XProcError.xcNotSchemaValidXmlSchema(ex.message ?: "No message given"), ex)
                     }
                     idx += 2
                 }
@@ -116,9 +116,9 @@ open class ValidateWithXmlSchema(): AbstractAtomicStep() {
                 manager.load(SAXSource(source))
             } catch (ex: SaxonApiException) {
                 if (schema.baseURI != null) {
-                    throw XProcError.xcXmlSchemaInvalidSchema(schema.baseURI!!).exception(ex)
+                    throw stepConfig.exception(XProcError.xcXmlSchemaInvalidSchema(schema.baseURI!!), ex)
                 }
-                throw XProcError.xcXmlSchemaInvalidSchema().exception(ex)
+                throw stepConfig.exception(XProcError.xcXmlSchemaInvalidSchema(), ex)
             }
         }
 

@@ -16,7 +16,7 @@ abstract class XProcExpression(val stepConfig: XProcStepConfiguration, val asTyp
             val expr = XProcSelectExpression.newInstance(stepConfig, select, asType, collection, values)
             expr._details = XPathExpressionParser(stepConfig).parse(select)
             if (expr.details.error != null) {
-                throw XProcError.xsXPathStaticError(expr.details.error?.message ?: "").exception(expr.details.error!!)
+                throw stepConfig.exception(XProcError.xsXPathStaticError(expr.details.error?.message ?: ""), expr.details.error!!)
             }
             return expr
         }
@@ -33,7 +33,7 @@ abstract class XProcExpression(val stepConfig: XProcStepConfiguration, val asTyp
             val expr = XProcMatchExpression.newInstance(stepConfig, match)
             expr._details = XPathExpressionParser(stepConfig).parse(match)
             if (expr.details.error != null) {
-                throw XProcError.xsXPathStaticError(expr.details.error?.message ?: "").exception(expr.details.error!!)
+                throw stepConfig.exception(XProcError.xsXPathStaticError(expr.details.error?.message ?: ""), expr.details.error!!)
             }
             return expr
         }
@@ -85,7 +85,7 @@ abstract class XProcExpression(val stepConfig: XProcStepConfiguration, val asTyp
             if (value == null || value is XdmValue || value is XProcDocument) {
                 _contextItem = value
             } else {
-                throw XProcError.xiImpossible("Context item must be a value or a document").exception()
+                throw stepConfig.exception(XProcError.xiImpossible("Context item must be a value or a document"))
             }
         }
 
@@ -137,7 +137,7 @@ abstract class XProcExpression(val stepConfig: XProcStepConfiguration, val asTyp
         for (name in variableRefs) {
             val variable = stepConfig.inscopeVariables[name]
             if (variable == null) {
-                throw XProcError.xsXPathStaticError(name).exception()
+                throw stepConfig.exception(XProcError.xsXPathStaticError(name))
             } else {
                 if (variable.canBeResolvedStatically()) {
                     setStaticBinding(name, variable.select!!)
@@ -151,7 +151,7 @@ abstract class XProcExpression(val stepConfig: XProcStepConfiguration, val asTyp
             try {
                 _staticValue = evaluate(stepConfig)
             } catch (ex: SaxonApiException) {
-                throw XProcError.xsXPathStaticError(ex.message!!).exception()
+                throw stepConfig.exception(XProcError.xsXPathStaticError(ex.message!!))
             }
         }
 

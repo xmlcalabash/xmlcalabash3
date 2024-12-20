@@ -58,7 +58,7 @@ class CompoundStepFoot(config: XProcStepConfiguration, step: FootModel): Abstrac
     override fun run() {
         for ((port, flange) in params.inputs) {
             if (!flange.sequence && !alwaysAllowSequences && (outputCount[port]?:0) != 1) {
-                throw XProcError.xdOutputSequenceForbidden(port).exception()
+                throw stepConfig.exception(XProcError.xdOutputSequenceForbidden(port))
             }
         }
 

@@ -86,7 +86,7 @@ open class HashStep(): AbstractAtomicStep(), ProcessMatchingNodes {
                     val recipientId = parameters[_recipientId]
 
                     if (key != null && (sharedSecret != null || senderId != null || recipientId != null)) {
-                        throw XProcError.xcHashBlake3ConflictingParameters().exception()
+                        throw stepConfig.exception(XProcError.xcHashBlake3ConflictingParameters())
                     }
 
                     if (key != null) {
@@ -96,7 +96,7 @@ open class HashStep(): AbstractAtomicStep(), ProcessMatchingNodes {
                             HashUtils.blake3(value, sharedSecret, senderId, recipientId)
                         } else {
                             if (sharedSecret != null || senderId != null || recipientId != null) {
-                                throw XProcError.xcHashBlake3IncompleteParameters().exception()
+                                throw stepConfig.exception(XProcError.xcHashBlake3IncompleteParameters())
                             }
                             HashUtils.blake3(value)
                         }

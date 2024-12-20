@@ -112,7 +112,7 @@ class CssWeasyprint: CssProcessor {
 
         exePath = options[_exePath]?.underlyingValue?.stringValue ?: defaultStringOptions[_exePath] ?: ""
         if (exePath == "") {
-            throw XProcError.xdStepFailed("Cannot find Weasyprint executable").exception()
+            throw stepConfig.exception(XProcError.xdStepFailed("Cannot find Weasyprint executable"))
         }
     }
 
@@ -145,7 +145,7 @@ class CssWeasyprint: CssProcessor {
 
     override fun format(document: XProcDocument, contentType: MediaType, out: OutputStream) {
         if (contentType != MediaType.PDF) {
-            throw XProcError.xcUnsupportedContentType(contentType).exception()
+            throw stepConfig.exception(XProcError.xcUnsupportedContentType(contentType))
         }
 
         commandLine.add(exePath)
@@ -234,13 +234,13 @@ class CssWeasyprint: CssProcessor {
             localrc
         } catch (ex: Exception) {
             ex.printStackTrace()
-            throw XProcError.xcOsExecFailed().exception()
+            throw stepConfig.exception(XProcError.xcOsExecFailed())
         }
 
         if (rc != 0) {
             println(stdout.toString())
             println(stderr.toString())
-            throw XProcError.xdStepFailed("Weasyprint failed: ${rc}").exception()
+            throw stepConfig.exception(XProcError.xdStepFailed("Weasyprint failed: ${rc}"))
         }
 
         val readPdf = FileInputStream(tempPdf)

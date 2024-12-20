@@ -44,11 +44,11 @@ class DeleteStep(): AbstractAtomicStep(), ProcessMatchingNodes {
     }
 
     override fun startDocument(node: XdmNode): Boolean {
-        throw XProcError.xcInvalidSelection(pattern, "document").exception()
+        throw stepConfig.exception(XProcError.xcInvalidSelection(pattern, "document"))
     }
 
     override fun endDocument(node: XdmNode) {
-        throw XProcError.xcInvalidSelection(pattern, "document").exception()
+        throw stepConfig.exception(XProcError.xcInvalidSelection(pattern, "document"))
     }
 
     override fun startElement(node: XdmNode, attributes: AttributeMap): Boolean {

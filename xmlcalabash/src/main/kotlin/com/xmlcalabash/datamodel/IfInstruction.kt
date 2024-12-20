@@ -37,7 +37,7 @@ class IfInstruction(parent: XProcInstruction): ChooseInstruction(parent, NsP.`if
                 return
             }
         }
-        throw XProcError.xsPrimaryOutputRequiredOnIf().exception()
+        throw stepConfig.exception(XProcError.xsPrimaryOutputRequiredOnIf())
     }
 
     override fun output(port: String?): OutputInstruction {

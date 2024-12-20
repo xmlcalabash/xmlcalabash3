@@ -56,7 +56,7 @@ class UniqueIdStep(): AbstractAtomicStep(), ProcessMatchingNodes {
         when (flavor) {
             "uuid" -> {
                 val version = (parameters[_version] ?: XdmAtomicValue(4)).underlyingValue.stringValue.toInt()
-                var nextUuid: () -> UUID = { throw XProcError.xcUnsupportedUuidVersion(version).exception() }
+                var nextUuid: () -> UUID = { throw stepConfig.exception(XProcError.xcUnsupportedUuidVersion(version)) }
                 when (version) {
                     1 -> nextUuid = { UuidCreator.getTimeBased() }
                     2 -> {
