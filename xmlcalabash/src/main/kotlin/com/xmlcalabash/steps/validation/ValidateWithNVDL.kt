@@ -36,7 +36,7 @@ open class ValidateWithNVDL(): AbstractAtomicStep() {
         val reportFormat = stringBinding(Ns.reportFormat) ?: "xvrl"
 
         if (reportFormat != "xvrl") {
-            throw XProcError.xcUnsupportedReportFormat(reportFormat).exception()
+            throw stepConfig.exception(XProcError.xcUnsupportedReportFormat(reportFormat))
         }
 
         val report = Errors(stepConfig, reportFormat)
@@ -62,17 +62,17 @@ open class ValidateWithNVDL(): AbstractAtomicStep() {
         try {
             driver.loadSchema(nvdl)
         } catch (ex: Exception) {
-            throw XProcError.xcNotNvdl(ex.message ?: "").exception(ex)
+            throw stepConfig.exception(XProcError.xcNotNvdl(ex.message ?: ""), ex)
         }
 
         try {
             if (!driver.validate(doc)) {
                 if (assertValid) {
-                    throw XProcError.xcNotSchemaValidNVDL().exception()
+                    throw stepConfig.exception(XProcError.xcNotSchemaValidNVDL())
                 }
             }
         } catch (ex: Exception) {
-            throw XProcError.xcNotSchemaValidNVDL().exception(ex)
+            throw stepConfig.exception(XProcError.xcNotSchemaValidNVDL(), ex)
         }
 
         receiver.output("result", document)

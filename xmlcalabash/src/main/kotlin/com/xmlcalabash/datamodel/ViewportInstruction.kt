@@ -28,7 +28,7 @@ class ViewportInstruction(parent: XProcInstruction): CompoundLoopDeclaration(par
 
     override fun elaborateInstructions() {
         if (!matchDefined) {
-            throw XProcError.xsMissingRequiredAttribute(Ns.match).exception()
+            throw stepConfig.exception(XProcError.xsMissingRequiredAttribute(Ns.match))
         }
 
         val withOption = WithOptionInstruction(this, Ns.match, stepConfig)
@@ -42,13 +42,13 @@ class ViewportInstruction(parent: XProcInstruction): CompoundLoopDeclaration(par
                 if (binding != null) {
                     variables[name] = XdmAtomicValue(0) // value is irrelevant for this compile test
                 } else {
-                    throw XProcError.xsXPathStaticError(name).exception()
+                    throw stepConfig.exception(XProcError.xsXPathStaticError(name))
                 }
             }
             val matcher = ProcessMatch(stepConfig, DummyProcessor(), stepConfig.inscopeNamespaces, variables)
             matcher.compilePattern(match.match)
         } catch (ex: SaxonApiException) {
-            throw XProcError.xsXPathStaticError("Invalid match pattern: ${match}").exception(ex)
+            throw stepConfig.exception(XProcError.xsXPathStaticError("Invalid match pattern: ${match}"), ex)
         }
 
         super.elaborateInstructions()

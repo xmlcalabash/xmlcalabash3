@@ -49,11 +49,11 @@ open class NamespaceRenameStep(): AbstractAtomicStep(), ProcessMatchingNodes {
     }
 
     override fun startDocument(node: XdmNode): Boolean {
-        throw XProcError.xiImpossible("p:namespace-rename matched start document").exception()
+        throw stepConfig.exception(XProcError.xiImpossible("p:namespace-rename matched start document"))
     }
 
     override fun endDocument(node: XdmNode) {
-        throw XProcError.xiImpossible("p:namespace-rename matched end document").exception()
+        throw stepConfig.exception(XProcError.xiImpossible("p:namespace-rename matched end document"))
     }
 
     override fun startElement(node: XdmNode, attributes: AttributeMap): Boolean {
@@ -143,7 +143,7 @@ open class NamespaceRenameStep(): AbstractAtomicStep(), ProcessMatchingNodes {
                 val pfx = forceAttrPrefix ?: nameCode.prefix
                 nameCode = FingerprintedQName(pfx, toNS, nameCode.localPart)
                 if (startAttr.get(nameCode) != null) {
-                    throw XProcError.xcAttributeNameCollision(nameCode.localPart).exception()
+                    throw stepConfig.exception(XProcError.xcAttributeNameCollision(nameCode.localPart))
                 }
                 atype = BuiltInAtomicType.UNTYPED_ATOMIC
             }
@@ -171,7 +171,7 @@ open class NamespaceRenameStep(): AbstractAtomicStep(), ProcessMatchingNodes {
         matchingAttributes: AttributeMap,
         nonMatchingAttributes: AttributeMap
     ): AttributeMap? {
-        throw XProcError.xiImpossible("p:namespace-rename matched attribute").exception()
+        throw stepConfig.exception(XProcError.xiImpossible("p:namespace-rename matched attribute"))
     }
 
     override fun endElement(node: XdmNode) {
@@ -179,15 +179,15 @@ open class NamespaceRenameStep(): AbstractAtomicStep(), ProcessMatchingNodes {
     }
 
     override fun text(node: XdmNode) {
-        throw XProcError.xiImpossible("p:namespace-rename matched text").exception()
+        throw stepConfig.exception(XProcError.xiImpossible("p:namespace-rename matched text"))
     }
 
     override fun comment(node: XdmNode) {
-        throw XProcError.xiImpossible("p:namespace-rename matched comment").exception()
+        throw stepConfig.exception(XProcError.xiImpossible("p:namespace-rename matched comment"))
     }
 
     override fun pi(node: XdmNode) {
-        throw XProcError.xiImpossible("p:namespace-rename matched processing-instruction").exception()
+        throw stepConfig.exception(XProcError.xiImpossible("p:namespace-rename matched processing-instruction"))
     }
 
     override fun toString(): String = "p:namespace-rename"

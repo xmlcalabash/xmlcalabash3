@@ -9,7 +9,7 @@ class OtherwiseInstruction(parent: ChooseInstruction): CompoundStepDeclaration(p
 
     override fun elaborateInstructions() {
         if (depends.isNotEmpty()) {
-            throw XProcError.xsAttributeForbidden(Ns.depends).exception()
+            throw stepConfig.exception(XProcError.xsAttributeForbidden(Ns.depends))
         }
         super.elaborateInstructions()
     }

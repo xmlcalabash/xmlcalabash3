@@ -25,19 +25,19 @@ class CacheDeleteStep(): AbstractAtomicStep() {
         val href = uriBinding(Ns.href)
 
         if (href == null && document.baseURI == null) {
-            throw XProcError.xiBaseUriRequiredToCache().exception()
+            throw stepConfig.exception(XProcError.xiBaseUriRequiredToCache())
         }
 
         if (href != null) {
             if (failIfNotCached && stepConfig.environment.documentManager.getCached(href) == null) {
-                throw XProcError.xiDocumentNotInCache(href).exception()
+                throw stepConfig.exception(XProcError.xiDocumentNotInCache(href))
             }
             val props = DocumentProperties(document.properties)
             props.set(Ns.baseUri, href)
             stepConfig.environment.documentManager.uncache(document.with(props))
         } else {
             if (failIfNotCached && stepConfig.environment.documentManager.getCached(document.baseURI!!) == null) {
-                throw XProcError.xiDocumentNotInCache(document.baseURI!!).exception()
+                throw stepConfig.exception(XProcError.xiDocumentNotInCache(document.baseURI!!))
             }
             stepConfig.environment.documentManager.uncache(document)
         }

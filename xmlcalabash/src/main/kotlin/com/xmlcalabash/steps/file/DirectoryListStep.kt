@@ -42,13 +42,13 @@ class DirectoryListStep(): FileStep(NsP.directoryList) {
         }
 
         if (path.scheme != "file") {
-            throw XProcError.xcUnsupportedScheme(path.scheme).exception()
+            throw stepConfig.exception(XProcError.xcUnsupportedScheme(path.scheme))
         }
 
         rootPath = path.path
         val dir = File(rootPath)
         if (!dir.isDirectory) {
-            throw XProcError.xcNotADirectory(path.path).exception()
+            throw stepConfig.exception(XProcError.xcNotADirectory(path.path))
         }
 
         val depth = if (maxDepth == "unbounded") {
@@ -57,11 +57,11 @@ class DirectoryListStep(): FileStep(NsP.directoryList) {
             try {
                 val num = Integer.parseInt(maxDepth)
                 if (num < 0) {
-                    throw XProcError.xdValueDoesNotSatisfyType(maxDepth, "xs:nonNegativeInteger").exception()
+                    throw stepConfig.exception(XProcError.xdValueDoesNotSatisfyType(maxDepth, "xs:nonNegativeInteger"))
                 }
                 num
             } catch (e: NumberFormatException) {
-                throw XProcError.xdValueDoesNotSatisfyType(maxDepth, "xs:nonNegativeInteger").exception()
+                throw stepConfig.exception(XProcError.xdValueDoesNotSatisfyType(maxDepth, "xs:nonNegativeInteger"))
             }
         }
 

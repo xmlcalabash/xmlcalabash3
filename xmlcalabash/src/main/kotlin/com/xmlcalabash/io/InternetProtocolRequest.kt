@@ -97,14 +97,14 @@ class InternetProtocolRequest(val stepConfig: XProcStepConfiguration, val uri: U
             MediaType.parse(value)
         }
         if (name.equals("transfer-encoding", ignoreCase = true)) {
-            throw XProcError.xcUnsupportedTransferEncoding(value).exception()
+            throw stepConfig.exception(XProcError.xcUnsupportedTransferEncoding(value))
         }
         headers.put(name, value)
     }
 
     fun authentication(method: String, username: String, password: String, preemtive: Boolean = false) {
         if (method != "basic" && method != "digest") {
-            throw XProcError.xcHttpBadAuth("auth-method must be 'basic' or 'digest'").exception()
+            throw stepConfig.exception(XProcError.xcHttpBadAuth("auth-method must be 'basic' or 'digest'"))
         }
         _authMethod = method
         _usercreds = UsernamePasswordCredentials(username, password.toCharArray())
@@ -169,7 +169,7 @@ class InternetProtocolRequest(val stepConfig: XProcStepConfiguration, val uri: U
                 "digest" -> {
                     authpref.add("digest")
                 }
-                else -> throw XProcError.xiImpossible("Unexpected authentication method: ${_authMethod}").exception()
+                else -> throw stepConfig.exception(XProcError.xiImpossible("Unexpected authentication method: ${_authMethod}"))
             }
 
             rqBuilder.setProxyPreferredAuthSchemes(authpref)
@@ -269,7 +269,7 @@ class InternetProtocolRequest(val stepConfig: XProcStepConfiguration, val uri: U
         val boundary = contentType.paramValue("boundary")
 
         if (boundary == null) {
-            throw XProcError.xcHttpInvalidBoundary("(none provided)").exception()
+            throw stepConfig.exception(XProcError.xcHttpInvalidBoundary("(none provided)"))
         }
 
         val stream = ByteArrayInputStream(httpResult.body)
@@ -413,7 +413,7 @@ class InternetProtocolRequest(val stepConfig: XProcStepConfiguration, val uri: U
     private fun setupGetOrHead(method: String): ClassicHttpRequest {
         val request = if (sendBodyAnyway && _sources.isNotEmpty()) {
             if (_sources.size != 1) {
-                throw XProcError.xiNotImplemented("Sending multiple bodies with GET").exception()
+                throw stepConfig.exception(XProcError.xiNotImplemented("Sending multiple bodies with GET"))
             }
             if (method == "HEAD") {
                 addEntity(ClassicRequestBuilder.head(href), _sources[0]).build()
@@ -439,7 +439,7 @@ class InternetProtocolRequest(val stepConfig: XProcStepConfiguration, val uri: U
         val headers = normalizedHeaders()
         var contentType = if (headers.contains("content-type")) {
             if (_sources.size > 1 && !headers["content-type"]!!.startsWith("multipart/")) {
-                throw XProcError.xcMultipartRequired(headers["content-type"]!!).exception()
+                throw stepConfig.exception(XProcError.xcMultipartRequired(headers["content-type"]!!))
             }
             MediaType.parse(headers["content-type"]!!)
         } else {
@@ -476,7 +476,7 @@ class InternetProtocolRequest(val stepConfig: XProcStepConfiguration, val uri: U
             val boundary = contentType.paramValue("boundary")!!
 
             if (boundary.startsWith("--")) {
-                throw XProcError.xcHttpInvalidBoundary(boundary).exception()
+                throw stepConfig.exception(XProcError.xcHttpInvalidBoundary(boundary))
             }
 
             entityBuilder.setBoundary(boundary)
@@ -542,7 +542,7 @@ class InternetProtocolRequest(val stepConfig: XProcStepConfiguration, val uri: U
     private fun setupDelete(): ClassicHttpRequest {
         val request = if (sendBodyAnyway && _sources.isNotEmpty()) {
             if (_sources.size != 1) {
-                throw XProcError.xiNotImplemented("Sending multiple bodies with GET").exception()
+                throw stepConfig.exception(XProcError.xiNotImplemented("Sending multiple bodies with GET"))
             }
             addEntity(ClassicRequestBuilder.delete(href), _sources[0]).build()
         } else {
@@ -611,7 +611,7 @@ class InternetProtocolRequest(val stepConfig: XProcStepConfiguration, val uri: U
         val normHeaders = mutableMapOf<String,String>()
         for ((name, value) in headers) {
             if (normHeaders.containsKey(name.lowercase())) {
-                throw XProcError.xcHttpDuplicateHeader(name.lowercase()).exception()
+                throw stepConfig.exception(XProcError.xcHttpDuplicateHeader(name.lowercase()))
             }
             normHeaders[name.lowercase()] = value
         }

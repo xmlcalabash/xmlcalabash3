@@ -28,7 +28,7 @@ abstract class CompoundLoopDeclaration(parent: XProcInstruction, instructionType
     override fun checkInputBindings() {
         for (child in children.filterIsInstance<InputBindingInstruction>()) {
             if (child.port != "current" && !child.weldedShut && child.children.isEmpty()) {
-                throw XProcError.xsNotConnected(child.port).exception()
+                throw stepConfig.exception(XProcError.xsNotConnected(child.port))
             }
         }
     }

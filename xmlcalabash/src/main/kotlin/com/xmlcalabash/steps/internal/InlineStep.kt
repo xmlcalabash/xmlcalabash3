@@ -25,7 +25,7 @@ open class InlineStep(val params: InlineStepParameters): AbstractAtomicStep() {
 
     override fun run() {
         if (contextSequence && !params.filter.isStatic()) {
-            throw XProcError.xdInlineContextSequence().at(stepParams.location).exception()
+            throw stepConfig.exception(XProcError.xdInlineContextSequence().at(stepParams.location))
         }
 
         super.run()
@@ -37,9 +37,9 @@ open class InlineStep(val params: InlineStepParameters): AbstractAtomicStep() {
                 params.filter.expandValueTemplates(stepConfig, contextItem, options)
             } catch (ex: SaxonApiException) {
                 if (ex.message != null && ex.message!!.contains("Namespace prefix") && ex.message!!.contains("has not been declared")) {
-                    throw XProcError.xdNoBindingInScope(ex.message!!).exception()
+                    throw stepConfig.exception(XProcError.xdNoBindingInScope(ex.message!!))
                 }
-                throw XProcError.xsXPathStaticError(ex.message ?: "").exception(ex)
+                throw stepConfig.exception(XProcError.xsXPathStaticError(ex.message ?: ""), ex)
             }
         }
 
@@ -50,7 +50,7 @@ open class InlineStep(val params: InlineStepParameters): AbstractAtomicStep() {
             try {
                 stepConfig.forceQNameKeys(docProps as XdmMap)
             } catch (ex: Exception) {
-                throw XProcError.xdInvalidSerialization(docProps.toString()).exception()
+                throw stepConfig.exception(XProcError.xdInvalidSerialization(docProps.toString()))
             }
         }
         val props = DocumentProperties(stepConfig.asMap(docMap))
@@ -59,7 +59,7 @@ open class InlineStep(val params: InlineStepParameters): AbstractAtomicStep() {
         if (ptype != null) {
             val pmtype = MediaType.parse(ptype.underlyingValue.stringValue)
             if (pmtype != params.contentType) {
-                throw XProcError.xdContentTypesDiffer(params.contentType.toString(), pmtype.toString()).exception()
+                throw stepConfig.exception(XProcError.xdContentTypesDiffer(params.contentType.toString(), pmtype.toString()))
             }
         } else {
             props[Ns.contentType] = params.contentType
@@ -69,7 +69,7 @@ open class InlineStep(val params: InlineStepParameters): AbstractAtomicStep() {
 
         // This is about whether the original inline contains markup
         if (params.filter.containsMarkup(stepConfig) && !(ctype.xmlContentType() || ctype.htmlContentType())) {
-            throw XProcError.xdMarkupForbidden(ctype.toString()).exception()
+            throw stepConfig.exception(XProcError.xdMarkupForbidden(ctype.toString()))
         }
 
         // This is about whether the constructed output contains markup
@@ -77,14 +77,14 @@ open class InlineStep(val params: InlineStepParameters): AbstractAtomicStep() {
 
         if (params.encoding == null) {
             if (ctype.charset() != null) {
-                throw XProcError.xdEncodingRequired(ctype.charset()!!).exception()
+                throw stepConfig.exception(XProcError.xdEncodingRequired(ctype.charset()!!))
             }
         } else {
             if (ctype.xmlContentType() || ctype.htmlContentType()) {
-                throw XProcError.xdEncodingWithXmlOrHtml(params.encoding).exception()
+                throw stepConfig.exception(XProcError.xdEncodingWithXmlOrHtml(params.encoding))
             }
             if (markup) {
-                throw XProcError.xdMarkupForbiddenWithEncoding(params.encoding).exception()
+                throw stepConfig.exception(XProcError.xdMarkupForbiddenWithEncoding(params.encoding))
             }
         }
 
@@ -104,7 +104,7 @@ open class InlineStep(val params: InlineStepParameters): AbstractAtomicStep() {
                 return
             } else {
                 if (!(ctype.xmlContentType() || ctype.htmlContentType())) {
-                    throw XProcError.xdMarkupForbidden(ctype.toString()).exception()
+                    throw stepConfig.exception(XProcError.xdMarkupForbidden(ctype.toString()))
                 }
             }
         }
@@ -132,7 +132,7 @@ open class InlineStep(val params: InlineStepParameters): AbstractAtomicStep() {
 
             val charsetName = ctype.charset() ?: "UTF-8"
             if (!Charset.isSupported(charsetName)) {
-                throw XProcError.xdUnsupportedCharset(charsetName).exception()
+                throw stepConfig.exception(XProcError.xdUnsupportedCharset(charsetName))
             }
 
             val charset = Charset.forName(ctype.charset() ?: "UTF-8")
@@ -166,7 +166,7 @@ open class InlineStep(val params: InlineStepParameters): AbstractAtomicStep() {
             val result = selector.evaluate()
             return result
         } catch (ex: SaxonApiException) {
-            throw XProcError.xdNotWellFormedJson().exception(ex)
+            throw stepConfig.exception(XProcError.xdNotWellFormedJson(), ex)
         }
     }
 
@@ -184,7 +184,7 @@ open class InlineStep(val params: InlineStepParameters): AbstractAtomicStep() {
             val bytes = decoder.decode(cleanText)
             return bytes
         } catch (ex: IllegalArgumentException) {
-            throw XProcError.xdBadBase64Input().exception(ex)
+            throw stepConfig.exception(XProcError.xdBadBase64Input(), ex)
         }
     }
 

@@ -48,7 +48,7 @@ class DocumentLoader(val context: XProcStepConfiguration,
 
     fun load(): XProcDocument {
         if (href == null) {
-            throw XProcError.xiImpossible("Attempt to load document with no URI").exception()
+            throw context.exception(XProcError.xiImpossible("Attempt to load document with no URI"))
         }
 
         absURI = if (href.isAbsolute) {
@@ -65,7 +65,7 @@ class DocumentLoader(val context: XProcStepConfiguration,
             try {
                 return loadFile()
             } catch (ex: IOException) {
-                throw XProcError.xdDoesNotExist(absURI.path).exception(ex)
+                throw context.exception(XProcError.xdDoesNotExist(absURI.path), ex)
             }
         }
 
@@ -74,10 +74,10 @@ class DocumentLoader(val context: XProcStepConfiguration,
             val resp = req.execute("GET")
 
             if (resp.statusCode >= 500) {
-                throw XProcError.xdIsNotReadable(absURI.toString(), "HTTP response code: ${resp.statusCode}").exception()
+                throw context.exception(XProcError.xdIsNotReadable(absURI.toString(), "HTTP response code: ${resp.statusCode}"))
             }
             if (resp.statusCode >= 400) {
-                throw XProcError.xdDoesNotExist(absURI.toString()).exception()
+                throw context.exception(XProcError.xdDoesNotExist(absURI.toString()))
             }
 
             return resp.response.first()
@@ -127,7 +127,7 @@ class DocumentLoader(val context: XProcStepConfiguration,
             try {
                 return loadXml(uri, stream)
             } catch (ex: SaxonApiException) {
-                throw XProcError.xdNotWellFormed().exception(ex)
+                throw context.exception(XProcError.xdNotWellFormed(), ex)
             }
         }
         if (mediaType.htmlContentType()) {
@@ -176,9 +176,9 @@ class DocumentLoader(val context: XProcStepConfiguration,
             val xdm = builder.build(SAXSource(source))
             if (errorHandler.errorCount > 0) {
                 if (validating) {
-                    throw XProcError.xdNotDtdValid(errorHandler.message ?: "No message provided").exception()
+                    throw context.exception(XProcError.xdNotDtdValid(errorHandler.message ?: "No message provided"))
                 }
-                throw XProcError.xdNotWellFormed().exception()
+                throw context.exception(XProcError.xdNotWellFormed())
             }
             return XProcDocument.ofXml(xdm, context, properties)
         } finally {
@@ -221,18 +221,18 @@ class DocumentLoader(val context: XProcStepConfiguration,
             return XProcDocument(json, context, properties)
         } catch (ex: SaxonApiException) {
             if ((ex.message ?: "").startsWith("Invalid option")) {
-                throw XProcError.xdInvalidParameter(ex.message!!).exception(ex)
+                throw context.exception(XProcError.xdInvalidParameter(ex.message!!), ex)
             }
 
             val pos = (ex.message ?: "").indexOf("Duplicate key")
             if (pos >= 0) {
                 val epos = ex.message!!.indexOf("}")
                 val key = ex.message!!.substring(pos+21, epos+1)
-                throw XProcError.xdDuplicateKey(key).exception(ex)
+                throw context.exception(XProcError.xdDuplicateKey(key), ex)
             }
 
             if ((ex.message ?: "").startsWith("Invalid JSON")) {
-                throw XProcError.xdNotWellFormedJson().exception(ex)
+                throw context.exception(XProcError.xdNotWellFormedJson(), ex)
             }
 
             throw ex
@@ -261,7 +261,7 @@ class DocumentLoader(val context: XProcStepConfiguration,
     private fun loadTextData(stream: InputStream): String {
         val charsetName = mediaType.charset() ?: "UTF-8"
         if (!Charset.isSupported(charsetName)) {
-            throw XProcError.xdUnsupportedDocumentCharset(charsetName).exception()
+            throw context.exception(XProcError.xdUnsupportedDocumentCharset(charsetName))
         }
         val charset = Charset.forName(charsetName)
         val reader = InputStreamReader(stream, charset)

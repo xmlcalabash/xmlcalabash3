@@ -29,7 +29,7 @@ class OutputInstruction(parent: XProcInstruction): PortBindingContainer(parent, 
 
     override fun elaborateInstructions() {
         if (select != null) {
-            throw XProcError.xsAttributeForbidden(Ns.select).exception()
+            throw stepConfig.exception(XProcError.xsAttributeForbidden(Ns.select))
         }
 
         if (_serialization == null) {

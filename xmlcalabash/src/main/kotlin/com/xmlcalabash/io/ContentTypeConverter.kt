@@ -91,7 +91,7 @@ class ContentTypeConverter() {
                         if (child.nodeKind == XdmNodeKind.TEXT) {
                             sb.append(child.stringValue)
                         } else {
-                            throw XProcError.xiCannotCastTo(contentType).exception()
+                            throw context.exception(XProcError.xiCannotCastTo(contentType))
                         }
                     }
                     sb.toString()
@@ -99,7 +99,7 @@ class ContentTypeConverter() {
                     if (value.nodeKind == XdmNodeKind.TEXT) {
                         value.stringValue
                     } else {
-                        throw XProcError.xiCannotCastTo(contentType).exception()
+                        throw context.exception(XProcError.xiCannotCastTo(contentType))
                     }
                 }
                 val compiler = context.processor.newXPathCompiler()
@@ -114,7 +114,7 @@ class ContentTypeConverter() {
                 return XProcDocument.ofJson(result, context, contentType, properties)
             }
 
-            throw XProcError.xiCannotCastTo(contentType).exception()
+            throw context.exception(XProcError.xiCannotCastTo(contentType))
         }
 
         fun jsonToXml(context: XProcStepConfiguration, document: XProcDocument, contentType: MediaType): XProcDocument {

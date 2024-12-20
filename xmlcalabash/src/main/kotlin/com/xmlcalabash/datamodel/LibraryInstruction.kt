@@ -63,7 +63,7 @@ open class LibraryInstruction(stepConfig: InstructionConfiguration): XProcInstru
                 is LibraryInstruction -> {
                     import.coherentStepDeclarations()
                 }
-                else -> throw XProcError.xiImpossible("Unexpected imported type: ${import}").exception()
+                else -> throw stepConfig.exception(XProcError.xiImpossible("Unexpected imported type: ${import}"))
             }
         }
 
@@ -103,7 +103,7 @@ open class LibraryInstruction(stepConfig: InstructionConfiguration): XProcInstru
                     import.findDeclarations(stepTypes, emptyMap(), bindings)
                     if (import.type != null && import.visibility != Visibility.PRIVATE) {
                         if (newStepTypes.containsKey(import.type)) {
-                            throw XProcError.xsDuplicateStepType(import.type!!).exception()
+                            throw stepConfig.exception(XProcError.xsDuplicateStepType(import.type!!))
                         }
                         newStepTypes[import.type!!] = import
                         _exportedSteps[import.type!!] = import
@@ -113,7 +113,7 @@ open class LibraryInstruction(stepConfig: InstructionConfiguration): XProcInstru
                     import.findDeclarations(stepTypes, emptyMap(), bindings)
                     for ((name, opt) in import.exportedOptions) {
                         if (newBindings.containsKey(name)) {
-                            throw XProcError.xsDuplicateOption(name).exception()
+                            throw stepConfig.exception(XProcError.xsDuplicateOption(name))
                         }
                         newBindings[name] = opt
                         if (opt.visibility != Visibility.PRIVATE) {
@@ -123,7 +123,7 @@ open class LibraryInstruction(stepConfig: InstructionConfiguration): XProcInstru
 
                     for ((type, decl) in import.exportedSteps) {
                         if (newStepTypes.containsKey(type)) {
-                            throw XProcError.xsDuplicateStepType(type).exception()
+                            throw stepConfig.exception(XProcError.xsDuplicateStepType(type))
                         }
                         newStepTypes[type] = decl
                         if (decl.visibility != Visibility.PRIVATE) {
@@ -131,7 +131,7 @@ open class LibraryInstruction(stepConfig: InstructionConfiguration): XProcInstru
                         }
                     }
                 }
-                else -> throw XProcError.xiImpossible("Unexpected imported type: ${import}").exception()
+                else -> throw stepConfig.exception(XProcError.xiImpossible("Unexpected imported type: ${import}"))
             }
         }
 
@@ -139,7 +139,7 @@ open class LibraryInstruction(stepConfig: InstructionConfiguration): XProcInstru
             if (child.type != null) {
                 val current = newStepTypes[child.type]
                 if (current != null && current !== child) {
-                    throw XProcError.xsDuplicateStepType(child.type!!).exception()
+                    throw stepConfig.exception(XProcError.xsDuplicateStepType(child.type!!))
                 }
                 newStepTypes[child.type!!] = child
             }
@@ -163,13 +163,13 @@ open class LibraryInstruction(stepConfig: InstructionConfiguration): XProcInstru
                 is OptionInstruction -> {
                     child.findDeclarations(newStepTypes, emptyMap(), newBindings)
                     if (optnames.contains(child.name)) {
-                        throw XProcError.xsDuplicateOption(child.name).exception()
+                        throw stepConfig.exception(XProcError.xsDuplicateOption(child.name))
                     }
                     optnames.add(child.name)
                     newBindings[child.name] = child
                     lastChild = child
                 }
-                else -> throw XProcError.xsInvalidElement(child.instructionType).exception()
+                else -> throw stepConfig.exception(XProcError.xsInvalidElement(child.instructionType))
             }
         }
     }
@@ -177,10 +177,10 @@ open class LibraryInstruction(stepConfig: InstructionConfiguration): XProcInstru
     override fun elaborateInstructions() {
         if (parent == null) {
             if (version == null) {
-                throw XProcError.xsMissingVersion().exception()
+                throw stepConfig.exception(XProcError.xsMissingVersion())
             } else {
                 if (version != 3.0 && version != 3.1) {
-                    throw XProcError.xsUnsupportedVersion(version!!.toString()).exception()
+                    throw stepConfig.exception(XProcError.xsUnsupportedVersion(version!!.toString()))
                 }
             }
         }
@@ -189,7 +189,7 @@ open class LibraryInstruction(stepConfig: InstructionConfiguration): XProcInstru
             when (import) {
                 is DeclareStepInstruction -> import.validate()
                 is LibraryInstruction -> import.validate()
-                else -> throw XProcError.xiImpossible("Import not a library or declared step?").exception()
+                else -> throw stepConfig.exception(XProcError.xiImpossible("Import not a library or declared step?"))
             }
         }
 
@@ -239,7 +239,7 @@ open class LibraryInstruction(stepConfig: InstructionConfiguration): XProcInstru
                 return child
             }
         }
-        throw XProcError.xiImpossible("No step named ${name}").exception()
+        throw stepConfig.exception(XProcError.xiImpossible("No step named ${name}"))
     }
 
     fun getRuntime(stepName: String?): XProcRuntime {
@@ -255,7 +255,7 @@ open class LibraryInstruction(stepConfig: InstructionConfiguration): XProcInstru
                 }
             }
 
-            throw XProcError.xiImpossible("No step named ${stepName}").exception()
+            throw stepConfig.exception(XProcError.xiImpossible("No step named ${stepName}"))
         }
     }
 
@@ -275,7 +275,7 @@ open class LibraryInstruction(stepConfig: InstructionConfiguration): XProcInstru
                 }
             }
 
-            throw XProcError.xiImpossible("No step named ${stepName}").exception()
+            throw stepConfig.exception(XProcError.xiImpossible("No step named ${stepName}"))
         }
     }
      */
@@ -317,7 +317,7 @@ open class LibraryInstruction(stepConfig: InstructionConfiguration): XProcInstru
     override fun addImportFunctions(import: ImportFunctionsInstruction) {
         if (children.filterIsInstance<OptionInstruction>().isNotEmpty()
             || children.filterIsInstance<DeclareStepInstruction>().isNotEmpty()) {
-            throw XProcError.xsInvalidElement(import.instructionType).exception()
+            throw stepConfig.exception(XProcError.xsInvalidElement(import.instructionType))
         }
         _children.add(import)
     }
@@ -326,7 +326,7 @@ open class LibraryInstruction(stepConfig: InstructionConfiguration): XProcInstru
 
     override fun option(name: QName): OptionInstruction {
         if (name.namespaceUri == NsP.namespace) {
-            throw XProcError.xsOptionInXProcNamespace(name).exception()
+            throw stepConfig.exception(XProcError.xsOptionInXProcNamespace(name))
         }
         val option = OptionInstruction(this, name, stepConfig.copy())
         _children.add(option)
@@ -335,7 +335,7 @@ open class LibraryInstruction(stepConfig: InstructionConfiguration): XProcInstru
 
     override fun option(name: QName, staticValue: XProcExpression): OptionInstruction {
         if (name.namespaceUri == NsP.namespace) {
-            throw XProcError.xsOptionInXProcNamespace(name).exception()
+            throw stepConfig.exception(XProcError.xsOptionInXProcNamespace(name))
         }
         val option = OptionInstruction(this, name, stepConfig.copy())
         option._select = staticValue
@@ -358,10 +358,10 @@ open class LibraryInstruction(stepConfig: InstructionConfiguration): XProcInstru
         if (decl.parent == null) {
             decl._parent = this
         } else {
-            throw XProcError.xiImpossible("Can't add a step to more than one container").exception()
+            throw stepConfig.exception(XProcError.xiImpossible("Can't add a step to more than one container"))
         }
         if (!decl.open) {
-            throw XProcError.xiImpossible("Can't add a compiled step to a container").exception()
+            throw stepConfig.exception(XProcError.xiImpossible("Can't add a compiled step to a container"))
         }
 
         _children.add(decl)

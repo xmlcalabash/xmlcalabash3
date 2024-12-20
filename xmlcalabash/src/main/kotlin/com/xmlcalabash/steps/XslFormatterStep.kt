@@ -66,7 +66,7 @@ open class XslFormatterStep(): AbstractAtomicStep() {
         }
 
         if (xslManager == null) {
-            throw XProcError.xdStepFailed("No XSL formatters available").exception()
+            throw stepConfig.exception(XProcError.xdStepFailed("No XSL formatters available"))
         }
 
         val provider = xslManager.getFoProcessor(genericXslFormatter)

@@ -81,7 +81,7 @@ class WrapStep(): AbstractAtomicStep(), ProcessMatchingNodes {
     override fun attributes(node: XdmNode,
                             matchingAttributes: AttributeMap,
                             nonMatchingAttributes: AttributeMap): AttributeMap? {
-        throw XProcError.xcInvalidSelection(pattern, "attribute").at(node).exception()
+        throw stepConfig.exception(XProcError.xcInvalidSelection(pattern, "attribute").at(node))
     }
 
     override fun endElement(node: XdmNode) {

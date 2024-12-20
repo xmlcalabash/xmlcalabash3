@@ -29,7 +29,7 @@ open class AtomicStepInstruction(parent: XProcInstruction, instructionType: QNam
         super.findDeclarations(stepTypes, stepNames, bindings)
 
         val decl = declaration()
-            ?: throw XProcError.xsMissingStepDeclaration(instructionType).exception()
+            ?: throw stepConfig.exception(XProcError.xsMissingStepDeclaration(instructionType))
 
         declId = decl.id
         val seenPorts = mutableSetOf<String>()
@@ -46,9 +46,9 @@ open class AtomicStepInstruction(parent: XProcInstruction, instructionType: QNam
 
             if (dinput == null) {
                 if (!input.portDefined) {
-                    throw XProcError.xsNoPrimaryInput().exception()
+                    throw stepConfig.exception(XProcError.xsNoPrimaryInput())
                 } else {
-                    throw XProcError.xsNoSuchPort(input.port).exception()
+                    throw stepConfig.exception(XProcError.xsNoSuchPort(input.port))
                 }
             }
 
@@ -57,7 +57,7 @@ open class AtomicStepInstruction(parent: XProcInstruction, instructionType: QNam
             }
 
             if (seenPorts.contains(input.port)) {
-                throw XProcError.xsDuplicatePortDeclaration(input.port).exception()
+                throw stepConfig.exception(XProcError.xsDuplicatePortDeclaration(input.port))
             }
             seenPorts.add(input.port)
 
@@ -103,13 +103,13 @@ open class AtomicStepInstruction(parent: XProcInstruction, instructionType: QNam
 
             val dopt = decl.getOption(opt.name)
             if (dopt == null) {
-                throw XProcError.xsNoSuchOption(opt.name).exception()
+                throw stepConfig.exception(XProcError.xsNoSuchOption(opt.name))
             }
             if (options.containsKey(opt.name)) {
-                throw XProcError.xsDuplicateWithOption(opt.name).exception()
+                throw stepConfig.exception(XProcError.xsDuplicateWithOption(opt.name))
             }
             if (dopt.static) {
-                throw XProcError.xsWithOptionForStatic(opt.name).exception()
+                throw stepConfig.exception(XProcError.xsWithOptionForStatic(opt.name))
             }
             options[opt.name] = opt
         }
@@ -137,7 +137,7 @@ open class AtomicStepInstruction(parent: XProcInstruction, instructionType: QNam
                 }
             } else {
                 if (option.required == true) {
-                    throw XProcError.xsMissingRequiredOption(option.name).exception()
+                    throw stepConfig.exception(XProcError.xsMissingRequiredOption(option.name))
                 } else {
                     if (decl.isAtomic) {
                         // If the step is atomic, we have to work out all the option values.
@@ -162,7 +162,7 @@ open class AtomicStepInstruction(parent: XProcInstruction, instructionType: QNam
 
     open fun withOption(name: QName, expr: XProcExpression?): WithOptionInstruction {
         if (children.filterIsInstance<WithOptionInstruction>().any { it.name == name }) {
-            throw XProcError.xsDuplicateWithOption(name).exception()
+            throw stepConfig.exception(XProcError.xsDuplicateWithOption(name))
         }
 
         val withOption = WithOptionInstruction(this, name, stepConfig.copy())

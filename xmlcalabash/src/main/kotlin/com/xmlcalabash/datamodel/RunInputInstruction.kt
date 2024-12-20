@@ -8,7 +8,7 @@ class RunInputInstruction(parent: XProcInstruction, stepConfig: InstructionConfi
         super.elaborateInstructions()
 
         if (!portDefined) {
-            throw XProcError.xsMissingRequiredAttribute(Ns.port).exception()
+            throw stepConfig.exception(XProcError.xsMissingRequiredAttribute(Ns.port))
         }
 
         _sequence = true

@@ -110,7 +110,7 @@ open class AtomicStep(config: XProcStepConfiguration, atomic: AtomicBuiltinStepM
         for (portName in openPorts) {
             val port = params.inputs[portName]!!
             if (!port.weldedShut && port.defaultBindings.isEmpty()) {
-                throw XProcError.xiImpossible("Unbound input port with no default bindings?").exception()
+                throw stepConfig.exception(XProcError.xiImpossible("Unbound input port with no default bindings?"))
             }
             for (binding in port.defaultBindings) {
                 for (document in defaultBindingDocuments(binding)) {
@@ -124,7 +124,7 @@ open class AtomicStep(config: XProcStepConfiguration, atomic: AtomicBuiltinStepM
             if ((inputCount[portName] ?: 0) == 0) {
                 val flange = params.inputs[portName]
                 if (flange != null && !flange.sequence) {
-                    throw XProcError.xdInputSequenceForbidden(portName).exception()
+                    throw stepConfig.exception(XProcError.xdInputSequenceForbidden(portName))
                 }
             }
         }

@@ -194,7 +194,7 @@ open class XProcStepConfigurationImpl internal constructor(
             val qname = when (value.primitiveTypeName) {
                 NsXs.string, NsXs.untypedAtomic -> XdmAtomicValue(parseQName(value.stringValue, inscopeNamespaces))
                 NsXs.QName -> value
-                else -> throw XProcError.xdBadType(value.stringValue, xsdtype).exception()
+                else -> throw exception(XProcError.xdBadType(value.stringValue, xsdtype))
             }
             return qname
         }
@@ -205,9 +205,9 @@ open class XProcStepConfigurationImpl internal constructor(
             when (ex) {
                 is SaxonApiException -> {
                     if (ex.message!!.contains("Invalid URI")) {
-                        throw XProcError.xdInvalidUri(value.stringValue).exception()
+                        throw exception(XProcError.xdInvalidUri(value.stringValue))
                     }
-                    throw XProcError.xdBadType(value.stringValue, xsdtype).exception()
+                    throw exception(XProcError.xdBadType(value.stringValue, xsdtype))
 
                 }
                 else -> throw ex
@@ -217,7 +217,7 @@ open class XProcStepConfigurationImpl internal constructor(
 
     fun xpathInstanceOf(value: XdmValue, type: QName): Boolean {
         if (type.namespaceUri != NsXs.namespace) {
-            throw XProcError.xiImpossible("Attempt to cast to non-xs type").exception()
+            throw exception(XProcError.xiImpossible("Attempt to cast to non-xs type"))
         }
 
         val compiler = processor.newXPathCompiler()
@@ -230,7 +230,7 @@ open class XProcStepConfigurationImpl internal constructor(
 
     fun xpathCastAs(value: XdmValue, type: QName): XdmValue {
         if (type.namespaceUri != NsXs.namespace) {
-            throw XProcError.xiImpossible("Attempt to cast to non-xs type").exception()
+            throw exception(XProcError.xiImpossible("Attempt to cast to non-xs type"))
         }
 
         val compiler = processor.newXPathCompiler()
@@ -243,7 +243,7 @@ open class XProcStepConfigurationImpl internal constructor(
 
     fun xpathTreatAs(value: XdmValue, type: QName): XdmValue {
         if (type.namespaceUri != NsXs.namespace) {
-            throw XProcError.xiImpossible("Attempt to cast to non-xs type").exception()
+            throw exception(XProcError.xiImpossible("Attempt to cast to non-xs type"))
         }
 
         val compiler = processor.newXPathCompiler()
@@ -254,16 +254,16 @@ open class XProcStepConfigurationImpl internal constructor(
         try {
             return selector.evaluate()
         } catch (ex: Exception) {
-            throw XProcError.xdBadType(ex.message ?: "").exception(ex)
+            throw exception(XProcError.xdBadType(ex.message ?: ""), ex)
         }
     }
 
     fun xpathPromote(value: XdmValue, type: QName): XdmValue {
         if (type.namespaceUri != NsXs.namespace) {
-            throw XProcError.xiImpossible("Attempt to cast to non-xs type").exception()
+            throw exception(XProcError.xiImpossible("Attempt to cast to non-xs type"))
         }
         if (value.underlyingValue !is AtomicValue) {
-            throw XProcError.xiImpossible("Attempt to promote non-atomic: ${value}").exception()
+            throw exception(XProcError.xiImpossible("Attempt to promote non-atomic: ${value}"))
         }
 
         val curType = (value.underlyingValue as AtomicValue).primitiveType
@@ -313,15 +313,15 @@ open class XProcStepConfigurationImpl internal constructor(
                     || sequenceType.occurrenceIndicator == OccurrenceIndicator.ZERO_OR_MORE) {
                     return value
                 }
-                throw XProcError.xdBadType("Empty sequence not allowed").exception()
+                throw exception(XProcError.xdBadType("Empty sequence not allowed"))
                 /*
                 if (code == "AB") {
                     return XdmAtomicValue(false)
                 }
                 if (varName == null) {
-                    throw XProcError.xdBadType(value.underlyingValue.stringValue, sequenceType.underlyingSequenceType.toString()).exception()
+                    throw exception(XProcError.xdBadType(value.underlyingValue.stringValue, sequenceType.underlyingSequenceType.toString()))
                 } else {
-                    throw XProcError.xdBadType(varName, value.toString(), sequenceType.underlyingSequenceType.toString()).exception()
+                    throw exception(XProcError.xdBadType(varName, value.toString(), sequenceType.underlyingSequenceType.toString()))
                 }
                  */
             }
@@ -351,7 +351,7 @@ open class XProcStepConfigurationImpl internal constructor(
                 return
             }
         }
-        throw XProcError.xdValueNotAllowed(value, values).exception()
+        throw exception(XProcError.xdValueNotAllowed(value, values))
     }
 
     override fun forceQNameKeys(inputMap: MapItem): XdmMap {
@@ -413,13 +413,13 @@ open class XProcStepConfigurationImpl internal constructor(
                         if (ex.error.code == NsErr.xd(36)) {
                             val name = ex.error.details.getOrNull(0)
                             if (name is String) {
-                                XProcError.xdInvalidSerialization(name).exception()
+                                exception(XProcError.xdInvalidSerialization(name))
                             }
-                            throw XProcError.xdInvalidSerialization().exception()
+                            throw exception(XProcError.xdInvalidSerialization())
                         }
                     }
                 } else {
-                    throw XProcError.xdInvalidSerialization().exception()
+                    throw exception(XProcError.xdInvalidSerialization())
                 }
             } else {
                 map = map.put(XdmAtomicValue(mapkey), value)
@@ -461,7 +461,7 @@ open class XProcStepConfigurationImpl internal constructor(
         if (name.startsWith("Q{")) {
             val pos = name.indexOf("}")
             if (pos < 0) {
-                throw XProcError.xdInvalidQName(name).exception()
+                throw exception(XProcError.xdInvalidQName(name))
             }
             return QName(NamespaceUri.of(name.substring(2, pos)), parseNCName(name.substring(pos+1)))
         }
@@ -476,7 +476,7 @@ open class XProcStepConfigurationImpl internal constructor(
             parseNCName(name.substring(pos+1)) // check that the local name is an NCName
             return QName(inscopeNamespaces[prefix], name)
         } else {
-            throw XProcError.xdInvalidPrefix(name, prefix).exception()
+            throw exception(XProcError.xdInvalidPrefix(name, prefix))
         }
     }
 

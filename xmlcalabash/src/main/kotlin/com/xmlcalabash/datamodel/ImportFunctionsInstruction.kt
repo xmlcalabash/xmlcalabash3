@@ -61,7 +61,7 @@ class ImportFunctionsInstruction(parent: XProcInstruction?, stepConfig: Instruct
                 MediaType.XSLT -> loadXsltLibrary(conn)
                 MediaType.XQUERY -> loadXQueryLibrary(conn)
                 else -> {
-                    throw XProcError.xsUnknownFunctionMediaType(ctype.toString()).exception()
+                    throw stepConfig.exception(XProcError.xsUnknownFunctionMediaType(ctype.toString()))
                 }
             }
 
@@ -71,7 +71,7 @@ class ImportFunctionsInstruction(parent: XProcInstruction?, stepConfig: Instruct
 
             return functionLibrary
         } catch (ex: Exception) {
-            throw XProcError.xsImportFunctionsUnloadable(href).exception(ex)
+            throw stepConfig.exception(XProcError.xsImportFunctionsUnloadable(href), ex)
         }
     }
 
@@ -149,7 +149,7 @@ class ImportFunctionsInstruction(parent: XProcInstruction?, stepConfig: Instruct
             }
 
             if (newns == null) {
-                throw XProcError.xsImportFunctionsUnloadable(href).exception()
+                throw stepConfig.exception(XProcError.xsImportFunctionsUnloadable(href))
             }
 
             if (namespace != null) {

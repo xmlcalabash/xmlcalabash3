@@ -30,19 +30,19 @@ class CreateTempfileStep(): FileStep(NsP.fileCreateTempfile) {
         val href = try {
             uriBinding(Ns.href)
         } catch (ex: Exception) {
-            throw XProcError.xdInvalidUri(options[Ns.href].toString()).exception(ex)
+            throw stepConfig.exception(XProcError.xdInvalidUri(options[Ns.href].toString()), ex)
         }
 
         try {
             val dir: Path?
             if (href != null) {
                 if (href.scheme != "file") {
-                    throw XProcError.xcUnsupportedFileCreateTempfileScheme(href.scheme).exception()
+                    throw stepConfig.exception(XProcError.xcUnsupportedFileCreateTempfileScheme(href.scheme))
                 }
                 dir = Paths.get(href.path)
                 if (!Files.exists(dir) || !Files.isDirectory(dir)) {
                     if (failOnError) {
-                        throw XProcError.xdDoesNotExist(dir.toString()).exception()
+                        throw stepConfig.exception(XProcError.xdDoesNotExist(dir.toString()))
                     } else {
                         val err = errorDocument(href, NsErr.xd(11))
                         receiver.output("result", XProcDocument.ofXml(err, stepConfig))
@@ -72,7 +72,7 @@ class CreateTempfileStep(): FileStep(NsP.fileCreateTempfile) {
             exception = ex
         } catch (ex: IOException) {
             if (failOnError) {
-                throw XProcError.xcTemporaryFileCreateFailed().exception(ex)
+                throw stepConfig.exception(XProcError.xcTemporaryFileCreateFailed(), ex)
             }
             exception = ex
         }

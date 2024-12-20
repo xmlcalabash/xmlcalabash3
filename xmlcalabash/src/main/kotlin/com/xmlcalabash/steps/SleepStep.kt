@@ -23,13 +23,13 @@ open class SleepStep(): AbstractAtomicStep() {
         try {
             val ms = duration.toLong()
             if (ms < 0) {
-                throw XProcError.xdBadType("Invalid duration: ${duration}").exception()
+                throw stepConfig.exception(XProcError.xdBadType("Invalid duration: ${duration}"))
             }
 
             logger.debug { "Waiting for ${String.format("%1.1f", ms)}s ... "}
             Thread.sleep(ms)
         } catch (ex: NumberFormatException) {
-            throw XProcError.xdBadType("Invalid duration: ${duration}").exception(ex)
+            throw stepConfig.exception(XProcError.xdBadType("Invalid duration: ${duration}"), ex)
         }
 
         while (cache.isNotEmpty()) {

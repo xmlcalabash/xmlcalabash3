@@ -44,7 +44,7 @@ open class ArchiveStep(): AbstractArchiveStep() {
             "source" -> archiveMembers.add(doc)
             "manifest" -> {
                 if (manifest != null) {
-                    throw XProcError.xcMultipleManifests().exception()
+                    throw stepConfig.exception(XProcError.xcMultipleManifests())
                 }
                 manifest = doc
             }
@@ -59,7 +59,7 @@ open class ArchiveStep(): AbstractArchiveStep() {
         val relativeTo = relativeTo()
 
         if (format != Ns.zip) {
-            throw XProcError.xcUnsupportedArchiveFormat(format).exception()
+            throw stepConfig.exception(XProcError.xcUnsupportedArchiveFormat(format))
         }
 
         for (archive in archives) {
@@ -83,10 +83,10 @@ open class ArchiveStep(): AbstractArchiveStep() {
         for (source in archiveMembers) {
             val uri = source.baseURI
             if (uri == null) {
-                throw XProcError.xcNoArchiveSourceUri().exception()
+                throw stepConfig.exception(XProcError.xcNoArchiveSourceUri())
             } else {
                 if (sourceMap.containsKey(uri)) {
-                    throw XProcError.xcDuplicateArchiveSourceUri(uri).exception()
+                    throw stepConfig.exception(XProcError.xcDuplicateArchiveSourceUri(uri))
                 }
             }
             sourceMap[uri] = source
@@ -109,7 +109,7 @@ open class ArchiveStep(): AbstractArchiveStep() {
                     } catch (ex: XProcException) {
                         throw ex
                     } catch (ex: Exception) {
-                        throw XProcError.xdDoesNotExist(entry.href.toString()).exception()
+                        throw stepConfig.exception(XProcError.xdDoesNotExist(entry.href.toString()))
                     }
                 }
             }
@@ -146,7 +146,7 @@ open class ArchiveStep(): AbstractArchiveStep() {
 
         for (entry in manifestList + extraList) {
             if (nameMap.containsKey(entry.name)) {
-                throw XProcError.xcDuplicateArchiveSourceUri(entry.name).exception()
+                throw stepConfig.exception(XProcError.xcDuplicateArchiveSourceUri(entry.name))
             }
             nameMap[entry.name] = entry
         }
@@ -180,11 +180,11 @@ open class ArchiveStep(): AbstractArchiveStep() {
         } catch (ex: XProcException) {
             throw ex
         } catch (ex: Exception) {
-            throw XProcError.xcInvalidArchiveFormat(format).exception(ex)
+            throw stepConfig.exception(XProcError.xcInvalidArchiveFormat(format), ex)
         }
 
         if (archiveFile!!.toFile().length() > Integer.MAX_VALUE) {
-            throw XProcError.xcArchiveTooLarge(archiveFile!!.toFile().length()).exception()
+            throw stepConfig.exception(XProcError.xcArchiveTooLarge(archiveFile!!.toFile().length()))
         }
 
         val bytes = ByteArray(archiveFile!!.toFile().length().toInt())
@@ -225,7 +225,7 @@ open class ArchiveStep(): AbstractArchiveStep() {
         val entries = mutableListOf<ManifestEntry>()
         val root = S9Api.documentElement(manifest.value as XdmNode)
         if (root.nodeName != NsC.archive) {
-            throw XProcError.xcInvalidManifest().exception()
+            throw stepConfig.exception(XProcError.xcInvalidManifest())
         }
         for (entry in root.axisIterator(Axis.CHILD)) {
             if (entry.nodeKind != XdmNodeKind.ELEMENT) {
@@ -237,7 +237,7 @@ open class ArchiveStep(): AbstractArchiveStep() {
             }
 
             if (entry.nodeName != NsC.entry) {
-                throw XProcError.xcInvalidManifest(entry.nodeName).exception()
+                throw stepConfig.exception(XProcError.xcInvalidManifest(entry.nodeName))
             }
 
             val properties = mutableMapOf<QName,String>()
@@ -252,23 +252,23 @@ open class ArchiveStep(): AbstractArchiveStep() {
                     properties[attr.nodeName] = attr.stringValue
                 } else {
                     if (attr.nodeName.namespaceUri != NamespaceUri.NULL) {
-                        throw XProcError.xcInvalidManifestEntry(attr.nodeName).exception()
+                        throw stepConfig.exception(XProcError.xcInvalidManifestEntry(attr.nodeName))
                     }
                 }
             }
 
             if (!properties.containsKey(Ns.name)) {
-                throw XProcError.xcInvalidManifestEntryName().exception()
+                throw stepConfig.exception(XProcError.xcInvalidManifestEntryName())
             }
 
             if (!properties.containsKey(Ns.href)) {
-                throw XProcError.xcInvalidManifestEntryHref().exception()
+                throw stepConfig.exception(XProcError.xcInvalidManifestEntryHref())
             }
 
             val muri = try {
                 entry.baseURI.resolve(properties[Ns.href]!!)
             } catch (ex: IllegalArgumentException) {
-                throw XProcError.xdInvalidUri(properties[Ns.href]!!.toString()).exception()
+                throw stepConfig.exception(XProcError.xdInvalidUri(properties[Ns.href]!!.toString()))
             }
 
             val mentry = ManifestEntry(properties[Ns.name]!!, muri)
@@ -303,23 +303,23 @@ open class ArchiveStep(): AbstractArchiveStep() {
             when (command) {
                 null -> Unit
                 "update", "create", "freshen", "delete" -> Unit
-                else -> throw XProcError.xcInvalidParameter(Ns.command, command!!).exception()
+                else -> throw stepConfig.exception(XProcError.xcInvalidParameter(Ns.command, command!!))
             }
             when (defaultLevel) {
                 null -> Unit
                 "smallest", "fastest", "default", "huffman", "none" -> Unit
-                else -> throw XProcError.xcInvalidParameter(Ns.level, defaultLevel!!).exception()
+                else -> throw stepConfig.exception(XProcError.xcInvalidParameter(Ns.level, defaultLevel!!))
             }
             when (defaultMethod) {
                 null -> Unit
                 "deflated", "none" -> Unit
-                else -> throw XProcError.xcInvalidParameter(Ns.method, defaultMethod!!).exception()
+                else -> throw stepConfig.exception(XProcError.xcInvalidParameter(Ns.method, defaultMethod!!))
             }
 
             if (archives.size > 1) {
-                throw XProcError.xcInvalidNumberOfArchives(archives.size).exception()
+                throw stepConfig.exception(XProcError.xcInvalidNumberOfArchives(archives.size))
             } else if (command == "delete" && archives.size != 1) {
-                throw XProcError.xcInvalidNumberOfArchives(archives.size).exception()
+                throw stepConfig.exception(XProcError.xcInvalidNumberOfArchives(archives.size))
             }
 
             if (origArchiveFiles.isNotEmpty()) {

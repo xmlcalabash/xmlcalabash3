@@ -20,11 +20,11 @@ class FileTouchStep(): FileStep(NsP.fileTouch) {
         val href = try {
             uriBinding(Ns.href)!!
         } catch (ex: Exception) {
-            throw XProcError.xdInvalidUri(options[Ns.href].toString()).exception(ex)
+            throw stepConfig.exception(XProcError.xdInvalidUri(options[Ns.href].toString()), ex)
         }
 
         if (href.scheme != "file") {
-            throw XProcError.xcUnsupportedFileTouchScheme(href.scheme).exception()
+            throw stepConfig.exception(XProcError.xcUnsupportedFileTouchScheme(href.scheme))
         }
 
         val timestamp = if (hasBinding(Ns.timestamp)) {

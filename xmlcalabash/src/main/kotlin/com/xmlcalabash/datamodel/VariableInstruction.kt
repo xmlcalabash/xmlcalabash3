@@ -9,7 +9,7 @@ import java.net.URI
 open class VariableInstruction(parent: XProcInstruction, name: QName, stepConfig: InstructionConfiguration): VariableBindingContainer(parent, name, stepConfig, NsP.variable) {
     override fun elaborateInstructions() {
         if (select == null) {
-            throw XProcError.xsMissingRequiredAttribute(Ns.select).exception()
+            throw stepConfig.exception(XProcError.xsMissingRequiredAttribute(Ns.select))
         } else {
             asType = asType ?: stepConfig.parseSequenceType("item()*")
             select = select!!.cast(asType!!)
@@ -18,7 +18,7 @@ open class VariableInstruction(parent: XProcInstruction, name: QName, stepConfig
         super.elaborateInstructions()
 
         if (name.namespaceUri == NsP.namespace) {
-            throw XProcError.xsOptionInXProcNamespace(name).exception()
+            throw stepConfig.exception(XProcError.xsOptionInXProcNamespace(name))
         }
     }
 }

@@ -17,11 +17,11 @@ class FileMkdirStep(): FileStep(NsP.fileDelete) {
         val href = try {
             uriBinding(Ns.href)!!
         } catch (ex: Exception) {
-            throw XProcError.xdInvalidUri(options[Ns.href].toString()).exception(ex)
+            throw stepConfig.exception(XProcError.xdInvalidUri(options[Ns.href].toString()), ex)
         }
 
         if (href.scheme != "file") {
-            throw XProcError.xcUnsupportedFileMkdirScheme(href.scheme).exception()
+            throw stepConfig.exception(XProcError.xcUnsupportedFileMkdirScheme(href.scheme))
         }
 
         failOnError = booleanBinding(Ns.failOnError) ?: true

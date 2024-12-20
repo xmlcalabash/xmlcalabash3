@@ -75,7 +75,7 @@ class PipelineBuilder private constructor(val pipelineContext: PipelineEnvironme
 
     fun option(name: QName, value: XdmValue) {
         if (started) {
-            throw XProcError.xiTooLateForStaticOptions(name).exception()
+            throw stepConfig.exception(XProcError.xiTooLateForStaticOptions(name))
         }
 
         var curValue : XdmValue? = staticOptionsManager.useWhenOptions[name]

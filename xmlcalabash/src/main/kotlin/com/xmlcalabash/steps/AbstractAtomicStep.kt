@@ -83,7 +83,7 @@ abstract class AbstractAtomicStep(): XProcStep {
         if (attName.localName == "xmlns" || attName.prefix == "xmlns" || NsXmlns.namespace == attName.namespaceUri
             || (attName.prefix == "xml" && attName.namespaceUri != NsXml.namespace)
             || (attName.prefix != "xml" && attName.namespaceUri == NsXml.namespace)) {
-            throw XProcError.xcCannotAddNamespaces(attName).exception()
+            throw stepConfig.exception(XProcError.xcCannotAddNamespaces(attName))
         }
     }
 
@@ -231,16 +231,16 @@ abstract class AbstractAtomicStep(): XProcStep {
             return emptyList()
         }
         if (value !is XdmArray) {
-            throw XProcError.xcBadOverrideContentTypesType().exception()
+            throw stepConfig.exception(XProcError.xcBadOverrideContentTypesType())
         }
         val pairs = mutableListOf<Pair<String,MediaType>>()
         for (index in 0 ..< value.arrayLength()) {
             val item = value.get(index)
             if (item !is XdmArray) {
-                throw XProcError.xcBadOverrideContentTypesMemberType(index).exception()
+                throw stepConfig.exception(XProcError.xcBadOverrideContentTypesMemberType(index))
             }
             if (item.arrayLength() != 2) {
-                throw XProcError.xcBadOverrideContentTypesMemberTypeLength(index).exception()
+                throw stepConfig.exception(XProcError.xcBadOverrideContentTypesMemberTypeLength(index))
             }
 
             val regex = item.get(0).underlyingValue.stringValue
@@ -256,7 +256,7 @@ abstract class AbstractAtomicStep(): XProcStep {
                 selector.setVariable(varb, XdmAtomicValue(regex))
                 selector.evaluate()
             } catch (ex: SaxonApiException) {
-                throw XProcError.xcInvalidRegex(regex).exception(ex)
+                throw stepConfig.exception(XProcError.xcInvalidRegex(regex), ex)
             }
 
             pairs.add(Pair(regex, MediaType.parse(ctstr)))

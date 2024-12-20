@@ -60,7 +60,7 @@ open class ViewportStep(config: XProcStepConfiguration, compound: CompoundStepMo
             val matchMap = params.options[Ns.match]!!.staticValue!!.evaluate(stepConfig).underlyingValue as MapItem
             match = matchMap.get(StringValue("match")).stringValue
             if (matchMap.size() != 1) {
-                throw XProcError.xiImpossible("Unexpected values in static match expression").exception()
+                throw stepConfig.exception(XProcError.xiImpossible("Unexpected values in static match expression"))
             }
         }
 
@@ -103,7 +103,7 @@ open class ViewportStep(config: XProcStepConfiguration, compound: CompoundStepMo
 
                 val remaining = runStepsExhaustively(stepsToRun)
                 if (remaining.isNotEmpty()) {
-                    throw XProcError.xiNoRunnableSteps().exception()
+                    throw stepConfig.exception(XProcError.xiNoRunnableSteps())
                 }
 
                 val nodes = mutableListOf<XdmNode>()
@@ -112,10 +112,10 @@ open class ViewportStep(config: XProcStepConfiguration, compound: CompoundStepMo
                     if (ct.xmlContentType() || ct.htmlContentType() || ct.textContentType()) {
                         when (doc.value) {
                             is XdmNode -> nodes.add(doc.value as XdmNode)
-                            else -> throw XProcError.xdViewportResultNotXml().exception()
+                            else -> throw stepConfig.exception(XProcError.xdViewportResultNotXml())
                         }
                     } else {
-                        throw XProcError.xdViewportResultNotXml().exception()
+                        throw stepConfig.exception(XProcError.xdViewportResultNotXml())
                     }
                 }
 

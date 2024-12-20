@@ -27,7 +27,7 @@ abstract class CompoundStep(config: XProcStepConfiguration, compound: CompoundSt
                 NsP.catch -> return TryCatchStep(newConfig, compound)
                 NsP.finally -> return TryFinallyStep(newConfig, compound)
                 NsP.run -> return RunStep(newConfig, compound)
-                else -> throw XProcError.xiImpossible("Unsupported compound step type: ${compound.type}").exception()
+                else -> throw config.exception(XProcError.xiImpossible("Unsupported compound step type: ${compound.type}"))
             }
         }
     }

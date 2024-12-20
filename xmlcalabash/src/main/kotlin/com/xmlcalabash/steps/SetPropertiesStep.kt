@@ -29,7 +29,7 @@ open class SetPropertiesStep(): AbstractAtomicStep() {
         setProperties.putAll(qnameMapBinding(Ns.properties))
 
         if (setProperties.containsKey(Ns.contentType)) {
-            throw XProcError.xcCannotSetContentType().exception()
+            throw stepConfig.exception(XProcError.xcCannotSetContentType())
         }
 
         var origBaseUri: URI? = document.properties.baseURI
@@ -45,7 +45,7 @@ open class SetPropertiesStep(): AbstractAtomicStep() {
             } catch (ex: Exception) {
                 when (ex) {
                     is URISyntaxException, is IllegalArgumentException ->
-                        throw XProcError.xdInvalidUri(uriValue).exception()
+                        throw stepConfig.exception(XProcError.xdInvalidUri(uriValue))
                     else -> throw ex
                 }
             }
@@ -63,10 +63,10 @@ open class SetPropertiesStep(): AbstractAtomicStep() {
                 try {
                     setProperties[Ns.serialization] = stepConfig.forceQNameKeys(value.underlyingValue)
                 } catch (ex: Exception) {
-                    throw XProcError.xdInvalidSerialization(value.toString()).exception()
+                    throw stepConfig.exception(XProcError.xdInvalidSerialization(value.toString()))
                 }
             } else {
-                throw XProcError.xdInvalidSerialization(value.toString()).exception()
+                throw stepConfig.exception(XProcError.xdInvalidSerialization(value.toString()))
             }
         }
 

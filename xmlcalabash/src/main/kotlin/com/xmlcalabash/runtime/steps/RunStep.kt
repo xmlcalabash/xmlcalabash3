@@ -39,13 +39,13 @@ open class RunStep(config: XProcStepConfiguration, compound: CompoundStepModel):
         val decl = try {
             parser.parse(cache["!source"]!!.first().value as XdmNode)
         } catch (ex: Exception) {
-            throw XProcError.xcNotAPipeline().exception(ex)
+            throw stepConfig.exception(XProcError.xcNotAPipeline(), ex)
         }
 
         val pipeline = try {
             decl.getExecutable()
         } catch (ex: Exception) {
-            throw XProcError.xcNotAPipeline().exception(ex)
+            throw stepConfig.exception(XProcError.xcNotAPipeline(), ex)
         }
 
         var okPrimary: String? = null
@@ -53,7 +53,7 @@ open class RunStep(config: XProcStepConfiguration, compound: CompoundStepModel):
             if (input.primary == true) {
                 okPrimary = input.port
                 if (runParams.primaryInput != null && input.port != runParams.primaryInput) {
-                    throw XProcError.xcRunInputPrimaryMismatch(input.port, runParams.primaryInput).exception()
+                    throw stepConfig.exception(XProcError.xcRunInputPrimaryMismatch(input.port, runParams.primaryInput))
                 }
             }
             val documents = cache[input.port] ?: emptyList()
@@ -62,7 +62,7 @@ open class RunStep(config: XProcStepConfiguration, compound: CompoundStepModel):
             }
         }
         if (okPrimary != runParams.primaryInput) {
-            throw XProcError.xcRunInputPrimaryMismatch(okPrimary ?: runParams.primaryInput!!).exception()
+            throw stepConfig.exception(XProcError.xcRunInputPrimaryMismatch(okPrimary ?: runParams.primaryInput!!))
         }
 
         okPrimary = null
@@ -70,13 +70,13 @@ open class RunStep(config: XProcStepConfiguration, compound: CompoundStepModel):
             if (output.primary == true) {
                 okPrimary = output.port
                 if (runParams.primaryOutput != null && output.port != runParams.primaryOutput) {
-                    throw XProcError.xcRunOutputPrimaryMismatch(output.port, runParams.primaryOutput).exception()
+                    throw stepConfig.exception(XProcError.xcRunOutputPrimaryMismatch(output.port, runParams.primaryOutput))
                 }
             }
         }
 
         if (okPrimary != runParams.primaryOutput) {
-            throw XProcError.xcRunOutputPrimaryMismatch(okPrimary ?: runParams.primaryOutput!!).exception()
+            throw stepConfig.exception(XProcError.xcRunOutputPrimaryMismatch(okPrimary ?: runParams.primaryOutput!!))
         }
 
         for (option in decl.options) {
@@ -114,7 +114,7 @@ open class RunStep(config: XProcStepConfiguration, compound: CompoundStepModel):
                     if (value is XdmMap) {
                         value = stepConfig.forceQNameKeys(value)
                     } else {
-                        throw XProcError.xsXPathStaticError("Value is not a map").exception()
+                        throw stepConfig.exception(XProcError.xsXPathStaticError("Value is not a map"))
                     }
                 }
             }

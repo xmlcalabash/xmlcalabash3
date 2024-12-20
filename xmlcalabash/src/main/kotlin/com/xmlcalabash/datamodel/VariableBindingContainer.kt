@@ -80,15 +80,15 @@ abstract class VariableBindingContainer(
         asType = asType ?: stepConfig.parseSequenceType("item()*")
 
         if (href != null && children.isNotEmpty()) {
-            throw XProcError.xsHrefAndChildren().exception()
+            throw stepConfig.exception(XProcError.xsHrefAndChildren())
         }
 
         if (pipe != null && children.isNotEmpty()) {
-            throw XProcError.xsPipeAndChildren().exception()
+            throw stepConfig.exception(XProcError.xsPipeAndChildren())
         }
 
         if (href != null && pipe != null) {
-            throw XProcError.xsHrefAndPipe().exception()
+            throw stepConfig.exception(XProcError.xsHrefAndPipe())
         }
 
         href?.let { promoteHref(it) }
@@ -109,9 +109,9 @@ abstract class VariableBindingContainer(
             val inScope = stepConfig.inscopeVariables[name]!!
             if (inScope is OptionInstruction && inScope.static) {
                 if (this is OptionInstruction) {
-                    throw XProcError.xsShadowStaticOption(name).exception()
+                    throw stepConfig.exception(XProcError.xsShadowStaticOption(name))
                 } else {
-                    throw XProcError.xsVariableShadowsStaticOption(name).exception()
+                    throw stepConfig.exception(XProcError.xsVariableShadowsStaticOption(name))
                 }
             }
         }
@@ -196,7 +196,7 @@ abstract class VariableBindingContainer(
             return child
         }
     }
-    throw XProcError.xiImpossible("expression has no output").exception()
+    throw stepConfig.exception(XProcError.xiImpossible("expression has no output"))
 }
 
     override fun toString(): String {

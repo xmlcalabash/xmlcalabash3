@@ -29,7 +29,7 @@ abstract class CompoundStepDeclaration(parent: XProcInstruction?, stepConfig: In
         for (input in inputs) {
             if (input.primary == true) {
                 if (drp != null) {
-                    throw XProcError.xsMultiplePrimaryInputPorts(input.port).exception()
+                    throw stepConfig.exception(XProcError.xsMultiplePrimaryInputPorts(input.port))
                 }
                 drp = input
             }
@@ -58,7 +58,7 @@ abstract class CompoundStepDeclaration(parent: XProcInstruction?, stepConfig: In
                 //is CatchInstruction, is FinallyInstruction -> Unit
                 else -> {
                     if (newStepNames.containsKey(child.name)) {
-                        throw XProcError.xsDuplicateStepName(child.name).exception()
+                        throw stepConfig.exception(XProcError.xsDuplicateStepName(child.name))
                     }
                     newStepNames[child.name] = child
                     stepConfig.addVisibleStepName(child)
@@ -73,7 +73,7 @@ abstract class CompoundStepDeclaration(parent: XProcInstruction?, stepConfig: In
         val portNames = mutableSetOf<String>()
         for (io in portList) {
             if (portNames.contains(io.port)) {
-                throw XProcError.xsDuplicatePortName(io.port).exception()
+                throw stepConfig.exception(XProcError.xsDuplicatePortName(io.port))
             }
             portNames.add(io.port)
             if (portList.size == 1) {
@@ -198,7 +198,7 @@ abstract class CompoundStepDeclaration(parent: XProcInstruction?, stepConfig: In
 
     override fun elaborateInstructions() {
         if (children.filterIsInstance<StepDeclaration>().isEmpty()) {
-            throw XProcError.xsNoSteps().exception()
+            throw stepConfig.exception(XProcError.xsNoSteps())
         }
 
         for (option in children.filterIsInstance<OptionInstruction>()) {
@@ -229,7 +229,7 @@ abstract class CompoundStepDeclaration(parent: XProcInstruction?, stepConfig: In
             val result = lastStep.primaryOutput()
             if (output.primary == true && output.children.isEmpty() && output.pipe == null && output.href == null) {
                 if (result == null) {
-                    throw XProcError.xsNoOutputConnection(output.port).exception()
+                    throw stepConfig.exception(XProcError.xsNoOutputConnection(output.port))
                 } else {
                     val pipe = output.pipe()
                     pipe.setReadablePort(result)
@@ -362,7 +362,7 @@ abstract class CompoundStepDeclaration(parent: XProcInstruction?, stepConfig: In
         } else {
             if (withInput.portDefined) {
                 if (withInput._port != "!source") {
-                    throw XProcError.xsPortNameNotAllowed().exception()
+                    throw stepConfig.exception(XProcError.xsPortNameNotAllowed())
                 }
             } else {
                 withInput._port = "!source"
@@ -373,10 +373,10 @@ abstract class CompoundStepDeclaration(parent: XProcInstruction?, stepConfig: In
 
     protected fun addInstruction(instruction: XProcInstruction, type: QName = instruction.instructionType) {
         when (contentModel[type]) {
-            null, '0' -> throw XProcError.xsInvalidElement(type).exception()
+            null, '0' -> throw stepConfig.exception(XProcError.xsInvalidElement(type))
             '?', '1' -> {
                 if (children.any { it.instructionType == type }) {
-                    throw XProcError.xsInvalidElement(type).exception()
+                    throw stepConfig.exception(XProcError.xsInvalidElement(type))
                 } else {
                     _children.add(instruction)
                 }
@@ -384,7 +384,7 @@ abstract class CompoundStepDeclaration(parent: XProcInstruction?, stepConfig: In
             '*' -> {
                 _children.add(instruction)
             }
-            else -> throw XProcError.xiImpossible("Invalid content model character for {$type}: ${contentModel[type]}").exception()
+            else -> throw stepConfig.exception(XProcError.xiImpossible("Invalid content model character for {$type}: ${contentModel[type]}"))
         }
     }
 

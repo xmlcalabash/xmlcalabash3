@@ -19,8 +19,8 @@ import java.net.URI
 import javax.xml.transform.sax.SAXSource
 
 class InstructionConfigurationImpl private constructor(
-    private val stepConfiguration: XProcStepConfiguration,
-): XProcStepConfiguration by stepConfiguration, InstructionConfiguration
+    private val stepConfig: XProcStepConfiguration,
+): XProcStepConfiguration by stepConfig, InstructionConfiguration
 {
     companion object {
         fun newInstance(builder: PipelineBuilder): InstructionConfiguration {
@@ -59,11 +59,11 @@ class InstructionConfigurationImpl private constructor(
     override var drp: PortBindingContainer? = null
 
     override fun copy(): InstructionConfiguration {
-        return copy(stepConfiguration.copy())
+        return copy(stepConfig.copy())
     }
 
     override fun copyNew(): InstructionConfiguration {
-        return copy(stepConfiguration.copyNew())
+        return copy(stepConfig.copyNew())
     }
 
     override fun copy(config: XProcStepConfiguration): InstructionConfiguration {
@@ -79,7 +79,7 @@ class InstructionConfigurationImpl private constructor(
         val name = decl.name
         val current = _inscopeStepNames[name]
         if (current != null && current !== decl) {
-             throw XProcError.xsDuplicateStepName(name).exception()
+             throw stepConfig.exception(XProcError.xsDuplicateStepName(name))
         }
         _inscopeStepNames[name] = decl
     }
@@ -88,9 +88,9 @@ class InstructionConfigurationImpl private constructor(
         val name = decl.type!!
         val current = inscopeStepTypes[name]
         if (current != null && current !== decl) {
-            throw XProcError.xsDuplicateStepType(name).exception()
+            throw stepConfig.exception(XProcError.xsDuplicateStepType(name))
         }
-        stepConfiguration.putStepType(name, decl)
+        stepConfig.putStepType(name, decl)
     }
 
     override fun addVariable(binding: VariableBindingContainer) {
@@ -103,7 +103,7 @@ class InstructionConfigurationImpl private constructor(
 
     override fun with(location: Location): InstructionConfiguration {
         val copy = copy() as InstructionConfigurationImpl
-        copy.stepConfiguration.setLocation(location)
+        copy.stepConfig.setLocation(location)
         return copy
     }
 
@@ -115,7 +115,7 @@ class InstructionConfigurationImpl private constructor(
 
     override fun with(namespaces: Map<String, NamespaceUri>): InstructionConfiguration {
         val copy = copy() as InstructionConfigurationImpl
-        copy.stepConfiguration.putAllNamespaces(namespaces)
+        copy.stepConfig.putAllNamespaces(namespaces)
         return copy
     }
 
@@ -132,21 +132,21 @@ class InstructionConfigurationImpl private constructor(
         }
 
         try {
-            stepConfiguration.setLocation(Location(node))
+            stepConfig.setLocation(Location(node))
         } catch (ex: IllegalStateException) {
             val uri = node.getAttributeValue(NsXml.base) ?: ""
-            throw XProcError.xdInvalidUri(uri).exception()
+            throw stepConfig.exception(XProcError.xdInvalidUri(uri))
         }
 
-        stepConfiguration.putAllNamespaces(nsmap)
+        stepConfig.putAllNamespaces(nsmap)
     }
 
     override fun updateWith(baseUri: URI) {
-        stepConfiguration.setLocation(location)
+        stepConfig.setLocation(location)
     }
 
     override fun putNamespace(prefix: String, uri: NamespaceUri) {
-        stepConfiguration.putNamespace(prefix, uri)
+        stepConfig.putNamespace(prefix, uri)
     }
 
     override fun fromUri(
@@ -176,7 +176,7 @@ class InstructionConfigurationImpl private constructor(
         when (visible) {
             "private" -> return Visibility.PRIVATE
             "public" -> return Visibility.PUBLIC
-            else -> throw XProcError.xsValueDoesNotSatisfyType(visible, "Visibility").exception()
+            else -> throw stepConfig.exception(XProcError.xsValueDoesNotSatisfyType(visible, "Visibility"))
         }
     }
 
@@ -194,7 +194,7 @@ class InstructionConfigurationImpl private constructor(
 
     override fun parseExcludeInlinePrefixes(prefixes: String): Set<NamespaceUri> {
         if (prefixes.trim() == "") {
-            throw XProcError.xsInvalidExcludePrefix().exception()
+            throw stepConfig.exception(XProcError.xsInvalidExcludePrefix())
         }
 
         val uriSet = mutableSetOf<NamespaceUri>()
@@ -208,7 +208,7 @@ class InstructionConfigurationImpl private constructor(
                 }
                 "#default" -> {
                     if (inscopeNamespaces[""] == null) {
-                        throw XProcError.xsNoDefaultNamespace().exception()
+                        throw stepConfig.exception(XProcError.xsNoDefaultNamespace())
                     } else {
                         uriSet.add(inscopeNamespaces[""]!!)
                     }
@@ -216,7 +216,7 @@ class InstructionConfigurationImpl private constructor(
                 else -> {
                     val uri = inscopeNamespaces[token]
                     if (uri == null) {
-                        throw XProcError.xsInvalidExcludePrefix(token).exception()
+                        throw stepConfig.exception(XProcError.xsInvalidExcludePrefix(token))
                     } else {
                         uriSet.add(uri)
                     }
@@ -235,7 +235,7 @@ class InstructionConfigurationImpl private constructor(
         for (value in selector.evaluate().iterator()) {
             when (value) {
                 is XdmAtomicValue -> values.add(value)
-                else -> throw XProcError.xsInvalidValues(value.toString()).exception()
+                else -> throw stepConfig.exception(XProcError.xsInvalidValues(value.toString()))
             }
         }
 
@@ -256,7 +256,7 @@ class InstructionConfigurationImpl private constructor(
             val st = parser.parseSequenceType(asExpr, icontext)
             return SequenceType.fromUnderlyingSequenceType(processor, st)
         } catch (ex: XPathException) {
-            throw XProcError.xsInvalidSequenceType(asExpr).exception()
+            throw stepConfig.exception(XProcError.xsInvalidSequenceType(asExpr))
         }
     }
 
@@ -267,7 +267,7 @@ class InstructionConfigurationImpl private constructor(
             "RegularExpression" -> return SpecialType.REGULAR_EXPRESSION
             "EQNameList" -> return SpecialType.EQNAME_LIST
             else -> {
-                throw XProcError.xiNotASpecialType(type).exception()
+                throw stepConfig.exception(XProcError.xiNotASpecialType(type))
             }
         }
     }

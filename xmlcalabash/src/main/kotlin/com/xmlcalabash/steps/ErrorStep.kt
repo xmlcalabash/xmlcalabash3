@@ -80,7 +80,7 @@ class ErrorStep(): AbstractAtomicStep() {
             Location.NULL
         }
 
-        throw XProcError(code, stepParams.location, location, XProcDocument.ofXml(builder.result, stepConfig)).exception()
+        throw stepConfig.exception(XProcError(code, stepParams.location, location, XProcDocument.ofXml(builder.result, stepConfig)))
     }
 
     override fun toString(): String = "p:error"

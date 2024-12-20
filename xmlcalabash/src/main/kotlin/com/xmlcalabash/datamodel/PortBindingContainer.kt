@@ -57,7 +57,7 @@ open class PortBindingContainer(parent: XProcInstruction, stepConfig: Instructio
                 for (name in _select!!.details.variableRefs) {
                     val ref = inscopeVariables[name]
                     if (ref == null) {
-                        throw XProcError.xsXPathStaticError(name).exception()
+                        throw stepConfig.exception(XProcError.xsXPathStaticError(name))
                     }
                     if (ref.canBeResolvedStatically()) {
                         _select!!.setStaticBinding(name, ref.select!!)
@@ -104,15 +104,15 @@ open class PortBindingContainer(parent: XProcInstruction, stepConfig: Instructio
         elaborated = true
 
         if (href != null && children.isNotEmpty()) {
-            throw XProcError.xsHrefAndChildren().exception()
+            throw stepConfig.exception(XProcError.xsHrefAndChildren())
         }
 
         if (pipe != null && children.isNotEmpty()) {
-            throw XProcError.xsPipeAndChildren().exception()
+            throw stepConfig.exception(XProcError.xsPipeAndChildren())
         }
 
         if (href != null && pipe != null) {
-            throw XProcError.xsHrefAndPipe().exception()
+            throw stepConfig.exception(XProcError.xsHrefAndPipe())
         }
 
         href?.let { promoteHref(it) }
@@ -141,12 +141,12 @@ open class PortBindingContainer(parent: XProcInstruction, stepConfig: Instructio
             child.elaborateInstructions()
             if (child is EmptyInstruction) {
                 if (newChildren.isNotEmpty() || sawEmpty) {
-                    throw XProcError.xsEmptyNotAllowed().exception()
+                    throw stepConfig.exception(XProcError.xsEmptyNotAllowed())
                 }
                 sawEmpty = true
             } else {
                 if (sawEmpty) {
-                    throw XProcError.xsEmptyNotAllowed().exception()
+                    throw stepConfig.exception(XProcError.xsEmptyNotAllowed())
                 }
             }
             newChildren.add(child as ConnectionInstruction)

@@ -30,7 +30,7 @@ open class StoreStep(): AbstractAtomicStep() {
         val href = try {
             uriBinding(Ns.href)
         } catch (ex: Exception) {
-            throw XProcError.xdInvalidUri(stringBinding(Ns.href)!!).exception(ex)
+            throw stepConfig.exception(XProcError.xdInvalidUri(stringBinding(Ns.href)!!), ex)
         }
         val serialization = qnameMapBinding(Ns.serialization)
         val contentType = document!!.contentType

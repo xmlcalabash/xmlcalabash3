@@ -69,10 +69,10 @@ class InlineInstruction(parent: XProcInstruction, xmlDocument: XdmNode): Connect
 
         if (encoding != null) {
             if (encoding != "base64") {
-                throw XProcError.xsUnsupportedEncoding(encoding!!).exception()
+                throw stepConfig.exception(XProcError.xsUnsupportedEncoding(encoding!!))
             }
             if (contentType!!.xmlContentType() || contentType!!.htmlContentType()) {
-                throw XProcError.xdEncodingWithXmlOrHtml(encoding!!).exception()
+                throw stepConfig.exception(XProcError.xdEncodingWithXmlOrHtml(encoding!!))
             }
         }
 
@@ -118,7 +118,7 @@ class InlineInstruction(parent: XProcInstruction, xmlDocument: XdmNode): Connect
         inlineStep.depends.addAll(step.depends)
 
         for (name in variables) {
-            val binding = stepConfig.inscopeVariables[name] ?: throw XProcError.xsXPathStaticError(name).exception()
+            val binding = stepConfig.inscopeVariables[name] ?: throw stepConfig.exception(XProcError.xsXPathStaticError(name))
             if (!binding.canBeResolvedStatically()) {
                 val eqname = "Q{${name.namespaceUri}}${name.localName}"
                 val wi = WithInputInstruction(this, stepConfig)

@@ -51,7 +51,7 @@ class XProcSelectExpression private constructor(stepConfig: XProcStepConfigurati
             // I suppose it's possible that it could occur elsewhere...still, hopefully the message
             // is clear enough.
             if (ex.message != null && ex.message!!.contains("cannot be used as a namespace URI")) {
-                throw XProcError.xcCannotSetNamespaces().exception()
+                throw stepConfig.exception(XProcError.xcCannotSetNamespaces())
             }
             throw ex
         }

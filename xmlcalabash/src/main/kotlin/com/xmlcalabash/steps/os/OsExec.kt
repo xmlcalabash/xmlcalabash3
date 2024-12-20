@@ -28,7 +28,7 @@ class OsExec(): AbstractAtomicStep() {
         super.run()
 
         if (documents.size > 1) {
-            throw XProcError.xcOsExecMultipleInputs().exception()
+            throw stepConfig.exception(XProcError.xcOsExecMultipleInputs())
         }
 
         var command = stringBinding(Ns.command)!!
@@ -48,7 +48,7 @@ class OsExec(): AbstractAtomicStep() {
         val slash = FileSystems.getDefault().getSeparator()
         if (pathSeparator != null) {
             if (pathSeparator.length > 1) {
-                throw XProcError.xcOsExecBadSeparator(pathSeparator).exception()
+                throw stepConfig.exception(XProcError.xcOsExecBadSeparator(pathSeparator))
             }
             command = command.replace(pathSeparator, slash)
             if (cwd != null) {
@@ -65,7 +65,7 @@ class OsExec(): AbstractAtomicStep() {
         if (cwd != null) {
             val path = Paths.get(cwd)
             if (!Files.exists(path) || !Files.isDirectory(path)) {
-                throw XProcError.xcOsExecBadCwd(cwd).exception()
+                throw stepConfig.exception(XProcError.xcOsExecBadCwd(cwd))
             }
         }
 
@@ -129,11 +129,11 @@ class OsExec(): AbstractAtomicStep() {
             stdoutThread.join()
             stderrThread.join()
         } catch (ex: Exception) {
-            throw XProcError.xcOsExecFailed().exception()
+            throw stepConfig.exception(XProcError.xcOsExecFailed())
         }
 
         if (failureThreshold != null && failureThreshold < rc) {
-            throw XProcError.xcOsExecFailed(rc).exception()
+            throw stepConfig.exception(XProcError.xcOsExecFailed(rc))
         }
 
         if (rc == 0) {

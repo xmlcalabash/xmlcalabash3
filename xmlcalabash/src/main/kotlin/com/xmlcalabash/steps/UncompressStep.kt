@@ -8,6 +8,7 @@ import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.exceptions.XProcException
 import com.xmlcalabash.namespace.Ns
 import com.xmlcalabash.io.DocumentLoader
+import com.xmlcalabash.runtime.XProcStepConfiguration
 import net.sf.saxon.s9api.QName
 import net.sf.saxon.s9api.XdmAtomicValue
 import net.sf.saxon.s9api.XdmValue
@@ -28,7 +29,7 @@ import java.lang.Exception
 
 open class UncompressStep(): AbstractAtomicStep() {
     companion object {
-        fun uncompress(format: QName, inputStream: InputStream): ByteArrayOutputStream {
+        fun uncompress(stepConfig: XProcStepConfiguration, format: QName, inputStream: InputStream): ByteArrayOutputStream {
             val baos = ByteArrayOutputStream()
             try {
                 val decompressor: CompressorInputStream = when (format) {
@@ -39,7 +40,7 @@ open class UncompressStep(): AbstractAtomicStep() {
                     Ns.lzma -> LZMACompressorInputStream(inputStream)
                     Ns.xz -> XZCompressorInputStream(inputStream)
                     Ns.compress -> ZCompressorInputStream(inputStream)
-                    else -> throw XProcError.xcUnsupportedCompressionFormat(format).exception()
+                    else -> throw stepConfig.exception(XProcError.xcUnsupportedCompressionFormat(format))
                 }
 
                 val buf = ByteArray(8192)
@@ -53,7 +54,7 @@ open class UncompressStep(): AbstractAtomicStep() {
             } catch (ex: XProcException) {
                 throw ex
             } catch (ex: Exception) {
-                throw XProcError.xcCannotUncompress().exception(ex)
+                throw stepConfig.exception(XProcError.xcCannotUncompress(), ex)
             }
 
             return baos
@@ -75,7 +76,7 @@ open class UncompressStep(): AbstractAtomicStep() {
         val doc = document!!
 
         if (doc !is XProcBinaryDocument) {
-            throw XProcError.xcCannotUncompress().exception()
+            throw stepConfig.exception(XProcError.xcCannotUncompress())
         }
 
         val inputStream = BufferedInputStream(ByteArrayInputStream(doc.binaryValue))
@@ -86,7 +87,7 @@ open class UncompressStep(): AbstractAtomicStep() {
         val format = if (declFormat != null) {
             declFormat
         } else if (contentType.mediaType != "application") {
-            throw XProcError.xcCannotUncompress(contentType).exception()
+            throw stepConfig.exception(XProcError.xcCannotUncompress(contentType))
         } else {
             when (contentType.mediaSubtype) {
                 "gzip" -> Ns.gzip
@@ -96,11 +97,11 @@ open class UncompressStep(): AbstractAtomicStep() {
                 "lzma" -> Ns.lzma
                 "xz" -> Ns.xz
                 "compress" -> Ns.compress
-                else -> throw XProcError.xcCannotUncompress(contentType).exception()
+                else -> throw stepConfig.exception(XProcError.xcCannotUncompress(contentType))
             }
         }
 
-        val baos = uncompress(format, inputStream)
+        val baos = uncompress(stepConfig, format, inputStream)
 
         val loader = DocumentLoader(stepConfig, doc.baseURI, doc.properties, parameters)
         try {
@@ -112,7 +113,7 @@ open class UncompressStep(): AbstractAtomicStep() {
 
             receiver.output("result", result.with(properties))
         } catch (ex: Exception) {
-            throw XProcError.xcCannotUncompress(outputContentType).exception(ex)
+            throw stepConfig.exception(XProcError.xcCannotUncompress(outputContentType), ex)
         }
     }
 

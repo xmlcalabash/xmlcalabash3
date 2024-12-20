@@ -48,7 +48,7 @@ open class ArchiveManifestStep(): AbstractArchiveStep() {
 
         if (relativeTo() == null) {
             if (archive.baseURI == null) {
-                throw XProcError.xcNoUnarchiveBaseUri().exception()
+                throw stepConfig.exception(XProcError.xcNoUnarchiveBaseUri())
             }
             relativeTo = URI(archive.baseURI.toString() + "/")
         } else {
@@ -88,7 +88,7 @@ open class ArchiveManifestStep(): AbstractArchiveStep() {
                 builder.addStartElement(NsC.archive, stepConfig.attributeMap(mapOf(Ns.format to "7z")))
                 sevenZManifest(builder, SeekableInMemoryByteChannel(bytes))
             }
-            else -> throw XProcError.xcInvalidArchiveFormat(format).exception()
+            else -> throw stepConfig.exception(XProcError.xcInvalidArchiveFormat(format))
         }
 
         builder.addEndElement()

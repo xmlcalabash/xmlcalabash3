@@ -35,7 +35,7 @@ class AddXmlBaseStep(): AbstractAtomicStep(), ProcessMatchingNodes {
         relative = booleanBinding(Ns.relative) ?: true
 
         if (all && relative) {
-            throw XProcError.xcAllAndRelative().exception()
+            throw stepConfig.exception(XProcError.xcAllAndRelative())
         }
 
         _matcher = ProcessMatch(stepConfig,this, stepConfig.inscopeNamespaces)
@@ -94,7 +94,7 @@ class AddXmlBaseStep(): AbstractAtomicStep(), ProcessMatchingNodes {
         matchingAttributes: AttributeMap,
         nonMatchingAttributes: AttributeMap
     ): AttributeMap? {
-        throw XProcError.xiImpossible("p:add-xml-base matched attribute").exception()
+        throw stepConfig.exception(XProcError.xiImpossible("p:add-xml-base matched attribute"))
     }
 
     override fun endElement(node: XdmNode) {
@@ -103,15 +103,15 @@ class AddXmlBaseStep(): AbstractAtomicStep(), ProcessMatchingNodes {
     }
 
     override fun text(node: XdmNode) {
-        throw XProcError.xiImpossible("p:add-xml-base matched text").exception()
+        throw stepConfig.exception(XProcError.xiImpossible("p:add-xml-base matched text"))
     }
 
     override fun comment(node: XdmNode) {
-        throw XProcError.xiImpossible("p:add-xml-base matched comment").exception()
+        throw stepConfig.exception(XProcError.xiImpossible("p:add-xml-base matched comment"))
     }
 
     override fun pi(node: XdmNode) {
-        throw XProcError.xiImpossible("p:add-xml-base matched processing-instruction").exception()
+        throw stepConfig.exception(XProcError.xiImpossible("p:add-xml-base matched processing-instruction"))
     }
 
     override fun toString(): String = "p:add-xml-base"

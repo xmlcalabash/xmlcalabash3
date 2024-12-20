@@ -71,7 +71,7 @@ open class CssFormatterStep(): AbstractAtomicStep() {
         }
 
         if (cssManager == null) {
-            throw XProcError.xdStepFailed("No CSS formatters available").exception()
+            throw stepConfig.exception(XProcError.xdStepFailed("No CSS formatters available"))
         }
 
         val provider = cssManager.getCssProcessor(genericCssFormatter)

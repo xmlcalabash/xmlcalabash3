@@ -80,9 +80,9 @@ open class ExpressionStep(val params: ExpressionStepParameters): AbstractAtomicS
             } catch (ex: SaxonApiException) {
                 if (ex.message != null && ex.message!!.contains("context item is absent")) {
                     if (contextItems.size > 1) {
-                        throw XProcError.xdSequenceForbidden().exception()
+                        throw stepConfig.exception(XProcError.xdSequenceForbidden())
                     } else {
-                        throw XProcError.xdEmptySequenceForbidden().exception()
+                        throw stepConfig.exception(XProcError.xdEmptySequenceForbidden())
                     }
                 }
                 throw ex

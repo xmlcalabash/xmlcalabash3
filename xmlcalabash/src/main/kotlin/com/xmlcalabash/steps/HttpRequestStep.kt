@@ -84,7 +84,7 @@ open class HttpRequestStep(): AbstractAtomicStep() {
                 Ns.timeout -> {
                     timeout = integerParameter(name, value)
                     if (timeout!! < 0) {
-                        throw XProcError.xcHttpInvalidParameter("timeout", value.toString()).exception()
+                        throw stepConfig.exception(XProcError.xcHttpInvalidParameter("timeout", value.toString()))
                     }
                 }
                 Ns.permitExpiredSslCertificate -> permitExpiredSslCertificate = booleanParameter(name, value)
@@ -110,7 +110,7 @@ open class HttpRequestStep(): AbstractAtomicStep() {
         }
 
         if (password != null && username == null) {
-            throw XProcError.xcHttpBadAuth("Username must be specified if password is specified").exception()
+            throw stepConfig.exception(XProcError.xcHttpBadAuth("Username must be specified if password is specified"))
         }
 
         if (username != null && password == null) {
@@ -118,11 +118,11 @@ open class HttpRequestStep(): AbstractAtomicStep() {
         }
 
         if (username != null && authmethod == null) {
-            throw XProcError.xcHttpBadAuth("auth-method must be specified").exception()
+            throw stepConfig.exception(XProcError.xcHttpBadAuth("auth-method must be specified"))
         }
 
         if (authmethod != null && authmethod != "basic" && authmethod != "digest") {
-            throw XProcError.xcHttpBadAuth("auth-method must be 'basic' or 'digest'").exception()
+            throw stepConfig.exception(XProcError.xcHttpBadAuth("auth-method must be 'basic' or 'digest'"))
         }
 
         if (href.scheme == "file") {
@@ -130,7 +130,7 @@ open class HttpRequestStep(): AbstractAtomicStep() {
         } else if (href.scheme == "http" || href.scheme == "https") {
             doHttp()
         } else {
-            throw XProcError.xcHttpUnsupportedScheme(href.scheme).exception()
+            throw stepConfig.exception(XProcError.xcHttpUnsupportedScheme(href.scheme))
         }
     }
 
@@ -165,14 +165,14 @@ open class HttpRequestStep(): AbstractAtomicStep() {
         } catch (ex: XProcException) {
             if (overrideContentType != null) {
                 if (ex.error.code == NsErr.xd(57)) {
-                    throw XProcError.xcHttpCannotParseAs(overrideContentType!!).exception()
+                    throw stepConfig.exception(XProcError.xcHttpCannotParseAs(overrideContentType!!))
                 }
             }
             throw ex
         }
 
         if (response.multipart && !acceptMultipart) {
-            throw XProcError.xcHttpMultipartForbidden(href).exception()
+            throw stepConfig.exception(XProcError.xcHttpMultipartForbidden(href))
         }
 
         val report = response.report!!
@@ -185,7 +185,7 @@ open class HttpRequestStep(): AbstractAtomicStep() {
             val result = evaluator.evaluate()
             if (!result.underlyingValue.effectiveBooleanValue()) {
                 val xmlReport = ContentTypeConverter.jsonToXml(stepConfig, report, MediaType.XML)
-                throw XProcError.xcHttpAssertionFailed(xmlReport).exception()
+                throw stepConfig.exception(XProcError.xcHttpAssertionFailed(xmlReport))
             }
         }
 
@@ -197,12 +197,12 @@ open class HttpRequestStep(): AbstractAtomicStep() {
     }
 
     private fun doFile() {
-        throw XProcError.xcHttpUnsupportedScheme(href.scheme).exception()
+        throw stepConfig.exception(XProcError.xcHttpUnsupportedScheme(href.scheme))
     }
 
     private fun parameterHttpVersion(value: XdmValue) {
         if (value !is XdmAtomicValue || value.typeName != NsXs.string) {
-            throw XProcError.xcHttpInvalidParameterType("http-version", value.toString()).exception()
+            throw stepConfig.exception(XProcError.xcHttpInvalidParameterType("http-version", value.toString()))
         }
 
         var majVer = 0
@@ -221,12 +221,12 @@ open class HttpRequestStep(): AbstractAtomicStep() {
             // I object slightly to this error. In theory, you can send any version you want. Only the
             // server knows if the version is supported.
             if (majVer != 1 || minVer < 0 || minVer > 1) {
-                throw XProcError.xcHttpUnsupportedHttpVersion(verStr).exception()
+                throw stepConfig.exception(XProcError.xcHttpUnsupportedHttpVersion(verStr))
             }
         } catch (ex: XProcException) {
             throw ex
         } catch (ex: Exception) {
-            throw XProcError.xcHttpInvalidParameter("override-content-type", value.toString()).exception()
+            throw stepConfig.exception(XProcError.xcHttpInvalidParameter("override-content-type", value.toString()))
         }
 
         httpVersion = Pair(majVer, minVer)
@@ -237,46 +237,46 @@ open class HttpRequestStep(): AbstractAtomicStep() {
             if (value is XdmAtomicValue && value.typeName == NsXs.string) {
                 overrideContentType = MediaType.parse(value.stringValue)
             } else {
-                throw XProcError.xcHttpInvalidParameterType("override-content-type", value.toString()).exception()
+                throw stepConfig.exception(XProcError.xcHttpInvalidParameterType("override-content-type", value.toString()))
             }
         } catch (ex: XProcException) {
             throw ex
         } catch (ex: Exception) {
-            throw XProcError.xcHttpInvalidParameter("override-content-type", value.toString()).exception()
+            throw stepConfig.exception(XProcError.xcHttpInvalidParameter("override-content-type", value.toString()))
         }
     }
 
     private fun booleanParameter(name: QName, value: XdmValue): Boolean {
         if (value !is XdmAtomicValue || value.typeName != NsXs.boolean) {
-            throw XProcError.xcHttpInvalidParameterType(name.localName, value.toString()).exception()
+            throw stepConfig.exception(XProcError.xcHttpInvalidParameterType(name.localName, value.toString()))
         }
         return value.booleanValue
     }
 
     private fun stringParameter(name: QName, value: XdmValue): String {
         if (value !is XdmAtomicValue || value.typeName != NsXs.string) {
-            throw XProcError.xcHttpInvalidParameterType(name.localName, value.toString()).exception()
+            throw stepConfig.exception(XProcError.xcHttpInvalidParameterType(name.localName, value.toString()))
         }
         return value.stringValue
     }
 
     private fun integerParameter(name: QName, value: XdmValue): Int {
         if (value !is XdmAtomicValue || value.typeName != NsXs.integer) {
-            throw XProcError.xcHttpInvalidParameterType(name.localName, value.toString()).exception()
+            throw stepConfig.exception(XProcError.xcHttpInvalidParameterType(name.localName, value.toString()))
         }
         return value.stringValue.toInt()
     }
 
     private fun stringAuth(name: String, value: XdmValue): String {
         if (value !is XdmAtomicValue || value.typeName != NsXs.string) {
-            throw XProcError.xcHttpInvalidAuth(name, value.toString()).exception()
+            throw stepConfig.exception(XProcError.xcHttpInvalidAuth(name, value.toString()))
         }
         return value.stringValue
     }
 
     private fun booleanAuth(name: String, value: XdmValue): Boolean {
         if (value !is XdmAtomicValue || value.typeName != NsXs.boolean) {
-            throw XProcError.xcHttpInvalidAuth(name, value.toString()).exception()
+            throw stepConfig.exception(XProcError.xcHttpInvalidAuth(name, value.toString()))
         }
         return value.booleanValue
     }

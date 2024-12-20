@@ -73,7 +73,7 @@ abstract class AbstractAH() {
                 when (key) {
                     _OptionFileURI -> ah.setOptionFileURI(value)
                     _OwnersPassword -> ah.setPdfOwnerPassword(value)
-                    else -> throw XProcError.xiImpossible("Unexpected string option: ${key}").exception()
+                    else -> throw stepConfig.exception(XProcError.xiImpossible("Unexpected string option: ${key}"))
                 }
             }
         }
@@ -84,7 +84,7 @@ abstract class AbstractAH() {
                 when (key) {
                     _ExitLevel -> ah.setExitLevel(value)
                     _ImageCompression -> ah.setPdfImageCompression(value)
-                    else -> throw XProcError.xiImpossible("Unexpected integer option: ${key}").exception()
+                    else -> throw stepConfig.exception(XProcError.xiImpossible("Unexpected integer option: ${key}"))
                 }
             }
         }
@@ -101,7 +101,7 @@ abstract class AbstractAH() {
                     _NoFillForm -> ah.setPdfNoFillForm(value)
                     _NoPrinting -> ah.setPdfNoPrinting(value)
                     _TwoPassFormatting -> ah.setTwoPassFormatting(value)
-                    else -> throw XProcError.xiImpossible("Unexpected boolean option: ${key}").exception()
+                    else -> throw stepConfig.exception(XProcError.xiImpossible("Unexpected boolean option: ${key}"))
                 }
             }
         }
