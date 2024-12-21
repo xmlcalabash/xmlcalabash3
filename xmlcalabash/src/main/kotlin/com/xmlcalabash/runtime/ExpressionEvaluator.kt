@@ -22,13 +22,6 @@ class ExpressionEvaluator(val processor: Processor, val select: String) {
         variableBindings.putAll(bindings)
     }
 
-    fun setExpressionBindings(bindings: Map<QName, LazyValue>) {
-        variableBindings.clear()
-        for ((name, binding) in bindings) {
-            variableBindings[name] = binding.value;
-        }
-    }
-
     fun setContext(item: XdmItem) {
         contextItem = item
     }

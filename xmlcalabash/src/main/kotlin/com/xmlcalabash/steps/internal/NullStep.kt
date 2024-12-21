@@ -33,10 +33,6 @@ class NullStep(): XProcStep {
         throw RuntimeException("Configuration error: option called on null step")
     }
 
-    override fun inScopeBinding(name: QName, binding: LazyValue) {
-        throw RuntimeException("Configuration error: inScopeBinding called on null step")
-    }
-
     override fun run() {
         throw RuntimeException("Configuration error: run called on null step")
     }

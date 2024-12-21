@@ -70,10 +70,6 @@ abstract class AbstractAtomicStep(): XProcStep {
         _options[name] = binding
     }
 
-    override fun inScopeBinding(name: QName, binding: LazyValue) {
-        // you have to override this one if you want them
-    }
-
     override fun run() {
         stepConfig.environment.messageReporter.progress { "Running ${this} (${stepParams.stepName}/${nodeId})" }
         logger.debug { "Running ${this} (${stepParams.stepName}/${nodeId})" }
