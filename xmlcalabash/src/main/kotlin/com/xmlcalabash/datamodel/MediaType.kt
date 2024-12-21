@@ -1,6 +1,8 @@
 package com.xmlcalabash.datamodel
 
+import com.xmlcalabash.config.CommonEnvironment
 import com.xmlcalabash.exceptions.XProcError
+import com.xmlcalabash.runtime.XProcStepConfiguration
 import net.sf.saxon.s9api.XdmAtomicValue
 import java.util.*
 import java.util.regex.Pattern
@@ -10,19 +12,23 @@ class MediaType private constructor(val mediaType: String, val mediaSubtype: Str
                                     val parameters: List<MediaTypeParameter> = listOf()) {
     companion object {
         val ANY = MediaType("*", "*")
-        val OCTET_STREAM = MediaType("application", "octet-stream")
-        val TEXT = MediaType("text", "plain")
-        val XML  = MediaType("application", "xml")
-        val JSON = MediaType("application", "json")
-        val YAML = MediaType("application", "vnd.yaml")
+        val GZIP = MediaType("application", "gzip")
         val HTML = MediaType("text", "html")
-        val XHTML = MediaType("application", "xhtml", "xml")
-        val ZIP = MediaType("application", "zip")
-        val PDF = MediaType("application", "pdf")
-        val XSLT = MediaType("application", "xslt", "xml")
-        val XQUERY = MediaType("application", "xquery")
+        val JPEG = MediaType("image", "jpeg")
+        val JSON = MediaType("application", "json")
         val MULTIPART = MediaType("multipart", "*")
         val MULTIPART_MIXED = MediaType("multipart", "mixed")
+        val OCTET_STREAM = MediaType("application", "octet-stream")
+        val PDF = MediaType("application", "pdf")
+        val TEXT = MediaType("text", "plain")
+        val XHTML = MediaType("application", "xhtml", "xml")
+        val XML  = MediaType("application", "xml")
+        val XQUERY = MediaType("application", "xquery")
+        val XSLT = MediaType("application", "xslt", "xml")
+        val YAML = MediaType("application", "vnd.yaml")
+        val ZIP = MediaType("application", "zip")
+
+        private val extensionMap = HashMap<MediaType, String>()
 
         val XML_OR_HTML = listOf<MediaType>(
             MediaType("application", "xml"),
@@ -328,6 +334,29 @@ class MediaType private constructor(val mediaType: String, val mediaSubtype: Str
         } else {
             OCTET_STREAM
         }
+    }
+
+    fun extension(): String {
+        synchronized(extensionMap) {
+            if (extensionMap.isEmpty()) {
+                for ((ext, ctype) in CommonEnvironment.defaultContentTypes) {
+                    extensionMap[parse(ctype)] = ext
+                }
+            }
+            // Hack. There are duplicates in the defaultContentTypes map...
+            extensionMap[XML] = "xml"
+            extensionMap[TEXT] = "txt"
+            extensionMap[GZIP] = "gz"
+            extensionMap[XQUERY] = "xqy"
+            extensionMap[XSLT] = "xsl"
+            extensionMap[JPEG] = "jpg"
+        }
+        for ((mtype, ext) in extensionMap) {
+            if (mtype.matches(this)) {
+                return ".${ext}"
+            }
+        }
+        return ".bin"
     }
 
     fun allowed(types: List<MediaType>): Boolean {

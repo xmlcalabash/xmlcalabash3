@@ -78,6 +78,14 @@ class DocumentProperties() {
         return null
     }
 
+    fun getSerialization(): XdmMap {
+        if (!properties.containsKey(Ns.serialization)) {
+            return XdmMap()
+        }
+
+        return properties[Ns.serialization] as XdmMap
+    }
+
     fun getUri(name: QName): URI? {
         if (properties.containsKey(name)) {
             return URI(properties[name]!!.underlyingValue.stringValue)

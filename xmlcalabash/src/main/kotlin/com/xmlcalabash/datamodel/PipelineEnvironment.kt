@@ -6,7 +6,7 @@ import com.xmlcalabash.config.XmlCalabash
 import com.xmlcalabash.exceptions.ErrorExplanation
 import com.xmlcalabash.io.DocumentManager
 import com.xmlcalabash.util.MessageReporter
-import net.sf.saxon.s9api.ItemTypeFactory
+import com.xmlcalabash.tracing.TraceListener
 import net.sf.saxon.s9api.QName
 import java.net.URI
 import javax.activation.MimetypesFileTypeMap
@@ -25,6 +25,7 @@ interface PipelineEnvironment: ExecutionContextManager {
     val xpathVersion: String
     var uniqueInlineUris: Boolean
 
+    val traceListener: TraceListener
     val documentManager: DocumentManager
     val mimeTypes: MimetypesFileTypeMap
     val errorExplanation: ErrorExplanation

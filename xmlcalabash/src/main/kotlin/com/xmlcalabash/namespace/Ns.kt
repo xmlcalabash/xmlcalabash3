@@ -71,6 +71,7 @@ object Ns {
     val hidden = QName("hidden")
     val href = QName("href")
     val httpVersion = QName("http-version")
+    val id = QName("id")
     val implementation = QName("implementation")
     val includeFilter = QName("include-filter")
     val indent = QName("indent")

@@ -2,12 +2,14 @@ package com.xmlcalabash.datamodel
 
 import com.xmlcalabash.XmlCalabashBuildConfig
 import com.xmlcalabash.config.CommonEnvironment
-import com.xmlcalabash.runtime.XProcStepConfiguration
 import com.xmlcalabash.config.XmlCalabash
 import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.exceptions.ErrorExplanation
 import com.xmlcalabash.io.DocumentManager
 import com.xmlcalabash.runtime.XProcExecutionContext
+import com.xmlcalabash.runtime.XProcStepConfiguration
+import com.xmlcalabash.tracing.NopTraceListener
+import com.xmlcalabash.tracing.TraceListener
 import com.xmlcalabash.util.MessageReporter
 import java.net.URI
 import java.util.*
@@ -33,6 +35,7 @@ class PipelineCompilerContext(override val xmlCalabash: XmlCalabash): PipelineEn
     override val xpathVersion = "3.1"
     override var uniqueInlineUris = true
 
+    private var _traceListener = NopTraceListener()
     private var _documentManager: DocumentManager = commonEnvironment.documentManager
     private var _mimeTypes = commonEnvironment.mimeTypes
     private var _errorExplanation: ErrorExplanation = commonEnvironment.errorExplanation
@@ -50,6 +53,8 @@ class PipelineCompilerContext(override val xmlCalabash: XmlCalabash): PipelineEn
         _proxies.putAll(commonEnvironment.proxies)
     }
 
+    override val traceListener: TraceListener
+        get() = _traceListener
     override val documentManager: DocumentManager
         get() = _documentManager
     override val mimeTypes: MimetypesFileTypeMap

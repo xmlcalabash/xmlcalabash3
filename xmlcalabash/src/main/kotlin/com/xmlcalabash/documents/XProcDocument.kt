@@ -19,6 +19,7 @@ import java.io.OutputStream
 import java.net.URI
 
 open class XProcDocument internal constructor() {
+    val id = ++_id
     private var _valueFunction: () -> XdmValue = { -> XdmEmptySequence.getInstance() }
     protected var _value: XdmValue? = null
     protected lateinit var _context: DocumentContext
@@ -105,15 +106,8 @@ open class XProcDocument internal constructor() {
         get() = _context
 
     companion object {
-        /*
-        fun ofEmpty(runtime: XProcRuntime): XProcDocument {
-            return ofEmpty(runtime, DocumentProperties())
-        }
-        fun ofEmpty(runtime: XProcRuntime, properties: DocumentProperties): XProcDocument {
-            val context = DocumentContext(runtime)
-            return XProcDocument(XdmAtomicValue.wrap(EmptySequence.getInstance()), context, withDefaults(properties, context.baseURI, MediaType.OCTET_STREAM))
-        }
-         */
+        private var _id = 0L
+
         fun ofEmpty(context: DocumentContext): XProcDocument {
             return ofEmpty(context, DocumentProperties())
         }

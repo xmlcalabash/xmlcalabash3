@@ -38,6 +38,7 @@ open class WrapSequenceStep(): AbstractAtomicStep() {
 
     override fun reset() {
         super.reset()
+        documents.clear()
         index = 0
     }
 

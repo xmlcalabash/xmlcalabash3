@@ -20,10 +20,12 @@ import com.xmlcalabash.util.Verbosity
 import net.sf.saxon.s9api.QName
 import org.apache.logging.log4j.kotlin.logger
 
-abstract class AbstractStep(val stepConfig: XProcStepConfiguration, step: StepModel): Consumer {
-    val id: String = step.id
-    val name: String = step.name
-    val type: QName = step.type
+abstract class AbstractStep(val stepConfig: XProcStepConfiguration, step: StepModel, val type: QName = step.type, val name: String = step.name): Consumer {
+    companion object {
+        private var _id = 0L
+    }
+
+    override val id = "${step.id}.${++_id}"
     val location = step.location
     internal val receiver = mutableMapOf<String, Pair<Consumer, String>>()
     val inputCount = mutableMapOf<String, Int>()
@@ -107,9 +109,13 @@ abstract class AbstractStep(val stepConfig: XProcStepConfiguration, step: StepMo
         logger.debug { "Running ${this}" }
         stepConfig.environment.messageReporter.progress { "Running ${this}" }
 
+        val startTime = System.nanoTime()
         try {
+            stepConfig.environment.traceListener.startExecution(this)
             run()
+            stepConfig.environment.traceListener.stopExecution(this, System.nanoTime() - startTime)
         } catch (ex: Exception) {
+            stepConfig.environment.traceListener.stopExecution(this, System.nanoTime() - startTime)
             when (ex) {
                 is XProcException -> {
                     ex.error.at(type, name).at(location)

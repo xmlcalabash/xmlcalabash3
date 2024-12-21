@@ -1,6 +1,5 @@
 package com.xmlcalabash.runtime
 
-import com.xmlcalabash.runtime.XProcStepConfiguration
 import com.xmlcalabash.documents.XProcDocument
 import net.sf.saxon.om.GroundedValue
 import net.sf.saxon.s9api.QName

@@ -1,0 +1,136 @@
+<appendix xmlns="http://docbook.org/ns/docbook"
+          xmlns:xlink="http://www.w3.org/1999/xlink"
+          xmlns:xi='http://www.w3.org/2001/XInclude'
+          version="5.2" xml:id="tracing">
+<info>
+  <?db filename="tracing"?>
+  <title>Tracing execution</title>
+</info>
+
+<para>The <option linkend="cli-trace">--trace</option> option can
+be used to create a trace of the execution of a pipeline.
+If the <option linkend="cli-trace-documents">--trace-documents</option> option is used,
+a copy of every document that flows through the pipeline will be saved.</para>
+
+<para>Trace documents are in the
+“<uri>https://xmlcalabash.com/ns/trace</uri>” namespace.</para>
+
+<para>The traces are divided by threads (at the moment, there’s only one
+thread). Within each thread, each step is recorded along with details about its
+execution. There are two logical views of the trace: execution order and
+execution structure. The step start tags are in execution order, earlier steps
+precede later ones. The hierarchical structure of steps is also significant.
+Compound steps are nested according to how they were executed.</para>
+
+<para>Documents also appear in execution order, and in execution order within
+the steps. Their position in the hierarchy <emphasis>is not</emphasis>
+(especially) significant. Just because a document appears as a child of a particular
+step does not imply that the parent step generated. The source and target of each
+document is explicitly identified with the document.</para>
+
+<section>
+<title>The trace vocabulary</title>
+
+<rng-pattern schema="../../build/trace.rng"
+             name="t.trace"/>
+
+<para>A trace consists of one or more threads of execution.</para>
+
+<section xml:id="t.thread">
+<title>Threads</title>
+
+<rng-pattern schema="../../build/trace.rng"
+             name="t.thread"/>
+
+<para>A thread has an id (it’s runtime thread id) and one or more steps. It may incidentally
+have document children as well.</para>
+
+</section>
+<section xml:id="t.step">
+<title>Steps</title>
+
+<rng-pattern schema="../../build/trace.rng"
+             name="t.step"/>
+
+<para>Each step has several attributes:</para>
+
+<variablelist>
+<varlistentry><term><tag class="attribute">id</tag></term>
+<listitem>
+<para>An id; this is a unique ID for this instantiation of this step. (In recursive pipelines, the
+same step may be instantiated more than once.)</para>
+</listitem>
+</varlistentry>
+<varlistentry><term><tag class="attribute">name</tag></term>
+<listitem>
+<para>A name; this is derived from the step’s name in the pipeline, if it has one. </para>
+</listitem>
+</varlistentry>
+<varlistentry><term><tag class="attribute">type</tag></term>
+<listitem>
+<para>The step type. User-defined pipelines appear in the trace with the
+type <tag>p:declare-step</tag>. That represents the invocation of their subpipeline.</para>
+</listitem>
+</varlistentry>
+<varlistentry><term><tag class="attribute">start-time</tag></term>
+<listitem>
+<para>The start time; this is the “wall-clock” time when execution of this step began.</para>
+</listitem>
+</varlistentry>
+<varlistentry><term><tag class="attribute">duration-ms</tag></term>
+<listitem>
+<para>How long the step executed. This is a value in milliseconds.</para>
+</listitem>
+</varlistentry>
+</variablelist>
+
+<para>A compound step will contain the execution traces for the steps it contains.
+It may also include documents.</para>
+
+</section>
+<section xml:id="t.document">
+<title>Documents</title>
+
+<rng-pattern schema="../../build/trace.rng"
+             name="t.document"/>
+
+<para>Each document has an id. This is a unique id for this document. Documents are immutable,
+so if the same document is passed between multiple steps, it will appear in multiple document
+elements.</para>
+
+<para>If the document has a content type, that’s also recorded.</para>
+
+<para>If the <option linkend="cli-trace-documents">--trace-documents</option> option is used,
+each document will also have a
+<tag namespace="https://xmlcalabash.com/ns/trace">location</tag> element.</para>
+
+<section xml:id="t.from">
+<title>From</title>
+
+<rng-pattern schema="../../build/trace.rng"
+             name="t.from"/>
+
+<para>Identifies the step that the produced the document, by id and port name.</para>
+
+</section>
+<section xml:id="t.to">
+<title>To</title>
+
+<rng-pattern schema="../../build/trace.rng"
+             name="t.to"/>
+
+<para>Identifies the step that received the document by, id and port name.</para>
+
+</section>
+<section xml:id="t.location">
+<title>Location</title>
+
+<rng-pattern schema="../../build/trace.rng"
+             name="t.location"/>
+
+<para>Identifies the filename where the document has been stored.</para>
+
+</section>
+</section>
+</section>
+</appendix>

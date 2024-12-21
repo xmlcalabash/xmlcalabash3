@@ -302,8 +302,21 @@ val rngConfigSchema = tasks.register<RelaxNGTranslateTask>("rngConfigSchema") {
   outputType("rng")
 }              
 
+val rngTraceSchema = tasks.register<RelaxNGTranslateTask>("rngTraceSchema") {
+  inputs.file(
+      layout.projectDirectory.file("../xmlcalabash/src/main/resources/com/xmlcalabash/trace.rnc"))
+  outputs.file(layout.buildDirectory.file("trace.rng"))
+
+  input(
+      layout.projectDirectory.file("../xmlcalabash/src/main/resources/com/xmlcalabash/trace.rnc"))
+  output(layout.buildDirectory.file("trace.rng").get().asFile)
+  inputType("rnc")
+  outputType("rng")
+}              
+
 val xincludeUserguide = tasks.register<SaxonXsltTask>("xincludeUserguide") {
   dependsOn(rngConfigSchema)
+  dependsOn(rngTraceSchema)
 
   inputs.file(rngConfigSchema.get().outputs.getFiles().getSingleFile())
   inputs.dir(layout.projectDirectory.dir("src/userguide"))
