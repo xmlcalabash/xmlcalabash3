@@ -18,7 +18,6 @@ import kotlin.math.floor
 
 open class HttpRequestStep(): AbstractAtomicStep() {
     val documents = mutableListOf<XProcDocument>()
-    val inScopeBindings = mutableMapOf<QName, LazyValue>()
 
     var href: URI = URI("https://xmlcalabash.com/not/used")
     var method = "GET"
@@ -50,10 +49,6 @@ open class HttpRequestStep(): AbstractAtomicStep() {
 
     override fun input(port: String, doc: XProcDocument) {
         documents.add(doc)
-    }
-
-    override fun inScopeBinding(name: QName, binding: LazyValue) {
-        inScopeBindings[name] = binding
     }
 
     override fun run() {
@@ -180,7 +175,6 @@ open class HttpRequestStep(): AbstractAtomicStep() {
         if (assert != "") {
             val evaluator = ExpressionEvaluator(stepConfig.processor, assert)
             evaluator.setNamespaces(stepConfig.inscopeNamespaces)
-            evaluator.setExpressionBindings(inScopeBindings)
             evaluator.setContext(response.report!!)
             val result = evaluator.evaluate()
             if (!result.underlyingValue.effectiveBooleanValue()) {

@@ -12,7 +12,6 @@ interface XProcStep {
     fun extensionAttributes(attributes: Map<QName, String>)
 
     fun option(name: QName, binding: LazyValue)
-    fun inScopeBinding(name: QName, binding: LazyValue)
     fun input(port: String, doc: XProcDocument)
     fun run()
 

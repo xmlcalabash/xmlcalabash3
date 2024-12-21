@@ -11,14 +11,9 @@ import net.sf.saxon.s9api.XdmItem
 
 class FilterStep(): AbstractAtomicStep() {
     lateinit var document: XProcDocument
-    val inScopeBindings = mutableMapOf<QName, LazyValue>()
 
     override fun input(port: String, doc: XProcDocument) {
         document = doc
-    }
-
-    override fun inScopeBinding(name: QName, binding: LazyValue) {
-        inScopeBindings[name] = binding
     }
 
     override fun run() {
@@ -27,7 +22,6 @@ class FilterStep(): AbstractAtomicStep() {
         val evaluator = ExpressionEvaluator(stepConfig.processor, stringBinding(Ns.select)!!)
         evaluator.setNamespaces(stepConfig.inscopeNamespaces)
         // FIXME: should only evaluate the bindings that are actually referenced...
-        evaluator.setExpressionBindings(inScopeBindings)
         evaluator.setContext(document.value as XdmItem)
         val value = evaluator.evaluate()
         for (doc in S9Api.makeDocuments(stepConfig, value)) {
