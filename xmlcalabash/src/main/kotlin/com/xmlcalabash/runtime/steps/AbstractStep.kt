@@ -13,6 +13,7 @@ import com.xmlcalabash.runtime.model.StepModel
 import com.xmlcalabash.runtime.parameters.DocumentStepParameters
 import com.xmlcalabash.runtime.parameters.InlineStepParameters
 import com.xmlcalabash.runtime.parameters.RuntimeStepParameters
+import com.xmlcalabash.steps.AbstractAtomicStep
 import com.xmlcalabash.steps.internal.DocumentStep
 import com.xmlcalabash.steps.internal.InlineStep
 import com.xmlcalabash.util.BufferingReceiver
@@ -145,8 +146,10 @@ abstract class AbstractStep(val stepConfig: XProcStepConfiguration, step: StepMo
         when (binding) {
             is InlineInstruction -> {
                 val inlineReceiver = BufferingReceiver()
+                val source = RuntimePort("source", false, true, emptyList())
+                val result = RuntimePort("result", false, false, emptyList())
                 val inlineStepParams = InlineStepParameters("!inline", binding.stepConfig.location,
-                    emptyMap(), emptyMap(), emptyMap(), binding.valueTemplateFilter, binding.contentType, binding.encoding)
+                    mapOf("source" to source), mapOf("result" to result), emptyMap(), binding.valueTemplateFilter, binding.contentType, binding.encoding)
                 val inlineStep = InlineStep(inlineStepParams)
                 inlineStep.setup(binding.stepConfig, inlineReceiver, inlineStepParams)
 

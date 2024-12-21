@@ -1,7 +1,6 @@
 package com.xmlcalabash.steps
 
 import com.xmlcalabash.namespace.Ns
-import com.xmlcalabash.runtime.parameters.StepParameters
 import kotlin.math.max
 import kotlin.math.min
 
@@ -9,8 +8,9 @@ open class TextHeadStep(): AbstractTextStep() {
     override fun run() {
         super.run()
 
+        val source = queues["source"]!!.first()
         val count = integerBinding(Ns.count)!!
-        val lines = textLines()
+        val lines = textLines(source)
         val sb = StringBuilder()
 
         if (count == 0) {

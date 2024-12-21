@@ -26,22 +26,23 @@ open class ValidateWithXmlSchema(): AbstractAtomicStep() {
     lateinit var document: XProcDocument
     val schemas = mutableListOf<XProcDocument>()
 
-    override fun input(port: String, doc: XProcDocument) {
-        if (port == "source") {
-            document = doc
-        } else {
-            schemas.add(doc)
-        }
-    }
-
     override fun run() {
         super.run()
+
+        document = queues["source"]!!.first()
+        schemas.addAll(queues["schema"]!!)
 
         val manager = stepConfig.processor.getSchemaManager()
         if (manager == null) {
             throw RuntimeException("Schema manager not found, XSD validation requires Saxon EE")
         }
         validateWithSaxon(manager)
+    }
+
+    override fun reset() {
+        super.reset()
+        document = XProcDocument.ofEmpty(stepConfig)
+        schemas.clear()
     }
 
     private fun validateWithSaxon(manager: SchemaManager) {

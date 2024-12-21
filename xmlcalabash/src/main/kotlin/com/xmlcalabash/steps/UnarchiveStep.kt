@@ -12,14 +12,10 @@ import org.apache.commons.compress.utils.SeekableInMemoryByteChannel
 import java.net.URI
 
 open class UnarchiveStep(): AbstractArchiveStep() {
-    override fun input(port: String, doc: XProcDocument) {
-        archives.add(doc)
-    }
-
     override fun run() {
         super.run()
 
-        val archive = archives.first()
+        val archive = queues["source"]!!.first()
         val format = qnameBinding(Ns.format) ?: Ns.zip
         val relativeTo = relativeTo()
 

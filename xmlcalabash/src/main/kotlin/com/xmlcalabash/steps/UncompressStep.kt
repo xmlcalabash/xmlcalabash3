@@ -3,16 +3,12 @@ package com.xmlcalabash.steps
 import com.xmlcalabash.datamodel.MediaType
 import com.xmlcalabash.documents.DocumentProperties
 import com.xmlcalabash.documents.XProcBinaryDocument
-import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.exceptions.XProcException
 import com.xmlcalabash.namespace.Ns
 import com.xmlcalabash.io.DocumentLoader
 import com.xmlcalabash.runtime.XProcStepConfiguration
 import net.sf.saxon.s9api.QName
-import net.sf.saxon.s9api.XdmAtomicValue
-import net.sf.saxon.s9api.XdmValue
-import net.sf.saxon.value.HexBinaryValue
 import org.apache.commons.compress.compressors.CompressorInputStream
 import org.apache.commons.compress.compressors.brotli.BrotliCompressorInputStream
 import org.apache.commons.compress.compressors.bzip2.BZip2CompressorInputStream
@@ -61,27 +57,20 @@ open class UncompressStep(): AbstractAtomicStep() {
         }
     }
 
-    var document: XProcDocument? = null
-
-    override fun input(port: String, doc: XProcDocument) {
-        document = doc
-    }
-
     override fun run() {
         super.run()
 
+        val document = queues["source"]!!.first()
         val parameters = qnameMapBinding(Ns.parameters)
         val outputContentType = mediaTypeBinding(Ns.contentType)
 
-        val doc = document!!
-
-        if (doc !is XProcBinaryDocument) {
+        if (document !is XProcBinaryDocument) {
             throw stepConfig.exception(XProcError.xcCannotUncompress())
         }
 
-        val inputStream = BufferedInputStream(ByteArrayInputStream(doc.binaryValue))
+        val inputStream = BufferedInputStream(ByteArrayInputStream(document.binaryValue))
 
-        val contentType = doc.contentType ?: MediaType.OCTET_STREAM
+        val contentType = document.contentType ?: MediaType.OCTET_STREAM
 
         val declFormat = qnameBinding(Ns.format)
         val format = if (declFormat != null) {
@@ -103,11 +92,11 @@ open class UncompressStep(): AbstractAtomicStep() {
 
         val baos = uncompress(stepConfig, format, inputStream)
 
-        val loader = DocumentLoader(stepConfig, doc.baseURI, doc.properties, parameters)
+        val loader = DocumentLoader(stepConfig, document.baseURI, document.properties, parameters)
         try {
-            val result = loader.load(doc.baseURI, ByteArrayInputStream(baos.toByteArray()), outputContentType)
+            val result = loader.load(document.baseURI, ByteArrayInputStream(baos.toByteArray()), outputContentType)
 
-            val properties = DocumentProperties(doc.properties)
+            val properties = DocumentProperties(document.properties)
             properties.remove(Ns.serialization)
             properties[Ns.contentType] = outputContentType
 

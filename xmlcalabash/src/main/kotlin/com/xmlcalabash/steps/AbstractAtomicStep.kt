@@ -30,7 +30,8 @@ abstract class AbstractAtomicStep(): XProcStep {
     private lateinit var _stepConfig: XProcStepConfiguration
     private lateinit var _receiver: Receiver
     private lateinit var _stepParams: RuntimeStepParameters
-    private var _options = mutableMapOf<QName, LazyValue>()
+    private val _options = mutableMapOf<QName, LazyValue>()
+    protected val _queues = mutableMapOf<String, MutableList<XProcDocument>>()
     private var _nodeId: Long = -1
 
     val stepParams: RuntimeStepParameters
@@ -41,6 +42,8 @@ abstract class AbstractAtomicStep(): XProcStep {
         get() = _receiver
     val options: Map<QName,LazyValue>
         get() = _options
+    val queues: Map<String, List<XProcDocument>>
+        get() = _queues
     val nodeId: Long
         get() = _nodeId
 
@@ -49,8 +52,18 @@ abstract class AbstractAtomicStep(): XProcStep {
         this._receiver = receiver
         this._stepParams = stepParams
 
+        for (port in stepParams.inputs.keys.filter { !it.startsWith("Q{")}) {
+            _queues.put(port, mutableListOf())
+        }
+
         synchronized(Companion) {
             _nodeId = ++_id
+        }
+    }
+
+    final override fun input(port: String, doc: XProcDocument) {
+        if (!port.startsWith("Q{")) {
+            _queues[port]?.add(doc)
         }
     }
 
@@ -64,6 +77,9 @@ abstract class AbstractAtomicStep(): XProcStep {
 
     override fun reset() {
         _options.clear()
+        for ((_, list) in _queues) {
+            list.clear()
+        }
     }
 
     override fun option(name: QName, binding: LazyValue) {
@@ -84,7 +100,6 @@ abstract class AbstractAtomicStep(): XProcStep {
     }
 
     internal fun processMatcher(matchName: QName): ProcessMatch {
-        val matchPattern = stringBinding(matchName)!!
         val nsbindings = valueBinding(Ns.match).context.inscopeNamespaces
         val bindings = mutableMapOf<QName, XdmValue>()
         return ProcessMatch(stepConfig, this as ProcessMatchingNodes, nsbindings, bindings)

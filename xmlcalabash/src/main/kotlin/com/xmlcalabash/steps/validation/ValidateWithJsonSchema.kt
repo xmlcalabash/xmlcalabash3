@@ -12,19 +12,11 @@ import java.io.ByteArrayOutputStream
 import java.nio.charset.StandardCharsets
 
 open class ValidateWithJsonSchema(): AbstractAtomicStep() {
-    lateinit var document: XProcDocument
-    lateinit var schema: XProcDocument
-
-    override fun input(port: String, doc: XProcDocument) {
-        if (port == "source") {
-            document = doc
-        } else {
-            schema = doc
-        }
-    }
-
     override fun run() {
         super.run()
+
+        val document = queues["source"]!!.first()
+        val schema = queues["schema"]!!.first()
 
         val assertValid = booleanBinding(Ns.assertValid) ?: true
         val defaultVersion = stringBinding(Ns.defaultVersion)

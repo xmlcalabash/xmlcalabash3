@@ -22,12 +22,9 @@ open class CastContentTypeStep(): AbstractAtomicStep() {
     var contentType = MediaType.ANY
     var parameters = mapOf<QName,XdmValue>()
 
-    override fun input(port: String, doc: XProcDocument) {
-        document = doc
-    }
-
     override fun run() {
         super.run()
+        document = queues["source"]!!.first()
 
         docContentType = document.contentType ?: MediaType.OCTET_STREAM
         contentType = mediaTypeBinding(Ns.contentType)

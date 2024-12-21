@@ -19,6 +19,7 @@ open class TextSortStep(): AbstractTextStep() {
     override fun run() {
         super.run()
 
+        val source = queues["source"]!!.first()
         val sortKey = stringBinding(Ns.sortKey) ?: "."
         val order = stringBinding(Ns.order)
         val caseOrder = stringBinding(Ns.caseOrder)
@@ -38,7 +39,7 @@ open class TextSortStep(): AbstractTextStep() {
         }
 
         // Make sure we do line handling...
-        val text = textLines()
+        val text = textLines(source)
         val sb = StringBuilder()
         for (index in text.indices) {
             if (index > 0) {

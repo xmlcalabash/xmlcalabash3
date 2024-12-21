@@ -21,17 +21,10 @@ open class ExpressionStep(val params: ExpressionStepParameters): AbstractAtomicS
     val expression = params.expression
     val collection = params.collection
 
-    override fun input(port: String, doc: XProcDocument) {
-        contextItems.add(doc)
-    }
-
-    override fun reset() {
-        super.reset()
-        contextItems.clear()
-    }
-
     override fun run() {
         super.run()
+        // Expression steps are unusual in that source may not exist
+        contextItems.addAll(queues["source"] ?: emptyList())
 
         if (override != null) {
             receiver.output("result", override!!)
@@ -94,6 +87,11 @@ open class ExpressionStep(val params: ExpressionStepParameters): AbstractAtomicS
         } else {
             receiver.output("result", XProcDocument(lazy(), stepConfig))
         }
+    }
+
+    override fun reset() {
+        super.reset()
+        contextItems.clear()
     }
 
     override fun toString(): String {

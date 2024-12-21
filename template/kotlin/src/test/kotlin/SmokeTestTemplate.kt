@@ -3,7 +3,7 @@ import com.xmlcalabash.util.BufferingReceiver
 import org.junit.jupiter.api.Assertions.fail
 import org.junit.jupiter.api.Test
 
-class SmokeTest {
+class SmokeTestTemplate {
     @Test
     fun testTemplate() {
         val calabash = XmlCalabash.newInstance()

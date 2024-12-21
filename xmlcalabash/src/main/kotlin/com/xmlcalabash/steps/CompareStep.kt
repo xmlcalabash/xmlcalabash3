@@ -19,15 +19,10 @@ open class CompareStep(): AbstractAtomicStep() {
     var failIfNotEqual = false
     var differences = mutableListOf<String>()
 
-    override fun input(port: String, doc: XProcDocument) {
-        when (port) {
-            "source" -> source = doc
-            "alternate" -> alternate = doc
-        }
-    }
-
     override fun run() {
         super.run()
+        source = queues["source"]!!.first()
+        alternate = queues["alternate"]!!.first()
 
         val method = qnameBinding(Ns.method) ?: Ns.deepEqual
         failIfNotEqual = booleanBinding(Ns.failIfNotEqual) ?: false

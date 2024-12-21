@@ -12,28 +12,18 @@ import org.nineml.coffeefilter.InvisibleXml
 import java.lang.IllegalArgumentException
 
 class CoffeePress(): AbstractAtomicStep() {
-    val grammar = mutableListOf<XProcDocument>()
-    lateinit var source: XProcDocument
-    lateinit var parameters: Map<QName, XdmValue>
-    var failOnError = true
-
-    override fun input(port: String, doc: XProcDocument) {
-        if (port == "source") {
-            source = doc
-        } else {
-            grammar.add(doc)
-        }
-    }
-
     override fun run() {
         super.run()
+
+        val source = queues["source"]!!.first()
+        val grammar = queues["grammar"]!!
 
         if (stepParams.stepType == NsP.ixml) {
             logger.info { "The step type p:ixml is deprecated, use p:invisible-xml instead" }
         }
 
-        failOnError = booleanBinding(Ns.failOnError) ?: true
-        parameters = qnameMapBinding(Ns.parameters)
+        val failOnError = booleanBinding(Ns.failOnError) != false
+        val parameters = qnameMapBinding(Ns.parameters)
 
         val invisibleXml = InvisibleXml()
         val parser = if (grammar.isNotEmpty()) {

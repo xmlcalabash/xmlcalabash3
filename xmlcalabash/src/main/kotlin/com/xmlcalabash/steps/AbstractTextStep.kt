@@ -12,17 +12,11 @@ import java.net.URI
 import java.nio.charset.StandardCharsets
 
 abstract class AbstractTextStep(): AbstractAtomicStep() {
-    lateinit var source: XProcDocument
-
-    override fun input(port: String, doc: XProcDocument) {
-        source = doc
-    }
-
-    fun text(doc: XProcDocument = source): String {
+    fun text(doc: XProcDocument): String {
         return S9Api.textContent(doc)
     }
 
-    fun textLines(doc: XProcDocument = source): List<String> {
+    fun textLines(doc: XProcDocument): List<String> {
         var text = text(doc)
 
         text = text.replace("\r\n", "\n")

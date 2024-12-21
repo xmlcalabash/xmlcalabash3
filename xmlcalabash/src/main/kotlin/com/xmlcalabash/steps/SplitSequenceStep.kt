@@ -1,22 +1,14 @@
 package com.xmlcalabash.steps
 
-import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.namespace.Ns
-import com.xmlcalabash.runtime.parameters.StepParameters
 import net.sf.saxon.om.Item
-import net.sf.saxon.s9api.XdmNode
 import net.sf.saxon.tree.iter.ManualIterator
 
 open class SplitSequenceStep(): AbstractAtomicStep() {
-    private val documents = mutableListOf<XProcDocument>()
-
-    override fun input(port: String, doc: XProcDocument) {
-        documents.add(doc)
-    }
-
     override fun run() {
         super.run()
 
+        val documents = queues["source"]!!
         val test = stringBinding(Ns.test)!!
         val testContext = options[Ns.test]!!.context
         val initialOnly = booleanBinding(Ns.initialOnly) ?: false

@@ -10,15 +10,10 @@ import com.xmlcalabash.namespace.NsCx
 import net.sf.saxon.s9api.XdmNode
 
 open class XIncludeStep(): AbstractAtomicStep() {
-    lateinit var document: XProcDocument
-
-    override fun input(port: String, doc: XProcDocument) {
-        document = doc
-    }
-
     override fun run() {
         super.run()
 
+        val document = queues["source"]!!.first()
         val defaultResolver = DefaultDocumentResolver()
         val xincluder = XInclude(XiResolver(defaultResolver))
         xincluder.trimText = booleanBinding(NsCx.trim) ?: false

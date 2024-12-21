@@ -12,20 +12,16 @@ import net.sf.saxon.s9api.QName
 import net.sf.saxon.s9api.XdmNode
 
 open class UuidStep(): AbstractAtomicStep(), ProcessMatchingNodes {
-    lateinit var document: XProcDocument
     lateinit var matcher: ProcessMatch
 
     var matchPattern = "/*"
     var version = 0
     var uuid = ""
 
-    override fun input(port: String, doc: XProcDocument) {
-        document = doc
-    }
-
     override fun run() {
         super.run()
 
+        val document = queues["source"]!!.first()
         matchPattern = stringBinding(Ns.match)!!
         version = integerBinding(Ns.version) ?: 4
 

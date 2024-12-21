@@ -9,10 +9,6 @@ import net.sf.saxon.s9api.XdmEmptySequence
 import java.net.URISyntaxException
 
 open class LoadStep(): AbstractAtomicStep() {
-    override fun input(port: String, doc: XProcDocument) {
-        // there are none
-    }
-
     override fun run() {
         super.run()
 

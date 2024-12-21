@@ -2,15 +2,12 @@ package com.xmlcalabash.steps.file
 
 import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.exceptions.XProcError
-import com.xmlcalabash.namespace.*
+import com.xmlcalabash.namespace.Ns
+import com.xmlcalabash.namespace.NsP
 import java.io.File
 import java.io.IOException
 
 class FileDeleteStep(): FileStep(NsP.fileDelete) {
-    override fun input(port: String, doc: XProcDocument) {
-        // never called
-    }
-
     override fun run() {
         super.run()
 

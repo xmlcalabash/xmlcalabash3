@@ -25,19 +25,14 @@ import java.io.FileOutputStream
 import java.net.URI
 
 open class CompressStep(): AbstractAtomicStep() {
-    var document: XProcDocument? = null
-
-    override fun input(port: String, doc: XProcDocument) {
-        document = doc
-    }
-
     override fun run() {
         super.run()
+        val document = queues["source"]!!.first()
 
         val parameters = qnameMapBinding(Ns.parameters)
         val serialization = qnameMapBinding(Ns.serialization)
 
-        val doc = document!!
+        val doc = document
         val format = qnameBinding(Ns.format) ?: Ns.gzip
 
         val bytes = if (doc.value.underlyingValue is HexBinaryValue) {
@@ -70,12 +65,6 @@ open class CompressStep(): AbstractAtomicStep() {
         properties[Ns.contentType] = "application/${format.localName}"
 
         receiver.output("result", XProcDocument.ofBinary(baos.toByteArray(), stepConfig, properties))
-    }
-
-    private fun storeXml(href: URI, serialization: Map<QName,XdmValue>) {
-        val outputFile = FileOutputStream(href.path)
-        val serializer = XProcSerializer(stepConfig)
-        serializer.write(document!!, outputFile)
     }
 
     override fun toString(): String = "p:store"

@@ -10,10 +10,6 @@ import net.sf.saxon.s9api.XdmValue
 import java.net.URLDecoder
 
 open class WwwFormUrlDecodeStep(): AbstractAtomicStep() {
-    override fun input(port: String, doc: XProcDocument) {
-        // nop, no inputs
-    }
-
     override fun run() {
         super.run()
 

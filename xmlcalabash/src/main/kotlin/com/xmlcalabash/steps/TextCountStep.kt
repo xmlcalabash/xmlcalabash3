@@ -10,8 +10,9 @@ import javax.xml.transform.sax.SAXSource
 open class TextCountStep(): AbstractTextStep() {
     override fun run() {
         super.run()
+        val document = queues["source"]!!.first()
 
-        val count = textLines().size
+        val count = textLines(document).size
 
         val result = "<c:result xmlns:c='${NsC.namespace}'>${count}</c:result>"
         val inputStream = ByteArrayInputStream(result.toByteArray(Charsets.UTF_8))

@@ -2,7 +2,6 @@ import com.xmlcalabash.config.XmlCalabash
 import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.util.BufferingReceiver
 import com.xmlcalabash.util.DefaultXmlCalabashConfiguration
-import net.sf.saxon.s9api.Processor
 import net.sf.saxon.s9api.QName
 import net.sf.saxon.s9api.XdmNode
 import org.junit.jupiter.api.Assertions
@@ -12,7 +11,7 @@ import java.io.File
 import java.net.URI
 import kotlin.collections.first
 
-class SmokeTest {
+class SmokeTestMetadataExtractor {
     private fun runPipeline(pipeline: URI, href: String? = null): XProcDocument {
         val config = DefaultXmlCalabashConfiguration()
         val calabash = XmlCalabash.newInstance(config)

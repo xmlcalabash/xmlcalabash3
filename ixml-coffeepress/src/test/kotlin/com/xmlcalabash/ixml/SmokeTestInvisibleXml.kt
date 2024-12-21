@@ -5,7 +5,7 @@ import com.xmlcalabash.util.BufferingReceiver
 import org.junit.jupiter.api.Assertions.fail
 import org.junit.jupiter.api.Test
 
-class SmokeTest {
+class SmokeTestInvisibleXml {
     @Test
     fun testCoffeePress() {
         val calabash = XmlCalabash.newInstance()

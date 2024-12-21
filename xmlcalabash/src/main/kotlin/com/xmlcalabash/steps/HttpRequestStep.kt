@@ -47,12 +47,9 @@ open class HttpRequestStep(): AbstractAtomicStep() {
     private var authmethod: String? = null
     private var sendauth = false
 
-    override fun input(port: String, doc: XProcDocument) {
-        documents.add(doc)
-    }
-
     override fun run() {
         super.run()
+        documents.addAll(queues["source"]!!)
 
         href = uriBinding(Ns.href)!!
         method = stringBinding(Ns.method)!!

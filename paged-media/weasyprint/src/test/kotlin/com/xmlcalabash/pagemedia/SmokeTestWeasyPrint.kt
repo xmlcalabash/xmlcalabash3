@@ -1,4 +1,4 @@
-package com.xmlcalabash.pagedmedia
+package com.xmlcalabash.pagemedia
 
 import com.xmlcalabash.config.XmlCalabash
 import com.xmlcalabash.datamodel.MediaType
@@ -14,13 +14,13 @@ import java.io.File
 import java.io.FileOutputStream
 import java.net.URI
 
-class PrinceSmokeTest {
+class SmokeTestWeasyPrint {
     companion object {
         const val WRITE_OUTPUT = false
     }
 
     @Test
-    @EnabledIfEnvironmentVariable(named = "XMLCALABASH_TEST_PRINCE", matches = "true")
+    @EnabledIfEnvironmentVariable(named = "XMLCALABASH_TEST_WEASY", matches = "true")
     fun testGenericCssFormatter() {
         val managers = mutableListOf<PagedMediaManager>()
         for (provider in PagedMediaServiceProvider.providers()) {
@@ -36,14 +36,14 @@ class PrinceSmokeTest {
         }
 
         Assertions.assertNotNull(xslManager)
-        Assertions.assertTrue(xslManager!!.formatterAvailable(URI("https://xmlcalabash.com/paged-media/css-formatter/prince")))
+        Assertions.assertTrue(xslManager!!.formatterAvailable(URI("https://xmlcalabash.com/paged-media/css-formatter/weasyprint")))
         Assertions.assertTrue(xslManager.formatterAvailable(URI("https://xmlcalabash.com/paged-media/css-formatter")))
         Assertions.assertFalse(xslManager.formatterAvailable(URI("https://xmlcalabash.com/paged-media/xsl-formatter")))
     }
 
     @Test
-    @EnabledIfEnvironmentVariable(named = "XMLCALABASH_TEST_PRINCE", matches = "true")
-    fun testPrinceCssFormatter() {
+    @EnabledIfEnvironmentVariable(named = "XMLCALABASH_TEST_WEASY", matches = "true")
+    fun testWeasyprintCssFormatter() {
         val managers = mutableListOf<PagedMediaManager>()
         for (provider in PagedMediaServiceProvider.providers()) {
             managers.add(provider.create())
@@ -51,20 +51,20 @@ class PrinceSmokeTest {
         Assertions.assertTrue(managers.isNotEmpty())
         var xslManager: PagedMediaManager? = null
         for (manager in managers) {
-            if (manager.formatterAvailable(URI("https://xmlcalabash.com/paged-media/css-formatter/prince"))) {
+            if (manager.formatterAvailable(URI("https://xmlcalabash.com/paged-media/css-formatter/weasyprint"))) {
                 xslManager = manager
                 break
             }
         }
 
         Assertions.assertNotNull(xslManager)
-        Assertions.assertTrue(xslManager!!.formatterAvailable(URI("https://xmlcalabash.com/paged-media/css-formatter/prince")))
+        Assertions.assertTrue(xslManager!!.formatterAvailable(URI("https://xmlcalabash.com/paged-media/css-formatter/weasyprint")))
         Assertions.assertTrue(xslManager.formatterAvailable(URI("https://xmlcalabash.com/paged-media/css-formatter")))
         Assertions.assertFalse(xslManager.formatterAvailable(URI("https://xmlcalabash.com/paged-media/xsl-formatter")))
     }
 
     @Test
-    @EnabledIfEnvironmentVariable(named = "XMLCALABASH_TEST_PRINCE", matches = "true")
+    @EnabledIfEnvironmentVariable(named = "XMLCALABASH_TEST_WEASY", matches = "true")
     fun testFormatter() {
         val calabash = XmlCalabash.newInstance()
         val parser = calabash.newXProcParser()
@@ -77,6 +77,7 @@ class PrinceSmokeTest {
         try {
             exec.run()
         } catch (ex: Exception) {
+            ex.printStackTrace()
             fail()
         }
 

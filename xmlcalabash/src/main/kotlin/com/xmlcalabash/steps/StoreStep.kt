@@ -1,32 +1,18 @@
 package com.xmlcalabash.steps
 
-import com.xmlcalabash.datamodel.MediaType
-import com.xmlcalabash.documents.XProcBinaryDocument
 import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.io.XProcSerializer
 import com.xmlcalabash.namespace.Ns
 import com.xmlcalabash.namespace.NsC
-import com.xmlcalabash.util.S9Api
 import com.xmlcalabash.util.SaxonTreeBuilder
-import net.sf.saxon.s9api.QName
-import net.sf.saxon.s9api.Serializer
-import net.sf.saxon.s9api.XdmValue
-import java.io.File
 import java.io.FileOutputStream
-import java.lang.RuntimeException
-import java.net.URI
 
 open class StoreStep(): AbstractAtomicStep() {
-    var document: XProcDocument? = null
-
-    override fun input(port: String, doc: XProcDocument) {
-        document = doc
-    }
-
     override fun run() {
         super.run()
 
+        val document = queues["source"]!!.first()
         val href = try {
             uriBinding(Ns.href)!!
         } catch (ex: Exception) {

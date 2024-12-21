@@ -36,12 +36,9 @@ open class ArchiveManifestStep(): AbstractArchiveStep() {
     private lateinit var relativeTo: URI
     private lateinit var parameters: Map<QName, XdmValue>
 
-    override fun input(port: String, doc: XProcDocument) {
-        archives.add(doc)
-    }
-
     override fun run() {
         super.run()
+        archives.addAll(queues["source"]!!)
 
         val archive = archives.first()
         val format = qnameBinding(Ns.format) ?: Ns.zip

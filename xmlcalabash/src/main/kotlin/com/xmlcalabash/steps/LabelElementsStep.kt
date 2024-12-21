@@ -20,8 +20,6 @@ import net.sf.saxon.s9api.XdmNode
 import net.sf.saxon.type.BuiltInAtomicType
 
 open class LabelElementsStep(): AbstractAtomicStep(), ProcessMatchingNodes {
-    lateinit var document: XProcDocument
-
     var matchPattern = "*"
     lateinit var attribute: QName
     lateinit var label: String
@@ -32,13 +30,10 @@ open class LabelElementsStep(): AbstractAtomicStep(), ProcessMatchingNodes {
     val matcher: ProcessMatch
         get() = _matcher ?: throw RuntimeException("Configuration error...")
 
-    override fun input(port: String, doc: XProcDocument) {
-        document = doc
-    }
-
     override fun run() {
         super.run()
 
+        val document = queues["source"]!!.first()
         matchPattern = stringBinding(Ns.match)!!
         attribute = qnameBinding(Ns.attribute)!!
         label = stringBinding(Ns.label)!!

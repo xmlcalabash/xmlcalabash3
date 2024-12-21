@@ -15,19 +15,15 @@ import net.sf.saxon.s9api.XdmNode
 import net.sf.saxon.s9api.XdmValue
 
 class DeleteStep(): AbstractAtomicStep(), ProcessMatchingNodes {
-    lateinit var document: XProcDocument
     var pattern = ""
     var _matcher: ProcessMatch? = null
     val matcher: ProcessMatch
         get() = _matcher ?: throw RuntimeException("Configuration error...")
 
-    override fun input(port: String, doc: XProcDocument) {
-        document = doc
-    }
-
     override fun run() {
         super.run()
 
+        val document = queues["source"]!!.first()
         pattern = stringBinding(Ns.match)!!
         _matcher = ProcessMatch(stepConfig, this, valueBinding(Ns.match).context.inscopeNamespaces)
         matcher.process(document.value as XdmNode, pattern)

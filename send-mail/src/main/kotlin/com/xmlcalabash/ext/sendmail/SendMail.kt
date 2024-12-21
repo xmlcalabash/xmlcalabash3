@@ -58,13 +58,10 @@ class SendMail(): AbstractAtomicStep() {
         sendmail = stepConfig.saxonConfig.xmlCalabash.xmlCalabashConfig.sendmail
     }
 
-    override fun input(port: String, doc: XProcDocument) {
-        sources.add(doc)
-    }
-
     override fun run() {
         super.run()
 
+        sources.addAll(queues["source"]!!)
         val parameters = qnameMapBinding(Ns.parameters)
         serialization = qnameMapBinding(Ns.serialization)
         auth = qnameMapBinding(Ns.serialization)

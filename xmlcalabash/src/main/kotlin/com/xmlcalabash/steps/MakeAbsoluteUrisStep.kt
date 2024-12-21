@@ -13,8 +13,6 @@ import net.sf.saxon.s9api.XdmNode
 import java.net.URI
 
 open class MakeAbsoluteUrisStep(): AbstractAtomicStep(), ProcessMatchingNodes {
-    lateinit var document: XProcDocument
-
     var matchPattern = "*"
     var baseUri: URI? = null
 
@@ -22,13 +20,10 @@ open class MakeAbsoluteUrisStep(): AbstractAtomicStep(), ProcessMatchingNodes {
     val matcher: ProcessMatch
         get() = _matcher ?: throw RuntimeException("Configuration error...")
 
-    override fun input(port: String, doc: XProcDocument) {
-        document = doc
-    }
-
     override fun run() {
         super.run()
 
+        val document = queues["source"]!!.first()
         matchPattern = stringBinding(Ns.match)!!
         baseUri = uriBinding(Ns.baseUri)
 

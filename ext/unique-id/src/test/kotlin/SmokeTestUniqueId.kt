@@ -1,6 +1,4 @@
 import com.xmlcalabash.config.XmlCalabash
-import com.xmlcalabash.parsers.xpl.XplParser
-import com.xmlcalabash.runtime.XProcRuntime
 import com.xmlcalabash.util.BufferingReceiver
 import com.xmlcalabash.util.DefaultXmlCalabashConfiguration
 import org.junit.jupiter.api.Assertions.fail
@@ -8,7 +6,7 @@ import org.junit.jupiter.api.Test
 import java.io.File
 import kotlin.collections.first
 
-class SmokeTest {
+class SmokeTestUniqueId {
     @Test
     fun testUniqueId() {
         val config = DefaultXmlCalabashConfiguration()

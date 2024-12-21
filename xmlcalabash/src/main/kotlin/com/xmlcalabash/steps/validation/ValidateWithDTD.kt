@@ -23,13 +23,10 @@ class ValidateWithDTD(): AbstractAtomicStep() {
     lateinit var source: XProcDocument
     val errors = mutableListOf<XmlProcessingError>()
 
-    override fun input(port: String, doc: XProcDocument) {
-        source = doc
-    }
-
     override fun run() {
         super.run()
 
+        source = queues["source"]!!.first()
         val assertValid = booleanBinding(Ns.assertValid) ?: true
 
         val stepSerialization = if (options[Ns.serialization] != null) {
@@ -88,6 +85,11 @@ class ValidateWithDTD(): AbstractAtomicStep() {
             xvrlReport(ex)
             receiver.output("result", source)
         }
+    }
+
+    override fun reset() {
+        super.reset()
+        source = XProcDocument.ofEmpty(stepConfig)
     }
 
     private fun serializeSource(serialization: Map<QName,XdmValue>): String {

@@ -19,7 +19,6 @@ class InsertStep(): AbstractAtomicStep(), ProcessMatchingNodes {
         private const val AFTER = "after"
     }
 
-    var document: XProcDocument? = null
     var insertions = mutableListOf<XProcDocument>()
     var pattern = ""
     var position = AFTER
@@ -27,27 +26,21 @@ class InsertStep(): AbstractAtomicStep(), ProcessMatchingNodes {
     val matcher: ProcessMatch
         get() = _matcher ?: throw RuntimeException("Configuration error...")
 
-    override fun input(port: String, doc: XProcDocument) {
-        if (port == "source") {
-            document = doc
-        } else {
-            insertions.add(doc)
-        }
-    }
-
     override fun run() {
         super.run()
+
+        val document = queues["source"]!!.first()
+        insertions.addAll(queues["insertion"]!!)
 
         pattern = stringBinding(Ns.match)!!
         position = stringBinding(Ns.position)!!
         _matcher = ProcessMatch(stepConfig, this, valueBinding(Ns.match).context.inscopeNamespaces)
-        matcher.process(document!!.value as XdmNode, pattern)
-        receiver.output("result", XProcDocument.ofXml(matcher.result, stepConfig, document!!.properties))
+        matcher.process(document.value as XdmNode, pattern)
+        receiver.output("result", XProcDocument.ofXml(matcher.result, stepConfig, document.properties))
     }
 
     override fun reset() {
         super.reset()
-        document = null
         insertions.clear()
     }
 

@@ -15,10 +15,6 @@ import java.nio.file.Path
 import java.nio.file.Paths
 
 class CreateTempfileStep(): FileStep(NsP.fileCreateTempfile) {
-    override fun input(port: String, doc: XProcDocument) {
-        // never called
-    }
-
     override fun run() {
         super.run()
 

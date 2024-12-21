@@ -7,10 +7,6 @@ import java.io.File
 import java.io.IOException
 
 class FileMkdirStep(): FileStep(NsP.fileDelete) {
-    override fun input(port: String, doc: XProcDocument) {
-        // never called
-    }
-
     override fun run() {
         super.run()
 
@@ -24,7 +20,7 @@ class FileMkdirStep(): FileStep(NsP.fileDelete) {
             throw stepConfig.exception(XProcError.xcUnsupportedFileMkdirScheme(href.scheme))
         }
 
-        failOnError = booleanBinding(Ns.failOnError) ?: true
+        failOnError = booleanBinding(Ns.failOnError) != false
 
         val file = File(href.path)
 

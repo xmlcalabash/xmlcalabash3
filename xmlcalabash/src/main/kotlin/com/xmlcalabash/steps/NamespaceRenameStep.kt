@@ -3,23 +3,15 @@ package com.xmlcalabash.steps
 import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.namespace.Ns
-import com.xmlcalabash.namespace.NsXml
 import com.xmlcalabash.runtime.ProcessMatch
 import com.xmlcalabash.runtime.ProcessMatchingNodes
-import com.xmlcalabash.util.*
 import net.sf.saxon.event.ReceiverOption
 import net.sf.saxon.om.*
-import net.sf.saxon.s9api.Axis
-import net.sf.saxon.s9api.QName
 import net.sf.saxon.s9api.XdmNode
-import net.sf.saxon.s9api.XdmNodeKind
 import net.sf.saxon.type.BuiltInAtomicType
 import net.sf.saxon.type.Untyped
-import java.net.URI
 
 open class NamespaceRenameStep(): AbstractAtomicStep(), ProcessMatchingNodes {
-    lateinit var document: XProcDocument
-
     var fromNS = NamespaceUri.NULL
     var toNS = NamespaceUri.NULL
     var applyTo = "all"
@@ -28,12 +20,9 @@ open class NamespaceRenameStep(): AbstractAtomicStep(), ProcessMatchingNodes {
     val matcher: ProcessMatch
         get() = _matcher ?: throw RuntimeException("Configuration error...")
 
-    override fun input(port: String, doc: XProcDocument) {
-        document = doc
-    }
-
     override fun run() {
         super.run()
+        val document = queues["source"]!!.first()
 
         if (uriBinding(Ns.from) != null) {
             fromNS = NamespaceUri.of(stringBinding(Ns.from).toString())

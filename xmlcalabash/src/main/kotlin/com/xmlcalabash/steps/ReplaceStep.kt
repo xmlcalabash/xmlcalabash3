@@ -7,13 +7,11 @@ import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.namespace.Ns
 import com.xmlcalabash.runtime.ProcessMatch
 import com.xmlcalabash.runtime.ProcessMatchingNodes
-import com.xmlcalabash.runtime.parameters.StepParameters
 import com.xmlcalabash.util.S9Api
 import net.sf.saxon.om.AttributeMap
-import net.sf.saxon.s9api.*
+import net.sf.saxon.s9api.XdmNode
 
 class ReplaceStep(): AbstractAtomicStep(), ProcessMatchingNodes {
-    lateinit var document: XProcDocument
     lateinit var replacement: XProcDocument
 
     var pattern = ""
@@ -21,16 +19,10 @@ class ReplaceStep(): AbstractAtomicStep(), ProcessMatchingNodes {
     val matcher: ProcessMatch
         get() = _matcher ?: throw RuntimeException("Configuration error...")
 
-    override fun input(port: String, doc: XProcDocument) {
-        if (port == "source") {
-            document = doc
-        } else {
-            replacement = doc
-        }
-    }
-
     override fun run() {
         super.run()
+        val document = queues["source"]!!.first()
+        replacement = queues["replacement"]!!.first()
 
         pattern = stringBinding(Ns.match)!!
         _matcher = ProcessMatch(stepConfig, this, valueBinding(Ns.match).context.inscopeNamespaces)
@@ -51,7 +43,6 @@ class ReplaceStep(): AbstractAtomicStep(), ProcessMatchingNodes {
 
     override fun reset() {
         super.reset()
-        document = XProcDocument.ofEmpty(stepConfig)
         replacement = XProcDocument.ofEmpty(stepConfig)
     }
 

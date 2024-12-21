@@ -20,20 +20,16 @@ open class XslFormatterStep(): AbstractAtomicStep() {
         val genericXslFormatter = URI("https://xmlcalabash.com/paged-media/xsl-formatter")
     }
 
-    private lateinit var document: XProcDocument
     private val extensionAttributes = mutableMapOf<QName, String>()
 
     override fun extensionAttributes(attributes: Map<QName, String>) {
         extensionAttributes.putAll(attributes)
     }
 
-    override fun input(port: String, doc: XProcDocument) {
-        document = doc
-    }
-
     override fun run() {
         super.run()
 
+        val document = queues["source"]!!.first()
         val contentType = mediaTypeBinding(Ns.contentType, MediaType.PDF)
         val parameters = qnameMapBinding(Ns.parameters)
         var xslManager: PagedMediaManager? = null

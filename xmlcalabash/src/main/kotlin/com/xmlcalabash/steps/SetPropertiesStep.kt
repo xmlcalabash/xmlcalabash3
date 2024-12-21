@@ -15,15 +15,10 @@ import java.net.URI
 import java.net.URISyntaxException
 
 open class SetPropertiesStep(): AbstractAtomicStep() {
-    lateinit var document: XProcDocument
-
-    override fun input(port: String, doc: XProcDocument) {
-        document = doc
-    }
-
     override fun run() {
         super.run()
 
+        val document = queues["source"]!!.first()
         val merge = booleanBinding(Ns.merge) ?: true
         val setProperties = mutableMapOf<QName,XdmValue>()
         setProperties.putAll(qnameMapBinding(Ns.properties))

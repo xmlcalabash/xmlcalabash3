@@ -12,15 +12,11 @@ class CacheDeleteStep(): AbstractAtomicStep() {
     companion object {
         val failIfNotInCache = QName(NamespaceUri.NULL, "fail-if-not-in-cache")
     }
-    private lateinit var document: XProcDocument
-
-    override fun input(port: String, doc: XProcDocument) {
-        document = doc
-    }
 
     override fun run() {
         super.run()
 
+        val document = queues["source"]!!.first()
         val failIfNotCached = booleanBinding(failIfNotInCache)!!
         val href = uriBinding(Ns.href)
 

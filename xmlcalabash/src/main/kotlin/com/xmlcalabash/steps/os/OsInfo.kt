@@ -27,10 +27,6 @@ class OsInfo(): AbstractAtomicStep() {
 
     var onlyStandardProperties = false
 
-    override fun input(port: String, doc: XProcDocument) {
-        // none
-    }
-
     override fun extensionAttributes(attributes: Map<QName, String>) {
         super.extensionAttributes(attributes)
         val value = attributes[NsCx.onlyStandard]

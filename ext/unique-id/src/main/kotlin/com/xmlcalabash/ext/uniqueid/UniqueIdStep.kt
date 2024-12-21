@@ -28,8 +28,6 @@ class UniqueIdStep(): AbstractAtomicStep(), ProcessMatchingNodes {
         private val _type = QName("type")
     }
 
-    private lateinit var document: XProcDocument
-
     var matchPattern = "/*"
     val parameters = mutableMapOf<QName, XdmValue>()
     var flavor = "uuid"
@@ -41,13 +39,10 @@ class UniqueIdStep(): AbstractAtomicStep(), ProcessMatchingNodes {
     val matcher: ProcessMatch
         get() = _matcher ?: throw RuntimeException("Configuration error...")
 
-    override fun input(port: String, doc: XProcDocument) {
-        document = doc
-    }
-
     override fun run() {
         super.run()
 
+        val document = queues["source"]!!.first()
         matchPattern = stringBinding(Ns.match)!!
         parameters.putAll(qnameMapBinding(Ns.parameters))
         flavor = stringBinding(_flavor) ?: "uuid"

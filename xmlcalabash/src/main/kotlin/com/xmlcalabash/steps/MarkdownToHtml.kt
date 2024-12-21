@@ -19,16 +19,12 @@ open class MarkdownToHtml(): AbstractAtomicStep() {
         private val q_configurers = QName(NsCx.namespace,"cx:configurers")
     }
 
-    lateinit var document: XProcDocument
     private val markdownExtensions = MarkdownExtensions()
-
-    override fun input(port: String, doc: XProcDocument) {
-        document = doc
-    }
 
     override fun run() {
         super.run()
 
+        val document = queues["source"]!!.first()
         val parameters = qnameMapBinding(Ns.parameters)
         val extensions = parameters[q_extensions]
         if (extensions != null) {

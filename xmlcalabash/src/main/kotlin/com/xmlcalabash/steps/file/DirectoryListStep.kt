@@ -16,10 +16,6 @@ class DirectoryListStep(): FileStep(NsP.directoryList) {
     var includeFilters = mutableListOf<String>()
     var excludeFilters = mutableListOf<String>()
 
-    override fun input(port: String, doc: XProcDocument) {
-        // never called
-    }
-
     override fun run() {
         super.run()
 
