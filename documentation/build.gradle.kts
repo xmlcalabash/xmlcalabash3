@@ -91,7 +91,7 @@ dependencies {
 
   documentation(project(":app", "runtimeElements"))
   documentation(project(":xmlcalabash", "runtimeElements"))
-  documentation(project(":ixml-coffeepress", "runtimeElements"))
+
   documentation(project(":send-mail", "runtimeElements"))
   documentation(project(":paged-media:antenna-house", "runtimeElements"))
   documentation(project(":paged-media:prince", "runtimeElements"))
@@ -362,7 +362,7 @@ val userguide = tasks.register<SaxonXsltTask>("userguide") {
   args(listOf("-init:org.docbook.xsltng.extensions.Register"))
   parameters (
       mapOf(
-          "mediaobject-input-base-uri" to "file:${layout.buildDirectory.get()}/xml/",
+          "mediaobject-input-base-uri" to "file:${layout.buildDirectory.get()}/userguide/",
           "chunk-output-base-uri" to "${layout.buildDirectory.get()}/userguide/",
           "dep_brotliDec" to project.findProperty("brotliDec").toString(),
           "dep_commonsCodec" to project.findProperty("commonsCodec").toString(),

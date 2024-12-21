@@ -14,10 +14,13 @@ class AtomicOptionStep(config: XProcStepConfiguration, atomic: AtomicBuiltinStep
         // nop
     }
 
-    override fun run() {
+    override fun prepare() {
         for ((name, value) in atomicOptionValues) {
             implementation.option(name, value)
         }
+    }
+
+    override fun run() {
         super.run()
     }
 

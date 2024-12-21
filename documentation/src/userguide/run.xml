@@ -62,6 +62,7 @@ given, the <command>run</command> command is assumed.</para>
   <sbr/>
   <arg rep="norepeat" linkend="cli-schema-aware">--schema-aware</arg>
   <arg rep="norepeat" linkend="cli-debug">--debug</arg>
+  <arg rep="norepeat" linkend="cli-debug">--debugger</arg>
   <arg rep="norepeat" linkend="cli-help">--help</arg>
   <sbr/>
   <arg choice="plain" linkend="cli-pipeline"><replaceable>pipeline.xpl</replaceable></arg>
@@ -283,6 +284,14 @@ framework’s “log level” is set to the verbosity.</para>
 output. XML Calabash uses <link xlink:href="https://www.slf4j.org/">SLF4J</link>
 and <link xlink:href="https://logback.qos.ch/">Logback</link> for logging.
 You can configure it in the usual ways.</para>
+</listitem>
+</varlistentry>
+
+<varlistentry xml:id="cli-debugger">
+  <term><option>--debugger</option></term>
+<listitem>
+<para>Start an interactive debugging session on the pipeline.
+See <xref linkend="debugging"/>.</para>
 </listitem>
 </varlistentry>
 

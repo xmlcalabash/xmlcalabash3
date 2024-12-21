@@ -27,6 +27,7 @@
 -->
 <xi:include href="install.xml"/>
 <xi:include href="run.xml"/>
+<xi:include href="debugger.xml"/>
 
 <xi:include href="config.xml"/>
 <xi:include href="tracing.xml"/>

@@ -80,6 +80,14 @@ dependencies {
   implementation("org.apache.logging.log4j:log4j-to-slf4j:2.23.1")
 
   implementation("org.apache.httpcomponents.client5:httpclient5:${dep_httpClient}")
+
+  implementation("org.nineml:coffeegrinder:3.2.7")
+  implementation("org.nineml:coffeefilter:3.2.7")
+
+  implementation("org.jline:jline-terminal:3.28.0")
+  implementation("org.jline:jline-terminal-jni:3.28.0")
+  implementation("org.jline:jline-reader:3.28.0")
+
   implementation(files("lib/"))
 }
 

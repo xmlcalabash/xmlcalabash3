@@ -7,7 +7,7 @@ rootProject.name = "xmlcalabash"
 
 include("xmlcalabash", "app", "test-driver",
         "documentation",
-        "ixml-coffeepress", "send-mail",
+        "send-mail",
         "paged-media:weasyprint", "paged-media:prince",
         "paged-media:antenna-house", "paged-media:fop",
         "ext:unique-id", "ext:metadata-extractor", "ext:cache",

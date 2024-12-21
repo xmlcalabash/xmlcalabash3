@@ -79,7 +79,8 @@ open class AtomicStep(config: XProcStepConfiguration, atomic: AtomicBuiltinStepM
         val targetPort = rpair.second
 
         stepConfig.environment.traceListener.sendDocument(Pair(id,port), Pair(targetStep.id, targetPort), document)
-        targetStep.input(targetPort, document)
+        val outdoc = stepConfig.environment.debugger.sendDocument(Pair(id,port), Pair(targetStep.id, targetPort), document)
+        targetStep.input(targetPort, outdoc)
     }
 
     override fun close(port: String) {
@@ -90,7 +91,7 @@ open class AtomicStep(config: XProcStepConfiguration, atomic: AtomicBuiltinStepM
         // nop
     }
 
-    override fun run() {
+    override fun prepare() {
         for ((name, details) in staticOptions) {
             if ((type.namespaceUri == NsP.namespace && name == Ns.message)
                 || (type.namespaceUri != NsP.namespace && name == NsP.message)) {
@@ -98,11 +99,6 @@ open class AtomicStep(config: XProcStepConfiguration, atomic: AtomicBuiltinStepM
             } else {
                 implementation.option(name, LazyValue(details.stepConfig, details.staticValue, stepConfig))
             }
-        }
-
-        if (message != null) {
-            println(message)
-            message = null
         }
 
         if (inputErrors.isNotEmpty()) {
@@ -129,6 +125,13 @@ open class AtomicStep(config: XProcStepConfiguration, atomic: AtomicBuiltinStepM
                     throw stepConfig.exception(XProcError.xdInputSequenceForbidden(portName))
                 }
             }
+        }
+    }
+
+    override fun run() {
+        if (message != null) {
+            println(message)
+            message = null
         }
 
         val stepConfig = (implementation as AbstractAtomicStep).stepConfig

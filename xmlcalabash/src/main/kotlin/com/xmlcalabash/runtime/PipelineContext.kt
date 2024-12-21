@@ -5,6 +5,8 @@ import com.xmlcalabash.api.XProcStep
 import com.xmlcalabash.config.XmlCalabash
 import com.xmlcalabash.datamodel.PipelineCompilerContext
 import com.xmlcalabash.datamodel.PipelineEnvironment
+import com.xmlcalabash.debugger.CliDebugger
+import com.xmlcalabash.debugger.Debugger
 import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.exceptions.ErrorExplanation
 import com.xmlcalabash.io.DocumentManager
@@ -38,6 +40,7 @@ class PipelineContext(compilerContext: PipelineCompilerContext): PipelineEnviron
     override val xpathVersion = "3.1"
     override var uniqueInlineUris = compilerContext.uniqueInlineUris
 
+    internal var _debugger: Debugger = compilerContext.debugger
     private var _traceListener = if (xmlCalabash.xmlCalabashConfig.trace != null
         || xmlCalabash.xmlCalabashConfig.traceDocuments != null) {
         if (xmlCalabash.xmlCalabashConfig.traceDocuments != null) {
@@ -58,6 +61,8 @@ class PipelineContext(compilerContext: PipelineCompilerContext): PipelineEnviron
         _proxies.putAll(compilerContext.proxies)
     }
 
+    override val debugger: Debugger
+        get() = _debugger
     override val traceListener: TraceListener
         get() = _traceListener
     override val documentManager: DocumentManager

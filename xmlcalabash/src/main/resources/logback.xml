@@ -50,7 +50,7 @@
   </appender>
 -->
 
-  <root level="info" additivity="false">
+  <root level="debug" additivity="false">
     <appender-ref ref="STDERR"/>
     <!-- Don't log to an output file by default
     <appender-ref ref="FILE"/>

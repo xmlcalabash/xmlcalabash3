@@ -1,17 +1,13 @@
-package com.xmlcalabash.ext.coffeepress
+package com.xmlcalabash.steps
 
 import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.namespace.Ns
 import com.xmlcalabash.namespace.NsP
-import com.xmlcalabash.steps.AbstractAtomicStep
-import net.sf.saxon.s9api.QName
-import net.sf.saxon.s9api.XdmValue
 import org.apache.logging.log4j.kotlin.logger
 import org.nineml.coffeefilter.InvisibleXml
-import java.lang.IllegalArgumentException
 
-class CoffeePress(): AbstractAtomicStep() {
+class InvisibleXmlStep(): AbstractAtomicStep() {
     override fun run() {
         super.run()
 
@@ -28,7 +24,7 @@ class CoffeePress(): AbstractAtomicStep() {
         val invisibleXml = InvisibleXml()
         val parser = if (grammar.isNotEmpty()) {
             if (grammar.size != 1) {
-                throw stepConfig.exception(XProcError.xcAtMostOneGrammar())
+                throw stepConfig.exception(XProcError.Companion.xcAtMostOneGrammar())
             }
             val theGrammar = grammar.first()
             if (theGrammar.contentType != null && theGrammar.contentType!!.textContentType()) {
@@ -42,7 +38,7 @@ class CoffeePress(): AbstractAtomicStep() {
 
         if (source.contentType != null && source.contentType!!.textContentType()) {
             if (!parser.constructed()) {
-                throw stepConfig.exception(XProcError.xcInvalidIxmlGrammar())
+                throw stepConfig.exception(XProcError.Companion.xcInvalidIxmlGrammar())
             }
 
             val doc = parser.parse(source.value.underlyingValue.stringValue)
@@ -54,7 +50,7 @@ class CoffeePress(): AbstractAtomicStep() {
             val bch = builder.newBuildingContentHandler()
             doc.getTree(bch)
             val tree = bch.documentNode
-            receiver.output("result", XProcDocument.ofXml(tree, stepConfig))
+            receiver.output("result", XProcDocument.Companion.ofXml(tree, stepConfig))
         } else {
             throw IllegalArgumentException("Only text source documents are supported")
         }

@@ -13,11 +13,9 @@ import com.xmlcalabash.runtime.model.StepModel
 import com.xmlcalabash.runtime.parameters.DocumentStepParameters
 import com.xmlcalabash.runtime.parameters.InlineStepParameters
 import com.xmlcalabash.runtime.parameters.RuntimeStepParameters
-import com.xmlcalabash.steps.AbstractAtomicStep
 import com.xmlcalabash.steps.internal.DocumentStep
 import com.xmlcalabash.steps.internal.InlineStep
 import com.xmlcalabash.util.BufferingReceiver
-import com.xmlcalabash.util.Verbosity
 import net.sf.saxon.s9api.QName
 import org.apache.logging.log4j.kotlin.logger
 
@@ -38,6 +36,7 @@ abstract class AbstractStep(val stepConfig: XProcStepConfiguration, step: StepMo
     abstract val readyToRun: Boolean
     abstract fun output(port: String, document: XProcDocument)
     abstract fun instantiate()
+    abstract fun prepare()
     abstract fun run()
 
     internal fun checkInputPort(port: String, doc: XProcDocument, flange: RuntimePort?): XProcError? {
@@ -112,11 +111,15 @@ abstract class AbstractStep(val stepConfig: XProcStepConfiguration, step: StepMo
 
         val startTime = System.nanoTime()
         try {
+            prepare()
+            stepConfig.environment.debugger.startStep(this)
             stepConfig.environment.traceListener.startExecution(this)
             run()
             stepConfig.environment.traceListener.stopExecution(this, System.nanoTime() - startTime)
+            stepConfig.environment.debugger.endStep(this)
         } catch (ex: Exception) {
             stepConfig.environment.traceListener.stopExecution(this, System.nanoTime() - startTime)
+            stepConfig.environment.debugger.endStep(this)
             when (ex) {
                 is XProcException -> {
                     ex.error.at(type, name).at(location)

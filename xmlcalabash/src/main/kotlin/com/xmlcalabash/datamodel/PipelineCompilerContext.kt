@@ -3,6 +3,9 @@ package com.xmlcalabash.datamodel
 import com.xmlcalabash.XmlCalabashBuildConfig
 import com.xmlcalabash.config.CommonEnvironment
 import com.xmlcalabash.config.XmlCalabash
+import com.xmlcalabash.debugger.CliDebugger
+import com.xmlcalabash.debugger.Debugger
+import com.xmlcalabash.debugger.NopDebugger
 import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.exceptions.ErrorExplanation
 import com.xmlcalabash.io.DocumentManager
@@ -53,6 +56,7 @@ class PipelineCompilerContext(override val xmlCalabash: XmlCalabash): PipelineEn
         _proxies.putAll(commonEnvironment.proxies)
     }
 
+    override val debugger: Debugger = NopDebugger() // The debugger is never used at compile time...
     override val traceListener: TraceListener
         get() = _traceListener
     override val documentManager: DocumentManager

@@ -46,8 +46,8 @@ class CompoundStepFoot(config: XProcStepConfiguration, step: FootModel): Abstrac
         val targetPort = rpair.second
 
         stepConfig.environment.traceListener.sendDocument(Pair(id,port), Pair(targetStep.id, targetPort), doc)
-
-        targetStep.input(targetPort, doc)
+        val outdoc = stepConfig.environment.debugger.sendDocument(Pair(id,port), Pair(targetStep.id, targetPort), doc)
+        targetStep.input(targetPort, outdoc)
     }
 
     override fun close(port: String) {
@@ -55,6 +55,10 @@ class CompoundStepFoot(config: XProcStepConfiguration, step: FootModel): Abstrac
     }
 
     override fun instantiate() {
+        // nop
+    }
+
+    override fun prepare() {
         // nop
     }
 
