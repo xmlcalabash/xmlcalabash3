@@ -45,16 +45,10 @@ open class XsltStep(): AbstractAtomicStep() {
     private var primaryDestination: Destination? = null
     private var primaryOutputProperties = mutableMapOf<QName, XdmValue>()
 
-    override fun input(port: String, doc: XProcDocument) {
-        if (port == "source") {
-            sources.add(doc)
-        } else {
-            stylesheet = doc
-        }
-    }
-
     override fun run() {
         super.run()
+        sources.addAll(queues["source"]!!)
+        stylesheet = queues["stylesheet"]!!.first()
 
         parameters.putAll(qnameMapBinding(Ns.parameters))
         staticParameters.putAll(qnameMapBinding(Ns.staticParameters))
@@ -81,6 +75,12 @@ open class XsltStep(): AbstractAtomicStep() {
             "1.0" -> xslt10()
             else -> throw stepConfig.exception(XProcError.xcVersionNotAvailable(version ?: "null"))
         }
+    }
+
+    override fun reset() {
+        super.reset()
+        sources.clear()
+        stylesheet = XProcDocument.ofEmpty(stepConfig)
     }
 
     private fun xslt30() {

@@ -14,20 +14,13 @@ import net.sf.saxon.s9api.XdmNode
 import org.xml.sax.InputSource
 
 open class ValidateWithNVDL(): AbstractAtomicStep() {
-    lateinit var document: XProcDocument
-    lateinit var nvdl: XProcDocument
-    val schemas = mutableListOf<XProcDocument>()
-
-    override fun input(port: String, doc: XProcDocument) {
-        when (port) {
-            "source" -> document = doc
-            "nvdl" -> nvdl = doc
-            else -> schemas.add(doc)
-        }
-    }
-
     override fun run() {
         super.run()
+
+        val document = queues["source"]!!.first()
+        val nvdl = queues["nvdl"]!!.first()
+        val schemas = queues["schemas"]!!
+
 
         val localDocumentManager = DocumentManager(stepConfig.environment.documentManager)
 
@@ -56,17 +49,17 @@ open class ValidateWithNVDL(): AbstractAtomicStep() {
 
         val driver = ValidationDriver(properties.toPropertyMap())
 
-        val nvdl: InputSource = S9Api.xdmToInputSource(stepConfig, nvdldoc)
-        val doc: InputSource = S9Api.xdmToInputSource(stepConfig, srcdoc)
+        val nvdlSource: InputSource = S9Api.xdmToInputSource(stepConfig, nvdldoc)
+        val docSource: InputSource = S9Api.xdmToInputSource(stepConfig, srcdoc)
 
         try {
-            driver.loadSchema(nvdl)
+            driver.loadSchema(nvdlSource)
         } catch (ex: Exception) {
             throw stepConfig.exception(XProcError.xcNotNvdl(ex.message ?: ""), ex)
         }
 
         try {
-            if (!driver.validate(doc)) {
+            if (!driver.validate(docSource)) {
                 if (assertValid) {
                     throw stepConfig.exception(XProcError.xcNotSchemaValidNVDL())
                 }
@@ -79,5 +72,5 @@ open class ValidateWithNVDL(): AbstractAtomicStep() {
         receiver.output("report", XProcDocument.ofXml(report.endErrors(), stepConfig))
     }
 
-    override fun toString(): String = "p:identity"
+    override fun toString(): String = "p:validate-with-nvdl"
 }

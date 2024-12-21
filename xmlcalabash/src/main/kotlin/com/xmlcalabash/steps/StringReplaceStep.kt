@@ -1,8 +1,6 @@
 package com.xmlcalabash.steps
 
-import com.xmlcalabash.datamodel.XProcExpression
 import com.xmlcalabash.documents.DocumentProperties
-import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.namespace.Ns
 import com.xmlcalabash.runtime.ExpressionEvaluator
 import com.xmlcalabash.runtime.ProcessMatch
@@ -13,8 +11,6 @@ import net.sf.saxon.s9api.QName
 import net.sf.saxon.s9api.XdmNode
 
 open class StringReplaceStep(): AbstractAtomicStep(), ProcessMatchingNodes {
-    lateinit var document: XProcDocument
-
     var matchPattern = "/*"
     var replace: String = ""
 
@@ -22,13 +18,10 @@ open class StringReplaceStep(): AbstractAtomicStep(), ProcessMatchingNodes {
     val matcher: ProcessMatch
         get() = _matcher ?: throw RuntimeException("Configuration error...")
 
-    override fun input(port: String, doc: XProcDocument) {
-        document = doc
-    }
-
     override fun run() {
         super.run()
 
+        val document = queues["source"]!!.first()
         matchPattern = stringBinding(Ns.match)!!
         replace = stringBinding(Ns.replace)!!
 

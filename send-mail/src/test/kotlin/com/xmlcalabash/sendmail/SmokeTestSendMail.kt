@@ -13,7 +13,7 @@ import java.net.URL
 // These tests require the Sendria server to be standing up.
 // They also require single-threaded execution.
 
-class SmokeTest {
+class SmokeTestSendMail {
     companion object {
         private val url = URL("http://localhost:1080/api/messages/")
     }

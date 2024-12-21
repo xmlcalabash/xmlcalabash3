@@ -22,12 +22,9 @@ class AddAttributeStep(): AbstractAtomicStep(), ProcessMatchingNodes {
     val matcher: ProcessMatch
         get() = _matcher ?: throw RuntimeException("Configuration error...")
 
-    override fun input(port: String, doc: XProcDocument) {
-        document = doc
-    }
-
     override fun run() {
         super.run()
+        document = queues["source"]!!.first()
 
         attName = qnameBinding(Ns.attributeName)!!
         forbidNamespaceAttribute(attName)

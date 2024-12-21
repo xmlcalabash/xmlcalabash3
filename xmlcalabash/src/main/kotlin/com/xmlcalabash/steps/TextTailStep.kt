@@ -8,8 +8,9 @@ open class TextTailStep(): AbstractTextStep() {
     override fun run() {
         super.run()
 
+        val source = queues["source"]!!.first()
         val count = integerBinding(Ns.count)!!
-        val lines = textLines()
+        val lines = textLines(source)
         val sb = StringBuilder()
 
         if (count == 0) {

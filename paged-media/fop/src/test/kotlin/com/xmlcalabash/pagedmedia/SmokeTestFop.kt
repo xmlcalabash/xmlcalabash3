@@ -1,4 +1,4 @@
-package com.xmlcalabash.pagemedia
+package com.xmlcalabash.pagedmedia
 
 import com.xmlcalabash.config.XmlCalabash
 import com.xmlcalabash.datamodel.MediaType
@@ -9,19 +9,17 @@ import com.xmlcalabash.util.BufferingReceiver
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.fail
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable
 import java.io.File
 import java.io.FileOutputStream
 import java.net.URI
 
-class WeasySmokeTest {
+class SmokeTestFop {
     companion object {
         const val WRITE_OUTPUT = false
     }
 
     @Test
-    @EnabledIfEnvironmentVariable(named = "XMLCALABASH_TEST_WEASY", matches = "true")
-    fun testGenericCssFormatter() {
+    fun testGenericXslFormatter() {
         val managers = mutableListOf<PagedMediaManager>()
         for (provider in PagedMediaServiceProvider.providers()) {
             managers.add(provider.create())
@@ -29,21 +27,20 @@ class WeasySmokeTest {
         Assertions.assertTrue(managers.isNotEmpty())
         var xslManager: PagedMediaManager? = null
         for (manager in managers) {
-            if (manager.formatterAvailable(URI("https://xmlcalabash.com/paged-media/css-formatter"))) {
+            if (manager.formatterAvailable(URI("https://xmlcalabash.com/paged-media/xsl-formatter"))) {
                 xslManager = manager
                 break
             }
         }
 
         Assertions.assertNotNull(xslManager)
-        Assertions.assertTrue(xslManager!!.formatterAvailable(URI("https://xmlcalabash.com/paged-media/css-formatter/weasyprint")))
-        Assertions.assertTrue(xslManager.formatterAvailable(URI("https://xmlcalabash.com/paged-media/css-formatter")))
-        Assertions.assertFalse(xslManager.formatterAvailable(URI("https://xmlcalabash.com/paged-media/xsl-formatter")))
+        Assertions.assertTrue(xslManager!!.formatterAvailable(URI("https://xmlcalabash.com/paged-media/xsl-formatter/fop")))
+        Assertions.assertTrue(xslManager.formatterAvailable(URI("https://xmlcalabash.com/paged-media/xsl-formatter")))
+        Assertions.assertFalse(xslManager.formatterAvailable(URI("https://xmlcalabash.com/paged-media/css-formatter")))
     }
 
     @Test
-    @EnabledIfEnvironmentVariable(named = "XMLCALABASH_TEST_WEASY", matches = "true")
-    fun testWeasyprintCssFormatter() {
+    fun testFopXslFormatter() {
         val managers = mutableListOf<PagedMediaManager>()
         for (provider in PagedMediaServiceProvider.providers()) {
             managers.add(provider.create())
@@ -51,20 +48,19 @@ class WeasySmokeTest {
         Assertions.assertTrue(managers.isNotEmpty())
         var xslManager: PagedMediaManager? = null
         for (manager in managers) {
-            if (manager.formatterAvailable(URI("https://xmlcalabash.com/paged-media/css-formatter/weasyprint"))) {
+            if (manager.formatterAvailable(URI("https://xmlcalabash.com/paged-media/xsl-formatter/fop"))) {
                 xslManager = manager
                 break
             }
         }
 
         Assertions.assertNotNull(xslManager)
-        Assertions.assertTrue(xslManager!!.formatterAvailable(URI("https://xmlcalabash.com/paged-media/css-formatter/weasyprint")))
-        Assertions.assertTrue(xslManager.formatterAvailable(URI("https://xmlcalabash.com/paged-media/css-formatter")))
-        Assertions.assertFalse(xslManager.formatterAvailable(URI("https://xmlcalabash.com/paged-media/xsl-formatter")))
+        Assertions.assertTrue(xslManager!!.formatterAvailable(URI("https://xmlcalabash.com/paged-media/xsl-formatter/fop")))
+        Assertions.assertTrue(xslManager.formatterAvailable(URI("https://xmlcalabash.com/paged-media/xsl-formatter")))
+        Assertions.assertFalse(xslManager.formatterAvailable(URI("https://xmlcalabash.com/paged-media/css-formatter")))
     }
 
     @Test
-    @EnabledIfEnvironmentVariable(named = "XMLCALABASH_TEST_WEASY", matches = "true")
     fun testFormatter() {
         val calabash = XmlCalabash.newInstance()
         val parser = calabash.newXProcParser()
@@ -77,7 +73,6 @@ class WeasySmokeTest {
         try {
             exec.run()
         } catch (ex: Exception) {
-            ex.printStackTrace()
             fail()
         }
 
@@ -85,7 +80,7 @@ class WeasySmokeTest {
         Assertions.assertEquals(MediaType.PDF, result.contentType)
 
         if (WRITE_OUTPUT) {
-            val out = FileOutputStream(File("/tmp/out.pdf"))
+            val out = FileOutputStream(File("/tmp/envelope.pdf"))
             out.write((result as XProcBinaryDocument).binaryValue)
             out.close()
         }

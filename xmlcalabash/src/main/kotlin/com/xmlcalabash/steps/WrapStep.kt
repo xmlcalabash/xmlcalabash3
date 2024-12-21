@@ -15,7 +15,6 @@ import net.sf.saxon.s9api.XdmNodeKind
 import java.util.*
 
 class WrapStep(): AbstractAtomicStep(), ProcessMatchingNodes {
-    var document: XProcDocument? = null
     var pattern = ""
     var _matcher: ProcessMatch? = null
     val matcher: ProcessMatch
@@ -25,13 +24,10 @@ class WrapStep(): AbstractAtomicStep(), ProcessMatchingNodes {
     private var groupAdjacent: String? = null
     private var groupAdjacentContext: DocumentContext? = null
 
-    override fun input(port: String, doc: XProcDocument) {
-        document = doc
-    }
-
     override fun run() {
         super.run()
 
+        val document = queues["source"]!!.first()
         wrapper = qnameBinding(Ns.wrapper)!!
         pattern = stringBinding(Ns.match)!!
         groupAdjacent = stringBinding(Ns.groupAdjacent)
@@ -42,13 +38,12 @@ class WrapStep(): AbstractAtomicStep(), ProcessMatchingNodes {
         inGroup.push(false)
 
         _matcher = ProcessMatch(stepConfig, this, valueBinding(Ns.match).context.inscopeNamespaces)
-        matcher.process(document!!.value as XdmNode, pattern)
-        receiver.output("result", XProcDocument.ofXml(matcher.result, stepConfig, document!!.properties))
+        matcher.process(document.value as XdmNode, pattern)
+        receiver.output("result", XProcDocument.ofXml(matcher.result, stepConfig, document.properties))
     }
 
     override fun reset() {
         super.reset()
-        document = null
     }
 
     override fun startDocument(node: XdmNode): Boolean {

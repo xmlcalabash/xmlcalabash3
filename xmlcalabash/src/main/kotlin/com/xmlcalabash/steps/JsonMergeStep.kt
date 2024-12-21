@@ -8,18 +8,14 @@ import com.xmlcalabash.runtime.parameters.StepParameters
 import net.sf.saxon.s9api.*
 
 open class JsonMergeStep(): AbstractAtomicStep() {
-    val inputs = mutableListOf<XProcDocument>()
     var duplicates = "use-first"
     var key = ""
     var index = 0
 
-    override fun input(port: String, doc: XProcDocument) {
-        inputs.add(doc)
-    }
-
     override fun run() {
         super.run()
 
+        val inputs = queues["source"]!!
         duplicates = stringBinding(Ns.duplicates) ?: "use-first"
         key = stringBinding(Ns.key) ?: "concat(\"_\",\$p:index)"
 

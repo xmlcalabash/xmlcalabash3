@@ -1,47 +1,35 @@
 package com.xmlcalabash.steps
 
-import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.namespace.Ns
 import com.xmlcalabash.namespace.NsCx
 import com.xmlcalabash.runtime.ProcessMatch
 import com.xmlcalabash.runtime.ProcessMatchingNodes
-import com.xmlcalabash.runtime.parameters.StepParameters
 import net.sf.saxon.om.AttributeInfo
 import net.sf.saxon.om.AttributeMap
 import net.sf.saxon.om.FingerprintedQName
 import net.sf.saxon.om.NamespaceUri
-import net.sf.saxon.s9api.QName
 import net.sf.saxon.s9api.XdmNode
 
 class RenameStep(): AbstractAtomicStep(), ProcessMatchingNodes {
-    companion object {
-        private val MATCH = QName("match")
-    }
-
-    var document: XProcDocument? = null
-
     var matchPattern = "/*"
     var newName = NsCx.unusedValue
     var _matcher: ProcessMatch? = null
     val matcher: ProcessMatch
         get() = _matcher ?: throw RuntimeException("Configuration error...")
 
-    override fun input(port: String, doc: XProcDocument) {
-        document = doc
-    }
-
     override fun run() {
         super.run()
 
+        val document = queues["source"]!!.first()
         matchPattern = stringBinding(Ns.match)!!
         newName = qnameBinding(Ns.newName)!!
 
         _matcher = ProcessMatch(stepConfig, this, valueBinding(Ns.match).context.inscopeNamespaces)
-        matcher.process(document!!.value as XdmNode, matchPattern)
+        matcher.process(document.value as XdmNode, matchPattern)
 
         val doc = matcher.result
-        val result = document!!.with(doc)
+        val result = document.with(doc)
 
         receiver.output("result", result)
     }

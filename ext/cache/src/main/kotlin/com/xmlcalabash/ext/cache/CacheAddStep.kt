@@ -12,14 +12,11 @@ class CacheAddStep(): AbstractAtomicStep() {
     companion object {
         val failIfInCache = QName(NamespaceUri.NULL, "fail-if-in-cache")
     }
-    private lateinit var document: XProcDocument
-
-    override fun input(port: String, doc: XProcDocument) {
-        document = doc
-    }
 
     override fun run() {
         super.run()
+
+        val document = queues["source"]!!.first()
 
         val failIfCached = booleanBinding(failIfInCache)!!
         val href = uriBinding(Ns.href)

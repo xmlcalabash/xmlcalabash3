@@ -1,16 +1,13 @@
 package com.xmlcalabash.steps
 
-import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.exceptions.XProcException
 import com.xmlcalabash.namespace.Ns
 import com.xmlcalabash.namespace.NsCx
 import com.xmlcalabash.runtime.ProcessMatch
 import com.xmlcalabash.runtime.ProcessMatchingNodes
-import com.xmlcalabash.runtime.parameters.StepParameters
 import com.xmlcalabash.util.HashUtils
 import net.sf.saxon.om.AttributeMap
-import net.sf.saxon.om.EmptyAttributeMap
 import net.sf.saxon.s9api.QName
 import net.sf.saxon.s9api.XdmNode
 import net.sf.saxon.s9api.XdmValue
@@ -18,13 +15,10 @@ import net.sf.saxon.s9api.XdmValue
 open class HashStep(): AbstractAtomicStep(), ProcessMatchingNodes {
     companion object {
         private val _key = QName("key")
-        private val _context = QName("context")
         private val _sharedSecret = QName("shared-secret")
         private val _senderId = QName("sender-id")
         private val _recipientId = QName("recipient-id")
     }
-
-    lateinit var document: XProcDocument
 
     var value: ByteArray = byteArrayOf()
     var algorithm = NsCx.unusedValue
@@ -37,13 +31,10 @@ open class HashStep(): AbstractAtomicStep(), ProcessMatchingNodes {
     val matcher: ProcessMatch
         get() = _matcher ?: throw RuntimeException("Configuration error...")
 
-    override fun input(port: String, doc: XProcDocument) {
-        document = doc
-    }
-
     override fun run() {
         super.run()
 
+        val document = queues["source"]!!.first()
         matchPattern = stringBinding(Ns.match)!!
         value = stringBinding(Ns.value)!!.toByteArray()
         algorithm = qnameBinding(Ns.algorithm)!!

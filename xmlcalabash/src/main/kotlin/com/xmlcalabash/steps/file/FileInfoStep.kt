@@ -9,10 +9,6 @@ import java.io.File
 import java.nio.file.Files
 
 class FileInfoStep(): FileStep(NsP.fileInfo) {
-    override fun input(port: String, doc: XProcDocument) {
-        // never called
-    }
-
     override fun run() {
         super.run()
 
@@ -26,7 +22,7 @@ class FileInfoStep(): FileStep(NsP.fileInfo) {
             throw stepConfig.exception(XProcError.xcUnsupportedFileInfoScheme(href.scheme))
         }
 
-        failOnError = booleanBinding(Ns.failOnError) ?: true
+        failOnError = booleanBinding(Ns.failOnError) != false
 
         val file = File(href.path)
         if (!file.exists()) {

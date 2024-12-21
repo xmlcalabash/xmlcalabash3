@@ -33,16 +33,10 @@ open class XQueryStep(): AbstractAtomicStep() {
     private var primaryDestination: Destination? = null
     private var outputProperties = mutableMapOf<QName, XdmValue>()
 
-    override fun input(port: String, doc: XProcDocument) {
-        if (port == "source") {
-            sources.add(doc)
-        } else {
-            query = doc
-        }
-    }
-
     override fun run() {
         super.run()
+        sources.addAll(queues["source"]!!)
+        query = queues["query"]!!.first()
 
         parameters.putAll(qnameMapBinding(Ns.parameters))
         version = stringBinding(Ns.version) ?: "3.1"
@@ -52,6 +46,12 @@ open class XQueryStep(): AbstractAtomicStep() {
             "3.0" -> xquery30()
             else -> throw stepConfig.exception(XProcError.xcXQueryVersionNotAvailable(version))
         }
+    }
+
+    override fun reset() {
+        super.reset()
+        sources.clear()
+        query = XProcDocument.ofEmpty(stepConfig)
     }
 
     private fun xquery30() {

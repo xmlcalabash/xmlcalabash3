@@ -9,22 +9,14 @@ import com.xmlcalabash.util.SaxonTreeBuilder
 import net.sf.saxon.om.EmptyAttributeMap
 
 open class PackStep(): AbstractAtomicStep() {
-    private val source = mutableListOf<XProcDocument>()
-    private val alternate = mutableListOf<XProcDocument>()
-    private var wrapperName = NsCx.unusedValue
-
-    override fun input(port: String, doc: XProcDocument) {
-        if (port == "source") {
-            source.add(doc)
-        } else {
-            alternate.add(doc)
-        }
-    }
-
     override fun run() {
         super.run()
+        val source = mutableListOf<XProcDocument>()
+        source.addAll(queues["source"]!!)
+        val alternate = mutableListOf<XProcDocument>()
+        alternate.addAll(queues["alternate"]!!)
+        val wrapperName = qnameBinding(Ns.wrapper)!!
 
-        wrapperName = qnameBinding(Ns.wrapper)!!
         while (source.isNotEmpty() || alternate.isNotEmpty()) {
             val builder = SaxonTreeBuilder(stepConfig)
             builder.startDocument(null)

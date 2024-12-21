@@ -9,10 +9,11 @@ open class TextReplaceStep(): AbstractTextStep() {
     override fun run() {
         super.run()
 
+        val source = queues["source"]!!.first()
         val pattern = stringBinding(Ns.pattern)
         val replacement = stringBinding(Ns.replacement)
         val flags = stringBinding(Ns.flags) ?: ""
-        val text = text()
+        val text = text(source)
 
         val compiler = stepConfig.processor.newXPathCompiler()
         compiler.declareVariable(Ns.pattern)

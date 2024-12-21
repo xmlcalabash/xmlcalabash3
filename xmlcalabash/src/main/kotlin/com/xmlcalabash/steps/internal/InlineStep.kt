@@ -15,20 +15,15 @@ import java.nio.charset.StandardCharsets
 import java.util.*
 
 open class InlineStep(val params: InlineStepParameters): AbstractAtomicStep() {
-    var contextItem: XProcDocument? = null
-    private var contextSequence = false
-
-    override fun input(port: String, doc: XProcDocument) {
-        contextSequence = contextItem != null
-        contextItem = doc
-    }
-
     override fun run() {
+        super.run()
+
+        val contextItem = queues["source"]!!.firstOrNull()
+        val contextSequence = queues["source"]!!.size > 1
+
         if (contextSequence && !params.filter.isStatic()) {
             throw stepConfig.exception(XProcError.xdInlineContextSequence().at(stepParams.location))
         }
-
-        super.run()
 
         val xml = if (params.filter.isStatic()) {
             params.filter.getNode()
@@ -149,8 +144,6 @@ open class InlineStep(val params: InlineStepParameters): AbstractAtomicStep() {
 
     override fun reset() {
         super.reset()
-        contextItem = null
-        contextSequence = false
     }
 
     private fun parseJson(bytes: ByteArray, contentType: MediaType?): XdmValue {

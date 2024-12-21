@@ -11,10 +11,6 @@ import java.nio.file.Files
 import java.nio.file.StandardCopyOption
 
 abstract class FileCopyOrMove(stepType: QName): FileStep(stepType) {
-    override fun input(port: String, doc: XProcDocument) {
-        // never called
-    }
-
     protected fun copyOrMove() {
         val href = try {
             uriBinding(Ns.href)!!

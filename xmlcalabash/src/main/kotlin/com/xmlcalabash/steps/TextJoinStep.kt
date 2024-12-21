@@ -9,15 +9,10 @@ import com.xmlcalabash.namespace.Ns
 import com.xmlcalabash.runtime.parameters.StepParameters
 
 open class TextJoinStep(): AbstractTextStep() {
-    val documents = mutableListOf<XProcDocument>()
-
-    override fun input(port: String, doc: XProcDocument) {
-        documents.add(doc)
-    }
-
     override fun run() {
         super.run()
 
+        val documents = queues["source"]!!
         val prefix = stringBinding(Ns.prefix)
         val suffix = stringBinding(Ns.suffix)
         val separator = stringBinding(Ns.separator)

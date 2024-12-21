@@ -39,21 +39,14 @@ open class ArchiveStep(): AbstractArchiveStep() {
     private var origArchiveFiles = mutableListOf<Path>()
     private var archiveFile: Path? = null
 
-    override fun input(port: String, doc: XProcDocument) {
-        when (port) {
-            "source" -> archiveMembers.add(doc)
-            "manifest" -> {
-                if (manifest != null) {
-                    throw stepConfig.exception(XProcError.xcMultipleManifests())
-                }
-                manifest = doc
-            }
-            "archive" -> archives.add(doc)
-        }
-    }
-
     override fun run() {
         super.run()
+        archiveMembers.addAll(queues["source"]!!)
+        archives.addAll(queues["archive"]!!)
+        if (queues["manifest"]!!.size > 1) {
+            throw stepConfig.exception(XProcError.xcMultipleManifests())
+        }
+        manifest = queues["manifest"]!!.firstOrNull()
 
         val format = qnameBinding(Ns.format) ?: Ns.zip
         val relativeTo = relativeTo()

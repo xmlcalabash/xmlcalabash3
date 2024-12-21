@@ -11,24 +11,7 @@ import net.sf.saxon.s9api.*
 import java.net.URISyntaxException
 
 open class DocumentStep(val params: DocumentStepParameters): AbstractAtomicStep() {
-    private var suppress = false
-
-    override fun input(port: String, doc: XProcDocument) {
-        // nop
-    }
-
-    internal fun suppress() {
-        suppress = true
-    }
-
     override fun run() {
-        if (suppress) {
-            // No one cares what this produces; but produce something so that
-            // we don't run afoul of the sequence property of the output
-            receiver.output("result", XProcDocument.ofEmpty(stepConfig))
-            return
-        }
-
         super.run()
 
         val props = DocumentProperties()
@@ -76,7 +59,6 @@ open class DocumentStep(val params: DocumentStepParameters): AbstractAtomicStep(
 
     override fun reset() {
         super.reset()
-        suppress = false
     }
 
     override fun toString(): String = "cx:document"

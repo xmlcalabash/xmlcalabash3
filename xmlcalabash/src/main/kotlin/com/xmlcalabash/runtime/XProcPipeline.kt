@@ -108,6 +108,7 @@ class XProcPipeline internal constructor(pipeline: CompoundStepModel, val config
         override fun input(port: String, doc: XProcDocument) {
             receiver.output(port, doc)
         }
+
         override fun close(port: String) {
             // nop
         }

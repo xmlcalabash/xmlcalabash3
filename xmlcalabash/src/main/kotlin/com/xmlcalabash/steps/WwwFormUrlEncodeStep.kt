@@ -1,21 +1,13 @@
 package com.xmlcalabash.steps
 
-import com.xmlcalabash.documents.DocumentProperties
 import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.namespace.Ns
-import com.xmlcalabash.namespace.NsCx
-import net.sf.saxon.s9api.XdmAtomicValue
 import net.sf.saxon.s9api.XdmEmptySequence
 import net.sf.saxon.s9api.XdmMap
 import net.sf.saxon.s9api.XdmValue
-import java.net.URLDecoder
 import java.nio.charset.StandardCharsets
 
 open class WwwFormUrlEncodeStep(): AbstractAtomicStep() {
-    override fun input(port: String, doc: XProcDocument) {
-        // nop, no inputs
-    }
-
     override fun run() {
         super.run()
 

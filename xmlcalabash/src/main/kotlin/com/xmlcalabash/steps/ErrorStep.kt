@@ -15,15 +15,10 @@ import net.sf.saxon.s9api.QName
 import net.sf.saxon.value.QNameValue
 
 class ErrorStep(): AbstractAtomicStep() {
-    private var document: XProcDocument? = null
-
-    override fun input(port: String, doc: XProcDocument) {
-        document = doc
-    }
-
     override fun run() {
         super.run()
 
+        val document = queues["source"]!!.firstOrNull()
         val value = options[Ns.code]!!.value.underlyingValue
         val code = when (value) {
             is QName -> value
@@ -70,12 +65,12 @@ class ErrorStep(): AbstractAtomicStep() {
         val builder = SaxonTreeBuilder(stepConfig)
         builder.startDocument(stepConfig.baseUri)
         if (document != null) {
-            builder.addSubtree(document!!.value)
+            builder.addSubtree(document.value)
         }
         builder.endDocument()
 
         val location = if (document != null) {
-            Location(document!!)
+            Location(document)
         } else {
             Location.NULL
         }

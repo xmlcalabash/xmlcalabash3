@@ -21,20 +21,13 @@ open class ValidateWithSchematron(): AbstractAtomicStep() {
         private val _phase = QName("phase")
     }
 
-    lateinit var document: XProcDocument
-    lateinit var schema: XProcDocument
     private var svrlToXvrl: Xslt30Transformer? = null
-
-    override fun input(port: String, doc: XProcDocument) {
-        if (port == "source") {
-            document = doc
-        } else {
-            schema = doc
-        }
-    }
 
     override fun run() {
         super.run()
+
+        val document = queues["source"]!!.first()
+        val schema = queues["schema"]!!.first()
 
         val parameters = qnameMapBinding(Ns.parameters)
         val assertValid = booleanBinding(Ns.assertValid) ?: true

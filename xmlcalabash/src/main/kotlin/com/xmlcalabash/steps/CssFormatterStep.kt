@@ -28,16 +28,10 @@ open class CssFormatterStep(): AbstractAtomicStep() {
         extensionAttributes.putAll(attributes)
     }
 
-    override fun input(port: String, doc: XProcDocument) {
-        if (port == "source") {
-            document = doc
-        } else {
-            stylesheets.add(doc)
-        }
-    }
-
     override fun run() {
         super.run()
+        document = queues["source"]!!.first()
+        stylesheets.addAll(queues["stylesheet"]!!)
 
         val contentType = mediaTypeBinding(Ns.contentType, MediaType.PDF)
         val parameters = qnameMapBinding(Ns.parameters)

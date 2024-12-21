@@ -79,7 +79,6 @@ open class AtomicStep(config: XProcStepConfiguration, atomic: AtomicBuiltinStepM
         val targetPort = rpair.second
 
         stepConfig.environment.traceListener.sendDocument(Pair(id,port), Pair(targetStep.id, targetPort), document)
-
         targetStep.input(targetPort, document)
     }
 

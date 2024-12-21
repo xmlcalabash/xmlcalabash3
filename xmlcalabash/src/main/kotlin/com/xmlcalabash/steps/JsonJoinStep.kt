@@ -3,22 +3,16 @@ package com.xmlcalabash.steps
 import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.namespace.Ns
-import com.xmlcalabash.util.S9Api
 import net.sf.saxon.s9api.XdmArray
 import net.sf.saxon.s9api.XdmAtomicValue
 import net.sf.saxon.s9api.XdmMap
 import net.sf.saxon.s9api.XdmNode
 
 open class JsonJoinStep(): AbstractAtomicStep() {
-    val inputs = mutableListOf<XProcDocument>()
-
-    override fun input(port: String, doc: XProcDocument) {
-        inputs.add(doc)
-    }
-
     override fun run() {
         super.run()
 
+        val inputs = queues["source"]!!
         val flatten = stringBinding(Ns.flattenToDepth)
         val depth = when (flatten) {
             null -> 0

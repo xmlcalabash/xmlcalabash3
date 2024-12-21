@@ -9,17 +9,19 @@ import com.xmlcalabash.util.BufferingReceiver
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.fail
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable
 import java.io.File
 import java.io.FileOutputStream
 import java.net.URI
 
-class FopSmokeTest {
+class SmokeTestPrince {
     companion object {
         const val WRITE_OUTPUT = false
     }
 
     @Test
-    fun testGenericXslFormatter() {
+    @EnabledIfEnvironmentVariable(named = "XMLCALABASH_TEST_PRINCE", matches = "true")
+    fun testGenericCssFormatter() {
         val managers = mutableListOf<PagedMediaManager>()
         for (provider in PagedMediaServiceProvider.providers()) {
             managers.add(provider.create())
@@ -27,20 +29,21 @@ class FopSmokeTest {
         Assertions.assertTrue(managers.isNotEmpty())
         var xslManager: PagedMediaManager? = null
         for (manager in managers) {
-            if (manager.formatterAvailable(URI("https://xmlcalabash.com/paged-media/xsl-formatter"))) {
+            if (manager.formatterAvailable(URI("https://xmlcalabash.com/paged-media/css-formatter"))) {
                 xslManager = manager
                 break
             }
         }
 
         Assertions.assertNotNull(xslManager)
-        Assertions.assertTrue(xslManager!!.formatterAvailable(URI("https://xmlcalabash.com/paged-media/xsl-formatter/fop")))
-        Assertions.assertTrue(xslManager.formatterAvailable(URI("https://xmlcalabash.com/paged-media/xsl-formatter")))
-        Assertions.assertFalse(xslManager.formatterAvailable(URI("https://xmlcalabash.com/paged-media/css-formatter")))
+        Assertions.assertTrue(xslManager!!.formatterAvailable(URI("https://xmlcalabash.com/paged-media/css-formatter/prince")))
+        Assertions.assertTrue(xslManager.formatterAvailable(URI("https://xmlcalabash.com/paged-media/css-formatter")))
+        Assertions.assertFalse(xslManager.formatterAvailable(URI("https://xmlcalabash.com/paged-media/xsl-formatter")))
     }
 
     @Test
-    fun testFopXslFormatter() {
+    @EnabledIfEnvironmentVariable(named = "XMLCALABASH_TEST_PRINCE", matches = "true")
+    fun testPrinceCssFormatter() {
         val managers = mutableListOf<PagedMediaManager>()
         for (provider in PagedMediaServiceProvider.providers()) {
             managers.add(provider.create())
@@ -48,19 +51,20 @@ class FopSmokeTest {
         Assertions.assertTrue(managers.isNotEmpty())
         var xslManager: PagedMediaManager? = null
         for (manager in managers) {
-            if (manager.formatterAvailable(URI("https://xmlcalabash.com/paged-media/xsl-formatter/fop"))) {
+            if (manager.formatterAvailable(URI("https://xmlcalabash.com/paged-media/css-formatter/prince"))) {
                 xslManager = manager
                 break
             }
         }
 
         Assertions.assertNotNull(xslManager)
-        Assertions.assertTrue(xslManager!!.formatterAvailable(URI("https://xmlcalabash.com/paged-media/xsl-formatter/fop")))
-        Assertions.assertTrue(xslManager.formatterAvailable(URI("https://xmlcalabash.com/paged-media/xsl-formatter")))
-        Assertions.assertFalse(xslManager.formatterAvailable(URI("https://xmlcalabash.com/paged-media/css-formatter")))
+        Assertions.assertTrue(xslManager!!.formatterAvailable(URI("https://xmlcalabash.com/paged-media/css-formatter/prince")))
+        Assertions.assertTrue(xslManager.formatterAvailable(URI("https://xmlcalabash.com/paged-media/css-formatter")))
+        Assertions.assertFalse(xslManager.formatterAvailable(URI("https://xmlcalabash.com/paged-media/xsl-formatter")))
     }
 
     @Test
+    @EnabledIfEnvironmentVariable(named = "XMLCALABASH_TEST_PRINCE", matches = "true")
     fun testFormatter() {
         val calabash = XmlCalabash.newInstance()
         val parser = calabash.newXProcParser()
@@ -80,7 +84,7 @@ class FopSmokeTest {
         Assertions.assertEquals(MediaType.PDF, result.contentType)
 
         if (WRITE_OUTPUT) {
-            val out = FileOutputStream(File("/tmp/envelope.pdf"))
+            val out = FileOutputStream(File("/tmp/out.pdf"))
             out.write((result as XProcBinaryDocument).binaryValue)
             out.close()
         }

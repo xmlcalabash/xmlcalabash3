@@ -10,15 +10,10 @@ import kotlin.math.max
 import kotlin.math.min
 
 class CountStep(): AbstractAtomicStep() {
-    private var count = 0
-
-    override fun input(port: String, doc: XProcDocument) {
-        count++
-    }
-
     override fun run() {
         super.run()
 
+        val count = queues["source"]!!.size
         val limit = max(integerBinding(Ns.limit) ?: 0, 0)
         val reportedCount = if (limit == 0) {
             count
@@ -34,5 +29,5 @@ class CountStep(): AbstractAtomicStep() {
         receiver.output("result", XProcDocument.ofXml(xdm, stepConfig))
     }
 
-    override fun toString(): String = "p:count (${count})"
+    override fun toString(): String = "p:count"
 }

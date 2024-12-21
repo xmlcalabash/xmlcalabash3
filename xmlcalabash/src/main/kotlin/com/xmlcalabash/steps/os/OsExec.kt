@@ -18,15 +18,10 @@ import java.nio.file.Files
 import java.nio.file.Paths
 
 class OsExec(): AbstractAtomicStep() {
-    var documents = mutableListOf<XProcDocument>()
-
-    override fun input(port: String, doc: XProcDocument) {
-        documents.add(doc)
-    }
-
     override fun run() {
         super.run()
 
+        val documents = queues["source"]!!
         if (documents.size > 1) {
             throw stepConfig.exception(XProcError.xcOsExecMultipleInputs())
         }

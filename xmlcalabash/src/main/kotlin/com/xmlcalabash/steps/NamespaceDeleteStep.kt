@@ -1,31 +1,25 @@
 package com.xmlcalabash.steps
 
-import com.xmlcalabash.datamodel.MediaType
-import com.xmlcalabash.documents.DocumentProperties
 import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.namespace.Ns
 import com.xmlcalabash.runtime.ProcessMatch
 import com.xmlcalabash.runtime.ProcessMatchingNodes
-import net.sf.saxon.om.*
+import net.sf.saxon.om.AttributeMap
+import net.sf.saxon.om.NamespaceUri
 import net.sf.saxon.s9api.QName
 import net.sf.saxon.s9api.XdmNode
 
 open class NamespaceDeleteStep(): AbstractAtomicStep(), ProcessMatchingNodes {
-    lateinit var document: XProcDocument
-
     val excludeNamespaces = mutableSetOf<NamespaceUri>()
     var _matcher: ProcessMatch? = null
     val matcher: ProcessMatch
         get() = _matcher ?: throw RuntimeException("Configuration error...")
 
-    override fun input(port: String, doc: XProcDocument) {
-        document = doc
-    }
-
     override fun run() {
         super.run()
 
+        val document = queues["source"]!!.first()
         val prefixes = stringBinding(Ns.prefixes)!!
         val prefixesContext = options[Ns.prefixes]!!.context
 

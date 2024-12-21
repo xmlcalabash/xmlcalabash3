@@ -19,13 +19,10 @@ open class WrapSequenceStep(): AbstractAtomicStep() {
     private var groupAdjacentContext: DocumentContext? = null
     var index = 0
 
-    override fun input(port: String, doc: XProcDocument) {
-        documents.add(doc)
-    }
-
     override fun run() {
         super.run()
 
+        documents.addAll(queues["source"]!!)
         wrapperName = qnameBinding(Ns.wrapper)!!
         groupAdjacent = stringBinding(Ns.groupAdjacent)
 

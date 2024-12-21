@@ -24,19 +24,11 @@ open class ValidateWithRelaxNG(): AbstractAtomicStep() {
         private val dtdIdIdrefWarnings = QName("dtd-id-idref-warnings")
     }
 
-    lateinit var document: XProcDocument
-    lateinit var schema: XProcDocument
-
-    override fun input(port: String, doc: XProcDocument) {
-        if (port == "source") {
-            document = doc
-        } else {
-            schema = doc
-        }
-    }
-
     override fun run() {
         super.run()
+
+        val document = queues["source"]!!.first()
+        val schema = queues["schema"]!!.first()
 
         val dtdAttributeValues = booleanBinding(dtdAttributeValues) ?: false
         val dtdIdIdRefWarnings = booleanBinding(dtdIdIdrefWarnings) ?: false
