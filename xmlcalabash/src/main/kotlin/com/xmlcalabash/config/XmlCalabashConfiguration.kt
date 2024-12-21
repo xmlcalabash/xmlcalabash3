@@ -23,6 +23,8 @@ abstract class XmlCalabashConfiguration {
     var mpt: Double = 0.99999998
     var graphviz: File? = null
     var serialization: Map<MediaType, Map<QName, String>> = emptyMap()
+    var trace: File? = null
+    var traceDocuments: File? = null
     var mimetypes: Map<String, String> = emptyMap()
     var sendmail: Map<String, String> = emptyMap()
     var pagedMediaManagers: List<PagedMediaManager> = emptyList()

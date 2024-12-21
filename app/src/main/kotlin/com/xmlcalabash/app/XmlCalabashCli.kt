@@ -82,6 +82,12 @@ class XmlCalabashCli private constructor() {
             config = loadConfiguration(commandLine.config)
 
             config.verbosity = commandLine.verbosity ?: config.verbosity
+            config.trace = commandLine.trace
+            config.traceDocuments = commandLine.traceDocuments
+
+            if (config.trace == null && config.traceDocuments != null) {
+                config.trace = config.traceDocuments!!.resolve("trace.xml")
+            }
 
             xmlCalabash = XmlCalabash.newInstance(config)
 

@@ -18,7 +18,7 @@ import kotlin.collections.component1
 import kotlin.collections.component2
 import kotlin.collections.iterator
 
-class CompoundStepHead(config: XProcStepConfiguration, step: HeadModel): AbstractStep(config, step) {
+class CompoundStepHead(config: XProcStepConfiguration, step: HeadModel): AbstractStep(config, step, NsCx.head, "${step.name}/head") {
     override val params = RuntimeStepParameters(NsCx.head, "!head",
         step.location, step.inputs, step.outputs, step.options)
     val defaultInputs = step.defaultInputs
@@ -214,6 +214,7 @@ class CompoundStepHead(config: XProcStepConfiguration, step: HeadModel): Abstrac
                 val targetPort = rpair.second
 
                 for (doc in documents) {
+                    stepConfig.environment.traceListener.sendDocument(Pair(id,port), Pair(targetStep.id, targetPort), doc)
                     targetStep.input(targetPort, doc)
                 }
             }

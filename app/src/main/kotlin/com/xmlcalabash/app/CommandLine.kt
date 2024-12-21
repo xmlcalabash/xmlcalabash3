@@ -44,6 +44,8 @@ class CommandLine private constructor(val args: Array<out String>) {
     private var _debug: Boolean? = null
     private var _verbosity: Verbosity? = null
     private var _help = false
+    private var _trace: File? = null
+    private var _traceDocuments: File? = null
     private var _errors = mutableListOf<XProcException>()
     private var _inputs = mutableMapOf<String, MutableList<URI>>()
     private var _outputs = mutableMapOf<String, OutputFilename>()
@@ -94,6 +96,14 @@ class CommandLine private constructor(val args: Array<out String>) {
     /** Did any parse errors occur? */
     val errors: List<XProcException>
         get() = _errors
+
+    /** Did the user specify a trace output file? */
+    val trace: File?
+        get() = _trace
+
+    /** Did the user specify a trace documents directory? */
+    val traceDocuments: File?
+        get() = _traceDocuments
 
     /** The pipeline inputs.
      * <p>The inputs are a map from input port name to a (list of) URI(s).</p>
@@ -153,6 +163,8 @@ class CommandLine private constructor(val args: Array<out String>) {
         ArgumentDescription("--schema-aware", listOf("-a"), ArgumentType.BOOLEAN, "true") { it -> _schemaAware = it == "true" },
         ArgumentDescription("--debug", listOf("-D"), ArgumentType.BOOLEAN, "true") { it -> _debug = it == "true" },
         ArgumentDescription("--help", listOf(), ArgumentType.BOOLEAN, "true") { it -> _help = it == "true" },
+        ArgumentDescription("--trace", listOf(), ArgumentType.FILE) { it -> _trace = File(it) },
+        ArgumentDescription("--trace-documents", listOf("--trace-docs"), ArgumentType.DIRECTORY) { it -> _traceDocuments = File(it) },
         ArgumentDescription("--verbosity", listOf("-V"),
             ArgumentType.STRING, "detail", listOf("trace", "debug", "progress", "info", "warn", "error")) { it ->
             _verbosity = when(it) {
@@ -219,6 +231,19 @@ class CommandLine private constructor(val args: Array<out String>) {
                         ArgumentType.EXISTING_FILE -> {
                             val file = File(value)
                             if (!file.exists() || !file.isFile || !file.canRead()) {
+                                _errors.add(XProcError.xiCliInvalidValue(option, value).exception())
+                                continue
+                            }
+                        }
+                        ArgumentType.DIRECTORY -> {
+                            val file = File(value)
+                            if (!file.exists()) {
+                                if (!file.mkdirs()) {
+                                    _errors.add(XProcError.xiCliInvalidValue(option, value).exception())
+                                    continue
+                                }
+                            }
+                            if (!file.isDirectory) {
                                 _errors.add(XProcError.xiCliInvalidValue(option, value).exception())
                                 continue
                             }
@@ -331,6 +356,6 @@ class CommandLine private constructor(val args: Array<out String>) {
                                     val process: (String) -> Unit)
 
     internal enum class ArgumentType {
-        STRING, URI, FILE, EXISTING_FILE, BOOLEAN
+        STRING, URI, FILE, EXISTING_FILE, DIRECTORY, BOOLEAN
     }
 }

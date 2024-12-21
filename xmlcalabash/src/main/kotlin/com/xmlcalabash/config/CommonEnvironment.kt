@@ -26,6 +26,7 @@ import javax.activation.MimetypesFileTypeMap
 
 class CommonEnvironment(private val xmlCalabash: XmlCalabash) {
     companion object {
+        // N.B. This is used in reverse in MediaType.extension()
         val defaultContentTypes = mapOf(
             "bmp" to "image/bmp",
             "bz2" to "application/bzip2",
@@ -48,7 +49,7 @@ class CommonEnvironment(private val xmlCalabash: XmlCalabash) {
             "text" to "text/plain",
             "txt" to "text/plain",
             "xml" to "application/xml",
-            "xpl" to "application/xml",
+            "xpl" to "application/xproc+xml",
             "xq" to "application/xquery",
             "xqy" to "application/xquery",
             "xsd" to "application/xsd+xml",

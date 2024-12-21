@@ -62,15 +62,6 @@ open class XProcStepConfigurationImpl internal constructor(
         private var varb = QName("b")
     }
 
-    private var _itemTypeFactory: ItemTypeFactory? = null
-    private val itemTypeFactory: ItemTypeFactory
-        get() {
-            if (_itemTypeFactory == null) {
-                _itemTypeFactory = ItemTypeFactory(processor)
-            }
-            return _itemTypeFactory!!
-        }
-
     protected var _location: Location = location
     override val location: Location
         get() = _location

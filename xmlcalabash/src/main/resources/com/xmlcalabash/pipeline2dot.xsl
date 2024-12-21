@@ -310,10 +310,10 @@
     <xsl:when test="($from_step/self::ns:compound-step or $from_step/self::ns:declare-step)
                     and $from_port/self::ns:input">
 
+<!--
       <xsl:message>cluster_{generate-id($from_step)}_head . {generate-id($from_port)}_head_output → cluster_{generate-id($to_step)} . {generate-id($to_port)}</xsl:message>
 
 
-<!--
 <xsl:message select="'STEP:', @step/string()"/>
 <xsl:message select="'FROM:', $from_step, ' :: ', $from_port"/>
 <xsl:message select="'TO:', $to_step, ' :: ', $to_port"/>

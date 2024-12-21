@@ -140,13 +140,13 @@ class DefaultErrorExplanation(): ErrorExplanation {
                     explanation = ""
                 }
             } else {
-                if (code == "") {
+                var match = Regex("^\\s*namespace\\s+(\\S+)\\s*=\\s*(.*)\\s*").find(line)
+                if (match != null) {
+                    val (prefix, uri) = match.destructured
+                    namespaces[prefix] = uri
+                } else {
                     var qcode: QName? = null
-                    var match = Regex("^\\s*namespace\\s+(\\S+)\\s*=\\s*(.*)\\s*").find(line)
-                    if (match != null) {
-                        val (prefix, uri) = match.destructured
-                        namespaces[prefix] = uri
-                    } else {
+                    if (code == "") {
                         match = Regex("^([^{]\\S*):(\\S+)\\s*/\\s*(\\d+)\\s*$").find(line)
                         if (match != null) {
                             val (prefix, localName, vcode) = match.destructured
@@ -197,25 +197,25 @@ class DefaultErrorExplanation(): ErrorExplanation {
                                 }
                             }
                         }
-                    }
 
-                    if (qcode != null) {
-                        code = qcode.clarkName
-                    } else {
-                        code = "????"
-                    }
-                } else {
-                    if (message == "") {
-                        message = line
-                    } else {
-                        if (explanation == "") {
-                            explanation = line
+                        if (qcode != null) {
+                            code = qcode.clarkName
                         } else {
-                            explanation += "\n${line}"
+                            code = "????"
+                        }
+                    } else {
+                        if (message == "") {
+                            message = line
+                        } else {
+                            if (explanation == "") {
+                                explanation = line
+                            } else {
+                                explanation += "\n${line}"
+                            }
                         }
                     }
                 }
-            }
+           }
         }
 
         if (code != "") {

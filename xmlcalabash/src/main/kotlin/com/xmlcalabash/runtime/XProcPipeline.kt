@@ -1,7 +1,10 @@
 package com.xmlcalabash.runtime
 
+import com.xmlcalabash.documents.DocumentProperties
 import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.exceptions.XProcError
+import com.xmlcalabash.io.XProcSerializer
+import com.xmlcalabash.namespace.Ns
 import com.xmlcalabash.runtime.api.Receiver
 import com.xmlcalabash.runtime.model.CompoundStepModel
 import com.xmlcalabash.runtime.steps.AtomicOptionStep
@@ -9,6 +12,8 @@ import com.xmlcalabash.runtime.steps.CompoundStep
 import com.xmlcalabash.runtime.steps.Consumer
 import com.xmlcalabash.util.DefaultOutputReceiver
 import net.sf.saxon.s9api.QName
+import net.sf.saxon.s9api.XdmAtomicValue
+import java.io.FileOutputStream
 
 class XProcPipeline internal constructor(pipeline: CompoundStepModel, val config: XProcStepConfiguration) {
     val inputManifold = pipeline.inputs
@@ -74,6 +79,22 @@ class XProcPipeline internal constructor(pipeline: CompoundStepModel, val config
             config.xmlCalabash.discardExecutionContext()
             throw e
         }
+
+        val trace = config.environment.xmlCalabash.xmlCalabashConfig.trace
+        if (trace != null) {
+            val props = DocumentProperties()
+            val serial = config.asXdmMap(mapOf(
+                Ns.method to XdmAtomicValue("xml"),
+                Ns.omitXmlDeclaration to XdmAtomicValue(true),
+                Ns.indent to XdmAtomicValue(true)
+            ))
+            props.set(Ns.serialization, serial)
+            val doc = XProcDocument.ofXml(config.environment.traceListener.summary(config), config, props)
+            val serializer = XProcSerializer(config)
+            val fileOutputStream = FileOutputStream(trace)
+            serializer.write(doc, fileOutputStream)
+            fileOutputStream.close()
+        }
     }
 
     fun reset() {
@@ -82,6 +103,8 @@ class XProcPipeline internal constructor(pipeline: CompoundStepModel, val config
     }
 
     inner class ReceiverProxy(): Consumer {
+        override val id = "PIPELINE"
+
         override fun input(port: String, doc: XProcDocument) {
             receiver.output(port, doc)
         }

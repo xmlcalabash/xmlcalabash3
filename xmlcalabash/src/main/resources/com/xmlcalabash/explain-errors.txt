@@ -790,9 +790,15 @@ XC0038
 XSLT version “$1” is not available.
 It is a dynamic error if the specified XSLT version is not available.
 
-XC0050
+XC0050/1
+Invalid URI: “$1”.
+It is a dynamic error if the URI scheme is not supported or the step cannot
+store to the specified location.
+
+XC0050/2
 Cannot copy “$1” to “$2”.
-It is a dynamic error if the URI scheme is not supported or the step cannot store to the specified location.
+It is a dynamic error if the URI scheme is not supported or the step cannot
+store to the specified location.
 
 XC0054/1
 Schematron validation failed: “$1”.

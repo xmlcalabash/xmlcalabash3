@@ -1,0 +1,51 @@
+default namespace = "https://xmlcalabash.com/ns/trace"
+namespace t = "https://xmlcalabash.com/ns/trace"
+
+start = t.trace
+
+t.trace =
+    element t:trace {
+        t.thread+
+    }
+
+t.thread =
+    element t:thread {
+        attribute id { xsd:long },
+        (t.step | t.document)+
+    }
+
+t.step =
+    element t:step {
+        attribute id { text },
+        attribute name { text },
+        attribute type { xsd:QName },
+        attribute start-time { xsd:dateTime },
+        attribute duration-ms { xsd:long },
+        (t.step | t.document)*
+    }
+
+t.document =
+    element t:document {
+        attribute id { xsd:long },
+        attribute content-type { text }?,
+        (t.from, t.to, t.location?)
+    }
+
+t.from =
+    element t:from {
+        attribute id { text },
+        attribute port { text },
+        empty
+    }
+
+t.to =
+    element t:to {
+        attribute id { text },
+        attribute port { text },
+        empty
+    }
+        
+t.location =
+    element t:location {
+        attribute filename { text }
+    }

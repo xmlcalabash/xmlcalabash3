@@ -28,18 +28,22 @@ open class StoreStep(): AbstractAtomicStep() {
         super.run()
 
         val href = try {
-            uriBinding(Ns.href)
+            uriBinding(Ns.href)!!
         } catch (ex: Exception) {
             throw stepConfig.exception(XProcError.xdInvalidUri(stringBinding(Ns.href)!!), ex)
         }
+
+        if (href.scheme != "file") {
+            throw stepConfig.exception(XProcError.xcInvalidUri(href))
+        }
+
         val serialization = qnameMapBinding(Ns.serialization)
         val contentType = document!!.contentType
 
-        when (contentType) {
-            MediaType.XML -> storeXml(href!!, serialization)
-            MediaType.PDF -> storeBinary(href!!)
-            else -> throw RuntimeException("Don't know how to store ${contentType}")
-        }
+        val serializer = XProcSerializer(stepConfig)
+        val outputFile = FileOutputStream(href.path)
+        serializer.write(document!!, outputFile, contentType, serialization)
+        outputFile.close()
 
         receiver.output("result", document!!)
 
@@ -50,21 +54,6 @@ open class StoreStep(): AbstractAtomicStep() {
         builder.addEndElement()
         builder.endDocument()
         receiver.output("result-uri", XProcDocument(builder.result, stepConfig))
-    }
-
-    private fun storeXml(href: URI, serialization: Map<QName,XdmValue>) {
-        val outputFile = FileOutputStream(href.path)
-        val serializer = XProcSerializer(stepConfig)
-        serializer.write(document!!, outputFile, null, serialization)
-    }
-
-    private fun storeBinary(href: URI) {
-        if (document !is XProcBinaryDocument) {
-            throw RuntimeException("Don't know how to store ${document} (not binary?)")
-        }
-        val outputFile = FileOutputStream(href.path)
-        outputFile.write((document!! as XProcBinaryDocument).binaryValue)
-        outputFile.close()
     }
 
     override fun toString(): String = "p:store"
