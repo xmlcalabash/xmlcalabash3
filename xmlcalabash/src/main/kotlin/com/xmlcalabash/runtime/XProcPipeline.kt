@@ -20,7 +20,7 @@ class XProcPipeline internal constructor(pipeline: CompoundStepModel, val config
     val outputManifold = pipeline.outputs
     val optionManifold = pipeline.options
     val runnable: CompoundStep
-    var receiver: Receiver = DefaultOutputReceiver(pipeline.stepConfig.processor)
+    var receiver: Receiver = DefaultOutputReceiver(pipeline.stepConfig)
     private val setOptions = mutableSetOf<QName>()
     private val boundInputs = mutableSetOf<String>()
 

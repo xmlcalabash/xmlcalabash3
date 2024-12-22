@@ -20,7 +20,6 @@ import net.sf.saxon.s9api.XdmMap
 import net.sf.saxon.s9api.XdmValue
 
 interface XProcStepConfiguration: DocumentContext {
-    val xmlCalabash: XmlCalabash
     val environment: PipelineEnvironment
     val saxonConfig: SaxonConfiguration
 

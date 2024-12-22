@@ -102,12 +102,10 @@ open class XQueryStep(): AbstractAtomicStep() {
                 if (root.nodeName != NsC.query) {
                     val baos = ByteArrayOutputStream()
 
-                    val props = mutableMapOf<QName, XdmValue>()
-                    props.put(Ns.encoding, XdmAtomicValue("utf-8"))
-                    props.put(Ns.omitXmlDeclaration, XdmAtomicValue(true))
-
                     val xserializer = XProcSerializer(stepConfig)
-                    xserializer.write(query, baos, null, props)
+                    xserializer.setOverrideProperty(MediaType.XML, Ns.encoding, "UTF-8")
+                    xserializer.setOverrideProperty(MediaType.XML, Ns.omitXmlDeclaration, "true")
+                    xserializer.write(query, baos, MediaType.XML)
 
                     xquery = baos.toString("utf-8")
                 }

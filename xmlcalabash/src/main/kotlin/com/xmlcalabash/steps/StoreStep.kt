@@ -1,5 +1,6 @@
 package com.xmlcalabash.steps
 
+import com.xmlcalabash.datamodel.MediaType
 import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.io.XProcSerializer
@@ -24,14 +25,16 @@ open class StoreStep(): AbstractAtomicStep() {
         }
 
         val serialization = qnameMapBinding(Ns.serialization)
-        val contentType = document!!.contentType
+        val contentType = document.contentType ?: MediaType.OCTET_STREAM
 
         val serializer = XProcSerializer(stepConfig)
+        serializer.setDefaultProperties(contentType, serialization)
+
         val outputFile = FileOutputStream(href.path)
-        serializer.write(document!!, outputFile, contentType, serialization)
+        serializer.write(document, outputFile, contentType)
         outputFile.close()
 
-        receiver.output("result", document!!)
+        receiver.output("result", document)
 
         val builder = SaxonTreeBuilder(stepConfig)
         builder.startDocument(null)

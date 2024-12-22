@@ -138,7 +138,7 @@ class TestCase(val suite: TestSuite, val testFile: File) {
             if (suite.options.outputDescription != null || suite.options.outputGraph != null) {
                 val description = runtime.description()
                 if (suite.options.outputDescription != null) {
-                    VisualizerOutput.xml(description, suite.options.outputDescription!!)
+                    VisualizerOutput.xml(suite.xmlCalabash, description, suite.options.outputDescription!!)
                 }
                 if (suite.options.outputGraph != null) {
                     if (graphviz == null) {
