@@ -1,5 +1,6 @@
 package com.xmlcalabash.util
 
+import com.xmlcalabash.config.XmlCalabash
 import com.xmlcalabash.io.XProcSerializer
 import com.xmlcalabash.namespace.Ns
 import com.xmlcalabash.namespace.NsDescription
@@ -11,9 +12,9 @@ import javax.xml.transform.sax.SAXSource
 
 class VisualizerOutput {
     companion object {
-        fun xml(description: XdmNode, basename: String) {
+        fun xml(xmlCalabash: XmlCalabash, description: XdmNode, basename: String) {
             val stream = PrintStream(File(basename + ".xml"))
-            val serial = XProcSerializer(description.processor)
+            val serial = XProcSerializer(xmlCalabash, description.processor)
             val props = mutableMapOf<QName, XdmValue>()
             props[Ns.method] = XdmAtomicValue("xml")
             props[Ns.indent] = XdmAtomicValue(true)

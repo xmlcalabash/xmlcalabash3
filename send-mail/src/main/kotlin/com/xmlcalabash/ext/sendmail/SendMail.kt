@@ -150,15 +150,14 @@ class SendMail(): AbstractAtomicStep() {
                     var contentType = ""
                     if (html) {
                         val serializer = XProcSerializer(stepConfig)
-                        val serprop = mutableMapOf<QName, XdmValue>(
+                        serializer.setDefaultProperties(MediaType.HTML, mapOf<QName, XdmValue>(
                             QName("html-version") to XdmAtomicValue("5"),
                             QName("encoding") to XdmAtomicValue("UTF-8"),
                             QName("indent") to XdmAtomicValue("no"),
-                            QName("omit-xml-declaration") to XdmAtomicValue("yes"),
-                        )
-                        serprop.putAll(serialization)
+                            QName("omit-xml-declaration") to XdmAtomicValue("yes")))
+
                         val stream = ByteArrayOutputStream()
-                        serializer.write(doc, stream, MediaType.HTML, serprop)
+                        serializer.write(doc, stream, MediaType.HTML)
                         content = stream.toString("UTF-8")
                         contentType = "text/html;charset=UTF-8"
                     } else {

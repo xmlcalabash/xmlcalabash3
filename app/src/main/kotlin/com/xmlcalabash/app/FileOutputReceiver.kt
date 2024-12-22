@@ -1,5 +1,6 @@
 package com.xmlcalabash.app
 
+import com.xmlcalabash.config.XmlCalabash
 import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.io.XProcSerializer
 import com.xmlcalabash.namespace.Ns
@@ -9,7 +10,8 @@ import org.apache.logging.log4j.kotlin.logger
 import java.io.FileOutputStream
 import java.io.PrintStream
 
-class FileOutputReceiver(processor: Processor, val files: Map<String,OutputFilename>): DefaultOutputReceiver(processor) {
+class FileOutputReceiver(xmlCalabash: XmlCalabash, processor: Processor, val files: Map<String,OutputFilename>
+): DefaultOutputReceiver(xmlCalabash, processor) {
     private val wroteTo = mutableSetOf<String>()
     override fun output(port: String, document: XProcDocument) {
         if (port in files) {
@@ -24,9 +26,9 @@ class FileOutputReceiver(processor: Processor, val files: Map<String,OutputFilen
             wroteTo.add(port)
 
             val stream = PrintStream(FileOutputStream(outfile))
-            val serializer = XProcSerializer(processor)
-            serializer.overrideProperties[Ns.omitXmlDeclaration] = "yes"
-            serializer.overrideProperties[Ns.indent] = "yes"
+            val serializer = XProcSerializer(xmlCalabash, processor)
+            //serializer.overrideProperties[Ns.omitXmlDeclaration] = "yes"
+            //serializer.overrideProperties[Ns.indent] = "yes"
             serializer.write(document, stream)
             stream.close()
         } else {

@@ -142,7 +142,7 @@ class XmlCalabashCli private constructor() {
             if (commandLine.pipelineDescription != null || commandLine.pipelineGraph != null) {
                 val description = runtime.description()
                 if (commandLine.pipelineDescription != null) {
-                    VisualizerOutput.xml(description, commandLine.pipelineDescription!!)
+                    VisualizerOutput.xml(xmlCalabash, description, commandLine.pipelineDescription!!)
                 }
 
                 if (commandLine.pipelineGraph != null) {
@@ -164,15 +164,11 @@ class XmlCalabashCli private constructor() {
             }
 
             optionManifold.putAll(pipeline.optionManifold)
-            //val staticOpts = runtime.pipeline!!.staticOptions
             for ((name, value) in xprocParser.builder.staticOptionsManager.useWhenOptions) {
-                //if (name !in staticOpts) {
-                //    runtime.option(name, value)
-                //}
                 pipeline.option(name, XProcDocument.ofValue(value, stepConfig, MediaType.ANY, DocumentProperties()))
             }
 
-            pipeline.receiver = FileOutputReceiver(xmlCalabash.saxonConfig.processor, commandLine.outputs)
+            pipeline.receiver = FileOutputReceiver(xmlCalabash, xmlCalabash.saxonConfig.processor, commandLine.outputs)
 
             pipeline.run()
         } catch (ex: Exception) {

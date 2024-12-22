@@ -121,10 +121,28 @@ You may not repeat the <option>--output</option> option for the same port.</para
 <para>The pipeline must have an output port named <replaceable>port</replaceable>.</para>
 <para>If the pipeline writes to a port for which there is no corresponding
 <option>--output</option> option, the results will be written to “standard output”, usually
-the shell window. In this case, a header is added before the output identifying the port
-name, document number, and base URI. A line of equal signs appears as a separator between
-documents. (The header and separator are omitted if standard output is being redirected, for example, to a file. But beware that the check for “is being redirected” isn’t very sophisticated and may be wrong
-in some circumstances.)</para>
+the terminal window. When writing to the terminal:</para>
+<itemizedlist>
+<listitem>
+<para>A header is printed before the output identifying the port name, document
+number, and base URI.</para>
+</listitem>
+<listitem>
+<para>A line of equal signs is printed as a separator between documents (if more than
+one document is output).</para>
+</listitem>
+<listitem>
+<para>When XML or HTML content is output, the XML declaration is omitted.</para>
+</listitem>
+<listitem>
+<para>Indentation is turned on.</para>
+</listitem>
+</itemizedlist>
+
+<para>The method for determining whether output is going to a terminal or being
+redirected isn’t terribly sophisticated and may be wrong in some
+circumstances. It’s safer to use <option>--output</option> to write to a file
+if you want to save the output.</para>
 </listitem>
 </varlistentry>
 

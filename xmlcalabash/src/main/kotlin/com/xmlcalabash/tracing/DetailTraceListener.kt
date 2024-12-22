@@ -25,23 +25,8 @@ class DetailTraceListener: StandardTraceListener() {
             val tempFile = Files.createTempFile(path, prefix, suffix).toFile()
             savedDocuments[document.id] = tempFile.absolutePath
 
-            val inputMap = document.properties.getSerialization()
-            val map = mutableMapOf<QName, XdmValue>()
-            for (key in inputMap.keySet()) {
-                val value = inputMap.get(key)
-                val qvalue = key.underlyingValue
-                val qkey = if (qvalue is QNameValue) {
-                    QName(qvalue.prefix, qvalue.namespaceURI.toString(), qvalue.localName)
-                } else {
-                    throw RuntimeException("Expected map of QName keys")
-                }
-                map.put(qkey, value)
-            }
-
-            val serializer = XProcSerializer(document.context.processor)
-            val fileOutputStream = FileOutputStream(tempFile)
-            serializer.write(document, fileOutputStream, document.contentType, map)
-            fileOutputStream.close()
+            val serializer = XProcSerializer(document.context)
+            serializer.write(document, tempFile)
         }
     }
 

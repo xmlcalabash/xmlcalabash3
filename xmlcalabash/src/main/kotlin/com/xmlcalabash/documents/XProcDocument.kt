@@ -290,23 +290,10 @@ open class XProcDocument internal constructor() {
     }
 
     fun serialize(out: OutputStream, defProp: Map<QName, XdmValue> = emptyMap()) {
-        val serializer = XProcSerializer(context.processor)
-        val serprop = mutableMapOf<QName, XdmValue>()
-        serprop.putAll(defProp)
-        val docprop = properties[Ns.serialization]
-        if (docprop != null) {
-            for (key in (docprop as XdmMap).keySet()) {
-                val value = docprop[key]
-                val qvalue = key.underlyingValue
-                val qkey = if (qvalue is QNameValue) {
-                    QName(qvalue.prefix, qvalue.namespaceURI.toString(), qvalue.localName)
-                } else {
-                    throw RuntimeException("Expected map of QName keys")
-                }
-                serprop[qkey] = value
-            }
-        }
-        serializer.write(this, out, null, serprop)
+        val ctype = contentType ?: MediaType.OCTET_STREAM
+        val serializer = XProcSerializer(context)
+        serializer.setDefaultProperties(ctype, defProp)
+        serializer.write(this, out)
     }
 
     override fun toString(): String {

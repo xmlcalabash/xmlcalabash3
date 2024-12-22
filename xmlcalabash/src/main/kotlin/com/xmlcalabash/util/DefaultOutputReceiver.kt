@@ -1,16 +1,32 @@
 package com.xmlcalabash.util
 
+import com.xmlcalabash.config.XmlCalabash
 import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.io.XProcSerializer
 import com.xmlcalabash.namespace.Ns
+import com.xmlcalabash.runtime.XProcStepConfiguration
 import com.xmlcalabash.runtime.api.Receiver
 import net.sf.saxon.s9api.Processor
+import org.apache.logging.log4j.kotlin.logger
 
-open class DefaultOutputReceiver(val processor: Processor): Receiver {
+open class DefaultOutputReceiver(val xmlCalabash: XmlCalabash, val processor: Processor): Receiver {
+    constructor(config: XProcStepConfiguration): this(config.xmlCalabash, config.processor)
+
+    companion object {
+        // This is a crude check, if you really care, use --output
+        private val writingToTerminal = System.console() != null
+        private var debugOutputShown = false // man, this is persnickty
+    }
+
     private var port = ""
     private var totals = mutableMapOf<String, Int>()
-    // This is a crude check, if you really care, use --output
-    private val writingToTerminal = System.console() != null
+
+    init {
+        if (!debugOutputShown && writingToTerminal) {
+            logger.debug { "Output is going to the terminal" }
+        }
+        debugOutputShown = true
+    }
 
     override fun output(port: String, document: XProcDocument) {
         this.port = port
@@ -27,10 +43,17 @@ open class DefaultOutputReceiver(val processor: Processor): Receiver {
         if (writingToTerminal) {
             println(header)
         }
-        val serializer = XProcSerializer(processor)
-        serializer.overrideProperties[Ns.omitXmlDeclaration] = "yes"
-        serializer.overrideProperties[Ns.indent] = "yes"
-        serializer.write(document, System.out)
+        val contentType = document.contentType
+        val serializer = XProcSerializer(xmlCalabash, processor)
+
+        if (writingToTerminal && contentType != null) {
+            if (contentType.xmlContentType() || contentType.htmlContentType()) {
+                serializer.setOverrideProperty(contentType, Ns.omitXmlDeclaration, "true")
+            }
+            serializer.setOverrideProperty(contentType, Ns.indent, "true")
+        }
+
+        serializer.write(document, System.out, contentType)
         if (writingToTerminal) {
             println("".padEnd(header.length, '='))
         }
