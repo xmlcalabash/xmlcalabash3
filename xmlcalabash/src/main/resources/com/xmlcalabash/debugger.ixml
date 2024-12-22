@@ -1,0 +1,100 @@
+ixml version "1.1" .
+
+command = breakpoint
+          | define 
+          | down
+          | eval
+          | exit
+          | help
+          | inputs
+          | models
+          | namespace
+          | options
+          | run
+          | set 
+          | stack
+          | step
+          | subpipeline
+          | up .
+
+-breakpoint = breakpoint-command, (((rs, -"on")?, rs, id), bport?, when?)? .
+-breakpoint-command = name-breakpoint, s, (-"breakpoint" | -"break" | -"b") .
+name-breakpoint>name = +"breakpoint" .
+-bport = (rs, -"at")?, rs, (input|output) .
+input = -"input", rs, -port .
+output = -"output", rs, -port .
+when = (rs, -"when"), rs, -expr .
+
+id = [L | P | Nd]+ .
+port = [L | P | Nd]+ .
+expr = ~[]+ .
+
+-define = define-command, rs, -'$', varname, s, -':'?, -'=', expr .
+-define-command = name-define, s, (-"define" | -"def") .
+name-define>name = +"define" .
+
+varname = [L | P | Nd]+ .
+
+-down = down-command, (rs, frames)? .
+-down-command = name-down, s, (-"down" | -"d") .
+name-down>name = +"down" .
+frames = ["0"-"9"]+ .
+
+-eval = eval-command, rs, expr .
+-eval-command = name-eval, s, (-"eval" | -"show" | -"echo") .
+name-eval>name = +"eval" .
+
+-exit = name-exit, s, (-"exit" | -"x" | -"quit" | -"q") .
+name-exit>name = +"exit" .
+
+-help = name-help, s, (-"help" | -"h" | -"?"), (rs, topic)? .
+name-help>name = +"help" .
+
+topic = [L | P | Nd]+ .
+
+-inputs = name-inputs, s, (-"inputs" | -"i") .
+name-inputs>name = +"inputs" .
+
+-models = models-command, (rs, id)? .
+-models-command = name-models, s, (-"models" | -"mod" | -"m") .
+name-models>name = +"models" .
+
+-namespace = namespace-command, (s, prefix, s, -"=", s, uri?)? .
+-namespace-command = name-namespace, s, (-"namespace" | -"ns") .
+name-namespace>name = +"namespace" .
+
+prefix = [L | P | Nd]+ .
+
+uri = -'"', dchar*, -'"'
+    | -"'", schar*, -"'" .
+
+-dchar = ~['"' | Cc] .
+-schar = ~["'" | Cc] .
+
+-options = name-options, s, (-"options" | -"o" | -"variables" | -"var") .
+name-options>name = +"options" .
+
+-run = name-run, s, (-"run" | -"r") .
+name-run>name = +"run" .
+
+-set = set-command, rs, -'$', varname, s, -':'?, -'=', expr .
+-set-command = name-set, s, -"set" .
+name-set>name = +"set" .
+
+-stack = stack-command, (rs, frame)? .
+-stack-command = name-stack, s, (-"stack") .
+name-stack>name = +"stack" .
+frame = ["0"-"9"]+ .
+
+-step = name-step, s, (-"step" | -"s") .
+name-step>name = +"step" .
+
+-subpipeline = name-subpipeline, s, (-"subpipeline" | -"sub") .
+name-subpipeline>name = +"subpipeline" .
+
+-up = up-command, (rs, frames)? .
+-up-command = name-up, s, (-"up" | -"u") .
+name-up>name = +"up" .
+
+-rs = -[#a | #d | " "]+ .
+-s  = -[#a | #d | " "]* .

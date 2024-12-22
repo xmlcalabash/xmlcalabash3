@@ -5,10 +5,6 @@ import com.xmlcalabash.runtime.model.CompoundStepModel
 
 open class GroupStep(config: XProcStepConfiguration, compound: CompoundStepModel): CompoundStep(config, compound) {
     override fun run() {
-        if (runnables.isEmpty()) {
-            instantiate()
-        }
-
         val stepsToRun = mutableListOf<AbstractStep>()
         stepsToRun.addAll(runnables)
 

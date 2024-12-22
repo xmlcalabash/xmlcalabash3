@@ -18,7 +18,6 @@ plugins {
 }
 
 val xmlcalabashRelease by configurations.dependencyScope("xmlcalabashRelease")
-val coffeepressRelease by configurations.dependencyScope("coffeepressRelease")
 val sendmailRelease by configurations.dependencyScope("sendmailRelease")
 val weasyprintRelease by configurations.dependencyScope("weasyprintRelease")
 val princeRelease by configurations.dependencyScope("princeRelease")
@@ -33,8 +32,6 @@ val dep_slf4j = project.findProperty("slf4j").toString()
 
 dependencies {
   xmlcalabashRelease(project(mapOf("path" to ":xmlcalabash",
-                                   "configuration" to "releaseArtifacts")))
-  coffeepressRelease(project(mapOf("path" to ":ixml-coffeepress",
                                    "configuration" to "releaseArtifacts")))
   sendmailRelease(project(mapOf("path" to ":send-mail",
                                 "configuration" to "releaseArtifacts")))
@@ -56,7 +53,6 @@ dependencies {
 //                                "configuration" to "releaseArtifacts")))
 
   implementation(project(":xmlcalabash"))
-  implementation(project(":ixml-coffeepress"))
   implementation(project(":send-mail"))
   implementation(project(":paged-media:antenna-house"))
   implementation(project(":paged-media:prince"))
@@ -72,9 +68,6 @@ dependencies {
 
 val xmlcalabashJar = configurations.resolvable("xmlcalabashJar") {
   extendsFrom(xmlcalabashRelease)
-}
-val coffeepressJar = configurations.resolvable("coffeepressJar") {
-  extendsFrom(coffeepressRelease)
 }
 val sendmailJar = configurations.resolvable("sendmailJar") {
   extendsFrom(sendmailRelease)
@@ -159,7 +152,6 @@ tasks.jar {
 
 tasks.register("stage-release") {
   inputs.files(xmlcalabashJar)
-  inputs.files(coffeepressJar)
   inputs.files(sendmailJar)
   inputs.files(weasyprintJar)
   inputs.files(princeJar)
@@ -204,12 +196,6 @@ tasks.register("stage-release") {
   doLast {
     copy {
       from(xmlcalabashJar)
-      into(layout.buildDirectory.dir("stage/lib"))
-    }
-  }
-  doLast {
-    copy {
-      from(coffeepressJar)
       into(layout.buildDirectory.dir("stage/lib"))
     }
   }

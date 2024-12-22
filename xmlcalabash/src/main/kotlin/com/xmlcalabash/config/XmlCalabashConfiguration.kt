@@ -25,6 +25,7 @@ abstract class XmlCalabashConfiguration {
     var serialization: Map<MediaType, Map<QName, String>> = emptyMap()
     var trace: File? = null
     var traceDocuments: File? = null
+    var debugger = false
     var mimetypes: Map<String, String> = emptyMap()
     var sendmail: Map<String, String> = emptyMap()
     var pagedMediaManagers: List<PagedMediaManager> = emptyList()

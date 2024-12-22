@@ -10,11 +10,9 @@ open class ForEachStep(config: XProcStepConfiguration, compound: CompoundStepMod
         foot.alwaysAllowSequences = true
     }
 
-    override fun run() {
-        if (runnables.isEmpty()) {
-            instantiate()
-        }
 
+
+    override fun run() {
         val cache = mutableMapOf<String, List<XProcDocument>>()
         cache.putAll(head.cache)
         head.cacheClear()

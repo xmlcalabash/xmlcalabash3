@@ -7,7 +7,7 @@ import com.xmlcalabash.runtime.model.CompoundStepModel
 import com.xmlcalabash.util.SaxonTreeBuilder
 import net.sf.saxon.s9api.XdmNode
 
-class XProcRuntime private constructor(private val start: DeclareStepInstruction, internal val config: XProcStepConfiguration) {
+class XProcRuntime private constructor(internal val start: DeclareStepInstruction, internal val config: XProcStepConfiguration) {
     companion object {
         internal fun newInstance(start: DeclareStepInstruction): XProcRuntime {
             val environment = PipelineContext(start.stepConfig.environment as PipelineCompilerContext)
@@ -25,8 +25,8 @@ class XProcRuntime private constructor(private val start: DeclareStepInstruction
         }
     }
 
-    private lateinit var pipelines: Map<DeclareStepInstruction, SubpipelineModel>
-    private lateinit var pipelineStep: CompoundStepModel
+    internal lateinit var pipelines: Map<DeclareStepInstruction, SubpipelineModel>
+    internal lateinit var pipelineStep: CompoundStepModel
     internal val runnables = mutableMapOf<String, CompoundStepModel>()
     val environment = config.environment
 
@@ -39,7 +39,7 @@ class XProcRuntime private constructor(private val start: DeclareStepInstruction
 
     fun executable(): XProcPipeline {
         val config = config.copy()
-        return XProcPipeline(pipelineStep, config)
+        return XProcPipeline(this, pipelineStep, config)
     }
 
     fun description(): XdmNode {

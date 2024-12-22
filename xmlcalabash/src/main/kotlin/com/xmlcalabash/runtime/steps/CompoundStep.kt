@@ -91,10 +91,13 @@ abstract class CompoundStep(config: XProcStepConfiguration, compound: CompoundSt
         }
     }
 
-    override fun run() {
+    override fun prepare() {
         if (runnables.isEmpty()) {
             instantiate()
         }
+    }
+
+    override fun run() {
     }
 
     override fun input(port: String, doc: XProcDocument) {

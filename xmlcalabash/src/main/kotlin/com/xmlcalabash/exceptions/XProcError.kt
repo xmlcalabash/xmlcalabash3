@@ -368,6 +368,7 @@ class XProcError private constructor(val code: QName, val variant: Int, val loca
         fun xiTooLateForStaticOptions(name: QName) = internal(213, name)
         fun xiCliDuplicateNamespace(prefix: String) = internal(214, prefix)
 
+        fun xiAbortDebugger() = internal(9997)
         fun xiImpossible(message: String) = internal(9998, message)
         fun xiNotImplemented(message: String) = internal(9999, message)
     }

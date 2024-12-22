@@ -1,5 +1,6 @@
 package com.xmlcalabash.runtime
 
+import com.xmlcalabash.debugger.CliDebugger
 import com.xmlcalabash.documents.DocumentProperties
 import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.exceptions.XProcError
@@ -13,9 +14,10 @@ import com.xmlcalabash.runtime.steps.Consumer
 import com.xmlcalabash.util.DefaultOutputReceiver
 import net.sf.saxon.s9api.QName
 import net.sf.saxon.s9api.XdmAtomicValue
+import org.apache.logging.log4j.kotlin.logger
 import java.io.FileOutputStream
 
-class XProcPipeline internal constructor(pipeline: CompoundStepModel, val config: XProcStepConfiguration) {
+class XProcPipeline internal constructor(private val runtime: XProcRuntime, pipeline: CompoundStepModel, val config: XProcStepConfiguration) {
     val inputManifold = pipeline.inputs
     val outputManifold = pipeline.outputs
     val optionManifold = pipeline.options
@@ -27,6 +29,15 @@ class XProcPipeline internal constructor(pipeline: CompoundStepModel, val config
     init {
         runnable = pipeline.runnable(config)() as CompoundStep
         runnable.instantiate()
+
+        if (pipeline.stepConfig.environment.xmlCalabash.xmlCalabashConfig.debugger) {
+            if (config.environment is PipelineContext) {
+                val debugger = CliDebugger(runtime)
+                (config.environment as PipelineContext)._debugger = debugger
+            } else {
+                logger.debug { "Cannot instantiate debugger on ${config.environment}" }
+            }
+        }
     }
 
     fun input(port: String, document: XProcDocument) {

@@ -42,6 +42,7 @@ class CommandLine private constructor(val args: Array<out String>) {
     private var _schemaAware = false
     private var _pipelineDescription: String? = null
     private var _debug: Boolean? = null
+    private var _debugger = false
     private var _verbosity: Verbosity? = null
     private var _help = false
     private var _trace: File? = null
@@ -105,6 +106,10 @@ class CommandLine private constructor(val args: Array<out String>) {
     val traceDocuments: File?
         get() = _traceDocuments
 
+    /** Enable the debugger? */
+    val debugger: Boolean
+        get() = _debugger
+
     /** The pipeline inputs.
      * <p>The inputs are a map from input port name to a (list of) URI(s).</p>
      */
@@ -162,6 +167,7 @@ class CommandLine private constructor(val args: Array<out String>) {
         ArgumentDescription("--description", listOf(), ArgumentType.FILE) { it -> _pipelineDescription = it },
         ArgumentDescription("--schema-aware", listOf("-a"), ArgumentType.BOOLEAN, "true") { it -> _schemaAware = it == "true" },
         ArgumentDescription("--debug", listOf("-D"), ArgumentType.BOOLEAN, "true") { it -> _debug = it == "true" },
+        ArgumentDescription("--debugger", listOf(), ArgumentType.BOOLEAN, "true") { it -> _debugger = it == "true" },
         ArgumentDescription("--help", listOf(), ArgumentType.BOOLEAN, "true") { it -> _help = it == "true" },
         ArgumentDescription("--trace", listOf(), ArgumentType.FILE) { it -> _trace = File(it) },
         ArgumentDescription("--trace-documents", listOf("--trace-docs"), ArgumentType.DIRECTORY) { it -> _traceDocuments = File(it) },

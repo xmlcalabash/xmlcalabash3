@@ -57,6 +57,7 @@ object NsP {
     val inlineExpandText            = QName(namespace, "p:inline-expand-text")
     val input                       = QName(namespace, "p:input")
     val insert                      = QName(namespace, "p:insert")
+    val invisibleXml                = QName(namespace, "p:invisible-xml")
     val iterationPosition           = QName(namespace, "p:iteration-position")
     val iterationSize               = QName(namespace, "p:iteration-size")
     val ixml                        = QName(namespace, "p:ixml")

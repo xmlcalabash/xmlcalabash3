@@ -26,8 +26,8 @@ class CompoundStepHead(config: XProcStepConfiguration, step: HeadModel): Abstrac
     internal val unboundInputs = mutableSetOf<String>()
     private var message: XdmValue? = null
     internal var showMessage = true
-    private val _cache = mutableMapOf<String, MutableList<XProcDocument>>()
-    private val _options = mutableMapOf<QName, MutableList<XProcDocument>>()
+    internal val _cache = mutableMapOf<String, MutableList<XProcDocument>>()
+    internal val _options = mutableMapOf<QName, MutableList<XProcDocument>>()
     private val inputErrors = mutableListOf<XProcError>()
 
     val cache: Map<String, List<XProcDocument>>
@@ -124,14 +124,16 @@ class CompoundStepHead(config: XProcStepConfiguration, step: HeadModel): Abstrac
         // nop
     }
 
-    override fun run() {
+    override fun prepare() {
         for ((name, details) in staticOptions) {
             if ((type.namespaceUri == NsP.namespace && name == Ns.message)
                 || (type.namespaceUri != NsP.namespace && name == NsP.message)) {
                 message = details.staticValue.evaluate(stepConfig)
             }
         }
+    }
 
+    override fun run() {
         if (showMessage && message != null) {
             println(message)
             message = null
@@ -215,7 +217,8 @@ class CompoundStepHead(config: XProcStepConfiguration, step: HeadModel): Abstrac
 
                 for (doc in documents) {
                     stepConfig.environment.traceListener.sendDocument(Pair(id,port), Pair(targetStep.id, targetPort), doc)
-                    targetStep.input(targetPort, doc)
+                    val outdoc = stepConfig.environment.debugger.sendDocument(Pair(id,port), Pair(targetStep.id, targetPort), doc)
+                    targetStep.input(targetPort, outdoc)
                 }
             }
 

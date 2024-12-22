@@ -30,8 +30,8 @@ abstract class AbstractAtomicStep(): XProcStep {
     private lateinit var _stepConfig: XProcStepConfiguration
     private lateinit var _receiver: Receiver
     private lateinit var _stepParams: RuntimeStepParameters
-    private val _options = mutableMapOf<QName, LazyValue>()
-    protected val _queues = mutableMapOf<String, MutableList<XProcDocument>>()
+    internal val _options = mutableMapOf<QName, LazyValue>()
+    internal val _queues = mutableMapOf<String, MutableList<XProcDocument>>()
     private var _nodeId: Long = -1
 
     val stepParams: RuntimeStepParameters

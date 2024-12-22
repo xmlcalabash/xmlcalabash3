@@ -22,7 +22,6 @@ val testrunner by configurations.creating {
 
 dependencies {
   implementation(project(":xmlcalabash"))
-  implementation(project(":ixml-coffeepress"))
   implementation(project(":send-mail"))
   implementation(project(":paged-media:antenna-house"))
   implementation(project(":paged-media:prince"))

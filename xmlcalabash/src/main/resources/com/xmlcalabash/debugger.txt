@@ -1,0 +1,108 @@
+The debugger accepts the following commands:
+
+* breakpoint (break, b): sets a breakpoint.
+
+  Syntax: breakpoint [on] STEP [input|output PORT] [when EXPR]
+
+  Where STEP is a step (model) ID, PORT is a port, and EXPR is
+  an XPath expression. On “input” and “output” the document on
+  the port is the context item for the expression.
+
+* define (def): creates a local variable.
+
+  Syntax: define $VARNAME = EXPR
+
+  Where VARNAME is a QName and EXPR is an XPath expression.
+
+* down: move down the stack.
+
+  Syntax: down [N]
+
+  Where N is the number of frames to move. If N is not
+  specified, moves 1 frame.
+
+* exit (x, quit, q): quit the debugger and abort the pipeline.
+
+  Syntax: exit 
+
+  Aborts execution and terminates the pipeline.
+
+* help (h, ?): display help (“help command” for more details)
+
+  Syntax: help [COMMAND]
+
+  Where COMMAND is one of the debugger commands.
+
+* inputs (i): show step inputs
+
+  Syntax: inputs
+
+  Displays the input ports and the numbrer of documents on each
+  port. The variable $cx:input is a map over these documents.
+
+* models (mod, m): show pipeline models.
+
+  Syntax: models [MODEL]
+
+  Where MODEL is a model id.
+
+* namespace (ns): change or show in-scope namespaces.
+
+  Syntax: namespace [PREFIX = "URI"]
+
+  Where PREFIX is a namespace prefix and URI is any URI. If the assignment
+  is omitted, displays the current, in-scope namespaces.
+
+* options (o): show step options.
+
+  Syntax: options
+
+  Displays the options on the current (atomic) step.
+
+* run (r): continue execution
+
+  Syntax: run
+
+  The pipeline resumes, stopping only at the next breakpoint
+  or when the pipeline ends.
+
+* set: set a variable or option value.
+
+  Syntax: set $VARNAME = EXPR
+
+  Where VARNAME is a QName and EXPR is an XPath expression.
+  Sets the value of the local variable or step optoin to
+  the result of evaluating the expression.
+
+* show (eval, echo): Evaluate an XPath expression and display the result.
+
+  Syntax: show EXPR
+
+  Where EXPR is an XPath expression.
+
+* stack: Show the current stack.
+
+  Syntax: stack [N]
+
+  Displays the stack and optionally moves to stack frame N.
+
+* step: Continue execution for one step.
+
+  Syntax: step
+
+  The pipeline resumes, stopping at the start of the next step
+  or the next breakpoint, whichever comes first.
+
+* subpipeline (sub): show the subpipeline.
+
+  Syntax: subpipeline
+
+  Shows the children of the current (compound) step. The ids
+  of these steps may be used in breakpoints.
+
+* up: move up the stack.
+
+  Syntax: up [N]
+
+  Where N is the number of frames to move. If N is not specified,
+  moves 1 frame.

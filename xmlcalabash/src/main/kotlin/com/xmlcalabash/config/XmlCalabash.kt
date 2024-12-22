@@ -117,8 +117,10 @@ class XmlCalabash private constructor(val xmlCalabashConfig: XmlCalabashConfigur
 
     internal fun discardExecutionContext() {
         synchronized(executables) {
-            val stack: Stack<XProcExecutionContext> = executables[Thread.currentThread().id]!!
-            stack.clear()
+            val stack: Stack<XProcExecutionContext>? = executables[Thread.currentThread().id]
+            if (stack != null) {
+                stack.clear()
+            }
             //println("Discard ${this}: ${context} for ${Thread.currentThread().id}")
         }
     }

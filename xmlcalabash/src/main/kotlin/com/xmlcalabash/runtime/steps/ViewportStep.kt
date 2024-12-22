@@ -22,10 +22,6 @@ open class ViewportStep(config: XProcStepConfiguration, compound: CompoundStepMo
     }
 
     override fun run() {
-        if (runnables.isEmpty()) {
-            instantiate()
-        }
-
         val cache = mutableMapOf<String, List<XProcDocument>>()
         cache.putAll(head.cache)
         head.cacheClear()

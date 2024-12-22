@@ -13,6 +13,7 @@ import com.xmlcalabash.exceptions.DefaultErrorExplanation
 import com.xmlcalabash.exceptions.ErrorExplanation
 import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.exceptions.XProcException
+import com.xmlcalabash.namespace.NsErr
 import com.xmlcalabash.namespace.NsFn
 import com.xmlcalabash.namespace.NsXs
 import com.xmlcalabash.runtime.api.RuntimeOption
@@ -84,6 +85,7 @@ class XmlCalabashCli private constructor() {
             config.verbosity = commandLine.verbosity ?: config.verbosity
             config.trace = commandLine.trace
             config.traceDocuments = commandLine.traceDocuments
+            config.debugger = commandLine.debugger
 
             if (config.trace == null && config.traceDocuments != null) {
                 config.trace = config.traceDocuments!!.resolve("trace.xml")
@@ -172,6 +174,12 @@ class XmlCalabashCli private constructor() {
 
             pipeline.run()
         } catch (ex: Exception) {
+            if (ex is XProcException) {
+                if (ex.error.code == NsErr.xi(9997)) { // FIXME: stupid literal constant
+                    exitProcess(1)
+                }
+            }
+
             if (commandLine.verbosity != null && commandLine.verbosity!! <= Verbosity.DEBUG) {
                 ex.printStackTrace()
             }

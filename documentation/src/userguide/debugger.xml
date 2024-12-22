@@ -1,0 +1,574 @@
+<chapter xmlns="http://docbook.org/ns/docbook"
+         xmlns:xlink="http://www.w3.org/1999/xlink"
+         xmlns:xi='http://www.w3.org/2001/XInclude'
+         version="5.2" xml:id="debugging">
+<info>
+  <?db filename="debugging"?>
+  <title>The interactive debugger</title>
+</info>
+
+<para>If you run XML Calabash with the <option
+linkend="cli-debugger">--debugger</option> option, the pipeline is loaded
+and then the debugger starts.</para>
+
+<note>
+<para>This is a very new feature and there are a number of rough edges. One of
+the roughest is the random and seemingly arbitrary nature of the IDs that are
+used to identify steps. There are also discrepancies between atomic and compound
+steps that don’t really make any sense. Future releases will (hopefully) sand off
+some of the sharper edges!</para>
+</note>
+
+<para>The debugger prompt is <code>&gt; </code>. When you start a pipeline in the
+debugger, the first prompt occurs just before the initial pipeline begins running.
+Subsequent prompts occur when you step through the running pipeline or when breakpoints
+are encountered.</para>
+
+<para>The debugger is always operating in the context of a particular step. There
+may be a stack of open steps. Moving around in the stack changes the context.</para>
+
+<section>
+<title>Command summary</title>
+
+<para>The available commands are:</para>
+
+<itemizedlist>
+<listitem>
+<para><command linkend="dbg-breakpoint">breakpoint</command>, example or set breakpoints.</para>
+</listitem>
+<listitem>
+<para><command linkend="dbg-define">define</command>, create a local variable.</para>
+</listitem>
+</itemizedlist>
+
+<section xml:id="dbg-breakpoint">
+<title>breakpoint</title>
+
+<para>Set or display breakpoints.</para>
+
+<para>There are four forms of the <command>breakpoint</command> command:
+</para>
+
+<cmdsynopsis>
+  <command>breakpoint</command>
+  <arg choice="opt">on</arg>
+  <arg choice="plain"><replaceable>id</replaceable></arg>
+  <arg choice="opt">
+    <arg choice="plain">when</arg>
+    <arg choice="plain"><replaceable>expression</replaceable></arg>
+  </arg>
+</cmdsynopsis>
+
+<para>Sets a breakpoint before the step <replaceable>id</replaceable> is
+executed. If an XPath <replaceable>expression</replaceable> is provided,
+the breakpoint is conditional on that expression. The breakpoint only
+occurs if the effective boolean value of the expression is true.</para>
+
+<cmdsynopsis>
+  <command>breakpoint</command>
+  <arg choice="opt">on</arg>
+  <arg choice="plain"><replaceable>id</replaceable></arg>
+  <arg choice="opt">
+    <arg choice="opt">at</arg>
+    <arg choice="plain">input</arg>
+    <arg choice="plain"><replaceable>port</replaceable></arg>
+  </arg>
+  <arg choice="opt">
+    <arg choice="plain">when</arg>
+    <arg choice="plain"><replaceable>expression</replaceable></arg>
+  </arg>
+</cmdsynopsis>
+
+<para>Sets a breakpoint before the step <replaceable>id</replaceable> is
+executed. This breakpoint is conditional on input arriving on
+<replaceable>port</replaceable>.
+If an XPath <replaceable>expression</replaceable> is provided,
+it will be evaluated once for each input on the specified <replaceable>port</replaceable>,
+with the input as the context item. The breakpoint only
+occurs if the effective boolean value of at least one expression is true.</para>
+
+<para>Unlike breakpoints on output ports, the breakpoint occurs just before
+the step executes. An “input” breakpoint is just a special kind of conditional
+breakpoint.</para>
+
+<cmdsynopsis>
+  <command>breakpoint</command>
+  <arg choice="opt">on</arg>
+  <arg choice="plain"><replaceable>id</replaceable></arg>
+  <arg choice="opt">
+    <arg choice="opt">at</arg>
+    <arg choice="plain">output</arg>
+    <arg choice="plain"><replaceable>port</replaceable></arg>
+  </arg>
+  <arg choice="opt">
+    <arg choice="plain">when</arg>
+    <arg choice="plain"><replaceable>expression</replaceable></arg>
+  </arg>
+</cmdsynopsis>
+
+<para>Sets a breakpoint that occurs when the step <replaceable>id</replaceable>
+produces a document on its output port named <replaceable>port</replaceable>.
+If an XPath <replaceable>expression</replaceable> is provided,
+it will be evaluated with the document as the context item. The breakpoint only
+occurs if the effective boolean value of the expression is true.</para>
+
+<para>When this breakpoint occurs, a variable named <literal>cx:document</literal>
+is added to the local variables. If the value of this variable is changed,
+the document that’s actually sent as output will be changed accordingly.</para>
+
+<cmdsynopsis>
+  <command>breakpoint</command>
+</cmdsynopsis>
+
+<para>If used with no arguments, the <command>breakpoint</command> prints a summary
+of enabled breakpoints.</para>
+
+<para>The commands <command>break</command> and <command>b</command> are
+synonyms for <command>breakpoint</command>.</para>
+</section>
+
+<section xml:id="dbg-define">
+<title>define</title>
+
+<para>Define a local variable.</para>
+
+<cmdsynopsis>
+  <command>define</command>
+  <arg choice="plain">$<replaceable>varname</replaceable></arg>
+  <arg choice="plain">=</arg>
+  <arg choice="plain"><replaceable>expression</replaceable></arg>
+</cmdsynopsis>
+
+<para>Creates a local variable named <varname>$varname</varname> and assigns to it
+the value that results from evaluating the expression. (If an error occurs
+evaluating the expression, the empty sequence will be assigned.)</para>
+
+<para>You can only define variables that do not already exist. To change the
+value of an existing variable, use <link linkend="dbg-set">set</link>.</para>
+
+<para>Local variables shadow step options of the same name.</para>
+
+<para>The command <command>def</command> is a synonym for
+<command>define</command>.</para>
+</section>
+
+<section xml:id="dbg-down">
+<title>down</title>
+
+<para>Move down in the stack.</para>
+
+<cmdsynopsis>
+<command>down</command>
+<arg choice="opt">frames</arg>
+</cmdsynopsis>
+
+<para>Moves down <replaceable>frames</replaceable> stack frames, or one frame if
+<replaceable>frames</replaceable> is not specified. Has no effect if you’re
+already on the last frame.</para>
+
+<para>The command <command>d</command> is a synonym for
+<command>down</command>.</para>
+</section>
+
+<section xml:id="dbg-exit">
+<title>exit</title>
+
+<para>Exit the debugger and the pipeline.</para>
+
+<cmdsynopsis>
+<command>exit</command>
+</cmdsynopsis>
+
+<para>Quits the debugger and aborts execution of the pipeline.</para>
+
+<para>The commands <command>x</command>, <command>quit</command>,
+and <command>q</command> are
+synonyms for <command>exit</command>.</para>
+</section>
+
+<section xml:id="dbg-help">
+<title>help</title>
+
+<para>Get help.</para>
+
+<cmdsynopsis>
+<command>help</command>
+<arg choice="opt">command</arg>
+</cmdsynopsis>
+
+<para>Displays a summary of the debugger commands. If <replaceable>command</replaceable> is
+provided, more detail is given about that command.</para>
+
+<para>The commands <command>h</command> and <command>?</command> are
+synonyms for <command>help</command>.</para>
+</section>
+
+<section xml:id="dbg-inputs">
+<title>inputs</title>
+
+<para>Show the step inputs.</para>
+
+<cmdsynopsis>
+<command>inputs</command>
+</cmdsynopsis>
+
+<para>Displays a summary of the inputs provided to the step. These can be
+examined in more detail with the <varname>cx:input</varname> map.</para>
+
+<para>The command <command>i</command> is a
+synonym for <command>inputs</command>.</para>
+</section>
+
+<section xml:id="dbg-models">
+<title>models</title>
+
+<para>Show the pipeline models.</para>
+
+<cmdsynopsis>
+<command>models</command>
+<arg choice="opt">model</arg>
+</cmdsynopsis>
+
+<para>In order to execute a pipeline, XML Calabash transforms it into a graph model.
+These models are then instantiated to be executed. The <command>model</command> command
+allows you to explore the available models.</para>
+
+<para>(At the moment, the mapping from model identifiers to the identifiers used during
+pipeline execution is unpredictable. Hopefully, that will be resolved in the future,
+allowing you to predict a step id for use in a breakpoint directly from the model.)</para>
+
+<para>The commands <command>mod</command> and <command>m</command> are
+synonyms for <command>model</command>.</para>
+</section>
+
+<section xml:id="dbg-namespace">
+<title>namespace</title>
+
+<para>Set or display namespace bindings.</para>
+
+<cmdsynopsis>
+<command>namespace</command>
+<arg choice="opt">
+  <arg choice="plain"><replaceable>prefix</replaceable></arg>
+  <arg choice="plain">=</arg>
+  <arg choice="plain">"uri"</arg>
+</arg>
+</cmdsynopsis>
+
+<para>Assigns the URI <replaceable>uri</replaceable> to the namespace prefix
+<replaceable>prefix</replaceable> in the local namespace bindings. For the
+purpose of evaluating expressions, local namespace bindings shadow bindings
+from the step context.</para>
+
+<para>If entered with no binding, <command>namespace</command> prints the current
+bindings.</para>
+
+<para>The command <command>ns</command> is a
+synonym for <command>namespace</command>.</para>
+</section>
+
+<section xml:id="dbg-options">
+<title>options</title>
+
+<para>Display (atomic) step options and local variables.</para>
+
+<cmdsynopsis>
+<command>options</command>
+</cmdsynopsis>
+
+<para>Displays the names of any options defined on the current (atomic) step
+or in local variables. These names can be used in expressions. Changing the value
+of a step option changes the value the step will receive when it runs!</para>
+
+<para>The commands <command>o</command>, <command>variables</command>
+and <command>var</command> are
+synonyms for <command>options</command>.</para>
+</section>
+
+<section xml:id="dbg-run">
+<title>run</title>
+
+<para>Continue execution of the pipeline.</para>
+
+<cmdsynopsis>
+<command>run</command>
+</cmdsynopsis>
+
+<para>Starts running the pipeline again. Execution will continue until the next
+breakpoint or until the pipeline finishes.</para>
+
+<para>The command <command>r</command> is a
+synonym for <command>run</command>.</para>
+</section>
+
+<section xml:id="dbg-set">
+<title>set</title>
+
+<para>Set the value of a step option of local variable.</para>
+
+<cmdsynopsis>
+  <command>set</command>
+  <arg choice="plain">$<replaceable>varname</replaceable></arg>
+  <arg choice="plain">=</arg>
+  <arg choice="plain"><replaceable>expression</replaceable></arg>
+</cmdsynopsis>
+
+<para>Changes the value of the stop option or local variable named
+<varname>$varname</varname> to the value that results from
+evaluating the expression. (If an error occurs evaluating the expression, the
+empty sequence will be assigned.)</para>
+
+<para>You can only set the values of options or variables that already exist. To create a
+new variable, use <link linkend="dbg-define">define</link>.</para>
+</section>
+
+<section xml:id="dbg-show">
+<title>show</title>
+
+<para>Show the results of evaluating an expression.</para>
+
+<cmdsynopsis>
+  <command>show</command>
+  <arg choice="plain"><replaceable>expression</replaceable></arg>
+</cmdsynopsis>
+
+<para>Evaluates the expression provided and displays the result.</para>
+
+<para>The commands <command>eval</command> and <command>echo</command> are
+synonyms for <command>show</command>.</para>
+</section>
+
+<section xml:id="dbg-stack">
+<title>stack</title>
+
+<para>Display the stack.</para>
+
+<cmdsynopsis>
+<command>stack</command>
+</cmdsynopsis>
+
+<para>Displays the current stack. The stack frame that is the
+current context is marked with a <literal>*</literal>.
+</para>
+</section>
+
+<section xml:id="dbg-step">
+<title>step</title>
+
+<para>Execute the current step.</para>
+
+<cmdsynopsis>
+<command>step</command>
+</cmdsynopsis>
+
+<para>Executes the current step, then returns to the debugger. (If a breakpoint
+occurs before the next step, execution will stop at the breakpoint.)</para>
+
+<para>The command <command>s</command> is a synonym for
+<command>step</command>.</para>
+</section>
+
+<section xml:id="dbg-subpipeline">
+<title>subpipeline</title>
+
+<para>Show subpipeline steps.</para>
+
+<cmdsynopsis>
+<command>subpipeline</command>
+</cmdsynopsis>
+
+<para>Displays the models that are children of the current (compound) step.</para>
+
+<para>The command <command>sub</command> is a synonym for
+<command>subpipeline</command>.</para>
+</section>
+
+<section xml:id="dbg-up">
+<title>up</title>
+
+<para>Move up in the stack.</para>
+
+<cmdsynopsis>
+<command>up</command>
+<arg choice="opt">frames</arg>
+</cmdsynopsis>
+
+<para>Moves up <replaceable>frames</replaceable> stack frames, or one frame if
+<replaceable>frames</replaceable> is not specified. Has no effect if you’re
+already on the first frame.</para>
+
+<para>The command <command>u</command> is a synonym for
+<command>up</command>.</para>
+</section>
+
+</section>
+
+<section xml:id="debugger-example">
+<title>Debugger example</title>
+
+<para>To explore how the debugger works, let’s work through a small example.
+The pipeline in <xref linkend="debugger-pipeline"/> is a simple, linear pipeline
+with a few extra identity steps.</para>
+
+<figure xml:id="debugger-pipeline">
+<title>Sample debugging pipeline</title>
+<programlisting language='xml'
+><xi:include href="../examples/xpl/debugger.xpl" parse="text"/></programlisting>
+</figure>
+
+<para>To understand what the debugger sees, consider the graph shown in
+<xref linkend="debugger-model"/>.</para>
+
+<figure xml:id="debugger-model">
+<title>The pipeline graph model</title>
+<mediaobject>
+<imageobject>
+<imagedata fileref="img/debugger-graph.svg"/>
+</imageobject>
+</mediaobject>
+</figure>
+
+<para>There are two models, one for each pipeline. And note that there are
+“extra” atomic steps at the head and foot of each compound step. Let’s start
+running this pipeline under the debugger:</para>
+
+<screen><prompt>$ </prompt><userinput>xmlcalabash debugger-example.xpl --debugger</userinput>
+<computeroutput>Debugger at MIC460.1 / !declare-step_IC460
+<prompt>> </prompt></computeroutput></screen>
+
+<para>The message tells us that we’re at the start of the “main” pipeline and
+the debugger is waiting for commands. We can look at the models with the
+<command>models</command>:</para>
+
+<screen><prompt>> </prompt><userinput>models</userinput>
+<computeroutput>*IC460 p:declare-step/IC460
+ IC462 p:declare-step/IC462: ex:ident</computeroutput>
+<prompt>> </prompt><userinput>models IC462</userinput>
+<computeroutput>MIC465 p:identity !identity_IC465</computeroutput>
+<prompt>> </prompt><userinput>models IC460</userinput>
+<computeroutput>MIC496 cx:document !document_IC496
+MIC466 p:xinclude !xinclude_IC466
+id1_IC468 p:identity id1
+ex1_IC469 ex:ident ex1
+add_IC470 p:add-attribute add
+id2_IC474 p:identity id2</computeroutput>
+<prompt>> </prompt></screen>
+
+<para>We can see that these models reflect the structure of the compiled pipelines.</para>
+
+<para>Let’s look at the stack:</para>
+
+<screen><prompt>> </prompt><userinput>stack</userinput>
+<computeroutput>*[0] !declare-step_IC460</computeroutput>
+<prompt>> </prompt><userinput>step</userinput>
+<computeroutput>Debugger at MIC460.2 / !declare-step_IC460/head</computeroutput>
+<prompt>> </prompt><userinput>step</userinput>
+<computeroutput>Debugger at MIC496.7 / !document_IC496</computeroutput>
+<prompt>> </prompt><userinput>stack</userinput>
+<computeroutput> [0] !declare-step_IC460
+*[1] !document_IC496</computeroutput>
+<prompt>> </prompt></screen>
+
+<para>The initial stack is just the one step, the main pipeline waiting to be run.
+Stepping forward once takes us the head of the compound step. Stepping foward again
+takes us to the <tag>p:document</tag> step. (Note that the order in which steps are run
+depends on the connections between them, they are not displayed in any particular order
+by the model or <command>subpipeline</command> commands.)</para>
+
+<para>We can explore the inputs to the step.</para>
+
+<screen><prompt>> </prompt><userinput>inputs</userinput>
+<prompt>> </prompt><userinput>options</userinput>
+<computeroutput>Step options:
+  $href
+  $document-properties
+  $parameters</computeroutput>
+<prompt>> </prompt><userinput>show $href</userinput>
+<computeroutput>../xml/default-input.xml</computeroutput>
+<prompt>> </prompt></screen>
+
+<para>The step has no inputs and three options. We can use the <command>show</command>
+command to inspect the values of the options. We could also use the <command>set</command>
+command to <emphasis>change them</emphasis>.</para>
+
+<para>Let’s set a breakpoint on the <tag>ex:ident</tag> step:</para>
+
+<screen><prompt>> </prompt><userinput>up</userinput>
+<prompt>> </prompt><userinput>stack</userinput>
+<computeroutput>*[0] !declare-step_IC460
+ [1] !document_IC496</computeroutput>
+<prompt>> </prompt><userinput>subpipeline</userinput>
+<computeroutput>MIC496.7 / !document_IC496
+MIC466.8 / !xinclude_IC466
+id1_IC468.9 / id1
+MIC462.4 / !declare-step_IC462
+add_IC470.10 / add
+id2_IC474.11 / id2</computeroutput>
+<prompt>> </prompt><userinput>break on MIC462.4</userinput>
+<prompt>> </prompt></screen>
+
+<para>We need the id of the <tag>ex:ident</tag> step. To find it, we navigate up
+to the stack frame for the compound step, then we look at its <command>subpipeline</command>.
+The step we’re interested is the one named “<literal>!declare_step_IC462</literal>.
+Once we know its id, we can set a breakpoint on it.</para>
+
+<para>Using <command>run</command>, we can advance to the breakpoint.</para>
+
+<screen><prompt>> </prompt><userinput>run</userinput>
+<computeroutput>Debugger at MIC462.4 / !declare-step_IC462</computeroutput>
+<prompt>> </prompt><userinput>stack</userinput>
+<computeroutput> [0] !declare-step_IC460
+*[1] !declare-step_IC462</computeroutput>
+<prompt>> </prompt></screen>
+
+<para>Now let’s do something more interesting. Let’s set a breakpoint on the output 
+of the <tag>p:add-attribute</tag> step if there’s a role attribute on the output.</para>
+
+<screen><prompt>> </prompt><userinput>break on add_IC470.10 output result when //ex:chap[@role]</userinput>
+<prompt>> </prompt><command>run</command>
+<computeroutput>Output from add_IC470.10 on result satisfies //ex:chap[@role]
+Debugger at add_IC470.10 / add</computeroutput>
+<prompt>> </prompt></screen>
+
+<para>We can look at that document with <command>show</command>:</para>
+
+<screen><prompt>> </prompt><userinput>show $cx:document</userinput>
+<computeroutput><![CDATA[<doc xmlns="https://xmlcalabash.com/ns/examples"
+     xmlns:xi="http://www.w3.org/2001/XInclude"
+     class="book">
+   <chap former="1" class="test" role="test">
+      <title>First Chapter</title>
+      <p>…</p>
+   </chap>
+   <chap role="test">
+      <title>Second Chapter</title>
+      <p>…</p>
+   </chap>
+   <chap role="test">
+      <title>Third Chapter</title>
+      <p>…</p>
+   </chap>
+   <app role="test">
+      <title>Appendix</title>
+      <p>…</p>
+   </app>
+</doc>]]></computeroutput>
+<prompt>> </prompt></screen>
+
+<para>For a last example, let’s be a little cheeky and change the output:</para>
+
+<screen><prompt>> </prompt><userinput><![CDATA[set $cx:document = parse-xml("<change role='nothing to see here'/>")]]></userinput>
+<prompt>> </prompt></screen>
+
+<para>We’ve passed all our breakpoints, so running the pipeline again will run
+to the end.</para>
+
+<screen><prompt>> </prompt><userinput>run</userinput>
+<computeroutput><![CDATA[=== result :: 1 :: file:/…/documentation/src/examples/xml/default-input.xml ===
+<change role="nothing to see here"/>
+=================================================================================================================]]></computeroutput></screen>
+
+<para>Hopefully, that gives you a flavor for what’s possible.</para>
+</section>
+
+</chapter>
