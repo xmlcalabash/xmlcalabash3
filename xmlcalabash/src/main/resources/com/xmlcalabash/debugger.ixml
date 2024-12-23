@@ -1,6 +1,7 @@
 ixml version "1.1" .
 
-command = breakpoint
+command = base-uri
+          | breakpoint
           | define 
           | down
           | eval
@@ -17,9 +18,18 @@ command = breakpoint
           | subpipeline
           | up .
 
--breakpoint = breakpoint-command, (((rs, -"on")?, rs, id), bport?, when?)? .
+-base-uri = base-uri-command, (rs, uri)? .
+-base-uri-command = name-base-uri, s, (-"base-uri" | -"base") .
+name-base-uri>name = +"base-uri" .
+
+-breakpoint = breakpoint-command, (break-clear | break-set)? .
 -breakpoint-command = name-breakpoint, s, (-"breakpoint" | -"break" | -"b") .
 name-breakpoint>name = +"breakpoint" .
+
+-break-clear = name-break-clear, rs, -"clear", rs, id .
+name-break-clear>clear = +"true" .
+-break-set = rs, (-"on" | -"set"), rs, id, bport?, when? .
+
 -bport = (rs, -"at")?, rs, (input|output) .
 input = -"input", rs, -port .
 output = -"output", rs, -port .
@@ -89,7 +99,7 @@ frame = ["0"-"9"]+ .
 -step = name-step, s, (-"step" | -"s") .
 name-step>name = +"step" .
 
--subpipeline = name-subpipeline, s, (-"subpipeline" | -"sub") .
+-subpipeline = name-subpipeline, s, (-"subpipeline" | -"sub"), (rs, id)? .
 name-subpipeline>name = +"subpipeline" .
 
 -up = up-command, (rs, frames)? .

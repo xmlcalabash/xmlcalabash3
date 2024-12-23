@@ -110,9 +110,6 @@ class XplParser internal constructor(val builder: PipelineBuilder) {
             parseLibrary(document.rootNode as LibraryNode, library)
         } else {
             val decl = builder.newDeclareStep()
-            decl.debugPipelineBefore = "/tmp/pipeline.xml"
-            decl.debugPipelineAfter = "/tmp/pipeline.xml"
-
             decl.stepConfig.updateWith(document.rootNode.node)
             parsedUris[uri] = decl
             parseDeclareStep(null, document.rootNode as DeclareStepNode, decl)

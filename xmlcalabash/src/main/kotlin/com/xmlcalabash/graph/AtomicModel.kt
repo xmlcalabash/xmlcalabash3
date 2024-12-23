@@ -3,7 +3,7 @@ package com.xmlcalabash.graph
 import com.xmlcalabash.datamodel.*
 import com.xmlcalabash.exceptions.XProcError
 
-open class AtomicModel(graph: Graph, parent: Model, step: AtomicStepInstruction): Model(graph, parent, step) {
+open class AtomicModel(graph: Graph, parent: Model, step: AtomicStepInstruction, id: String): Model(graph, parent, step, id) {
     override fun init() {
         graph.models.add(this)
         graph.instructionMap[step] = this

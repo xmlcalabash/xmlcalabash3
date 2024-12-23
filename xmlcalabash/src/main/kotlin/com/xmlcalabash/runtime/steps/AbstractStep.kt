@@ -20,11 +20,17 @@ import net.sf.saxon.s9api.QName
 import org.apache.logging.log4j.kotlin.logger
 
 abstract class AbstractStep(val stepConfig: XProcStepConfiguration, step: StepModel, val type: QName = step.type, val name: String = step.name): Consumer {
-    companion object {
-        private var _id = 0L
+    val _id: String
+    init {
+        if (step.instantiationCount == 1) {
+            _id = step.id
+        } else {
+            _id = "${step.id}/${step.instantiationCount}"
+        }
+        step.instantiationCount++
     }
+    override val id = _id
 
-    override val id = "${step.id}.${++_id}"
     val location = step.location
     internal val receiver = mutableMapOf<String, Pair<Consumer, String>>()
     val inputCount = mutableMapOf<String, Int>()

@@ -11,9 +11,9 @@ import java.util.*
 
 class Graph private constructor(val environment: PipelineEnvironment) {
     companion object {
-        fun build(decl: DeclareStepInstruction, environment: PipelineEnvironment): PipelineModel {
+        fun build(decl: DeclareStepInstruction, environment: PipelineEnvironment): SubpipelineModel {
             val graph = Graph(environment)
-            return graph.build(decl)
+            return SubpipelineModel(graph.build(decl), graph.modelName("pipeline"))
         }
     }
 
@@ -34,8 +34,12 @@ class Graph private constructor(val environment: PipelineEnvironment) {
             return _graphXml
         }
 
+    fun modelName(base: String): String {
+        return environment.uniqueName(base)
+    }
+
     private fun build(pipeline: DeclareStepInstruction): PipelineModel {
-        val node = PipelineModel(this, null, pipeline)
+        val node = PipelineModel(this, null, pipeline, modelName(pipeline.name))
         createModels(node)
         node.init()
 
@@ -86,11 +90,11 @@ class Graph private constructor(val environment: PipelineEnvironment) {
     private fun createModels(node: CompoundModel) {
         for (child in (node.step as CompoundStepDeclaration).children.filterIsInstance<StepDeclaration>()) {
             val cnode = when (child) {
-                is CompoundStepDeclaration -> CompoundModel(this, node, child)
+                is CompoundStepDeclaration -> CompoundModel(this, node, child, modelName(child.name))
                 is AtomicExpressionStepInstruction -> {
-                    AtomicModel(this, node, child as AtomicStepInstruction)
+                    AtomicModel(this, node, child as AtomicStepInstruction, modelName(child.name))
                 }
-                else -> AtomicModel(this, node, child as AtomicStepInstruction)
+                else -> AtomicModel(this, node, child as AtomicStepInstruction, modelName(child.name))
             }
             if (cnode.step.instructionType != NsCx.empty) {
                 node._children.add(cnode)
@@ -297,7 +301,7 @@ class Graph private constructor(val environment: PipelineEnvironment) {
                     val step = Splitter(pnode.step)
                     //pnode.step._children.add(step)
 
-                    val splitter = AtomicModel(this, pnode, step)
+                    val splitter = AtomicModel(this, pnode, step, modelName(step.name))
                     (pnode as CompoundModel)._children.add(splitter)
                     splitter.init()
 
@@ -346,7 +350,7 @@ class Graph private constructor(val environment: PipelineEnvironment) {
                     val step = Joiner(pnode.step)
                     //pnode.step._children.add(step)
 
-                    val joiner = AtomicModel(this, pnode, step)
+                    val joiner = AtomicModel(this, pnode, step, modelName(step.name))
                     (pnode as CompoundModel)._children.add(joiner)
                     joiner.init()
 

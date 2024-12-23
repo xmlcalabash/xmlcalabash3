@@ -5,15 +5,20 @@ import com.xmlcalabash.exceptions.XProcException
 import net.sf.saxon.s9api.QName
 
 abstract class StepDeclaration(parent: XProcInstruction?, stepConfig: InstructionConfiguration, instructionType: QName): XProcInstruction(parent, stepConfig, instructionType) {
-    init {
-        stepConfig.stepName = "!${instructionType.localName}_${id}"
-    }
+    private var nameAssigned = false
 
     internal var declId: String = ""
     var name: String
-        get() = stepConfig.stepName
+        get() {
+            if (!nameAssigned) {
+                stepConfig.stepName = stepConfig.environment.uniqueName("!${instructionType.localName}")
+                nameAssigned = true
+            }
+            return stepConfig.stepName
+        }
         set(value) {
             checkOpen()
+            nameAssigned = true
             stepConfig.stepName = value
         }
 
@@ -27,8 +32,6 @@ abstract class StepDeclaration(parent: XProcInstruction?, stepConfig: Instructio
     // ========================================================================================
 
     protected fun elaborateInstructionInfo() {
-        stepConfig.stepName = name
-
         for (name in depends) {
             val dependsOn = stepConfig.inscopeStepNames[name] ?: throw stepConfig.exception(XProcError.xsDependsNotAStep(name))
 
@@ -159,21 +162,6 @@ abstract class StepDeclaration(parent: XProcInstruction?, stepConfig: Instructio
                             }
                         }
                     }
-                } else {
-                    // Empty steps were created to complete the graph, generating
-                    // no input where a p:empty was bound. I don't *believe* they
-                    // are necessary anymore.
-                    /*
-                    val emptyStep = AtomicEmptyStepInstruction(this)
-                    emptyStep.elaborateAtomicStep()
-                    result.add(emptyStep)
-
-                    val wi = exprStep.withInput()
-                    wi.port = "source"
-                    val readablePort = emptyStep.primaryOutput()!!
-                    val pipe = wi.pipe()
-                    pipe.setReadablePort(readablePort)
-                     */
                 }
 
                 variableBindings(option.select!!, exprStep)

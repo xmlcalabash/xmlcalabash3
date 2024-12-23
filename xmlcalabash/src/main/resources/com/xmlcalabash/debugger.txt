@@ -1,5 +1,12 @@
 The debugger accepts the following commands:
 
+* base-uri (base): display or set the base URI.
+
+  Syntax: base-uri ["URI"]
+
+  Where URI is a valid URI. If URI is specified, sets the base
+  URI to URI, otherwise, displays the current base URI.
+
 * breakpoint (break, b): sets a breakpoint.
 
   Syntax: breakpoint [on] STEP [input|output PORT] [when EXPR]

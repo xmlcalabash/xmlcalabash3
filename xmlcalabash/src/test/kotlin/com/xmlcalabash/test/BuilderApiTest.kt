@@ -467,9 +467,6 @@ class BuilderApiTest {
         decl.input("source")
         decl.output("result")
 
-        decl.debugPipelineAfter = "/tmp/pipeline.xml"
-        decl.debugPipelineGraph = "/tmp/graph.xml"
-
         val library1 = builder.newLibrary()
         library1.stepConfig.updateWith(URI("http://example.com/library1"))
         val library2 = builder.newLibrary()
@@ -553,9 +550,6 @@ class BuilderApiTest {
         val output = declStep.output("result")
         output.sequence = true
 
-        declStep.debugPipelineAfter = "/tmp/pipeline.xml"
-        declStep.debugPipelineGraph = "/tmp/graph.xml"
-
         val forEach = declStep.forEach()
         val addAttr = forEach.atomicStep(NsP.addAttribute)
         addAttr.withOption(Ns.match, "/*")
@@ -586,9 +580,6 @@ class BuilderApiTest {
         input.inline(input.fromString("<doc>7</doc>"))
 
         declStep.output("result")
-
-        declStep.debugPipelineAfter = "/tmp/pipeline.xml"
-        declStep.debugPipelineGraph = "/tmp/graph.xml"
 
         val choose = declStep.choose()
         val when1 = choose.whenInstruction()

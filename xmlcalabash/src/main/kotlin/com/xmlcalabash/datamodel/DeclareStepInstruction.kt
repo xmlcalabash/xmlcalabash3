@@ -1,6 +1,5 @@
 package com.xmlcalabash.datamodel
 
-import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.namespace.NsP
 import com.xmlcalabash.runtime.XProcPipeline
@@ -25,7 +24,6 @@ class DeclareStepInstruction(parent: XProcInstruction?, stepConfig: InstructionC
     private var compiled = false
     override val contentModel = anySteps + mapOf(NsP.input to '*', NsP.output to '*', NsP.declareStep to '*', NsP.option to '*')
     internal val declaredSteps = mutableListOf<DeclareStepInstruction>()
-    var eagerEval = false
 
     override var psviRequired: Boolean? = null
         set(value) {
@@ -78,10 +76,6 @@ class DeclareStepInstruction(parent: XProcInstruction?, stepConfig: InstructionC
             }
             return true
         }
-
-    var debugPipelineBefore: String? = null
-    var debugPipelineAfter: String? = null
-    var debugPipelineGraph: String? = null
 
     // ========================================================================================
 
@@ -500,14 +494,8 @@ class DeclareStepInstruction(parent: XProcInstruction?, stepConfig: InstructionC
 
     override fun toString(): String {
         if (type == null) {
-            if (name.startsWith("!")) {
-                return "${instructionType}/${id}"
-            }
-            return "${instructionType}/${id} \"${name}\""
+            return name
         }
-        if (name.startsWith("!")) {
-            return "${instructionType}/${id}: ${type}"
-        }
-        return "${instructionType}/${id}: ${type} \"${name}\""
+        return "${name}: ${type}"
     }
 }

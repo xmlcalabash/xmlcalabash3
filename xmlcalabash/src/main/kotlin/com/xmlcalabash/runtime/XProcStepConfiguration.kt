@@ -28,6 +28,7 @@ interface XProcStepConfiguration: DocumentContext {
     var stepName: String
     val location: Location
     val nextId: String
+    //fun uniqueName(base: String): String
 
     fun copy(): XProcStepConfiguration
     fun copyNew(): XProcStepConfiguration

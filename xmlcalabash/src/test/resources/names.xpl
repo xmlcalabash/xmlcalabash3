@@ -7,24 +7,19 @@
 <p:declare-step type="ex:ident">
   <p:input port="source" sequence="true"/>
   <p:output port="result" sequence="true"/>
-  <p:identity/>
+  <p:identity name="id1"/>
 </p:declare-step>
 
 <p:xinclude>
-  <p:with-input href="../xml/default-input.xml"/>
+  <p:with-input href="names.xpl"/>
 </p:xinclude>
+
+<p:identity name="id1"/>
 
 <ex:ident name="ex1"/>
 
-<p:for-each>
-  <p:with-input select="/ex:doc/*"/>
-  <p:identity name="id1"/>
-  <p:add-attribute name="add"
-                   attribute-name="role" attribute-value="test"/>
-</p:for-each>
-
-<p:wrap-sequence expand-text="false"
-                 wrapper="Q{https://xmlcalabash.com/ns/examples}set"/>
+<p:add-attribute name="add"
+                 attribute-name="role" attribute-value="test"/>
 
 <p:identity name="id2"/>
 

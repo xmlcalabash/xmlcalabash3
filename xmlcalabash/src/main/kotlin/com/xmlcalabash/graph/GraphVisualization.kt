@@ -172,11 +172,7 @@ class   GraphVisualization private constructor(val graph: Graph) {
     }
 
     abstract inner class ModelNode(val model: Model): Node() {
-        override val id = if (model.step.name.startsWith("!")) {
-            "M${model.step.id}"
-        } else {
-            "${model.step.name}_${model.step.id}"
-        }
+        override val id = model.id
 
         override fun addSinks() {
             val pnode = model.parent.let { modelMap[it] }
@@ -190,7 +186,9 @@ class   GraphVisualization private constructor(val graph: Graph) {
                         }
                     }
                 }
-                if (sendsTo != null) {
+                if (sendsTo != null || port.parent is Foot) {
+                    // There aren't any edges for the output of compound steps;
+                    // but that doesn't mean they are sinks...
                     continue
                 }
 
@@ -242,10 +240,11 @@ class   GraphVisualization private constructor(val graph: Graph) {
     }
 
     open inner class HeadNode(model: Model): AtomicNode(model) {
-        override val id = "!head_${model.step.id}"
+        override val id = model.id
         override fun describe(builder: SaxonTreeBuilder) {
             builder.addStartElement(NsDescription.head, stepConfig.stringAttributeMap(mapOf(
                 "id" to id,
+                "tag" to "cx:head",
                 "name" to model.step.name)))
             connections(builder)
             builder.addEndElement()
@@ -253,10 +252,11 @@ class   GraphVisualization private constructor(val graph: Graph) {
     }
 
     open inner class FootNode(model: Model): AtomicNode(model) {
-        override val id = "!foot_${model.step.id}"
+        override val id = model.id
         override fun describe(builder: SaxonTreeBuilder) {
             builder.addStartElement(NsDescription.foot, stepConfig.stringAttributeMap(mapOf(
                 "id" to id,
+                "tag" to "cx:foot",
                 "name" to model.step.name)))
             connections(builder)
             builder.addEndElement()

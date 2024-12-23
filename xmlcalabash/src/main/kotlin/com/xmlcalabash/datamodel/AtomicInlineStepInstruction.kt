@@ -9,6 +9,6 @@ class AtomicInlineStepInstruction(parent: InlineInstruction, val filter: ValueTe
     var documentProperties = parent.documentProperties
 
     init {
-        name = "!${instructionType.localName}_${stepConfig.nextId}"
+        name = stepConfig.environment.uniqueName("!${instructionType.localName}")
     }
 }
