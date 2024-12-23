@@ -15,9 +15,82 @@ finer detail.</para>
 <revhistory>
 <revision xml:id="r300-alpha6">
 <revnumber>3.0.0-alpha6</revnumber>
-<date>2024-12-15</date>
+<date>2024-12-23</date>
 <revdescription>
-<para>T.B.D.</para>
+<itemizedlist>
+<listitem>
+<para>Added <link xlink:href="debugging.html">an interactive debugger</link>.</para>
+</listitem>
+<listitem>
+<para>Added a <link xlink:href="tracing.html">tracing feature</link>.</para>
+</listitem>
+<listitem>
+<para>Fixed
+<link xlink:href="https://github.com/xmlcalabash/xmlcalabash3/issues/48">issue #48</link>
+by supplying extension attributes to atomic steps.</para>
+</listitem>
+<listitem>
+<para>Fixed
+<link xlink:href="https://github.com/xmlcalabash/xmlcalabash3/issues/47">issue #47</link>
+by documenting the <option linkend="cli-pipeline">pipeline</option> option.</para>
+</listitem>
+<listitem>
+<para>Added support for a
+<option linkend="cli-init">--init</option> command line option to support registering
+extension functions before running a pipeline.</para>
+</listitem>
+<listitem>
+<para>Refactored the API that provides inputs to atomic steps. The inputs are now
+cached by the implementation and made available when the step is run. The previous API didn’t
+require that inputs be cached, but the overwhelming majority of steps do. Centralizing
+that feature simplifies atomic step implementations and avoids bugs.</para>
+</listitem>
+<listitem>
+<para>Fixed a bug where <tag>p:store</tag> could not store binary outputs.
+Generally improved handling of serialized outputs.
+Implemented support for the <tag linkend="cc.serialization">cc:serialization</tag>
+configuration option.</para>
+</listitem>
+<listitem>
+<para>Refactored the paged media steps. Documented the extensions supported by
+<tag xlink:href="https://docs.xmlcalabash.com/reference/current/p-css-formatter.html">p:css-formatter</tag>
+and
+<tag xlink:href="https://docs.xmlcalabash.com/reference/current/p-xsl-formatter.html">p:xsl-formatter</tag>.
+</para>
+</listitem>
+<listitem>
+<para>Documented the <function
+xlink:href="https://docs.xmlcalabash.com/reference/current/xproc-functions.html#f.system-property"
+>p:system-property</function> function, including the vendor-specific property
+names.</para>
+</listitem>
+<listitem>
+<para>Refactored the logging-related configuration. Switched to the
+<link xlink:href="https://logback.qos.ch/">Logback</link> backend. Changed the
+<option linkend="cli-debug">--debug</option> option so that it enables debug logging.
+</para>
+</listitem>
+<listitem>
+<para>Refactored and reorganized the <option linkend="cli-verbosity">--verbosity</option>
+values. They now align with debugging log levels.</para>
+</listitem>
+<listitem>
+<para>Refactored how “empty” is handled. Empty inputs are now addressed when the
+graph model is built, not during pipeline construction. This simplifies construction
+and fixed at least one bug.</para>
+</listitem>
+<listitem>
+<para>Fixed a bug in the way the error explanations file was parsed.</para>
+</listitem>
+<listitem>
+<para>Attempted to make sure that error messages include the location of the error.
+Things are improved, though perhaps not fixed everywhere.</para>
+</listitem>
+<listitem>
+<para>Refactored how step and model IDs are managed. The new system produces simpler,
+more predictable APIs.</para>
+</listitem>
+</itemizedlist>
 </revdescription>
 </revision>
 
