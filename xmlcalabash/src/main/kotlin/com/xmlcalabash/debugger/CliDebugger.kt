@@ -311,6 +311,10 @@ class CliDebugger(val runtime: XProcRuntime): Debugger {
                 compiler.declareVariable(name)
             }
 
+            if (curFrame.step.stepConfig.baseUri != null) {
+                compiler.baseURI = curFrame.step.stepConfig.baseUri
+            }
+
             val exec = compiler.compile(expr)
             val selector = exec.load()
             for ((name, value) in variables) {
