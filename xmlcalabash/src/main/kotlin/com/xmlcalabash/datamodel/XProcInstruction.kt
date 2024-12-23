@@ -159,18 +159,6 @@ abstract class XProcInstruction internal constructor(initialParent: XProcInstruc
         return null
     }
 
-    /*
-    internal fun addRewriteEmpty(step: StepDeclaration): AtomicStepInstruction {
-        val emptyStep = AtomicStepInstruction(step, NsCx.empty)
-        emptyStep.elaborateAtomicStep()
-        return emptyStep
-    }
-
-    fun fromUri(href: URI, properties: DocumentProperties = DocumentProperties(), parameters: Map<QName, XdmValue> = emptyMap()): XProcDocument {
-        return stepConfig.fromUri(href, properties, parameters)
-    }
-    */
-
     fun fromString(xml: String, properties: DocumentProperties = DocumentProperties()): XProcDocument {
         return stepConfig.fromString(xml, properties, emptyMap())
     }

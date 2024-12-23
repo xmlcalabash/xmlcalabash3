@@ -16,7 +16,7 @@ class XProcRuntime private constructor(internal val start: DeclareStepInstructio
             val usedSteps = runtime.findUsedSteps(start)
             val pipelines = mutableMapOf<DeclareStepInstruction, SubpipelineModel>()
             for (decl in usedSteps) {
-                val model = SubpipelineModel(Graph.build(decl, config.environment))
+                val model = Graph.build(decl, config.environment)
                 model.init()
                 pipelines[decl] = model
             }

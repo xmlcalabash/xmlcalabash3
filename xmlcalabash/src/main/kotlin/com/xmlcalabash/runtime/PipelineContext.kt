@@ -83,6 +83,24 @@ class PipelineContext(compilerContext: PipelineCompilerContext): PipelineEnviron
             }
         }
 
+    // In this object, we return unique model names
+    private val nameCounts = mutableMapOf<String, Int>()
+    override fun uniqueName(base: String): String {
+        val key = if (base.startsWith("!")) {
+            base.substring(1)
+        } else {
+            base
+        }
+
+        if (key in nameCounts) {
+            val suffix = nameCounts[key]!! + 1
+            nameCounts[key] = suffix
+            return "${key}_${suffix}"
+        }
+        nameCounts[key] = 1
+        return key
+    }
+
     override fun uniqueUri(base: String): URI {
         return commonEnvironment.uniqueUri(base)
     }

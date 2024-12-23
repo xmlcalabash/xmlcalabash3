@@ -4,12 +4,12 @@ import com.xmlcalabash.datamodel.*
 import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.namespace.NsP
 
-open class CompoundModel internal constructor(graph: Graph, parent: Model?, step: CompoundStepDeclaration): Model(graph, parent, step) {
-    private val _head = Head(graph, this)
+open class CompoundModel internal constructor(graph: Graph, parent: Model?, step: CompoundStepDeclaration, id: String): Model(graph, parent, step, id) {
+    private val _head = Head(graph, this, "${id}_head")
     val head: Head
         get() = _head
 
-    private val _foot = Foot(graph, this)
+    private val _foot = Foot(graph, this, "${id}_foot")
     val foot: Foot
         get() = _foot
 
@@ -117,7 +117,7 @@ open class CompoundModel internal constructor(graph: Graph, parent: Model?, step
     }
 
     protected fun decomposeCompoundModel(child: CompoundModel): SubpipelineModel {
-        val submodel = SubpipelineModel(child)
+        val submodel = SubpipelineModel(child, "${child.id}_pipeline")
         submodel.init()
 
         for (input in child.inputs.values.toList()) {

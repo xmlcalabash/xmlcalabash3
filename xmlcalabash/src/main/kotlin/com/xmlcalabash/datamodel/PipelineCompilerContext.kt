@@ -43,7 +43,11 @@ class PipelineCompilerContext(override val xmlCalabash: XmlCalabash): PipelineEn
     private var _mimeTypes = commonEnvironment.mimeTypes
     private var _errorExplanation: ErrorExplanation = commonEnvironment.errorExplanation
     private var _messageReporter: MessageReporter = commonEnvironment.messageReporter
+
     private var _proxies = mutableMapOf<String, String>()
+    init {
+        _proxies.putAll(commonEnvironment.proxies)
+    }
 
     override val nextId: String
         get() {
@@ -52,8 +56,16 @@ class PipelineCompilerContext(override val xmlCalabash: XmlCalabash): PipelineEn
             }
         }
 
-    init {
-        _proxies.putAll(commonEnvironment.proxies)
+    // In this object, we return unique step names
+    private val nameCounts = mutableMapOf<String, Int>()
+    override fun uniqueName(base: String): String {
+        if (base in nameCounts) {
+            val suffix = nameCounts[base]!! + 1
+            nameCounts[base] = suffix
+            return "${base}_${suffix}"
+        }
+        nameCounts[base] = 1
+        return base
     }
 
     override val debugger: Debugger = NopDebugger() // The debugger is never used at compile time...

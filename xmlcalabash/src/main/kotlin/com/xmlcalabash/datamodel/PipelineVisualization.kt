@@ -133,7 +133,8 @@ class PipelineVisualization private constructor(private val instruction: XProcIn
             "type" to step.instructionType.toString(),
         )
         if (step is AtomicDocumentStepInstruction && step.staticOptions.containsKey(Ns.href)) {
-            attr["href"] = step.staticOptions[Ns.href].toString()
+            val opt = step.staticOptions[Ns.href]!!
+            attr["href"] = opt.staticValue.toString()
         }
         if (step is AtomicSelectStepInstruction) {
             attr["select"] = step.select.toString()

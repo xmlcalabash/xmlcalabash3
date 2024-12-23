@@ -24,7 +24,7 @@ class InstructionConfigurationImpl private constructor(
 {
     companion object {
         fun newInstance(builder: PipelineBuilder): InstructionConfiguration {
-            val environment = PipelineCompilerContext(builder.saxonConfig.xmlCalabash)
+            val environment =  builder.pipelineContext //PipelineCompilerContext(builder.saxonConfig.xmlCalabash)
             val xprocStepConfig = XProcStepConfigurationImpl(environment, builder.saxonConfig, Location.NULL)
             val iconfig = InstructionConfigurationImpl(xprocStepConfig)
             return iconfig

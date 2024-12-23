@@ -4,7 +4,6 @@ import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.exceptions.XProcException
 import com.xmlcalabash.graph.SubpipelineModel
-import com.xmlcalabash.namespace.Ns
 import com.xmlcalabash.namespace.NsCx
 import com.xmlcalabash.namespace.NsXmlns
 import com.xmlcalabash.runtime.LazyValue
@@ -21,6 +20,8 @@ import org.nineml.coffeefilter.InvisibleXml
 import org.nineml.coffeefilter.InvisibleXmlParser
 import org.nineml.coffeefilter.ParserOptions
 import org.nineml.coffeefilter.trees.DataTreeBuilder
+import java.net.URI
+import java.net.URISyntaxException
 import java.nio.charset.StandardCharsets
 import java.util.*
 
@@ -39,6 +40,7 @@ class CliDebugger(val runtime: XProcRuntime): Debugger {
 
     val localNamespaces = mutableMapOf<String, NamespaceUri>()
     val localVariables = mutableMapOf<QName, XdmValue>()
+    var localBaseUri: URI? = null
 
     lateinit var curFrame: StackFrame
     var stack: Stack<StackFrame> = Stack()
@@ -70,6 +72,7 @@ class CliDebugger(val runtime: XProcRuntime): Debugger {
         }
 
         if (stopHere) {
+            localBaseUri = curFrame.step.stepConfig.baseUri
             cli(step)
         }
     }
@@ -79,7 +82,7 @@ class CliDebugger(val runtime: XProcRuntime): Debugger {
     }
 
     private fun cli(step: AbstractStep) {
-        println("Debugger at ${step.id} / ${step.name}")
+        println("Debugger at ${step.id}")
         if (curFrame.cx != "cx") {
             println("xmlns:${curFrame.cx} = ${NsCx.namespace}")
         }
@@ -111,6 +114,7 @@ class CliDebugger(val runtime: XProcRuntime): Debugger {
                         println("Parse failed: ${line}")
                         continue
                     }
+                    "base-uri" -> doBaseUri(command)
                     "breakpoint" -> doBreakpoint(command)
                     "define" -> doDefine(command)
                     "down" -> doDown(command)
@@ -131,7 +135,7 @@ class CliDebugger(val runtime: XProcRuntime): Debugger {
                         stepping = true
                         return
                     }
-                    "subpipeline" -> doSubpipeline()
+                    "subpipeline" -> doSubpipeline(command)
                     "up" -> doUp(command)
                     else -> {
                         println("Unexpected command: ${command["name"]}")
@@ -311,8 +315,8 @@ class CliDebugger(val runtime: XProcRuntime): Debugger {
                 compiler.declareVariable(name)
             }
 
-            if (curFrame.step.stepConfig.baseUri != null) {
-                compiler.baseURI = curFrame.step.stepConfig.baseUri
+            if (localBaseUri != null) {
+                compiler.baseURI = localBaseUri
             }
 
             val exec = compiler.compile(expr)
@@ -400,16 +404,23 @@ class CliDebugger(val runtime: XProcRuntime): Debugger {
         val id = command["id"]
         if (id == null) {
             val start = runtime.start.id
+            var maxlen = 0
+            for ((_, value) in runtime.pipelines) {
+                if (value.id.length > maxlen) {
+                    maxlen = value.id.length
+                }
+            }
+
             for ((key, value) in runtime.pipelines) {
                 print(if (start == key.id) "*" else " ")
-                println("${key.id} ${value.model}")
+                println("${value.id.padEnd(maxlen)} ... ${value.model}")
             }
             return
         }
 
         var model: SubpipelineModel? = null
-        for ((key, value) in runtime.pipelines) {
-            if (id == key.id) {
+        for ((_, value) in runtime.pipelines) {
+            if (id == value.id) {
                 model = value
                 break
             }
@@ -420,8 +431,15 @@ class CliDebugger(val runtime: XProcRuntime): Debugger {
             return
         }
 
+        var maxlen = 0
         for (step in model.model.children) {
-            println("${step.id} ${step}")
+            if (step.id.length > maxlen) {
+                maxlen = step.id.length
+            }
+        }
+
+        for (step in model.model.children) {
+            println("${step.id.padEnd(maxlen)} ... ${step}")
         }
     }
 
@@ -441,14 +459,51 @@ class CliDebugger(val runtime: XProcRuntime): Debugger {
         }
     }
 
-    fun doSubpipeline() {
-        val step = curFrame.step
+    fun doSubpipeline(command: Map<String,String>) {
+        var step = curFrame.step
+        if (step !is CompoundStep) {
+            println("This step has no subpipeline")
+        }
+
+        val target = command["id"]
+        if (target != null) {
+            var found = false
+            for (substep in (step as CompoundStep).runnables) {
+                if (target == substep.id) {
+                    found = true
+                    step = substep
+                    break
+                }
+            }
+            if (!found) {
+                println("No subpipeline: ${target}")
+                return
+            }
+        }
+
         if (step is CompoundStep) {
-            for (step in step.runnables) {
-                println("${step.id} / ${step.name}")
+            var maxlen = 0
+            if (step.runnables.isEmpty()) {
+                for ((model, _) in step.runnableProviders) {
+                    if (model.id.length > maxlen) {
+                        maxlen = model.id.length
+                    }
+                }
+                for ((model, _) in step.runnableProviders) {
+                    println("${model.id.padEnd(maxlen)} ... ${model.type}")
+                }
+            } else {
+                for (step in step.runnables) {
+                    if (step.id.length > maxlen) {
+                        maxlen = step.id.length
+                    }
+                }
+                for (step in step.runnables) {
+                    println("${step.id.padEnd(maxlen)} ... ${step.type}")
+                }
             }
         } else {
-            println("This step has no subpipeline")
+            println("Step has no subpipeline")
         }
     }
 
@@ -462,6 +517,22 @@ class CliDebugger(val runtime: XProcRuntime): Debugger {
         val offset = command["frames"]?.toInt() ?: 1
         frameNumber = Math.min(frameNumber + offset, stack.size - 1)
         curFrame = stack[frameNumber]
+    }
+
+    fun doBaseUri(command: Map<String,String>) {
+        if ("uri" in command) {
+            try {
+                localBaseUri = URI(command["uri"]!!)
+            } catch (ex: URISyntaxException) {
+                println("Not a valid URI: ${command["uri"]!!}")
+            }
+            return
+        }
+        if (localBaseUri != null) {
+            println(localBaseUri)
+        } else {
+            println("The base URI is undefined.")
+        }
     }
 
     fun doBreakpoint(command: Map<String,String>) {
@@ -485,6 +556,16 @@ class CliDebugger(val runtime: XProcRuntime): Debugger {
         }
 
         val stepId = command["id"]!!
+
+        if ("clear" in command) {
+            if (stepId in breakpoints) {
+                breakpoints.remove(stepId)
+            } else {
+                println("No breakpoints set on ${stepId}")
+            }
+            return
+        }
+
         val expr = command["when"] ?: "true()"
 
         val list = breakpoints[stepId] ?: mutableListOf()

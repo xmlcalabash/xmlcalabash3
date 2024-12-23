@@ -35,6 +35,7 @@ interface PipelineEnvironment: ExecutionContextManager {
     val proxies: Map<String, String>
 
     val nextId: String
+    fun uniqueName(base: String): String
 
     fun uniqueUri(base: String): URI
     val standardSteps: Map<QName, DeclareStepInstruction>

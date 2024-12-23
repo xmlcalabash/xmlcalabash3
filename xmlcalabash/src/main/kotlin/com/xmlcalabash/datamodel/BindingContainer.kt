@@ -1,10 +1,7 @@
 package com.xmlcalabash.datamodel
 
-import com.xmlcalabash.runtime.XProcStepConfiguration
 import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.exceptions.XProcError
-import com.xmlcalabash.namespace.NsP
-import com.xmlcalabash.util.S9Api
 import net.sf.saxon.s9api.QName
 import net.sf.saxon.s9api.XdmNode
 

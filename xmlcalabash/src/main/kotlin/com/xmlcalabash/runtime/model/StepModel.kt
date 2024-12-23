@@ -19,6 +19,7 @@ abstract class StepModel(val runtime: XProcRuntime, model: Model) {
     val location: Location = model.step.location
     val name: String = model.step.name
     val type: QName = model.step.instructionType
+    internal var instantiationCount = 1
     internal val _inputs: MutableMap<String, RuntimePort>
     val inputs: Map<String, RuntimePort>
         get() = _inputs

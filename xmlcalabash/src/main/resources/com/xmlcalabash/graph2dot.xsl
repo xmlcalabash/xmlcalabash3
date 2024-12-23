@@ -206,7 +206,7 @@
           <br/>
         </xsl:if>
         <xsl:if test="true() or self::g:subpipeline or not(starts-with($label, '!'))">
-          <xsl:text>{$label} / {@id}</xsl:text>
+          <xsl:text>{@id}</xsl:text>
         </xsl:if>
       </td>
     </tr>

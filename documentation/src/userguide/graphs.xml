@@ -1,0 +1,69 @@
+<chapter xmlns="http://docbook.org/ns/docbook"
+         xmlns:xlink="http://www.w3.org/1999/xlink"
+         xmlns:xi='http://www.w3.org/2001/XInclude'
+         version="5.2" xml:id="graphs">
+<info>
+  <?db filename="graphs"?>
+  <title>Pipelines vs. Graphs</title>
+</info>
+
+<para>XML Calabash transforms a pipeline into a collection of graphs. It is the
+graphs that are evaluated at runtime.</para>
+
+<para>T.B.D. This chapter needs a lot of work. It needs to be written, really. 🙂</para>
+
+<para>To explore the difference between pipelines and graphs, consider
+the example pipeline in <xref linkend="debugger-xpl"/>.</para>
+
+<sidebar>
+<title>Unnecessary complexity</title>
+<para>The example pipeline in this chapter is straightfoward, but unnecessarily complicated in
+order to highlight some of the differences between pipelines and graphs. An
+equivalent and more concise version is:</para>
+<programlisting language='xml'
+><xi:include href="../examples/xpl/simple.xpl" parse="text"/></programlisting>
+<para>But that’s not as interesting for this discussion.</para>
+</sidebar>
+
+<para>The pipeline declares two steps and uses one additional compound step.</para>
+
+<figure xml:id="debugger-xpl">
+<title>Sample debugging pipeline</title>
+<programlisting language='xml'
+><xi:include href="../examples/xpl/debugger.xpl" parse="text"/></programlisting>
+</figure>
+
+<para>The processor analyzes the pipeline (resolves <tag class="attribute">use-when</tag>
+attributes, default readable ports, etc.) and constructs a model like the
+one shown in <xref linkend="debugger-pipeline"/>.</para>
+
+<figure xml:id="debugger-pipeline">
+<title>The pipeline model</title>
+<mediaobject>
+<imageobject>
+<imagedata fileref="img/debugger-pipeline.svg"/>
+</imageobject>
+</mediaobject>
+</figure>
+
+<para>The processor makes some changes in the pipeline. Some occurrences of <tag>p:document</tag>,
+<tag>p:inline</tag>, and even <tag>p:option</tag> and <tag>p:variable</tag>, are “promoted”
+to steps. This would be burdonsome for authoring, but simplifies the implementation.</para>
+
+<para>The processor then analyzes the pipeline to construct a set of graphs.
+It’s the actual graph that gets executed. The graph for this pipeline is
+shown in <xref linkend="debugger-model"/>.</para>
+
+<figure xml:id="debugger-model">
+<title>The pipeline graph model</title>
+<mediaobject>
+<imageobject>
+<imagedata fileref="img/debugger-graph.svg"/>
+</imageobject>
+</mediaobject>
+</figure>
+
+<para>Compound steps are represented as separate graphs. They have also grown
+“head” and “foot” steps that manage the boundaries.</para>
+
+</chapter>

@@ -2,7 +2,7 @@ package com.xmlcalabash.graph
 
 import com.xmlcalabash.datamodel.InputInstruction
 
-class Head(graph: Graph, parent: CompoundModel): Model(graph, parent, parent.step) {
+class Head(graph: Graph, parent: CompoundModel, id: String): Model(graph, parent, parent.step, id) {
     val defaultInputs = mutableMapOf<String,DefaultInput>()
 
     override fun init() {
