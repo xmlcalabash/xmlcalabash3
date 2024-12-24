@@ -102,7 +102,7 @@ class XProcPipeline internal constructor(private val runtime: XProcRuntime, pipe
     }
 
     fun run() {
-        val proxy = ReceiverProxy()
+        val proxy = PipelineReceiverProxy(receiver)
         for ((port, _) in outputManifold) {
             runnable.foot.receiver[port] = Pair(proxy, port)
         }
@@ -143,17 +143,5 @@ class XProcPipeline internal constructor(private val runtime: XProcRuntime, pipe
     fun reset() {
         runnable.reset()
         boundInputs.clear()
-    }
-
-    inner class ReceiverProxy(): Consumer {
-        override val id = "PIPELINE"
-
-        override fun input(port: String, doc: XProcDocument) {
-            receiver.output(port, doc)
-        }
-
-        override fun close(port: String) {
-            // nop
-        }
     }
 }

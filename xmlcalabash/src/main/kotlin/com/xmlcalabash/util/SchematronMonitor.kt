@@ -12,6 +12,7 @@ import com.xmlcalabash.namespace.NsS
 import com.xmlcalabash.namespace.NsSvrl
 import com.xmlcalabash.namespace.NsXml
 import com.xmlcalabash.runtime.Monitor
+import com.xmlcalabash.runtime.PipelineReceiverProxy
 import com.xmlcalabash.runtime.XProcStepConfiguration
 import com.xmlcalabash.runtime.steps.*
 import net.sf.saxon.om.NamespaceUri
@@ -197,7 +198,13 @@ class SchematronMonitor(): Monitor {
         val toStep: AbstractStep = when (to.first) {
             is AtomicStep -> to.first as AbstractStep
             is CompoundStepHead -> to.first as AbstractStep
-            is CompoundStepFoot -> to.first as AbstractStep
+            is CompoundStepFoot -> {
+                // Handled on the output side...
+                return document
+            }
+            is PipelineReceiverProxy -> {
+                return document
+            }
             else -> {
                 logger.debug { "Unexpected SchematronMonitor target: ${to.first}" }
                 return document

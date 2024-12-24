@@ -198,6 +198,7 @@ open class PortBindingContainer(parent: XProcInstruction, stepConfig: Instructio
                     }
                 }
             }
+
             val assertions = extensionAttributes[NsCx.assertions]
             if (assertions != null) {
                 val schematronMap = SchematronMonitor.findSchemas(this)
