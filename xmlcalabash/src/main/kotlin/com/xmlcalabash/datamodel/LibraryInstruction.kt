@@ -127,7 +127,8 @@ open class LibraryInstruction(stepConfig: InstructionConfiguration): XProcInstru
                     }
 
                     for ((type, decl) in import.exportedSteps) {
-                        if (newStepTypes.containsKey(type)) {
+                        val existing = newStepTypes[type]
+                        if (existing != null && existing.parent != decl.parent) {
                             throw stepConfig.exception(XProcError.xsDuplicateStepType(type))
                         }
                         newStepTypes[type] = decl
