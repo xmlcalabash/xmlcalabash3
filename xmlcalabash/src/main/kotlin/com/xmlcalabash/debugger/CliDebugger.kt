@@ -84,8 +84,10 @@ class CliDebugger(val runtime: XProcRuntime): Monitor {
         frameNumber = stack.size - 1
 
         if (stopOnEnd) {
+            stopOnEnd = false
             cli(step, false)
         }
+
         stack.pop()
     }
 
@@ -132,6 +134,7 @@ class CliDebugger(val runtime: XProcRuntime): Monitor {
         }
 
         if (stopOnEnd) {
+            stopOnEnd = false
             cli(step, false)
         }
 
@@ -189,13 +192,15 @@ class CliDebugger(val runtime: XProcRuntime): Monitor {
                     "namespace" -> doNamespace(command)
                     "options" -> doOptions()
                     "run" -> {
-                        stepping = false
-                        stopOnEnd = false
+                        doRun(command)
                         return
                     }
                     "set" -> doSet(command)
                     "stack" -> doStack(command)
-                    "step" -> doStep(command)
+                    "step" -> {
+                        doStep(command)
+                        return
+                    }
                     "subpipeline" -> doSubpipeline(command)
                     "up" -> doUp(command)
                     else -> {
@@ -520,10 +525,14 @@ class CliDebugger(val runtime: XProcRuntime): Monitor {
         }
     }
 
+    fun doRun(command: Map<String,String>) {
+        stepping = false
+        stopOnEnd = false
+    }
+
     fun doStep(command: Map<String,String>) {
         stepping = true
         stopOnEnd = command["end"] != null
-        return
     }
 
     fun doSubpipeline(command: Map<String,String>) {
