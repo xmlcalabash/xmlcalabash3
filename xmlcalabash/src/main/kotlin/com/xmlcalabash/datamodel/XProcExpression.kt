@@ -105,8 +105,8 @@ abstract class XProcExpression(val stepConfig: XProcStepConfiguration, val asTyp
     val alwaysDynamic: Boolean
         get() = details.alwaysDynamic
 
-    fun canBeResolvedStatically(): Boolean {
-        if (details.error != null || details.alwaysDynamic || details.contextRef) {
+    fun canBeResolvedStatically(includeContextRef: Boolean = true): Boolean {
+        if (details.error != null || details.alwaysDynamic || (includeContextRef && details.contextRef)) {
             return false
         }
 
