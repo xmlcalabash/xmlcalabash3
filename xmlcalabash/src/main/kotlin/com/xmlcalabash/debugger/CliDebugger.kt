@@ -36,7 +36,9 @@ class CliDebugger(val runtime: XProcRuntime): Monitor {
     var parser: InvisibleXmlParser? = null
     val stacks = mutableMapOf<Long, Stack<StackFrame>>()
     val breakpoints = mutableMapOf<String, MutableList<Breakpoint>>()
+    val catchpoints = mutableListOf<Catchpoint>()
     var stepping = true
+    var stopOnEnd = false
     var help = mutableListOf<String>()
 
     val localNamespaces = mutableMapOf<String, NamespaceUri>()
@@ -74,20 +76,75 @@ class CliDebugger(val runtime: XProcRuntime): Monitor {
 
         if (stopHere) {
             localBaseUri = curFrame.step.stepConfig.baseUri
-            cli(step)
+            cli(step, true)
         }
     }
 
     override fun endStep(step: AbstractStep) {
+        frameNumber = stack.size - 1
+
+        if (stopOnEnd) {
+            cli(step, false)
+        }
         stack.pop()
     }
 
     override fun abortStep(step: AbstractStep, ex: Exception) {
+        frameNumber = stack.size - 1
+
+        val code = if (ex is XProcException) {
+            ex.error.code
+        } else {
+            null
+        }
+
+        for (point in catchpoints) {
+            val catchCode = if (point.code != null) {
+                try {
+                    step.stepConfig.parseQName(point.code)
+                } catch (_: Exception) {
+                    println("Catch failed to parse ${point.code}")
+                    continue
+                }
+            } else {
+                null
+            }
+
+            if ((point.id == null || point.id == step.id)
+                && (catchCode == null || catchCode == code)) {
+                if (point.id == null) {
+                    if (code == null) {
+                        println("Debugger caught error")
+                    } else {
+                        println("Debugger caught ${code}")
+                    }
+                } else {
+                    if (code == null) {
+                        println("Debugger caught error on ${point.id}")
+                    } else {
+                        println("Debugger caught ${code} on ${point.id}")
+                    }
+                }
+
+                stopOnEnd = false
+                cli(step, false)
+            }
+        }
+
+        if (stopOnEnd) {
+            cli(step, false)
+        }
+
         stack.pop()
     }
 
-    private fun cli(step: AbstractStep) {
-        println("Debugger at ${step.id}")
+    private fun cli(step: AbstractStep, start: Boolean) {
+        if (start) {
+            println("Debugger at ${step.id}")
+        } else {
+            println("Debugger at end of ${step.id}")
+        }
+
         if (curFrame.cx != "cx") {
             println("xmlns:${curFrame.cx} = ${NsCx.namespace}")
         }
@@ -121,6 +178,7 @@ class CliDebugger(val runtime: XProcRuntime): Monitor {
                     }
                     "base-uri" -> doBaseUri(command)
                     "breakpoint" -> doBreakpoint(command)
+                    "catch" -> doCatchpoint(command)
                     "define" -> doDefine(command)
                     "down" -> doDown(command)
                     "eval" -> doEval(command)
@@ -132,14 +190,12 @@ class CliDebugger(val runtime: XProcRuntime): Monitor {
                     "options" -> doOptions()
                     "run" -> {
                         stepping = false
+                        stopOnEnd = false
                         return
                     }
                     "set" -> doSet(command)
                     "stack" -> doStack(command)
-                    "step" -> {
-                        stepping = true
-                        return
-                    }
+                    "step" -> doStep(command)
                     "subpipeline" -> doSubpipeline(command)
                     "up" -> doUp(command)
                     else -> {
@@ -175,7 +231,7 @@ class CliDebugger(val runtime: XProcRuntime): Monitor {
 
                         val varname = QName(curFrame.cx, NsCx.namespace.toString(), "document")
                         localVariables[varname] = document.value
-                        cli(curFrame.step)
+                        cli(curFrame.step, true)
 
                         val newValue = localVariables.remove(varname)!!
 
@@ -464,6 +520,12 @@ class CliDebugger(val runtime: XProcRuntime): Monitor {
         }
     }
 
+    fun doStep(command: Map<String,String>) {
+        stepping = true
+        stopOnEnd = command["end"] != null
+        return
+    }
+
     fun doSubpipeline(command: Map<String,String>) {
         var step = curFrame.step
         if (step !is CompoundStep) {
@@ -589,6 +651,44 @@ class CliDebugger(val runtime: XProcRuntime): Monitor {
         }
     }
 
+    fun doCatchpoint(command: Map<String,String>) {
+        if ("id" !in command && "code" !in command) {
+            if (catchpoints.isEmpty()) {
+                println("No catch points")
+            } else {
+                println("Active catch points:")
+                for (point in catchpoints) {
+                    if (point.id == null && point.code == null) {
+                        println("  Catch any error on any step")
+                    } else if (point.id != null) {
+                        if (point.code == null) {
+                            println("  Catch any error on ${point.id}")
+                        } else {
+                            println("  Catch ${point.code} on ${point.id}")
+                        }
+                    } else {
+                        println("  Catch ${point.code} on any step")
+                    }
+                }
+            }
+            return
+        }
+
+        val stepId = command["id"]
+
+        val newPoint = if (stepId == "*") {
+            Catchpoint(null, command["code"])
+        } else {
+            Catchpoint(stepId, command["code"])
+        }
+
+        if (catchpoints.any { it.id == newPoint.id && it.code == newPoint.code }) {
+            return
+        }
+
+        catchpoints.add(newPoint)
+    }
+
     fun doHelp(command: Map<String,String>) {
         if (help.isEmpty()) {
             val text = CliDebugger::class.java.getResource("/com/xmlcalabash/debugger.txt")
@@ -699,6 +799,9 @@ class CliDebugger(val runtime: XProcRuntime): Monitor {
         override fun toString(): String {
             return "on step ${id} input ${port}${if (expr != "true()") " when $expr" else ""}"
         }
+    }
+
+    open inner class Catchpoint(val id: String?, val code: String?) {
     }
 
     inner class StackFrame(val step: AbstractStep) {

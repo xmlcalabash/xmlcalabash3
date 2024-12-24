@@ -2,6 +2,7 @@ ixml version "1.1" .
 
 command = base-uri
           | breakpoint
+          | catch
           | define 
           | down
           | eval
@@ -38,6 +39,12 @@ when = (rs, -"when"), rs, -expr .
 id = [L | P | Nd]+ .
 port = [L | P | Nd]+ .
 expr = ~[]+ .
+
+-catch = catch-command, (rs, -"on", rs, id)?, (rs, -"error", rs, code)? .
+-catch-command = name-catch, s, (-"catch") .
+name-catch>name = +"catch" .
+
+code = [L | P | Nd]+ .
 
 -define = define-command, rs, -'$', varname, s, -':'?, -'=', expr .
 -define-command = name-define, s, (-"define" | -"def") .
@@ -96,8 +103,9 @@ name-set>name = +"set" .
 name-stack>name = +"stack" .
 frame = ["0"-"9"]+ .
 
--step = name-step, s, (-"step" | -"s") .
+-step = name-step, s, (-"step" | -"s"), ((rs, -"to")?, rs, end)? .
 name-step>name = +"step" .
+end = "end" .
 
 -subpipeline = name-subpipeline, s, (-"subpipeline" | -"sub"), (rs, id)? .
 name-subpipeline>name = +"subpipeline" .
