@@ -654,7 +654,7 @@ class StandardLibrary private constructor(builder: PipelineBuilder, private val 
         input.contentTypes = MediaType.parseList("xml html")
 
         val output = decl.output("result", primary=true, sequence=true)
-        output.contentTypes = MediaType.parseList("text xml html")
+        output.contentTypes = MediaType.parseList("text xml html json")
 
         val option = decl.option(QName("select"))
         option.asType = stepConfig.parseSequenceType("xs:string")
