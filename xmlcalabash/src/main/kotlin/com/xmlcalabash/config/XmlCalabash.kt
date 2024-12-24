@@ -32,6 +32,7 @@ class XmlCalabash private constructor(val xmlCalabashConfig: XmlCalabashConfigur
         fun newInstance(config: XmlCalabashConfiguration): XmlCalabash {
             val xmlCalabash = XmlCalabash(config)
             xmlCalabash._commonEnvironment = CommonEnvironment(xmlCalabash)
+            xmlCalabash._commonEnvironment.messageReporter.threshold = config.verbosity
             val environment = PipelineCompilerContext(xmlCalabash)
             val saxonConfig = SaxonConfiguration.newInstance(environment)
             xmlCalabash._saxonConfig = saxonConfig

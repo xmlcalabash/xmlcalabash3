@@ -4,11 +4,16 @@ import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.namespace.NsP
 import com.xmlcalabash.runtime.XProcPipeline
 import com.xmlcalabash.runtime.XProcRuntime
+import com.xmlcalabash.util.SchematronAssertions
+import com.xmlcalabash.util.SchematronMonitor
 import net.sf.saxon.om.NamespaceUri
 import net.sf.saxon.s9api.QName
+import net.sf.saxon.s9api.XdmNode
 import java.net.URI
 
 open class LibraryInstruction(stepConfig: InstructionConfiguration): XProcInstruction(null, stepConfig, NsP.library), StepContainerInterface {
+    internal val schematron = mutableMapOf<String, XdmNode>()
+
     override var psviRequired: Boolean? = null
         set(value) {
             checkOpen()
@@ -183,6 +188,10 @@ open class LibraryInstruction(stepConfig: InstructionConfiguration): XProcInstru
                     throw stepConfig.exception(XProcError.xsUnsupportedVersion(version!!.toString()))
                 }
             }
+        }
+
+        if (stepConfig.xmlCalabash.xmlCalabashConfig.assertions != SchematronAssertions.IGNORE) {
+            SchematronMonitor.parseFromPipeinfo(this)
         }
 
         for (import in _imported) {

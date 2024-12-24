@@ -47,9 +47,9 @@ abstract class XProcInstruction internal constructor(initialParent: XProcInstruc
         _extensionAttributes[name] = value
     }
 
-    internal val _pipeInfo = mutableListOf<XdmNode>()
-    val pipeInfo: List<XdmNode>
-        get() = _pipeInfo
+    internal val _pipeinfo = mutableListOf<XdmNode>()
+    val pipeinfo: List<XdmNode>
+        get() = _pipeinfo
 
     internal var open = true
     protected fun checkOpen() {

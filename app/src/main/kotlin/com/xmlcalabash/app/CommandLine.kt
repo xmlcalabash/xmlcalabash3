@@ -2,6 +2,7 @@ package com.xmlcalabash.app
 
 import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.exceptions.XProcException
+import com.xmlcalabash.util.SchematronAssertions
 import com.xmlcalabash.util.UriUtils
 import com.xmlcalabash.util.Verbosity
 import net.sf.saxon.om.NamespaceUri
@@ -44,6 +45,7 @@ class CommandLine private constructor(val args: Array<out String>) {
     private var _debug: Boolean? = null
     private var _debugger = false
     private var _verbosity: Verbosity? = null
+    private var _assertions = SchematronAssertions.IGNORE
     private var _help = false
     private var _trace: File? = null
     private var _traceDocuments: File? = null
@@ -85,6 +87,10 @@ class CommandLine private constructor(val args: Array<out String>) {
     /** How chatty shall we be? */
     val verbosity: Verbosity?
         get() = _verbosity
+
+    /** Evaluate assertions? */
+    val assertions: SchematronAssertions
+        get() = _assertions
 
     /** Display command line help instructions?
      *
@@ -172,7 +178,7 @@ class CommandLine private constructor(val args: Array<out String>) {
         ArgumentDescription("--trace", listOf(), ArgumentType.FILE) { it -> _trace = File(it) },
         ArgumentDescription("--trace-documents", listOf("--trace-docs"), ArgumentType.DIRECTORY) { it -> _traceDocuments = File(it) },
         ArgumentDescription("--verbosity", listOf("-V"),
-            ArgumentType.STRING, "detail", listOf("trace", "debug", "progress", "info", "warn", "error")) { it ->
+            ArgumentType.STRING, "info", listOf("trace", "debug", "progress", "info", "warn", "error")) { it ->
             _verbosity = when(it) {
                 "error" -> Verbosity.ERROR
                 "warn" -> Verbosity.WARN
@@ -181,6 +187,14 @@ class CommandLine private constructor(val args: Array<out String>) {
                 "debug" -> Verbosity.DEBUG
                 "trace" -> Verbosity.TRACE
                 else -> Verbosity.INFO
+            }},
+        ArgumentDescription("--assertions", listOf(),
+            ArgumentType.STRING, "warn", listOf("ignore", "warn", "warning", "error")) { it ->
+            _assertions = when(it) {
+                "ignore" -> SchematronAssertions.IGNORE
+                "warn", "warning" -> SchematronAssertions.WARNING
+                "error" -> SchematronAssertions.ERROR
+                else -> SchematronAssertions.IGNORE
             }}
     )
 

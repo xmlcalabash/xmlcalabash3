@@ -1,0 +1,100 @@
+<chapter xmlns="http://docbook.org/ns/docbook"
+         xmlns:xlink="http://www.w3.org/1999/xlink"
+         xmlns:xi='http://www.w3.org/2001/XInclude'
+         version="5.2" xml:id="assertions">
+<info>
+  <?db filename="assertions"?>
+  <title>Schematron assertions</title>
+</info>
+
+<para>You can use Schematron assertions to test that your pipeline is processing
+documents the way you expect. In order to use assertions you must enable them
+with the <option linkend="cli-assertions">--assertions</option> option.
+</para>
+
+<para>There are two ways to use assertions: you can place them directly in
+<tag>p:input</tag>, <tag>p:output</tag>, or <tag>p:with-input</tag> elements, or
+you can refer to them with a <tag class="attribute">cx:assertions</tag> extension
+attribute.</para>
+
+<para>In either case, each document is tested against the specified schema(s).</para>
+
+<section xml:id="assert-embed">
+<title>Directly embedded assertions</title>
+
+<para>To use an assertion directly, simply place the Schematron schema in
+a <tag>p:pipeinfo</tag> element in the input or output. For example:</para>
+
+<programlisting language='xml'
+><xi:include href="../examples/xpl/assertions-1.xpl" parse="text"/></programlisting>
+
+<para>If you enable assertion warnings and run that pipeline with this input document:</para>
+
+<programlisting language='xml'
+><xi:include href="../examples/xml/default-ch2.xml" parse="text"/></programlisting>
+
+<para>You’ll see:</para>
+
+<screen><prompt>> </prompt><userinput>xmlcalabash --assertions:warn -i:source=default-ch2.xml</userinput>
+<computeroutput>At / on p:declare-step/source in file:/…/examples/xml/default-ch2.xml:
+  Report not(*/@xml:id): The source document does not have a root id.
+At / on p:declare-step/source in file:/…/examples/xml/default-ch2.xml:
+  Warning ex:book: The source is not a book.
+=== result :: 1 :: file:/…/examples/xml/default-ch2.xml ===
+<![CDATA[<chap xmlns="https://xmlcalabash.com/ns/examples"
+      unique-id="16e550c1-96ff-4e88-98be-d85a15183a65">
+   <title>Second Chapter</title>
+   <p>…</p>
+</chap>]]>
+=====================================================================================================</computeroutput></screen>
+
+<para>If you enable assertion errors, the pipeline will fail. If you ignore assertions,
+you’ll just get the output without any schema results.</para>
+
+</section>
+
+<section xml:id="assert-ref">
+<title>Assertions by reference</title>
+
+<para>There are two reasons to use assertions by reference: reuse and testing
+the output of atomic steps:</para>
+
+<itemizedlist>
+<listitem>
+<para>It may be convenient to make the same assertions on
+several outputs, so it’s useful to refer to a schema rather than embedding it
+directly every time.</para>
+</listitem>
+<listitem>
+<para>Atomic steps don’t have <tag>p:output</tag> (or any sort of “with-output”)
+children in which you can place the assertions, so there has to be another method
+to reference them.</para>
+</listitem>
+</itemizedlist>
+
+<para>To use them by reference, place the schemas in a <tag>p:pipeinfo</tag> within the
+<tag>p:declare-step</tag> (or <tag>p:library</tag>) that contains the pipeline. Give
+each schema an <tag class="attribute">xml:id</tag> attribute.</para>
+
+<para>You can refer to the schemas from a <tag class="attribute">cx:assertions</tag>
+attribute on a step. The attribute is a map from port names to a list of IDs.
+Here is the earlier assertions pipeline rewritten in this way:</para>
+
+<programlisting language='xml'
+><xi:include href="../examples/xpl/assertions-2.xpl" parse="text"/></programlisting>
+
+<para>As a convience for the case where you want to reuse schemas where
+you have an input or output element, you can put the 
+<tag class="attribute">cx:assertions</tag> attribute directly on the input or
+output element. In this case, the assertions must be a list of strings.</para>
+
+<para>Here’s a final example that adds another test.</para>
+
+<programlisting language='xml'
+><xi:include href="../examples/xpl/assertions-3.xpl" parse="text"/></programlisting>
+
+<para>You can mix-and-match the embedded and referenced assertions.</para>
+
+</section>
+
+</chapter>

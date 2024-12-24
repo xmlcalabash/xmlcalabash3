@@ -963,7 +963,7 @@ class XplParser internal constructor(val builder: PipelineBuilder) {
                         }
                         if (child.node.nodeName == NsP.pipeinfo) {
                             val xml = inlineXml(instruction.stepConfig, child, listOf(child))
-                            instruction._pipeInfo.add(xml)
+                            instruction._pipeinfo.add(xml)
                             continue
                         }
 

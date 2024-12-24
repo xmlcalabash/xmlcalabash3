@@ -9,11 +9,12 @@ import com.xmlcalabash.debugger.NopDebugger
 import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.exceptions.ErrorExplanation
 import com.xmlcalabash.io.DocumentManager
+import com.xmlcalabash.runtime.Monitor
 import com.xmlcalabash.runtime.XProcExecutionContext
 import com.xmlcalabash.runtime.XProcStepConfiguration
-import com.xmlcalabash.tracing.NopTraceListener
 import com.xmlcalabash.tracing.TraceListener
 import com.xmlcalabash.util.MessageReporter
+import com.xmlcalabash.util.SchematronMonitor
 import java.net.URI
 import java.util.*
 import javax.activation.MimetypesFileTypeMap
@@ -38,7 +39,6 @@ class PipelineCompilerContext(override val xmlCalabash: XmlCalabash): PipelineEn
     override val xpathVersion = "3.1"
     override var uniqueInlineUris = true
 
-    private var _traceListener = NopTraceListener()
     private var _documentManager: DocumentManager = commonEnvironment.documentManager
     private var _mimeTypes = commonEnvironment.mimeTypes
     private var _errorExplanation: ErrorExplanation = commonEnvironment.errorExplanation
@@ -68,9 +68,7 @@ class PipelineCompilerContext(override val xmlCalabash: XmlCalabash): PipelineEn
         return base
     }
 
-    override val debugger: Debugger = NopDebugger() // The debugger is never used at compile time...
-    override val traceListener: TraceListener
-        get() = _traceListener
+    override val monitors: List<Monitor> = emptyList()
     override val documentManager: DocumentManager
         get() = _documentManager
     override val mimeTypes: MimetypesFileTypeMap

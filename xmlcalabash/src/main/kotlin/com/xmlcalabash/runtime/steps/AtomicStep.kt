@@ -78,8 +78,11 @@ open class AtomicStep(config: XProcStepConfiguration, atomic: AtomicBuiltinStepM
         val targetStep = rpair.first
         val targetPort = rpair.second
 
-        stepConfig.environment.traceListener.sendDocument(Pair(id,port), Pair(targetStep.id, targetPort), document)
-        val outdoc = stepConfig.environment.debugger.sendDocument(Pair(id,port), Pair(targetStep.id, targetPort), document)
+        var outdoc = document
+        for (monitor in stepConfig.environment.monitors) {
+            outdoc = monitor.sendDocument(Pair(this, port), Pair(targetStep, targetPort), outdoc)
+        }
+
         targetStep.input(targetPort, outdoc)
     }
 
@@ -129,6 +132,20 @@ open class AtomicStep(config: XProcStepConfiguration, atomic: AtomicBuiltinStepM
     }
 
     override fun run() {
+        /*
+        for ((_, input) in params.inputs) {
+            for (schema in input.schematron) {
+                if (implementation is AbstractAtomicStep) {
+                    for (doc in implementation.queues[input.name] ?: emptyList()) {
+                        testAssertion(schema, doc)
+                    }
+                } else {
+                    logger.info { "Schematron tests are only supported on atomic step inputs" }
+                }
+            }
+        }
+         */
+
         if (message != null) {
             println(message)
             message = null

@@ -11,7 +11,12 @@ import com.xmlcalabash.runtime.model.CompoundStepModel
 import com.xmlcalabash.runtime.steps.AtomicOptionStep
 import com.xmlcalabash.runtime.steps.CompoundStep
 import com.xmlcalabash.runtime.steps.Consumer
+import com.xmlcalabash.tracing.DetailTraceListener
+import com.xmlcalabash.tracing.StandardTraceListener
+import com.xmlcalabash.tracing.TraceListener
 import com.xmlcalabash.util.DefaultOutputReceiver
+import com.xmlcalabash.util.SchematronAssertions
+import com.xmlcalabash.util.SchematronMonitor
 import net.sf.saxon.s9api.QName
 import net.sf.saxon.s9api.XdmAtomicValue
 import org.apache.logging.log4j.kotlin.logger
@@ -25,17 +30,41 @@ class XProcPipeline internal constructor(private val runtime: XProcRuntime, pipe
     var receiver: Receiver = DefaultOutputReceiver(pipeline.stepConfig)
     private val setOptions = mutableSetOf<QName>()
     private val boundInputs = mutableSetOf<String>()
+    private var traceListener: TraceListener? = null
 
     init {
         runnable = pipeline.runnable(config)() as CompoundStep
         runnable.instantiate()
 
-        if (pipeline.stepConfig.environment.xmlCalabash.xmlCalabashConfig.debugger) {
+        val xconfig = pipeline.stepConfig.xmlCalabash.xmlCalabashConfig
+
+        if (xconfig.debugger) {
             if (config.environment is PipelineContext) {
                 val debugger = CliDebugger(runtime)
-                (config.environment as PipelineContext)._debugger = debugger
+                (config.environment as PipelineContext).monitors.add(debugger)
             } else {
-                logger.debug { "Cannot instantiate debugger on ${config.environment}" }
+                logger.debug { "Cannot provide debugger on ${config.environment}" }
+            }
+        }
+
+        if (xconfig.assertions != SchematronAssertions.IGNORE) {
+            if (config.environment is PipelineContext) {
+                (config.environment as PipelineContext).monitors.add(SchematronMonitor())
+            } else {
+                logger.debug { "Cannot provide Schematron monitor on ${config.environment}" }
+            }
+        }
+
+        if (xconfig.trace != null || xconfig.traceDocuments != null) {
+            if (config.environment is PipelineContext) {
+                traceListener = if (xconfig.traceDocuments != null) {
+                    DetailTraceListener()
+                } else {
+                    StandardTraceListener()
+                }
+                (config.environment as PipelineContext).monitors.add(traceListener!!)
+            } else {
+                logger.debug { "Cannot provide tracing on ${config.environment}" }
             }
         }
     }
@@ -73,7 +102,7 @@ class XProcPipeline internal constructor(private val runtime: XProcRuntime, pipe
     }
 
     fun run() {
-        val proxy = ReceiverProxy()
+        val proxy = PipelineReceiverProxy(receiver)
         for ((port, _) in outputManifold) {
             runnable.foot.receiver[port] = Pair(proxy, port)
         }
@@ -100,28 +129,19 @@ class XProcPipeline internal constructor(private val runtime: XProcRuntime, pipe
                 Ns.indent to XdmAtomicValue(true)
             ))
             props.set(Ns.serialization, serial)
-            val doc = XProcDocument.ofXml(config.environment.traceListener.summary(config), config, props)
-            val serializer = XProcSerializer(config)
-            val fileOutputStream = FileOutputStream(trace)
-            serializer.write(doc, fileOutputStream)
-            fileOutputStream.close()
+
+            if (traceListener != null) {
+                val doc = XProcDocument.ofXml(traceListener!!.summary(config), config, props)
+                val serializer = XProcSerializer(config)
+                val fileOutputStream = FileOutputStream(trace)
+                serializer.write(doc, fileOutputStream)
+                fileOutputStream.close()
+            }
         }
     }
 
     fun reset() {
         runnable.reset()
         boundInputs.clear()
-    }
-
-    inner class ReceiverProxy(): Consumer {
-        override val id = "PIPELINE"
-
-        override fun input(port: String, doc: XProcDocument) {
-            receiver.output(port, doc)
-        }
-
-        override fun close(port: String) {
-            // nop
-        }
     }
 }

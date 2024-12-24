@@ -29,6 +29,7 @@
 <xi:include href="run.xml"/>
 <xi:include href="graphs.xml"/>
 <xi:include href="debugger.xml"/>
+<xi:include href="assertions.xml"/>
 
 <xi:include href="config.xml"/>
 <xi:include href="tracing.xml"/>

@@ -3,6 +3,7 @@ package com.xmlcalabash.config
 import com.xmlcalabash.datamodel.MediaType
 import com.xmlcalabash.spi.PagedMediaManager
 import com.xmlcalabash.spi.PagedMediaProvider
+import com.xmlcalabash.util.SchematronAssertions
 import com.xmlcalabash.util.Verbosity
 import net.sf.saxon.Configuration
 import net.sf.saxon.s9api.QName
@@ -14,6 +15,7 @@ abstract class XmlCalabashConfiguration {
     abstract fun xmlCalabashConfigurer(xmlCalabash: XmlCalabash)
 
     var verbosity = Verbosity.INFO
+    var assertions = SchematronAssertions.WARNING
     var saxonConfigurationFile: File? = null
     var saxonConfigurationProperties: Map<String,String> = emptyMap()
     var uniqueInlineUris: Boolean = true

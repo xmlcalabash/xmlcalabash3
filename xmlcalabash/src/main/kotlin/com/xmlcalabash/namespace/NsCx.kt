@@ -10,6 +10,7 @@ object NsCx {
     val anonymous = QName(namespace, "cx:anonymous")
     val anonymousType = QName(namespace, "cx:anonymous-type")
     val antiItem = QName(namespace, "cx:anti-item")
+    val assertions = QName(namespace, "cx:assertions")
     val atomicStep = QName(namespace, "cx:atomic-step")
     val blake3 = QName(namespace, "cx:blake3")
     val cacheAddDocument = QName(namespace, "cx:cache-add-document")

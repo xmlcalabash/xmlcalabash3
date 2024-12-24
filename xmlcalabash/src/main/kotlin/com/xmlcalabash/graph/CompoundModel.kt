@@ -84,7 +84,10 @@ open class CompoundModel internal constructor(graph: Graph, parent: Model?, step
                         when (conn) {
                             is PipeInstruction -> {
                                 val from = graph.instructionMap[conn.readablePort!!.parent]!!
-                                foot.inputs[child.port] = ModelPort(foot, child.port, false, child.primary == true, child.sequence == true, child.contentTypes)
+                                val footPort = ModelPort(foot, child.port, false, child.primary == true, child.sequence == true, child.contentTypes)
+                                footPort.schematron.addAll(child.schematron)
+                                foot.inputs[child.port] = footPort
+
                                 graph.addEdge(from, conn.port!!, foot, child.port)
                             }
                             else -> {
@@ -126,6 +129,7 @@ open class CompoundModel internal constructor(graph: Graph, parent: Model?, step
             } else {
                 ModelPort(submodel, child.step.namedInput(input.name)!!)
             }
+            port.schematron.addAll(input.schematron)
 
             val toEdges = graph.edges.filter { it.to == child }
             for (edge in toEdges) {
@@ -138,15 +142,15 @@ open class CompoundModel internal constructor(graph: Graph, parent: Model?, step
         }
 
         for (output in child.outputs.values.toList()) {
-            val port = ModelPort(submodel, child.step.namedOutput(output.name)!!)
-
             val fromEdges = graph.edges.filter { it.from == child }
             for (edge in fromEdges) {
                 val oport = edge.outputPort
                 graph.addEdge(submodel, oport, edge.to, edge.inputPort)
                 graph.edges.remove(edge)
                 val mport = ModelPort(child.outputs[oport]!!)
-                submodel.outputs[oport] = ModelPort(submodel, oport, false, mport.primary, mport.sequence, mport.contentTypes)
+                val outport = ModelPort(submodel, oport, false, mport.primary, mport.sequence, mport.contentTypes)
+                outport.schematron.addAll(output.schematron)
+                submodel.outputs[oport] = outport
             }
         }
 

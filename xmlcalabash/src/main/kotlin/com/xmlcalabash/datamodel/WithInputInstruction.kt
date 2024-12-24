@@ -2,6 +2,11 @@ package com.xmlcalabash.datamodel
 
 import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.namespace.NsP
+import com.xmlcalabash.namespace.NsS
+import com.xmlcalabash.util.S9Api
+import net.sf.saxon.s9api.Axis
+import net.sf.saxon.s9api.XdmNode
+import net.sf.saxon.s9api.XdmNodeKind
 
 open class WithInputInstruction(parent: XProcInstruction, stepConfig: InstructionConfiguration): InputBindingInstruction(parent, stepConfig, NsP.withInput) {
     constructor(parent: XProcInstruction, stepConfig: InstructionConfiguration, port: String) : this(parent, stepConfig) {

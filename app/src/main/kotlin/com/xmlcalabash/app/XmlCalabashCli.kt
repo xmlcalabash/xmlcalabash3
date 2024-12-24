@@ -86,6 +86,7 @@ class XmlCalabashCli private constructor() {
             config.trace = commandLine.trace
             config.traceDocuments = commandLine.traceDocuments
             config.debugger = commandLine.debugger
+            config.assertions = commandLine.assertions
 
             if (config.trace == null && config.traceDocuments != null) {
                 config.trace = config.traceDocuments!!.resolve("trace.xml")

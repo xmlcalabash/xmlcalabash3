@@ -3,9 +3,13 @@ package com.xmlcalabash.util
 class DefaultMessageReporter(initialThreshold: Verbosity): MessageReporter {
     override var threshold = initialThreshold
 
+    override fun error(message: () -> String) {
+        System.err.println(message())
+    }
+
     override fun warn(message: () -> String) {
         if (threshold <= Verbosity.WARN) {
-            println(message())
+            System.err.println(message())
         }
     }
 
@@ -21,8 +25,14 @@ class DefaultMessageReporter(initialThreshold: Verbosity): MessageReporter {
         }
     }
 
-    override fun detail(message: () -> String) {
+    override fun debug(message: () -> String) {
         if (threshold <= Verbosity.DEBUG) {
+            println(message())
+        }
+    }
+
+    override fun trace(message: () -> String) {
+        if (threshold <= Verbosity.TRACE) {
             println(message())
         }
     }
