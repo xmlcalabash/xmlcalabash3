@@ -1,9 +1,11 @@
 package com.xmlcalabash.debugger
 
 import com.xmlcalabash.documents.XProcDocument
+import com.xmlcalabash.runtime.Monitor
 import com.xmlcalabash.runtime.steps.AbstractStep
+import com.xmlcalabash.runtime.steps.Consumer
 
-class NopDebugger: Debugger {
+class NopDebugger: Monitor {
     override fun startStep(step: AbstractStep) {
         // nop
     }
@@ -11,7 +13,11 @@ class NopDebugger: Debugger {
         // nop
     }
 
-    override fun sendDocument(from: Pair<String, String>, to: Pair<String, String>, document: XProcDocument): XProcDocument {
+    override fun abortStep(step: AbstractStep, ex: Exception) {
+        // nop
+    }
+
+    override fun sendDocument(from: Pair<AbstractStep, String>, to: Pair<Consumer, String>, document: XProcDocument): XProcDocument {
         return document
     }
 }

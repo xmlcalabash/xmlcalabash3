@@ -126,24 +126,16 @@ abstract class AbstractStep(val stepConfig: XProcStepConfiguration, step: StepMo
                 monitor.startStep(this)
             }
 
-            stepConfig.environment.debugger.startStep(this)
-            stepConfig.environment.traceListener.startExecution(this)
             run()
 
             for (monitor in stepConfig.environment.monitors) {
                 monitor.endStep(this)
             }
-
-            stepConfig.environment.traceListener.stopExecution(this, System.nanoTime() - startTime)
-            stepConfig.environment.debugger.endStep(this)
         } catch (ex: Exception) {
-
             for (monitor in stepConfig.environment.monitors) {
                 monitor.abortStep(this, ex)
             }
 
-            stepConfig.environment.traceListener.stopExecution(this, System.nanoTime() - startTime)
-            stepConfig.environment.debugger.endStep(this)
             when (ex) {
                 is XProcException -> {
                     ex.error.at(type, name).at(location)

@@ -28,8 +28,6 @@ interface PipelineEnvironment: ExecutionContextManager {
     var uniqueInlineUris: Boolean
 
     val monitors: List<Monitor>
-    val debugger: Debugger
-    val traceListener: TraceListener
     val documentManager: DocumentManager
     val mimeTypes: MimetypesFileTypeMap
     val errorExplanation: ErrorExplanation

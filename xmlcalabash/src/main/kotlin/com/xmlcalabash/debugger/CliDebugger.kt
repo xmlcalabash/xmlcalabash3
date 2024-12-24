@@ -7,6 +7,7 @@ import com.xmlcalabash.graph.SubpipelineModel
 import com.xmlcalabash.namespace.NsCx
 import com.xmlcalabash.namespace.NsXmlns
 import com.xmlcalabash.runtime.LazyValue
+import com.xmlcalabash.runtime.Monitor
 import com.xmlcalabash.runtime.XProcRuntime
 import com.xmlcalabash.runtime.steps.*
 import com.xmlcalabash.steps.AbstractAtomicStep
@@ -25,7 +26,7 @@ import java.net.URISyntaxException
 import java.nio.charset.StandardCharsets
 import java.util.*
 
-class CliDebugger(val runtime: XProcRuntime): Debugger {
+class CliDebugger(val runtime: XProcRuntime): Monitor {
     val terminal = TerminalBuilder.builder().dumb(true).build()
     val reader = LineReaderBuilder.builder()
         .terminal(terminal)
@@ -78,6 +79,10 @@ class CliDebugger(val runtime: XProcRuntime): Debugger {
     }
 
     override fun endStep(step: AbstractStep) {
+        stack.pop()
+    }
+
+    override fun abortStep(step: AbstractStep, ex: Exception) {
         stack.pop()
     }
 
@@ -152,8 +157,8 @@ class CliDebugger(val runtime: XProcRuntime): Debugger {
         }
     }
 
-    override fun sendDocument(from: Pair<String, String>, to: Pair<String, String>, document: XProcDocument): XProcDocument {
-        for (bp in breakpoints[from.first] ?: emptyList()) {
+    override fun sendDocument(from: Pair<AbstractStep, String>, to: Pair<Consumer, String>, document: XProcDocument): XProcDocument {
+        for (bp in breakpoints[from.first.id] ?: emptyList()) {
             if (bp is OutputBreakpoint && bp.port == from.second) {
                 if (document.value is XdmItem) {
                     val ebv = evalExpression(bp.expr, document.value as XdmItem, true)

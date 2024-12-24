@@ -4,18 +4,17 @@ import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.io.XProcSerializer
 import com.xmlcalabash.namespace.Ns
 import com.xmlcalabash.runtime.XProcStepConfiguration
+import com.xmlcalabash.runtime.steps.AbstractStep
+import com.xmlcalabash.runtime.steps.Consumer
 import com.xmlcalabash.util.SaxonTreeBuilder
 import net.sf.saxon.s9api.QName
-import net.sf.saxon.s9api.XdmValue
-import net.sf.saxon.value.QNameValue
-import java.io.FileOutputStream
 import java.nio.file.Files
 import kotlin.io.path.Path
 
 class DetailTraceListener: StandardTraceListener() {
     val savedDocuments = mutableMapOf<Long, String>()
 
-    override fun sendDocument(from: Pair<String, String>, to: Pair<String, String>, document: XProcDocument) {
+    override fun sendDocument(from: Pair<AbstractStep, String>, to: Pair<Consumer, String>, document: XProcDocument): XProcDocument {
         super.sendDocument(from, to, document)
 
         if (document.id !in savedDocuments) {
@@ -28,6 +27,8 @@ class DetailTraceListener: StandardTraceListener() {
             val serializer = XProcSerializer(document.context)
             serializer.write(document, tempFile)
         }
+
+        return document
     }
 
     override fun documentSummary(config: XProcStepConfiguration, builder: SaxonTreeBuilder, detail: DocumentDetail) {

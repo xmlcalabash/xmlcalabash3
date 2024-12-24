@@ -45,12 +45,9 @@ class CompoundStepFoot(config: XProcStepConfiguration, val parent: CompoundStep,
         val targetStep = rpair.first
         val targetPort = rpair.second
 
-        stepConfig.environment.traceListener.sendDocument(Pair(id,port), Pair(targetStep.id, targetPort), doc)
-        val outdoc = stepConfig.environment.debugger.sendDocument(Pair(id,port), Pair(targetStep.id, targetPort), doc)
-
-        var outdoc2 = doc
+        var outdoc = doc
         for (monitor in stepConfig.environment.monitors) {
-            outdoc2 = monitor.sendDocument(Pair(this, port), Pair(targetStep, targetPort), outdoc2)
+            outdoc = monitor.sendDocument(Pair(this, port), Pair(targetStep, targetPort), outdoc)
         }
 
         targetStep.input(targetPort, outdoc)

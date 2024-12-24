@@ -7,6 +7,7 @@ import com.xmlcalabash.namespace.NsCx
 import com.xmlcalabash.namespace.NsP
 import com.xmlcalabash.runtime.XProcStepConfiguration
 import com.xmlcalabash.runtime.steps.AbstractStep
+import com.xmlcalabash.runtime.steps.Consumer
 import com.xmlcalabash.util.SaxonTreeBuilder
 import net.sf.saxon.om.EmptyAttributeMap
 import net.sf.saxon.om.NamespaceMap
@@ -22,7 +23,7 @@ open class StandardTraceListener: TraceListener {
 
     protected val threads = mutableSetOf<Long>()
 
-    override fun startExecution(step: AbstractStep) {
+    override fun startStep(step: AbstractStep) {
         threads.add(Thread.currentThread().id)
         val detail = StepStartDetail(step, Thread.currentThread().id, System.currentTimeMillis())
         synchronized(_trace) {
@@ -30,17 +31,27 @@ open class StandardTraceListener: TraceListener {
         }
     }
 
-    override fun sendDocument(from: Pair<String, String>, to: Pair<String, String>, document: XProcDocument) {
-        synchronized(_trace) {
-            _trace.add(DocumentDetail(Thread.currentThread().id, from, to, document))
-        }
-    }
-
-    override fun stopExecution(step: AbstractStep, duration: Long) {
-        val detail = StepStopDetail(step, Thread.currentThread().id, duration / 1_000_000)
+    override fun endStep(step: AbstractStep) {
+        val detail = StepStopDetail(step, Thread.currentThread().id)
         synchronized(_trace) {
             _trace.add(detail)
         }
+    }
+
+    override fun abortStep(step: AbstractStep, ex: Exception) {
+        val detail = StepStopDetail(step, Thread.currentThread().id)
+        synchronized(_trace) {
+            _trace.add(detail)
+        }
+    }
+
+    override fun sendDocument(from: Pair<AbstractStep, String>, to: Pair<Consumer, String>, document: XProcDocument): XProcDocument {
+        synchronized(_trace) {
+            val fromDetail = Pair(from.first.id, from.second)
+            val toDetail = Pair(to.first.id, to.second)
+            _trace.add(DocumentDetail(Thread.currentThread().id, fromDetail, toDetail, document))
+        }
+        return document
     }
 
     override fun summary(config: XProcStepConfiguration): XdmNode {
@@ -75,12 +86,13 @@ open class StandardTraceListener: TraceListener {
                             nsMap.put(detail.type.prefix, detail.type.namespaceUri)
                         }
 
+                        val ms = (end.nanoSeconds - detail.nanoSeconds) / 1_000_000
                         builder.addStartElement(NsTrace.step, config.attributeMap(mapOf(
                             Ns.id to detail.id,
                             Ns.name to detail.name,
                             Ns.type to "${detail.type}",
                             _startTime to "${dt}",
-                            _durationMs to "${end.duration}"
+                            _durationMs to "${ms}"
                         )), localNsMap)
                     }
                     is StepStopDetail -> {

@@ -11,7 +11,6 @@ import com.xmlcalabash.runtime.model.AtomicBuiltinStepModel
 import com.xmlcalabash.runtime.parameters.RuntimeStepParameters
 import com.xmlcalabash.steps.AbstractAtomicStep
 import net.sf.saxon.s9api.XdmValue
-import org.apache.logging.log4j.kotlin.logger
 
 open class AtomicStep(config: XProcStepConfiguration, atomic: AtomicBuiltinStepModel): AbstractStep(config, atomic), Receiver {
     final override val params = RuntimeStepParameters(atomic.type, atomic.name, atomic.location,
@@ -79,12 +78,9 @@ open class AtomicStep(config: XProcStepConfiguration, atomic: AtomicBuiltinStepM
         val targetStep = rpair.first
         val targetPort = rpair.second
 
-        stepConfig.environment.traceListener.sendDocument(Pair(id,port), Pair(targetStep.id, targetPort), document)
-        val outdoc = stepConfig.environment.debugger.sendDocument(Pair(id,port), Pair(targetStep.id, targetPort), document)
-
-        var outdoc2 = document
+        var outdoc = document
         for (monitor in stepConfig.environment.monitors) {
-            outdoc2 = monitor.sendDocument(Pair(this, port), Pair(targetStep, targetPort), outdoc2)
+            outdoc = monitor.sendDocument(Pair(this, port), Pair(targetStep, targetPort), outdoc)
         }
 
         targetStep.input(targetPort, outdoc)

@@ -12,7 +12,6 @@ import com.xmlcalabash.exceptions.ErrorExplanation
 import com.xmlcalabash.io.DocumentManager
 import com.xmlcalabash.runtime.parameters.StepParameters
 import com.xmlcalabash.tracing.DetailTraceListener
-import com.xmlcalabash.tracing.NopTraceListener
 import com.xmlcalabash.tracing.StandardTraceListener
 import com.xmlcalabash.tracing.TraceListener
 import com.xmlcalabash.util.MessageReporter
@@ -41,17 +40,6 @@ class PipelineContext(compilerContext: PipelineCompilerContext): PipelineEnviron
     override val xpathVersion = "3.1"
     override var uniqueInlineUris = compilerContext.uniqueInlineUris
 
-    internal var _debugger: Debugger = compilerContext.debugger
-    private var _traceListener = if (xmlCalabash.xmlCalabashConfig.trace != null
-        || xmlCalabash.xmlCalabashConfig.traceDocuments != null) {
-        if (xmlCalabash.xmlCalabashConfig.traceDocuments != null) {
-            DetailTraceListener()
-        } else {
-            StandardTraceListener()
-        }
-    } else {
-        NopTraceListener()
-    }
     private var _documentManager = compilerContext.documentManager
     private var _mimeTypes = compilerContext.mimeTypes
     private var _errorExplanation = compilerContext.errorExplanation
@@ -62,11 +50,7 @@ class PipelineContext(compilerContext: PipelineCompilerContext): PipelineEnviron
         _proxies.putAll(compilerContext.proxies)
     }
 
-    override val monitors: List<Monitor> = listOf(SchematronMonitor())
-    override val debugger: Debugger
-        get() = _debugger
-    override val traceListener: TraceListener
-        get() = _traceListener
+    override val monitors: MutableList<Monitor> = mutableListOf()
     override val documentManager: DocumentManager
         get() = _documentManager
     override val mimeTypes: MimetypesFileTypeMap
