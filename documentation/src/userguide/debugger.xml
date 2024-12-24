@@ -40,6 +40,9 @@ may be a stack of open steps. Moving around in the stack changes the context.</p
 <simpara><command linkend="dbg-breakpoint">breakpoint</command>, set or display breakpoints.</simpara>
 </listitem>
 <listitem>
+<simpara><command linkend="dbg-catch">catch</command>, catch errors.</simpara>
+</listitem>
+<listitem>
 <simpara><command linkend="dbg-define">define</command>, define a local variable.</simpara>
 </listitem>
 <listitem>
@@ -93,7 +96,7 @@ may be a stack of open steps. Moving around in the stack changes the context.</p
 
 <cmdsynopsis>
   <command>base-uri</command>
-  <arg choice="opt">"uri"</arg>
+  <arg choice="opt">"<replaceable>uri</replaceable>"</arg>
 </cmdsynopsis>
 
 <para>If no <replaceable>uri</replaceable> is specified, shows the current base URI.
@@ -120,7 +123,7 @@ synonym for <command>base-uri</command>.</para>
   <command>breakpoint</command>
 </cmdsynopsis>
 
-<para>If used with no arguments, the <command>breakpoint</command> prints a summary
+<para>If used with no arguments, the <command>breakpoint</command> command prints a summary
 of enabled breakpoints.</para>
 
 <cmdsynopsis>
@@ -205,6 +208,44 @@ synonyms for <command>breakpoint</command> and <command>set</command>
 is a synonym for <command>on</command>.</para>
 </section>
 
+<section xml:id="dbg-catch">
+<title>catch</title>
+
+<para>Catch errors.</para>
+
+<cmdsynopsis>
+  <command>catch</command>
+  <arg choice="opt">
+    <arg choice="plain">on</arg>
+    <arg choice="plain"><replaceable>id</replaceable></arg>
+  </arg>
+  <arg choice="opt">
+    <arg choice="plain">error</arg>
+    <arg choice="plain"><replaceable>code</replaceable></arg>
+  </arg>
+</cmdsynopsis>
+
+<para>If used with no arguments, the <command>catch</command> command prints a
+summary of existing catch points.</para>
+
+<para>If an <replaceable>id</replaceable> is provided, the debugger will catch
+errors on the step <replaceable>id</replaceable>. If a
+<replaceable>code</replaceable> is provided, the debugger will only stop if the
+error code matches <replaceable>code</replaceable>. If only a
+<replaceable>code</replaceable> is provided, the debugger will stop at any step
+when that error occurs. Errors precolate up the stack until a <tag>p:try</tag>
+is encountered or the pipeline terminates. It is possible to catch the same
+error on several consecutive steps as you go “up” the stack.</para>
+
+<para>If a <replaceable>code</replaceable> is provided, it is interpreted as a QName
+in the context of the step(s) on which it is being evaluated. It must be a valid
+QName in the context in order to match.</para>
+
+<para>When an error is caught, the last stack frame is the step that has been aborted.
+You can inspect its options and inputs, but it has already run, so changing them can
+have no effect.</para>
+</section>
+
 <section xml:id="dbg-define">
 <title>define</title>
 
@@ -237,7 +278,7 @@ value of an existing variable, use <link linkend="dbg-set">set</link>.</para>
 
 <cmdsynopsis>
 <command>down</command>
-<arg choice="opt">frames</arg>
+<arg choice="opt"><replaceable>frames</replaceable></arg>
 </cmdsynopsis>
 
 <para>Moves down <replaceable>frames</replaceable> stack frames, or one frame if
@@ -271,7 +312,7 @@ synonyms for <command>exit</command>.</para>
 
 <cmdsynopsis>
 <command>help</command>
-<arg choice="opt">command</arg>
+<arg choice="opt"><replaceable>command</replaceable></arg>
 </cmdsynopsis>
 
 <para>Displays a summary of the debugger commands. If <replaceable>command</replaceable> is
@@ -304,7 +345,7 @@ synonym for <command>inputs</command>.</para>
 
 <cmdsynopsis>
 <command>models</command>
-<arg choice="opt">model</arg>
+<arg choice="opt"><replaceable>model</replaceable></arg>
 </cmdsynopsis>
 
 <para>In order to execute a pipeline, XML Calabash transforms it into a graph model.
@@ -329,7 +370,7 @@ synonyms for <command>model</command>.</para>
 <arg choice="opt">
   <arg choice="plain"><replaceable>prefix</replaceable></arg>
   <arg choice="plain">=</arg>
-  <arg choice="plain">"uri"</arg>
+  <arg choice="plain">"<replaceable>uri</replaceable>"</arg>
 </arg>
 </cmdsynopsis>
 
@@ -437,10 +478,20 @@ current context is marked with a <literal>*</literal>.
 
 <cmdsynopsis>
 <command>step</command>
+<arg choice="opt">
+  <arg choice="opt">to</arg>
+  <arg choice="plain"><replaceable>end</replaceable></arg>
+</arg>
 </cmdsynopsis>
 
 <para>Executes the current step, then returns to the debugger. (If a breakpoint
 occurs before the next step, execution will stop at the breakpoint.)</para>
+
+<para>If the “<literal>end</literal>” argument is given, the debugger will stop
+at either the beginning of the next step or the end of the current step,
+whichever comes first. If it stops at the end, the last stack frame is the step
+that has just finished. You can inspect its options and inputs, but it has
+already run, so changing them can have no effect.</para>
 
 <para>The command <command>s</command> is a synonym for
 <command>step</command>.</para>
@@ -468,7 +519,7 @@ occurs before the next step, execution will stop at the breakpoint.)</para>
 
 <cmdsynopsis>
 <command>up</command>
-<arg choice="opt">frames</arg>
+<arg choice="opt"><replaceable>frames</replaceable></arg>
 </cmdsynopsis>
 
 <para>Moves up <replaceable>frames</replaceable> stack frames, or one frame if
