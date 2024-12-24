@@ -13,10 +13,13 @@ import com.xmlcalabash.runtime.model.StepModel
 import com.xmlcalabash.runtime.parameters.DocumentStepParameters
 import com.xmlcalabash.runtime.parameters.InlineStepParameters
 import com.xmlcalabash.runtime.parameters.RuntimeStepParameters
+import com.xmlcalabash.steps.AbstractAtomicStep
 import com.xmlcalabash.steps.internal.DocumentStep
 import com.xmlcalabash.steps.internal.InlineStep
 import com.xmlcalabash.util.BufferingReceiver
+import com.xmlcalabash.util.SchematronImpl
 import net.sf.saxon.s9api.QName
+import net.sf.saxon.s9api.XdmNode
 import org.apache.logging.log4j.kotlin.logger
 
 abstract class AbstractStep(val stepConfig: XProcStepConfiguration, step: StepModel, val type: QName = step.type, val name: String = step.name): Consumer {
@@ -118,12 +121,27 @@ abstract class AbstractStep(val stepConfig: XProcStepConfiguration, step: StepMo
         val startTime = System.nanoTime()
         try {
             prepare()
+
+            for (monitor in stepConfig.environment.monitors) {
+                monitor.startStep(this)
+            }
+
             stepConfig.environment.debugger.startStep(this)
             stepConfig.environment.traceListener.startExecution(this)
             run()
+
+            for (monitor in stepConfig.environment.monitors) {
+                monitor.endStep(this)
+            }
+
             stepConfig.environment.traceListener.stopExecution(this, System.nanoTime() - startTime)
             stepConfig.environment.debugger.endStep(this)
         } catch (ex: Exception) {
+
+            for (monitor in stepConfig.environment.monitors) {
+                monitor.abortStep(this, ex)
+            }
+
             stepConfig.environment.traceListener.stopExecution(this, System.nanoTime() - startTime)
             stepConfig.environment.debugger.endStep(this)
             when (ex) {
@@ -206,6 +224,18 @@ abstract class AbstractStep(val stepConfig: XProcStepConfiguration, step: StepMo
                 throw stepConfig.exception(XProcError.xiImpossible("Unexpected default binding: ${binding}"))
             }
         }
+    }
+
+    protected fun testAssertion(schema: XdmNode, doc: XProcDocument) {
+        val validator = SchematronImpl(stepConfig)
+        if (doc.value is XdmNode) {
+            val result = validator.test(doc.value as XdmNode, schema)
+            println(result)
+        } else {
+            logger.warn { "Cannot apply Schematron to non-XML documents" }
+        }
+
+
     }
 
     override fun toString(): String {

@@ -38,8 +38,8 @@ abstract class CompoundStep(config: XProcStepConfiguration, compound: CompoundSt
     internal val runnableProviders = mutableMapOf<StepModel, () -> AbstractStep>()
     internal val edges = compound.edges
     internal val runnables = mutableListOf<AbstractStep>()
-    internal val head = CompoundStepHead(config, compound.head)
-    internal val foot = CompoundStepFoot(config, compound.foot)
+    internal val head = CompoundStepHead(config, this, compound.head)
+    internal val foot = CompoundStepFoot(config, this, compound.foot)
     internal var stepName: String? = null
     internal var stepType: QName? = null
 

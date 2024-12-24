@@ -11,6 +11,7 @@ import com.xmlcalabash.runtime.model.AtomicBuiltinStepModel
 import com.xmlcalabash.runtime.parameters.RuntimeStepParameters
 import com.xmlcalabash.steps.AbstractAtomicStep
 import net.sf.saxon.s9api.XdmValue
+import org.apache.logging.log4j.kotlin.logger
 
 open class AtomicStep(config: XProcStepConfiguration, atomic: AtomicBuiltinStepModel): AbstractStep(config, atomic), Receiver {
     final override val params = RuntimeStepParameters(atomic.type, atomic.name, atomic.location,
@@ -80,6 +81,12 @@ open class AtomicStep(config: XProcStepConfiguration, atomic: AtomicBuiltinStepM
 
         stepConfig.environment.traceListener.sendDocument(Pair(id,port), Pair(targetStep.id, targetPort), document)
         val outdoc = stepConfig.environment.debugger.sendDocument(Pair(id,port), Pair(targetStep.id, targetPort), document)
+
+        var outdoc2 = document
+        for (monitor in stepConfig.environment.monitors) {
+            outdoc2 = monitor.sendDocument(Pair(this, port), Pair(targetStep, targetPort), outdoc2)
+        }
+
         targetStep.input(targetPort, outdoc)
     }
 
@@ -129,6 +136,20 @@ open class AtomicStep(config: XProcStepConfiguration, atomic: AtomicBuiltinStepM
     }
 
     override fun run() {
+        /*
+        for ((_, input) in params.inputs) {
+            for (schema in input.schematron) {
+                if (implementation is AbstractAtomicStep) {
+                    for (doc in implementation.queues[input.name] ?: emptyList()) {
+                        testAssertion(schema, doc)
+                    }
+                } else {
+                    logger.info { "Schematron tests are only supported on atomic step inputs" }
+                }
+            }
+        }
+         */
+
         if (message != null) {
             println(message)
             message = null

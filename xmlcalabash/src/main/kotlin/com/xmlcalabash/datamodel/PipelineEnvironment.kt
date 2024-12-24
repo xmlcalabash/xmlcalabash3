@@ -6,6 +6,7 @@ import com.xmlcalabash.config.XmlCalabash
 import com.xmlcalabash.debugger.Debugger
 import com.xmlcalabash.exceptions.ErrorExplanation
 import com.xmlcalabash.io.DocumentManager
+import com.xmlcalabash.runtime.Monitor
 import com.xmlcalabash.tracing.TraceListener
 import com.xmlcalabash.util.MessageReporter
 import net.sf.saxon.s9api.QName
@@ -26,6 +27,7 @@ interface PipelineEnvironment: ExecutionContextManager {
     val xpathVersion: String
     var uniqueInlineUris: Boolean
 
+    val monitors: List<Monitor>
     val debugger: Debugger
     val traceListener: TraceListener
     val documentManager: DocumentManager

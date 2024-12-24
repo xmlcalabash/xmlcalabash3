@@ -1378,6 +1378,9 @@ No step named “$1” in library (“$2”).
 cxerr:XI0040/1
 Initializer failed: $1
 
+cxerr:XI0041
+Schematron assertion failed: $1
+
 cxerr:XI0200
 Invalid option value “$2” for $1.
 

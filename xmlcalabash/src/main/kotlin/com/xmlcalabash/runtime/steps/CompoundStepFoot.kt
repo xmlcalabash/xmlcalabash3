@@ -7,7 +7,7 @@ import com.xmlcalabash.runtime.XProcStepConfiguration
 import com.xmlcalabash.runtime.model.FootModel
 import com.xmlcalabash.runtime.parameters.RuntimeStepParameters
 
-class CompoundStepFoot(config: XProcStepConfiguration, step: FootModel): AbstractStep(config, step, NsCx.foot, "${step.name}/foot") {
+class CompoundStepFoot(config: XProcStepConfiguration, val parent: CompoundStep, step: FootModel): AbstractStep(config, step, NsCx.foot, "${step.name}/foot") {
     internal var alwaysAllowSequences = false
     val cache = mutableMapOf<String, MutableList<XProcDocument>>()
     val holdPorts = mutableSetOf<String>()
@@ -47,6 +47,12 @@ class CompoundStepFoot(config: XProcStepConfiguration, step: FootModel): Abstrac
 
         stepConfig.environment.traceListener.sendDocument(Pair(id,port), Pair(targetStep.id, targetPort), doc)
         val outdoc = stepConfig.environment.debugger.sendDocument(Pair(id,port), Pair(targetStep.id, targetPort), doc)
+
+        var outdoc2 = doc
+        for (monitor in stepConfig.environment.monitors) {
+            outdoc2 = monitor.sendDocument(Pair(this, port), Pair(targetStep, targetPort), outdoc2)
+        }
+
         targetStep.input(targetPort, outdoc)
     }
 

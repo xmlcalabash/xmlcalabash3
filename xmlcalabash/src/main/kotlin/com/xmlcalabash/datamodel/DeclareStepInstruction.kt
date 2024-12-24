@@ -2,11 +2,21 @@ package com.xmlcalabash.datamodel
 
 import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.namespace.NsP
+import com.xmlcalabash.namespace.NsS
+import com.xmlcalabash.namespace.NsXml
 import com.xmlcalabash.runtime.XProcPipeline
 import com.xmlcalabash.runtime.XProcRuntime
+import com.xmlcalabash.util.S9Api
+import com.xmlcalabash.util.SchematronAssertions
+import com.xmlcalabash.util.SchematronMonitor
 import net.sf.saxon.om.NamespaceUri
+import net.sf.saxon.s9api.Axis
 import net.sf.saxon.s9api.QName
+import net.sf.saxon.s9api.XdmMap
 import net.sf.saxon.s9api.XdmNode
+import net.sf.saxon.s9api.XdmNodeKind
+import net.sf.saxon.value.StringValue
+import org.apache.logging.log4j.kotlin.logger
 import java.net.URI
 
 class DeclareStepInstruction(parent: XProcInstruction?, stepConfig: InstructionConfiguration): CompoundStepDeclaration(parent, stepConfig, NsP.declareStep), StepContainerInterface {
@@ -24,6 +34,7 @@ class DeclareStepInstruction(parent: XProcInstruction?, stepConfig: InstructionC
     private var compiled = false
     override val contentModel = anySteps + mapOf(NsP.input to '*', NsP.output to '*', NsP.declareStep to '*', NsP.option to '*')
     internal val declaredSteps = mutableListOf<DeclareStepInstruction>()
+    internal val schematron = mutableMapOf<String, XdmNode>()
 
     override var psviRequired: Boolean? = null
         set(value) {
@@ -263,6 +274,10 @@ class DeclareStepInstruction(parent: XProcInstruction?, stepConfig: InstructionC
 
         if (isAtomic) {
             return
+        }
+
+        if (stepConfig.xmlCalabash.xmlCalabashConfig.assertions != SchematronAssertions.IGNORE) {
+            SchematronMonitor.parseFromPipeinfo(this)
         }
 
         for (import in _imported) {

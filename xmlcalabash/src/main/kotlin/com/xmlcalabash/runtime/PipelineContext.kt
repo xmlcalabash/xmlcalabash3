@@ -16,6 +16,7 @@ import com.xmlcalabash.tracing.NopTraceListener
 import com.xmlcalabash.tracing.StandardTraceListener
 import com.xmlcalabash.tracing.TraceListener
 import com.xmlcalabash.util.MessageReporter
+import com.xmlcalabash.util.SchematronMonitor
 import net.sf.saxon.s9api.QName
 import java.net.URI
 import java.util.*
@@ -61,6 +62,7 @@ class PipelineContext(compilerContext: PipelineCompilerContext): PipelineEnviron
         _proxies.putAll(compilerContext.proxies)
     }
 
+    override val monitors: List<Monitor> = listOf(SchematronMonitor())
     override val debugger: Debugger
         get() = _debugger
     override val traceListener: TraceListener
