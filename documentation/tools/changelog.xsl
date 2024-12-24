@@ -72,7 +72,7 @@
   <xsl:apply-templates/>
 </xsl:template>
 
-<xsl:template match="db:emphasis">
+<xsl:template match="db:emphasis|db:command">
   <xsl:text>*</xsl:text>
   <xsl:apply-templates/>
   <xsl:text>*</xsl:text>
