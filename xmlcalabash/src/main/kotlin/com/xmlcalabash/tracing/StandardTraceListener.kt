@@ -2,7 +2,9 @@ package com.xmlcalabash.tracing
 
 import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.exceptions.XProcError
+import com.xmlcalabash.exceptions.XProcException
 import com.xmlcalabash.namespace.Ns
+import com.xmlcalabash.namespace.Ns.code
 import com.xmlcalabash.namespace.NsCx
 import com.xmlcalabash.namespace.NsP
 import com.xmlcalabash.runtime.XProcStepConfiguration
@@ -39,7 +41,7 @@ open class StandardTraceListener: TraceListener {
     }
 
     override fun abortStep(step: AbstractStep, ex: Exception) {
-        val detail = StepStopDetail(step, Thread.currentThread().id)
+        val detail = StepStopDetail(step, Thread.currentThread().id, ex)
         synchronized(_trace) {
             _trace.add(detail)
         }
@@ -87,13 +89,25 @@ open class StandardTraceListener: TraceListener {
                         }
 
                         val ms = (end.nanoSeconds - detail.nanoSeconds) / 1_000_000
-                        builder.addStartElement(NsTrace.step, config.attributeMap(mapOf(
+                        val attributes = mutableMapOf<QName, String>(
                             Ns.id to detail.id,
                             Ns.name to detail.name,
                             Ns.type to "${detail.type}",
                             _startTime to "${dt}",
                             _durationMs to "${ms}"
-                        )), localNsMap)
+                        )
+
+                        if (end.aborted != null) {
+                            val reason = if (end.aborted is XProcException) {
+                                val code= end.aborted.error.code
+                                "Q{${code.namespaceUri}}${code.localName}"
+                            } else {
+                                end.aborted.message ?: end.aborted.javaClass.simpleName
+                            }
+                            attributes[Ns.error] = reason
+                        }
+
+                        builder.addStartElement(NsTrace.step, config.attributeMap(attributes), localNsMap)
                     }
                     is StepStopDetail -> {
                         builder.addEndElement()

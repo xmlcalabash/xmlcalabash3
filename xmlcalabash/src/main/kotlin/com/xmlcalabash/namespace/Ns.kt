@@ -47,6 +47,7 @@ object Ns {
     val duplicates = QName("duplicates")
     val duration = QName("duration")
     val encoding = QName("encoding")
+    val error = QName("error")
     val errorContentType = QName("error-content-type")
     val excludeFilter = QName("exclude-filter")
     val excludeInlinePrefixes = QName("exclude-inline-prefixes")
