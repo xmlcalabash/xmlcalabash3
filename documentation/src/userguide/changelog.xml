@@ -17,7 +17,36 @@ finer detail.</para>
 <revnumber>3.0.0-alpha7</revnumber>
 <date>2024-12-24</date>
 <revdescription>
-<para>T.B.D.</para>
+<itemizedlist>
+<listitem>
+<para>Added the <link linkend="assertions">Schematron assertions feature</link>.
+</para>
+</listitem>
+<listitem>
+<para>Added a <command linkend="dbg-catch">catch</command> command to the
+debugger to catch steps that fail. Added an option to the 
+<command linkend="dbg-step">step</command> command to stop after a step executes.
+</para>
+</listitem>
+<listitem>
+<para>Fixed <link xlink:href="https://github.com/xproc/3.0-test-suite/pull/783">a bug</link>
+in the way steps are handled in nested, common imports.</para>
+</listitem>
+<listitem>
+<para>Fixed <link xlink:href="https://github.com/xproc/3.0-test-suite/pull/781">p:filter</link>
+to work as expected rather than as documented. See also,
+<link xlink:href="https://github.com/xproc/3.0-steps/pull/645">PR #645</link>, the documentation
+fix.</para>
+</listitem>
+<listitem>
+<para>Updated the <link linkend="tracing">trace listener</link> to record when steps fail.</para>
+</listitem>
+<listitem>
+<para>Tinkered with the message listener to align its methods with the
+<link linkend="revision-verbosity">recent changes</link> to
+<option linkend="cli-verbosity">--verbosity</option>.</para>
+</listitem>
+</itemizedlist>
 </revdescription>
 </revision>
 
@@ -78,7 +107,7 @@ names.</para>
 <option linkend="cli-debug">--debug</option> option so that it enables debug logging.
 </para>
 </listitem>
-<listitem>
+<listitem xml:id="revision-verbosity">
 <para>Refactored and reorganized the <option linkend="cli-verbosity">--verbosity</option>
 values. They now align with debugging log levels.</para>
 </listitem>
