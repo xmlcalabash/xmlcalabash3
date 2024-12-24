@@ -33,6 +33,7 @@ class ViewportInstruction(parent: XProcInstruction): CompoundLoopDeclaration(par
 
         val withOption = WithOptionInstruction(this, Ns.match, stepConfig)
         withOption.select = match
+        withOption.specialType = SpecialType.XSLT_SELECTION_PATTERN
         _children.add(withOption)
 
         try {

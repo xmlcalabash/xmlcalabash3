@@ -73,7 +73,17 @@ abstract class VariableBindingContainer(
         get() = _withOutput
 
     open fun canBeResolvedStatically(): Boolean {
-        return !alwaysDynamic && select?.canBeResolvedStatically() ?: false
+        if (alwaysDynamic) {
+            return false
+        }
+
+        val exprSelect = select
+        if (exprSelect == null) {
+            return false
+        }
+
+        // Selection patterns don't have a context reference...
+        return exprSelect.canBeResolvedStatically(specialType != SpecialType.XSLT_SELECTION_PATTERN)
     }
 
     override fun elaborateInstructions() {
