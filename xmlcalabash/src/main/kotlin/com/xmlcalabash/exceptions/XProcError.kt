@@ -334,6 +334,7 @@ class XProcError private constructor(val code: QName, val variant: Int, val loca
         fun xcAtMostOneGrammar() = step(211)
         fun xcInvalidIxmlGrammar() = step(212)
 
+        fun xiNoSuchOutputPort(port: String)= internal(1, port)
         fun xiImpossibleNodeType(type: XdmNodeKind) = internal(2, type)
         fun xiCannotCastTo(to: MediaType) = internal(4, to)
         fun xiConfigurationInvalid(file: String) = internal(Pair(17, 1), file)

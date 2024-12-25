@@ -1306,6 +1306,10 @@ XC0212
 Invalid Invisible XML grammar.
 It is a dynamic error if the grammar provided is not a valid Invisible XML grammar.
 
+cxerr:XI0001
+Pipeline has no “$1” output port.
+Cannot save the output from a port that doesn’t exist.
+
 cxerr:XI0002
 Impossible node type: “$1”.
 

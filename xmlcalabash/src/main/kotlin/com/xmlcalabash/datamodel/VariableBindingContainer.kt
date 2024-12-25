@@ -107,10 +107,11 @@ abstract class VariableBindingContainer(
         pipe?.let { promotePipe(it) }
         pipe = null
 
-        if (select!!.contextRef && children.isEmpty()
-            && stepConfig.drp != null) {
-            val readFrom = pipe()
-            readFrom.setReadablePort(stepConfig.drp!!)
+        if (select!!.contextRef && children.isEmpty() && stepConfig.drp != null) {
+            if (specialType != SpecialType.XSLT_SELECTION_PATTERN) {
+                val readFrom = pipe()
+                readFrom.setReadablePort(stepConfig.drp!!)
+            }
         }
 
         super.elaborateInstructions()

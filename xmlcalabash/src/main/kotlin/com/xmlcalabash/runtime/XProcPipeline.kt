@@ -70,6 +70,10 @@ class XProcPipeline internal constructor(private val runtime: XProcRuntime, pipe
     }
 
     fun input(port: String, document: XProcDocument) {
+        if ((!runnable.params.inputs.containsKey(port))) {
+            throw XProcError.xsNoSuchPort(port).exception()
+        }
+
         boundInputs.add(port)
         runnable.head.input(port, document)
     }

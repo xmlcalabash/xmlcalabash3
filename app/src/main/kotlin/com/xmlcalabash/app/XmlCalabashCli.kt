@@ -158,11 +158,17 @@ class XmlCalabashCli private constructor() {
             }
 
             inputManifold.putAll(pipeline.inputManifold)
-            outputManifold.putAll(pipeline.outputManifold)
             for ((port, uris) in commandLine.inputs) {
                 for (uri in uris) {
                     val doc = stepConfig.environment.documentManager.load(uri, pipeline.config)
                     pipeline.input(port, doc)
+                }
+            }
+
+            outputManifold.putAll(pipeline.outputManifold)
+            for ((port, _) in commandLine.outputs) {
+                if (!outputManifold.containsKey(port)) {
+                    throw XProcError.xiNoSuchOutputPort(port).exception()
                 }
             }
 

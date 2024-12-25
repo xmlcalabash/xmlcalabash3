@@ -82,6 +82,18 @@ jobs:
       - name: What are we running?
         run: |
           echo "GRAALVM_HOME: $GRAALVM_HOME"
+          echo "HAVE_ACCESS_TOKEN: $HAVE_ACCESS_TOKEN"
+          echo "HAVE_LIBRARIES: $HAVE_LIBRARIES"
+          echo "HAVE_DOCS: $HAVE_DOCS"
+          echo "HAVE_WWW: $HAVE_WWW"
+          echo "CAN_PUBLISH: $CAN_PUBLISH"
+          echo "XMLCALABASH_VER: $XMLCALABASH_VER"
+          echo "CI_SHA1: $CI_SHA1"
+          echo "CI_BUILD_NUM: $CI_BUILD_NUM"
+          echo "CI_PROJECT_USERNAME: $CI_PROJECT_USERNAME"
+          echo "CI_PROJECT_REPONAME: $CI_PROJECT_REPONAME"
+          echo "CI_BRANCH: $CI_BRANCH"
+          echo "CI_TAG: $CI_TAG"
           echo "JAVA_HOME: $JAVA_HOME"
           java --version
           native-image --version

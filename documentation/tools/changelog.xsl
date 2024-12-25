@@ -28,8 +28,10 @@
 
 <xsl:template match="db:appendix">
   <xsl:variable name="revision" select="db:revhistory/db:revision[@xml:id=$version]"/>
-  <xsl:if test="count($revision) != 1">
-    <xsl:message terminate="yes">Cannot find revision {$version} in changelog</xsl:message>
+  <xsl:if test="not(contains($version, 'SNAPSHOT'))">
+    <xsl:if test="count($revision) != 1">
+      <xsl:message terminate="yes">Cannot find revision {$version} in changelog</xsl:message>
+    </xsl:if>
   </xsl:if>
   <xsl:apply-templates select="$revision/db:revdescription"/>
 </xsl:template>

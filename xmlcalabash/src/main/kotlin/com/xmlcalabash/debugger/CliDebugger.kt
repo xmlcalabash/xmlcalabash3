@@ -15,7 +15,9 @@ import net.sf.saxon.om.NamespaceUri
 import net.sf.saxon.s9api.*
 import net.sf.saxon.value.BooleanValue
 import org.jline.reader.EndOfFileException
+import org.jline.reader.LineReader
 import org.jline.reader.LineReaderBuilder
+import org.jline.reader.UserInterruptException
 import org.jline.terminal.TerminalBuilder
 import org.nineml.coffeefilter.InvisibleXml
 import org.nineml.coffeefilter.InvisibleXmlParser
@@ -27,10 +29,8 @@ import java.nio.charset.StandardCharsets
 import java.util.*
 
 class CliDebugger(val runtime: XProcRuntime): Monitor {
-    val terminal = TerminalBuilder.builder().dumb(true).build()
-    val reader = LineReaderBuilder.builder()
-        .terminal(terminal)
-        .build()
+    val terminal = TerminalBuilder.terminal()
+    var reader: LineReader? = null
     val prompt = "> "
 
     var parser: InvisibleXmlParser? = null
@@ -142,6 +142,13 @@ class CliDebugger(val runtime: XProcRuntime): Monitor {
     }
 
     private fun cli(step: AbstractStep, start: Boolean) {
+        if (reader == null) {
+            reader = LineReaderBuilder.builder()
+                .terminal(terminal)
+                .build()
+        }
+
+
         if (start) {
             println("Debugger at ${step.id}")
         } else {
@@ -154,7 +161,7 @@ class CliDebugger(val runtime: XProcRuntime): Monitor {
 
         try {
             while (true) {
-                val line = reader.readLine(prompt).trim()
+                val line = reader!!.readLine(prompt).trim()
                 if (line == "") {
                     continue
                 }
@@ -212,6 +219,7 @@ class CliDebugger(val runtime: XProcRuntime): Monitor {
         } catch (ex: Exception) {
             when (ex) {
                 is EndOfFileException -> Unit
+                is UserInterruptException -> doExit()
                 is XProcException -> throw ex
                 else -> throw XProcError.xiImpossible("Unexpected exception from jline: ${ex}").exception(ex)
             }
