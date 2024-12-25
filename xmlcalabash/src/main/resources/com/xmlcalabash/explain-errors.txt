@@ -67,6 +67,11 @@ Serialization properties are not compatible.
 It is a dynamic error if the combination of serialization options specified or
 defaulted is not allowed.
 
+XD0022
+Saxon EE is required for XML Schema support.
+It is a dynamic error if a processor that does not support PSVI annotations
+attempts to invoke a step which asserts that they are required.
+
 XD0023
 DTD validation failed: “$1”.
 It is a dynamic error if a DTD validation is performed and either the document
