@@ -1,10 +1,12 @@
 package com.xmlcalabash.runtime
 
 import com.xmlcalabash.datamodel.*
+import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.graph.*
 import com.xmlcalabash.namespace.NsDescription
 import com.xmlcalabash.runtime.model.CompoundStepModel
 import com.xmlcalabash.util.SaxonTreeBuilder
+import net.sf.saxon.Configuration
 import net.sf.saxon.s9api.XdmNode
 
 class XProcRuntime private constructor(internal val start: DeclareStepInstruction, internal val config: XProcStepConfiguration) {
@@ -12,6 +14,11 @@ class XProcRuntime private constructor(internal val start: DeclareStepInstructio
         internal fun newInstance(start: DeclareStepInstruction): XProcRuntime {
             val environment = PipelineContext(start.stepConfig.environment as PipelineCompilerContext)
             val config = XProcStepConfigurationImpl(environment, start.stepConfig.saxonConfig, start.location)
+
+            if (start.psviRequired == true && !config.saxonConfig.configuration.isLicensedFeature(Configuration.LicenseFeature.SCHEMA_VALIDATION)) {
+                throw XProcError.xdPsviUnsupported().exception()
+            }
+
             val runtime = XProcRuntime(start, config)
             val usedSteps = runtime.findUsedSteps(start)
             val pipelines = mutableMapOf<DeclareStepInstruction, SubpipelineModel>()

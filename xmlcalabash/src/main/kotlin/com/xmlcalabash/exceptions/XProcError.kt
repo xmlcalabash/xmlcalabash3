@@ -151,6 +151,7 @@ class XProcError private constructor(val code: QName, val variant: Int, val loca
         fun xdInvalidFunctionSelection() = dynamic(Pair(16, 2))
         fun xdValueNotAllowed(value: XdmValue, allowed: List<XdmAtomicValue>) = dynamic(19, value, allowed)
         fun xdInvalidSerializationProperty() = dynamic(Pair(20,1))
+        fun xdPsviUnsupported() = dynamic(22)
         fun xdNotDtdValid(msg: String) = dynamic(23, msg)
         fun xdValueDoesNotSatisfyType(value: String, type: String) = dynamic(28, value, type)
         fun xdStepFailed(message: String) = dynamic(30, message)
