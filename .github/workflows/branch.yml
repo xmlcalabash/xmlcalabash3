@@ -8,6 +8,7 @@ jobs:
       branch: ${{ steps.check_step.outputs.branch }}
       reponame: ${{ steps.check_step.outputs.reponame }}
       tag: ${{ steps.check_step.outputs.tag }}
+      version: ${{ steps.check_step.outputs.xmlcalabashVersion }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -30,6 +31,7 @@ jobs:
             echo "Running in $reponame on $branch"
           fi
           echo "tag=$tag" >> $GITHUB_OUTPUT
+          grep xmlcalabashVersion gradle.properties >> $GITHUB_OUTPUT
 
   build-and-deploy:
     runs-on: ubuntu-latest
@@ -41,6 +43,7 @@ jobs:
       HAVE_WWW: ${{ secrets.WWW_REPOSITORY != '' }}
       CAN_PUBLISH: ${{ secrets.ACCESS_TOKEN != '' }}
       XMLCALABASH_TEST_WEASY: "true"
+      XMLCALABASH_VER: ${{ needs.check_branch.outputs.version }}
       CIWORKFLOW: "yes"
       CI_SHA1: ${{ github.sha }}
       CI_BUILD_NUM: ${{ github.run_number }}
@@ -98,7 +101,7 @@ jobs:
 
       - name: Publish tagged release
         uses: softprops/action-gh-release@v1
-        if: ${{ env.HAVE_ACCESS_TOKEN == 'true' && env.CI_BRANCH == 'main' && env.CI_TAG != '' }}
+        if: ${{ env.HAVE_ACCESS_TOKEN == 'true' && env.CI_BRANCH == 'main' && env.CI_TAG != '' && !contains(env.XMLCALABASH_VER, 'SNAPSHOT') }}
         with:
           draft: false
           prerelease: false
@@ -108,7 +111,7 @@ jobs:
             app/build/distributions/xmlcalabash-${{ env.CI_TAG }}.zip
 
       - name: Checkout www
-        if: ${{ env.HAVE_WWW == 'true' && env.HAVE_ACCESS_TOKEN == 'true' && env.CI_BRANCH == 'main' }}
+        if: ${{ env.HAVE_WWW == 'true' && env.HAVE_ACCESS_TOKEN == 'true' && env.CI_BRANCH == 'main' && !contains(env.XMLCALABASH_VER, 'SNAPSHOT') }}
         uses: actions/checkout@v4
         with:
           repository: ${{ secrets.WWW_REPOSITORY }}
@@ -116,7 +119,7 @@ jobs:
           ref: "gh-pages"
 
       - name: Update test-report
-        if: ${{ env.HAVE_ACCESS_TOKEN == 'true' && env.CI_BRANCH == 'main' && env.CI_TAG != '' }}
+        if: ${{ env.HAVE_ACCESS_TOKEN == 'true' && env.CI_BRANCH == 'main' && env.CI_TAG != '' && !contains(env.XMLCALABASH_VER, 'SNAPSHOT')}}
         run: |
           PRODUCTVER=`cat gradle.properties | grep xmlcalabashVersion | cut -f2 -d= | xargs`
           rm -rf www/docs/test-report/current
@@ -127,7 +130,7 @@ jobs:
           rsync -ar test-driver/build/test-report/ www/docs/test-report/$PRODUCTVER/
 
       - name: Deploy updated test report
-        if: ${{ env.HAVE_ACCESS_TOKEN == 'true' && env.CI_BRANCH == 'main' && env.CI_TAG != '' }}
+        if: ${{ env.HAVE_ACCESS_TOKEN == 'true' && env.CI_BRANCH == 'main' && env.CI_TAG != '' && !contains(env.XMLCALABASH_VER, 'SNAPSHOT')}}
         uses: JamesIves/github-pages-deploy-action@v4.6.4
         with:
           folder: www/docs/test-report
@@ -137,7 +140,7 @@ jobs:
           target-folder: /docs/test-report
 
       - name: Checkout docs
-        if: ${{ env.HAVE_DOCS == 'true' && env.HAVE_ACCESS_TOKEN == 'true' && env.CI_BRANCH == 'main' }}
+        if: ${{ env.HAVE_DOCS == 'true' && env.HAVE_ACCESS_TOKEN == 'true' && env.CI_BRANCH == 'main' && !contains(env.XMLCALABASH_VER, 'SNAPSHOT')}}
         uses: actions/checkout@v4
         with:
           repository: ${{ secrets.DOCS_REPOSITORY }}
@@ -175,7 +178,7 @@ jobs:
           rsync -ar xmlcalabash/build/dokka/javadoc/ docs/docs/apidocs/$APIVER/
 
       - name: Deploy the updated user guide
-        if: ${{ env.HAVE_DOCS == 'true' && env.HAVE_ACCESS_TOKEN == 'true' && env.CI_BRANCH == 'main' }}
+        if: ${{ env.HAVE_DOCS == 'true' && env.HAVE_ACCESS_TOKEN == 'true' && env.CI_BRANCH == 'main' && !contains(env.XMLCALABASH_VER, 'SNAPSHOT')}}
         uses: JamesIves/github-pages-deploy-action@v4.6.4
         with:
           folder: docs/docs/userguide
@@ -185,7 +188,7 @@ jobs:
           target-folder: /docs/userguide
 
       - name: Deploy the updated reference
-        if: ${{ env.HAVE_DOCS == 'true' && env.HAVE_ACCESS_TOKEN == 'true' && env.CI_BRANCH == 'main' }}
+        if: ${{ env.HAVE_DOCS == 'true' && env.HAVE_ACCESS_TOKEN == 'true' && env.CI_BRANCH == 'main' && !contains(env.XMLCALABASH_VER, 'SNAPSHOT') }}
         uses: JamesIves/github-pages-deploy-action@v4.6.4
         with:
           folder: docs/docs/reference
@@ -195,7 +198,7 @@ jobs:
           target-folder: /docs/reference
 
       - name: Deploy the updated api docs
-        if: ${{ env.HAVE_DOCS == 'true' && env.HAVE_ACCESS_TOKEN == 'true' && env.CI_BRANCH == 'main' }}
+        if: ${{ env.HAVE_DOCS == 'true' && env.HAVE_ACCESS_TOKEN == 'true' && env.CI_BRANCH == 'main' && !contains(env.XMLCALABASH_VER, 'SNAPSHOT')}}
         uses: JamesIves/github-pages-deploy-action@v4.6.4
         with:
           folder: docs/docs/apidocs
