@@ -39,10 +39,19 @@
           </div>
 -->
           <div class="docversion">
-            <a href="#r{replace($VERSION?guideVersion, '\.', '')}">
-              <xsl:text>Version </xsl:text>
-              <xsl:sequence select="$VERSION?guideVersion"/>
-            </a>
+            <xsl:variable name="vid" select="'r' || replace($VERSION?guideVersion, '\.', '')"/>
+            <xsl:choose>
+              <xsl:when test="not(id($vid)) and contains($vid, 'SNAPSHOT')">
+                <xsl:text>Version </xsl:text>
+                <xsl:sequence select="$VERSION?guideVersion"/>
+              </xsl:when>
+              <xsl:otherwise>
+                <a href="#r{replace($VERSION?guideVersion, '\.', '')}">
+                  <xsl:text>Version </xsl:text>
+                  <xsl:sequence select="$VERSION?guideVersion"/>
+                </a>
+              </xsl:otherwise>
+            </xsl:choose>
           </div>
           <div class="version">
             <xsl:text>for XML Calabash </xsl:text>
