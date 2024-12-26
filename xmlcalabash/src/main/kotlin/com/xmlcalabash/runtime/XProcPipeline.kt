@@ -88,7 +88,7 @@ class XProcPipeline internal constructor(private val runtime: XProcRuntime, pipe
         }
         try {
             config.checkType(name, value.value, option.asType, config.inscopeNamespaces, option.values)
-        } catch (ex: Exception) {
+        } catch (_: Exception) {
             throw XProcError.xdBadType(value.value.toString(), option.asType.toString()).exception()
         }
 
