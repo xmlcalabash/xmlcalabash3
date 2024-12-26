@@ -11,6 +11,8 @@ object NsErr {
     private val stepErrors = mutableMapOf<Int, QName>()
     private val internalErrors = mutableMapOf<Int, QName>()
 
+    val threadInterrupted = xi(3)
+
     fun xs(code: Int): QName {
         val err = staticErrors[code] ?: error(code, "XS")
         staticErrors[code] = err

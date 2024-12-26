@@ -10,6 +10,8 @@ class AtomicOptionStep(config: XProcStepConfiguration, atomic: AtomicBuiltinStep
     var externalValue: XProcDocument? = null
     internal val atomicOptionValues = mutableMapOf<QName, LazyValue>()
 
+    override val stepTimeout: Long = 0
+
     override fun instantiate() {
         // nop
     }

@@ -21,6 +21,7 @@ class CompoundStepModel(runtime: XProcRuntime, model: CompoundModel): StepModel(
     lateinit var params: RuntimeStepParameters
     val steps = mutableListOf<StepModel>()
     val edges = mutableListOf<ModelEdge>()
+    val timeout = model.timeout
 
     init {
         staticOptions.putAll(model.step.staticOptions)

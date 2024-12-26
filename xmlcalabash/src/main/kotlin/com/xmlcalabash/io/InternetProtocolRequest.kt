@@ -25,21 +25,20 @@ import org.apache.hc.client5.http.impl.auth.BasicAuthCache
 import org.apache.hc.client5.http.impl.auth.BasicCredentialsProvider
 import org.apache.hc.client5.http.impl.auth.BasicScheme
 import org.apache.hc.client5.http.impl.classic.HttpClients
-import org.apache.hc.client5.http.impl.io.BasicHttpClientConnectionManager
 import org.apache.hc.client5.http.protocol.HttpClientContext
 import org.apache.hc.core5.http.*
 import org.apache.hc.core5.http.io.HttpClientResponseHandler
-import org.apache.hc.core5.http.io.SocketConfig
 import org.apache.hc.core5.http.io.entity.ByteArrayEntity
 import org.apache.hc.core5.http.io.support.ClassicRequestBuilder
 import org.apache.hc.core5.util.TimeValue
-import org.apache.hc.core5.util.Timeout
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
+import java.net.SocketTimeoutException
 import java.net.URI
 import java.nio.charset.StandardCharsets
 import java.time.Instant
 import java.time.format.DateTimeFormatter
+import java.util.concurrent.TimeUnit
 
 class InternetProtocolRequest(val stepConfig: XProcStepConfiguration, val uri: URI) {
     companion object {
@@ -47,7 +46,7 @@ class InternetProtocolRequest(val stepConfig: XProcStepConfiguration, val uri: U
     }
 
     private var href: URI? = null
-    private var finalURI: URI? = null
+    lateinit private var finalURI: URI
     private val headers = mutableMapOf<String,String>()
 
     private val _properties = DocumentProperties()
@@ -119,18 +118,19 @@ class InternetProtocolRequest(val stepConfig: XProcStepConfiguration, val uri: U
     private fun executeWithRedirects(method: String): InternetProtocolResponse {
         val builder = HttpClients.custom()
         val rqBuilder = RequestConfig.custom()
-        rqBuilder.setCookieSpec("default")
         val localContext = HttpClientContext.create()
         if (cookieStore == null) {
             cookieStore = BasicCookieStore()
         }
-        builder.setDefaultCookieStore(cookieStore)
 
         if (timeout != null) {
             // https://stackoverflow.com/questions/68096970/httpclient5-lot-of-apis-changed-removed
-            val socketConfig = SocketConfig.custom().setSoTimeout(Timeout.ofSeconds(timeout!!.toLong())).build()
-            val connMgr = BasicHttpClientConnectionManager()
-            connMgr.socketConfig = socketConfig
+            // val socketConfig = SocketConfig.custom().setSoTimeout(Timeout.ofSeconds(timeout!!.toLong())).build()
+            // val connMgr = BasicHttpClientConnectionManager()
+            // connMgr.socketConfig = socketConfig
+            // https://stackoverflow.com/questions/78040298/best-way-to-configure-timeouts-on-apache-httpclient-5
+            rqBuilder.setConnectionRequestTimeout(timeout!!.toLong(), TimeUnit.SECONDS)
+            rqBuilder.setResponseTimeout(timeout!!.toLong(), TimeUnit.SECONDS)
         }
 
         val httpRequest = when (method.uppercase()) {
@@ -142,6 +142,9 @@ class InternetProtocolRequest(val stepConfig: XProcStepConfiguration, val uri: U
             else -> throw UnsupportedOperationException("Unsupported method: ${method}")
         }
 
+        val requestConfig = rqBuilder.build()
+        builder.setDefaultRequestConfig(requestConfig)
+        localContext.cookieStore = cookieStore
         builder.setRetryStrategy(DefaultHttpRequestRetryStrategy(3, TimeValue.ofSeconds(1)))
 
         if (stepConfig.environment.proxies[uri.scheme] != null) {
@@ -180,7 +183,8 @@ class InternetProtocolRequest(val stepConfig: XProcStepConfiguration, val uri: U
         // cookies and (2) the semantics of followRedirectCount aren't implemented by
         // the underlying library.
         builder.disableRedirectHandling()
-        val httpClient = builder.build() ?: throw RuntimeException("HTTP requests have been disabled?")
+        val httpClient = builder
+            .build() ?: throw RuntimeException("HTTP requests have been disabled?")
 
         if (httpVersion != null) {
             localContext.protocolVersion = ProtocolVersion(href!!.scheme, httpVersion!!.first, httpVersion!!.second)
@@ -188,9 +192,26 @@ class InternetProtocolRequest(val stepConfig: XProcStepConfiguration, val uri: U
 
         val responseHandler = ResponseEntityHandler()
 
-        val httpResult = httpClient.execute(httpRequest, localContext, responseHandler)
-
         finalURI = httpRequest.uri
+
+        val httpResult = try {
+            httpClient.execute(httpRequest, localContext, responseHandler)
+        } catch (_: SocketTimeoutException) {
+            val response = InternetProtocolResponse(finalURI, 408)
+            response.cookieStore = cookieStore
+            response.headers = emptyMap()
+
+            var report = XdmMap()
+            report = report.put(XdmAtomicValue("status-code"), XdmAtomicValue(408))
+            report = report.put(XdmAtomicValue("base-uri"), XdmAtomicValue(finalURI))
+            response.report = report
+
+            return response
+        }
+
+        if (Thread.currentThread().isInterrupted) {
+            throw stepConfig.exception(XProcError.xiThreadInterrupted())
+        }
 
         if (listOf(301, 302, 303).contains(httpResult.code) && (followRedirectCount != 0)) {
             followRedirectCount -= 1
@@ -207,7 +228,7 @@ class InternetProtocolRequest(val stepConfig: XProcStepConfiguration, val uri: U
             }
         }
 
-        val response = InternetProtocolResponse(finalURI!!, httpResult.code)
+        val response = InternetProtocolResponse(finalURI, httpResult.code)
         response.cookieStore = cookieStore
         response.headers = requestHeaders(httpResult)
         response.report = requestReport(httpResult)

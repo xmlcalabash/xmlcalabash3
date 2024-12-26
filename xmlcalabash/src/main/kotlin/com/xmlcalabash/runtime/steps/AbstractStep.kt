@@ -21,6 +21,10 @@ import com.xmlcalabash.util.SchematronImpl
 import net.sf.saxon.s9api.QName
 import net.sf.saxon.s9api.XdmNode
 import org.apache.logging.log4j.kotlin.logger
+import java.util.concurrent.Callable
+import java.util.concurrent.Executors
+import java.util.concurrent.TimeUnit
+import java.util.concurrent.TimeoutException
 
 abstract class AbstractStep(val stepConfig: XProcStepConfiguration, step: StepModel, val type: QName = step.type, val name: String = step.name): Consumer {
     val _id: String
@@ -41,12 +45,18 @@ abstract class AbstractStep(val stepConfig: XProcStepConfiguration, step: StepMo
     val staticOptions = step.staticOptions.toMutableMap()
     val verbosity = stepConfig.saxonConfig.xmlCalabash.xmlCalabashConfig.verbosity
 
+    var aborted = false
+    abstract val stepTimeout: Long
     abstract val params: RuntimeStepParameters
     abstract val readyToRun: Boolean
     abstract fun output(port: String, document: XProcDocument)
     abstract fun instantiate()
     abstract fun prepare()
     abstract fun run()
+
+    open fun abort() {
+        aborted = true
+    }
 
     internal fun checkInputPort(port: String, doc: XProcDocument, flange: RuntimePort?): XProcError? {
         if (flange == null) {
@@ -118,7 +128,6 @@ abstract class AbstractStep(val stepConfig: XProcStepConfiguration, step: StepMo
         logger.debug { "Running ${this}" }
         stepConfig.environment.messageReporter.progress { "Running ${this}" }
 
-        val startTime = System.nanoTime()
         try {
             prepare()
 
@@ -126,7 +135,20 @@ abstract class AbstractStep(val stepConfig: XProcStepConfiguration, step: StepMo
                 monitor.startStep(this)
             }
 
-            run()
+            if (stepTimeout > 0) {
+                val service = Executors.newSingleThreadExecutor()
+                val future = service.submit(RunTask())
+                try {
+                    future.get(stepTimeout, TimeUnit.SECONDS)
+                } catch (_: TimeoutException) {
+                    future.cancel(true)
+                    service.shutdownNow()
+                    throw stepConfig.exception(XProcError.xdStepTimeout(stepTimeout))
+                }
+                service.shutdownNow()
+            } else {
+                run()
+            }
 
             for (monitor in stepConfig.environment.monitors) {
                 monitor.endStep(this)
@@ -153,6 +175,7 @@ abstract class AbstractStep(val stepConfig: XProcStepConfiguration, step: StepMo
     }
 
     open fun reset() {
+        aborted = false
         inputCount.clear()
         outputCount.clear()
     }
@@ -218,6 +241,7 @@ abstract class AbstractStep(val stepConfig: XProcStepConfiguration, step: StepMo
         }
     }
 
+    /*
     protected fun testAssertion(schema: XdmNode, doc: XProcDocument) {
         val validator = SchematronImpl(stepConfig)
         if (doc.value is XdmNode) {
@@ -226,11 +250,16 @@ abstract class AbstractStep(val stepConfig: XProcStepConfiguration, step: StepMo
         } else {
             logger.warn { "Cannot apply Schematron to non-XML documents" }
         }
-
-
     }
+     */
 
     override fun toString(): String {
         return "${type}/${name} (${id})"
+    }
+
+    inner class RunTask: Callable<Unit> {
+        override fun call() {
+            run()
+        }
     }
 }

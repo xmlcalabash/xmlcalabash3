@@ -14,6 +14,7 @@ interface XProcStep {
     fun option(name: QName, binding: LazyValue)
     fun input(port: String, doc: XProcDocument)
     fun run()
+    fun abort()
 
     fun reset()
     fun teardown()

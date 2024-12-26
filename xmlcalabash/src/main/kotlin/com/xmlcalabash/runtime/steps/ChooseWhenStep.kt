@@ -1,13 +1,15 @@
 package com.xmlcalabash.runtime.steps
 
 import com.xmlcalabash.exceptions.XProcError
+import com.xmlcalabash.exceptions.XProcException
 import com.xmlcalabash.namespace.NsCx
+import com.xmlcalabash.namespace.NsErr
 import com.xmlcalabash.runtime.XProcStepConfiguration
 import com.xmlcalabash.runtime.model.CompoundStepModel
 import com.xmlcalabash.steps.internal.GuardStep
 
 open class ChooseWhenStep(config: XProcStepConfiguration, compound: CompoundStepModel): CompoundStep(config, compound) {
-    protected val stepsToRun = mutableListOf<AbstractStep>()
+    protected val localStepsToRun = mutableListOf<AbstractStep>()
 
     open fun evaluateGuardExpression(): Boolean {
         if (runnables.isEmpty()) {
@@ -16,7 +18,7 @@ open class ChooseWhenStep(config: XProcStepConfiguration, compound: CompoundStep
 
         stepConfig.environment.newExecutionContext(stepConfig)
 
-        stepsToRun.clear()
+        localStepsToRun.clear()
 
         head.runStep()
 
@@ -29,7 +31,7 @@ open class ChooseWhenStep(config: XProcStepConfiguration, compound: CompoundStep
                 if ((step.type == NsCx.splitter || step.type == NsCx.joiner) && step.readyToRun) {
                     guardSteps.add(step)
                 } else {
-                    stepsToRun.add(step)
+                    localStepsToRun.add(step)
                 }
             } else {
                 guardSteps.add(step)
@@ -43,15 +45,25 @@ open class ChooseWhenStep(config: XProcStepConfiguration, compound: CompoundStep
         var more = true
         while (more) {
             more = false
-            val remaining = runStepsExhaustively(guardSteps)
+            val remaining = try {
+                runStepsExhaustively(guardSteps)
+            } catch (ex: XProcException) {
+                if (ex.error.code == NsErr.threadInterrupted) {
+                    for (step in stepsToRun) {
+                        step.abort()
+                    }
+                }
+                throw ex
+            }
+
             if (remaining.isNotEmpty()) {
                 guardSteps.clear()
                 guardSteps.addAll(remaining)
 
-                for (step in stepsToRun.toList()) {
+                for (step in localStepsToRun.toList()) {
                     if ((step.type == NsCx.splitter || step.type == NsCx.joiner) && step.readyToRun) {
                         guardSteps.add(step)
-                        stepsToRun.remove(step)
+                        localStepsToRun.remove(step)
                         more = true
                     }
                 }
@@ -70,10 +82,9 @@ open class ChooseWhenStep(config: XProcStepConfiguration, compound: CompoundStep
     override fun run() {
         stepConfig.environment.newExecutionContext(stepConfig)
 
-        val left = runStepsExhaustively(stepsToRun)
-        if (left.isNotEmpty()) {
-            throw RuntimeException("did not run all steps")
-        }
+        stepsToRun.clear()
+        stepsToRun.addAll(localStepsToRun)
+        runSubpipeline()
 
         for ((port, documents) in foot.cache) {
             for (document in documents) {

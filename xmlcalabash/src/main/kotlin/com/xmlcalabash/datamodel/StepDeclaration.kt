@@ -36,6 +36,7 @@ abstract class StepDeclaration(parent: XProcInstruction?, stepConfig: Instructio
 
     val location = stepConfig.location
 
+    internal var timeout = 0
     internal var depends = mutableSetOf<String>()
     internal val _staticOptions = mutableMapOf<QName, StaticOptionDetails>()
     val staticOptions: Map<QName, StaticOptionDetails>
@@ -222,6 +223,21 @@ abstract class StepDeclaration(parent: XProcInstruction?, stepConfig: Instructio
                 throw ex.error.asStatic().exception()
             }
         }
+    }
+
+    fun timeout(value: String) {
+        try {
+            timeout(value.toInt())
+        } catch (_: NumberFormatException) {
+            throw stepConfig.exception(XProcError.xsValueDoesNotSatisfyType(value, "xs:nonNegativeInteger"))
+        }
+    }
+
+    fun timeout(value: Int) {
+        if (value < 0) {
+            throw stepConfig.exception(XProcError.xsValueDoesNotSatisfyType(value.toString(), "xs:nonNegativeInteger"))
+        }
+        timeout = value
     }
 
     fun inputs(): List<PortBindingContainer> {
