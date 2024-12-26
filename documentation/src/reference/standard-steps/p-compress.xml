@@ -36,11 +36,13 @@
 </refsection>
 </refsynopsisdiv>
 
-   <refsection>
-      <title>Description</title>
-      <para>Compression is supported by the third party
+<refsection>
+  <title>Description</title>
+
+   <para role="external-refs"/>
+
+   <para>Compression is supported by the third party
 Apache Commons Compress™ library.</para>
-   </refsection>
 
    <refsection>
      <title>Supported formats</title>
@@ -81,6 +83,6 @@ but they are read-only. You cannot compress with those algorithms.</para>
 </listitem>
 </orderedlist>
 </refsection>
-
-   </refsection>
+</refsection>
+</refsection>
 </refentry>

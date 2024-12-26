@@ -39,10 +39,9 @@ are <glossterm>implementation-defined</glossterm>.</impl>
 </refsection>
 </refsynopsisdiv>
 
-   <refsection>
-      <title>Description</title>
-      <para>TBD.</para>
-   </refsection>
+<refsection>
+  <title>Description</title>
+  <para role="external-refs"/>
 
    <refsection>
       <title>Supported versions</title>
@@ -55,4 +54,5 @@ are <glossterm>implementation-defined</glossterm>.</impl>
       <para>The <xref linkend="cx-unique-id"/> step can generate version 1 through 7 UUIDs and other
       forms of unique identifier.</para>
    </refsection>
+</refsection>
 </refentry>

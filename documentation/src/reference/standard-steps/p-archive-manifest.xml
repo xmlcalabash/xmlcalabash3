@@ -58,11 +58,13 @@
 </refsection>
 </refsynopsisdiv>
 
-   <refsection>
-      <title>Description</title>
-      <para>Compression is supported by the third party
+<refsection>
+<title>Description</title>
+
+<para role="external-refs"/>
+
+<para>Compression is supported by the third party
 Apache Commons Compress™ library.</para>
-   </refsection>
 
    <refsection>
      <title>Supported formats</title>
@@ -227,5 +229,6 @@ attributes will either both be present or neither will be present.</para>
 </listitem>
 </orderedlist>
 </refsection>
-   </refsection>
+</refsection>
+</refsection>
 </refentry>

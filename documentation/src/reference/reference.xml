@@ -23,12 +23,7 @@
   <h:link href="./css/xproc.css" rel="stylesheet"/>
 </info>
 
-<preface>
-<title>Preface</title>
-<para>This whole things is pretty rough. There are some experiments with new
-step documentation. And ultimately there needs to be reference documentation about the APIs
-and things. Maybe when they’re a little a little more baked and a little less runny batter.</para>
-</preface>
+<xi:include href="preface.xml"/>
 
 <xi:include href="depends.xml"/>
 <xi:include href="running.xml"/>

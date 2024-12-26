@@ -222,7 +222,7 @@ val reference = tasks.register<SaxonXsltTask>("reference") {
   args(listOf("-init:org.docbook.xsltng.extensions.Register"))
   parameters (
       mapOf(
-          "mediaobject-input-base-uri" to "file:${layout.buildDirectory.get()}/xml/",
+          "mediaobject-input-base-uri" to "file:${layout.buildDirectory.get()}/reference/",
           "chunk-output-base-uri" to "${layout.buildDirectory.get()}/reference/",
           "dep_brotliDec" to project.findProperty("brotliDec").toString(),
           "dep_commonsCodec" to project.findProperty("commonsCodec").toString(),

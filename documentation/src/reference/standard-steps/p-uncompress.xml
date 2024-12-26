@@ -44,11 +44,12 @@
 </refsection>
 </refsynopsisdiv>
 
-   <refsection>
-      <title>Description</title>
-      <para>Uncompression is supported by the third party
-Apache Commons Compress™ library.</para>
-   </refsection>
+<refsection>
+  <title>Description</title>
+  <para role="external-refs"/>
+  
+  <para>Uncompression is supported by the third party
+  Apache Commons Compress™ library.</para>
 
    <refsection>
      <title>Supported formats</title>
@@ -94,6 +95,6 @@ Compress™ library version 1.27.1.</para>
 </listitem>
 </orderedlist>
 </refsection>
-
-   </refsection>
+</refsection>
+</refsection>
 </refentry>
