@@ -1,6 +1,6 @@
 <!-- -*- nxml -*- -->
 <cc:xml-calabash xmlns:cc="https://xmlcalabash.com/ns/configuration"
-                 schema-aware="false">
+                 licensed="false">
   <cc:mimetype content-type="application/xml" extensions="xml xpl"/>
   <cc:mimetype content-type="text/plain" extensions="text"/>
   <cc:mimetype content-type="application/json" extensions="json"/>

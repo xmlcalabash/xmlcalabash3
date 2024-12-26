@@ -2,7 +2,6 @@ package com.xmlcalabash.config
 
 import com.xmlcalabash.datamodel.MediaType
 import com.xmlcalabash.spi.PagedMediaManager
-import com.xmlcalabash.spi.PagedMediaProvider
 import com.xmlcalabash.util.SchematronAssertions
 import com.xmlcalabash.util.Verbosity
 import net.sf.saxon.Configuration
@@ -19,7 +18,7 @@ abstract class XmlCalabashConfiguration {
     var saxonConfigurationFile: File? = null
     var saxonConfigurationProperties: Map<String,String> = emptyMap()
     var uniqueInlineUris: Boolean = true
-    var schemaAware: Boolean = false
+    var licensed: Boolean = true // If a licensed configuration can't be loaded, an unlicensed one will be...
     var proxies: Map<String, String> = emptyMap()
     var inlineTrimWhitespace: Boolean = false
     var mpt: Double = 0.99999998

@@ -34,8 +34,8 @@ class ConfigurationLoader private constructor(private val config: XmlCalabashCon
         private val ccSendmail = QName(ns, "cc:send-mail")
         private val ccPagedMedia = QName(ns, "cc:paged-media")
         private val _debug = QName("debug")
+        private val _licensed = QName("licensed")
         private val _verbosity = QName("verbosity")
-        private val _schemaAware = QName("schema-aware")
         private val _saxonConfiguration = QName("saxon-configuration")
         private val _value = QName("value")
         private val _scheme = QName("scheme")
@@ -127,7 +127,7 @@ class ConfigurationLoader private constructor(private val config: XmlCalabashCon
             }
         }
 
-        config.schemaAware = booleanAttribute(root.getAttributeValue(_schemaAware), "schema-aware")
+        config.licensed = booleanAttribute(root.getAttributeValue(_licensed), "licensed")
         config.verbosity = verbosityAttribute(root.getAttributeValue(_verbosity))
 
         for (child in root.axisIterator(Axis.CHILD)) {

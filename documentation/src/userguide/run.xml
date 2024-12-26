@@ -62,7 +62,7 @@ given, the <command>run</command> command is assumed.</para>
   <sbr/>
   <arg rep="norepeat" linkend="cli-assertions">--assertions:<replaceable>level</replaceable></arg>
   <sbr/>
-  <arg rep="norepeat" linkend="cli-schema-aware">--schema-aware</arg>
+  <arg rep="norepeat" linkend="cli-licensed">--licensed</arg>
   <arg rep="norepeat" linkend="cli-debug">--debug</arg>
   <arg rep="norepeat" linkend="cli-debug">--debugger</arg>
   <arg rep="norepeat" linkend="cli-help">--help</arg>
@@ -293,10 +293,13 @@ are treated as warnings.</para></listitem>
 </listitem>
 </varlistentry>
 
-<varlistentry xml:id="cli-schema-aware">
-  <term><option>--schema-aware</option></term>
+<varlistentry xml:id="cli-licensed">
+  <term><option>--licensed</option></term>
 <listitem>
-<para>Requests schema-aware processing.</para>
+<para>Requests a licensed processor. In practice, a licensed processor is used
+by default, if one is available. However, <option>--licensed:false</option> can be used
+to explicitly request an <emphasis>unlicensed</emphasis> processor when Saxon PE or
+Saxon EE are on the classpath.</para>
 <para>Schema-aware processing requires Saxon EE and a valid Saxon license.</para>
 </listitem>
 </varlistentry>

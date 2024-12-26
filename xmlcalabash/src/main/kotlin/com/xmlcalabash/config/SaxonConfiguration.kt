@@ -38,7 +38,11 @@ class SaxonConfiguration private constructor(
 
         private fun newConfiguration(xmlCalabash: XmlCalabash): Configuration {
             val newConfiguration = if (xmlCalabash.xmlCalabashConfig.saxonConfigurationFile == null) {
-                Configuration.newLicensedConfiguration()
+                if (xmlCalabash.xmlCalabashConfig.licensed) {
+                    Configuration.newLicensedConfiguration()
+                } else {
+                    Configuration()
+                }
             } else {
                 val source = SAXSource(InputSource(xmlCalabash.xmlCalabashConfig.saxonConfigurationFile!!.toURI().toString()))
                 Configuration.readConfiguration(source)
