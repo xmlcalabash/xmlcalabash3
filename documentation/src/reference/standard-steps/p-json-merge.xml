@@ -40,8 +40,8 @@ port <port>result</port>.</para>
 </refsection>
 </refsynopsisdiv>
 
-   <refsection>
-      <title>Description</title>
-      <para>TBD.</para>
-   </refsection>
+<refsection>
+  <title>Description</title>
+  <para role="external-refs"/>
+</refsection>
 </refentry>

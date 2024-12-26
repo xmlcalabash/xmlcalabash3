@@ -6,6 +6,7 @@
                 xmlns:fp="http://docbook.org/ns/docbook/functions/private"
                 xmlns:h="http://www.w3.org/1999/xhtml"
                 xmlns:m="http://docbook.org/ns/docbook/modes"
+                xmlns:map="http://www.w3.org/2005/xpath-functions/map"
                 xmlns:mp="http://docbook.org/ns/docbook/modes/private"
                 xmlns:p="http://www.w3.org/ns/xproc"
                 xmlns:rddl="http://www.rddl.org/"
@@ -149,6 +150,81 @@
       </ul>
     </details>
   </xsl:if>
+</xsl:template>
+
+<!-- ============================================================ -->
+
+<xsl:variable name="standard-map"
+              select="map { '3.0': 'https://spec.xproc.org/3.0/steps/',
+                            '3.1': 'https://spec.xproc.org/master/head/steps/' }"/>
+
+<xsl:template match="db:para[@role='external-refs']">
+  <xsl:if test="node()">
+    <xsl:message terminate="yes">The ‘external-refs’ paragraph must be empty.</xsl:message>
+  </xsl:if>
+
+  <xsl:variable name="info" select="ancestor::db:refentry[1]/db:info"/>
+  <xsl:variable name="name" select="ancestor::db:refentry[1]/db:refnamediv/db:refname"/>
+  <xsl:variable name="version" select="($info/db:bibliomisc[@role='version']/string(), '3.0')[1]"/>
+
+  <xsl:if test="not($version = ('3.0', '3.1'))">
+    <xsl:message terminate="yes">Unsupported version {$version}.</xsl:message>
+  </xsl:if>
+
+  <p>The <code>{$name}</code> step is defined in the
+  <a href="{map:get($standard-map, $version)}#{replace($name, 'p:', 'c.')}">XProc {$version}:
+  Standard Step Library</a>. It is also described on
+  <a href="https://xprocref.org/{$version}/{replace($name, ':', '.')}.html">XProcRef.org</a>.
+  </p>
+</xsl:template>
+
+<xsl:template match="db:refentry" mode="m:toc-entry">
+  <xsl:variable name="refmeta" select=".//db:refmeta"/>
+  <xsl:variable name="refentrytitle" select="$refmeta//db:refentrytitle"/>
+  <xsl:variable name="refnamediv" select=".//db:refnamediv"/>
+  <xsl:variable name="refname" select="$refnamediv//db:refname"/>
+
+  <xsl:variable name="title">
+    <xsl:choose>
+      <xsl:when test="$refentrytitle">
+        <xsl:apply-templates select="$refentrytitle[1]">
+          <xsl:with-param name="purpose" select="'lot'"/>
+        </xsl:apply-templates>
+      </xsl:when>
+      <xsl:when test="$refnamediv/db:refdescriptor">
+        <xsl:apply-templates select="($refnamediv/db:refdescriptor)[1]">
+          <xsl:with-param name="purpose" select="'lot'"/>
+        </xsl:apply-templates>
+      </xsl:when>
+      <xsl:when test="$refname">
+        <xsl:apply-templates select="$refname[1]">
+          <xsl:with-param name="purpose" select="'lot'"/>
+        </xsl:apply-templates>
+      </xsl:when>
+      <xsl:otherwise></xsl:otherwise>
+    </xsl:choose>
+  </xsl:variable>
+
+  <xsl:variable name="desc" select="db:refsection[db:info/db:title = 'Description']"/>
+  <xsl:variable name="version" select="db:info/db:bibliomisc[@role = 'version']/string()"/>
+  <xsl:variable name="augmented"
+                select="count($desc/* except $desc/db:info) gt 1"/>
+
+  <li>
+    <span class="refentrytitle {if ($augmented) then 'impldetail' else 'standard'}">
+      <a href="#{f:id(.)}">
+        <xsl:sequence select="$title"/>
+      </a>
+    </span>
+    <xsl:if test="f:is-true($annotate-toc)">
+      <xsl:apply-templates select="(db:refnamediv/db:refpurpose)[1]">
+        <xsl:with-param name="purpose" select="'lot'"/>
+      </xsl:apply-templates>
+    </xsl:if>
+    <xsl:if test="$version">
+      <span class="newinver">{$version}</span>
+    </xsl:if>
+  </li>
 </xsl:template>
 
 <!-- ============================================================ -->

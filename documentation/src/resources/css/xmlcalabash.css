@@ -85,6 +85,31 @@ code.literal {
     content: "← ";
 }
 
+.toc li .impldetail {
+    font-weight: bold;
+}
+
+.impldetail::after {
+    font-weight: normal;
+    content: "✵";
+    font-size: 80%;
+    vertical-align: super;
+}
+
+.newinver {
+    margin-left: 1em;
+    font-size: 70%;
+    font-family: sans-serif;
+    color: white;
+    background-color: black;
+    padding-left: 4px;
+    padding-right: 4px;
+    padding-top: 3px;
+    padding-bottom: 1px;
+    border: 1px solid black;
+    border-radius: 4px;
+}
+
 /* ============================================================ */
 
 .element-syntax {

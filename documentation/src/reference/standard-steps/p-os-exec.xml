@@ -1,10 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?><refentry xmlns="http://docbook.org/ns/docbook" xmlns:p="http://www.w3.org/ns/xproc" xml:id="p-os-exec">
 <?db filename="p-os-exec"?>
-   <refnamediv>
-      <refname>p:os-exec</refname>
-      <refpurpose>The standard p:os-exec step</refpurpose>
-   </refnamediv>
-   <refsynopsisdiv>
+<info>
+  <bibliomisc role="version">3.1</bibliomisc>
+</info>
+<refnamediv>
+  <refname>p:os-exec</refname>
+  <refpurpose>The standard p:os-exec step</refpurpose>
+</refnamediv>
+<refsynopsisdiv>
 
 <refsection role="introduction">
 <title>Introduction</title>
@@ -49,8 +52,8 @@ a process invoked with <tag>p:os-exec</tag> are
 </refsection>
 </refsynopsisdiv>
 
-   <refsection>
-      <title>Description</title>
-      <para>TBD.</para>
-   </refsection>
+<refsection>
+  <title>Description</title>
+  <para role="external-refs"/>
+</refsection>
 </refentry>

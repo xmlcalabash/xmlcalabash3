@@ -4,6 +4,9 @@
           xmlns:xlink="http://www.w3.org/1999/xlink"
           xml:id="p-css-formatter">
 <?db filename="p-css-formatter"?>
+<info>
+  <bibliomisc role="version">3.1</bibliomisc>
+</info>
 <refnamediv>
    <refname>p:css-formatter</refname>
    <refpurpose>The standard p:css-formatter step</refpurpose>
@@ -57,10 +60,14 @@ are defined by the CSS implementation used and are
 
 <refsection>
 <title>Description</title>
-<para>XML Calabash supports several CSS formatter implementations. There is also
-a service provider interface so that additional implementations can be provided by
-third parties. Several <link linkend="p-xsl-formatter">XSL formatters</link> are
-also supported.</para>
+
+<para role="external-refs"/>
+
+<para>XML Calabash supports several CSS formatter implementations.
+There is also a service provider interface so that additional
+implementations can be provided by third parties. Several <link
+linkend="p-xsl-formatter">XSL formatters</link> are also
+supported.</para>
 
 <refsection>
 <title>Antenna House</title>

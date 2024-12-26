@@ -1,10 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?><refentry xmlns="http://docbook.org/ns/docbook" xmlns:p="http://www.w3.org/ns/xproc" xml:id="p-markdown-to-html">
 <?db filename="p-markdown-to-html"?>
-   <refnamediv>
-      <refname>p:markdown-to-html</refname>
-      <refpurpose>Converts Markdown formatted text to HTML</refpurpose>
-   </refnamediv>
-   <refsynopsisdiv>
+<info>
+  <bibliomisc role="version">3.1</bibliomisc>
+</info>
+<refnamediv>
+  <refname>p:markdown-to-html</refname>
+  <refpurpose>Converts Markdown formatted text to HTML</refpurpose>
+</refnamediv>
+<refsynopsisdiv>
 
 <refsection role="introduction">
 <title>Introduction</title>
@@ -28,13 +31,14 @@
 </refsection>
 </refsynopsisdiv>
 
-   <refsection>
-      <title>Description</title>
+<refsection>
+  <title>Description</title>
 
-      <para>The XML Calabash implementation of <tag>p:markdown-to-html</tag> uses the
+   <para role="external-refs"/>
+
+   <para>The XML Calabash implementation of <tag>p:markdown-to-html</tag> uses the
       <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="https://github.com/vsch/flexmark-java">Flexmark-java</link> implementation
       of <link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="https://spec.commonmark.org/0.28">Commonmark</link>.</para>
-   </refsection>
 
    <refsection>
      <title>Extensions</title>
@@ -75,4 +79,5 @@
      instantiate the class with reflection, it will call the <methodname>configure</methodname> method,
      passing the key value from the parameters map as the second argument.</para>
    </refsection>
+</refsection>
 </refentry>

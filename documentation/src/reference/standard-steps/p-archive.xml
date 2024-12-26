@@ -91,9 +91,9 @@
 </refsection>
 </refsynopsisdiv>
 
-   <refsection>
-      <title>Description</title>
-      <para>The <tag>p:archive</tag> step only supports Zip archives.</para>
-   </refsection>
+<refsection>
+  <title>Description</title>
+  <para role="external-refs"/>
+</refsection>
 
 </refentry>

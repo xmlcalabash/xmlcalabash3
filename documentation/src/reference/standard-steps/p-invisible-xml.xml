@@ -1,10 +1,13 @@
-<?xml version="1.0" encoding="utf-8"?><refentry xmlns="http://docbook.org/ns/docbook" xmlns:p="http://www.w3.org/ns/xproc" xml:id="p-invisible-xml">
+<refentry xmlns="http://docbook.org/ns/docbook" xmlns:p="http://www.w3.org/ns/xproc" xml:id="p-invisible-xml">
 <?db filename="p-ixml"?>
-   <refnamediv>
-      <refname>p:ixml</refname>
-      <refpurpose>The standard p:ixml step</refpurpose>
-   </refnamediv>
-   <refsynopsisdiv>
+<info>
+  <bibliomisc role="version">3.1</bibliomisc>
+</info>
+<refnamediv>
+  <refname>p:invisible-xml</refname>
+  <refpurpose>The standard p:invisible-xml step</refpurpose>
+</refnamediv>
+<refsynopsisdiv>
 
 <refsection role="introduction">
 <title>Introduction</title>
@@ -30,8 +33,8 @@ the specified Invisible XML grammar.</para>
 </refsection>
 </refsynopsisdiv>
 
-   <refsection>
-      <title>Description</title>
-      <para>TBD.</para>
-   </refsection>
+<refsection>
+  <title>Description</title>
+  <para role="external-refs"/>
+</refsection>
 </refentry>

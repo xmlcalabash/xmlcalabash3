@@ -4,9 +4,12 @@
           xmlns:xlink="http://www.w3.org/1999/xlink"
           xml:id="p-xsl-formatter">
 <?db filename="p-xsl-formatter"?>
+<info>
+  <bibliomisc role="version">3.1</bibliomisc>
+</info>
 <refnamediv>
-   <refname>p:xsl-formatter</refname>
-   <refpurpose>The standard p:xsl-formatter step</refpurpose>
+  <refname>p:xsl-formatter</refname>
+  <refpurpose>The standard p:xsl-formatter step</refpurpose>
 </refnamediv>
 <refsynopsisdiv>
 
@@ -49,6 +52,7 @@ are defined by the XSL implementation used and are
 
 <refsection>
 <title>Description</title>
+
 <para>XML Calabash supports several XSL formatter implementations. There is also
 a service provider interface so that additional implementations can be provided by
 third parties. Several <link linkend="p-css-formatter">CSS formatters</link> are

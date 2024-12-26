@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><refentry xmlns="http://docbook.org/ns/docbook" xmlns:p="http://www.w3.org/ns/xproc" xml:id="p-add-attribute">
+<refentry xmlns="http://docbook.org/ns/docbook" xmlns:p="http://www.w3.org/ns/xproc" xml:id="p-add-attribute">
 <?db filename="p-add-attribute"?>
 <refnamediv>
    <refname>p:add-attribute</refname>
@@ -49,7 +49,7 @@ or any other prefix that resolves to the namespace name
 
 <refsection>
    <title>Description</title>
-   <para>TBD.</para>
+   <para role="external-refs"/>
 </refsection>
 
 <refsection>

@@ -1,0 +1,17 @@
+<preface xmlns="http://docbook.org/ns/docbook"
+         xmlns:h="http://www.w3.org/1999/xhtml"
+         xmlns:xi="http://www.w3.org/2001/XInclude"
+         xmlns:xlink="http://www.w3.org/1999/xlink">
+<title>Preface</title>
+
+<para>This whole things is pretty rough. There are some experiments with new
+step documentation. And ultimately there needs to be reference documentation about the APIs
+and things. Maybe when they’re a little a little more baked and a little less runny batter.</para>
+
+<tip>
+<para>All of the standard and extension steps are included in the reference.
+The steps that have descriptions providing additional, implementation-specific detail
+are indicated in the table of contents with a bold font and a “✵” icon.</para>
+</tip>
+
+</preface>

@@ -28,8 +28,8 @@ with the string result of evaluating an XPath expression.</para>
 </refsection>
 </refsynopsisdiv>
 
-   <refsection>
-      <title>Description</title>
-      <para>TBD.</para>
-   </refsection>
+<refsection>
+  <title>Description</title>
+  <para role="external-refs"/>
+</refsection>
 </refentry>
