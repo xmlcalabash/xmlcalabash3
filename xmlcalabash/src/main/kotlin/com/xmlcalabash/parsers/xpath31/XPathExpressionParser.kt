@@ -1,5 +1,6 @@
 package com.xmlcalabash.parsers.xpath31
 
+import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.runtime.XProcStepConfiguration
 import com.xmlcalabash.namespace.NsFn
 import com.xmlcalabash.namespace.NsP
@@ -232,7 +233,10 @@ class XPathExpressionParser(val stepConfig: XProcStepConfiguration) {
                         val pos = terminal.token.indexOf(":")
                         val prefix = if (pos > 0) terminal.token.substring(0, pos) else ""
                         val localName = if (pos > 0) terminal.token.substring(pos+1) else terminal.token
-                        val ns = if (prefix == "") "" else stepConfig.inscopeNamespaces[prefix]!!.toString()
+                        val ns = if (prefix == "") "" else stepConfig.inscopeNamespaces[prefix]?.toString()
+                        if (ns == null) {
+                            throw XProcError.xsXPathStaticError("No namespace in-scope for prefix \"$prefix\"").exception()
+                        }
                         val atts = stepConfig.stringAttributeMap(mapOf("name" to "Q{${encodeForUri(ns)}}${localName}"))
                         builder.addStartElement(QName(nsT, "t:" + terminal.name), atts, nsmap)
                         builder.addText(terminal.token)
