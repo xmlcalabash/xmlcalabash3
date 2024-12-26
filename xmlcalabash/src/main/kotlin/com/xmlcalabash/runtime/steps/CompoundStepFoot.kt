@@ -14,6 +14,8 @@ class CompoundStepFoot(config: XProcStepConfiguration, val parent: CompoundStep,
     override val params = RuntimeStepParameters(NsCx.foot, "!foot",
         step.location, step.inputs, step.outputs, step.options)
 
+    override val stepTimeout: Long = 0
+
     override val readyToRun: Boolean
         get() = true
 
@@ -36,6 +38,10 @@ class CompoundStepFoot(config: XProcStepConfiguration, val parent: CompoundStep,
     }
 
     internal fun write(port: String, doc: XProcDocument) {
+        if (aborted) {
+            return
+        }
+
         val rpair = receiver[port]
         if (rpair == null) {
             println("No receiver for ${port} from ${this} (in foot)")

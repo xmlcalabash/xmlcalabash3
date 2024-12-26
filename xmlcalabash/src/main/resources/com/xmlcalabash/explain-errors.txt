@@ -135,6 +135,10 @@ Invalid result from attribute value template: “$1”.
 It is a dynamic error if the XPath expression in an AVT or TVT evaluates to
 something to other than a sequence containing atomic values or nodes.
 
+XD0053
+Step timeout; ran for more than “$1” seconds.
+It is a dynamic error if a step runs longer than its timeout value.
+
 XD0054
 Encoding “$1” specified on HTML or XML document.
 It is a dynamic error if an encoding is specified and the content type is an XML
@@ -879,6 +883,11 @@ XC0077
 Media types “$1” and “$2” are incompatible for the comparison.
 It is a dynamic error if the media types of the documents supplied are
 incompatible with the comparison method.
+
+XC0078
+HTTP request timeout, response took more than “$1” seconds.
+It is a dynamic error “fail-on-timeout” is true a HTTP status code 408 is
+encountered.
 
 XC0079
 Invalid $1 parameter value: “$2”.

@@ -2,6 +2,8 @@ package com.xmlcalabash.runtime.steps
 
 import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.exceptions.XProcError
+import com.xmlcalabash.exceptions.XProcException
+import com.xmlcalabash.namespace.NsErr
 import com.xmlcalabash.namespace.NsP
 import com.xmlcalabash.runtime.LazyValue
 import com.xmlcalabash.runtime.XProcStepConfiguration
@@ -42,6 +44,8 @@ abstract class CompoundStep(config: XProcStepConfiguration, compound: CompoundSt
     internal val foot = CompoundStepFoot(config, this, compound.foot)
     internal var stepName: String? = null
     internal var stepType: QName? = null
+    override val stepTimeout = compound.timeout.toLong()
+    protected val stepsToRun = mutableListOf<AbstractStep>()
 
     override val readyToRun: Boolean
         get() = head.readyToRun
@@ -98,6 +102,27 @@ abstract class CompoundStep(config: XProcStepConfiguration, compound: CompoundSt
     }
 
     override fun run() {
+    }
+
+    protected fun runSubpipeline() {
+        val left = try {
+            runStepsExhaustively(stepsToRun)
+        } catch (ex: XProcException) {
+            if (ex.error.code == NsErr.threadInterrupted) {
+                for (step in stepsToRun) {
+                    step.abort()
+                }
+            }
+            throw ex
+        }
+
+        if (left.isNotEmpty()) {
+            throw RuntimeException("did not run all steps")
+        }
+    }
+
+    override fun abort() {
+        super.abort()
     }
 
     override fun input(port: String, doc: XProcDocument) {

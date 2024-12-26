@@ -9,8 +9,8 @@ open class ChooseOtherwiseStep(yconfig: XProcStepConfiguration, compound: Compou
             instantiate()
         }
 
-        stepsToRun.clear()
-        stepsToRun.addAll(runnables)
+        localStepsToRun.clear()
+        localStepsToRun.addAll(runnables)
 
         head.runStep()
 

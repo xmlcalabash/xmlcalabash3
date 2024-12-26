@@ -5,19 +5,15 @@ import com.xmlcalabash.runtime.model.CompoundStepModel
 
 open class GroupStep(config: XProcStepConfiguration, compound: CompoundStepModel): CompoundStep(config, compound) {
     override fun run() {
-        val stepsToRun = mutableListOf<AbstractStep>()
+        stepsToRun.clear()
         stepsToRun.addAll(runnables)
 
         stepConfig.environment.newExecutionContext(stepConfig)
 
         head.runStep()
-
-        val left = runStepsExhaustively(stepsToRun)
-        if (left.isNotEmpty()) {
-            throw RuntimeException("did not run all steps")
-        }
-
+        runSubpipeline()
         foot.runStep()
+
         stepConfig.environment.releaseExecutionContext()
     }
 }

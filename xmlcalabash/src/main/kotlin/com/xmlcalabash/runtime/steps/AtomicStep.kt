@@ -20,8 +20,8 @@ open class AtomicStep(config: XProcStepConfiguration, atomic: AtomicBuiltinStepM
     val initiallyOpenPorts = mutableSetOf<String>()
     val openPorts = mutableSetOf<String>()
     private var message: XdmValue? = null
-    //private val rteContext = yconfig.rteContext
     private val inputErrors = mutableListOf<XProcError>()
+    override val stepTimeout = atomic.model.step.timeout.toLong()
 
     init {
         inputPorts.addAll(atomic.inputs.keys)
@@ -67,6 +67,10 @@ open class AtomicStep(config: XProcStepConfiguration, atomic: AtomicBuiltinStepM
     }
 
     override fun output(port: String, document: XProcDocument) {
+        if (aborted) {
+            return
+        }
+
         checkOutputPort(port, document, params.outputs[port])
 
         val rpair = receiver[port]
@@ -132,20 +136,6 @@ open class AtomicStep(config: XProcStepConfiguration, atomic: AtomicBuiltinStepM
     }
 
     override fun run() {
-        /*
-        for ((_, input) in params.inputs) {
-            for (schema in input.schematron) {
-                if (implementation is AbstractAtomicStep) {
-                    for (doc in implementation.queues[input.name] ?: emptyList()) {
-                        testAssertion(schema, doc)
-                    }
-                } else {
-                    logger.info { "Schematron tests are only supported on atomic step inputs" }
-                }
-            }
-        }
-         */
-
         if (message != null) {
             println(message)
             message = null
@@ -163,6 +153,11 @@ open class AtomicStep(config: XProcStepConfiguration, atomic: AtomicBuiltinStepM
 
     internal open fun runImplementation() {
         implementation.run()
+    }
+
+    override fun abort() {
+        super.abort()
+        implementation.abort()
     }
 
     override fun reset() {

@@ -19,7 +19,7 @@ open class ChooseStep(config: XProcStepConfiguration, compound: CompoundStepMode
         val context = cache["!source"] ?: mutableListOf()
         cache.remove("!source")
 
-        val stepsToRun = mutableListOf<AbstractStep>()
+        stepsToRun.clear()
         stepsToRun.addAll(runnables.filter { it !is ChooseWhenStep })
 
         stepConfig.environment.newExecutionContext(stepConfig)
@@ -31,10 +31,7 @@ open class ChooseStep(config: XProcStepConfiguration, compound: CompoundStepMode
 
         head.runStep()
 
-        val left = runStepsExhaustively(stepsToRun)
-        if (left.isNotEmpty()) {
-            throw RuntimeException("did not run all steps")
-        }
+        runSubpipeline()
 
         for (step in runnables.filterIsInstance<ChooseWhenStep>()) {
             val guard = step.evaluateGuardExpression()

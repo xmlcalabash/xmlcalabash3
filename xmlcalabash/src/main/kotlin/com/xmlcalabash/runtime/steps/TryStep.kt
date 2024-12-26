@@ -19,13 +19,14 @@ open class TryStep(config: XProcStepConfiguration, compound: CompoundStepModel):
         var group: GroupStep? = null
         val catches = mutableListOf<TryCatchStep>()
         var finally: TryFinallyStep? = null
-        val others = mutableListOf<AbstractStep>()
+        stepsToRun.clear()
+
         for (step in runnables) {
             when (step) {
                 is TryFinallyStep -> finally = step
                 is TryCatchStep -> catches.add(step)
                 is GroupStep -> group = step
-                else -> others.add(step)
+                else -> stepsToRun.add(step)
             }
         }
 
@@ -35,10 +36,7 @@ open class TryStep(config: XProcStepConfiguration, compound: CompoundStepModel):
         var errorDocument: XProcDocument? = null
         var throwException: Exception? = null
         try {
-            val left = runStepsExhaustively(others)
-            if (left.isNotEmpty()) {
-                throw RuntimeException("did not run all steps")
-            }
+            runSubpipeline()
             group!!.runStep()
         } catch (ex: Exception) {
             foot.cache.clear() // anything that accumulated so far? nope.

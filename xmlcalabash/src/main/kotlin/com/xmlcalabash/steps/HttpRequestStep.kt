@@ -167,6 +167,10 @@ open class HttpRequestStep(): AbstractAtomicStep() {
             throw stepConfig.exception(XProcError.xcHttpMultipartForbidden(href))
         }
 
+        if (response.statusCode == 408 && failOnTimeout) {
+            throw stepConfig.exception(XProcError.xcFailOnTimeout(timeout!!))
+        }
+
         val report = response.report!!
 
         if (assert != "") {

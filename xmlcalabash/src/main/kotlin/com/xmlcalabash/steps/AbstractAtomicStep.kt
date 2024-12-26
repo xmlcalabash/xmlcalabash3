@@ -91,6 +91,10 @@ abstract class AbstractAtomicStep(): XProcStep {
         logger.debug { "Running ${this} (${stepParams.stepName}/${nodeId})" }
     }
 
+    override fun abort() {
+        // nop?
+    }
+
     internal fun forbidNamespaceAttribute(attName: QName) {
         if (attName.localName == "xmlns" || attName.prefix == "xmlns" || NsXmlns.namespace == attName.namespaceUri
             || (attName.prefix == "xml" && attName.namespaceUri != NsXml.namespace)

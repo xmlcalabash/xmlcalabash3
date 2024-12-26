@@ -859,6 +859,19 @@ class XplParser internal constructor(val builder: PipelineBuilder) {
                                 }
                                 instruction.depends(value)
                             }
+                            Ns.timeout -> {
+                                if (node.node.nodeName.namespaceUri == NsP.namespace) {
+                                    instruction.timeout(value)
+                                } else {
+                                    errors.add(XProcError.xsAttributeForbidden(name).at(node.node).exception())
+                                }
+                            }
+                            NsP.timeout -> {
+                                if (node.node.nodeName.namespaceUri == NsP.namespace) {
+                                    throw XProcError.xsAttributeNotAllowed(name).at(node.node).exception()
+                                }
+                                instruction.depends(value)
+                            }
                             else -> {
                                 if (name.namespaceUri != NamespaceUri.NULL) {
                                     instruction.setExtensionAttribute(name, value)
@@ -927,6 +940,19 @@ class XplParser internal constructor(val builder: PipelineBuilder) {
                     }
                     NsP.inlineExpandText -> {
                         throw XProcError.xsNoSuchOption(NsP.inlineExpandText).at(node.node).exception()
+                    }
+                    Ns.timeout -> {
+                        if (node.node.nodeName.namespaceUri == NsP.namespace) {
+                            atomic.timeout(value)
+                        } else {
+                            errors.add(XProcError.xsAttributeForbidden(name).at(node.node).exception())
+                        }
+                    }
+                    NsP.timeout -> {
+                        if (node.node.nodeName.namespaceUri == NsP.namespace) {
+                            throw XProcError.xsAttributeNotAllowed(name).at(node.node).exception()
+                        }
+                        atomic.depends(value)
                     }
                     else -> {
                         if ((atomic.instructionType.namespaceUri == NsP.namespace && name == Ns.message)

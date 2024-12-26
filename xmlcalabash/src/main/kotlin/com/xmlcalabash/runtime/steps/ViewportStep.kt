@@ -62,7 +62,7 @@ open class ViewportStep(config: XProcStepConfiguration, compound: CompoundStepMo
 
         val composer = XmlViewportComposer(stepConfig, match, bindings)
 
-        val stepsToRun = mutableListOf<AbstractStep>()
+        stepsToRun.clear()
         stepsToRun.addAll(runnables)
 
         val exec = stepConfig.environment.newExecutionContext(stepConfig)
@@ -97,10 +97,7 @@ open class ViewportStep(config: XProcStepConfiguration, compound: CompoundStepMo
 
                 head.runStep()
 
-                val remaining = runStepsExhaustively(stepsToRun)
-                if (remaining.isNotEmpty()) {
-                    throw stepConfig.exception(XProcError.xiNoRunnableSteps())
-                }
+                runSubpipeline()
 
                 val nodes = mutableListOf<XdmNode>()
                 for (doc in foot.cache[outputPort] ?: emptyList()) {

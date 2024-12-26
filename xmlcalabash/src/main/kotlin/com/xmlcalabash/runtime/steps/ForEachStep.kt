@@ -1,6 +1,8 @@
 package com.xmlcalabash.runtime.steps
 
 import com.xmlcalabash.documents.XProcDocument
+import com.xmlcalabash.exceptions.XProcException
+import com.xmlcalabash.namespace.NsErr
 import com.xmlcalabash.runtime.XProcStepConfiguration
 import com.xmlcalabash.runtime.model.CompoundStepModel
 
@@ -9,8 +11,6 @@ open class ForEachStep(config: XProcStepConfiguration, compound: CompoundStepMod
         head.openPorts.remove("current") // doesn't count as an open port from the outside
         foot.alwaysAllowSequences = true
     }
-
-
 
     override fun run() {
         val cache = mutableMapOf<String, List<XProcDocument>>()
@@ -23,7 +23,7 @@ open class ForEachStep(config: XProcStepConfiguration, compound: CompoundStepMod
 
         var position = 1L
 
-        val stepsToRun = mutableListOf<AbstractStep>()
+        stepsToRun.clear()
         stepsToRun.addAll(runnables)
 
         val exec = stepConfig.environment.newExecutionContext(stepConfig)
@@ -45,14 +45,12 @@ open class ForEachStep(config: XProcStepConfiguration, compound: CompoundStepMod
                 }
 
                 head.cacheInputs(cache)
+
                 head.input("current", sequence.removeFirst())
 
                 head.runStep()
 
-                val left = runStepsExhaustively(stepsToRun)
-                if (left.isNotEmpty()) {
-                    throw RuntimeException("did not run all steps")
-                }
+                runSubpipeline()
 
                 foot.runStep()
                 position++
@@ -61,6 +59,10 @@ open class ForEachStep(config: XProcStepConfiguration, compound: CompoundStepMod
 
         cache.clear()
         stepConfig.environment.releaseExecutionContext()
+    }
+
+    override fun abort() {
+        super.abort()
     }
 
     override fun reset() {

@@ -25,6 +25,10 @@ class NullStep(): XProcStep {
         // nop
     }
 
+    override fun abort() {
+        // nop
+    }
+
     override fun input(port: String, doc: XProcDocument) {
         throw RuntimeException("Configuration error: input called on null step")
     }

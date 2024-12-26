@@ -166,6 +166,7 @@ class XProcError private constructor(val code: QName, val variant: Int, val loca
         fun xdNotWellFormed() = dynamic(49)
         fun xdValueTemplateError(message: String) = dynamic(50, message)
         fun xdInvalidAvtResult(result: String) = dynamic(51, result)
+        fun xdStepTimeout(timeout: Long) = dynamic(53, timeout)
         fun xdEncodingWithXmlOrHtml(encoding: String) = dynamic(54, encoding)
         fun xdEncodingRequired(charset: String) = dynamic(55, charset)
         fun xdMarkupForbiddenWithEncoding(encoding: String) = dynamic(56, encoding)
@@ -238,6 +239,7 @@ class XProcError private constructor(val code: QName, val variant: Int, val loca
         fun xcDifferentContentTypes(contentType: MediaType, dataContentType: MediaType) = step(74, contentType, dataContentType)
         fun xcComparisonMethodNotSupported(method: QName) = step(76, method)
         fun xcComparisonNotPossible(sourceType: MediaType, altType: MediaType) = step(77, sourceType, altType)
+        fun xcFailOnTimeout(timeout: Int) = step(78, timeout)
         fun xcInvalidParameter(name: QName, value: String) = step(79, name, value)
         fun xcInvalidNumberOfArchives(number: Int) = step(80, number)
 
@@ -337,6 +339,7 @@ class XProcError private constructor(val code: QName, val variant: Int, val loca
 
         fun xiNoSuchOutputPort(port: String)= internal(1, port)
         fun xiImpossibleNodeType(type: XdmNodeKind) = internal(2, type)
+        fun xiThreadInterrupted() = internal(3)
         fun xiCannotCastTo(to: MediaType) = internal(4, to)
         fun xiConfigurationInvalid(file: String) = internal(Pair(17, 1), file)
         fun xiConfigurationInvalid(file: String, message: String) = internal(Pair(17, 2), file, message)

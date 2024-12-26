@@ -5,6 +5,8 @@ import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.namespace.NsP
 
 open class CompoundModel internal constructor(graph: Graph, parent: Model?, step: CompoundStepDeclaration, id: String): Model(graph, parent, step, id) {
+    val timeout = step.timeout
+
     private val _head = Head(graph, this, "${id}_head")
     val head: Head
         get() = _head
