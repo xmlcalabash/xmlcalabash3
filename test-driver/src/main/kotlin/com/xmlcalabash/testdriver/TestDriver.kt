@@ -1,6 +1,7 @@
 package com.xmlcalabash.testdriver
 
 import com.xmlcalabash.config.XmlCalabash
+import com.xmlcalabash.util.DefaultXmlCalabashConfiguration
 import com.xmlcalabash.util.SaxonTreeBuilder
 import net.sf.saxon.event.ReceiverOption
 import net.sf.saxon.om.AttributeInfo
@@ -19,7 +20,7 @@ class TestDriver(val testOptions: TestOptions, val exclusions: Map<String, Strin
     lateinit var xmlCalabash: XmlCalabash
     val failedTests = mutableListOf<String>()
     val passedTests = mutableListOf<String>()
-    val sortedTests = mutableListOf<TestCase>()
+    val allTestCases = mutableListOf<TestCase>()
     var total = 0
     var pass = 0
     var fail = 0
@@ -105,60 +106,81 @@ class TestDriver(val testOptions: TestOptions, val exclusions: Map<String, Strin
             testsToRun.addAll(allTests)
         }
 
-        xmlCalabash = XmlCalabash.newInstance()
-        xmlCalabash.xmlCalabashConfig.uniqueInlineUris = false
-        val saxonConfig = xmlCalabash.saxonConfig
+        val licensedConfig = DefaultXmlCalabashConfiguration()
+        licensedConfig.licensed = true
 
+        val unlicensedConfig = DefaultXmlCalabashConfiguration()
+        unlicensedConfig.licensed = false
+
+        xmlCalabash = XmlCalabash.newInstance(licensedConfig)
+        xmlCalabash.xmlCalabashConfig.uniqueInlineUris = false
+
+        val saxonConfig = xmlCalabash.saxonConfig
         println("Running tests with ${saxonConfig.processor.saxonEdition} version ${saxonConfig.processor.saxonProductVersion}")
-        val suite = TestSuite(xmlCalabash, testOptions)
+
+        val unlicensedXmlCalabash = XmlCalabash.newInstance(unlicensedConfig)
+        unlicensedXmlCalabash.xmlCalabashConfig.uniqueInlineUris = false
+
+        val licensedSuite = TestSuite(xmlCalabash, testOptions)
+        val unlicensedSuite = TestSuite(unlicensedXmlCalabash, testOptions)
 
         for (testFile in testsToRun) {
-            suite.loadTest(testFile)
+            val case = licensedSuite.loadTest(testFile)
+            if (case.features.contains("no-psvi-support")) {
+                licensedSuite.removeTest(case)
+                unlicensedSuite.loadTest(testFile)
+            }
         }
 
         for ((testFile, _) in skipTests) {
-            suite.loadTest(testFile)
+            licensedSuite.loadTest(testFile)
         }
 
-        sortedTests.clear()
-        sortedTests.addAll(suite.testCases.keys.sortedWith(compareBy { it.testFile.toString() }))
+        val allSuites = mutableListOf<TestSuite>()
+        allSuites.add(licensedSuite)
+        if (unlicensedSuite.testCases.isNotEmpty()) {
+            allSuites.add(unlicensedSuite)
+        }
 
-        val repeat = 0
-        val suiteStart = System.nanoTime()
-        for (test in sortedTests) {
-            test.singleTest = testOptions.stopOnFirstFailed || testsToRun.size == 1
-            for (rep in 0..repeat) {
-                if (test.testFile in skipTests) {
-                    suite.skip(test, skipTests[test.testFile]!!)
+        for (suite in allSuites) {
+            allTestCases.addAll(suite.tests)
+            val repeat = 0
+            val suiteStart = System.nanoTime()
+            for (test in suite.tests) {
+                test.singleTest = testOptions.stopOnFirstFailed || testsToRun.size == 1
+                for (rep in 0..repeat) {
+                    if (test.testFile in skipTests) {
+                        suite.skip(test, skipTests[test.testFile]!!)
+                    } else {
+                        test.run()
+                    }
+                }
+                if (testOptions.stopOnFirstFailed) {
+                    var stop = false
+                    for (result in suite.testCases.values) {
+                        stop = stop || result.status == "fail"
+                    }
+                    if (stop) {
+                        break;
+                    }
+                }
+            }
+            suiteElapsed = (System.nanoTime() - suiteStart) / 1e9
+
+            for (test in suite.tests) {
+                val status = suite.testCases[test]!!
+                total++
+                if (status.status == "pass") {
+                    pass++
+                } else if (status.status == "fail") {
+                    fail++
                 } else {
-                    test.run()
-                }
-            }
-            if (testOptions.stopOnFirstFailed) {
-                var stop = false
-                for (result in suite.testCases.values) {
-                    stop = stop || result.status == "fail"
-                }
-                if (stop) {
-                    break;
+                    notrun++
                 }
             }
         }
-        suiteElapsed = (System.nanoTime() - suiteStart) / 1e9
 
-        for (test in sortedTests) {
-            val status = suite.testCases[test]!!
-            total++
-            if (status.status == "pass") {
-                pass++
-            } else if (status.status == "fail") {
-                fail++
-            } else {
-                notrun++
-            }
-        }
-
-        val attempted = total + notrun
+        val attempted = total - notrun
         val percent = "%.1f".format(100.0 * (1.0 * pass) / (1.0 * attempted))
 
         statusDir.mkdirs()
@@ -167,20 +189,22 @@ class TestDriver(val testOptions: TestOptions, val exclusions: Map<String, Strin
 
         println("Test suite: ${pass} pass (${percent}%), ${fail} fail, ${notrun} not run (${total} total)")
         var max = 10
-        for (testCase in sortedTests) {
-            val status = suite.testCases[testCase]!!
+        for (suite in allSuites) {
+            for (testCase in suite.tests) {
+                val status = suite.testCases[testCase]!!
 
-            val testResult = File(statusDir, testCase.testFile.name)
-            testResult.writeText("${status}\n")
+                val testResult = File(statusDir, testCase.testFile.name)
+                testResult.writeText("${status}\n")
 
-            if (max > 0 && status.status == "fail") {
-                max--
-                if (status.error != null && status.expectedCodes.isNotEmpty()) {
-                    println("FAIL: ${testCase.testFile} (${status.error.code} ≠ ${status.expectedCodes[0]})")
-                } else if (status.failedAssertions.isNotEmpty()) {
-                    println("FAIL: ${testCase.testFile}: ${status.failedAssertions[0].stringValue}${if (status.failedAssertions.size > 1) " ..." else ""}")
-                } else {
-                    println("FAIL: ${testCase.testFile}")
+                if (max > 0 && status.status == "fail") {
+                    max--
+                    if (status.error != null && status.expectedCodes.isNotEmpty()) {
+                        println("FAIL: ${testCase.testFile} (${status.error.code} ≠ ${status.expectedCodes[0]})")
+                    } else if (status.failedAssertions.isNotEmpty()) {
+                        println("FAIL: ${testCase.testFile}: ${status.failedAssertions[0].stringValue}${if (status.failedAssertions.size > 1) " ..." else ""}")
+                    } else {
+                        println("FAIL: ${testCase.testFile}")
+                    }
                 }
             }
         }
@@ -196,26 +220,36 @@ class TestDriver(val testOptions: TestOptions, val exclusions: Map<String, Strin
                 }
                 line = reader.readLine()
             }
-            println("== Regressions ==========================================================")
+            var firstRegression = true
             var newPass = 0
             var failingDifferently = 0
-            for (testCase in sortedTests) {
-                val status = suite.testCases[testCase]!!
-                if (status.status != "NOTRUN") {
-                    val prev = previous[testCase.testFile.toString()]
-                    if (prev == null) {
-                        println("NEW  ${status} ${testCase.testFile}")
-                    } else if (prev == status.toString()) {
-                        // no change
-                    } else {
-                        if (status.status == "pass") {
-                            newPass++
-                            //println("PASS ${testCase.testFile}")
+            for (suite in allSuites) {
+                for (testCase in suite.tests) {
+                    val status = suite.testCases[testCase]!!
+                    if (status.status != "NOTRUN") {
+                        val prev = previous[testCase.testFile.toString()]
+                        if (prev == null) {
+                            if (firstRegression) {
+                                println("== Regressions ==========================================================")
+                                firstRegression = false
+                            }
+                            println("NEW  ${status} ${testCase.testFile}")
+                        } else if (prev == status.toString()) {
+                            // no change
                         } else {
-                            if (prev.startsWith("fail")) {
-                                failingDifferently++
+                            if (status.status == "pass") {
+                                newPass++
+                                //println("PASS ${testCase.testFile}")
                             } else {
-                                println("FAIL ${prev}->${status} ${testCase.testFile}")
+                                if (prev.startsWith("fail")) {
+                                    failingDifferently++
+                                } else {
+                                    if (firstRegression) {
+                                        println("== Regressions ==========================================================")
+                                        firstRegression = false
+                                    }
+                                    println("FAIL ${prev}->${status} ${testCase.testFile}")
+                                }
                             }
                         }
                     }
@@ -231,9 +265,11 @@ class TestDriver(val testOptions: TestOptions, val exclusions: Map<String, Strin
 
         if (testOptions.updateRegressions || !previousStatus.exists()) {
             val out = PrintStream(FileOutputStream(previousStatus))
-            for (testCase in sortedTests) {
-                val status = suite.testCases[testCase]!!
-                out.println("${status} ${testCase.testFile}")
+            for (suite in allSuites) {
+                for (testCase in suite.tests) {
+                    val status = suite.testCases[testCase]!!
+                    out.println("${status} ${testCase.testFile}")
+                }
             }
         }
 
@@ -275,10 +311,10 @@ class TestDriver(val testOptions: TestOptions, val exclusions: Map<String, Strin
         property(report, "vendorURI", env.vendorUri)
         property(report, "xprocVersion", "3.1")
         property(report, "xpathVersion", env.xpathVersion)
-        property(report, "psviSupported", xmlCalabash.xmlCalabashConfig.schemaAware.toString())
+        property(report, "psviSupported", "mixed")
         report.addEndElement()
 
-        for (test in sortedTests) {
+        for (test in allTestCases) {
             map.clear()
             map[NsReport.name] = test.testFile.name
             map[NsReport.time] = String.format("%1.4f", test.elapsedSeconds)
