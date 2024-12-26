@@ -438,6 +438,11 @@ XS0065
 There is no primary input port.
 It is a static error if there is no primary input port.
 
+XS0066
+Invalid value template: $1.
+It is a static error if an expression does not have a closing right curly bracket
+or if an unescaped right curly bracket occurs outside of an expression.
+
 XS0067
 No step specified and there is no default readable port.
 It is a static error if the step attribute is not specified, and there is no

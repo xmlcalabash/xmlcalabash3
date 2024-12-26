@@ -199,7 +199,7 @@ class ValueTemplateFilterXml(val originalNode: XdmNode, val baseUri: URI): Value
     }
 
     private fun considerValueTemplates(config: XProcStepConfiguration, context: XdmNode, text: String): String {
-        val avt = ValueTemplateParser.parse(text)
+        val avt = ValueTemplateParser.parse(config, text)
 
         if (avt.value.size == 1) {
             // There are no value templates in here.
@@ -241,7 +241,7 @@ class ValueTemplateFilterXml(val originalNode: XdmNode, val baseUri: URI): Value
     }
 
     private fun considerValueTemplates(config: XProcStepConfiguration, builder: SaxonTreeBuilder, context: XdmNode, text: String) {
-        val avt = ValueTemplateParser.parse(text)
+        val avt = ValueTemplateParser.parse(config, text)
 
         //val avtConfig = stepConfig.copy()
         //avtConfig.updateWith(context)

@@ -10,7 +10,11 @@ abstract class CompoundLoopDeclaration(parent: XProcInstruction, instructionType
             // But don't make it twice.
             // It's a sequence because it might have zero inputs
             val current = InputInstruction(this, "current", true, true)
-            _children.add(1, current)
+            if (children.isEmpty()) {
+                _children.add(current)
+            } else {
+                _children.add(1, current)
+            }
         }
 
         super.findDefaultReadablePort(drp)

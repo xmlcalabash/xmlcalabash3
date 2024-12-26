@@ -169,7 +169,7 @@ open class LibraryInstruction(stepConfig: InstructionConfiguration): XProcInstru
                 is OptionInstruction -> {
                     child.findDeclarations(newStepTypes, emptyMap(), newBindings)
                     if (optnames.contains(child.name)) {
-                        throw stepConfig.exception(XProcError.xsDuplicateOption(child.name))
+                        throw stepConfig.exception(XProcError.xsDuplicateStaticOption(child.name))
                     }
                     optnames.add(child.name)
                     newBindings[child.name] = child

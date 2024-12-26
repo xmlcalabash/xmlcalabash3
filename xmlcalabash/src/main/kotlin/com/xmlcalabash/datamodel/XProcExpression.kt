@@ -22,7 +22,7 @@ abstract class XProcExpression(val stepConfig: XProcStepConfiguration, val asTyp
         }
 
         fun avt(stepConfig: XProcStepConfiguration, avt: String, asType: SequenceType = SequenceType.ANY, values: List<XdmAtomicValue> = emptyList()): XProcAvtExpression {
-            return avt(stepConfig, ValueTemplateParser.parse(avt), asType, values)
+            return avt(stepConfig, ValueTemplateParser.parse(stepConfig, avt), asType, values)
         }
 
         fun shortcut(stepConfig: XProcStepConfiguration, shortcut: String, asType: SequenceType = SequenceType.ANY, values: List<XdmAtomicValue> = emptyList()): XProcShortcutExpression {

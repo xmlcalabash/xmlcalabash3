@@ -1,5 +1,8 @@
 package com.xmlcalabash.util
 
+import com.xmlcalabash.exceptions.XProcError
+import com.xmlcalabash.runtime.XProcStepConfiguration
+
 /*
 This class parses value templates. Value templates have the form "string{expr}s{{t}}ring{expr}string" etc.
 The "string" portions can be empty. The tricky bit is that the "expr" portions are XPath expressions
@@ -10,13 +13,18 @@ Inside an expr, { and } are ignored inside strings or comments. An unbalanced } 
 (I don't think a balanced pair of { } is valid in XPath 3.1, but let's look towards the future.)
 */
 
-class ValueTemplateParser private constructor(val expr: String) {
+class ValueTemplateParser private constructor(private val stepConfig: XProcStepConfiguration?, val expr: String) {
     companion object {
         private const val DOUBLEQUOTE = "\""
         private const val SINGLEQUOTE ="'"
 
-        fun parse(expr: String): ValueTemplate {
-            val parser = ValueTemplateParser(expr)
+        internal fun testParse(expr: String): ValueTemplate {
+            val parser = ValueTemplateParser(null, expr)
+            return parser.template()
+        }
+
+        fun parse(config: XProcStepConfiguration, expr: String): ValueTemplate {
+            val parser = ValueTemplateParser(config, expr)
             return parser.template()
         }
     }
@@ -33,7 +41,12 @@ class ValueTemplateParser private constructor(val expr: String) {
             ""
         }
 
-    private fun peek(next: String): Boolean = more && next == expr.subSequence(pos+1,pos+2)
+    private fun peek(next: String): Boolean {
+        if (pos+2 > expr.length) {
+            return false
+        }
+        return more && next == expr.subSequence(pos+1,pos+2)
+    }
 
     fun template(): ValueTemplate {
         val template: MutableList<String> = mutableListOf()
@@ -63,7 +76,10 @@ class ValueTemplateParser private constructor(val expr: String) {
                         pos += 1
                         moreString = false
                         if (current == "") {
-                            throw RuntimeException("Unmatched { appears at end of string")
+                            if (stepConfig == null) {
+                                throw XProcError.xsInvalidAVT("Unmatched open brace at end of string").exception()
+                            }
+                            throw stepConfig.exception(XProcError.xsInvalidAVT("Unmatched open brace at end of string"))
                         }
                     }
                 "}" ->
@@ -73,7 +89,10 @@ class ValueTemplateParser private constructor(val expr: String) {
                         pos += 1
                         moreString = more
                     } else {
-                        throw RuntimeException("Unescaped } in string")
+                        if (stepConfig == null) {
+                            throw XProcError.xsInvalidAVT("Unescaped closing brace in string").exception()
+                        }
+                        throw stepConfig.exception(XProcError.xsInvalidAVT("Unescaped closing brace in string"))
                     }
                 else -> {
                     acc.append(current)
@@ -217,11 +236,17 @@ class ValueTemplateParser private constructor(val expr: String) {
         }
 
         if (state != State.ORDINARY) {
-            throw RuntimeException("Invalid AVT (in quoted string or coment at end of expression)")
+            if (stepConfig == null) {
+                throw XProcError.xsInvalidAVT("Ended in quoted string or comment").exception()
+            }
+            throw stepConfig.exception(XProcError.xsInvalidAVT("Ended in quoted string or comment"))
         }
 
         if (braceDepth != 0) {
-            throw RuntimeException("Invalid AVT, unmatched {")
+            if (stepConfig == null) {
+                throw XProcError.xsInvalidAVT("Unmatched opening brace").exception()
+            }
+            throw stepConfig.exception(XProcError.xsInvalidAVT("Unmatched opening brace"))
         }
 
         return acc.toString()
