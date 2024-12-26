@@ -35,8 +35,8 @@ class TryInstruction(parent: XProcInstruction): CompoundStepDeclaration(parent, 
         provisionalPrimaryOutput = super.primaryOutput()
         if (provisionalPrimaryOutput == null) {
             // What if there will be one later?
-            val group = children.filterIsInstance<GroupInstruction>().first()
-            if (group.primaryOutput() != null) {
+            val group = children.filterIsInstance<GroupInstruction>().firstOrNull()
+            if (group?.primaryOutput() != null) {
                 provisionalPrimaryOutput = OutputInstruction(this, group.primaryOutput()!!.port, true, true)
             }
         }

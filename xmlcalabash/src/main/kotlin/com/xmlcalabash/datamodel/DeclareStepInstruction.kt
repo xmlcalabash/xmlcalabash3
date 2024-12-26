@@ -273,6 +273,11 @@ class DeclareStepInstruction(parent: XProcInstruction?, stepConfig: InstructionC
         }
 
         if (isAtomic) {
+            for (output in children.filterIsInstance<OutputInstruction>()) {
+                if (!output.children.isEmpty()) {
+                    throw stepConfig.exception(XProcError.xsOutputConnectionForbidden(output.port))
+                }
+            }
             return
         }
 

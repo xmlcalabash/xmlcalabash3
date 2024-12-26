@@ -13,7 +13,11 @@ class FinallyInstruction(parent: XProcInstruction): CompoundStepDeclaration(pare
             throw stepConfig.exception(XProcError.xsAttributeForbidden(Ns.depends))
         }
         // Make this one "by hand" because p:finally can't have an input instructions
-        _children.add(1, errorPort)
+        if (children.isEmpty()) {
+            _children.add(errorPort)
+        } else {
+            _children.add(1, errorPort)
+        }
         super.elaborateInstructions()
     }
 
