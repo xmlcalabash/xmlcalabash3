@@ -37,10 +37,14 @@ The conventional prefix for this namespace in the documentation is <code>cc:</co
 configuration file</link>. This file will be loaded to initialize the Saxon configuration.</para>
 </listitem>
 </varlistentry>
-<varlistentry><term><tag class="attribute">schema-aware</tag> (boolean)</term>
+<varlistentry><term><tag class="attribute">licensed</tag> (boolean)</term>
 <listitem>
-<para>If <literal>true</literal>, a schema-aware Saxon configuration will be requested.
-This can also be specified <link linkend="cli-schema-aware">on the command line</link>.
+<para>If <literal>true</literal>, a licensed Saxon configuration will be requested.
+In practice, a licensed processor is used by default, if one is available.
+However, setting this property to <literal>false</literal> will explicitly request an
+<emphasis>unlicensed</emphasis> processor when Saxon PE or Saxon EE are on the
+classpath.</para>
+<para>This can also be specified <link linkend="cli-licensed">on the command line</link>.
 The command-line setting takes precedence.</para>
 <para>Schema-aware processing requires Saxon EE and a valid Saxon license.</para>
 </listitem>

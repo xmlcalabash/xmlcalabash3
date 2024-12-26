@@ -40,7 +40,7 @@ class CommandLine private constructor(val args: Array<out String>) {
     private var _command: String = "run"
     private var _config: File? = null
     private var _pipelineGraph: String? = null
-    private var _schemaAware = false
+    private var _licensed = true
     private var _pipelineDescription: String? = null
     private var _debug: Boolean? = null
     private var _debugger = false
@@ -70,11 +70,11 @@ class CommandLine private constructor(val args: Array<out String>) {
     val pipelineGraph: String?
         get() = _pipelineGraph
 
-    /** Enable schema-aware processing?
-     * <p>This feature requires Saxon EE.</p>
+    /** Enable licensed features?
+     * <p>Setting licensed to false will disable licensed features in Saxon PE and Saxon EE.</p>
      */
-    val schemaAware: Boolean
-        get() = _schemaAware
+    val licensed: Boolean
+        get() = _licensed
 
     /** The pipeline description output filename. */
     val pipelineDescription: String?
@@ -171,7 +171,7 @@ class CommandLine private constructor(val args: Array<out String>) {
         ArgumentDescription("--step", listOf(), ArgumentType.STRING) { it -> _step = it },
         ArgumentDescription("--graph", listOf(), ArgumentType.FILE) { it -> _pipelineGraph = it },
         ArgumentDescription("--description", listOf(), ArgumentType.FILE) { it -> _pipelineDescription = it },
-        ArgumentDescription("--schema-aware", listOf("-a"), ArgumentType.BOOLEAN, "true") { it -> _schemaAware = it == "true" },
+        ArgumentDescription("--licensed", listOf(), ArgumentType.BOOLEAN, "true") { it -> _licensed = it == "true" },
         ArgumentDescription("--debug", listOf("-D"), ArgumentType.BOOLEAN, "true") { it -> _debug = it == "true" },
         ArgumentDescription("--debugger", listOf(), ArgumentType.BOOLEAN, "true") { it -> _debugger = it == "true" },
         ArgumentDescription("--help", listOf(), ArgumentType.BOOLEAN, "true") { it -> _help = it == "true" },

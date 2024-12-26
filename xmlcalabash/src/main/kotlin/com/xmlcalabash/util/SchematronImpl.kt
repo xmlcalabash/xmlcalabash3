@@ -61,7 +61,7 @@ class SchematronImpl(val stepConfig: XProcStepConfiguration) {
 
         val schema = S9Api.adjustBaseUri(xschema, schemaXml.baseURI)
         val schemaType = sourceXml.underlyingNode.schemaType.structuredQName
-        val schemaAware = schemaType != null && schemaType != _untyped
+        val schemaAware = stepConfig.processor.isSchemaAware
 
         var compiler = stepConfig.processor.newXsltCompiler()
         var xResolver = UResourceResolver(compiler.resourceResolver)

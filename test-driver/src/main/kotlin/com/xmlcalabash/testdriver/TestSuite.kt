@@ -8,27 +8,42 @@ import java.io.File
 
 class TestSuite(val xmlCalabash: XmlCalabash, val options: TestOptions) {
     val testCases = mutableMapOf<TestCase, TestStatus>()
+    private val _tests = mutableListOf<TestCase>()
+    val tests: List<TestCase>
+        get() {
+            if (_tests.isEmpty()) {
+                _tests.addAll(testCases.keys.sortedWith(compareBy { it.testFile.toString() }))
+            }
+            return _tests
+        }
 
-    fun loadTest(testFile: File) {
+    fun loadTest(testFile: File): TestCase {
         val case = TestCase(this, testFile)
         case.load()
         if (!options.onlyExpectedToPass || case.expected == "pass") {
             case.status = TestStatus("NOTRUN")
             testCases[case] = case.status
         }
+        _tests.clear()
+        return case
     }
 
     fun skipTest(testFile: File, reason: String) {
         val case = TestCase(this, testFile)
         case.load()
         case.status = TestStatus("SKIPPED")
+        _tests.clear()
         testCases[case] = case.status
+    }
+
+    fun removeTest(testCase: TestCase) {
+        testCases.remove(testCase)
+        _tests.clear()
     }
 
     fun skip(case: TestCase, reason: String) {
         case.status = TestStatus("skip", reason)
         testCases[case] = case.status
-
     }
 
     fun pass(case: TestCase) {

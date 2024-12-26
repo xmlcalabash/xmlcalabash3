@@ -22,12 +22,14 @@ import com.xmlcalabash.util.DefaultXmlCalabashConfiguration
 import com.xmlcalabash.util.UriUtils
 import com.xmlcalabash.util.Verbosity
 import com.xmlcalabash.util.VisualizerOutput
+import net.sf.saxon.Configuration
 import net.sf.saxon.lib.Initializer
 import net.sf.saxon.om.NamespaceUri
 import net.sf.saxon.s9api.ItemType
 import net.sf.saxon.s9api.QName
 import net.sf.saxon.s9api.XdmAtomicValue
 import net.sf.saxon.s9api.XdmValue
+import net.sf.saxon.trans.LicenseException
 import org.apache.logging.log4j.kotlin.logger
 import org.slf4j.MDC
 import java.io.BufferedReader
@@ -294,6 +296,8 @@ class XmlCalabashCli private constructor() {
 
     private fun version() {
         val proc = xmlCalabash.saxonConfig.processor
+        val license = proc.underlyingConfiguration.isLicensedFeature(Configuration.LicenseFeature.SCHEMA_VALIDATION)
+                || proc.underlyingConfiguration.isLicensedFeature(Configuration.LicenseFeature.PROFESSIONAL_EDITION)
         val deplist = XmlCalabashBuildConfig.DEPENDENCIES.keys.toList().sorted()
 
         if (xmlCalabash.xmlCalabashConfig.verbosity <= Verbosity.DEBUG) {
@@ -302,7 +306,7 @@ class XmlCalabashCli private constructor() {
             println("BUILD_DATE=${XmlCalabashBuildConfig.BUILD_DATE}")
             println("BUILD_HASH=${XmlCalabashBuildConfig.BUILD_HASH}")
             println("SAXON=${proc.saxonEdition}")
-            println("SAXON_LICENSE=${proc.isSchemaAware}")
+            println("SAXON_LICENSE=${license}")
             println("VENDOR_NAME=${XmlCalabashBuildConfig.VENDOR_NAME}")
             println("VENDOR_URI=${XmlCalabashBuildConfig.VENDOR_URI}")
             for (name in deplist) {
@@ -319,7 +323,7 @@ class XmlCalabashCli private constructor() {
             println("(build ${XmlCalabashBuildConfig.BUILD_HASH}, ${dateFormatter.format(date)})")
             print("Running with Saxon ${proc.saxonEdition} version ${proc.saxonProductVersion}")
             if (proc.saxonEdition != "HE") {
-                if (proc.isSchemaAware) {
+                if (license) {
                     print(" (with a license)")
                 } else {
                     print(" (without a license)")

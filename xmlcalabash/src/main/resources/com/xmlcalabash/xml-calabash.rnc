@@ -7,7 +7,7 @@ cc.xmlCalabash =
     element cc:xml-calabash {
         attribute version { "1.0" }?,
         attribute saxon-configuration { text }?,
-        attribute schema-aware { xsd:boolean }?,
+        attribute licensed { xsd:boolean }?,
         attribute debug { xsd:boolean }?,
         attribute verbosity { "trace" | "debug" | "progress" | "info" | "warn" | "error" }?,
         (cc.graphviz

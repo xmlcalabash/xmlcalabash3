@@ -2,6 +2,7 @@ package com.xmlcalabash.datamodel
 
 import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.namespace.NsP
+import net.sf.saxon.Configuration
 import net.sf.saxon.functions.ExecutableFunctionLibrary
 import net.sf.saxon.functions.FunctionLibrary
 import net.sf.saxon.functions.FunctionLibraryList
@@ -189,7 +190,7 @@ class ImportFunctionsInstruction(parent: XProcInstruction?, stepConfig: Instruct
 
     private fun loadXQueryMainModule(bufstream: InputStream): FunctionLibrary? {
         val compiler = stepConfig.processor.newXQueryCompiler()
-        compiler.setSchemaAware(false) // FIXME:
+        compiler.setSchemaAware(stepConfig.processor.isSchemaAware)
         val exec = compiler.compile(bufstream)
         val loaded = exec.underlyingCompiledQuery.executable.functionLibrary
 
