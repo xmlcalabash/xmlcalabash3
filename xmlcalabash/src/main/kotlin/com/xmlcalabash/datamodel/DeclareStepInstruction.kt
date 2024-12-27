@@ -437,19 +437,33 @@ class DeclareStepInstruction(parent: XProcInstruction?, stepConfig: InstructionC
         return null
     }
 
-    override fun importFunctions(href: URI, contentType: MediaType?, namespace: String?): ImportFunctionsInstruction {
-        val import = ImportFunctionsInstruction(this, stepConfig.copy(), href)
-        import.contentType = contentType
-        import.namespace = namespace
-        val functionLibrary = import.prefetch()
+    override fun import(import: StepContainerInterface) {
+        val last = children.lastOrNull()
+        if (last == null || last is ImportFunctionsInstruction) {
+            _imported.add(import)
+            return
+        }
+        throw stepConfig.exception(XProcError.xsInvalidElement(NsP.import))
+    }
 
-        // Importing a function library changes our StepConfiguration so that future steps also
-        // inherited these functions
-        if (functionLibrary != null) {
-            stepConfig.saxonConfig.addFunctionLibrary(import.href, functionLibrary)
+    override fun importFunctions(href: URI, contentType: MediaType?, namespace: String?): ImportFunctionsInstruction {
+        val last = children.lastOrNull()
+        if (last == null || last is ImportFunctionsInstruction) {
+            val import = ImportFunctionsInstruction(this, stepConfig.copy(), href)
+            import.contentType = contentType
+            import.namespace = namespace
+            val functionLibrary = import.prefetch()
+
+            // Importing a function library changes our StepConfiguration so that future steps also
+            // inherited these functions
+            if (functionLibrary != null) {
+                stepConfig.saxonConfig.addFunctionLibrary(import.href, functionLibrary)
+            }
+
+            return import
         }
 
-        return import
+        throw stepConfig.exception(XProcError.xsInvalidElement(NsP.importFunctions))
     }
 
     fun addIOType(instruction: XProcInstruction) {
@@ -506,10 +520,6 @@ class DeclareStepInstruction(parent: XProcInstruction?, stepConfig: InstructionC
         val decl = DeclareStepInstruction(this, stepConfig.copyNew())
         _children.add(decl)
         return decl
-    }
-
-    override fun import(import: StepContainerInterface) {
-        _imported.add(import)
     }
 
     override fun toString(): String {

@@ -73,7 +73,7 @@ class WhenInstruction(parent: ChooseInstruction): CompoundStepDeclaration(parent
 
         if (testExpression.contextRef && guardDrp == null) {
             if ((parent as ChooseInstruction).namedInput("!context") == null) {
-                logger.warn { "Expression refers to context when no context is available" }
+                stepConfig.warn { "Expression refers to context when no context is available" }
             }
         }
 

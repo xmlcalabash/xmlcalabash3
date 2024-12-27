@@ -43,15 +43,15 @@ class XProcPipeline internal constructor(private val runtime: XProcRuntime, pipe
                 val debugger = CliDebugger(runtime)
                 (config.environment as PipelineContext).monitors.add(debugger)
             } else {
-                logger.debug { "Cannot provide debugger on ${config.environment}" }
+                pipeline.stepConfig.warn { "Cannot provide debugger on ${config.environment}" }
             }
         }
 
-        if (xconfig.assertions != SchematronAssertions.IGNORE) {
+        if (config.environment.assertions != SchematronAssertions.IGNORE) {
             if (config.environment is PipelineContext) {
                 (config.environment as PipelineContext).monitors.add(SchematronMonitor())
             } else {
-                logger.debug { "Cannot provide Schematron monitor on ${config.environment}" }
+                pipeline.stepConfig.warn { "Cannot provide Schematron monitor on ${config.environment}" }
             }
         }
 
@@ -64,7 +64,7 @@ class XProcPipeline internal constructor(private val runtime: XProcRuntime, pipe
                 }
                 (config.environment as PipelineContext).monitors.add(traceListener!!)
             } else {
-                logger.debug { "Cannot provide tracing on ${config.environment}" }
+                pipeline.stepConfig.warn { "Cannot provide tracing on ${config.environment}" }
             }
         }
     }
@@ -107,8 +107,9 @@ class XProcPipeline internal constructor(private val runtime: XProcRuntime, pipe
 
     fun run() {
         val proxy = PipelineReceiverProxy(receiver)
-        for ((port, _) in outputManifold) {
+        for ((port, manifold) in outputManifold) {
             runnable.foot.receiver[port] = Pair(proxy, port)
+            proxy.serialization(port, manifold.serialization)
         }
 
         for ((port, _) in inputManifold) {

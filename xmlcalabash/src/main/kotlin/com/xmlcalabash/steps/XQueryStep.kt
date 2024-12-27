@@ -68,7 +68,7 @@ open class XQueryStep(): AbstractAtomicStep() {
                 is XdmMap -> throw stepConfig.exception(XProcError.xcXQueryInvalidParameterType(name, "map"))
                 is XdmArray -> throw stepConfig.exception(XProcError.xcXQueryInvalidParameterType(name, "array"))
                 is XdmFunctionItem -> throw stepConfig.exception(XProcError.xcXQueryInvalidParameterType(name, "function"))
-                else -> logger.debug { "Unexpected parameter type: ${value} passed to p:xquery"}
+                else -> stepConfig.debug { "Unexpected parameter type: ${value} passed to p:xquery"}
             }
         }
 

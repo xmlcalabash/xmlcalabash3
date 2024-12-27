@@ -1,39 +1,13 @@
 package com.xmlcalabash.util
 
-class DefaultMessageReporter(initialThreshold: Verbosity): MessageReporter {
-    override var threshold = initialThreshold
+import com.xmlcalabash.api.MessageReporter
+import net.sf.saxon.s9api.QName
 
-    override fun error(message: () -> String) {
-        System.err.println(message())
-    }
-
-    override fun warn(message: () -> String) {
-        if (threshold <= Verbosity.WARN) {
-            System.err.println(message())
-        }
-    }
-
-    override fun info(message: () -> String) {
-        if (threshold <= Verbosity.INFO) {
+class DefaultMessageReporter(nextReporter: MessageReporter? = null): NopMessageReporter(nextReporter) {
+    override fun report(verbosity: Verbosity, extraAttributes: Map<QName, String>, message: () -> String) {
+        if (verbosity >= threshold) {
             println(message())
         }
-    }
-
-    override fun progress(message: () -> String) {
-        if (threshold <= Verbosity.PROGRESS) {
-            println(message())
-        }
-    }
-
-    override fun debug(message: () -> String) {
-        if (threshold <= Verbosity.DEBUG) {
-            println(message())
-        }
-    }
-
-    override fun trace(message: () -> String) {
-        if (threshold <= Verbosity.TRACE) {
-            println(message())
-        }
+        nextReporter?.report(verbosity, extraAttributes, message)
     }
 }

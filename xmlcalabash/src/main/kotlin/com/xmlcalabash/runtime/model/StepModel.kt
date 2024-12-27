@@ -46,7 +46,7 @@ abstract class StepModel(val runtime: XProcRuntime, model: Model) {
 
         ports.clear()
         for ((name, port) in model.outputs) {
-            val rtport = RuntimePort(name, port.unbound, port.sequence, port.contentTypes)
+            val rtport = RuntimePort(name, port.unbound, port.sequence, port.contentTypes, port.serialization)
             rtport.weldedShut = port.weldedShut
             rtport.schematron.addAll(port.schematron)
             ports[name] = rtport

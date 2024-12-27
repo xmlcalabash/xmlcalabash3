@@ -988,8 +988,28 @@ class XplParser internal constructor(val builder: PipelineBuilder) {
                             continue
                         }
                         if (child.node.nodeName == NsP.pipeinfo) {
-                            val xml = inlineXml(instruction.stepConfig, child, listOf(child))
-                            instruction._pipeinfo.add(xml)
+                            if (child.attributes.contains(NsCx.href)) {
+                                for (gchild in child.node.axisIterator(Axis.CHILD)) {
+                                    throw instruction.stepConfig.exception(XProcError.xiPipeinfoMustBeEmpty())
+                                }
+                                val uri = child.node.baseURI.resolve(child.attributes[NsCx.href]!!)
+                                val info = try {
+                                    builder.pipelineContext.documentManager.load(uri, instruction.stepConfig)
+                                } catch (ex: Exception) {
+                                    throw instruction.stepConfig.exception(XProcError.xiPipeinfoMustExist(ex.message ?: "???"))
+                                }
+                                if (info.value !is XdmNode) {
+                                    throw instruction.stepConfig.exception(XProcError.xiPipeinfoMustBePipeinfo("Document is not XML."))
+                                }
+                                val root = S9Api.documentElement(info.value as XdmNode)
+                                if (root.nodeName != NsP.pipeinfo) {
+                                    throw instruction.stepConfig.exception(XProcError.xiPipeinfoMustBePipeinfo(root.nodeName))
+                                }
+                                instruction._pipeinfo.add(info.value as XdmNode)
+                            } else {
+                                val xml = inlineXml(instruction.stepConfig, child, listOf(child))
+                                instruction._pipeinfo.add(xml)
+                            }
                             continue
                         }
 

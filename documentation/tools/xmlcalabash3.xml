@@ -12,4 +12,7 @@
   <cc:mimetype content-type="text/rnc" extensions="rnc"/>
   <cc:mimetype content-type="application/nvdl+xml" extensions="nvdl"/>
   <cc:inline trim-whitespace="true"/>
+
+  <cc:serialization content-type="application/xml"
+                    omit-xml-declaration="true"/>
 </cc:xml-calabash>

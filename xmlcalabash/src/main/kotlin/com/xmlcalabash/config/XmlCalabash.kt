@@ -10,6 +10,8 @@ import com.xmlcalabash.util.DefaultXmlCalabashConfiguration
 import com.xmlcalabash.parsers.xpl.XplParser
 import com.xmlcalabash.runtime.XProcExecutionContext
 import com.xmlcalabash.runtime.XProcStepConfiguration
+import com.xmlcalabash.util.BufferingMessageReporter
+import com.xmlcalabash.util.DefaultMessageReporter
 import java.util.*
 import kotlin.collections.set
 
@@ -32,7 +34,11 @@ class XmlCalabash private constructor(val xmlCalabashConfig: XmlCalabashConfigur
         fun newInstance(config: XmlCalabashConfiguration): XmlCalabash {
             val xmlCalabash = XmlCalabash(config)
             xmlCalabash._commonEnvironment = CommonEnvironment(xmlCalabash)
-            xmlCalabash._commonEnvironment.messageReporter.threshold = config.verbosity
+
+            val defaultReporter = DefaultMessageReporter()
+            defaultReporter.threshold = config.verbosity
+            xmlCalabash._commonEnvironment.messageReporter = { BufferingMessageReporter(config.messageBufferSize, defaultReporter) }
+
             val environment = PipelineCompilerContext(xmlCalabash)
             val saxonConfig = SaxonConfiguration.newInstance(environment)
             xmlCalabash._saxonConfig = saxonConfig

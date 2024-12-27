@@ -45,7 +45,7 @@ open class TryStep(config: XProcStepConfiguration, compound: CompoundStepModel):
             val errorCode = if (ex is XProcException) {
                 ex.error.code
             } else {
-                logger.warn { "Caught unwrapped exception: ${ex}" }
+                stepConfig.warn { "Caught unwrapped exception: ${ex}" }
                 null
             }
 
@@ -110,7 +110,7 @@ open class TryStep(config: XProcStepConfiguration, compound: CompoundStepModel):
             attr["name"] = error.stackTrace[0]?.stepName
             attr["type"] = error.stackTrace[0]?.stepType.toString()
             attr["code"] = error.code.toString()
-            attr["href"] = error.inputLocation.baseURI?.toString()
+            attr["href"] = error.inputLocation.baseUri?.toString()
             if (error.inputLocation.lineNumber > 0) {
                 attr["line"] = error.inputLocation.lineNumber.toString()
             }

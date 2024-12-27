@@ -7,7 +7,7 @@ import com.xmlcalabash.io.DocumentManager
 import com.xmlcalabash.runtime.XProcExecutionContext
 import com.xmlcalabash.runtime.XProcStepConfiguration
 import com.xmlcalabash.runtime.parameters.StepParameters
-import com.xmlcalabash.util.MessageReporter
+import com.xmlcalabash.api.MessageReporter
 import net.sf.saxon.s9api.QName
 import java.net.URI
 import javax.activation.MimetypesFileTypeMap

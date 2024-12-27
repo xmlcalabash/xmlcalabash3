@@ -94,7 +94,7 @@ class InlineInstruction(parent: XProcInstruction, xmlDocument: XdmNode): Connect
         _xml = _valueTemplateFilter.expandStaticValueTemplates(stepConfig, expandText!!, staticBindings)
 
         if (!(contentType!!.xmlContentType() || contentType!!.htmlContentType()) && _valueTemplateFilter.containsMarkup(stepConfig)) {
-            logger.warn { "Markup detected in ${contentType} inline" }
+            stepConfig.warn { "Markup detected in ${contentType} inline" }
         }
 
         val usesContext = _valueTemplateFilter.usesContext()

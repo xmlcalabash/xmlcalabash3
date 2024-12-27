@@ -49,7 +49,7 @@ open class XslFormatterStep(): AbstractAtomicStep() {
         }
 
         for (formatter in formatters) {
-            logger.debug { "Searching for ${formatter} css-formatter" }
+            stepConfig.debug { "Searching for ${formatter} css-formatter" }
             for (manager in stepConfig.xmlCalabash.xmlCalabashConfig.pagedMediaManagers) {
                 if (manager.formatterAvailable(formatter)) {
                     xslManager = manager

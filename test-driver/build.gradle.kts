@@ -29,6 +29,7 @@ dependencies {
   implementation(project(":paged-media:fop"))
   implementation(project(":ext:unique-id"))
   implementation(project(":ext:metadata-extractor"))
+  implementation(project(":ext:pipeline-messages"))
   implementation(project(":ext:cache"))
   implementation(files("lib"))
   // WTF? Why is this necessary?

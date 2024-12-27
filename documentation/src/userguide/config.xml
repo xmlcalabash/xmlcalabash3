@@ -49,16 +49,20 @@ The command-line setting takes precedence.</para>
 <para>Schema-aware processing requires Saxon EE and a valid Saxon license.</para>
 </listitem>
 </varlistentry>
-<varlistentry><term><tag class="attribute">debug</tag> (boolean)</term>
-<listitem>
-<para>The default “debug” setting. This can also be specified <link
-linkend="cli-debug">on the command line</link>. The command-line setting takes precedence.</para>
-</listitem>
-</varlistentry>
 <varlistentry><term><tag class="attribute">verbosity</tag></term>
 <listitem>
 <para>The default “verbosity” setting. This can also be specified <link
 linkend="cli-verbosity">on the command line</link>. The command-line setting takes precedence.</para>
+</listitem>
+</varlistentry>
+<varlistentry><term><tag class="attribute">message-buffer-size</tag> (integer)</term>
+<listitem>
+<para>Sets the number of messages buffered. These can be retrieved in a pipeline
+with <tag>cx:pipeline-messagers</tag>. If the value is negative, there is no limit on
+the number of messages buffered. The default value is 32.</para>
+<note>
+<para>All messages are buffered, irrespective of the verbosity setting.</para>
+</note>
 </listitem>
 </varlistentry>
 </variablelist>

@@ -15,7 +15,7 @@ open class SleepStep(): AbstractAtomicStep() {
                 throw stepConfig.exception(XProcError.xdBadType("Invalid duration: ${duration}"))
             }
 
-            logger.debug { "Waiting for ${String.format("%1.1f", ms)}s ... "}
+            stepConfig.debug { "Waiting for ${String.format("%1.1f", ms)}s ... "}
             Thread.sleep(ms)
         } catch (ex: NumberFormatException) {
             throw stepConfig.exception(XProcError.xdBadType("Invalid duration: ${duration}"), ex)

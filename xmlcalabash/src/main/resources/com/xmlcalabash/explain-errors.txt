@@ -1404,6 +1404,18 @@ Initializer failed: $1
 cxerr:XI0041
 Schematron assertion failed: $1
 
+cxerr:XI0043
+If cx:href appears on p:pipeinfo, the p:pipeinfo must be empty.
+
+cxerr:XI0044
+If cx:href appears on p:pipeinfo, it must be accessible.
+
+cxerr:XI0045/1
+If cx:href appears on p:pipeinfo, it must point to a p:pipeinfo document. $1
+
+cxerr:XI0045/2
+If cx:href appears on p:pipeinfo, it must point to a p:pipeinfo document. Error: $1
+
 cxerr:XI0200
 Invalid option value “$2” for $1.
 

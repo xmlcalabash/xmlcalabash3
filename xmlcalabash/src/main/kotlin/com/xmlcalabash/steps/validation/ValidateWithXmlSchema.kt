@@ -11,8 +11,6 @@ import net.sf.saxon.om.NamespaceUri
 import net.sf.saxon.s9api.*
 import net.sf.saxon.serialize.SerializationProperties
 import net.sf.saxon.type.ValidationException
-import org.apache.logging.log4j.kotlin.logger
-import java.io.IOException
 import java.net.URI
 import javax.xml.transform.sax.SAXSource
 
@@ -66,7 +64,7 @@ open class ValidateWithXmlSchema(): AbstractAtomicStep() {
         for (schema in schemas) {
             val schemaNode = S9Api.documentElement(schema.value as XdmNode)
             val targetNS = schemaNode.getAttributeValue(_targetNamespace) ?: ""
-            logger.debug { "Caching input schema ${schema.baseURI} for ${targetNS}"}
+            stepConfig.debug { "Caching input schema ${schema.baseURI} for ${targetNS}"}
             schemaDocuments.add(schema.value as XdmNode)
         }
 
@@ -134,7 +132,7 @@ open class ValidateWithXmlSchema(): AbstractAtomicStep() {
         val invalidityHandler = validator.invalidityHandler
 
         val report = Errors(stepConfig, reportFormat)
-        val listener = CachingErrorListener(report, invalidityHandler)
+        val listener = CachingErrorListener(stepConfig, report, invalidityHandler)
 
         validator.destination = destination
         validator.invalidityHandler = listener

@@ -15,7 +15,7 @@ class InvisibleXmlStep(): AbstractAtomicStep() {
         val grammar = queues["grammar"]!!
 
         if (stepParams.stepType == NsP.ixml) {
-            logger.info { "The step type p:ixml is deprecated, use p:invisible-xml instead" }
+            stepConfig.info { "The step type p:ixml is deprecated, use p:invisible-xml instead" }
         }
 
         val failOnError = booleanBinding(Ns.failOnError) != false

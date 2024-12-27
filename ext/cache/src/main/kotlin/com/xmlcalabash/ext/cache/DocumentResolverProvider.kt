@@ -40,7 +40,7 @@ class DocumentResolverProvider:  DocumentResolverProvider, DocumentResolver {
             }
 
             val loader = DocumentLoader(context, MAGIC_URI)
-            val stream = com.xmlcalabash.ext.cache.DocumentResolverProvider::class.java.getResourceAsStream(RESOURCE_PATH)
+            val stream = DocumentResolverProvider::class.java.getResourceAsStream(RESOURCE_PATH)
                 ?: throw IOException("Failed to find ${RESOURCE_PATH} as a resource")
             library = loader.load(MAGIC_URI, stream, MediaType.XML)
             stream.close()

@@ -103,7 +103,7 @@ class FoFop(): FoProcessor {
 
         for (key in options.keys) {
             if (key != _CreationDate && key !in stringOptions && key !in floatOptions && key !in booleanOptions) {
-                logger.warn("Unsupported FOP property: ${key}")
+                stepConfig.warn { "Unsupported FOP property: ${key}" }
             }
         }
 

@@ -3,6 +3,7 @@ package com.xmlcalabash.graph
 import com.xmlcalabash.datamodel.*
 import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.namespace.NsP
+import net.sf.saxon.s9api.XdmMap
 
 open class CompoundModel internal constructor(graph: Graph, parent: Model?, step: CompoundStepDeclaration, id: String): Model(graph, parent, step, id) {
     val timeout = step.timeout
@@ -52,7 +53,6 @@ open class CompoundModel internal constructor(graph: Graph, parent: Model?, step
                 }
                 is OutputInstruction -> {
                     outputs[child.port] = ModelPort(foot, child)
-                    //head.inputs[child.port] = ModelPort(head, child)
                     foot.inputs[child.port] = ModelPort(foot, child)
                 }
                 else -> Unit
@@ -88,6 +88,7 @@ open class CompoundModel internal constructor(graph: Graph, parent: Model?, step
                                 val from = graph.instructionMap[conn.readablePort!!.parent]!!
                                 val footPort = ModelPort(foot, child.port, false, child.primary == true, child.sequence == true, child.contentTypes)
                                 footPort.schematron.addAll(child.schematron)
+                                footPort.serialization = child.serialization.evaluate(child.stepConfig) as XdmMap
                                 foot.inputs[child.port] = footPort
 
                                 graph.addEdge(from, conn.port!!, foot, child.port)

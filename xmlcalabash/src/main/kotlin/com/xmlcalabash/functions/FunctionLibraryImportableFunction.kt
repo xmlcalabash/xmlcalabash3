@@ -31,7 +31,7 @@ class FunctionLibraryImportableFunction(private val config: SaxonConfiguration):
     inner class FuncLibImportableImpl: ExtensionFunctionCall() {
         override fun call(context: XPathContext?, arguments: Array<out Sequence>?): Sequence {
             if (config.processor.underlyingConfiguration.editionCode != "EE") {
-                logger.debug { "Importing functions requires Saxon EE" }
+                logger.warn { "Importing functions requires Saxon EE" }
                 return BooleanValue.FALSE
             }
 

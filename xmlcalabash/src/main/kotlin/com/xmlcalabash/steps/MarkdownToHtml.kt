@@ -42,11 +42,11 @@ open class MarkdownToHtml(): AbstractAtomicStep() {
                         val configurer = klass.getConstructor().newInstance() as MarkdownConfigurer
                         configurer.configure(markdownExtensions.options, param)
                     } catch (ex: Exception) {
-                        logger.warn { "Failed to instantiate markdown configurer: ${param}: ${ex}" }
+                        stepConfig.warn { "Failed to instantiate markdown configurer: ${param}: ${ex}" }
                     }
                 }
             } else {
-                logger.warn { "Configurers must be a map"}
+                stepConfig.warn { "Configurers must be a map"}
             }
         }
 
@@ -74,7 +74,7 @@ open class MarkdownToHtml(): AbstractAtomicStep() {
                 val value = mapValue.get(extension)
                 if (markdownExtensions.extensions.contains(extension)) {
                     if (value !is XdmMap) {
-                        logger.warn { "Extension \"${extension}\" value must be a map" }
+                        stepConfig.warn { "Extension \"${extension}\" value must be a map" }
                     } else {
                         markdownExtensions.enable(markdownExtensions.extensions[extension]!!())
                         val options = markdownExtensions.extensionOptions[extension]!!
@@ -83,12 +83,12 @@ open class MarkdownToHtml(): AbstractAtomicStep() {
                             if (options.containsKey(optname)) {
                                 configureExtension(extension, optname, value.get(optkey), options[optname]!!)
                             } else {
-                                logger.warn { "Extension \"${extension}\" has no property named \"${optname}\"" }
+                                stepConfig.warn { "Extension \"${extension}\" has no property named \"${optname}\"" }
                             }
                         }
                     }
                 } else {
-                    logger.warn { "No extension configured for \"${extension}\"" }
+                    stepConfig.warn { "No extension configured for \"${extension}\"" }
                 }
             }
         }
@@ -107,7 +107,7 @@ open class MarkdownToHtml(): AbstractAtomicStep() {
                 if (dkenum != null) {
                     dkenum.set()
                 } else {
-                    logger.warn { "Extension \"${extension}\" property \"${property}\" has no value \"${strvalue}\"" }
+                    stepConfig.warn { "Extension \"${extension}\" property \"${property}\" has no value \"${strvalue}\"" }
                 }
             }
             is MarkdownExtensions.DataKeyString -> {
@@ -124,7 +124,7 @@ open class MarkdownToHtml(): AbstractAtomicStep() {
                 try {
                     options.set(strvalue.toInt())
                 } catch (ex: NumberFormatException) {
-                    logger.warn { "Extension \"${extension}\" property \"${property}\" is not a number" }
+                    stepConfig.warn { "Extension \"${extension}\" property \"${property}\" is not a number" }
                 }
             }
             is MarkdownExtensions.DataKeyNullableInteger -> {
@@ -134,7 +134,7 @@ open class MarkdownToHtml(): AbstractAtomicStep() {
                     try {
                         options.set(strvalue.toInt())
                     } catch (ex: NumberFormatException) {
-                        logger.warn { "Extension \"${extension}\" property \"${property}\" is not a number" }
+                        stepConfig.warn { "Extension \"${extension}\" property \"${property}\" is not a number" }
                     }
                 }
             }
@@ -143,7 +143,7 @@ open class MarkdownToHtml(): AbstractAtomicStep() {
                     "true", "1", "yes" -> options.set(true)
                     "false", "0", "no" -> options.set(false)
                     else -> {
-                        logger.warn { "Extension \"${extension}\" property \"${property}\" must be a boolean: ${strvalue}"}
+                        stepConfig.warn { "Extension \"${extension}\" property \"${property}\" must be a boolean: ${strvalue}"}
                     }
                 }
             }
@@ -155,7 +155,7 @@ open class MarkdownToHtml(): AbstractAtomicStep() {
                     }
                     options.set(map)
                 } else {
-                    logger.warn { "Extension \"${extension}\" property \"${property}\" must be a map(xs:string,xs:string)" }
+                    stepConfig.warn { "Extension \"${extension}\" property \"${property}\" must be a map(xs:string,xs:string)" }
                 }
             }
             is MarkdownExtensions.DataKeyMapCharacterInteger -> {
@@ -168,15 +168,15 @@ open class MarkdownToHtml(): AbstractAtomicStep() {
                             try {
                                 map[kchar[0]] = kint.toInt()
                             } catch (ex: NumberFormatException) {
-                                logger.warn { "Extension \"${extension}\" property \"${property}\" values must be integers" }
+                                stepConfig.warn { "Extension \"${extension}\" property \"${property}\" values must be integers" }
                             }
                         } else {
-                            logger.warn { "Extension \"${extension}\" property \"${property}\" keys must be single characters" }
+                            stepConfig.warn { "Extension \"${extension}\" property \"${property}\" keys must be single characters" }
                         }
                     }
                     options.set(map)
                 } else {
-                    logger.warn { "Extension \"${extension}\" property \"${property}\" must be a map(xs:string,xs:integer)" }
+                    stepConfig.warn { "Extension \"${extension}\" property \"${property}\" must be a map(xs:string,xs:integer)" }
                 }
             }
             is MarkdownExtensions.DataKeyArrayString -> {
@@ -188,7 +188,7 @@ open class MarkdownToHtml(): AbstractAtomicStep() {
                 options.set(vlist.toTypedArray())
             }
             else -> {
-                logger.warn { "Internal error: unexpected option type: ${options}" }
+                stepConfig.warn { "Internal error: unexpected option type: ${options}" }
             }
         }
     }

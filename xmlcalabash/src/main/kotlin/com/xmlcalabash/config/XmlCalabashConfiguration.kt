@@ -14,6 +14,7 @@ abstract class XmlCalabashConfiguration {
     abstract fun xmlCalabashConfigurer(xmlCalabash: XmlCalabash)
 
     var verbosity = Verbosity.INFO
+    var messageBufferSize = 32
     var assertions = SchematronAssertions.WARNING
     var saxonConfigurationFile: File? = null
     var saxonConfigurationProperties: Map<String,String> = emptyMap()

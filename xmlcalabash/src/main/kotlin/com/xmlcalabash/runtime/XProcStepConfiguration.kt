@@ -1,5 +1,6 @@
 package com.xmlcalabash.runtime
 
+import com.xmlcalabash.api.MessageReporter
 import com.xmlcalabash.config.SaxonConfiguration
 import com.xmlcalabash.config.XmlCalabash
 import com.xmlcalabash.datamodel.DeclareStepInstruction
@@ -9,6 +10,7 @@ import com.xmlcalabash.datamodel.PipelineEnvironment
 import com.xmlcalabash.documents.DocumentContext
 import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.exceptions.XProcException
+import com.xmlcalabash.util.Verbosity
 import net.sf.saxon.ma.map.MapItem
 import net.sf.saxon.om.AttributeMap
 import net.sf.saxon.om.NamespaceUri
@@ -28,7 +30,13 @@ interface XProcStepConfiguration: DocumentContext {
     var stepName: String
     val location: Location
     val nextId: String
-    //fun uniqueName(base: String): String
+
+    fun error(message: () -> String)
+    fun warn(message: () -> String)
+    fun info(message: () -> String)
+    fun progress(message: () -> String)
+    fun debug(message: () -> String)
+    fun trace(message: () -> String)
 
     fun copy(): XProcStepConfiguration
     fun copyNew(): XProcStepConfiguration

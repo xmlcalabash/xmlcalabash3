@@ -28,7 +28,17 @@ class SchematronImpl(val stepConfig: XProcStepConfiguration) {
         return failedAssertions(report(sourceXml, schemaXml, phase))
     }
 
-    fun report(sourceXml: XdmNode, schemaXml: XdmNode, phase: String? = null): XdmNode {
+    fun test(sourceValue: XdmValue, schemaXml: XdmNode, phase: String? = null): List<XdmNode> {
+        val failures = mutableListOf<XdmNode>()
+        val iter = sourceValue.iterator()
+        while (iter.hasNext()) {
+            val item = iter.next()
+            failures.addAll(failedAssertions(report(item, schemaXml, phase)))
+        }
+        return failures
+    }
+
+    fun report(sourceXml: XdmItem, schemaXml: XdmNode, phase: String? = null): XdmNode {
         val schemaRoot = when (schemaXml.nodeKind) {
             XdmNodeKind.ELEMENT -> schemaXml
             else -> S9Api.documentElement(schemaXml)
@@ -60,7 +70,6 @@ class SchematronImpl(val stepConfig: XProcStepConfiguration) {
         }
 
         val schema = S9Api.adjustBaseUri(xschema, schemaXml.baseURI)
-        val schemaType = sourceXml.underlyingNode.schemaType.structuredQName
         val schemaAware = stepConfig.processor.isSchemaAware
 
         var compiler = stepConfig.processor.newXsltCompiler()
@@ -104,20 +113,20 @@ class SchematronImpl(val stepConfig: XProcStepConfiguration) {
         compiler.isSchemaAware = schemaAware
 
         exec = compiler.compile(compiledSchema.asSource())
-        val transformer = exec.load()
+        val transformer = exec.load30()
 
-        for ((name, value) in params) {
-            transformer.setParameter(name, value)
-        }
+        transformer.setStylesheetParameters(params)
 
         transformer.resourceResolver = xResolver
-        transformer.initialContextNode = sourceXml
-        transformer.destination = destination
-        if (sourceXml.baseURI != null) {
-            transformer.setBaseOutputURI(sourceXml.baseURI.toString())
+        transformer.globalContextItem = sourceXml
+
+        if (sourceXml is XdmNode) {
+            if (sourceXml.baseURI != null) {
+                transformer.setBaseOutputURI(sourceXml.baseURI.toString())
+            }
         }
 
-        transformer.transform()
+        transformer.applyTemplates(sourceXml, destination)
         return destination.xdmNode
     }
 

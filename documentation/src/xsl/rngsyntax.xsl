@@ -285,8 +285,8 @@
 	    <xsl:text> (</xsl:text>
 	    <xsl:value-of select="ancestor::rng:element/@name"/>
 	    <xsl:text>)</xsl:text>
-            <xsl:sequence select="."/>
-	  </xsl:message>
+          </xsl:message>
+          <xsl:message select="."/>
 	</xsl:otherwise>
       </xsl:choose>
     </xsl:attribute>
@@ -355,6 +355,9 @@
 	<xsl:when test="$content/rng:text or not($content/*)">
 	  <xsl:text>string</xsl:text>
 	</xsl:when>
+	<xsl:when test="rng:text or not(* except (db:purpose|rng:anyName))">
+	  <xsl:text>string</xsl:text>
+	</xsl:when>
 	<xsl:otherwise>
 	  <xsl:message>
 	    <xsl:text>Warning: unsupported content in attribute: </xsl:text>
@@ -362,11 +365,12 @@
 	    <xsl:text> (</xsl:text>
 	    <xsl:value-of select="ancestor::rng:element/@name"/>
 	    <xsl:text>)</xsl:text>
-            <xsl:sequence select="."/>
-	  </xsl:message>
+          </xsl:message>
+          <xsl:message select="$content"/>
 	</xsl:otherwise>
       </xsl:choose>
     </xsl:attribute>
+    <xsl:sequence select="db:purpose/node()"/>
   </ss:attribute>
 </xsl:template>
 
@@ -532,6 +536,11 @@
   <xsl:call-template name="separator"/>
 </xsl:template>
 
+<xsl:template match="ss:element" mode="table">
+  <xsl:text>&#160;&#160;</xsl:text>
+  <xsl:apply-templates select="."/>
+</xsl:template>
+
 <xsl:template match="ss:element">
   <xsl:param name="prefix" tunnel="yes"/>
 
@@ -614,6 +623,9 @@
 	        </var>
 	      </xsl:otherwise>
             </xsl:choose>
+
+            <xsl:if test="empty(ss:attribute)">&gt;</xsl:if>
+            
           </td>
           <td class="desc"></td>
         </tr>
@@ -623,12 +635,14 @@
         <xsl:choose>
 	  <xsl:when test="*[not(self::ss:attribute)]">
             <tr>
-              <td class="code">
-	        <xsl:text>&gt;</xsl:text>
-              </td>
+              <xsl:if test="exists(ss:attribute)">
+                <td class="code">
+	          <xsl:text>&gt;</xsl:text>
+                </td>
+              </xsl:if>
               <td class="desc"></td>
             </tr>
-	    <xsl:apply-templates select="*[not(self::ss:attribute)]"/>
+	    <xsl:apply-templates select="*[not(self::ss:attribute)]" mode="table"/>
             <tr>
               <td class="code last">
 	        <xsl:text>&lt;/</xsl:text>
@@ -671,6 +685,16 @@
       </tbody>
     </table>
   </div>
+</xsl:template>
+
+<xsl:template match="ss:content-model" mode="table">
+  <tr>
+    <td class="code">
+      <xsl:apply-templates mode="table"/>
+    </td>
+    <td>
+    </td>
+  </tr>
 </xsl:template>
 
 <xsl:template match="ss:attribute" mode="table">

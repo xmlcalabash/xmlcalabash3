@@ -5,6 +5,7 @@ import com.xmlcalabash.documents.DocumentProperties
 import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.namespace.Ns
+import com.xmlcalabash.namespace.NsCx
 import com.xmlcalabash.namespace.NsFn
 import com.xmlcalabash.util.*
 import net.sf.saxon.Configuration
@@ -24,7 +25,10 @@ import java.net.URI
 
 open class XsltStep(): AbstractAtomicStep() {
     companion object {
-        val BUILD_TREE: QName = ValueUtils.parseClarkName(SaxonOutputKeys.BUILD_TREE)
+        val BUILD_TREE = ValueUtils.parseClarkName(SaxonOutputKeys.BUILD_TREE)
+        val _terminate = QName("terminate")
+        val _systemIdentifier = QName("system-identifier")
+        val _publicIdentifier = QName("public-identifier")
     }
 
     val sources = mutableListOf<XProcDocument>()
@@ -92,7 +96,7 @@ open class XsltStep(): AbstractAtomicStep() {
 
     private fun xslt20() {
         if (globalContextItem != null) {
-            logger.info { "Global context item doesn't apply to XSLT 2.0"}
+            stepConfig.info { "Global context item doesn't apply to XSLT 2.0"}
             globalContextItem = null
         }
 
@@ -112,7 +116,7 @@ open class XsltStep(): AbstractAtomicStep() {
                 is XdmArray -> throw stepConfig.exception(XProcError.xcXsltParameterNot20Compatible(name, "array"))
                 is XdmFunctionItem -> throw stepConfig.exception(XProcError.xcXsltParameterNot20Compatible(name, "function"))
                 else -> {
-                    logger.debug { "Unexpected parameter type: ${value} passed to p:xslt (2.0)"}
+                    stepConfig.debug { "Unexpected parameter type: ${value} passed to p:xslt (2.0)"}
                 }
             }
         }
@@ -127,7 +131,7 @@ open class XsltStep(): AbstractAtomicStep() {
         val collectionFinder = config.collectionFinder
         val unparsedTextURIResolver = config.unparsedTextURIResolver
 
-        val errorReporter = ErrorLogger()
+        val errorReporter = ErrorLogger(stepConfig)
         val compiler = processor.newXsltCompiler()
         compiler.resourceResolver = stepConfig.environment.documentManager
         compiler.setSchemaAware(processor.isSchemaAware)
@@ -187,11 +191,30 @@ open class XsltStep(): AbstractAtomicStep() {
         }
 
         transformer.setMessageHandler { message ->
+            val extra = mutableMapOf<QName, String>()
+            extra[Ns.code] = "Q{${message.errorCode.namespaceUri}}${message.errorCode.localName}"
+            if (!stepParams.stepName.startsWith("!")) {
+                extra[Ns.stepName] = stepParams.stepName
+            }
+            message.location.systemId?.let { extra[_systemIdentifier] = it }
+            message.location.publicId?.let { extra[_publicIdentifier] = it }
+            if (message.location.lineNumber > 0) {
+                extra[Ns.lineNumber] = "${message.location.lineNumber}"
+            }
+            if (message.location.columnNumber > 0) {
+                extra[Ns.columnNumber] = "${message.location.columnNumber}"
+            }
             if (message.isTerminate) {
+                extra[_terminate] = "true"
+            }
+
+            if (message.isTerminate) {
+                stepConfig.environment.messageReporter.report(Verbosity.ERROR, extra, { message.toString() })
                 terminationError = XProcError.xcXsltUserTermination(message.content.stringValue)
                     .at(stepParams.location).at(message.location)
+            } else {
+                stepConfig.environment.messageReporter.report(Verbosity.INFO, extra, { message.toString() })
             }
-            println(message)
         }
 
         val documentResolver = MyResultDocumentResolver(processor.underlyingConfiguration)

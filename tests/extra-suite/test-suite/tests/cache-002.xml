@@ -23,8 +23,8 @@
                     xmlns:err="http://www.w3.org/ns/xproc-error"
                     xmlns:cx="http://xmlcalabash.com/ns/extensions"
                     xmlns:p="http://www.w3.org/ns/xproc">
-      <p:output port="result"/>
       <p:import href="https://xmlcalabash.com/ext/library/cache.xpl"/>
+      <p:output port="result"/>
 
       <cx:cache-add name="cache-add"
                     href="https://xmlcalabash.com/does/not/exist.xml">

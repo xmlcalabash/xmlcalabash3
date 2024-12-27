@@ -34,7 +34,7 @@ class OsInfo(): AbstractAtomicStep() {
             if (value == "true" || value == "false") {
                 onlyStandardProperties = value == "true"
             } else {
-                logger.debug { "Ignoring unexpected value for cx:only-standard: ${value}"}
+                stepConfig.debug { "Ignoring unexpected value for cx:only-standard: ${value}"}
             }
         }
     }

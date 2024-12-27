@@ -13,7 +13,8 @@ import com.xmlcalabash.runtime.Monitor
 import com.xmlcalabash.runtime.XProcExecutionContext
 import com.xmlcalabash.runtime.XProcStepConfiguration
 import com.xmlcalabash.tracing.TraceListener
-import com.xmlcalabash.util.MessageReporter
+import com.xmlcalabash.api.MessageReporter
+import com.xmlcalabash.util.SchematronAssertions
 import com.xmlcalabash.util.SchematronMonitor
 import java.net.URI
 import java.util.*
@@ -38,11 +39,12 @@ class PipelineCompilerContext(override val xmlCalabash: XmlCalabash): PipelineEn
     override val version = "3.0"
     override val xpathVersion = "3.1"
     override var uniqueInlineUris = true
+    override val assertions: SchematronAssertions = SchematronAssertions.IGNORE
 
     private var _documentManager: DocumentManager = commonEnvironment.documentManager
     private var _mimeTypes = commonEnvironment.mimeTypes
     private var _errorExplanation: ErrorExplanation = commonEnvironment.errorExplanation
-    private var _messageReporter: MessageReporter = commonEnvironment.messageReporter
+    private var _messageReporter: MessageReporter = commonEnvironment.messageReporter()
 
     private var _proxies = mutableMapOf<String, String>()
     init {

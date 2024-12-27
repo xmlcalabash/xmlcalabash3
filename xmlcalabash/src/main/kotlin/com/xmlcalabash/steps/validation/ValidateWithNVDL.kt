@@ -33,7 +33,7 @@ open class ValidateWithNVDL(): AbstractAtomicStep() {
         }
 
         val report = Errors(stepConfig, reportFormat)
-        val listener = CachingErrorListener(report)
+        val listener = CachingErrorListener(stepConfig, report)
         val properties = PropertyMapBuilder()
         properties.put(ValidateProperty.ERROR_HANDLER, listener)
         RngProperty.CHECK_ID_IDREF.add(properties)

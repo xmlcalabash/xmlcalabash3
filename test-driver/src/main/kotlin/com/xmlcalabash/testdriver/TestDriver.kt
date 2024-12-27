@@ -1,8 +1,14 @@
 package com.xmlcalabash.testdriver
 
 import com.xmlcalabash.config.XmlCalabash
+import com.xmlcalabash.util.BufferingMessageReporter
+import com.xmlcalabash.util.DefaultMessageReporter
 import com.xmlcalabash.util.DefaultXmlCalabashConfiguration
+import com.xmlcalabash.util.LoggingMessageReporter
+import com.xmlcalabash.util.NopMessageReporter
 import com.xmlcalabash.util.SaxonTreeBuilder
+import com.xmlcalabash.util.SchematronAssertions
+import com.xmlcalabash.util.Verbosity
 import net.sf.saxon.event.ReceiverOption
 import net.sf.saxon.om.AttributeInfo
 import net.sf.saxon.om.AttributeMap
@@ -17,7 +23,6 @@ import java.time.ZonedDateTime
 import kotlin.system.exitProcess
 
 class TestDriver(val testOptions: TestOptions, val exclusions: Map<String, String>) {
-    lateinit var xmlCalabash: XmlCalabash
     val failedTests = mutableListOf<String>()
     val passedTests = mutableListOf<String>()
     val allTestCases = mutableListOf<TestCase>()
@@ -108,18 +113,22 @@ class TestDriver(val testOptions: TestOptions, val exclusions: Map<String, Strin
 
         val licensedConfig = DefaultXmlCalabashConfiguration()
         licensedConfig.licensed = true
+        licensedConfig.uniqueInlineUris = false
+        licensedConfig.assertions = SchematronAssertions.WARNING
 
         val unlicensedConfig = DefaultXmlCalabashConfiguration()
         unlicensedConfig.licensed = false
+        unlicensedConfig.uniqueInlineUris = false
+        unlicensedConfig.assertions = SchematronAssertions.WARNING
 
-        xmlCalabash = XmlCalabash.newInstance(licensedConfig)
-        xmlCalabash.xmlCalabashConfig.uniqueInlineUris = false
+        val xmlCalabash = XmlCalabash.newInstance(licensedConfig)
+        xmlCalabash.commonEnvironment.messageReporter = { BufferingMessageReporter(100, NopMessageReporter()) }
 
         val saxonConfig = xmlCalabash.saxonConfig
         println("Running tests with ${saxonConfig.processor.saxonEdition} version ${saxonConfig.processor.saxonProductVersion}")
 
         val unlicensedXmlCalabash = XmlCalabash.newInstance(unlicensedConfig)
-        unlicensedXmlCalabash.xmlCalabashConfig.uniqueInlineUris = false
+        xmlCalabash.commonEnvironment.messageReporter = { BufferingMessageReporter(100, NopMessageReporter()) }
 
         val licensedSuite = TestSuite(xmlCalabash, testOptions)
         val unlicensedSuite = TestSuite(unlicensedXmlCalabash, testOptions)
@@ -185,7 +194,7 @@ class TestDriver(val testOptions: TestOptions, val exclusions: Map<String, Strin
 
         statusDir.mkdirs()
 
-        makeReport()
+        makeReport(xmlCalabash)
 
         println("Test suite: ${pass} pass (${percent}%), ${fail} fail, ${notrun} not run (${total} total)")
         var max = 10
@@ -278,7 +287,7 @@ class TestDriver(val testOptions: TestOptions, val exclusions: Map<String, Strin
         }
     }
 
-    fun makeReport() {
+    fun makeReport(xmlCalabash: XmlCalabash) {
         if (testOptions.report == null) {
             return
         }
@@ -340,6 +349,9 @@ class TestDriver(val testOptions: TestOptions, val exclusions: Map<String, Strin
                         }
                     }
                     report.addEndElement()
+                    if (test.messages != null) {
+                        report.addSubtree(test.messages!!)
+                    }
                 }
 
                 if (test.stdoutOutput.isNotEmpty()) {
@@ -385,8 +397,6 @@ class TestDriver(val testOptions: TestOptions, val exclusions: Map<String, Strin
     private fun fqName(name: QName): FingerprintedQName = FingerprintedQName(name.prefix, name.namespaceUri, name.localName)
 
     private fun property(report: SaxonTreeBuilder, key: String, value: String) {
-        val saxonConfig = xmlCalabash.saxonConfig
-
         val map = mapOf( NsReport.name to key, NsReport.value to value )
         report.addStartElement(NsReport.property, attributeMap(map))
         report.addEndElement()
