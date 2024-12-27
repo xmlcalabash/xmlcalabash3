@@ -27,6 +27,7 @@
 <xsl:import href="rngsyntax.xsl"/>
 <xsl:import href="user-custom.xsl"/>
 
+<xsl:param name="dep_saxon" select="'UNCONFIGURED'"/>
 <xsl:param name="dep_brotliDec" select="'UNCONFIGURED'"/>
 <xsl:param name="dep_commonsCodec" select="'UNCONFIGURED'"/>
 <xsl:param name="dep_commonsCompress" select="'UNCONFIGURED'"/>

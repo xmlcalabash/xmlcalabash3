@@ -146,6 +146,10 @@ fun distClasspath(): List<File> {
 tasks.jar {
   val libs = mutableListOf<String>()
   for (jar in distClasspath()) {
+    if (jar.getName().startsWith("Saxon-HE")) {
+      libs.add("lib/Saxon-EE-${project.findProperty("saxonVersion")}.jar")
+      libs.add("lib/Saxon-PE-${project.findProperty("saxonVersion")}.jar")
+    }
     libs.add("lib/${jar.getName()}")
   }
 

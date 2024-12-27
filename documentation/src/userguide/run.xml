@@ -20,11 +20,32 @@ a shell script:</para>
 <screen>java com.xmlcalabash.app.Main <replaceable>options…</replaceable></screen>
 
 <para>But if you choose this form, you must ensure that the classpath contains
-both the XML Calabash jar file and all of the necessary dependencies.</para>
+both the XML Calabash jar file and all of the necessary dependencies.
+One feature of the second form is that it allows you to change or update the dependencies.
+</para>
 
-<para>One feature of the second form is that it allows you to change or update the dependencies.
-For example, if you have a Saxon-EE license, put the Saxon-EE jar file on the class path
-<emphasis>instead of</emphasis> the Saxon-HE jar file.</para>
+<para>In the fullness of time, XML Calabash will be available through Maven which has
+extensive features for managing dependencies. In the short term, it’s just a bit messy.</para>
+
+<tip>
+<title>Upgrading Saxon</title>
+<para>The one library that you are likely to want to change in Saxon. If you
+have a license for Saxon PE or Saxon EE, it makes sense to swap out the Saxon HE
+library that ships with XML Calabash for PE or EE.</para>
+<para>To save you the trouble of constructing and managing a large classpath, the
+alpha distribution of XML Calabash is configured with a hack. Simply
+delete the <filename>Saxon-HE-<?version DEPENDENCY_saxon?>.jar</filename> file from the
+<filename class="directory">lib</filename> directory and copy in your PE or EE jar instead. You
+<emphasis>must</emphasis> use a <?version DEPENDENCY_saxon?> jar file for this purpose!
+Be careful to make sure there’s only one Saxon jar file in the 
+<filename class="directory">lib</filename> directory. Having multiple versions of the same library on the classpath
+is an invitation for subtle and mysterious crashes.</para>
+<para>Saxon generally searches for a license file on the classpath, which isn’t going
+to work with this hack. Instead, you can use the <envar>SAXON_HOME</envar> environment
+variable, as described in
+<link xlink:href="https://www.saxonica.com/documentation12/index.html#!about/license/licensekey">the
+documentation</link>.</para>
+</tip>
 
 <para>Elsewhere in this document, we assume that the command “<command>xmlcalabash</command>”
 runs XML Calabash. This can be replaced by the <command>java -jar …</command> version above or
@@ -420,6 +441,7 @@ DEPENDENCY_htmlparser=<?version DEPENDENCY_htmlparser?>
 DEPENDENCY_httpClient=<?version DEPENDENCY_httpClient?>
 DEPENDENCY_jing=<?version DEPENDENCY_jing?>
 DEPENDENCY_jsonSchemaValidator=<?version DEPENDENCY_jsonSchemaValidator?>
+DEPENDENCY_saxon=<?version DEPENDENCY_saxon?>
 DEPENDENCY_schxslt=<?version DEPENDENCY_schxslt?>
 DEPENDENCY_sinclude=<?version DEPENDENCY_sinclude?>
 DEPENDENCY_slf4j=<?version DEPENDENCY_slf4j?>
