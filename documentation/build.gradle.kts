@@ -237,6 +237,7 @@ val reference = tasks.register<SaxonXsltTask>("reference") {
       mapOf(
           "mediaobject-input-base-uri" to "file:${layout.buildDirectory.get()}/reference/",
           "chunk-output-base-uri" to "${layout.buildDirectory.get()}/reference/",
+          "dep_saxon" to project.findProperty("saxonVersion").toString(),
           "dep_brotliDec" to project.findProperty("brotliDec").toString(),
           "dep_commonsCodec" to project.findProperty("commonsCodec").toString(),
           "dep_commonsCompress" to project.findProperty("commonsCompress").toString(),
@@ -377,6 +378,7 @@ val userguide = tasks.register<SaxonXsltTask>("userguide") {
       mapOf(
           "mediaobject-input-base-uri" to "file:${layout.buildDirectory.get()}/userguide/",
           "chunk-output-base-uri" to "${layout.buildDirectory.get()}/userguide/",
+          "dep_saxon" to project.findProperty("saxonVersion").toString(),
           "dep_brotliDec" to project.findProperty("brotliDec").toString(),
           "dep_commonsCodec" to project.findProperty("commonsCodec").toString(),
           "dep_commonsCompress" to project.findProperty("commonsCompress").toString(),

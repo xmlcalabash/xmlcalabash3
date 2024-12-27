@@ -108,6 +108,7 @@ buildConfig {
 
   val sb = StringBuilder()
   sb.append("mapOf(\n")
+  sb.append("  \"saxon\" to \"${project.findProperty("saxonVersion").toString()}\",\n")
   arrayOf<String>("brotliDec",
                   "commonsCodec",
                   "commonsCompress",
