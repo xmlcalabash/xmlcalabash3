@@ -44,7 +44,7 @@ class ImportFunctionsInstruction(parent: XProcInstruction?, stepConfig: Instruct
 
     fun prefetch(): FunctionLibrary? {
         if (stepConfig.processor.underlyingConfiguration.editionCode != "EE") {
-            logger.debug { "Saxon EE required for p:import-functions" }
+            stepConfig.warn { "Saxon EE required for p:import-functions" }
             return null
         }
 

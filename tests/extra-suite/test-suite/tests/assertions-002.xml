@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<t:test expected="pass"
+        xmlns:t="http://xproc.org/ns/testsuite/3.0">
+  <t:info>
+    <t:title>assertions-002</t:title>
+    <t:revision-history>
+      <t:revision>
+        <t:date>2024-12-27</t:date>
+        <t:author>
+          <t:name>Norm Tovey-Walsh</t:name>
+        </t:author>
+        <t:description xmlns="http://www.w3.org/1999/xhtml">
+          <p>Created test.</p>
+        </t:description>
+      </t:revision>
+    </t:revision-history>
+  </t:info>
+  <t:description xmlns="http://www.w3.org/1999/xhtml">
+    <p>Tests a Schematron assertion.</p>
+  </t:description>
+  <t:input port="source">
+    <not-doc/>
+  </t:input>
+  <t:pipeline src="../pipelines/assertions1.xpl"/>
+  <t:schematron>
+    <s:schema queryBinding="xslt2"
+              xmlns:s="http://purl.oclc.org/dsdl/schematron">
+      <s:ns prefix="cx" uri="http://xmlcalabash.com/ns/extensions"/>
+      <s:pattern>
+        <s:rule context="/">
+          <s:assert test="cx:messages">The document root is not correct.</s:assert>
+        </s:rule>
+        <s:rule context="/cx:messages">
+          <s:assert test="cx:message[@level='WARN' and contains(@message, 'The source document is not a doc')]"
+                    >Did not find Schematron report for doc.</s:assert>
+        </s:rule>
+      </s:pattern>
+    </s:schema>
+  </t:schematron>
+</t:test>

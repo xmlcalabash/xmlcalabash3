@@ -8,7 +8,8 @@ import com.xmlcalabash.exceptions.ErrorExplanation
 import com.xmlcalabash.io.DocumentManager
 import com.xmlcalabash.runtime.Monitor
 import com.xmlcalabash.tracing.TraceListener
-import com.xmlcalabash.util.MessageReporter
+import com.xmlcalabash.api.MessageReporter
+import com.xmlcalabash.util.SchematronAssertions
 import net.sf.saxon.s9api.QName
 import java.net.URI
 import javax.activation.MimetypesFileTypeMap
@@ -33,6 +34,7 @@ interface PipelineEnvironment: ExecutionContextManager {
     val errorExplanation: ErrorExplanation
     val messageReporter: MessageReporter
     val proxies: Map<String, String>
+    val assertions: SchematronAssertions
 
     val nextId: String
     fun uniqueName(base: String): String

@@ -17,7 +17,7 @@ import com.xmlcalabash.spi.AtomicStepManager
 import com.xmlcalabash.spi.AtomicStepServiceProvider
 import com.xmlcalabash.spi.DocumentResolverServiceProvider
 import com.xmlcalabash.util.DefaultMessageReporter
-import com.xmlcalabash.util.MessageReporter
+import com.xmlcalabash.api.MessageReporter
 import com.xmlcalabash.util.Verbosity
 import net.sf.saxon.s9api.QName
 import org.apache.logging.log4j.kotlin.logger
@@ -60,9 +60,9 @@ class CommonEnvironment(private val xmlCalabash: XmlCalabash) {
     }
 
     private var _documentManager: DocumentManager = DocumentManager()
-    private var _mimeTypes = MimetypesFileTypeMap()
     private var _errorExplanation: ErrorExplanation = DefaultErrorExplanation()
-    private var _messageReporter: MessageReporter = DefaultMessageReporter(Verbosity.INFO)
+    private var _messageReporter: (() -> MessageReporter)? = null
+    private var _mimeTypes = MimetypesFileTypeMap()
     private var _proxies = mutableMapOf<String, String>()
     internal val _standardSteps = mutableMapOf<QName, DeclareStepInstruction>()
 
@@ -94,14 +94,31 @@ class CommonEnvironment(private val xmlCalabash: XmlCalabash) {
     }
 
     var eagerEvaluation = false
-    val documentManager: DocumentManager
+    var documentManager: DocumentManager
         get() = _documentManager
+        set(value) {
+            _documentManager = value
+            for (provider in DocumentResolverServiceProvider.providers()) {
+                provider.create().configure(_documentManager)
+            }
+        }
     val mimeTypes: MimetypesFileTypeMap
         get() = _mimeTypes
-    val errorExplanation: ErrorExplanation
+    var errorExplanation: ErrorExplanation
         get() = _errorExplanation
-    val messageReporter: MessageReporter
-        get() = _messageReporter
+        set(value) {
+            _errorExplanation = value
+        }
+    var messageReporter: () -> MessageReporter
+        get() {
+            if (_messageReporter == null) {
+                _messageReporter = { DefaultMessageReporter() }
+            }
+            return _messageReporter!!
+        }
+        set(value) {
+            _messageReporter = value
+        }
     val proxies: Map<String, String>
         get() = _proxies
     val standardSteps: Map<QName, DeclareStepInstruction>

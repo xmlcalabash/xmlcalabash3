@@ -87,7 +87,7 @@ open class HttpRequestStep(): AbstractAtomicStep() {
                 Ns.statusOnly -> statusOnly = booleanParameter(name, value)
                 Ns.suppressCookies -> suppressCookies = booleanParameter(name, value)
                 Ns.sendBodyAnyway -> sendBodyAnyway = booleanParameter(name, value)
-                else -> logger.debug { "Unexpected http-request parameter: ${name}"}
+                else -> stepConfig.debug { "Unexpected http-request parameter: ${name}"}
             }
         }
 
@@ -97,7 +97,7 @@ open class HttpRequestStep(): AbstractAtomicStep() {
                 "password" -> password = stringAuth(name, value)
                 "auth-method" -> authmethod = stringAuth(name, value).lowercase()
                 "send-authorization" -> sendauth = booleanAuth(name, value)
-                else -> logger.debug { "Unexpected http-request authentication parameter: ${name}"}
+                else -> stepConfig.debug { "Unexpected http-request authentication parameter: ${name}"}
             }
         }
 

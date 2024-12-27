@@ -14,7 +14,8 @@ import com.xmlcalabash.runtime.parameters.StepParameters
 import com.xmlcalabash.tracing.DetailTraceListener
 import com.xmlcalabash.tracing.StandardTraceListener
 import com.xmlcalabash.tracing.TraceListener
-import com.xmlcalabash.util.MessageReporter
+import com.xmlcalabash.api.MessageReporter
+import com.xmlcalabash.util.SchematronAssertions
 import com.xmlcalabash.util.SchematronMonitor
 import net.sf.saxon.s9api.QName
 import java.net.URI
@@ -39,6 +40,7 @@ class PipelineContext(compilerContext: PipelineCompilerContext): PipelineEnviron
     override val version = "3.0"
     override val xpathVersion = "3.1"
     override var uniqueInlineUris = compilerContext.uniqueInlineUris
+    override var assertions: SchematronAssertions = xmlCalabash.xmlCalabashConfig.assertions
 
     private var _documentManager = compilerContext.documentManager
     private var _mimeTypes = compilerContext.mimeTypes

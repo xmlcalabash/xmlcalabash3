@@ -84,7 +84,7 @@ class OsExec(): AbstractAtomicStep() {
             builder.directory(File(cwd))
         }
 
-        logger.debug { "Exec: ${showCmd}" }
+        stepConfig.debug { "OS exec: ${showCmd}" }
 
         try {
             val process = builder.start()

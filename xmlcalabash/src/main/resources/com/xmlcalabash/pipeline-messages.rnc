@@ -1,0 +1,31 @@
+default namespace = "http://xmlcalabash.com/ns/extensions"
+namespace cx = "http://xmlcalabash.com/ns/extensions"
+namespace db = "http://docbook.org/ns/docbook"
+
+start = cx.messages
+
+cx.messages =
+    element cx:messages {
+        cx.message*
+    }
+
+cx.message =
+    element cx:message {
+        [ db:purpose
+              [ "The logging level." ]
+        ]
+        attribute level { "TRACE" | "DEBUG" | "PROGRESS" | "INFO" | "WARN" | "ERROR" },
+        [ db:purpose
+              [ "The message text." ]
+        ]
+        attribute message { text },
+        [ db:purpose
+              [ "The message timestamp (local time)." ]
+        ]
+        attribute date { xsd:dateTime },
+        [ db:purpose
+              [ "Any additional attributes are allowed." ]
+        ]
+        attribute * { text }, 
+        empty
+    }

@@ -9,7 +9,7 @@ class Location(private val uri: URI?, lineNo: Int?, colNo: Int?) {
         val NULL = Location(null, null, null)
     }
 
-    val baseURI: URI? = uri
+    val baseUri: URI? = uri
     var _lineNumber: Int = lineNo ?: -1
     val lineNumber: Int = _lineNumber
     var _columnNumber: Int = colNo ?: -1

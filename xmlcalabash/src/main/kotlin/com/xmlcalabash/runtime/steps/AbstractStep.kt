@@ -60,7 +60,7 @@ abstract class AbstractStep(val stepConfig: XProcStepConfiguration, step: StepMo
 
     internal fun checkInputPort(port: String, doc: XProcDocument, flange: RuntimePort?): XProcError? {
         if (flange == null) {
-            logger.warn { "Unexpected input port: ${port} on ${this}" }
+            stepConfig.warn { "Unexpected input port: ${port} on ${this}" }
             return null
         }
 
@@ -84,7 +84,7 @@ abstract class AbstractStep(val stepConfig: XProcStepConfiguration, step: StepMo
 
     internal fun checkInputPort(port: String, flange: RuntimePort?): XProcError? {
         if (flange == null) {
-            logger.warn { "Unexpected input port: ${port} on ${this}" }
+            stepConfig.warn { "Unexpected input port: ${port} on ${this}" }
             return null
         }
 
@@ -99,7 +99,7 @@ abstract class AbstractStep(val stepConfig: XProcStepConfiguration, step: StepMo
 
     internal fun checkOutputPort(port: String, doc: XProcDocument, flange: RuntimePort?) {
         if (flange == null) {
-            logger.warn { "Unexpected output port: ${port} on ${this}" }
+            stepConfig.warn { "Unexpected output port: ${port} on ${this}" }
             return
         }
 
@@ -125,8 +125,7 @@ abstract class AbstractStep(val stepConfig: XProcStepConfiguration, step: StepMo
     }
 
     open fun runStep() {
-        logger.debug { "Running ${this}" }
-        stepConfig.environment.messageReporter.progress { "Running ${this}" }
+        stepConfig.progress { "Running ${this}" }
 
         try {
             prepare()
@@ -240,18 +239,6 @@ abstract class AbstractStep(val stepConfig: XProcStepConfiguration, step: StepMo
             }
         }
     }
-
-    /*
-    protected fun testAssertion(schema: XdmNode, doc: XProcDocument) {
-        val validator = SchematronImpl(stepConfig)
-        if (doc.value is XdmNode) {
-            val result = validator.test(doc.value as XdmNode, schema)
-            println(result)
-        } else {
-            logger.warn { "Cannot apply Schematron to non-XML documents" }
-        }
-    }
-     */
 
     override fun toString(): String {
         return "${type}/${name} (${id})"

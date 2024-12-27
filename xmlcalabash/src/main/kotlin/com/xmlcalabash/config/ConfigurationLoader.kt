@@ -33,24 +33,24 @@ class ConfigurationLoader private constructor(private val config: XmlCalabashCon
         private val ccMimetype = QName(ns, "cc:mimetype")
         private val ccSendmail = QName(ns, "cc:send-mail")
         private val ccPagedMedia = QName(ns, "cc:paged-media")
-        private val _debug = QName("debug")
-        private val _licensed = QName("licensed")
-        private val _verbosity = QName("verbosity")
-        private val _saxonConfiguration = QName("saxon-configuration")
-        private val _value = QName("value")
-        private val _scheme = QName("scheme")
-        private val _uri = QName("uri")
         private val _count = QName("count")
-        private val _trimWhitespace = QName("trim-whitespace")
+        private val _cssFormatter = QName("css-formatter")
         private val _dot = QName("dot")
         private val _extensions = QName("extensions")
         private val _host = QName("host")
-        private val _port = QName("port")
-        private val _username = QName("username")
-        private val _password = QName("password")
+        private val _licensed = QName("licensed")
         private val _mpt = QName("mpt")
+        private val _password = QName("password")
+        private val _port = QName("port")
+        private val _saxonConfiguration = QName("saxon-configuration")
+        private val _scheme = QName("scheme")
+        private val _trimWhitespace = QName("trim-whitespace")
+        private val _uri = QName("uri")
+        private val _username = QName("username")
+        private val _value = QName("value")
+        private val _verbosity = QName("verbosity")
         private val _xslFormatter = QName("xsl-formatter")
-        private val _cssFormatter = QName("css-formatter")
+        private val _messageBufferSize = QName("message-buffer-size")
 
         fun load(source: File): XmlCalabashConfiguration {
             return load(source, DefaultXmlCalabashConfiguration())
@@ -129,6 +129,14 @@ class ConfigurationLoader private constructor(private val config: XmlCalabashCon
 
         config.licensed = booleanAttribute(root.getAttributeValue(_licensed), "licensed")
         config.verbosity = verbosityAttribute(root.getAttributeValue(_verbosity))
+
+        if (root.getAttributeValue(_messageBufferSize) != null) {
+            try {
+                config.messageBufferSize = root.getAttributeValue(_messageBufferSize)!!.toInt()
+            } catch (_: NumberFormatException) {
+                throw XProcError.xiConfigurationInvalid(configFile, "message-buffer-size is not an integer").exception()
+            }
+        }
 
         for (child in root.axisIterator(Axis.CHILD)) {
             when (child.nodeKind) {

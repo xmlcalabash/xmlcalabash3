@@ -1,11 +1,12 @@
 package com.xmlcalabash.util
 
+import com.xmlcalabash.runtime.XProcStepConfiguration
 import net.sf.saxon.lib.ErrorReporter
 import net.sf.saxon.s9api.XmlProcessingError
 import net.sf.saxon.tree.AttributeLocation
 import org.apache.logging.log4j.kotlin.logger
 
-class ErrorLogger: ErrorReporter {
+class ErrorLogger(val stepConfig: XProcStepConfiguration): ErrorReporter {
     override fun report(error: XmlProcessingError?) {
         if (error == null) {
             return
@@ -28,7 +29,7 @@ class ErrorLogger: ErrorReporter {
                     sb.append(" column ${loc.columnNumber}")
                 }
             }
-            logger.debug { sb.toString() }
+            stepConfig.debug { sb.toString() }
         }
 
         val sb = StringBuilder()
@@ -39,6 +40,6 @@ class ErrorLogger: ErrorReporter {
             sb.append(error.errorCode.toString()).append(" ")
         }
         sb.append(error.message)
-        logger.debug { sb.toString() }
+        stepConfig.debug { sb.toString() }
     }
 }

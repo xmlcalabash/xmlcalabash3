@@ -87,8 +87,7 @@ abstract class AbstractAtomicStep(): XProcStep {
     }
 
     override fun run() {
-        stepConfig.environment.messageReporter.progress { "Running ${this} (${stepParams.stepName}/${nodeId})" }
-        logger.debug { "Running ${this} (${stepParams.stepName}/${nodeId})" }
+        stepConfig.progress { "Running ${this} (${stepParams.stepName}/${nodeId})" }
     }
 
     override fun abort() {

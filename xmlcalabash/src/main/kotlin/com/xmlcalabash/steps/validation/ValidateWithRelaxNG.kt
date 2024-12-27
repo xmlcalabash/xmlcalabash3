@@ -41,7 +41,7 @@ open class ValidateWithRelaxNG(): AbstractAtomicStep() {
         }
 
         val report = Errors(stepConfig, reportFormat)
-        val listener = CachingErrorListener(report)
+        val listener = CachingErrorListener(stepConfig, report)
         val properties = PropertyMapBuilder()
         properties.put(ValidateProperty.ERROR_HANDLER, listener)
         //properties.put(ValidateProperty.URI_RESOLVER, ...)

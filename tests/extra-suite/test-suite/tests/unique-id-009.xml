@@ -22,8 +22,8 @@
     <p:declare-step version="3.0"
                     xmlns:cx="http://xmlcalabash.com/ns/extensions"
                     xmlns:p="http://www.w3.org/ns/xproc">
-      <p:output port="result"/>
       <p:import href="https://xmlcalabash.com/ext/library/unique-id.xpl"/>
+      <p:output port="result"/>
       <cx:unique-id match="/*/@typeid" flavor="typeid">
         <p:with-input>
           <doc typeid=""/>

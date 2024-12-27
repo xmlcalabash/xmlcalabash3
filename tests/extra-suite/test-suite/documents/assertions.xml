@@ -1,0 +1,30 @@
+<p:pipeinfo xmlns:p="http://www.w3.org/ns/xproc"
+            xmlns:s="http://purl.oclc.org/dsdl/schematron">
+  <s:schema queryBinding="xslt2" xml:id="input-correct">
+    <s:pattern>
+      <s:rule context="/">
+        <s:report test="doc">The source document is a doc</s:report>
+        <s:assert test="doc">The source document is not a doc</s:assert>
+      </s:rule>
+    </s:pattern>
+  </s:schema>
+
+  <s:schema queryBinding="xslt2" xml:id="output-correct">
+    <s:pattern>
+      <s:rule context="/">
+        <s:report test="doc">The result document is a doc</s:report>
+        <s:assert test="doc">The result document is not a doc</s:assert>
+      </s:rule>
+    </s:pattern>
+  </s:schema>
+
+  <!-- This doesn't work and I don't know if it can be made to work. -->
+  <s:schema queryBinding="xslt3" xml:id="correct-map">
+    <s:pattern>
+      <s:rule context=".[. instance of map(*)]">
+        <s:report test="true()">The result document is a doc</s:report>
+      </s:rule>
+    </s:pattern>
+  </s:schema>
+</p:pipeinfo>
+

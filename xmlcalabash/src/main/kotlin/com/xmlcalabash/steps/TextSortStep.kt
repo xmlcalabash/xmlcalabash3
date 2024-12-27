@@ -34,7 +34,7 @@ open class TextSortStep(): AbstractTextStep() {
 
         // We accidentally published collations starting with https://www.w3.org/ in the specs :-(
         if (collation != null && collation.startsWith("https://www.w3.org/")) {
-            logger.info("Fixing invalid collation: ${collation}")
+            stepConfig.info { "Fixing invalid collation: ${collation}" }
             collation = "http:${collation.substring(6)}"
         }
 
@@ -80,7 +80,7 @@ open class TextSortStep(): AbstractTextStep() {
         val bais = ByteArrayInputStream(xsl.toByteArray(StandardCharsets.UTF_8))
 
         try {
-            val errorReporter = ErrorLogger()
+            val errorReporter = ErrorLogger(stepConfig)
             val compiler = stepConfig.processor.newXsltCompiler()
             compiler.resourceResolver = stepConfig.environment.documentManager
             compiler.setErrorReporter(errorReporter)

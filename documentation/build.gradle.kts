@@ -167,9 +167,22 @@ val rngArchiveManifestSchema = tasks.register<RelaxNGTranslateTask>("rngArchiveM
   outputType("rng")
 }              
 
+val rngPipelineMessagesSchema = tasks.register<RelaxNGTranslateTask>("rngPipelineMessagesSchema") {
+  inputs.file(
+      layout.projectDirectory.file("../xmlcalabash/src/main/resources/com/xmlcalabash/pipeline-messages.rnc"))
+  outputs.file(layout.buildDirectory.file("pipeline-messages.rng"))
+
+  input(
+      layout.projectDirectory.file("../xmlcalabash/src/main/resources/com/xmlcalabash/pipeline-messages.rnc"))
+  output(layout.buildDirectory.file("pipeline-messages.rng").get().asFile)
+  inputType("rnc")
+  outputType("rng")
+}              
+
 val xincludeReference = tasks.register<SaxonXsltTask>("xincludeReference") {
   dependsOn("makeExamples")
   dependsOn(rngArchiveManifestSchema)
+  dependsOn(rngPipelineMessagesSchema)
 
   inputs.file(rngArchiveManifestSchema.get().outputs.getFiles().getSingleFile())
   inputs.dir(layout.buildDirectory.dir("examples"))
@@ -526,6 +539,7 @@ val exampleConfig = mapOf<String,Map<String,String>>(
     "add-xml-base-001.xpl" to mapOf(),
     "delete-001.xpl" to mapOf("input" to "default-input.xml", "diff" to "default-input.xml"),
     "delete-002.xpl" to mapOf("input" to "default-input.xml", "diff" to "default-input.xml"),
+    "messages.xpl" to mapOf("input" to "default-input.xml"),
 )
 
 for ((example,options) in exampleConfig) {
@@ -541,12 +555,12 @@ for ((example,options) in exampleConfig) {
     outputs.file(outputFile)
 
     if ("input" in options) {
-      args("--debug", "--config:${layout.projectDirectory.file("tools/xmlcalabash3.xml")}",
+      args("--config:${layout.projectDirectory.file("tools/xmlcalabash3.xml")}",
            "-i:source=${layout.projectDirectory.file("src/examples/xml/${options["input"]!!}")}",
            "-o:result=${outputFile.get().asFile}",
            "${inputFile}")
     } else {
-      args("--debug", "--config:${layout.projectDirectory.file("tools/xmlcalabash3.xml")}",
+      args("--config:${layout.projectDirectory.file("tools/xmlcalabash3.xml")}",
            "-o:result=${outputFile.get().asFile}",
            "${inputFile}")
     }

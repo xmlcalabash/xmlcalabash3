@@ -41,6 +41,7 @@ class XProcRuntime private constructor(internal val start: DeclareStepInstructio
         val impl = XProcStepConfigurationImpl(config.environment, instructionConfig.saxonConfig.newConfiguration(), instructionConfig.location)
         impl.putAllNamespaces(instructionConfig.inscopeNamespaces)
         impl.putAllStepTypes(instructionConfig.inscopeStepTypes)
+        impl.stepName = instructionConfig.stepName
         return impl
     }
 

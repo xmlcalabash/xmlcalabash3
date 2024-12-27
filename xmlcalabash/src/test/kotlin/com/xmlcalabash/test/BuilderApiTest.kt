@@ -257,8 +257,6 @@ class BuilderApiTest {
         val declStep = builder.newDeclareStep()
         declStep.name = "main"
         declStep.version = 3.1
-        declStep.input("source")
-        declStep.output("result")
 
         //declStep.debugPipelineAfter = "/tmp/pipeline.xml"
         //declStep.debugPipelineGraph = "/tmp/graph.xml"
@@ -274,6 +272,9 @@ class BuilderApiTest {
         tstep.atomicStep(NsP.identity)
 
         declStep.import(library)
+
+        declStep.input("source")
+        declStep.output("result")
 
         val testStep = declStep.atomicStep(test_test, "test")
         val wrap = declStep.atomicStep(NsP.wrapSequence, "wrap")
@@ -347,16 +348,18 @@ class BuilderApiTest {
 
         val decl = builder.newDeclareStep()
         decl.version = 3.1
-        decl.input("source")
-        decl.output("result")
 
-        val test = decl.declareStep()
+        val test = builder.newDeclareStep()
+        test.version = 3.1
         test.type = test_test1
         test.input("source")
         test.output("result")
         test.atomicStep(NsP.identity)
 
         decl.import(test)
+
+        decl.input("source")
+        decl.output("result")
 
         decl.atomicStep(test_test1)
 
@@ -383,8 +386,6 @@ class BuilderApiTest {
 
         val decl = builder.newDeclareStep()
         decl.version = 3.1
-        decl.input("source")
-        decl.output("result")
 
         //decl.debugPipelineAfter = "/tmp/pipeline.xml"
         //decl.debugPipelineGraph = "/tmp/graph.xml"
@@ -398,6 +399,9 @@ class BuilderApiTest {
         test.atomicStep(NsP.identity)
 
         decl.import(test)
+
+        decl.input("source")
+        decl.output("result")
 
         decl.atomicStep(test_test1)
 
@@ -424,8 +428,6 @@ class BuilderApiTest {
 
         val decl = builder.newDeclareStep()
         decl.version = 3.1
-        decl.input("source")
-        decl.output("result")
 
         val library = builder.newLibrary()
 
@@ -438,6 +440,9 @@ class BuilderApiTest {
         test.atomicStep(NsP.identity)
 
         decl.import(test)
+
+        decl.input("source")
+        decl.output("result")
 
         decl.atomicStep(test_test1)
 
@@ -464,8 +469,6 @@ class BuilderApiTest {
         val test_test2 = QName(testns, "test:test2")
 
         val decl = builder.newDeclareStep()
-        decl.input("source")
-        decl.output("result")
 
         val library1 = builder.newLibrary()
         library1.stepConfig.updateWith(URI("http://example.com/library1"))
@@ -488,6 +491,9 @@ class BuilderApiTest {
         test2.atomicStep(NsP.identity)
 
         decl.import(library1)
+
+        decl.input("source")
+        decl.output("result")
 
         decl.atomicStep(test_test1)
         decl.atomicStep(test_test2)

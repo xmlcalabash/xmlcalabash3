@@ -1,7 +1,6 @@
 package com.xmlcalabash.runtime
 
 import com.xmlcalabash.config.SaxonConfiguration
-import com.xmlcalabash.runtime.XProcStepConfiguration
 import com.xmlcalabash.config.XmlCalabash
 import com.xmlcalabash.datamodel.DeclareStepInstruction
 import com.xmlcalabash.datamodel.Location
@@ -13,41 +12,18 @@ import com.xmlcalabash.namespace.Ns
 import com.xmlcalabash.namespace.NsErr
 import com.xmlcalabash.namespace.NsFn
 import com.xmlcalabash.namespace.NsXs
+import com.xmlcalabash.util.Verbosity
 import net.sf.saxon.event.ReceiverOption
 import net.sf.saxon.expr.parser.XPathParser
 import net.sf.saxon.ma.arrays.ArrayItemType
 import net.sf.saxon.ma.map.MapItem
 import net.sf.saxon.ma.map.MapType
-import net.sf.saxon.om.AttributeInfo
-import net.sf.saxon.om.AttributeMap
-import net.sf.saxon.om.EmptyAttributeMap
-import net.sf.saxon.om.FingerprintedQName
-import net.sf.saxon.om.NamespaceUri
+import net.sf.saxon.om.*
 import net.sf.saxon.s9api.*
+import net.sf.saxon.s9api.SequenceType
 import net.sf.saxon.sxpath.IndependentContext
 import net.sf.saxon.type.BuiltInAtomicType
-import net.sf.saxon.value.AnyURIValue
-import net.sf.saxon.value.AtomicValue
-import net.sf.saxon.value.Base64BinaryValue
-import net.sf.saxon.value.BooleanValue
-import net.sf.saxon.value.DateTimeValue
-import net.sf.saxon.value.DateValue
-import net.sf.saxon.value.DayTimeDurationValue
-import net.sf.saxon.value.DecimalValue
-import net.sf.saxon.value.DoubleValue
-import net.sf.saxon.value.DurationValue
-import net.sf.saxon.value.FloatValue
-import net.sf.saxon.value.GDayValue
-import net.sf.saxon.value.GMonthDayValue
-import net.sf.saxon.value.GMonthValue
-import net.sf.saxon.value.GYearMonthValue
-import net.sf.saxon.value.GYearValue
-import net.sf.saxon.value.HexBinaryValue
-import net.sf.saxon.value.Int64Value
-import net.sf.saxon.value.QNameValue
-import net.sf.saxon.value.StringValue
-import net.sf.saxon.value.TimeValue
-import net.sf.saxon.value.YearMonthDurationValue
+import net.sf.saxon.value.*
 import java.net.URI
 
 open class XProcStepConfigurationImpl internal constructor(
@@ -87,7 +63,7 @@ open class XProcStepConfigurationImpl internal constructor(
         }
 
     override val baseUri: URI?
-        get() = _location.baseURI
+        get() = _location.baseUri
 
     private var _nextId: String? = null
     override val nextId: String
@@ -97,6 +73,47 @@ open class XProcStepConfigurationImpl internal constructor(
             }
             return _nextId!!
         }
+
+    override fun error(message: () -> String) {
+        report(Verbosity.ERROR, emptyMap(), message)
+    }
+
+    override fun warn(message: () -> String) {
+        report(Verbosity.WARN, emptyMap(), message)
+    }
+
+    override fun info(message: () -> String) {
+        report(Verbosity.INFO, emptyMap(), message)
+    }
+
+    override fun progress(message: () -> String) {
+        report(Verbosity.PROGRESS, emptyMap(), message)
+    }
+
+    override fun debug(message: () -> String) {
+        report(Verbosity.DEBUG, emptyMap(), message)
+    }
+
+    override fun trace(message: () -> String) {
+        report(Verbosity.TRACE, emptyMap(), message)
+    }
+
+    fun report(verbosity: Verbosity, extraAttributes: Map<QName, String>, message: () -> String) {
+        val extra = mutableMapOf<QName, String>()
+        extra.putAll(extraAttributes)
+
+        if (_stepName != null && !stepName.startsWith("!")) {
+            extra[Ns.stepName] = stepName
+        }
+        baseUri?.let { extra[Ns.baseUri] = "${it}" }
+        if (location.lineNumber > 0) {
+            extra[Ns.lineNumber] = "${location.lineNumber}"
+        }
+        if (location.columnNumber > 0) {
+            extra[Ns.columnNumber] = "${location.columnNumber}"
+        }
+        environment.messageReporter.report(verbosity, extra, message)
+    }
 
     override fun copy(): XProcStepConfiguration {
         val copy = XProcStepConfigurationImpl(environment, saxonConfig, location)

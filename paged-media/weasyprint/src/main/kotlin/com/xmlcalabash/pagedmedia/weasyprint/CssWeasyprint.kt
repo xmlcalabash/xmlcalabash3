@@ -126,7 +126,7 @@ class CssWeasyprint: CssProcessor {
 
     override fun addStylesheet(document: XProcDocument) {
         if (document.contentType == null || !document.contentType!!.textContentType()) {
-            logger.error("Ignoring non-text CSS sytlesheet: ${document.baseURI}")
+            stepConfig.error { "Ignoring non-text CSS sytlesheet: ${document.baseURI}" }
             return
         }
 
@@ -134,7 +134,7 @@ class CssWeasyprint: CssProcessor {
         temp.deleteOnExit()
         tempFiles.add(temp)
 
-        logger.debug { "css-formatter css: ${temp.absolutePath}" }
+        stepConfig.debug { "css-formatter css: ${temp.absolutePath}" }
 
         val cssout = PrintStream(temp)
         cssout.print(document.value.underlyingValue.stringValue)
@@ -194,7 +194,7 @@ class CssWeasyprint: CssProcessor {
 
         commandLine.add(tempXml.absolutePath)
 
-        logger.debug { "css-formatter source: ${tempXml.absolutePath}" }
+        stepConfig.debug { "css-formatter source: ${tempXml.absolutePath}" }
 
         val serializer = XProcSerializer(stepConfig)
         val fos = FileOutputStream(tempXml)
@@ -209,7 +209,7 @@ class CssWeasyprint: CssProcessor {
         val stdout = ByteArrayOutputStream()
         val stderr = ByteArrayOutputStream()
 
-        logger.debug { commandLine.joinToString(" ") }
+        stepConfig.debug { commandLine.joinToString(" ") }
 
         //println("RUN: ${commandLine.joinToString(" ")}")
 

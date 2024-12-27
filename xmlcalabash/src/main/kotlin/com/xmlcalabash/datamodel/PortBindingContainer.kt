@@ -142,7 +142,7 @@ open class PortBindingContainer(parent: XProcInstruction, stepConfig: Instructio
                 }
             }
             if (!acceptsSomething) {
-                logger.debug { "Content type constraints on port '${port}' excludes all documents" }
+                stepConfig.debug { "Content type constraints on port '${port}' excludes all documents" }
             }
         }
 
@@ -217,15 +217,14 @@ open class PortBindingContainer(parent: XProcInstruction, stepConfig: Instructio
                             if (schema != null) {
                                 schematron.add(schema)
                             } else {
-                                logger.warn { "Error: cx:assertion references non-existint schema: ${id}"}
+                                stepConfig.warn { "Error: cx:assertion references non-existant schema: ${id}"}
                             }
                         } else {
-                            logger.warn { "The cx:assertions values must be strings: ${assertions}" }
+                            stepConfig.warn { "The cx:assertions values must be strings: ${assertions}" }
                         }
                     }
                 } catch (ex: Exception) {
-                    logger.warn { "Failed to parse cx:assertion: ${assertions}" }
-                    logger.warn { "  ${ex.message ?: "No explanation"}" }
+                    stepConfig.warn { "Failed to parse cx:assertion: ${assertions}: ${ex.message ?: "No explanation"}" }
                 }
             }
         }

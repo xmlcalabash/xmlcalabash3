@@ -69,7 +69,7 @@ class FoAH(): AbstractAH(), FoProcessor {
         val temp = File.createTempFile("xmlcalabash-ahfo", ".xml")
         temp.deleteOnExit()
 
-        logger.debug { "xsl-formatter source: ${temp.absolutePath}" }
+        stepConfig.debug { "xsl-formatter source: ${temp.absolutePath}" }
 
         // AH won't parse HTML
         val sourceContentType = document.contentType ?: MediaType.OCTET_STREAM

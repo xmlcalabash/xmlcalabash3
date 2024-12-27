@@ -26,6 +26,7 @@ val fopRelease by configurations.dependencyScope("fopRelease")
 val uniqueidRelease by configurations.dependencyScope("uniqueidRelease")
 val metadataextractorRelease by configurations.dependencyScope("metadataextractorRelease")
 val cacheRelease by configurations.dependencyScope("cacheRelease")
+val pipelineMessagesRelease by configurations.dependencyScope("pipelineMessagesRelease")
 //val polyglotRelease by configurations.dependencyScope("polyglotRelease")
 
 val dep_slf4j = project.findProperty("slf4j").toString()
@@ -49,6 +50,8 @@ dependencies {
                                          "configuration" to "releaseArtifacts")))
   cacheRelease(project(mapOf("path" to ":ext:cache",
                              "configuration" to "releaseArtifacts")))
+  pipelineMessagesRelease(project(mapOf("path" to ":ext:pipeline-messages",
+                                        "configuration" to "releaseArtifacts")))
 //  polyglotRelease(project(mapOf("path" to ":ext:polyglot",
 //                                "configuration" to "releaseArtifacts")))
 
@@ -61,6 +64,7 @@ dependencies {
   implementation(project(":ext:unique-id"))
   implementation(project(":ext:metadata-extractor"))
   implementation(project(":ext:cache"))
+  implementation(project(":ext:pipeline-messages"))
 //  implementation(project(":ext:polyglot"))
 
   implementation("org.slf4j:slf4j-api:${dep_slf4j}")
@@ -92,6 +96,9 @@ val metadataextractorJar = configurations.resolvable("metadataextractorJar") {
 }
 val cacheJar = configurations.resolvable("cacheJar") {
   extendsFrom(cacheRelease)
+}
+val pipelineMessagesJar = configurations.resolvable("pipelineMessagesJar") {
+  extendsFrom(pipelineMessagesRelease)
 }
 //val polyglotJar = configurations.resolvable("polyglotJar") {
 //  extendsFrom(polyglotRelease)
@@ -160,6 +167,7 @@ tasks.register("stage-release") {
   inputs.files(uniqueidJar)
   inputs.files(metadataextractorJar)
   inputs.files(cacheJar)
+  inputs.files(pipelineMessagesJar)
 //  inputs.files(polyglotJar)
   dependsOn("jar")
 
@@ -244,6 +252,12 @@ tasks.register("stage-release") {
   doLast {
     copy {
       from(cacheJar)
+      into(layout.buildDirectory.dir("stage/lib"))
+    }
+  }
+  doLast {
+    copy {
+      from(pipelineMessagesJar)
       into(layout.buildDirectory.dir("stage/lib"))
     }
   }

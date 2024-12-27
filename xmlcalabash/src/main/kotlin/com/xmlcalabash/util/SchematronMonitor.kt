@@ -4,6 +4,7 @@ import com.xmlcalabash.datamodel.DeclareStepInstruction
 import com.xmlcalabash.datamodel.LibraryInstruction
 import com.xmlcalabash.datamodel.StepDeclaration
 import com.xmlcalabash.datamodel.XProcInstruction
+import com.xmlcalabash.documents.XProcBinaryDocument
 import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.namespace.Ns
@@ -20,6 +21,7 @@ import net.sf.saxon.s9api.Axis
 import net.sf.saxon.s9api.XdmMap
 import net.sf.saxon.s9api.XdmNode
 import net.sf.saxon.s9api.XdmNodeKind
+import net.sf.saxon.s9api.XdmValue
 import net.sf.saxon.value.StringValue
 import org.apache.logging.log4j.kotlin.logger
 
@@ -48,11 +50,11 @@ class SchematronMonitor(): Monitor {
                 for (child in info.axisIterator(Axis.CHILD)) {
                     if (child.nodeKind == XdmNodeKind.ELEMENT && child.nodeName == NsS.schema) {
                         if (child.getAttributeValue(NsXml.id) == null) {
-                            logger.warn { "Ignoring schematron schema without xml:id"}
+                            step.stepConfig.warn { "Ignoring schematron schema without xml:id"}
                         } else {
                             val id = child.getAttributeValue(NsXml.id)!!
                             if (schematron.containsKey(id)) {
-                                logger.warn { "Error: duplicate xml:id in schematron schemas"}
+                                step.stepConfig.warn { "Error: duplicate xml:id in schematron schemas"}
                             } else {
                                 schematron.put(id, child)
                             }
@@ -86,14 +88,14 @@ class SchematronMonitor(): Monitor {
                     for ((port, ids) in assertions) {
                         val portBinding = step.namedInput(port) ?: step.namedOutput(port)
                         if (portBinding == null) {
-                            logger.warn { "Error: cx:assertion on non-existant port: $port" }
+                            step.stepConfig.warn { "Error: cx:assertion on non-existant port: $port" }
                         } else {
                             for (id in ids) {
                                 val schema = schematron[id]
                                 if (schema != null) {
                                     portBinding.schematron.add(schema)
                                 } else {
-                                    logger.warn { "Error: cx:assertion references non-existint schema: ${id}"}
+                                    step.stepConfig.warn { "Error: cx:assertion references non-existant schema: ${id}"}
                                 }
                             }
                         }
@@ -111,7 +113,7 @@ class SchematronMonitor(): Monitor {
                 val selector = exec.load()
                 val value = selector.evaluate()
                 if (value !is XdmMap) {
-                    logger.warn { "The cx:assertions is not a map: ${assertions}" }
+                    step.stepConfig.warn { "The cx:assertions is not a map: ${assertions}" }
                     return emptyMap()
                 }
 
@@ -119,7 +121,7 @@ class SchematronMonitor(): Monitor {
                 val map = stepConfig.asMap(stepConfig.forceQNameKeys(value))
                 for ((name, values) in map) {
                     if (name.namespaceUri != NamespaceUri.NULL) {
-                        logger.warn { "The cx:assertions port names must be strings: ${assertions}" }
+                        step.stepConfig.warn { "The cx:assertions port names must be strings: ${assertions}" }
                         return emptyMap()
                     }
                     val port = name.localName
@@ -129,7 +131,7 @@ class SchematronMonitor(): Monitor {
                         if (value.underlyingValue is StringValue) {
                             assertionMap[port]!!.add(value.stringValue)
                         } else {
-                            logger.warn { "The cx:assertions values must be strings: ${assertions}" }
+                            step.stepConfig.warn { "The cx:assertions values must be strings: ${assertions}" }
                             return emptyMap()
                         }
                     }
@@ -137,8 +139,8 @@ class SchematronMonitor(): Monitor {
 
                 return assertionMap
             } catch (ex: Exception) {
-                logger.warn { "Failed to parse cx:assertion: ${assertions}" }
-                logger.warn { "  ${ex.message ?: "No explanation"}" }
+                step.stepConfig.warn { "Failed to parse cx:assertion: ${assertions}" }
+                step.stepConfig.warn { "  ${ex.message ?: "No explanation"}" }
                 return emptyMap()
             }
         }
@@ -244,50 +246,57 @@ class SchematronMonitor(): Monitor {
 
     private fun schematron(stepConfig: XProcStepConfiguration, stepid: String, schema: XdmNode, document: XProcDocument) {
         val validator = SchematronImpl(stepConfig)
-        if (document.value is XdmNode) {
-            val results = validator.test(document.value as XdmNode, schema)
-            if (results.isNotEmpty()) {
-                val messages = stepConfig.environment.messageReporter
-                val level = stepConfig.xmlCalabash.xmlCalabashConfig.assertions
-                for (result in results) {
-                    val location = result.getAttributeValue(Ns.location) ?: ""
-                    val test = result.getAttributeValue(Ns.test) ?: ""
-                    val text = getText(result)
-                    when (result.nodeName) {
-                        NsSvrl.successfulReport -> {
+        if (document is XProcBinaryDocument) {
+            stepConfig.info({ "Schematron assertions cannot be applied to binary documents" })
+            return
+        }
+
+        val results = if (document.value is XdmNode) {
+            validator.test(document.value as XdmNode, schema)
+        } else {
+            //validator.test(document.value, schema)
+            stepConfig.info({ "Schematron assertions can only be applied to XML and HTML documents" })
+            return
+        }
+
+        if (results.isNotEmpty()) {
+            val level = stepConfig.environment.assertions
+            for (result in results) {
+                val location = result.getAttributeValue(Ns.location) ?: ""
+                val test = result.getAttributeValue(Ns.test) ?: ""
+                val text = getText(result)
+                when (result.nodeName) {
+                    NsSvrl.successfulReport -> {
+                        if (document.baseURI != null) {
+                            stepConfig.info { "At ${location} ${stepid} in ${document.baseURI}:" }
+                        } else {
+                            stepConfig.info { "At ${location} ${stepid}:" }
+                        }
+                        stepConfig.info { "  Report ${test}: ${text}"}
+                    }
+                    NsSvrl.failedAssert -> {
+                        if (level == SchematronAssertions.WARNING) {
                             if (document.baseURI != null) {
-                                messages.info { "At ${location} ${stepid} in ${document.baseURI}:" }
+                                stepConfig.warn { "At ${location} ${stepid} in ${document.baseURI}:" }
                             } else {
-                                messages.info { "At ${location} ${stepid}:" }
+                                stepConfig.warn { "At ${location} ${stepid}:" }
                             }
-                            messages.info { "  Report ${test}: ${text}"}
-                        }
-                        NsSvrl.failedAssert -> {
-                            if (level == SchematronAssertions.WARNING) {
-                                if (document.baseURI != null) {
-                                    messages.warn { "At ${location} ${stepid} in ${document.baseURI}:" }
-                                } else {
-                                    messages.warn { "At ${location} ${stepid}:" }
-                                }
-                                messages.warn { "  Warning ${test}: ${text}" }
+                            stepConfig.warn { "  Warning ${test}: ${text}" }
+                        } else {
+                            if (document.baseURI != null) {
+                                stepConfig.error { "At ${location} ${stepid} in ${document.baseURI}:" }
                             } else {
-                                if (document.baseURI != null) {
-                                    messages.error { "At ${location} ${stepid} in ${document.baseURI}:" }
-                                } else {
-                                    messages.error { "At ${location} ${stepid}:" }
-                                }
-                                messages.error { " Error ${test} : ${text}" }
-                                throw XProcError.xiAssertionFailed("${test} : ${text}").exception()
+                                stepConfig.error { "At ${location} ${stepid}:" }
                             }
+                            stepConfig.error { " Error ${test} : ${text}" }
+                            throw XProcError.xiAssertionFailed("${test} : ${text}").exception()
                         }
-                        else -> {
-                            logger.warn { "Unexpected assertion result: ${result.nodeName}" }
-                        }
+                    }
+                    else -> {
+                        stepConfig.warn { "Unexpected assertion result: ${result.nodeName}" }
                     }
                 }
             }
-        } else {
-            logger.info { "Schematron assertions on ports only apply to nodes" }
         }
     }
 

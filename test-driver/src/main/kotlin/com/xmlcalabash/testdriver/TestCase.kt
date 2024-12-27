@@ -1,17 +1,29 @@
 package com.xmlcalabash.testdriver
 
+import com.xmlcalabash.datamodel.Location
 import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.exceptions.XProcException
 import com.xmlcalabash.namespace.Ns
+import com.xmlcalabash.namespace.NsCx
+import com.xmlcalabash.namespace.NsCx.xmlCalabash
+import com.xmlcalabash.namespace.NsErr
 import com.xmlcalabash.namespace.NsXs
+import com.xmlcalabash.runtime.PipelineContext
+import com.xmlcalabash.runtime.XProcStepConfigurationImpl
 import com.xmlcalabash.util.*
+import net.sf.saxon.event.ReceiverOption
 import net.sf.saxon.expr.parser.ExpressionTool
 import net.sf.saxon.expr.parser.ExpressionVisitor
 import net.sf.saxon.expr.parser.RoleDiagnostic
 import net.sf.saxon.expr.parser.Token
+import net.sf.saxon.om.AttributeInfo
+import net.sf.saxon.om.AttributeMap
+import net.sf.saxon.om.EmptyAttributeMap
+import net.sf.saxon.om.FingerprintedQName
 import net.sf.saxon.om.NamespaceUri
 import net.sf.saxon.s9api.*
+import net.sf.saxon.type.BuiltInAtomicType
 import org.apache.logging.log4j.kotlin.logger
 import org.xml.sax.InputSource
 import java.io.ByteArrayOutputStream
@@ -71,6 +83,7 @@ class TestCase(val suite: TestSuite, val testFile: File) {
     var elapsedSeconds: Double = -1.0
     var stderrOutput = ""
     var stdoutOutput = ""
+    var messages: XdmNode? = null
 
     var stdoutBais: ByteArrayOutputStream? = null
     var stderrBais: ByteArrayOutputStream? = null
@@ -116,6 +129,7 @@ class TestCase(val suite: TestSuite, val testFile: File) {
             setupFileEnvironment(fileEnvironment!!)
         }
 
+        lateinit var messageReporter: BufferingMessageReporter
         try {
             println(testFile.absolutePath)
 
@@ -131,8 +145,18 @@ class TestCase(val suite: TestSuite, val testFile: File) {
             treeBuilder.endDocument()
             val document = treeBuilder.result
 
+            messageReporter = BufferingMessageReporter(LoggingMessageReporter())
+
             val decl = parser.parse(document)
             val runtime = decl.runtime()
+
+            messageReporter = runtime.environment.messageReporter as BufferingMessageReporter
+
+            // Something of a hack...
+            if (expected == "fail" && errorCodes.contains(NsErr.assertionFailed)) {
+                (runtime.environment as PipelineContext).assertions = SchematronAssertions.ERROR
+            }
+
             val pipeline = runtime.executable()
 
             if (suite.options.outputDescription != null || suite.options.outputGraph != null) {
@@ -192,7 +216,7 @@ class TestCase(val suite: TestSuite, val testFile: File) {
                 if (result.isEmpty()) {
                     listOf()
                 } else {
-                    validate(result[0].value as XdmNode)
+                    validate(result[0].value)
                 }
             } else {
                 listOf()
@@ -215,12 +239,12 @@ class TestCase(val suite: TestSuite, val testFile: File) {
                 stream.close()
                 stderrOutput += bytes.toString(StandardCharsets.UTF_8)
 
-                fail(errors)
+                fail(errors, messagesXml(messageReporter.messages(Verbosity.TRACE)))
             } else {
                 if (expected == "pass" && result.isNotEmpty()) {
                     pass()
                 } else {
-                    fail()
+                    fail(messagesXml(messageReporter.messages(Verbosity.TRACE)))
                 }
             }
         } catch (ex: XProcException) {
@@ -232,26 +256,26 @@ class TestCase(val suite: TestSuite, val testFile: File) {
                 if (ok) {
                     pass()
                 } else {
-                    fail(ex.error, errorCodes)
+                    fail(ex.error, errorCodes, messagesXml(messageReporter.messages(Verbosity.TRACE)))
                 }
             } else {
                 if (singleTest) {
                     ex.printStackTrace()
                 }
-                fail(ex.error)
+                fail(ex.error, messagesXml(messageReporter.messages(Verbosity.TRACE)))
             }
         } catch (ex: Exception) {
             if (singleTest) {
                 ex.printStackTrace()
             }
             val error = XProcError.internal(999, ex)
-            fail(error)
+            fail(error, messagesXml(messageReporter.messages(Verbosity.TRACE)))
         } catch (t: Throwable) {
             if (singleTest) {
                 t.printStackTrace()
             }
             println("CRASH! ${testFile}")
-            fail()
+            fail(messagesXml(messageReporter.messages(Verbosity.TRACE)))
         }
 
         if (features.contains("urify-windows") || features.contains("urify-non-windows")) {
@@ -303,23 +327,60 @@ class TestCase(val suite: TestSuite, val testFile: File) {
         suite.pass(this)
     }
 
-    private fun fail() {
+    private fun fail(msgxml: XdmNode) {
+        messages = msgxml
         suite.fail(this)
     }
 
-    private fun fail(error: XProcError) {
+    private fun fail(error: XProcError, msgxml: XdmNode) {
+        messages = msgxml
         suite.fail(this, error)
     }
 
-    private fun fail(errors: List<XdmNode>) {
+    private fun fail(errors: List<XdmNode>, msgxml: XdmNode) {
+        messages = msgxml
         suite.fail(this, errors)
     }
 
-    private fun fail(error: XProcError, codes: List<QName>) {
+    private fun fail(error: XProcError, codes: List<QName>, msgxml: XdmNode) {
+        messages = msgxml
         suite.fail(this, error, codes)
     }
 
-    private fun validate(doc: XdmNode): List<XdmNode> {
+    private fun messagesXml(messages: List<BufferingMessageReporter.Message>): XdmNode {
+        val builder = SaxonTreeBuilder(suite.xmlCalabash.saxonConfig.processor)
+        builder.startDocument(null)
+        builder.addStartElement(NsCx.messages)
+        for (message in messages) {
+            builder.addStartElement(NsCx.message, attributeMap(mapOf(
+                Ns.level to "${message.level}",
+                Ns.message to message.message(),
+                Ns.date to "${message.timestamp}"
+            )))
+            builder.addEndElement()
+        }
+        builder.addEndElement()
+        builder.endDocument()
+        return builder.result
+    }
+
+    fun attributeMap(attr: Map<QName, String?>): AttributeMap {
+        var map: AttributeMap = EmptyAttributeMap.getInstance()
+        for ((name, value) in attr) {
+            if (value != null) {
+                map = map.put(attributeInfo(name, value))
+            }
+        }
+        return map
+    }
+
+    private fun attributeInfo(name: QName, value: String, location: net.sf.saxon.s9api.Location? = null): AttributeInfo {
+        return AttributeInfo(fqName(name), BuiltInAtomicType.UNTYPED_ATOMIC, value, location, ReceiverOption.NONE)
+    }
+
+    private fun fqName(name: QName): FingerprintedQName = FingerprintedQName(name.prefix, name.namespaceUri, name.localName)
+
+    private fun validate(doc: XdmValue): List<XdmNode> {
         val validator = SchematronImpl(testConfig)
         return validator.test(doc, schematron!!)
     }

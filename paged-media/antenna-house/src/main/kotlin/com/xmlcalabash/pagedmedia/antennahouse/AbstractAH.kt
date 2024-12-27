@@ -53,7 +53,7 @@ abstract class AbstractAH() {
 
         for (key in options.keys) {
             if (key != _EmbedAllFontsEx && key !in stringOptions && key !in intOptions && key !in booleanOptions) {
-                logger.warn("Unsupported Antenna House XSL FO property: ${key}")
+                stepConfig.warn { "Unsupported Antenna House XSL FO property: ${key}" }
             }
         }
 
@@ -63,7 +63,7 @@ abstract class AbstractAH() {
                 "part" -> ah.setPdfEmbedAllFontsEx(XfoObj.S_PDF_EMBALLFONT_PART)
                 "base14" -> ah.setPdfEmbedAllFontsEx(XfoObj.S_PDF_EMBALLFONT_BASE14)
                 "all" -> ah.setPdfEmbedAllFontsEx(XfoObj.S_PDF_EMBALLFONT_ALL)
-                else -> logger.warn("Ignoring unknown Antennah House CSS EmbedAllFontsEx option: ${embed}")
+                else -> stepConfig.warn { "Ignoring unknown Antennah House CSS EmbedAllFontsEx option: ${embed}" }
             }
         }
 
@@ -114,14 +114,14 @@ abstract class AbstractAH() {
             }
 
             when (errorLevel) {
-                1 -> logger.info(errorMessage)
-                2 -> logger.warn(errorMessage)
-                else -> logger.error(errorMessage)
+                1 -> stepConfig.info { errorMessage }
+                2 -> stepConfig.warn { errorMessage }
+                else -> stepConfig.error { errorMessage }
             }
         }
 
         override fun onFormatPage(pageNo: Int) {
-            logger.debug("Formatted PDF page ${pageNo}")
+            stepConfig.debug { "Formatted PDF page ${pageNo}" }
         }
     }
 }

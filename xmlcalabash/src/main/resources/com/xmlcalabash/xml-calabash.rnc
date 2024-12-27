@@ -8,8 +8,8 @@ cc.xmlCalabash =
         attribute version { "1.0" }?,
         attribute saxon-configuration { text }?,
         attribute licensed { xsd:boolean }?,
-        attribute debug { xsd:boolean }?,
         attribute verbosity { "trace" | "debug" | "progress" | "info" | "warn" | "error" }?,
+        attribute message-buffer-size { xsd:integer }?,
         (cc.graphviz
         | cc.inline
         | cc.mimetype
