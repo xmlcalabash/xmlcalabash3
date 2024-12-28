@@ -50,6 +50,7 @@ object NsCx {
     val saxonEdition = QName(namespace, "saxon-edition")
     val saxonVersion = QName(namespace, "saxon-version")
     val select = QName(namespace, "cx:select")
+    val sink = QName(namespace, "cx:sink")
     val splitter = QName(namespace, "cx:splitter")
     val stackFrame = QName(namespace, "cx:stack-frame")
     val stackTrace = QName(namespace, "cx:stack-trace")

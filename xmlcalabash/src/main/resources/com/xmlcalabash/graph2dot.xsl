@@ -2,7 +2,7 @@
                 xmlns:xs="http://www.w3.org/2001/XMLSchema"
                 xmlns:g="http://xmlcalabash.com/ns/description"
                 xmlns:p="http://www.w3.org/ns/xproc"
-                xmlns:dot="http://jafpl.com/ns/dot"
+                xmlns:dot="http://xmlcalabash.com/ns/dot"
                 expand-text="yes"
                 exclude-result-prefixes="g p xs"
                 version="3.0">
@@ -130,6 +130,11 @@
   <xsl:if test="not(starts-with($edges/@from, '!foot'))">
     <dot:node xml:id="{@gid}" dot:shape="point"/>
   </xsl:if>
+</xsl:template>
+
+<xsl:template match="g:atomic[@tag='cx:sink']" priority="10">
+  <!-- If the sink was added by the graph builder, don't pretend it's a real node. -->
+  <dot:node xml:id="{@gid}" dot:shape="point"/>
 </xsl:template>
 
 <xsl:template match="g:atomic|g:subpipeline">
