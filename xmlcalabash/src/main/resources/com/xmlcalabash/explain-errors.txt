@@ -1335,6 +1335,9 @@ Impossible node type: “$1”.
 cxerr:XI0004
 Cannot cast to “$1”.
 
+cxerr:XI0005
+Failed to load resource: $1
+
 cxerr:XI0017/1
 Configuration invalid: “$1”.
 

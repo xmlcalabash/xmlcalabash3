@@ -39,7 +39,7 @@ val dep_httpClient = project.findProperty("httpClient").toString()
 val dep_jing = project.findProperty("jing").toString()
 val dep_jsonSchemaValidator = project.findProperty("jsonSchemaValidator").toString()
 val dep_graalvmJS = project.findProperty("graalvmJS").toString()
-val dep_schxslt = project.findProperty("schxslt").toString()
+val dep_schxslt2 = project.findProperty("schxslt2").toString()
 val dep_sinclude = project.findProperty("sinclude").toString()
 val dep_slf4j = project.findProperty("slf4j").toString()
 val dep_tukaaniXz = project.findProperty("tukaaniXz").toString()
@@ -50,7 +50,10 @@ dependencies {
   implementation("org.jetbrains.kotlin:kotlin-stdlib:2.0.0")
   implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.1")
   implementation("org.jetbrains.kotlin:kotlin-reflect:2.0.0")
-  implementation("name.dmaus.schxslt:schxslt:${dep_schxslt}")
+
+  // implementation("name.dmaus.schxslt:schxslt:${dep_schxslt}")
+  // The SchXslt2 transpiler is included in our resources
+
   implementation("nu.validator:htmlparser:${dep_htmlparser}")
   implementation("commons-codec:commons-codec:${dep_commonsCodec}")
 
@@ -105,6 +108,7 @@ buildConfig {
   buildConfigField("VENDOR_URI", xmlbuild.vendorUri.get())
   buildConfigField("BUILD_DATE", xmlbuild.buildDate.get())
   buildConfigField("BUILD_HASH", xmlbuild.gitHash())
+  buildConfigField("SCHXSLT2", project.findProperty("schxslt2").toString())
 
   val sb = StringBuilder()
   sb.append("mapOf(\n")
@@ -118,7 +122,7 @@ buildConfig {
                   "jing",
                   "jsonSchemaValidator",
                   "graalvmJS",
-                  "schxslt",
+                  "schxslt2",
                   "sinclude",
                   "slf4j",
                   "tukaaniXz",
