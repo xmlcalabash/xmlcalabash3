@@ -13,6 +13,122 @@ See the commits and pull requests on
 finer detail.</para>
 
 <revhistory>
+<revision xml:id="r300-alpha8">
+<revnumber>3.0.0-alpha8</revnumber>
+<date>2024-12-28</date>
+<revdescription>
+<itemizedlist>
+<listitem>
+<para>Fixed an issue where the command line interface used by the debugger was
+always a “dumb” terminal. It now supports history and editing keys.
+</para>
+</listitem>
+<listitem>
+<para>Improve the error messages associated with attempting to set inputs or
+outputs on the command line for ports that don’t exist in the pipeline.
+</para>
+</listitem>
+<listitem>
+<para>An error is now reported if <tag class="attribute">psvi-required</tag> is true but the
+processor doesn’t support XML Schema validation. (Saxon EE is required for PSVI support.)
+</para>
+</listitem>
+<listitem>
+<para>Renamed the “<literal>schema-aware</literal>” command line option and configuration
+property to “<literal>licensed</literal>”. Cleaned up the tests for schema awareness in
+several places.
+</para>
+</listitem>
+<listitem>
+<para>Added support for the <code>[p:]timeout</code> option on steps.
+</para>
+</listitem>
+<listitem>
+<para>Added support for the <literal>timeout</literal> parameter on <tag>p:http-request</tag>.
+</para>
+</listitem>
+<listitem>
+<para>Improved the error message associated with an undeclared prefix in an XPath expression.
+</para>
+</listitem>
+<listitem>
+<para>Improved the error codes reported for static errors in several places.
+</para>
+</listitem>
+<listitem>
+<para>Reworked the <interfacename>MessageReporter</interfacename> interface;
+allowed one reporter to chain to another. Added a buffering reporter to keep track
+of messages. By default the buffering reporter chains to the default reporter
+which chains to the logging reporter. The buffering reporter holds the last 32
+messages. The default reporter prints messages to the console if they have a
+level that exceeds the verbosity threshold. The logging reporter sends all
+messages to the Java logger.</para>
+<para>There’s a new <code linkend="cfg-message-buffer-size">message-buffer-size</code>
+configuration setting to set the number of messages to buffered.</para>
+</listitem>
+<listitem>
+<para>Added a new <tag>cx:pipeline-messages</tag> extension step that can
+retrieve the messages buffered by the buffering reporter.
+</para>
+</listitem>
+<listitem>
+<para>Changed the message reporter and document manager to be unique per-pipeline,
+rather than shared across multiple pipelines.</para>
+</listitem>
+<listitem>
+<para>Fixed a bug where serialization properties on <tag>p:output</tag> were not
+being applied when pipeline outputs were serialized.</para>
+</listitem>
+<listitem>
+<para>Fixed a bug where XML Calabash was failing to detect that <tag>p:import</tag>
+must precede <tag>p:input</tag> and <tag>p:output</tag>.
+Fixed that error in many of the tests in the extra test suite.</para>
+</listitem>
+<listitem>
+<para>Improved support for Schematron assertions. Assertions are now applied to non-XML
+values by first performing “cast content type” on them.
+</para>
+</listitem>
+<listitem>
+<para>Added support for a <tag class="attribute">cx:href</tag> attribute on
+<tag>p:pipeinfo</tag>. When present, the processor behaves as if the referenced
+document appeared where the reference appears. The <tag>p:pipeinfo</tag> must be
+empty and the <tag class="attribute">cx:href</tag> must point to a
+<tag>p:pipeinfo</tag> document. This makes it practical to share Schematron
+assertions across pipelines.
+</para>
+</listitem>
+<listitem>
+<para>“<link linkend="upgrading-saxon">Fixed</link>” <link xlink:href="https://github.com/xmlcalabash/xmlcalabash3/issues/74">#74</link>
+by adding a hack to the manifest classpath.
+</para>
+</listitem>
+<listitem>
+<para>Fixed an obscure bug in the debug logging message associated with
+<tag>p:sleep</tag>.
+</para>
+</listitem>
+<listitem>
+<para>Upgraded from SchXslt1 to SchXslt2 version 1.3.</para>
+</listitem>
+<listitem>
+<para>Cleaned up the error reporter in many steps.
+</para>
+</listitem>
+<listitem>
+<para>Removed the defunct <code>debug</code> configuration setting.
+</para>
+</listitem>
+<listitem>
+<para>Improve the reference documentation for steps. Defer to the specification and to
+Erik Siegal’s <emphasis>excellent</emphasis> <link xlink:href="https://XProcRef.org/">XProcRef</link>
+for standard step descriptions.
+</para>
+</listitem>
+</itemizedlist>
+</revdescription>
+</revision>
+
 <revision xml:id="r300-alpha7">
 <revnumber>3.0.0-alpha7</revnumber>
 <date>2024-12-24</date>

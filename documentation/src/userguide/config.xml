@@ -55,7 +55,8 @@ The command-line setting takes precedence.</para>
 linkend="cli-verbosity">on the command line</link>. The command-line setting takes precedence.</para>
 </listitem>
 </varlistentry>
-<varlistentry><term><tag class="attribute">message-buffer-size</tag> (integer)</term>
+<varlistentry xml:id="cfg-message-buffer-size">
+<term><tag class="attribute">message-buffer-size</tag> (integer)</term>
 <listitem>
 <para>Sets the number of messages buffered. These can be retrieved in a pipeline
 with <tag>cx:pipeline-messagers</tag>. If the value is negative, there is no limit on
