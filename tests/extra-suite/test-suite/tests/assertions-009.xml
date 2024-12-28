@@ -10,15 +10,6 @@
           <t:name>Norm Tovey-Walsh</t:name>
         </t:author>
         <t:description xmlns="http://www.w3.org/1999/xhtml">
-          <p>Revised. Test can now pass because of implementation changes.</p>
-        </t:description>
-      </t:revision>
-      <t:revision>
-        <t:date>2024-12-27</t:date>
-        <t:author>
-          <t:name>Norm Tovey-Walsh</t:name>
-        </t:author>
-        <t:description xmlns="http://www.w3.org/1999/xhtml">
           <p>Created test.</p>
         </t:description>
       </t:revision>
@@ -36,8 +27,8 @@
       <p:import href="https://xmlcalabash.com/ext/library/pipeline-messages.xpl"/>
       <p:output port="result"/>
 
-      <p:identity name="identity" cx:assertions="map { 'result': 'correct-map' }">
-        <p:with-input select="map { 'now': current-dateTime(), 'count': 42 }">
+      <p:identity name="identity" cx:assertions="map { 'result': 'life-the-universe-and-everything' }">
+        <p:with-input select="17">
           <irrelevant/>
         </p:with-input>
       </p:identity>
@@ -57,10 +48,8 @@
           <s:assert test="cx:messages">The document root is not correct.</s:assert>
         </s:rule>
         <s:rule context="/cx:messages">
-          <s:assert test="cx:message[@level='INFO' and contains(@message, 'Test date:')]"
-                    >Test did not produce a test date</s:assert>
-          <s:assert test="cx:message[@level='WARN' and contains(@message, 'Threshold exceeded:')]"
-                    >Test did not detect threshold</s:assert>
+          <s:assert test="cx:message[@level='WARN' and contains(@message, 'Wrong. The answer is 42')]"
+                    >Test did not detect error</s:assert>
         </s:rule>
       </s:pattern>
     </s:schema>

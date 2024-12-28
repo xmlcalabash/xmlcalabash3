@@ -19,6 +19,13 @@ attribute.</para>
 
 <para>In either case, each document is tested against the specified schema(s).</para>
 
+<note>
+<para>Schematron operates on XML documents. If you make an assertion on a
+document that contains a map or array (or simple atomic value), it will be
+converted to XML (as per <tag>p:cast-content-type</tag>) before the assertions
+are applied. Assertions cannot be applied to binary document.</para>
+</note>
+
 <section xml:id="assert-embed">
 <title>Directly embedded assertions</title>
 
@@ -95,6 +102,19 @@ output element. In this case, the assertions must be a list of strings.</para>
 
 <para>You can mix-and-match the embedded and referenced assertions.</para>
 
+<section xml:id="pipeinfo-href">
+<title>Reusing <tag>p:pipeinfo</tag> elements</title>
+
+<para>To support reuse, you can load <tag>p:pipeinfo</tag> elements from external
+documents in your pipeline. An empty <tag>p:pipeinfo</tag> element with a 
+<tag class="attribute">cx:href</tag> attribute:</para>
+
+<programlisting language='xml'
+><![CDATA[<p:pipeinfo cx:href="assertions.xml"/>]]></programlisting>
+
+<para>will load the <tag>p:pipeinfo</tag> element from the external document and
+behave exactly as if it had been embedded in the pipeline.</para>
+</section>
 </section>
 
 </chapter>
