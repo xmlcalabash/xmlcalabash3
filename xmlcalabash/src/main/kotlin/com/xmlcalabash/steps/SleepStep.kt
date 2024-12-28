@@ -9,17 +9,18 @@ open class SleepStep(): AbstractAtomicStep() {
         super.run()
 
         val duration = stringBinding(Ns.duration)!!
-        try {
-            val ms = duration.toLong()
-            if (ms < 0) {
-                throw stepConfig.exception(XProcError.xdBadType("Invalid duration: ${duration}"))
-            }
-
-            stepConfig.debug { "Waiting for ${String.format("%1.1f", ms)}s ... "}
-            Thread.sleep(ms)
+        val ms = try {
+            duration.toLong()
         } catch (ex: NumberFormatException) {
             throw stepConfig.exception(XProcError.xdBadType("Invalid duration: ${duration}"), ex)
         }
+
+        if (ms < 0) {
+            throw stepConfig.exception(XProcError.xdBadType("Invalid duration: ${duration}"))
+        }
+
+        stepConfig.debug { "Sleeping for ${String.format("%1.1f", (1.0 * ms) / 1000.0)}s ... "}
+        Thread.sleep(ms)
 
         for (doc in queues["source"]!!) {
             receiver.output("result", doc)
