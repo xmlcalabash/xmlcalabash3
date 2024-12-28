@@ -121,7 +121,7 @@
     <xsl:when test="$dep = 'httpClient'">${dep_httpClient}</xsl:when>
     <xsl:when test="$dep = 'jing'">${dep_jing}</xsl:when>
     <xsl:when test="$dep = 'jsonSchemaValidator'">{$dep_jsonSchemaValidator}</xsl:when>
-    <xsl:when test="$dep = 'schxslt'">{$dep_schxslt}</xsl:when>
+    <xsl:when test="$dep = 'schxslt2'">{$dep_schxslt2}</xsl:when>
     <xsl:when test="$dep = 'sinclude'">${dep_sinclude}</xsl:when>
     <xsl:when test="$dep = 'slf4j'">${dep_slf4j}</xsl:when>
     <xsl:when test="$dep = 'tukaaniXz'">{$dep_tukaaniXz}</xsl:when>

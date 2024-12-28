@@ -37,7 +37,7 @@
 <xsl:param name="dep_httpClient" select="'UNCONFIGURED'"/>
 <xsl:param name="dep_jing" select="'UNCONFIGURED'"/>
 <xsl:param name="dep_jsonSchemaValidator" select="'UNCONFIGURED'"/>
-<xsl:param name="dep_schxslt" select="'UNCONFIGURED'"/>
+<xsl:param name="dep_schxslt2" select="'UNCONFIGURED'"/>
 <xsl:param name="dep_sinclude" select="'UNCONFIGURED'"/>
 <xsl:param name="dep_slf4j" select="'UNCONFIGURED'"/>
 <xsl:param name="dep_tukaaniXz" select="'UNCONFIGURED'"/>

@@ -79,7 +79,7 @@ an appropriate license if you want to use EE features (like XML Schema validatio
 </listitem>
 </varlistentry>
 <varlistentry>
-<term>schxslt, version <?version DEPENDENCY_schxslt?></term>
+<term>SchXslt2, version <?version DEPENDENCY_schxslt2?></term>
 <listitem>
 <para>To support Schematron.
 </para>

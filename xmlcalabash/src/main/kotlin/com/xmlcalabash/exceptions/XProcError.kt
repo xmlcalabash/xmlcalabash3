@@ -343,6 +343,7 @@ class XProcError private constructor(val code: QName, val variant: Int, val loca
         fun xiImpossibleNodeType(type: XdmNodeKind) = internal(2, type)
         fun xiThreadInterrupted() = internal(3)
         fun xiCannotCastTo(to: MediaType) = internal(4, to)
+        fun xiCannotLoadResource(path: String) = internal(5, path)
         fun xiConfigurationInvalid(file: String) = internal(Pair(17, 1), file)
         fun xiConfigurationInvalid(file: String, message: String) = internal(Pair(17, 2), file, message)
         fun xiUnreadableFile(filename: String) = internal(21, filename)
