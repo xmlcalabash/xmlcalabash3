@@ -18,11 +18,26 @@
     </s:pattern>
   </s:schema>
 
-  <!-- This doesn't work and I don't know if it can be made to work. -->
   <s:schema queryBinding="xslt3" xml:id="correct-map">
+    <s:ns prefix="fn" uri="http://www.w3.org/2005/xpath-functions"/>
     <s:pattern>
-      <s:rule context=".[. instance of map(*)]">
-        <s:report test="true()">The result document is a doc</s:report>
+      <s:rule context="/">
+        <s:assert test="fn:map">The result document is not a map</s:assert>
+        <s:assert test="number(fn:map/fn:number[@key='count']) le 16"
+                  >Threshold exceeded: <s:value-of select="fn:map/fn:number[@key='count']"/> gt 16</s:assert>
+      </s:rule>
+      <s:rule context="/fn:map/fn:string">
+        <s:report test="@key='now'">Test date: <s:value-of select="."/></s:report>
+      </s:rule>
+    </s:pattern>
+  </s:schema>
+
+  <s:schema queryBinding="xslt3" xml:id="life-the-universe-and-everything">
+    <s:ns prefix="fn" uri="http://www.w3.org/2005/xpath-functions"/>
+    <s:pattern>
+      <s:rule context="/">
+        <s:assert test="fn:number">The answer is not a number.</s:assert>
+        <s:assert test="fn:number = '42'">Wrong. The answer is 42, not <s:value-of select="."/></s:assert>
       </s:rule>
     </s:pattern>
   </s:schema>

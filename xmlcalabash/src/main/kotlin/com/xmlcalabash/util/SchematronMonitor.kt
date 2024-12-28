@@ -2,22 +2,22 @@ package com.xmlcalabash.util
 
 import com.xmlcalabash.datamodel.DeclareStepInstruction
 import com.xmlcalabash.datamodel.LibraryInstruction
+import com.xmlcalabash.datamodel.MediaType
 import com.xmlcalabash.datamodel.StepDeclaration
 import com.xmlcalabash.datamodel.XProcInstruction
 import com.xmlcalabash.documents.XProcBinaryDocument
 import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.exceptions.XProcError
-import com.xmlcalabash.namespace.Ns
-import com.xmlcalabash.namespace.NsCx
-import com.xmlcalabash.namespace.NsS
-import com.xmlcalabash.namespace.NsSvrl
-import com.xmlcalabash.namespace.NsXml
+import com.xmlcalabash.io.ContentTypeConverter
+import com.xmlcalabash.namespace.*
 import com.xmlcalabash.runtime.Monitor
 import com.xmlcalabash.runtime.PipelineReceiverProxy
 import com.xmlcalabash.runtime.XProcStepConfiguration
 import com.xmlcalabash.runtime.steps.*
 import net.sf.saxon.om.NamespaceUri
 import net.sf.saxon.s9api.Axis
+import net.sf.saxon.s9api.XdmArray
+import net.sf.saxon.s9api.XdmAtomicValue
 import net.sf.saxon.s9api.XdmMap
 import net.sf.saxon.s9api.XdmNode
 import net.sf.saxon.s9api.XdmNodeKind
@@ -251,45 +251,33 @@ class SchematronMonitor(): Monitor {
             return
         }
 
-        val results = if (document.value is XdmNode) {
-            validator.test(document.value as XdmNode, schema)
+        val testDocument = if (document.value is XdmNode) {
+            document.value
         } else {
-            //validator.test(document.value, schema)
-            stepConfig.info({ "Schematron assertions can only be applied to XML and HTML documents" })
-            return
+            try {
+                ContentTypeConverter.jsonToXml(stepConfig, document.value, MediaType.XML)
+            } catch (ex: Exception) {
+                stepConfig.warn({ "Failed to convert non-XML input to XML for Schematron testing: ${document.contentType}"})
+                return
+            }
         }
+
+        val results = validator.test(testDocument, schema)
 
         if (results.isNotEmpty()) {
             val level = stepConfig.environment.assertions
             for (result in results) {
-                val location = result.getAttributeValue(Ns.location) ?: ""
-                val test = result.getAttributeValue(Ns.test) ?: ""
                 val text = getText(result)
                 when (result.nodeName) {
                     NsSvrl.successfulReport -> {
-                        if (document.baseURI != null) {
-                            stepConfig.info { "At ${location} ${stepid} in ${document.baseURI}:" }
-                        } else {
-                            stepConfig.info { "At ${location} ${stepid}:" }
-                        }
-                        stepConfig.info { "  Report ${test}: ${text}"}
+                        stepConfig.info { "Report ${stepid}: ${text}" }
                     }
                     NsSvrl.failedAssert -> {
                         if (level == SchematronAssertions.WARNING) {
-                            if (document.baseURI != null) {
-                                stepConfig.warn { "At ${location} ${stepid} in ${document.baseURI}:" }
-                            } else {
-                                stepConfig.warn { "At ${location} ${stepid}:" }
-                            }
-                            stepConfig.warn { "  Warning ${test}: ${text}" }
+                            stepConfig.warn { "Assert ${stepid}: ${text}" }
                         } else {
-                            if (document.baseURI != null) {
-                                stepConfig.error { "At ${location} ${stepid} in ${document.baseURI}:" }
-                            } else {
-                                stepConfig.error { "At ${location} ${stepid}:" }
-                            }
-                            stepConfig.error { " Error ${test} : ${text}" }
-                            throw XProcError.xiAssertionFailed("${test} : ${text}").exception()
+                            stepConfig.error { "Assert ${stepid}: ${text}" }
+                            throw XProcError.xiAssertionFailed(text).exception()
                         }
                     }
                     else -> {
@@ -298,6 +286,18 @@ class SchematronMonitor(): Monitor {
                 }
             }
         }
+    }
+
+    private fun convertToXml(stepConfig: XProcStepConfiguration, map: XdmMap): XdmNode {
+        return ContentTypeConverter.jsonToXml(stepConfig, map, MediaType.XML)
+    }
+
+    private fun convertToXml(stepConfig: XProcStepConfiguration, map: XdmArray): XdmNode {
+        return ContentTypeConverter.jsonToXml(stepConfig, map, MediaType.XML)
+    }
+
+    private fun convertToXml(stepConfig: XProcStepConfiguration, map: XdmAtomicValue): XdmNode {
+        return ContentTypeConverter.jsonToXml(stepConfig, map, MediaType.XML)
     }
 
     private fun getText(node: XdmNode): String {
