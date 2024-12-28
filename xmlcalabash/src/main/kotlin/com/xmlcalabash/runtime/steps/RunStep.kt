@@ -147,7 +147,9 @@ open class RunStep(config: XProcStepConfiguration, compound: CompoundStepModel):
 
     inner class PassthroughReceiver(): Receiver {
         override fun output(port: String, document: XProcDocument) {
-            foot.input(port, document)
+            if (port in foot.receiver) {
+                foot.input(port, document)
+            }
         }
     }
 }

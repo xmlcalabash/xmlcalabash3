@@ -4,7 +4,7 @@ import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.namespace.Ns
 import com.xmlcalabash.namespace.NsXslt
 import com.xmlcalabash.runtime.parameters.StepParameters
-import com.xmlcalabash.util.ErrorLogger
+import com.xmlcalabash.util.SaxonErrorReporter
 import com.xmlcalabash.util.SaxonTreeBuilder
 import com.xmlcalabash.util.TransformationNamespaces
 import net.sf.saxon.s9api.*
@@ -80,7 +80,7 @@ open class TextSortStep(): AbstractTextStep() {
         val bais = ByteArrayInputStream(xsl.toByteArray(StandardCharsets.UTF_8))
 
         try {
-            val errorReporter = ErrorLogger(stepConfig)
+            val errorReporter = SaxonErrorReporter(stepConfig)
             val compiler = stepConfig.processor.newXsltCompiler()
             compiler.resourceResolver = stepConfig.environment.documentManager
             compiler.setErrorReporter(errorReporter)

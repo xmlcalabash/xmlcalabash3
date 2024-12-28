@@ -21,7 +21,6 @@ open class ValidateWithNVDL(): AbstractAtomicStep() {
         val nvdl = queues["nvdl"]!!.first()
         val schemas = queues["schemas"]!!
 
-
         val localDocumentManager = DocumentManager(stepConfig.environment.documentManager)
 
         val parameters = qnameMapBinding(Ns.parameters)

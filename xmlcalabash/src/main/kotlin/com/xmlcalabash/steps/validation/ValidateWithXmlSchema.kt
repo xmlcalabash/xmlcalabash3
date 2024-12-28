@@ -4,8 +4,12 @@ import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.namespace.Ns
 import com.xmlcalabash.namespace.NsXsi
+import com.xmlcalabash.runtime.XProcStepConfiguration
+import com.xmlcalabash.runtime.api.Receiver
+import com.xmlcalabash.runtime.parameters.RuntimeStepParameters
 import com.xmlcalabash.steps.AbstractAtomicStep
 import com.xmlcalabash.util.S9Api
+import com.xmlcalabash.util.SaxonErrorReporter
 import net.sf.saxon.Controller
 import net.sf.saxon.om.NamespaceUri
 import net.sf.saxon.s9api.*
@@ -22,7 +26,15 @@ open class ValidateWithXmlSchema(): AbstractAtomicStep() {
     }
 
     lateinit var document: XProcDocument
+    lateinit var errorReporter: SaxonErrorReporter
     val schemas = mutableListOf<XProcDocument>()
+
+    override fun setup(stepConfig: XProcStepConfiguration, receiver: Receiver, stepParams: RuntimeStepParameters) {
+        super.setup(stepConfig, receiver, stepParams)
+        // FIXME: I expect this could be more centrally handled...
+        errorReporter = SaxonErrorReporter(stepConfig)
+        stepConfig.saxonConfig.configuration.setErrorReporterFactory { config -> errorReporter }
+    }
 
     override fun run() {
         super.run()
@@ -31,6 +43,7 @@ open class ValidateWithXmlSchema(): AbstractAtomicStep() {
         schemas.addAll(queues["schema"]!!)
 
         val manager = stepConfig.processor.getSchemaManager()
+        manager.errorReporter = errorReporter
         if (manager == null) {
             throw RuntimeException("Schema manager not found, XSD validation requires Saxon EE")
         }
@@ -126,6 +139,7 @@ open class ValidateWithXmlSchema(): AbstractAtomicStep() {
         val pipe = controller.makePipelineConfiguration()
         val preceiver = destination.getReceiver(pipe, SerializationProperties())
         pipe.setRecoverFromValidationErrors(assertValid)
+        pipe.errorReporter = errorReporter
         preceiver.setPipelineConfiguration(pipe)
 
         val validator = manager.newSchemaValidator()

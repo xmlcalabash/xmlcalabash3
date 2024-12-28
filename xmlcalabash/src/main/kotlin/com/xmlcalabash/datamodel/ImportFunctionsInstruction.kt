@@ -2,6 +2,7 @@ package com.xmlcalabash.datamodel
 
 import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.namespace.NsP
+import com.xmlcalabash.util.SaxonErrorReporter
 import net.sf.saxon.Configuration
 import net.sf.saxon.functions.ExecutableFunctionLibrary
 import net.sf.saxon.functions.FunctionLibrary
@@ -37,6 +38,8 @@ class ImportFunctionsInstruction(parent: XProcInstruction?, stepConfig: Instruct
             checkOpen()
             field = value
         }
+
+    val errorReporter = SaxonErrorReporter(stepConfig)
 
     private var _functionLibrary: FunctionLibrary? = null
     val functionLibrary: FunctionLibrary?
@@ -79,6 +82,7 @@ class ImportFunctionsInstruction(parent: XProcInstruction?, stepConfig: Instruct
     private fun loadXsltLibrary(conn: URLConnection): FunctionLibrary? {
         val stylesheet = SAXSource(InputSource(conn.getInputStream()))
         val compiler = stepConfig.processor.newXsltCompiler()
+        compiler.errorReporter = errorReporter
         val exec = compiler.compile(stylesheet)
         val ps = exec.underlyingCompiledStylesheet
         val loaded = ps.functionLibrary
@@ -131,6 +135,7 @@ class ImportFunctionsInstruction(parent: XProcInstruction?, stepConfig: Instruct
 
     private fun loadXQueryLibrary(conn: URLConnection): FunctionLibrary? {
         val compiler = stepConfig.processor.newXQueryCompiler()
+        compiler.errorReporter = errorReporter
         val context = compiler.underlyingStaticContext
 
         val knownLibraries = mutableSetOf<NamespaceUri>()
@@ -190,6 +195,7 @@ class ImportFunctionsInstruction(parent: XProcInstruction?, stepConfig: Instruct
 
     private fun loadXQueryMainModule(bufstream: InputStream): FunctionLibrary? {
         val compiler = stepConfig.processor.newXQueryCompiler()
+        compiler.errorReporter = errorReporter
         compiler.setSchemaAware(stepConfig.processor.isSchemaAware)
         val exec = compiler.compile(bufstream)
         val loaded = exec.underlyingCompiledQuery.executable.functionLibrary

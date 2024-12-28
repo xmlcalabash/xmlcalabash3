@@ -7,6 +7,8 @@ import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.namespace.Ns
 import com.xmlcalabash.namespace.NsCx
 import com.xmlcalabash.namespace.NsFn
+import com.xmlcalabash.runtime.XProcStepConfiguration
+import com.xmlcalabash.runtime.parameters.RuntimeStepParameters
 import com.xmlcalabash.util.*
 import net.sf.saxon.Configuration
 import net.sf.saxon.event.PipelineConfiguration
@@ -33,6 +35,7 @@ open class XsltStep(): AbstractAtomicStep() {
 
     val sources = mutableListOf<XProcDocument>()
     lateinit var stylesheet: XProcDocument
+    lateinit var errorReporter: SaxonErrorReporter
 
     val parameters = mutableMapOf<QName,XdmValue>()
     val staticParameters = mutableMapOf<QName,XdmValue>()
@@ -48,6 +51,13 @@ open class XsltStep(): AbstractAtomicStep() {
 
     private var primaryDestination: Destination? = null
     private var primaryOutputProperties = mutableMapOf<QName, XdmValue>()
+
+    override fun setup(stepConfig: XProcStepConfiguration, receiver: com.xmlcalabash.runtime.api.Receiver, stepParams: RuntimeStepParameters) {
+        super.setup(stepConfig, receiver, stepParams)
+        // FIXME: I expect this could be more centrally handled...
+        errorReporter = SaxonErrorReporter(stepConfig)
+        stepConfig.saxonConfig.configuration.setErrorReporterFactory { config -> errorReporter }
+    }
 
     override fun run() {
         super.run()
@@ -131,7 +141,6 @@ open class XsltStep(): AbstractAtomicStep() {
         val collectionFinder = config.collectionFinder
         val unparsedTextURIResolver = config.unparsedTextURIResolver
 
-        val errorReporter = ErrorLogger(stepConfig)
         val compiler = processor.newXsltCompiler()
         compiler.resourceResolver = stepConfig.environment.documentManager
         compiler.setSchemaAware(processor.isSchemaAware)
