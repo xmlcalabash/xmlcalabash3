@@ -80,6 +80,27 @@ class Graph private constructor(val environment: PipelineEnvironment) {
             edges.remove(edge)
         }
 
+        for (model in models.filter { it !== node}) {
+            for ((port, _) in model.outputs) {
+                var unconnected = true
+                for (edge in edges) {
+                    if (edge.from == model && edge.outputPort == port) {
+                        unconnected = false
+                        break
+                    }
+                }
+                if (unconnected) {
+                    pipeline.stepConfig.debug { "Adding p:sink to ${model} output ${port}"}
+                    val step = Sink(model.parent!!.step)
+                    val sink = AtomicModel(this, model.parent, step, modelName(step.name))
+                    sink.init()
+                    sink.inputs["source"] = ModelPort(sink, "source", false, true, true, listOf())
+                    (model.parent as CompoundModel)._children.add(sink)
+                    addEdge(model, port, sink, "source")
+                }
+            }
+        }
+
         node.decompose()
         makeConnections()
 
@@ -169,7 +190,7 @@ class Graph private constructor(val environment: PipelineEnvironment) {
             modelSequence.add(0, node)
             node = node.parent!!
 
-            if ((node as CompoundModel).children.filter { it === from }.isNotEmpty()) {
+            if ((node as CompoundModel).children.any { it === from }) {
                 return modelSequence
             }
         }
@@ -225,12 +246,6 @@ class Graph private constructor(val environment: PipelineEnvironment) {
                 }
 
                 replaceEdge(edge, from, fromPort, edge.to, edge.inputPort)
-
-                // If there are any other steps in the "from" container
-                // that also read from the original port, also update them.
-
-
-
             }
         }
     }
@@ -392,7 +407,7 @@ class Graph private constructor(val environment: PipelineEnvironment) {
     private fun identifyGuards(node: CompoundModel) {
         val guardSteps = mutableSetOf<Model>()
         val candidates = mutableSetOf<Model>()
-        val guard = node.children.filter { it is AtomicModel && it.step.instructionType == NsCx.guard }.first()
+        val guard = node.children.first { it is AtomicModel && it.step.instructionType == NsCx.guard }
         candidates.add(guard)
 
         while (candidates.isNotEmpty()) {

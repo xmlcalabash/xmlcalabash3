@@ -1,5 +1,5 @@
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-                xmlns:dot="http://jafpl.com/ns/dot"
+                xmlns:dot="http://xmlcalabash.com/ns/dot"
                 xmlns:ns="http://xmlcalabash.com/ns/description"
                 xmlns:p="http://www.w3.org/ns/xproc"
                 xmlns:xs="http://www.w3.org/2001/XMLSchema"

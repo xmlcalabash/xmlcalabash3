@@ -4,7 +4,7 @@
                 xmlns:p="http://www.w3.org/ns/xproc"
                 xmlns:cx="http://xmlcalabash.com/ns/extensions"
                 xmlns:f="http://xmlcalabash.com/ns/functions"
-                xmlns:dot="http://jafpl.com/ns/dot"
+                xmlns:dot="http://xmlcalabash.com.com/ns/dot"
                 expand-text="yes"
                 exclude-result-prefixes="#all"
                 version="3.0">
