@@ -29,7 +29,6 @@ import net.sf.saxon.s9api.ItemType
 import net.sf.saxon.s9api.QName
 import net.sf.saxon.s9api.XdmAtomicValue
 import net.sf.saxon.s9api.XdmValue
-import net.sf.saxon.trans.LicenseException
 import org.apache.logging.log4j.kotlin.logger
 import org.slf4j.MDC
 import java.io.BufferedReader
@@ -298,6 +297,15 @@ class XmlCalabashCli private constructor() {
         val proc = xmlCalabash.saxonConfig.processor
         val license = proc.underlyingConfiguration.isLicensedFeature(Configuration.LicenseFeature.SCHEMA_VALIDATION)
                 || proc.underlyingConfiguration.isLicensedFeature(Configuration.LicenseFeature.PROFESSIONAL_EDITION)
+        var edition = proc.saxonEdition
+        if (!license) {
+            if (javaClassExists("com.saxonica.config.EnterpriseConfiguration")) {
+                edition = "EE"
+            } else if (javaClassExists("com.saxonica.config.ProfessionalConfiguration")) {
+                edition = "PE"
+            }
+        }
+
         val deplist = XmlCalabashBuildConfig.DEPENDENCIES.keys.toList().sorted()
 
         if (xmlCalabash.xmlCalabashConfig.verbosity <= Verbosity.DEBUG) {
@@ -329,6 +337,21 @@ class XmlCalabashCli private constructor() {
                     print(" (without a license)")
                 }
             }
+            println()
+            if (edition != proc.saxonEdition) {
+                println("(You appear to have ${edition}; perhaps a license wasn't found?)")
+            }
         }
+    }
+
+    private fun javaClassExists(klass: String): Boolean {
+        try {
+            if (Class.forName(klass) != null) {
+                return true
+            }
+        } catch (_: ClassNotFoundException) {
+            return false
+        }
+        return false
     }
 }
