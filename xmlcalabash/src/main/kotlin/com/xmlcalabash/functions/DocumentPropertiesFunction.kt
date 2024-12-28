@@ -71,6 +71,7 @@ class DocumentPropertiesFunction(private val config: SaxonConfiguration): Extens
                             result = result.put(XdmAtomicValue(Ns.contentType), XdmAtomicValue(MediaType.XML.toString()))
                         }
                     }
+                    /*
                     is MapItem, is ArrayItem -> {
                         result = result.put(XdmAtomicValue(Ns.contentType), XdmAtomicValue(MediaType.JSON.toString()))
                     }
@@ -81,6 +82,7 @@ class DocumentPropertiesFunction(private val config: SaxonConfiguration): Extens
                         // I'm not sure if this is 100% kosher for all atomic values, but...
                         result = result.put(XdmAtomicValue(Ns.contentType), XdmAtomicValue(MediaType.JSON.toString()))
                     }
+                     */
                     else -> Unit
                 }
                 return result.underlyingValue
