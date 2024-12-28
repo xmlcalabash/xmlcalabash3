@@ -27,7 +27,7 @@ One feature of the second form is that it allows you to change or update the dep
 <para>In the fullness of time, XML Calabash will be available through Maven which has
 extensive features for managing dependencies. In the short term, it’s just a bit messy.</para>
 
-<tip>
+<tip xml:id="upgrading-saxon">
 <title>Upgrading Saxon</title>
 <para>The one library that you are likely to want to change in Saxon. If you
 have a license for Saxon PE or Saxon EE, it makes sense to swap out the Saxon HE
