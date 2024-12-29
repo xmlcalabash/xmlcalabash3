@@ -525,7 +525,7 @@ class InternetProtocolRequest(val stepConfig: XProcStepConfiguration, val uri: U
 
                 val baos = ByteArrayOutputStream()
                 val serializer = XProcSerializer(stepConfig)
-                serializer.write(source, baos)
+                serializer.write(source, baos, "HTTP request")
 
                 part.setBody(ByteArrayBody(baos.toByteArray(), ContentType.create(bodyContentType.toString(), charset)))
 
@@ -542,7 +542,7 @@ class InternetProtocolRequest(val stepConfig: XProcStepConfiguration, val uri: U
 
                 val baos = ByteArrayOutputStream()
                 val serializer = XProcSerializer(stepConfig)
-                serializer.write(_sources[0], baos)
+                serializer.write(_sources[0], baos, "HTTP request")
 
                 // This is a bit awkward.
                 // https://github.com/ndw/xmlcalabash1/issues/290
@@ -582,7 +582,7 @@ class InternetProtocolRequest(val stepConfig: XProcStepConfiguration, val uri: U
 
         val baos = ByteArrayOutputStream()
         val serializer = XProcSerializer(stepConfig)
-        serializer.write(doc, baos)
+        serializer.write(doc, baos, "HTTP request")
         ebuilder.setBinary(baos.toByteArray())
 
         val docctype = doc.contentType ?: MediaType.OCTET_STREAM

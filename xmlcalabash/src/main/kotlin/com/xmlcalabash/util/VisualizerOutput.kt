@@ -19,7 +19,7 @@ class VisualizerOutput {
             val props = mutableMapOf<QName, XdmValue>()
             props[Ns.method] = XdmAtomicValue("xml")
             props[Ns.indent] = XdmAtomicValue(true)
-            serial.write(description, stream, props)
+            serial.write(description, stream, "pipeline description", props)
         }
 
         fun svg(description: XdmNode, basename: String, graphviz: String) {

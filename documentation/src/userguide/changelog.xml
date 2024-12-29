@@ -63,7 +63,7 @@ which chains to the logging reporter. The buffering reporter holds the last 32
 messages. The default reporter prints messages to the console if they have a
 level that exceeds the verbosity threshold. The logging reporter sends all
 messages to the Java logger.</para>
-<para>There’s a new <code linkend="cfg-message-buffer-size">message-buffer-size</code>
+<para>There’s a new <code>message-buffer-size</code>
 configuration setting to set the number of messages to buffered.</para>
 </listitem>
 <listitem>

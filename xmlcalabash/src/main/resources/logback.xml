@@ -1,11 +1,12 @@
 <configuration>
-  <!-- debugging the debug logger
-  <statusListener class="ch.qos.logback.core.status.OnConsoleStatusListener" />
+  <!-- The default logger only logs to STDERR and uses a dynamic threshold
+       filter to control the level. If you want something else, use
+       your own logback.xml configuration... 
   -->
 
   <turboFilter class="ch.qos.logback.classic.turbo.DynamicThresholdFilter">
     <Key>LOG_LEVEL</Key>
-    <DefaultThreshold>INFO</DefaultThreshold>
+    <DefaultThreshold>WARN</DefaultThreshold>
     <OnHigherOrEqual>ACCEPT</OnHigherOrEqual>
     <OnLower>DENY</OnLower>
     <MDCValueLevelPair>
@@ -36,24 +37,8 @@
       <pattern>%-5level %msg%n</pattern>
     </encoder>
   </appender>
-
-<!-- this has to be commented out unless you refer to it below
-  <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-    <file>xmlcalabash.log</file>
-    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-      <fileNamePattern>/tmp/xmlcalabash.%d{yyyy-MM-dd}.log</fileNamePattern>
-      <maxHistory>5</maxHistory>
-    </rollingPolicy>
-    <encoder>
-      <pattern>%d{HH:mm:ss.SSS}  %-4relative [%thread] %-5level %logger{35} - %msg%n</pattern>
-    </encoder>
-  </appender>
--->
-
-  <root level="debug" additivity="false">
+  
+  <root level="WARN" additivity="false">
     <appender-ref ref="STDERR"/>
-    <!-- Don't log to an output file by default
-    <appender-ref ref="FILE"/>
-    -->
   </root>
 </configuration>

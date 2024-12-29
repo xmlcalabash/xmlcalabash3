@@ -9,7 +9,6 @@ cc.xmlCalabash =
         attribute saxon-configuration { text }?,
         attribute licensed { xsd:boolean }?,
         attribute verbosity { "trace" | "debug" | "progress" | "info" | "warn" | "error" }?,
-        attribute message-buffer-size { xsd:integer }?,
         (cc.graphviz
         | cc.inline
         | cc.mimetype
@@ -19,6 +18,8 @@ cc.xmlCalabash =
         | cc.sendMail
         | cc.serialization
         | cc.systemProperty
+        | cc.messageReporter
+        | cc.visualizer
         | cc.threading)*
     }
 
@@ -115,3 +116,15 @@ cc.sendMail =
         empty
     }
 
+cc.messageReporter =
+    element cc:message-reporter {
+        attribute buffer-size { xsd:integer }?,
+        empty
+    }
+
+cc.visualizer =
+    element cc:visualizer {
+        attribute name { "silent" | "plain" | "detail" },
+        attribute * { text },
+        empty
+    }

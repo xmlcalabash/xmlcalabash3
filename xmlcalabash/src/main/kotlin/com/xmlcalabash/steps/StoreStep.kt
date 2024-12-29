@@ -7,6 +7,7 @@ import com.xmlcalabash.io.XProcSerializer
 import com.xmlcalabash.namespace.Ns
 import com.xmlcalabash.namespace.NsC
 import com.xmlcalabash.util.SaxonTreeBuilder
+import java.io.File
 import java.io.FileOutputStream
 
 open class StoreStep(): AbstractAtomicStep() {
@@ -30,9 +31,8 @@ open class StoreStep(): AbstractAtomicStep() {
         val serializer = XProcSerializer(stepConfig)
         serializer.setDefaultProperties(contentType, serialization)
 
-        val outputFile = FileOutputStream(href.path)
-        serializer.write(document, outputFile, contentType)
-        outputFile.close()
+        val outFile = File(href.path)
+        serializer.write(document, outFile, contentType)
 
         receiver.output("result", document)
 

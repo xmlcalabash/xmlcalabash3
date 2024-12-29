@@ -407,7 +407,7 @@ open class ArchiveStep(): AbstractArchiveStep() {
 
             val entryBaos = ByteArrayOutputStream()
             val serializer = XProcSerializer(stepConfig)
-            serializer.write(entry.document!!, entryBaos)
+            serializer.write(entry.document!!, entryBaos, "archive")
             zipResultStream!!.write(entryBaos.toByteArray())
             zipResultStream!!.closeArchiveEntry()
         }

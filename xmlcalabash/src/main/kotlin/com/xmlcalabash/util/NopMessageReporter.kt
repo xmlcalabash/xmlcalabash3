@@ -18,10 +18,6 @@ open class NopMessageReporter(val nextReporter: MessageReporter? = null): Messag
         report(Verbosity.INFO, emptyMap(), message)
     }
 
-    override fun progress(message: () -> String) {
-        report(Verbosity.PROGRESS, emptyMap(), message)
-    }
-
     override fun debug(message: () -> String) {
         report(Verbosity.DEBUG, emptyMap(), message)
     }

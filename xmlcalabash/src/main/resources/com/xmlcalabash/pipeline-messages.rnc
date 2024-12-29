@@ -14,7 +14,7 @@ cx.message =
         [ db:purpose
               [ "The logging level." ]
         ]
-        attribute level { "TRACE" | "DEBUG" | "PROGRESS" | "INFO" | "WARN" | "ERROR" },
+        attribute level { "TRACE" | "DEBUG" | "INFO" | "WARN" | "ERROR" },
         [ db:purpose
               [ "The message text." ]
         ]

@@ -1,10 +1,14 @@
 package com.xmlcalabash.app
 
+import com.xmlcalabash.api.Monitor
 import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.exceptions.XProcException
 import com.xmlcalabash.util.SchematronAssertions
 import com.xmlcalabash.util.UriUtils
 import com.xmlcalabash.util.Verbosity
+import com.xmlcalabash.visualizers.Detail
+import com.xmlcalabash.visualizers.Plain
+import com.xmlcalabash.visualizers.Silent
 import net.sf.saxon.om.NamespaceUri
 import java.io.File
 import java.net.URI
@@ -44,6 +48,7 @@ class CommandLine private constructor(val args: Array<out String>) {
     private var _pipelineDescription: String? = null
     private var _debug: Boolean? = null
     private var _debugger = false
+    private var _visualizer: Monitor? = null
     private var _verbosity: Verbosity? = null
     private var _assertions = SchematronAssertions.IGNORE
     private var _help = false
@@ -87,6 +92,10 @@ class CommandLine private constructor(val args: Array<out String>) {
     /** How chatty shall we be? */
     val verbosity: Verbosity?
         get() = _verbosity
+
+    /** Did we select a visualizer? */
+    val visualizer: Monitor?
+        get() = _visualizer
 
     /** Evaluate assertions? */
     val assertions: SchematronAssertions
@@ -183,7 +192,6 @@ class CommandLine private constructor(val args: Array<out String>) {
                 "error" -> Verbosity.ERROR
                 "warn" -> Verbosity.WARN
                 "info" -> Verbosity.INFO
-                "progress" -> Verbosity.PROGRESS
                 "debug" -> Verbosity.DEBUG
                 "trace" -> Verbosity.TRACE
                 else -> Verbosity.INFO
@@ -195,8 +203,10 @@ class CommandLine private constructor(val args: Array<out String>) {
                 "warn", "warning" -> SchematronAssertions.WARNING
                 "error" -> SchematronAssertions.ERROR
                 else -> SchematronAssertions.IGNORE
-            }}
-    )
+            }},
+        ArgumentDescription("--visualizer", listOf("--vis"),
+            ArgumentType.STRING, "plain", emptyList()) { it -> parseVisualizer(it) }
+        )
 
     private fun parse() {
         if (args.isEmpty()) {
@@ -272,7 +282,13 @@ class CommandLine private constructor(val args: Array<out String>) {
                             value = UriUtils.cwdAsUri().resolve(value).toString()
                         }
                     }
-                    arg.process(value)
+
+                    try {
+                        arg.process(value)
+                    } catch (ex: XProcException) {
+                        _errors.add(ex)
+                    }
+
                     break
                 }
             }
@@ -366,6 +382,42 @@ class CommandLine private constructor(val args: Array<out String>) {
             throw XProcError.xiUnreadableFile(arg).exception()
         }
         return pfile
+    }
+
+    private fun parseVisualizer(arg: String) {
+        val pos = arg.indexOf("?")
+        val name = if (pos >= 0) {
+            arg.substring(0, pos).trim()
+        } else {
+            arg
+        }
+        val opts = if (pos >= 0) {
+            arg.substring(pos + 1).trim()
+        } else {
+            ""
+        }
+
+        val options = mutableMapOf<String,String>()
+
+        // Cheap and cheerful. And keep it that way.
+        if (opts.trim().isNotEmpty()) {
+            for (nvpair in opts.split(";")) {
+                val eqpos = nvpair.indexOf("=")
+                if (eqpos <= 0) {
+                    throw XProcError.xiCliInvalidValue("--visualizer", arg).exception()
+                }
+                val key = nvpair.substring(0, eqpos).trim()
+                val value = nvpair.substring(eqpos + 1).trim()
+                options[key] = value
+            }
+        }
+
+        _visualizer = when(name) {
+            "silent" -> Silent(options)
+            "plain" -> Plain(options)
+            "detail" -> Detail(options)
+            else -> throw XProcError.xiCliInvalidValue("--visualizer", arg).exception()
+        }
     }
 
     internal inner class ArgumentDescription(val name: String,

@@ -5,7 +5,7 @@ import com.xmlcalabash.config.ExecutionContextManager
 import com.xmlcalabash.config.XmlCalabash
 import com.xmlcalabash.exceptions.ErrorExplanation
 import com.xmlcalabash.io.DocumentManager
-import com.xmlcalabash.runtime.Monitor
+import com.xmlcalabash.api.Monitor
 import com.xmlcalabash.api.MessageReporter
 import com.xmlcalabash.util.SchematronAssertions
 import net.sf.saxon.s9api.QName

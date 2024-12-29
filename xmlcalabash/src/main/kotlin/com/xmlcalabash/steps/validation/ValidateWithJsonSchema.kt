@@ -32,7 +32,7 @@ open class ValidateWithJsonSchema(): AbstractAtomicStep() {
 
         val jserializer = XProcSerializer(stepConfig)
         var jbytes = ByteArrayOutputStream()
-        jserializer.write(schema, jbytes)
+        jserializer.write(schema, jbytes, "JSON Schema schema input")
         val jschema = jbytes.toString(StandardCharsets.UTF_8)
 
         val jsonSchema = try {
@@ -56,7 +56,7 @@ open class ValidateWithJsonSchema(): AbstractAtomicStep() {
         }
 
         jbytes = ByteArrayOutputStream()
-        jserializer.write(document, jbytes)
+        jserializer.write(document, jbytes, "JSON Schema document input")
         val jinput = jbytes.toString(StandardCharsets.UTF_8)
 
         val assertions = jsonSchema.validate(jinput, InputFormat.JSON) {

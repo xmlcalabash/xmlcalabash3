@@ -53,7 +53,7 @@ open class DefaultOutputReceiver(val xmlCalabash: XmlCalabash, val processor: Pr
             serializer.setOverrideProperty(contentType, Ns.indent, "true")
         }
 
-        serializer.write(document, System.out, contentType)
+        serializer.write(document, System.out, "standard output", contentType)
         if (writingToTerminal) {
             println("".padEnd(header.length, '='))
         }

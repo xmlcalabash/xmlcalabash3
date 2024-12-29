@@ -9,6 +9,9 @@ import com.xmlcalabash.util.DefaultXmlCalabashConfiguration
 import com.xmlcalabash.util.NopPagedMediaProvider
 import com.xmlcalabash.util.S9Api
 import com.xmlcalabash.util.Verbosity
+import com.xmlcalabash.visualizers.Detail
+import com.xmlcalabash.visualizers.Plain
+import com.xmlcalabash.visualizers.Silent
 import net.sf.saxon.lib.FeatureIndex
 import net.sf.saxon.om.NamespaceUri
 import net.sf.saxon.s9api.*
@@ -33,6 +36,8 @@ class ConfigurationLoader private constructor(private val config: XmlCalabashCon
         private val ccMimetype = QName(ns, "cc:mimetype")
         private val ccSendmail = QName(ns, "cc:send-mail")
         private val ccPagedMedia = QName(ns, "cc:paged-media")
+        private val ccVisualizer = QName(ns, "cc:visualizer")
+        private val ccMessageReporter = QName(ns, "cc:message-reporter")
         private val _count = QName("count")
         private val _cssFormatter = QName("css-formatter")
         private val _dot = QName("dot")
@@ -49,8 +54,9 @@ class ConfigurationLoader private constructor(private val config: XmlCalabashCon
         private val _username = QName("username")
         private val _value = QName("value")
         private val _verbosity = QName("verbosity")
+        private val _visualizer = QName("visualizer")
         private val _xslFormatter = QName("xsl-formatter")
-        private val _messageBufferSize = QName("message-buffer-size")
+        private val _bufferSize = QName("buffer-size")
 
         fun load(source: File): XmlCalabashConfiguration {
             return load(source, DefaultXmlCalabashConfiguration())
@@ -130,14 +136,6 @@ class ConfigurationLoader private constructor(private val config: XmlCalabashCon
         config.licensed = booleanAttribute(root.getAttributeValue(_licensed), "licensed")
         config.verbosity = verbosityAttribute(root.getAttributeValue(_verbosity))
 
-        if (root.getAttributeValue(_messageBufferSize) != null) {
-            try {
-                config.messageBufferSize = root.getAttributeValue(_messageBufferSize)!!.toInt()
-            } catch (_: NumberFormatException) {
-                throw XProcError.xiConfigurationInvalid(configFile, "message-buffer-size is not an integer").exception()
-            }
-        }
-
         for (child in root.axisIterator(Axis.CHILD)) {
             when (child.nodeKind) {
                 XdmNodeKind.ELEMENT -> {
@@ -152,6 +150,8 @@ class ConfigurationLoader private constructor(private val config: XmlCalabashCon
                         ccMimetype -> parseMimetype(child)
                         ccSendmail -> parseSendmail(child)
                         ccPagedMedia -> parsePagedMedia(child)
+                        ccMessageReporter -> parseMessageReporter(child)
+                        ccVisualizer -> parseVisualizer(child)
                         else -> throw XProcError.xiUnrecognizedConfigurationProperty(child.nodeName).exception()
                     }
                 }
@@ -181,7 +181,6 @@ class ConfigurationLoader private constructor(private val config: XmlCalabashCon
             "error" -> Verbosity.ERROR
             "warn", "warning", "warnings" -> Verbosity.WARN
             "info" -> Verbosity.INFO
-            "progress" -> Verbosity.PROGRESS
             "debug" -> Verbosity.DEBUG
             "trace" -> Verbosity.TRACE
             else -> throw XProcError.xiConfigurationInvalid(configFile, "invalid verbose setting: ${value}").exception()
@@ -365,6 +364,29 @@ class ConfigurationLoader private constructor(private val config: XmlCalabashCon
             return URI.create(value)
         }
         return URI.create("https://xmlcalabash.com/paged-media/${type}/${value}")
+    }
+
+    private fun parseMessageReporter(node: XdmNode) {
+        checkAttributes(node, listOf(_bufferSize))
+        node.getAttributeValue(_bufferSize)?.let { config.messageBufferSize = it.toInt() }
+    }
+
+    private fun parseVisualizer(node: XdmNode) {
+        val value = node.getAttributeValue(Ns.name)
+        val options = mutableMapOf<String, String>()
+        for (attr in node.axisIterator(Axis.ATTRIBUTE)) {
+            if (attr.nodeName.namespaceUri == NamespaceUri.NULL) {
+                options[attr.nodeName.localName] = value
+            }
+        }
+
+        when (value) {
+            null -> Unit
+            "silent" -> config.visualizer = Silent(options)
+            "plain" -> config.visualizer = Plain(options)
+            "detail" -> config.visualizer = Detail(options)
+            else -> throw XProcError.xiUnrecognizedConfigurationValue(ccVisualizer, Ns.name, value).exception()
+        }
     }
 
     private fun checkAttributes(node: XdmNode, attributes: List<QName>, optionalAttributes: List<QName> = listOf()) {

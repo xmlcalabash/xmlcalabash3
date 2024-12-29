@@ -1,9 +1,11 @@
 package com.xmlcalabash.config
 
+import com.xmlcalabash.api.Monitor
 import com.xmlcalabash.datamodel.MediaType
 import com.xmlcalabash.spi.PagedMediaManager
 import com.xmlcalabash.util.SchematronAssertions
 import com.xmlcalabash.util.Verbosity
+import com.xmlcalabash.visualizers.Silent
 import net.sf.saxon.Configuration
 import net.sf.saxon.s9api.QName
 import java.io.File
@@ -14,6 +16,7 @@ abstract class XmlCalabashConfiguration {
     abstract fun xmlCalabashConfigurer(xmlCalabash: XmlCalabash)
 
     var verbosity = Verbosity.INFO
+    var visualizer: Monitor = Silent(emptyMap())
     var messageBufferSize = 32
     var assertions = SchematronAssertions.WARNING
     var saxonConfigurationFile: File? = null

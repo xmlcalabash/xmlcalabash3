@@ -211,7 +211,7 @@ class S9Api {
         fun xdmToInputSource(stepConfig: XProcStepConfiguration, doc: XProcDocument): InputSource {
             val out = ByteArrayOutputStream()
             val serializer = XProcSerializer(stepConfig)
-            serializer.write(doc, out)
+            serializer.write(doc, out, "input source from document")
             val source = InputSource(ByteArrayInputStream(out.toByteArray()))
             if (doc.baseURI != null) {
                 source.systemId = doc.baseURI.toString()

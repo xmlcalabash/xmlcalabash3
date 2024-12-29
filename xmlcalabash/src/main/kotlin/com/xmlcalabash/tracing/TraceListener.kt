@@ -1,6 +1,6 @@
 package com.xmlcalabash.tracing
 
-import com.xmlcalabash.runtime.Monitor
+import com.xmlcalabash.api.Monitor
 import com.xmlcalabash.runtime.XProcStepConfiguration
 import com.xmlcalabash.util.SaxonTreeBuilder
 import net.sf.saxon.s9api.XdmNode

@@ -73,16 +73,15 @@ class XProcSerializer(val xmlCalabash: XmlCalabash, val processor: Processor) {
         return props
     }
 
-
     fun write(doc: XProcDocument, file: File, overrideContentType: MediaType? = null) {
         val stream = FileOutputStream(file)
-        write(doc, stream, overrideContentType)
+        write(doc, stream, file.absolutePath, overrideContentType)
         stream.close()
     }
 
-    fun write(doc: XProcDocument, stream: OutputStream, overrideContentType: MediaType? = null) {
+    fun write(doc: XProcDocument, stream: OutputStream, purpose: String, overrideContentType: MediaType? = null) {
         if (doc is XProcBinaryDocument) {
-            logger.debug { "Serializing (writing) binary output" }
+            logger.debug { "Serializing binary output for ${purpose}" }
             stream.write(doc.binaryValue)
             return
         }
@@ -114,41 +113,50 @@ class XProcSerializer(val xmlCalabash: XmlCalabash, val processor: Processor) {
 
         if (contentType.htmlContentType()) {
             if (contentType == MediaType.XHTML) {
+                logger.debug { "Serializing XHTML for ${purpose}" }
                 serializeXml(doc, stream)
             } else {
+                logger.debug { "Serializing HTML for ${purpose}" }
                 serializeHtml(doc, stream)
             }
             return
         }
 
         if (contentType.xmlContentType() ) {
+            logger.debug { "Serializing XML for ${purpose}" }
             serializeXml(doc, stream)
             return
         }
 
         if (contentType.jsonContentType()) {
+            logger.debug { "Serializing JSON for ${purpose}" }
             serializeJson(doc, stream)
             return
         }
 
         if (contentType.textContentType()) {
+            logger.debug { "Serializing text for ${purpose}" }
             serializeText(doc, stream)
             return
         }
 
         if (doc.value is XdmNode) {
+            logger.debug { "Serializing XML for ${purpose}" }
             serializeXml(doc, stream)
         } else {
+            logger.debug { "Serializing JSON for ${purpose}" }
             serializeJson(doc, stream)
         }
     }
 
-    fun write(node: XdmNode, stream: OutputStream, defaultProperties: Map<QName, XdmValue> = mapOf()) {
+    fun write(node: XdmNode, stream: OutputStream, purpose: String, defaultProperties: Map<QName, XdmValue> = mapOf()) {
         if (S9Api.isTextDocument(node)) {
             setupProperties(MediaType.TEXT, defaultProperties)
+            logger.debug { "Serializing text for ${purpose}"}
             serializeText(node, stream)
         } else {
             setupProperties(MediaType.XML, defaultProperties)
+            logger.debug { "Serializing XML for ${purpose}"}
             serializeXml(node, stream)
         }
     }
@@ -169,29 +177,24 @@ class XProcSerializer(val xmlCalabash: XmlCalabash, val processor: Processor) {
     }
 
     private fun serializeXml(doc: XProcDocument, stream: OutputStream) {
-        logger.debug { "Serializing as XML" }
         val serializer = processor.newSerializer(stream)
         setSerializationProperties(serializer, "xml")
         serializer.serializeXdmValue(doc.value)
     }
 
     private fun serializeXml(node: XdmNode, stream: OutputStream) {
-        logger.debug { "Serializing as XML" }
         val serializer = processor.newSerializer(stream)
         setSerializationProperties(serializer,"xml")
         serializer.serializeXdmValue(node)
     }
 
     private fun serializeHtml(doc: XProcDocument, stream: OutputStream) {
-        logger.debug { "Serializing as HTML" }
         val serializer = processor.newSerializer(stream)
         setSerializationProperties(serializer, "html")
         serializer.serializeXdmValue(doc.value)
     }
 
     private fun serializeJson(doc: XProcDocument, stream: OutputStream) {
-        logger.debug { "Serializing as JSON" }
-
         val xs = ByteArrayOutputStream()
         val xv = processor.newSerializer(xs)
         setSerializationProperties(xv, "json")
@@ -204,14 +207,12 @@ class XProcSerializer(val xmlCalabash: XmlCalabash, val processor: Processor) {
     }
 
     private fun serializeText(doc: XProcDocument, stream: OutputStream) {
-        logger.debug { "Serializing as TEXT" }
         val serializer = processor.newSerializer(stream)
         setSerializationProperties(serializer, "text")
         serializer.serializeXdmValue(doc.value)
     }
 
     private fun serializeText(node: XdmNode, stream: OutputStream) {
-        logger.debug { "Serializing as TEXT" }
         val serializer = processor.newSerializer(stream)
         setSerializationProperties(serializer, "text")
         serializer.serializeXdmValue(node)

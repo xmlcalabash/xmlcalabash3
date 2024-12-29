@@ -22,6 +22,7 @@ import com.xmlcalabash.util.DefaultXmlCalabashConfiguration
 import com.xmlcalabash.util.UriUtils
 import com.xmlcalabash.util.Verbosity
 import com.xmlcalabash.util.VisualizerOutput
+import com.xmlcalabash.visualizers.Silent
 import net.sf.saxon.Configuration
 import net.sf.saxon.lib.Initializer
 import net.sf.saxon.om.NamespaceUri
@@ -73,7 +74,6 @@ class XmlCalabashCli private constructor() {
                 null -> Unit
                 Verbosity.TRACE -> MDC.put("LOG_LEVEL", "TRACE")
                 Verbosity.DEBUG -> MDC.put("LOG_LEVEL", "DEBUG")
-                Verbosity.PROGRESS -> MDC.put("LOG_LEVEL", "INFO")
                 Verbosity.INFO -> MDC.put("LOG_LEVEL", "INFO")
                 Verbosity.WARN -> MDC.put("LOG_LEVEL", "WARN")
                 Verbosity.ERROR -> MDC.put("LOG_LEVEL", "ERROR")
@@ -86,9 +86,15 @@ class XmlCalabashCli private constructor() {
             config.verbosity = commandLine.verbosity ?: config.verbosity
             config.trace = commandLine.trace
             config.traceDocuments = commandLine.traceDocuments
-            config.debugger = commandLine.debugger
             config.assertions = commandLine.assertions
             config.licensed = config.licensed && commandLine.licensed
+
+            config.debugger = commandLine.debugger
+            if (commandLine.debugger) {
+                config.visualizer = commandLine.visualizer ?: Silent(emptyMap())
+            } else {
+                commandLine.visualizer?.let { config.visualizer = it }
+            }
 
             if (config.trace == null && config.traceDocuments != null) {
                 config.trace = config.traceDocuments!!.resolve("trace.xml")
@@ -270,7 +276,7 @@ class XmlCalabashCli private constructor() {
 
         for (error in errors) {
             errorExplanation.message(error.error)
-            if (verbosity <= Verbosity.PROGRESS) {
+            if (verbosity < Verbosity.INFO) {
                 errorExplanation.explanation(error.error)
             }
         }

@@ -113,7 +113,6 @@ class CssAH(): AbstractAH(), CssProcessor {
         stepConfig.debug { "css-formatter source: ${tempXml.absolutePath}" }
 
         val serializer = XProcSerializer(stepConfig)
-        val fos = FileOutputStream(tempXml)
 
         // AH won't parse HTML
         val sourceContentType = document.contentType ?: MediaType.OCTET_STREAM
@@ -123,8 +122,7 @@ class CssAH(): AbstractAH(), CssProcessor {
             null
         }
 
-        serializer.write(document, fos, overrideContentType)
-        fos.close()
+        serializer.write(document, tempXml, overrideContentType)
 
         val fis = FileInputStream(tempXml)
 

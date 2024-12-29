@@ -9,7 +9,7 @@ import com.xmlcalabash.debugger.NopDebugger
 import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.exceptions.ErrorExplanation
 import com.xmlcalabash.io.DocumentManager
-import com.xmlcalabash.runtime.Monitor
+import com.xmlcalabash.api.Monitor
 import com.xmlcalabash.runtime.XProcExecutionContext
 import com.xmlcalabash.runtime.XProcStepConfiguration
 import com.xmlcalabash.tracing.TraceListener

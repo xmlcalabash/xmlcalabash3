@@ -32,7 +32,7 @@ abstract class AbstractStep(val stepConfig: XProcStepConfiguration, step: StepMo
         if (step.instantiationCount == 1) {
             _id = step.id
         } else {
-            _id = "${step.id}/${step.instantiationCount}"
+            _id = "${step.id}.${step.instantiationCount}"
         }
         step.instantiationCount++
     }
@@ -125,7 +125,7 @@ abstract class AbstractStep(val stepConfig: XProcStepConfiguration, step: StepMo
     }
 
     open fun runStep() {
-        stepConfig.progress { "Running ${this}" }
+        logger.debug { "Running ${this}" }
 
         try {
             prepare()

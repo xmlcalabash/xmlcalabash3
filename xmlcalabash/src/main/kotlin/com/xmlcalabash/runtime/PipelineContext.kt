@@ -15,6 +15,7 @@ import com.xmlcalabash.tracing.DetailTraceListener
 import com.xmlcalabash.tracing.StandardTraceListener
 import com.xmlcalabash.tracing.TraceListener
 import com.xmlcalabash.api.MessageReporter
+import com.xmlcalabash.api.Monitor
 import com.xmlcalabash.util.SchematronAssertions
 import com.xmlcalabash.util.SchematronMonitor
 import net.sf.saxon.s9api.QName

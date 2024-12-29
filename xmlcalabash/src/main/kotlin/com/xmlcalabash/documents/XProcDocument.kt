@@ -293,7 +293,7 @@ open class XProcDocument internal constructor() {
         val ctype = contentType ?: MediaType.OCTET_STREAM
         val serializer = XProcSerializer(context)
         serializer.setDefaultProperties(ctype, defProp)
-        serializer.write(this, out)
+        serializer.write(this, out, "output stream")
     }
 
     override fun toString(): String {

@@ -1,0 +1,174 @@
+<chapter xmlns="http://docbook.org/ns/docbook"
+         xmlns:xlink="http://www.w3.org/1999/xlink"
+         xmlns:xi='http://www.w3.org/2001/XInclude'
+         version="5.2" xml:id="logging">
+<info>
+  <?db filename="logging"?>
+  <title>Messages and logging</title>
+</info>
+
+<para>Messages and logging are frustratingly complex to manage. Java
+provides a flexible and robust set of logging APIs. Production systems
+can leverage that infrastructure in sophisticated ways to control what
+is logged, where, and how. But <emphasis>configuring</emphasis> that
+infrastructure, even <emphasis>learning how</emphasis> to configure
+it, are substantial tasks. They’re far more than a casual user running
+a single application on a local machine is ever likely to
+need.</para>
+
+<para>XML Calabash tries to offer the best of both worlds. It uses the
+SLF4J logging framework (version <?dep slf4j?>) with the “logback
+classic” back end. (Other backends can be used, SLF4J supports the
+full logging ecosystem.) All of the messages that XML Calabash produces are
+sent to the logger.
+If the <option linkend="cli-debug">debug</option> is used, the logging messages
+are also printed on the console. For more control, see
+<xref linkend="logback"/>.</para>
+
+<para>In front of that back end, XML Calabash has its own “message
+reporter” interface which it ties into the various message listener
+and error listener APIs provided by the APIs it uses. Casual users can set the “verbosity level”
+(via a <link linkend="cc.xml-calabash">configuration option</link>
+or on the <link linkend="cli-verbosity">command line</link>) to quickly
+filter the level of detail they’re interested in.</para>
+
+<para>That leaves only the category of “progress messages” to resolve.
+Often, it’s most convenient to run a pipeline and get its results with
+no concern about what steps ran, or in what order. But for long
+running or complex pipelines, it may be reassuring, especially during
+development, to track the progress of steps in the pipeline.</para>
+
+<para>XML Calabash provides three “visualizations” for progress:
+silent, plain, and detailed. (Custom visualizations are also
+possible.) The <literal>silent</literal> visualizer, as the name
+suggests, prints nothing. That’s the default.</para>
+
+<para>The <literal>plain</literal> visualizer prints the names of
+steps as they are run. It elides some noise, specifically the majority
+of steps introduced when constructing <link linkend="graphs">the
+graph</link>. The plain output for sample pipeline in the graphs chapter
+looks like this:</para>
+
+<screen><?db verbatim-style="plain"?><computeroutput>Running p:declare-step
+Running . cx:document (../xml/default-input.xml)
+Running . p:xinclude
+Running . ex:ident
+Running .. p:identity
+Running . p:for-each
+Running .. p:identity/id1
+Running .. p:add-attribute/add
+Running .. p:identity/id1
+Running .. p:add-attribute/add
+Running .. p:identity/id1
+Running .. p:add-attribute/add
+Running .. p:identity/id1
+Running .. p:add-attribute/add
+Running . p:wrap-sequence
+Running . p:identity/id2</computeroutput></screen>
+
+<para>The <literal>detail</literal> visualizer tracks the progress of
+all steps, both the start and end of compound steps, and can track the documents
+produced by each step along the way. With both step and document reporting enabled,
+its output looks like this:</para>
+
+<screen><?db verbatim-style="raw"?><computeroutput><![CDATA[┌─ p:declare-step/declare-step
+│  ├─ cx:head/declare-step_head
+│  ├─ cx:document/document (../xml/default-input.xml)
+│  │  ┄ cx:document/document.result ⟶ <doc ...>
+│  ├─ p:xinclude/xinclude
+│  │  ┄ p:xinclude/xinclude.result ⟶ <doc ...>
+│  ├─ ex:ident/declare-step_2
+│  │  ├─ cx:head/declare-step_2_head
+│  │  │  ┄ cx:head/declare-step_2_head.source ⟶ <doc ...>
+│  │  ├─ p:identity/identity
+│  │  │  ┄ p:identity/identity.result ⟶ <doc ...>
+│  │  │  ┄ cx:foot/declare-step_2_foot.result ⟶ <doc ...>
+│  │  ├─ cx:foot/declare-step_2_foot
+│  ├─ ex:ident/declare-step_2
+│  ├─ cx:select/select_IC511
+│  │  ┄ cx:select/select_IC511.result ⟶ <chap ...>
+│  │  ┄ cx:select/select_IC511.result ⟶ <chap ...>
+│  │  ┄ cx:select/select_IC511.result ⟶ <chap ...>
+│  │  ┄ cx:select/select_IC511.result ⟶ <app ...>
+│  ├─ p:for-each/for-each
+│  │  ├─ cx:head/for-each_head
+│  │  │  ┄ cx:head/for-each_head.current ⟶ <chap ...>
+│  │  ├─ p:identity/id1
+│  │  │  ┄ p:identity/id1.result ⟶ <chap ...>
+│  │  ├─ p:add-attribute/add
+│  │  │  ┄ p:add-attribute/add.result ⟶ <chap ...>
+│  │  │  ┄ cx:foot/for-each_foot.!result ⟶ <chap ...>
+│  │  ├─ cx:foot/for-each_foot
+│  │  ├─ cx:head/for-each_head
+│  │  │  ┄ cx:head/for-each_head.current ⟶ <chap ...>
+│  │  ├─ p:identity/id1
+│  │  │  ┄ p:identity/id1.result ⟶ <chap ...>
+│  │  ├─ p:add-attribute/add
+│  │  │  ┄ p:add-attribute/add.result ⟶ <chap ...>
+│  │  │  ┄ cx:foot/for-each_foot.!result ⟶ <chap ...>
+│  │  ├─ cx:foot/for-each_foot
+│  │  ├─ cx:head/for-each_head
+│  │  │  ┄ cx:head/for-each_head.current ⟶ <chap ...>
+│  │  ├─ p:identity/id1
+│  │  │  ┄ p:identity/id1.result ⟶ <chap ...>
+│  │  ├─ p:add-attribute/add
+│  │  │  ┄ p:add-attribute/add.result ⟶ <chap ...>
+│  │  │  ┄ cx:foot/for-each_foot.!result ⟶ <chap ...>
+│  │  ├─ cx:foot/for-each_foot
+│  │  ├─ cx:head/for-each_head
+│  │  │  ┄ cx:head/for-each_head.current ⟶ <app ...>
+│  │  ├─ p:identity/id1
+│  │  │  ┄ p:identity/id1.result ⟶ <app ...>
+│  │  ├─ p:add-attribute/add
+│  │  │  ┄ p:add-attribute/add.result ⟶ <app ...>
+│  │  │  ┄ cx:foot/for-each_foot.!result ⟶ <app ...>
+│  │  ├─ cx:foot/for-each_foot
+│  ├─ p:for-each/for-each
+│  ├─ p:wrap-sequence/wrap-sequence
+│  │  ┄ p:wrap-sequence/wrap-sequence.result ⟶ <set ...>
+│  ├─ p:identity/id2
+│  │  ┄ p:identity/id2.result ⟶ <set ...>
+│  │  ┄ cx:foot/declare-step_foot.result ⟶ <set ...>
+│  ├─ cx:foot/declare-step_foot
+└─ p:declare-step/declare-step]]></computeroutput></screen>
+
+<para>It’s worth noting that the IDs in this output, for example “<literal>select_IC511</literal>”,
+are the same IDs that the debugger uses to set breakpoints. If you configure a default
+visualizer in the configuration file, using the <option linkend="cli-debugger">--debugger</option>
+option will automatically disable it. (But you can force it to be on with the
+<option linkend="cli-visualizer">--visualizer</option> option, if that’s what you’d prefer.)
+</para>
+
+<section xml:id="logback">
+<title>Configuring the logging back end</title>
+
+<para>XML Calabash uses the “logback classic” backend by default. The configuration
+file that ships with XML Calabash only sends messages to the console and it uses 
+a “turboFilter” to dynamically control the log level.</para>
+
+<para>If you want to quickly configure XML Calabash to save log messages to a file,
+simply point to a logback configuration that is configured accordingly. For example,
+the configuration in <xref linkend="logback-file"/>.</para>
+
+<figure xml:id="logback-file">
+<title>Example logback Configuration</title>
+<programlisting language='xml'
+><xi:include href="../examples/xml/logback.xml" parse="text"/></programlisting>
+</figure>
+
+<para>This configuration doesn’t offer dynamic control of the log level. It 
+sends warning and error messages to the console and <emphasis>all</emphasis> messages
+to the log file (<filename>/tmp/xmlcalabash.log</filename> in this example).</para>
+
+<para>One way to tell Java to use this logging configuration instead of the
+default is to specify it with a system property, for example, on the command line:</para>
+
+<screen><prompt>$ </prompt><userinput>java -Dlogback.configurationFile=/path/logback.xml …</userinput>
+</screen>
+
+<para>Where <filename>/path/logback.xml</filename> is the path to your configuration file
+and “…” is the rest of the Java arguments you want to use.
+</para>
+
+</section>
+</chapter>

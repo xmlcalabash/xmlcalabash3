@@ -1,3 +1,3 @@
 package com.xmlcalabash.util
 
-enum class Verbosity { TRACE, DEBUG, PROGRESS, INFO, WARN, ERROR }
+enum class Verbosity { TRACE, DEBUG, INFO, WARN, ERROR }

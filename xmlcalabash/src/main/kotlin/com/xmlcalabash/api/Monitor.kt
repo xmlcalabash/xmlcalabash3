@@ -1,4 +1,4 @@
-package com.xmlcalabash.runtime
+package com.xmlcalabash.api
 
 import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.runtime.steps.AbstractStep

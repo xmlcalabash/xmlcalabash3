@@ -55,17 +55,6 @@ The command-line setting takes precedence.</para>
 linkend="cli-verbosity">on the command line</link>. The command-line setting takes precedence.</para>
 </listitem>
 </varlistentry>
-<varlistentry xml:id="cfg-message-buffer-size">
-<term><tag class="attribute">message-buffer-size</tag> (integer)</term>
-<listitem>
-<para>Sets the number of messages buffered. These can be retrieved in a pipeline
-with <tag>cx:pipeline-messagers</tag>. If the value is negative, there is no limit on
-the number of messages buffered. The default value is 32.</para>
-<note>
-<para>All messages are buffered, irrespective of the verbosity setting.</para>
-</note>
-</listitem>
-</varlistentry>
 </variablelist>
 
 <para>For simplicity, the content model of <tag>cc:xml-calabash</tag> allows every element to
@@ -382,6 +371,77 @@ The serialization properties on a document take precendence over these defaults.
 
 <para>Any properties specified in the configuration file will be set before the pipeline
 runs.</para>
+
+</section>
+
+<section xml:id="cc.message-reporter">
+<info>
+<?db filename="cc-message-reporter"?>
+<title>cc:message-reporter</title>
+</info>
+
+<para>Configure the message reporter. The only option is
+<tag class="attribute">buffer-size</tag>.</para>
+
+<rng-pattern schema="../../build/xml-calabash.rng"
+             name="cc.messageReporter"/>
+
+<variablelist>
+<varlistentry>
+<term><tag class="attribute">buffer-size</tag> (integer)</term>
+<listitem>
+<para>Sets the number of messages buffered. These can be retrieved in a pipeline
+with <tag>cx:pipeline-messagers</tag>. If the value is negative, there is no limit on
+the number of messages buffered. The default value is 32.</para>
+</listitem>
+</varlistentry>
+</variablelist>
+</section>
+
+<section xml:id="cc.visualizer">
+<info>
+<?db filename="cc-visualizer"?>
+<title>cc:visualizer</title>
+</info>
+
+<para>Control which visualizer is used and its options.</para>
+
+<rng-pattern schema="../../build/xml-calabash.rng"
+             name="cc.visualizer"/>
+
+<para>The <tag class="attribute">name</tag> must be specified. Additional
+attributes provide options for the visualizer.</para>
+
+<para>There are three options for the name:</para>
+
+<variablelist>
+<varlistentry><term><literal>silent</literal></term>
+<listitem>
+<para>Silent, no progress is reported.</para>
+</listitem>
+</varlistentry>
+
+<varlistentry><term><literal>plain</literal></term>
+<listitem>
+<para>Plain, the name of each step is reported when it begins running.
+Most steps manufactured automatically during graph construction are
+omitted. There is one option, <literal>indent</literal> which
+determines whether or not, and to what extent, reports are indented when
+they are nested inside compound steps.</para>
+</listitem>
+</varlistentry>
+
+<varlistentry><term><literal>detail</literal></term>
+<listitem>
+<para>Detailed, the start and end of each step is identified and the
+documents that they produce can also be identified.</para>
+<para>If the <literal>steps</literal> option is <literal>true</literal>,
+the progress of steps is recorded. (Defaults to true.)</para>
+<para>If the <literal>documents</literal> option is <literal>true</literal>,
+the documents produced during execution are recorded. (Defaults to false.)</para>
+</listitem>
+</varlistentry>
+</variablelist>
 
 </section>
 
