@@ -43,10 +43,10 @@ open class ValidateWithXmlSchema(): AbstractAtomicStep() {
         schemas.addAll(queues["schema"]!!)
 
         val manager = stepConfig.processor.getSchemaManager()
-        manager.errorReporter = errorReporter
         if (manager == null) {
             throw RuntimeException("Schema manager not found, XSD validation requires Saxon EE")
         }
+        manager.errorReporter = errorReporter
         validateWithSaxon(manager)
     }
 
