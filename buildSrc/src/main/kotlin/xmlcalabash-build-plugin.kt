@@ -24,6 +24,7 @@ interface XmlCalabashBuildExtension {
   abstract val vendorUri: Property<String>
   abstract val buildTime: Property<String>
   abstract val buildDate: Property<String>
+  abstract val buildDateId: Property<String>
 
   fun jarArchiveFilename(): String {
     return "${name.get()}-${version.get()}.jar"
@@ -55,6 +56,10 @@ interface XmlCalabashBuildExtension {
     }
 
     return stdout.toString().trim()
+  }
+
+  fun buildId(): String {
+    return "${gitHash()}.${buildDateId.get()}"
   }
 }
 
@@ -91,5 +96,9 @@ class XmlCalabashBuildPlugin : Plugin<Project> {
     extension.vendorUri.set("https://xmlcalabash.com/")
     extension.buildTime.set(DateTimeFormatter.ISO_INSTANT.format(buildTime))
     extension.buildDate.set(DateTimeFormatter.ofPattern("yyyy-MM-dd").format(buildTime))
+    extension.buildDateId.set(String.format("%02x%x.%02x%02x%02x",
+                                            buildTime.year % 100,
+                                            buildTime.monthValue,
+                                            buildTime.dayOfMonth, buildTime.hour, buildTime.minute))
   }
 }

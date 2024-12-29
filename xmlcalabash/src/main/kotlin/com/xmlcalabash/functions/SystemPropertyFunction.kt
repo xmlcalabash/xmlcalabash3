@@ -58,7 +58,7 @@ class SystemPropertyFunction(private val config: SaxonConfiguration): ExtensionF
                 NsP.psviSupported -> config.processor.isSchemaAware.toString()
                 NsCx.saxonVersion -> config.processor.saxonProductVersion
                 NsCx.saxonEdition -> config.processor.saxonEdition
-                NsCx.productBuild -> env.gitHash
+                NsCx.productBuild -> env.buildId
                 else -> ""
             }
 

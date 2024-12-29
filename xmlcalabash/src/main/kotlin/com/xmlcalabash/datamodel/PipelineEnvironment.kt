@@ -3,11 +3,9 @@ package com.xmlcalabash.datamodel
 import com.xmlcalabash.config.CommonEnvironment
 import com.xmlcalabash.config.ExecutionContextManager
 import com.xmlcalabash.config.XmlCalabash
-import com.xmlcalabash.debugger.Debugger
 import com.xmlcalabash.exceptions.ErrorExplanation
 import com.xmlcalabash.io.DocumentManager
 import com.xmlcalabash.runtime.Monitor
-import com.xmlcalabash.tracing.TraceListener
 import com.xmlcalabash.api.MessageReporter
 import com.xmlcalabash.util.SchematronAssertions
 import net.sf.saxon.s9api.QName
@@ -21,7 +19,7 @@ interface PipelineEnvironment: ExecutionContextManager {
     val locale: String
     val productName: String
     val productVersion: String
-    val gitHash: String
+    val buildId: String
     val vendor: String
     val vendorUri: String
     val version: String

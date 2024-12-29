@@ -34,7 +34,7 @@ class PipelineContext(compilerContext: PipelineCompilerContext): PipelineEnviron
     override val locale = Locale.getDefault().toString().replace("_", "-")
     override val productName = XmlCalabashBuildConfig.PRODUCT_NAME
     override val productVersion = XmlCalabashBuildConfig.VERSION
-    override val gitHash = XmlCalabashBuildConfig.BUILD_HASH
+    override val buildId = XmlCalabashBuildConfig.BUILD_ID
     override val vendor = XmlCalabashBuildConfig.VENDOR_NAME
     override val vendorUri = XmlCalabashBuildConfig.VENDOR_URI
     override val version = "3.0"

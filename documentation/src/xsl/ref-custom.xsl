@@ -43,7 +43,7 @@
           </div>
           <div class="version">
             <xsl:text>for XML Calabash </xsl:text>
-            <span title="{$VERSION?BUILD_HASH} {$VERSION?BUILD_DATE}">{$VERSION?VERSION}</span>
+            <span title="Build id: {$VERSION?BUILD_ID}">{$VERSION?VERSION}</span>
           </div>
           <div class="date">
             <xsl:text>Updated: </xsl:text>
