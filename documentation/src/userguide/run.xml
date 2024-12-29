@@ -408,14 +408,13 @@ command line arguments are ignored.</para>
   <command>xmlcalabash</command>
   <arg choice="plain">version</arg>
   <arg rep="norepeat" linkend="cli-verbosity">--verbosity:<replaceable>verbosity</replaceable></arg>
-  <arg rep="norepeat" linkend="cli-debug">--debug</arg>
 </cmdsynopsis>
 
 <para>Displays the XML Calabash version and the version of Saxon:</para>
 
 <screen><userinput><prompt>$</prompt> xmlcalabash version</userinput>
-<computeroutput>XML Calabash version <?version?> (build <?version build-hash?>, <?version build-date display?>)
-Running with Saxon EE version 12.5 (with a license)</computeroutput></screen>
+<computeroutput>XML Calabash version <?version?> (build <?version build-id?>, <?version build-date display?>)
+Running with Saxon <?version saxon-edition?> version <?dep saxon?></computeroutput></screen>
 
 <para>Most options are ignored when the <command>version</command> command is
 used, but if the <literal>debug</literal> level of <option>--verbosity</option>
@@ -427,9 +426,8 @@ is formatted in a way that can more easily be parsed, for example by a shell scr
 <computeroutput>PRODUCT_NAME=XML Calabash
 VERSION=<?version VERSION?>
 BUILD_DATE=<?version BUILD_DATE?>
-BUILD_HASH=<?version BUILD_HASH?>
-SAXON=<?version SAXON?>
-SAXON_LICENSE=<?version SAXON_LICENSE?>
+BUILD_ID=<?version BUILD_ID?>
+SAXON_EDITION=<?version SAXON_EDITION?>
 VENDOR_NAME=Norm Tovey-Walsh
 VENDOR_URI=https://xmlcalabash.com/
 DEPENDENCY_brotliDec=<?version DEPENDENCY_brotliDec?>

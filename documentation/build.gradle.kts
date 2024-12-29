@@ -236,24 +236,7 @@ val reference = tasks.register<SaxonXsltTask>("reference") {
   parameters (
       mapOf(
           "mediaobject-input-base-uri" to "file:${layout.buildDirectory.get()}/reference/",
-          "chunk-output-base-uri" to "${layout.buildDirectory.get()}/reference/",
-          "dep_saxon" to project.findProperty("saxonVersion").toString(),
-          "dep_brotliDec" to project.findProperty("brotliDec").toString(),
-          "dep_commonsCodec" to project.findProperty("commonsCodec").toString(),
-          "dep_commonsCompress" to project.findProperty("commonsCompress").toString(),
-          "dep_flexmarkAll" to project.findProperty("flexmarkAll").toString(),
-          "dep_graalvmJS" to project.findProperty("graalvmJS").toString(),
-          "dep_htmlparser" to project.findProperty("htmlparser").toString(),
-          "dep_httpClient" to project.findProperty("httpClient").toString(),
-          "dep_jing" to project.findProperty("jing").toString(),
-          "dep_jsonSchemaValidator" to project.findProperty("jsonSchemaValidator").toString(),
-          "dep_schxslt2" to project.findProperty("schxslt2").toString(),
-          "dep_sinclude" to project.findProperty("sinclude").toString(),
-          "dep_slf4j" to project.findProperty("slf4j").toString(),
-          "dep_tukaaniXz" to project.findProperty("tukaaniXz").toString(),
-          "dep_uuidCreator" to project.findProperty("uuidCreator").toString(),
-          "dep_xercesImpl" to project.findProperty("xercesImpl").toString(),
-          "dep_xmlResolver" to project.findProperty("xmlResolver").toString()
+          "chunk-output-base-uri" to "${layout.buildDirectory.get()}/reference/"
       )
   )
 
@@ -377,24 +360,7 @@ val userguide = tasks.register<SaxonXsltTask>("userguide") {
   parameters (
       mapOf(
           "mediaobject-input-base-uri" to "file:${layout.buildDirectory.get()}/userguide/",
-          "chunk-output-base-uri" to "${layout.buildDirectory.get()}/userguide/",
-          "dep_saxon" to project.findProperty("saxonVersion").toString(),
-          "dep_brotliDec" to project.findProperty("brotliDec").toString(),
-          "dep_commonsCodec" to project.findProperty("commonsCodec").toString(),
-          "dep_commonsCompress" to project.findProperty("commonsCompress").toString(),
-          "dep_flexmarkAll" to project.findProperty("flexmarkAll").toString(),
-          "dep_graalvmJS" to project.findProperty("graalvmJS").toString(),
-          "dep_htmlparser" to project.findProperty("htmlparser").toString(),
-          "dep_httpClient" to project.findProperty("httpClient").toString(),
-          "dep_jing" to project.findProperty("jing").toString(),
-          "dep_jsonSchemaValidator" to project.findProperty("jsonSchemaValidator").toString(),
-          "dep_schxslt2" to project.findProperty("schxslt2").toString(),
-          "dep_sinclude" to project.findProperty("sinclude").toString(),
-          "dep_slf4j" to project.findProperty("slf4j").toString(),
-          "dep_tukaaniXz" to project.findProperty("tukaaniXz").toString(),
-          "dep_uuidCreator" to project.findProperty("uuidCreator").toString(),
-          "dep_xercesImpl" to project.findProperty("xercesImpl").toString(),
-          "dep_xmlResolver" to project.findProperty("xmlResolver").toString()
+          "chunk-output-base-uri" to "${layout.buildDirectory.get()}/userguide/"
       )
   )
 

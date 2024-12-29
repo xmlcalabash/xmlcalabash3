@@ -106,7 +106,7 @@
   <varlistentry>
     <term><varname>cx:product-build</varname></term>
     <listitem>
-      <para>Returns the product build identifier, for example “<literal><?version build-hash?></literal>”.
+      <para>Returns the product build identifier, for example “<literal><?version build-id?></literal>”.
       </para>
     </listitem>
   </varlistentry>

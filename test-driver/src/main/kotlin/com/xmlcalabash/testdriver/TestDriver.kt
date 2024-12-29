@@ -2,13 +2,10 @@ package com.xmlcalabash.testdriver
 
 import com.xmlcalabash.config.XmlCalabash
 import com.xmlcalabash.util.BufferingMessageReporter
-import com.xmlcalabash.util.DefaultMessageReporter
 import com.xmlcalabash.util.DefaultXmlCalabashConfiguration
-import com.xmlcalabash.util.LoggingMessageReporter
 import com.xmlcalabash.util.NopMessageReporter
 import com.xmlcalabash.util.SaxonTreeBuilder
 import com.xmlcalabash.util.SchematronAssertions
-import com.xmlcalabash.util.Verbosity
 import net.sf.saxon.event.ReceiverOption
 import net.sf.saxon.om.AttributeInfo
 import net.sf.saxon.om.AttributeMap
@@ -314,7 +311,7 @@ class TestDriver(val testOptions: TestOptions, val exclusions: Map<String, Strin
         val env = saxonConfig.environment
         property(report, "processor", env.productName)
         property(report, "version", env.productVersion)
-        property(report, "gitHash", env.gitHash)
+        property(report, "buildId", env.buildId)
         property(report, "saxonVersion", "${saxonConfig.processor.saxonProductVersion}/${saxonConfig.processor.saxonEdition}")
         property(report, "vendor", env.vendor)
         property(report, "vendorURI", env.vendorUri)

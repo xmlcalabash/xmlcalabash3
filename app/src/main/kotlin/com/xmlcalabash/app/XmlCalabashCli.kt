@@ -88,6 +88,7 @@ class XmlCalabashCli private constructor() {
             config.traceDocuments = commandLine.traceDocuments
             config.debugger = commandLine.debugger
             config.assertions = commandLine.assertions
+            config.licensed = config.licensed && commandLine.licensed
 
             if (config.trace == null && config.traceDocuments != null) {
                 config.trace = config.traceDocuments!!.resolve("trace.xml")
@@ -312,9 +313,8 @@ class XmlCalabashCli private constructor() {
             println("PRODUCT_NAME=${XmlCalabashBuildConfig.PRODUCT_NAME}")
             println("VERSION=${XmlCalabashBuildConfig.VERSION}")
             println("BUILD_DATE=${XmlCalabashBuildConfig.BUILD_DATE}")
-            println("BUILD_HASH=${XmlCalabashBuildConfig.BUILD_HASH}")
-            println("SAXON=${proc.saxonEdition}")
-            println("SAXON_LICENSE=${license}")
+            println("BUILD_ID=${XmlCalabashBuildConfig.BUILD_ID}")
+            println("SAXON_EDITION=${proc.saxonEdition}")
             println("VENDOR_NAME=${XmlCalabashBuildConfig.VENDOR_NAME}")
             println("VENDOR_URI=${XmlCalabashBuildConfig.VENDOR_URI}")
             for (name in deplist) {
@@ -328,16 +328,8 @@ class XmlCalabashCli private constructor() {
             val dateFormatter = DateTimeFormatter.ofPattern("dd LLLL yyyy")
 
             print("${XmlCalabashBuildConfig.PRODUCT_NAME} version ${XmlCalabashBuildConfig.VERSION} ")
-            println("(build ${XmlCalabashBuildConfig.BUILD_HASH}, ${dateFormatter.format(date)})")
-            print("Running with Saxon ${proc.saxonEdition} version ${proc.saxonProductVersion}")
-            if (proc.saxonEdition != "HE") {
-                if (license) {
-                    print(" (with a license)")
-                } else {
-                    print(" (without a license)")
-                }
-            }
-            println()
+            println("(build ${XmlCalabashBuildConfig.BUILD_ID}, ${dateFormatter.format(date)})")
+            println("Running with Saxon ${proc.saxonEdition} version ${proc.saxonProductVersion}")
             if (edition != proc.saxonEdition) {
                 println("(You appear to have ${edition}; perhaps a license wasn't found?)")
             }

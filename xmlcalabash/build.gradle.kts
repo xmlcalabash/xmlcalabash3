@@ -107,7 +107,7 @@ buildConfig {
   buildConfigField("VENDOR_NAME", xmlbuild.vendorName.get())
   buildConfigField("VENDOR_URI", xmlbuild.vendorUri.get())
   buildConfigField("BUILD_DATE", xmlbuild.buildDate.get())
-  buildConfigField("BUILD_HASH", xmlbuild.gitHash())
+  buildConfigField("BUILD_ID", xmlbuild.buildId())
   buildConfigField("SCHXSLT2", project.findProperty("schxslt2").toString())
 
   val sb = StringBuilder()
