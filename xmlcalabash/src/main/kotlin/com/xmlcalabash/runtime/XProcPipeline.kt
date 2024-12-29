@@ -10,17 +10,15 @@ import com.xmlcalabash.runtime.api.Receiver
 import com.xmlcalabash.runtime.model.CompoundStepModel
 import com.xmlcalabash.runtime.steps.AtomicOptionStep
 import com.xmlcalabash.runtime.steps.CompoundStep
-import com.xmlcalabash.runtime.steps.Consumer
 import com.xmlcalabash.tracing.DetailTraceListener
 import com.xmlcalabash.tracing.StandardTraceListener
 import com.xmlcalabash.tracing.TraceListener
 import com.xmlcalabash.util.DefaultOutputReceiver
 import com.xmlcalabash.util.SchematronAssertions
 import com.xmlcalabash.util.SchematronMonitor
+import com.xmlcalabash.visualizers.Silent
 import net.sf.saxon.s9api.QName
 import net.sf.saxon.s9api.XdmAtomicValue
-import org.apache.logging.log4j.kotlin.logger
-import java.io.FileOutputStream
 
 class XProcPipeline internal constructor(private val runtime: XProcRuntime, pipeline: CompoundStepModel, val config: XProcStepConfiguration) {
     val inputManifold = pipeline.inputs
@@ -37,11 +35,12 @@ class XProcPipeline internal constructor(private val runtime: XProcRuntime, pipe
         runnable.instantiate()
 
         val xconfig = pipeline.stepConfig.xmlCalabash.xmlCalabashConfig
+        val monitors = (config.environment as PipelineContext).monitors
 
         if (xconfig.debugger) {
             if (config.environment is PipelineContext) {
                 val debugger = CliDebugger(runtime)
-                (config.environment as PipelineContext).monitors.add(debugger)
+                monitors.add(debugger)
             } else {
                 pipeline.stepConfig.warn { "Cannot provide debugger on ${config.environment}" }
             }
@@ -49,7 +48,7 @@ class XProcPipeline internal constructor(private val runtime: XProcRuntime, pipe
 
         if (config.environment.assertions != SchematronAssertions.IGNORE) {
             if (config.environment is PipelineContext) {
-                (config.environment as PipelineContext).monitors.add(SchematronMonitor())
+                monitors.add(SchematronMonitor())
             } else {
                 pipeline.stepConfig.warn { "Cannot provide Schematron monitor on ${config.environment}" }
             }
@@ -62,10 +61,14 @@ class XProcPipeline internal constructor(private val runtime: XProcRuntime, pipe
                 } else {
                     StandardTraceListener()
                 }
-                (config.environment as PipelineContext).monitors.add(traceListener!!)
+                monitors.add(traceListener!!)
             } else {
                 pipeline.stepConfig.warn { "Cannot provide tracing on ${config.environment}" }
             }
+        }
+
+        if (xconfig.visualizer !is Silent) {
+            monitors.add(xconfig.visualizer)
         }
     }
 
@@ -138,9 +141,7 @@ class XProcPipeline internal constructor(private val runtime: XProcRuntime, pipe
             if (traceListener != null) {
                 val doc = XProcDocument.ofXml(traceListener!!.summary(config), config, props)
                 val serializer = XProcSerializer(config)
-                val fileOutputStream = FileOutputStream(trace)
-                serializer.write(doc, fileOutputStream)
-                fileOutputStream.close()
+                serializer.write(doc, trace)
             }
         }
     }

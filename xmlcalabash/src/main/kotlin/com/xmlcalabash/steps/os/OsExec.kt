@@ -104,7 +104,7 @@ class OsExec(): AbstractAtomicStep() {
                 try {
                     val os = process.outputStream
                     val serializer = XProcSerializer(stepConfig)
-                    serializer.write(documents.first(), os)
+                    serializer.write(documents.first(), os, "process input")
                     os.close()
                 } catch (ex: SaxonApiException) {
                     var ignore = false

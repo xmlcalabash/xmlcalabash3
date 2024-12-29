@@ -15,4 +15,6 @@
 
   <cc:serialization content-type="application/xml"
                     omit-xml-declaration="true"/>
+
+  <cc:visualizer name="detail"/>
 </cc:xml-calabash>

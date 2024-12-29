@@ -24,7 +24,6 @@ class PipelineMessagesStep(): AbstractAtomicStep() {
             "error" -> Verbosity.ERROR
             "warning" -> Verbosity.WARN
             "info" -> Verbosity.INFO
-            "progress" -> Verbosity.PROGRESS
             "debug" -> Verbosity.DEBUG
             "trace" -> Verbosity.TRACE
             else -> {

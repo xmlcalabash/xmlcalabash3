@@ -1,7 +1,7 @@
 package com.xmlcalabash.debugger
 
 import com.xmlcalabash.documents.XProcDocument
-import com.xmlcalabash.runtime.Monitor
+import com.xmlcalabash.api.Monitor
 import com.xmlcalabash.runtime.steps.AbstractStep
 import com.xmlcalabash.runtime.steps.Consumer
 

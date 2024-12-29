@@ -87,7 +87,7 @@ abstract class AbstractAtomicStep(): XProcStep {
     }
 
     override fun run() {
-        stepConfig.progress { "Running ${this} (${stepParams.stepName}/${nodeId})" }
+        // nop
     }
 
     override fun abort() {

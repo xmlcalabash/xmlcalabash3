@@ -157,7 +157,7 @@ class SendMail(): AbstractAtomicStep() {
                             QName("omit-xml-declaration") to XdmAtomicValue("yes")))
 
                         val stream = ByteArrayOutputStream()
-                        serializer.write(doc, stream, MediaType.HTML)
+                        serializer.write(doc, stream, "sending mail", MediaType.HTML)
                         content = stream.toString("UTF-8")
                         contentType = "text/html;charset=UTF-8"
                     } else {
@@ -191,7 +191,7 @@ class SendMail(): AbstractAtomicStep() {
 
                 val serializer = XProcSerializer(stepConfig)
                 val stream = ByteArrayOutputStream()
-                serializer.write(doc, stream)
+                serializer.write(doc, stream, "sending mail")
 
                 val bodyPart = MimeBodyPart()
                 val source = PartDataSource(stream.toByteArray(), contentType, filename)

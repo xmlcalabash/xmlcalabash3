@@ -66,7 +66,10 @@ class AtomicUserStepModel(runtime: XProcRuntime, model: AtomicModel, private val
                 step.head.unboundInputs.add(port)
             }
         }
+
         step.staticOptions.putAll(staticOptions)
+        step.head.staticOptions.putAll(staticOptions)
+
         return { step }
     }
 

@@ -4,7 +4,7 @@
                 xmlns:p="http://www.w3.org/ns/xproc"
                 xmlns:cx="http://xmlcalabash.com/ns/extensions"
                 xmlns:f="http://xmlcalabash.com/ns/functions"
-                xmlns:dot="http://xmlcalabash.com.com/ns/dot"
+                xmlns:dot="http://xmlcalabash.com/ns/dot"
                 expand-text="yes"
                 exclude-result-prefixes="#all"
                 version="3.0">
@@ -15,20 +15,21 @@
 
 <xsl:variable name="nl" select="'&#10;'"/>
 
-<xsl:template match="dot:digraph">
-<!-- The digraph {} wrapper is added by the caller because
-     it may be combining several graphs into one. -->
-<!--
+<xsl:template match="dot:digraph-wrapper">
+  <!-- special case, mostly when debugging -->
   <xsl:text>digraph </xsl:text>
   <xsl:value-of select="@xml:id"/>
   <xsl:text> {{&#10;</xsl:text>
   <xsl:text>compound=true{$nl}</xsl:text>
   <xsl:text>rankdir=TB{$nl}</xsl:text>
--->
   <xsl:apply-templates/>
-<!--
   <xsl:text>}}&#10;</xsl:text>
--->
+</xsl:template>
+
+<xsl:template match="dot:digraph">
+  <!-- The digraph {} wrapper is added by the caller because
+       it may be combining several graphs into one. -->
+  <xsl:apply-templates/>
 </xsl:template>
 
 <xsl:template match="dot:subgraph[table]">

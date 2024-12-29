@@ -5,6 +5,7 @@ import com.xmlcalabash.io.XProcSerializer
 import com.xmlcalabash.namespace.Ns
 import com.xmlcalabash.namespace.NsDescription
 import net.sf.saxon.s9api.*
+import org.apache.logging.log4j.kotlin.logger
 import org.xml.sax.InputSource
 import java.io.File
 import java.io.PrintStream
@@ -18,7 +19,7 @@ class VisualizerOutput {
             val props = mutableMapOf<QName, XdmValue>()
             props[Ns.method] = XdmAtomicValue("xml")
             props[Ns.indent] = XdmAtomicValue(true)
-            serial.write(description, stream, props)
+            serial.write(description, stream, "pipeline description", props)
         }
 
         fun svg(description: XdmNode, basename: String, graphviz: String) {
@@ -96,6 +97,9 @@ class VisualizerOutput {
             val args = arrayOf(graphviz, "-Tsvg", tempFile.getAbsolutePath().toString(), "-o", filename)
             val process = rt.exec(args)
             process.waitFor()
+            if (process.exitValue() != 0) {
+                logger.warn { "Graph generation failed for $filename" }
+            }
             tempFile.delete()
         }
     }

@@ -7,7 +7,7 @@ import com.xmlcalabash.graph.SubpipelineModel
 import com.xmlcalabash.namespace.NsCx
 import com.xmlcalabash.namespace.NsXmlns
 import com.xmlcalabash.runtime.LazyValue
-import com.xmlcalabash.runtime.Monitor
+import com.xmlcalabash.api.Monitor
 import com.xmlcalabash.runtime.XProcRuntime
 import com.xmlcalabash.runtime.steps.*
 import com.xmlcalabash.steps.AbstractAtomicStep

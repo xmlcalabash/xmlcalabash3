@@ -12,6 +12,7 @@ import com.xmlcalabash.runtime.XProcExecutionContext
 import com.xmlcalabash.runtime.XProcStepConfiguration
 import com.xmlcalabash.util.BufferingMessageReporter
 import com.xmlcalabash.util.DefaultMessageReporter
+import com.xmlcalabash.util.LoggingMessageReporter
 import java.util.*
 import kotlin.collections.set
 
@@ -35,7 +36,7 @@ class XmlCalabash private constructor(val xmlCalabashConfig: XmlCalabashConfigur
             val xmlCalabash = XmlCalabash(config)
             xmlCalabash._commonEnvironment = CommonEnvironment(xmlCalabash)
 
-            val defaultReporter = DefaultMessageReporter()
+            val defaultReporter = DefaultMessageReporter(LoggingMessageReporter())
             defaultReporter.threshold = config.verbosity
             xmlCalabash._commonEnvironment.messageReporter = { BufferingMessageReporter(config.messageBufferSize, defaultReporter) }
 

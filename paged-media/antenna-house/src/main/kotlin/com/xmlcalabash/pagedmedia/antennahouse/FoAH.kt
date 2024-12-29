@@ -80,9 +80,7 @@ class FoAH(): AbstractAH(), FoProcessor {
         }
 
         val serializer = XProcSerializer(stepConfig)
-        val fos = FileOutputStream(temp)
-        serializer.write(document, fos, overrideContentType)
-        fos.close()
+        serializer.write(document, temp, overrideContentType)
 
         val fis = FileInputStream(temp)
         ah.render(fis, out, outputFormat)

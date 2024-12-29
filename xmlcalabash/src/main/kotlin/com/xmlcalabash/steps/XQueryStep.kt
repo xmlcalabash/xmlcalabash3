@@ -105,7 +105,7 @@ open class XQueryStep(): AbstractAtomicStep() {
                     val xserializer = XProcSerializer(stepConfig)
                     xserializer.setOverrideProperty(MediaType.XML, Ns.encoding, "UTF-8")
                     xserializer.setOverrideProperty(MediaType.XML, Ns.omitXmlDeclaration, "true")
-                    xserializer.write(query, baos, MediaType.XML)
+                    xserializer.write(query, baos, "XQuery query input", MediaType.XML)
 
                     xquery = baos.toString("utf-8")
                 }

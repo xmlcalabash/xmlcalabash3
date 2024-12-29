@@ -221,11 +221,11 @@ class CssPrince: CssProcessor {
         stepConfig.debug { "css-formatter source: ${tempXml.absolutePath}" }
 
         val serializer = XProcSerializer(stepConfig)
-        val fos = FileOutputStream(tempXml)
-        serializer.write(document, fos)
+        serializer.write(document, tempXml)
 
         val fis = FileInputStream(tempXml)
         prince.convert(fis, out)
+        fis.close()
 
         while (tempFiles.isNotEmpty()) {
             val temp = tempFiles.removeAt(0)

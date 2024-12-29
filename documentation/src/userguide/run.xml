@@ -77,6 +77,7 @@ given, the <command>run</command> command is assumed.</para>
   <arg rep="norepeat" linkend="cli-step">--step:<replaceable>step-name</replaceable></arg>
   <sbr/>
   <arg rep="norepeat" linkend="cli-verbosity">--verbosity:<replaceable>verbosity</replaceable></arg>
+  <arg rep="norepeat" linkend="cli-visualizer">--visualizer:<replaceable>name</replaceable></arg>
   <sbr/>
   <arg rep="norepeat" linkend="cli-trace">--trace:<replaceable>output-file</replaceable></arg>
   <arg rep="norepeat" linkend="cli-trace-documents">--trace-documents:<replaceable>output-directory</replaceable></arg>
@@ -243,10 +244,6 @@ detail is printed about the progress of a running pipeline.</para>
 <listitem><para>Lots of detail</para></listitem>
 </varlistentry>
 <varlistentry>
-<term><literal>progress</literal></term>
-<listitem><para>Show when the execution of each step begins.</para></listitem>
-</varlistentry>
-<varlistentry>
 <term><literal>info</literal></term>
 <listitem><para>Show relevant status messages.</para></listitem>
 </varlistentry>
@@ -260,8 +257,46 @@ detail is printed about the progress of a running pipeline.</para>
 </varlistentry>
 </variablelist>
 <para>Setting the verbosity also sets the logging level.
-The “progress” setting is really the same as “info” except that the
-progress of execution (when each step starts running) will be shown.</para>
+</para>
+</listitem>
+</varlistentry>
+
+<varlistentry xml:id="cli-visualizer">
+  <term><option>--visualizer:<replaceable>name</replaceable></option></term>
+<listitem>
+<para>Selects a visualizer for reporting pipeline progress. There are three defined visualizers.</para>
+<variablelist>
+<varlistentry>
+<term><literal>silent</literal></term>
+<listitem><para>Shows no progress reports.</para>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term><literal>plain</literal></term>
+<listitem><para>Reports the name of each step when it begins running.
+Most steps manufactured automatically during graph construction are
+omitted. There is one option, <literal>indent</literal> which
+determines whether or not, and to what extent, reports are indented when
+they are nested inside compound steps.</para>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term><literal>detail</literal></term>
+<listitem><para>Reports the name of each step and may report on the documents produced.
+</para>
+<para>If the <literal>steps</literal> option is <literal>true</literal>,
+the progress of steps is recorded. (Defaults to true.)</para>
+<para>If the <literal>documents</literal> option is <literal>true</literal>,
+the documents produced during execution are recorded. (Defaults to false.)</para>
+</listitem>
+</varlistentry>
+</variablelist>
+
+<para>Options can be specified on the command line as <literal>key=value</literal> pairs
+after the name. The name and any options are separated by a question mark (<literal>?</literal>).
+Key-value pairs are separted by semicolons (<literal>;</literal>).
+For example: <literal>--visualizer=detail?steps=true;documents=true</literal>.</para>
+
 </listitem>
 </varlistentry>
 

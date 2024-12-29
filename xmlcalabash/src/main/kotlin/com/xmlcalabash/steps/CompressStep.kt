@@ -41,7 +41,7 @@ open class CompressStep(): AbstractAtomicStep() {
         } else {
             val baos = ByteArrayOutputStream()
             val serializer = XProcSerializer(stepConfig)
-            serializer.write(doc, baos)
+            serializer.write(doc, baos, "compression")
             baos.toByteArray()
         }
 

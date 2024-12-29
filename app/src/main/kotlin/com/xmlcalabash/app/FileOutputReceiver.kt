@@ -25,12 +25,8 @@ class FileOutputReceiver(xmlCalabash: XmlCalabash, processor: Processor, val fil
             }
             wroteTo.add(port)
 
-            val stream = PrintStream(FileOutputStream(outfile))
             val serializer = XProcSerializer(xmlCalabash, processor)
-            //serializer.overrideProperties[Ns.omitXmlDeclaration] = "yes"
-            //serializer.overrideProperties[Ns.indent] = "yes"
-            serializer.write(document, stream)
-            stream.close()
+            serializer.write(document, outfile)
         } else {
             super.output(port, document)
         }

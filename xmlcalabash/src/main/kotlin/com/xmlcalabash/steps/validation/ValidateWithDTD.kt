@@ -96,7 +96,7 @@ class ValidateWithDTD(): AbstractAtomicStep() {
         if (source.contentType!!.xmlContentType()) {
             val baos = ByteArrayOutputStream()
             val serializer = XProcSerializer(stepConfig)
-            serializer.write(source.value as XdmNode, baos, serialization)
+            serializer.write(source.value as XdmNode, baos, "DTD parse", serialization)
             return baos.toString(StandardCharsets.UTF_8)
         } else {
             return source.value.underlyingValue.stringValue

@@ -197,8 +197,7 @@ class CssWeasyprint: CssProcessor {
         stepConfig.debug { "css-formatter source: ${tempXml.absolutePath}" }
 
         val serializer = XProcSerializer(stepConfig)
-        val fos = FileOutputStream(tempXml)
-        serializer.write(document, fos)
+        serializer.write(document, tempXml)
 
         val tempPdf = File.createTempFile("xmlcalabash-weasycss", ".pdf")
         tempPdf.deleteOnExit()

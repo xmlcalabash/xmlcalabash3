@@ -10,7 +10,6 @@ class LoggingMessageReporter(nextReporter: MessageReporter? = null): NopMessageR
             Verbosity.ERROR -> logger.error(message)
             Verbosity.WARN -> logger.warn(message)
             Verbosity.INFO -> logger.info(message)
-            Verbosity.PROGRESS -> logger.debug(message)
             Verbosity.DEBUG -> logger.debug(message)
             Verbosity.TRACE -> logger.trace(message)
         }

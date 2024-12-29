@@ -150,7 +150,7 @@ class DocumentManager(): EntityResolver, EntityResolver2, ResourceResolver, Modu
                 if (doc.value is XdmNode) {
                     val byteStream = ByteArrayOutputStream()
                     val serializer = XProcSerializer(doc.context)
-                    serializer.write(doc, byteStream)
+                    serializer.write(doc, byteStream, "cached input")
                     byteStream.toByteArray().inputStream()
                 } else {
                     doc.value.toString().toByteArray().inputStream()
