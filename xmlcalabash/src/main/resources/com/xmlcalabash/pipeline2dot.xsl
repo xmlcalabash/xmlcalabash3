@@ -24,14 +24,16 @@
 <xsl:template match="ns:description">
   <xsl:choose>
     <xsl:when test="$number = 0">
-      <xsl:for-each select="ns:declare-step">
-        <xsl:variable name="pipeline" as="document-node()">
-          <xsl:document>
-            <xsl:sequence select="."/>
-          </xsl:document>
-        </xsl:variable>
-        <xsl:apply-templates select="$pipeline"/>
-      </xsl:for-each>
+      <dot:digraph-wrapper>
+        <xsl:for-each select="ns:declare-step">
+          <xsl:variable name="pipeline" as="document-node()">
+            <xsl:document>
+              <xsl:sequence select="."/>
+            </xsl:document>
+          </xsl:variable>
+          <xsl:apply-templates select="$pipeline"/>
+        </xsl:for-each>
+      </dot:digraph-wrapper>
     </xsl:when>
     <xsl:otherwise>
       <xsl:variable name="pipeline" as="document-node()">
