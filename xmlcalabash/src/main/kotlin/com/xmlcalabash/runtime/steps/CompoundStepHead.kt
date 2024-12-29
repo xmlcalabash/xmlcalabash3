@@ -136,7 +136,7 @@ class CompoundStepHead(config: XProcStepConfiguration, val parent: CompoundStep,
 
     override fun run() {
         if (showMessage && message != null) {
-            println(message)
+            stepConfig.info { "${message}" }
             message = null
             showMessage = false
         }

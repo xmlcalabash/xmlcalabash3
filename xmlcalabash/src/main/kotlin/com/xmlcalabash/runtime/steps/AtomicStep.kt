@@ -137,7 +137,7 @@ open class AtomicStep(config: XProcStepConfiguration, atomic: AtomicBuiltinStepM
 
     override fun run() {
         if (message != null) {
-            println(message)
+            stepConfig.info { "${message}" }
             message = null
         }
 
