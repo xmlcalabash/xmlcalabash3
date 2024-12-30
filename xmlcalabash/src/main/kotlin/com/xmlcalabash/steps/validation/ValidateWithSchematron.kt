@@ -7,6 +7,7 @@ import com.xmlcalabash.namespace.Ns
 import com.xmlcalabash.steps.AbstractAtomicStep
 import com.xmlcalabash.util.S9Api
 import com.xmlcalabash.util.SchematronImpl
+import com.xmlcalabash.xvrl.XvrlReport
 import net.sf.saxon.om.NamespaceUri
 import net.sf.saxon.s9api.QName
 import net.sf.saxon.s9api.XdmDestination
@@ -20,8 +21,6 @@ open class ValidateWithSchematron(): AbstractAtomicStep() {
         private val s_schematron = QName(NamespaceUri.of("http://purl.oclc.org/dsdl/schematron"), "s:schema")
         private val _phase = QName("phase")
     }
-
-    private var svrlToXvrl: Xslt30Transformer? = null
 
     override fun run() {
         super.run()
@@ -50,16 +49,7 @@ open class ValidateWithSchematron(): AbstractAtomicStep() {
         val failed = impl.failedAssertions(report)
 
         if (reportFormat == "xvrl") {
-            if (svrlToXvrl == null) {
-                var styleStream = SaxonConfiguration::class.java.getResourceAsStream("/com/xmlcalabash/svrl2xvrl.xsl")
-                var styleSource = SAXSource(InputSource(styleStream))
-                var xsltCompiler = stepConfig.processor.newXsltCompiler()
-                var xsltExec = xsltCompiler.compile(styleSource)
-                svrlToXvrl = xsltExec.load30()
-            }
-            val destination = XdmDestination()
-            svrlToXvrl!!.transform(report.asSource(), destination)
-            report = destination.xdmNode
+            report = XvrlReport.from(stepConfig, report)
         }
 
         if (assertValid) {

@@ -7,5 +7,6 @@ object NsXml {
     val namespace = NamespaceUri.of("http://www.w3.org/XML/1998/namespace")
 
     val base = QName(namespace, "xml:base")
+    val lang = QName(namespace, "xml:lang")
     val id = QName(namespace, "xml:id")
 }
