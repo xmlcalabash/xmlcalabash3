@@ -4,6 +4,7 @@ import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.namespace.NsFn
 import com.xmlcalabash.namespace.NsP
 import net.sf.saxon.om.StructuredQName
+import net.sf.saxon.s9api.OccurrenceIndicator
 import net.sf.saxon.s9api.QName
 import net.sf.saxon.s9api.SequenceType
 import net.sf.saxon.s9api.XdmAtomicValue
@@ -75,8 +76,21 @@ open class OptionInstruction(parent: XProcInstruction, name: QName, stepConfig: 
                 if (static && stepConfig.staticBindings.contains(name)) {
                     select = XProcExpression.constant(stepConfig, stepConfig.staticBindings[name]!!, asType ?: SequenceType.ANY, values)
                 } else {
-                    select = XProcExpression.constant(stepConfig, XdmEmptySequence.getInstance(), asType ?: SequenceType.ANY, values)
+                    val type = asType
+                    if (type != null) {
+                        if (type.occurrenceIndicator in listOf(OccurrenceIndicator.ONE, OccurrenceIndicator.ONE_OR_MORE)) {
+                            // If an empty sequence isn't allowed here, make sure it will fail unless an option is provided at runtime
+                            select = XProcExpression.select(stepConfig,
+                                "Q{http://xmlcalabash.com/ns/extensions}error('dynamic', 36)",
+                                SequenceType.ANY, false)
+                        } else {
+                            select = XProcExpression.constant(stepConfig, XdmEmptySequence.getInstance(), type, values)
+                        }
+                    } else {
+                        select = XProcExpression.constant(stepConfig, XdmEmptySequence.getInstance(), SequenceType.ANY, values)
+                    }
                 }
+
             }
         } else {
             if (required == true) {
