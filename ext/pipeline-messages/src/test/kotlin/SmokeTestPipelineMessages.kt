@@ -4,6 +4,7 @@ import com.xmlcalabash.namespace.NsCx
 import com.xmlcalabash.util.BufferingReceiver
 import com.xmlcalabash.util.DefaultXmlCalabashConfiguration
 import com.xmlcalabash.util.S9Api
+import com.xmlcalabash.visualizers.Detail
 import net.sf.saxon.s9api.QName
 import net.sf.saxon.s9api.XdmNode
 import org.junit.jupiter.api.Assertions
@@ -18,6 +19,7 @@ class SmokeTestPipelineMessages {
     fun runPipeline() {
         val pipeline = File("src/test/resources/pipe.xpl").toURI()
         val config = DefaultXmlCalabashConfiguration()
+        config.visualizer = Detail(emptyMap())
         val calabash = XmlCalabash.newInstance(config)
         val parser = calabash.newXProcParser()
         val decl = parser.parse(pipeline)
@@ -25,8 +27,8 @@ class SmokeTestPipelineMessages {
         val exec = runtime.executable()
 
         val receiver = BufferingReceiver()
-        exec.receiver = receiver
         try {
+            exec.receiver = receiver
             exec.run()
         } catch (ex: Exception) {
             System.err.println(ex.message)

@@ -60,7 +60,7 @@ class Detail(options: Map<String,String>): Plain(emptyMap()) {
             print("├─ ")
         }
 
-        println("${name(step)}${extra(step)}")
+        println("${name(step)}${extra(step)} (ends)")
     }
 
     override fun showDocument(step: AbstractStep, port: String, depth: Int, document: XProcDocument) {
