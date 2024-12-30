@@ -76,4 +76,7 @@ class IfInstruction(parent: XProcInstruction): ChooseInstruction(parent, NsP.`if
         return whenInstruction.atomicStep(type)
     }
 
+    override fun variable(name: QName): VariableInstruction {
+        return whenInstruction.variable(name)
+    }
 }
