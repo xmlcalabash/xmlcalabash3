@@ -210,7 +210,7 @@ open class ArchiveStep(): AbstractArchiveStep() {
 
         val props = DocumentProperties()
         props[Ns.baseUri] = XdmEmptySequence.getInstance()
-
+        props[Ns.contentType] = MediaType.ZIP
         receiver.output("result", XProcDocument.ofBinary(bytes, stepConfig, props))
     }
 

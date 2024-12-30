@@ -381,6 +381,16 @@ class XProcError private constructor(val code: QName, val variant: Int, val loca
         fun xiTooLateForStaticOptions(name: QName) = internal(213, name)
         fun xiCliDuplicateNamespace(prefix: String) = internal(214, prefix)
 
+        fun xiXvrlInvalidValue(name: QName, value: String) = internal(300, name, value)
+        fun xiXvrlIllegalMessageName(name: QName) = internal(301, name)
+        fun xiXvrlIllegalMessageAttribute(name: QName) = internal(302, name)
+        fun xiXvrlIllegalCommonAttribute(name: QName) = internal(303, name)
+        fun xiXvrlInvalidSeverity(severity: String) = internal(304, severity)
+        fun xiXvrlInvalidMessage(message: String) = internal(305, message)
+        fun xiXvrlInvalidValid(valid: String) = internal(306, valid)
+        fun xiXvrlInvalidWorst(worst: String) = internal(307, worst)
+        fun xiXvrlInvalidSvrl(nodeName: QName) = internal(308, nodeName)
+
         fun xiAbortDebugger() = internal(9997)
         fun xiImpossible(message: String) = internal(9998, message)
         fun xiNotImplemented(message: String) = internal(9999, message)
