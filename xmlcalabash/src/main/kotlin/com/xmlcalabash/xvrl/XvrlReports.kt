@@ -18,7 +18,7 @@ class XvrlReports private constructor(stepConfig: XProcStepConfiguration): XvrlE
         get() = _metadata
     val report = mutableListOf<XvrlReport>()
     val reports = mutableListOf<XvrlReports>()
-    internal var digest = XvrlDigest(stepConfig)
+    var digest = XvrlDigest(stepConfig)
 
     companion object {
         val _document = QName("document")
