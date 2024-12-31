@@ -120,6 +120,7 @@ resources, XML Calabash defines a pragmatically more useful default.</para>
 <row><entry>bz2</entry><entry>application/bzip2</entry></row>
 <row><entry>css</entry><entry>text/plain</entry></row>
 <row><entry>eps</entry><entry>image/eps</entry></row>
+<row><entry>epub</entry><entry>application/epub+zip</entry></row>
 <row><entry>fo</entry><entry>application/xml</entry></row>
 <row><entry>gif</entry><entry>image/gif</entry></row>
 <row><entry>gz</entry><entry>application/gzip</entry></row>

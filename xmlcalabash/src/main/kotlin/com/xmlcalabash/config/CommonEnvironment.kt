@@ -31,6 +31,7 @@ class CommonEnvironment(private val xmlCalabash: XmlCalabash) {
             "bmp" to "image/bmp",
             "bz2" to "application/bzip2",
             "css" to "text/plain",
+            "epub" to "application/epub+zip",
             "eps" to "image/eps",
             "fo" to "application/xml",
             "gif" to "image/gif",
