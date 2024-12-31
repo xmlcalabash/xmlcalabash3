@@ -19,7 +19,7 @@ class XvrlDigest internal constructor(stepConfig: XProcStepConfiguration): XvrlE
         val _infoCodes = QName("info-codes")
         val _unspecifiedCodes = QName("unspecified-codes")
 
-        fun newInstance(stepConfig: XProcStepConfiguration, attr: Map<QName, String> = emptyMap()): XvrlDigest {
+        fun newInstance(stepConfig: XProcStepConfiguration, attr: Map<QName,String?> = emptyMap()): XvrlDigest {
             val digest = XvrlDigest(stepConfig)
             digest.setAttributes(attr)
             return digest
@@ -40,7 +40,7 @@ class XvrlDigest internal constructor(stepConfig: XProcStepConfiguration): XvrlE
     var worst: String
         get() = _worst
         set(value) {
-            if (value !in listOf("fatal-error", "error", "warning", "info", "nothing")) {
+            if (value !in listOf("fatal-error", "error", "warning", "info", "nothing","unspecified")) {
                 throw stepConfig.exception(XProcError.xiXvrlInvalidWorst(value))
             }
             when (_worst) {

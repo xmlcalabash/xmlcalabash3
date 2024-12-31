@@ -1,0 +1,13 @@
+<s:schema queryBinding="xslt2" xml:id="assert-input"
+          xmlns:s="http://purl.oclc.org/dsdl/schematron">
+
+  <s:ns prefix="ex" uri="https://xmlcalabash.com/ns/examples"/>
+
+  <s:pattern>
+    <s:rule context="/">
+      <s:report test="*/@xml:id">The source document has a root id.</s:report>
+      <s:report test="not(*/@xml:id)">The source document does not have a root id.</s:report>
+      <s:assert test="ex:book">The source is not a book.</s:assert>
+    </s:rule>
+  </s:pattern>
+</s:schema>

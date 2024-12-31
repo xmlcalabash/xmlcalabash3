@@ -9,7 +9,7 @@ import net.sf.saxon.s9api.XdmNode
 
 class XvrlLet private constructor(stepConfiguration: XProcStepConfiguration): XvrlContainer(stepConfiguration) {
     companion object {
-        fun newInstance(stepConfig: XProcStepConfiguration, name: QName, value: String, attr: Map<QName,String> = emptyMap()): XvrlLet {
+        fun newInstance(stepConfig: XProcStepConfiguration, name: QName, value: String, attr: Map<QName,String?> = emptyMap()): XvrlLet {
             val let = XvrlLet(stepConfig)
             let.setAttributes(attr)
             let.setAttribute(Ns.name, "${name}")
@@ -17,7 +17,7 @@ class XvrlLet private constructor(stepConfiguration: XProcStepConfiguration): Xv
             return let
         }
 
-        fun newInstance(stepConfig: XProcStepConfiguration, name: QName, node: XdmNode, attr: Map<QName,String> = emptyMap()): XvrlLet {
+        fun newInstance(stepConfig: XProcStepConfiguration, name: QName, node: XdmNode, attr: Map<QName,String?> = emptyMap()): XvrlLet {
             val let = XvrlLet(stepConfig)
             let.withNode(node)
             let.setAttributes(attr)
@@ -25,7 +25,7 @@ class XvrlLet private constructor(stepConfiguration: XProcStepConfiguration): Xv
             return let
         }
 
-        fun newInstance(stepConfig: XProcStepConfiguration, name: QName, nodes: List<XdmNode>, attr: Map<QName,String> = emptyMap()): XvrlLet {
+        fun newInstance(stepConfig: XProcStepConfiguration, name: QName, nodes: List<XdmNode>, attr: Map<QName,String?> = emptyMap()): XvrlLet {
             val let = XvrlLet(stepConfig)
             let.withNodes(nodes)
             let.setAttributes(attr)

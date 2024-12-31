@@ -18,24 +18,29 @@ open class XvrlLocation protected constructor(stepConfig: XProcStepConfiguration
         private val _column = QName("column")
         private val _octetPosition = QName("octet-position")
 
-        fun newInstance(stepConfig: XProcStepConfiguration, href: URI?): XvrlLocation {
+        fun newInstance(stepConfig: XProcStepConfiguration, href: URI?, attr: Map<QName,String?> = emptyMap()): XvrlLocation {
             val loc = XvrlLocation(stepConfig)
+            loc.setAttributes(attr)
             href?.let { loc.setAttribute(_href, "${it}") }
             return loc
         }
 
-        fun newInstance(stepConfig: XProcStepConfiguration, href: URI?, line: Int, column: Int = 0): XvrlLocation {
+        fun newInstance(stepConfig: XProcStepConfiguration, href: URI?, line: Int, column: Int = 0, attr: Map<QName,String?> = emptyMap()): XvrlLocation {
             val loc = XvrlLocation(stepConfig)
+            loc.setAttributes(attr)
             href?.let { loc.setAttribute(_href, "${it}") }
-            loc.setAttribute(_line, "${line}")
+            if (line > 0) {
+                loc.setAttribute(_line, "${line}")
+            }
             if (column > 0) {
                 loc.setAttribute(_column, "${column}")
             }
             return loc
         }
 
-        fun newInstance(stepConfig: XProcStepConfiguration, href: URI?, offset: Int): XvrlLocation {
+        fun newInstance(stepConfig: XProcStepConfiguration, href: URI?, offset: Int, attr: Map<QName,String?> = emptyMap()): XvrlLocation {
             val loc = XvrlLocation(stepConfig)
+            loc.setAttributes(attr)
             href?.let { loc.setAttribute(_href, "${it}") }
             if (offset > 0) {
                 loc.setAttribute(_octetPosition, "${offset}")

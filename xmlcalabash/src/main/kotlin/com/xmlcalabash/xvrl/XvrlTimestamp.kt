@@ -10,7 +10,7 @@ import java.time.format.DateTimeFormatter
 
 class XvrlTimestamp private constructor(stepConfiguration: XProcStepConfiguration, val timestamp: ZonedDateTime): XvrlElement(stepConfiguration) {
     companion object {
-        fun newInstance(stepConfig: XProcStepConfiguration, stamp: ZonedDateTime, attr: Map<QName, String> = emptyMap()): XvrlTimestamp {
+        fun newInstance(stepConfig: XProcStepConfiguration, stamp: ZonedDateTime, attr: Map<QName,String?> = emptyMap()): XvrlTimestamp {
             val timestamp = XvrlTimestamp(stepConfig, stamp)
             timestamp.commonAttributes(attr)
             return timestamp

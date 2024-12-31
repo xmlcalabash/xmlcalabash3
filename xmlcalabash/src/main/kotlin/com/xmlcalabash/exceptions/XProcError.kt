@@ -389,7 +389,7 @@ class XProcError private constructor(val code: QName, val variant: Int, val loca
         fun xiXvrlInvalidMessage(message: String) = internal(305, message)
         fun xiXvrlInvalidValid(valid: String) = internal(306, valid)
         fun xiXvrlInvalidWorst(worst: String) = internal(307, worst)
-        fun xiXvrlInvalidSvrl(nodeName: QName) = internal(308, nodeName)
+        fun xiXvrlNullCode() = internal(308)
 
         fun xiAbortDebugger() = internal(9997)
         fun xiImpossible(message: String) = internal(9998, message)

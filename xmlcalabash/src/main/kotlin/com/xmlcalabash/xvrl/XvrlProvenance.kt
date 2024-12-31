@@ -11,7 +11,7 @@ class XvrlProvenance private constructor(stepConfiguration: XProcStepConfigurati
     val locations = mutableListOf<XvrlLocation>()
 
     companion object {
-        fun newInstance(stepConfig: XProcStepConfiguration, attr: Map<QName,String> = emptyMap()): XvrlProvenance {
+        fun newInstance(stepConfig: XProcStepConfiguration, attr: Map<QName,String?> = emptyMap()): XvrlProvenance {
             val provenance = XvrlProvenance(stepConfig)
             provenance.setAttributes(attr)
             return provenance

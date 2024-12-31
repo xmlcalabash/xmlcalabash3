@@ -29,6 +29,7 @@ class SchematronImpl(val stepConfig: XProcStepConfiguration) {
         }
         return failures
     }
+
     fun report(sourceXml: XdmItem, schemaXml: XdmNode, phase: String? = null): XdmNode {
         val schemaRoot = when (schemaXml.nodeKind) {
             XdmNodeKind.ELEMENT -> schemaXml

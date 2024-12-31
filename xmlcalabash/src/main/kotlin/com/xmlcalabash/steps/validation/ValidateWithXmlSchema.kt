@@ -145,7 +145,7 @@ open class ValidateWithXmlSchema(): AbstractAtomicStep() {
         val validator = manager.newSchemaValidator()
         val invalidityHandler = validator.invalidityHandler
 
-        val report = Errors(stepConfig, reportFormat)
+        val report = Errors(stepConfig, document.baseURI)
         val listener = CachingErrorListener(stepConfig, report, invalidityHandler)
 
         validator.destination = destination
@@ -159,7 +159,7 @@ open class ValidateWithXmlSchema(): AbstractAtomicStep() {
         try {
             validator.validate((document.value as XdmNode).asSource())
         } catch (ex: SaxonApiException) {
-            errors = report.endErrors()
+            errors = report.asXml()
             var msg = ex.message
             if (listener.exceptions.isNotEmpty()) {
                 val lex = listener.exceptions.first()
@@ -201,7 +201,7 @@ open class ValidateWithXmlSchema(): AbstractAtomicStep() {
             }
         } else {
             receiver.output("result", XProcDocument.ofXml(destination.xdmNode, stepConfig))
-            receiver.output("report", XProcDocument.ofXml(report.endErrors(), stepConfig))
+            receiver.output("report", XProcDocument.ofXml(report.asXml(), stepConfig))
         }
     }
 

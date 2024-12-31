@@ -31,7 +31,7 @@ open class ValidateWithNVDL(): AbstractAtomicStep() {
             throw stepConfig.exception(XProcError.xcUnsupportedReportFormat(reportFormat))
         }
 
-        val report = Errors(stepConfig, reportFormat)
+        val report = Errors(stepConfig, document.baseURI)
         val listener = CachingErrorListener(stepConfig, report)
         val properties = PropertyMapBuilder()
         properties.put(ValidateProperty.ERROR_HANDLER, listener)
@@ -68,7 +68,7 @@ open class ValidateWithNVDL(): AbstractAtomicStep() {
         }
 
         receiver.output("result", document)
-        receiver.output("report", XProcDocument.ofXml(report.endErrors(), stepConfig))
+        receiver.output("report", XProcDocument.ofXml(report.asXml(), stepConfig))
     }
 
     override fun toString(): String = "p:validate-with-nvdl"

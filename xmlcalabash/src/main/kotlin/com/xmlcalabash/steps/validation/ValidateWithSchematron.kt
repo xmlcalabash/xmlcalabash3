@@ -8,6 +8,7 @@ import com.xmlcalabash.steps.AbstractAtomicStep
 import com.xmlcalabash.util.S9Api
 import com.xmlcalabash.util.SchematronImpl
 import com.xmlcalabash.xvrl.XvrlReport
+import com.xmlcalabash.xvrl.XvrlReports
 import net.sf.saxon.om.NamespaceUri
 import net.sf.saxon.s9api.QName
 import net.sf.saxon.s9api.XdmDestination
@@ -49,7 +50,8 @@ open class ValidateWithSchematron(): AbstractAtomicStep() {
         val failed = impl.failedAssertions(report)
 
         if (reportFormat == "xvrl") {
-            report = XvrlReport.from(stepConfig, report)
+            val xvrl = XvrlReports.fromSvrl(stepConfig, report)
+            report = xvrl.asXml()
         }
 
         if (assertValid) {
