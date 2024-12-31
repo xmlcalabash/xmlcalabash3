@@ -161,6 +161,17 @@ tasks.jar {
   }
 }
 
+val copyScripts = tasks.register<Copy>("copyScripts") {
+  inputs.file(layout.projectDirectory.file("src/main/scripts/xmlcalabash.sh"))
+  outputs.file(layout.buildDirectory.file("stage/xmlcalabash.sh"))
+  from(layout.projectDirectory.dir("src/main/scripts"))
+  into(layout.buildDirectory.dir("stage"))
+  include("xmlcalabash.sh")
+  filter { line ->
+    line.replace("@@VERSION@@", xmlbuild.version.get())
+  }
+}
+
 tasks.register("stage-release") {
   inputs.files(xmlcalabashJar)
   inputs.files(sendmailJar)
@@ -172,6 +183,7 @@ tasks.register("stage-release") {
   inputs.files(metadataextractorJar)
   inputs.files(cacheJar)
   inputs.files(pipelineMessagesJar)
+  inputs.files(copyScripts)
 //  inputs.files(polyglotJar)
   dependsOn("jar")
 
@@ -189,8 +201,8 @@ tasks.register("stage-release") {
       copy {
         from(path)
         into(layout.buildDirectory.dir("stage/lib"))
-        exclude("META-INF/ **")
-        exclude("com/ **")
+        exclude("META-INF/**")
+        exclude("com/**")
       }                      
     }
   }
@@ -283,6 +295,9 @@ tasks.register<Zip>("release") {
 tasks.register("helloWorld") {
   doLast {
     println("Building with Java version ${System.getProperty("java.version")}")
+    for (jar in distClasspath()) {
+      println("APP: ${jar}")
+    }
   }
 }
 
