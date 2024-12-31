@@ -8,7 +8,9 @@ import com.xmlcalabash.namespace.Ns
 import com.xmlcalabash.namespace.NsXvrl
 import com.xmlcalabash.steps.AbstractAtomicStep
 import com.xmlcalabash.util.SaxonTreeBuilder
+import com.xmlcalabash.xvrl.XvrlReport
 import java.io.ByteArrayOutputStream
+import java.net.URI
 import java.nio.charset.StandardCharsets
 
 open class ValidateWithJsonSchema(): AbstractAtomicStep() {
@@ -63,20 +65,26 @@ open class ValidateWithJsonSchema(): AbstractAtomicStep() {
             executionContext: ExecutionContext -> executionContext.executionConfig.formatAssertionsEnabled = true
         }
 
-        val builder = SaxonTreeBuilder(stepConfig)
-        builder.startDocument(null)
-        builder.addStartElement(NsXvrl.report)
+        val report = XvrlReport.newInstance(stepConfig)
+        document.baseURI?.let { report.metadata.document(it) }
         for (assertion in assertions) {
-            val amap = mapOf(Ns.code to assertion.code, Ns.message to assertion.message)
-            builder.addStartElement(NsXvrl.detection, stepConfig.attributeMap(amap))
-            builder.addEndElement()
+            val detection = report.detection("error", assertion.code, assertion.message)
+            if (assertion.schemaLocation != null || assertion.instanceLocation != null) {
+                val uri = if (assertion.schemaLocation != null) {
+                    URI("${assertion.schemaLocation}")
+                } else {
+                    null
+                }
+                val loc = detection.location(uri)
+                if (assertion.instanceLocation != null) {
+                    loc.jsonpath = "${assertion.instanceLocation}"
+                }
+            }
         }
-        builder.addEndElement()
-        builder.endDocument()
 
         if (assertions.isEmpty()) {
             receiver.output("result", document)
-            receiver.output("report", XProcDocument.ofXml(builder.result, stepConfig))
+            receiver.output("report", XProcDocument.ofXml(report.asXml(), stepConfig))
             return
         }
 
@@ -88,7 +96,7 @@ open class ValidateWithJsonSchema(): AbstractAtomicStep() {
         }
 
         receiver.output("result", document)
-        receiver.output("report", XProcDocument.ofXml(builder.result, stepConfig))
+        receiver.output("report", XProcDocument.ofXml(report.asXml(), stepConfig))
     }
 
     override fun toString(): String = "p:validate-with-json-schema"

@@ -40,7 +40,7 @@ open class ValidateWithRelaxNG(): AbstractAtomicStep() {
             throw stepConfig.exception(XProcError.xcUnsupportedReportFormat(reportFormat))
         }
 
-        val report = Errors(stepConfig, reportFormat)
+        val report = Errors(stepConfig, document.baseURI)
         val listener = CachingErrorListener(stepConfig, report)
         val properties = PropertyMapBuilder()
         properties.put(ValidateProperty.ERROR_HANDLER, listener)
@@ -89,7 +89,7 @@ open class ValidateWithRelaxNG(): AbstractAtomicStep() {
         val din = S9Api.xdmToInputSource(stepConfig, document)
         if (!driver.validate(din)) {
             if (assertValid) {
-                errors = report.endErrors()
+                errors = report.asXml()
                 for (lex in listener.exceptions) {
                     when (lex) {
                         is SAXParseException -> {
@@ -126,7 +126,7 @@ open class ValidateWithRelaxNG(): AbstractAtomicStep() {
         }
 
         receiver.output("result", document)
-        receiver.output("report", XProcDocument.ofXml(report.endErrors(), stepConfig))
+        receiver.output("report", XProcDocument.ofXml(report.asXml(), stepConfig))
     }
 
     override fun toString(): String = "p:validate-with-relax-ng"

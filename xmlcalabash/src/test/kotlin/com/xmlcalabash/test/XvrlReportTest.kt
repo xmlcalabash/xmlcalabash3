@@ -5,12 +5,17 @@ import com.xmlcalabash.namespace.NsXml
 import com.xmlcalabash.namespace.NsXs
 import com.xmlcalabash.runtime.XProcStepConfiguration
 import com.xmlcalabash.util.SaxonTreeBuilder
+import com.xmlcalabash.util.SchematronImpl
 import com.xmlcalabash.xvrl.XvrlReport
+import com.xmlcalabash.xvrl.XvrlReports
 import net.sf.saxon.s9api.QName
+import net.sf.saxon.s9api.XdmDestination
+import net.sf.saxon.s9api.XdmNode
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS
+import java.io.File
 import java.net.URI
 
 @TestInstance(PER_CLASS)
@@ -45,7 +50,7 @@ class XvrlReportTest {
         report.metadata.schema(URI.create("file://tmp/schema.xml"), NsXs.namespace, "3.4", mapOf(NsXml.id to "test2"))
         report.metadata.supplemental("Wat?")
 
-        val node = report.serialize()
+        val node = report.asXml()
         println(node)
     }
 
@@ -74,8 +79,23 @@ class XvrlReportTest {
         val context = detect.context()
         context.location(URI.create("file://tmp/out.xml"))
 
-        val node = report.serialize()
-        println(node)
-
+        val node = report.asXml()
     }
+
+    fun load(filename: String): XdmNode {
+        val builder = stepConfig.processor.newDocumentBuilder()
+        val destination = XdmDestination()
+        builder.parse(File("src/test/resources/schematron/${filename}"), destination)
+        return destination.xdmNode
+    }
+
+    @Test
+    fun fromSvrl1() {
+        val schema = load("schema-001.xml")
+        val doc = load("doc-001.xml")
+        val schReport = SchematronImpl(stepConfig).report(doc, schema)
+        val reports = XvrlReports.fromSvrl(stepConfig, schReport)
+        val node = reports.asXml()
+    }
+
 }

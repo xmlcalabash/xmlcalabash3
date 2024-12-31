@@ -1,117 +1,52 @@
 package com.xmlcalabash.steps.validation
 
-import com.xmlcalabash.namespace.Ns
-import com.xmlcalabash.namespace.NsC
-import com.xmlcalabash.namespace.NsFn
-import com.xmlcalabash.namespace.NsXvrl
+import com.xmlcalabash.namespace.NsSaxon
 import com.xmlcalabash.runtime.XProcStepConfiguration
-import com.xmlcalabash.util.SaxonTreeBuilder
-import net.sf.saxon.om.EmptyAttributeMap
-import net.sf.saxon.om.NamespaceMap
+import com.xmlcalabash.xvrl.XvrlReport
 import net.sf.saxon.s9api.QName
 import net.sf.saxon.s9api.XdmNode
 import net.sf.saxon.type.ValidationFailure
-import java.util.*
+import java.net.URI
 
-class Errors(private val stepConfig: XProcStepConfiguration, val format: String) {
-    companion object {
-        val sourceUri = QName("source-uri")
-        val sourceLine = QName("source-line")
-        val sourceColumn = QName("source-column")
-        val schemaPart = QName("schema-part")
-        val constraintName = QName("constraint-name")
-        val constraintClause = QName("constraint-clause")
-        val schemaType = QName("schema-type")
-    }
-    private val builder = SaxonTreeBuilder(stepConfig)
-    private val openStack = Stack<QName>()
-    private val inLibrary = false
-    private var nsmap = NamespaceMap.emptyMap()
-
+class Errors(stepConfig: XProcStepConfiguration, uri: URI?) {
+    val report = XvrlReport.newInstance(stepConfig)
     init {
-        builder.startDocument(null)
-        if (format == "xvrl") {
-            nsmap = nsmap.put("xvrl", NsXvrl.namespace)
-            nsmap = nsmap.put("err", NsFn.errorNamespace)
-            builder.addStartElement(NsXvrl.report, EmptyAttributeMap.getInstance(), nsmap)
-            openStack.push(NsXvrl.report)
-        } else {
-            nsmap = nsmap.put("c", NsC.namespace)
-            nsmap = nsmap.put("err", NsFn.errorNamespace)
-            builder.addStartElement(NsC.errors, EmptyAttributeMap.getInstance(), nsmap)
-            openStack.push(NsC.errors)
-        }
+        report.metadata.creator(stepConfig.saxonConfig.environment.productName,
+            stepConfig.saxonConfig.environment.productVersion)
+        uri?.let { report.metadata.document(it) }
     }
 
-    fun endErrors(): XdmNode {
-        builder.addEndElement()
-        openStack.pop()
-        builder.endDocument()
-        return builder.result
-    }
-
-    private fun end() {
-        builder.addEndElement()
-        openStack.pop()
+    fun asXml(): XdmNode {
+        return report.asXml()
     }
 
     fun xsdValidationError(msg: String, fail: ValidationFailure) {
-        var nsmap = NamespaceMap.emptyMap()
         val amap = mutableMapOf<QName, String?>(
-            Ns.message to msg,
-            sourceUri to fail.systemId,
-            Ns.path to fail.absolutePath?.toString(),
-            constraintName to fail.constraintName,
-            constraintClause to fail.constraintClauseNumber,
-            schemaType to fail.schemaType?.toString()
+            NsSaxon.constraintName to fail.constraintName,
+            NsSaxon.constraintClause to fail.constraintClauseNumber,
+            NsSaxon.schemaType to fail.schemaType?.toString(),
+            NsSaxon.schemaPart to if (fail.schemaPart > 0) "${fail.schemaPart}" else null
         )
 
-        if (fail.lineNumber > 0) {
-            amap[sourceLine] = fail.lineNumber.toString()
-            if (fail.columnNumber > 0) {
-                amap[sourceColumn] = fail.columnNumber.toString()
+        val detection = report.detection("error", null, msg, amap)
+        fail.errorCodeQName?.let { detection.code = "Q{${it.namespaceUri}}${it.localPart}"}
+
+        if (fail.absolutePath != null || fail.systemId != null) {
+            val uri = if (fail.systemId != null) {
+                URI(fail.systemId!!)
+            } else {
+                null
             }
-        }
-
-        if (fail.errorCodeQName != null) {
-            nsmap = nsmap.put("err", fail.errorCodeQName.namespaceUri)
-            amap[Ns.code] = fail.errorCodeQName.displayName
-        }
-
-        if (fail.schemaPart >= 0) {
-            amap[schemaPart] = fail.schemaPart.toString()
-        }
-
-        if (format == "xvrl") {
-            builder.addStartElement(NsXvrl.detection, stepConfig.attributeMap(amap))
-            builder.addEndElement()
-        } else {
-            builder.addStartElement(NsC.error, stepConfig.attributeMap(amap))
-            builder.addEndElement()
+            val loc = detection.location(uri, fail.lineNumber, fail.columnNumber)
+            fail.absolutePath?.let { loc.xpath = "${fail.absolutePath}" }
         }
     }
 
     fun xsdValidationError(msg: String) {
-        val amap = mapOf(Ns.message to msg)
-
-        if (format == "xvrl") {
-            builder.addStartElement(NsXvrl.detection, stepConfig.attributeMap(amap))
-            builder.addEndElement()
-        } else {
-            builder.addStartElement(NsC.error, stepConfig.attributeMap(amap))
-            builder.addEndElement()
-        }
+        report.detection("error", null, msg)
     }
 
     fun jsonValidationError(code: String, message: String) {
-        val amap = mapOf(Ns.code to code, Ns.message to message)
-
-        if (format == "xvrl") {
-            builder.addStartElement(NsXvrl.detection, stepConfig.attributeMap(amap))
-            builder.addEndElement()
-        } else {
-            builder.addStartElement(NsC.error, stepConfig.attributeMap(amap))
-            builder.addEndElement()
-        }
+        report.detection("error", code, message)
     }
 }

@@ -15,19 +15,19 @@ class XvrlMessageElement private constructor(stepConfiguration: XProcStepConfigu
         get() = _content
 
     companion object {
-        fun newInstance(stepConfig: XProcStepConfiguration, name: QName, text: String, attr: Map<QName,String> = emptyMap()): XvrlMessageElement {
+        fun newInstance(stepConfig: XProcStepConfiguration, name: QName, text: String?, attr: Map<QName,String?> = emptyMap()): XvrlMessageElement {
             if (name.namespaceUri in listOf(NsXvrl.namespace)) {
                 throw stepConfig.exception(XProcError.xiXvrlIllegalMessageName(name))
             }
             val message = XvrlMessageElement(stepConfig)
             message.setAttributes(attr)
             message.setAttribute(Ns.name, "${name}")
-            message._content.add(XvrlText(stepConfig, text))
+            text?.let { message._content.add(XvrlText(stepConfig, it)) }
             message.setAttributes(attr)
             return message
         }
 
-        fun newInstance(stepConfig: XProcStepConfiguration, name: QName, valueOf: XvrlValueOf, attr: Map<QName,String> = emptyMap()): XvrlMessageElement {
+        fun newInstance(stepConfig: XProcStepConfiguration, name: QName, valueOf: XvrlValueOf, attr: Map<QName,String?> = emptyMap()): XvrlMessageElement {
             if (name.namespaceUri in listOf(NsXvrl.namespace)) {
                 throw stepConfig.exception(XProcError.xiXvrlIllegalMessageName(name))
             }
@@ -38,7 +38,7 @@ class XvrlMessageElement private constructor(stepConfiguration: XProcStepConfigu
             return message
         }
 
-        fun newInstance(stepConfig: XProcStepConfiguration, name: QName, message: XvrlMessageElement, attr: Map<QName,String> = emptyMap()): XvrlMessageElement {
+        fun newInstance(stepConfig: XProcStepConfiguration, name: QName, message: XvrlMessageElement, attr: Map<QName,String?> = emptyMap()): XvrlMessageElement {
             if (name.namespaceUri in listOf(NsXvrl.namespace)) {
                 throw stepConfig.exception(XProcError.xiXvrlIllegalMessageName(name))
             }
@@ -58,6 +58,48 @@ class XvrlMessageElement private constructor(stepConfiguration: XProcStepConfigu
     fun clear() {
         _content.clear()
     }
+
+    fun message(name: QName, attr: Map<QName,String?> = emptyMap()): XvrlMessageElement {
+        val message = XvrlMessageElement.newInstance(stepConfig, name, null, attr)
+        return message
+    }
+
+    /*
+            fun newInstance(stepConfig: XProcStepConfiguration, name: QName, text: String?, attr: Map<QName,String?> = emptyMap()): XvrlMessageElement {
+            if (name.namespaceUri in listOf(NsXvrl.namespace)) {
+                throw stepConfig.exception(XProcError.xiXvrlIllegalMessageName(name))
+            }
+            val message = XvrlMessageElement(stepConfig)
+            message.setAttributes(attr)
+            message.setAttribute(Ns.name, "${name}")
+            text?.let { message._content.add(XvrlText(stepConfig, it)) }
+            message.setAttributes(attr)
+            return message
+        }
+
+        fun newInstance(stepConfig: XProcStepConfiguration, name: QName, valueOf: XvrlValueOf, attr: Map<QName,String?> = emptyMap()): XvrlMessageElement {
+            if (name.namespaceUri in listOf(NsXvrl.namespace)) {
+                throw stepConfig.exception(XProcError.xiXvrlIllegalMessageName(name))
+            }
+            val message = XvrlMessageElement(stepConfig)
+            message.setAttributes(attr)
+            message.setAttribute(Ns.name, "${name}")
+            message._content.add(valueOf)
+            return message
+        }
+
+        fun newInstance(stepConfig: XProcStepConfiguration, name: QName, message: XvrlMessageElement, attr: Map<QName,String?> = emptyMap()): XvrlMessageElement {
+            if (name.namespaceUri in listOf(NsXvrl.namespace)) {
+                throw stepConfig.exception(XProcError.xiXvrlIllegalMessageName(name))
+            }
+            val message = XvrlMessageElement(stepConfig)
+            message.setAttributes(attr)
+            message.setAttribute(Ns.name, "${name}")
+            message._content.add(message)
+            return message
+        }
+
+     */
 
     fun addContent(content: XvrlElement) {
         when (content) {

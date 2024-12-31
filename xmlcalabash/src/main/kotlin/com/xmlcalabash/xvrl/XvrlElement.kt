@@ -11,7 +11,6 @@ import net.sf.saxon.s9api.QName
 abstract class XvrlElement(val stepConfig: XProcStepConfiguration) {
     companion object {
         val xpathDefaultNamespace = QName("xpath-default-namespace")
-
     }
 
     protected val attributes = mutableMapOf<QName, String>()
@@ -20,8 +19,11 @@ abstract class XvrlElement(val stepConfig: XProcStepConfiguration) {
         attributes[name] = value
     }
 
-    fun commonAttributes(attr: Map<QName, String>) {
+    fun commonAttributes(attr: Map<QName, String?>) {
         for ((name, value) in attr) {
+            if (value == null) {
+                continue
+            }
             when (name) {
                 NsXml.lang -> attributes[name] = value
                 NsXml.id -> attributes[name] = value
@@ -41,9 +43,9 @@ abstract class XvrlElement(val stepConfig: XProcStepConfiguration) {
         setElementAttribute(name, value)
     }
 
-    open fun setAttributes(attr: Map<QName, String>) {
+    open fun setAttributes(attr: Map<QName,String?>) {
         for ((name, value) in attr) {
-            setAttribute(name, value)
+            value?.let { setAttribute(name, it) }
         }
     }
 

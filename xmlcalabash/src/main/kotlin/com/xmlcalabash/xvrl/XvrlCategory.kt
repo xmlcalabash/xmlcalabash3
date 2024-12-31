@@ -11,7 +11,7 @@ class XvrlCategory private constructor(stepConfig: XProcStepConfiguration): Xvrl
     companion object {
         private val _vocabulary = QName("vocabulary")
 
-        fun newInstance(stepConfig: XProcStepConfiguration, text: String? = null, vocabulary: String? = null, attr: Map<QName,String> = emptyMap()): XvrlCategory {
+        fun newInstance(stepConfig: XProcStepConfiguration, text: String? = null, vocabulary: String? = null, attr: Map<QName,String?> = emptyMap()): XvrlCategory {
             val cat = XvrlCategory(stepConfig)
             text?.let { cat.withText(it) }
             cat.setAttributes(attr)
@@ -19,7 +19,7 @@ class XvrlCategory private constructor(stepConfig: XProcStepConfiguration): Xvrl
             return cat
         }
 
-        fun newInstance(stepConfig: XProcStepConfiguration, node: XdmNode, vocabulary: String? = null, attr: Map<QName,String> = emptyMap()): XvrlCategory {
+        fun newInstance(stepConfig: XProcStepConfiguration, node: XdmNode, vocabulary: String? = null, attr: Map<QName,String?> = emptyMap()): XvrlCategory {
             val cat = XvrlCategory(stepConfig)
             cat.withNode(node)
             cat.setAttributes(attr)
@@ -27,7 +27,7 @@ class XvrlCategory private constructor(stepConfig: XProcStepConfiguration): Xvrl
             return cat
         }
 
-        fun newInstance(stepConfig: XProcStepConfiguration, nodes: List<XdmNode>, vocabulary: String? = null, attr: Map<QName,String> = emptyMap()): XvrlCategory {
+        fun newInstance(stepConfig: XProcStepConfiguration, nodes: List<XdmNode>, vocabulary: String? = null, attr: Map<QName,String?> = emptyMap()): XvrlCategory {
             val cat = XvrlCategory(stepConfig)
             cat.withNodes(nodes)
             cat.setAttributes(attr)

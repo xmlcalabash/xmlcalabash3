@@ -13,7 +13,7 @@ class XvrlSchema private constructor(stepConfiguration: XProcStepConfiguration):
     companion object {
         private val _schematypens = QName("schematypens")
 
-        fun newInstance(stepConfig: XProcStepConfiguration, href: URI?, typens: NamespaceUri, version: String?, attr: Map<QName,String> = emptyMap()): XvrlSchema {
+        fun newInstance(stepConfig: XProcStepConfiguration, href: URI?, typens: NamespaceUri, version: String?, attr: Map<QName,String?> = emptyMap()): XvrlSchema {
             val schema = XvrlSchema(stepConfig)
             schema.setAttributes(attr)
             href?.let { schema.setAttribute(Ns.href, "${it}") }
@@ -22,7 +22,7 @@ class XvrlSchema private constructor(stepConfiguration: XProcStepConfiguration):
             return schema
         }
 
-        fun newInstance(stepConfig: XProcStepConfiguration, href: URI?, typens: NamespaceUri, version: String?, content: String, attr: Map<QName,String> = emptyMap()): XvrlSchema {
+        fun newInstance(stepConfig: XProcStepConfiguration, href: URI?, typens: NamespaceUri, version: String?, content: String, attr: Map<QName,String?> = emptyMap()): XvrlSchema {
             val schema = XvrlSchema(stepConfig)
             schema.withText(content)
             schema.setAttributes(attr)
@@ -32,7 +32,7 @@ class XvrlSchema private constructor(stepConfiguration: XProcStepConfiguration):
             return schema
         }
 
-        fun newInstance(stepConfig: XProcStepConfiguration, href: URI?, typens: NamespaceUri, version: String?, content: XdmNode, attr: Map<QName,String> = emptyMap()): XvrlSchema {
+        fun newInstance(stepConfig: XProcStepConfiguration, href: URI?, typens: NamespaceUri, version: String?, content: XdmNode, attr: Map<QName,String?> = emptyMap()): XvrlSchema {
             val schema = XvrlSchema(stepConfig)
             schema.withNode(content)
             schema.setAttributes(attr)
@@ -43,7 +43,7 @@ class XvrlSchema private constructor(stepConfiguration: XProcStepConfiguration):
         }
 
 
-        fun newInstance(stepConfig: XProcStepConfiguration, href: URI?, typens: NamespaceUri, version: String?, content: List<XdmNode>, attr: Map<QName,String> = emptyMap()): XvrlSchema {
+        fun newInstance(stepConfig: XProcStepConfiguration, href: URI?, typens: NamespaceUri, version: String?, content: List<XdmNode>, attr: Map<QName,String?> = emptyMap()): XvrlSchema {
             val schema = XvrlSchema(stepConfig)
             schema.withNodes(content)
             schema.setAttributes(attr)

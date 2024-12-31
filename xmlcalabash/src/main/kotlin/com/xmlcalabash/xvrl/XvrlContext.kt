@@ -11,21 +11,21 @@ class XvrlContext private constructor(stepConfiguration: XProcStepConfiguration)
     var location: XvrlLocation? = null
 
     companion object {
-        fun newInstance(stepConfig: XProcStepConfiguration, text: String?, attr: Map<QName,String> = emptyMap()): XvrlContext {
+        fun newInstance(stepConfig: XProcStepConfiguration, text: String?, attr: Map<QName,String?> = emptyMap()): XvrlContext {
             val context = XvrlContext(stepConfig)
             text?.let { context.withText(it) }
             context.setAttributes(attr)
             return context
         }
 
-        fun newInstance(stepConfig: XProcStepConfiguration, node: XdmNode, attr: Map<QName,String> = emptyMap()): XvrlContext {
+        fun newInstance(stepConfig: XProcStepConfiguration, node: XdmNode, attr: Map<QName,String?> = emptyMap()): XvrlContext {
             val context = XvrlContext(stepConfig)
             context.withNode(node)
             context.setAttributes(attr)
             return context
         }
 
-        fun newInstance(stepConfig: XProcStepConfiguration, nodes: List<XdmNode>, attr: Map<QName,String> = emptyMap()): XvrlContext {
+        fun newInstance(stepConfig: XProcStepConfiguration, nodes: List<XdmNode>, attr: Map<QName,String?> = emptyMap()): XvrlContext {
             val context = XvrlContext(stepConfig)
             context.withNodes(nodes)
             context.setAttributes(attr)
@@ -35,7 +35,7 @@ class XvrlContext private constructor(stepConfiguration: XProcStepConfiguration)
 
     // ============================================================
 
-    fun location(href: URI?): XvrlLocation {
+    fun location(href: URI? = null): XvrlLocation {
         location = XvrlLocation.newInstance(stepConfig, href)
         return location!!
     }

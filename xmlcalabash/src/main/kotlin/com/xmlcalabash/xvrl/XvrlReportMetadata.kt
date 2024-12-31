@@ -11,7 +11,7 @@ import java.time.ZonedDateTime
 
 class XvrlReportMetadata private constructor(stepConfiguration: XProcStepConfiguration): XvrlElement(stepConfiguration) {
     companion object {
-        fun newInstance(stepConfig: XProcStepConfiguration, attr: Map<QName,String> = emptyMap()): XvrlReportMetadata {
+        fun newInstance(stepConfig: XProcStepConfiguration, attr: Map<QName,String?> = emptyMap()): XvrlReportMetadata {
             val metadata = XvrlReportMetadata(stepConfig)
             metadata.commonAttributes(attr)
             return metadata
@@ -27,91 +27,91 @@ class XvrlReportMetadata private constructor(stepConfiguration: XProcStepConfigu
     val schema = mutableListOf<XvrlSchema>()
     val supplemental = mutableListOf<XvrlSupplemental>()
 
-    fun timestamp(attr: Map<QName, String> = emptyMap()): XvrlTimestamp {
+    fun timestamp(attr: Map<QName,String?> = emptyMap()): XvrlTimestamp {
         timestamp = XvrlTimestamp.newInstance(stepConfig, ZonedDateTime.now(), attr)
         return timestamp!!
     }
 
-    fun timestamp(stamp: ZonedDateTime, attr: Map<QName, String> = emptyMap()): XvrlTimestamp {
+    fun timestamp(stamp: ZonedDateTime, attr: Map<QName,String?> = emptyMap()): XvrlTimestamp {
         timestamp = XvrlTimestamp.newInstance(stepConfig, stamp, attr)
         return timestamp!!
     }
 
     // ============================================================
 
-    fun validator(name: String, attr: Map<QName, String> = emptyMap()): XvrlValidator {
+    fun validator(name: String, attr: Map<QName,String?> = emptyMap()): XvrlValidator {
         validator = XvrlValidator.newInstance(stepConfig, name, null, attr)
         return validator!!
     }
 
-    fun validator(name: String, version: String, attr: Map<QName, String> = emptyMap()): XvrlValidator {
+    fun validator(name: String, version: String, attr: Map<QName,String?> = emptyMap()): XvrlValidator {
         validator = XvrlValidator.newInstance(stepConfig, name, version, attr)
         return validator!!
     }
 
-    fun validator(name: String, version: String, text: String, attr: Map<QName, String> = emptyMap()): XvrlValidator {
+    fun validator(name: String, version: String, text: String, attr: Map<QName,String?> = emptyMap()): XvrlValidator {
         validator = XvrlValidator.newInstance(stepConfig, name, version, text, attr)
         return validator!!
     }
 
-    fun validator(name: String, version: String, node: XdmNode, attr: Map<QName, String> = emptyMap()): XvrlValidator {
+    fun validator(name: String, version: String, node: XdmNode, attr: Map<QName,String?> = emptyMap()): XvrlValidator {
         validator = XvrlValidator.newInstance(stepConfig, name, version, node, attr)
         return validator!!
     }
 
-    fun validator(name: String, version: String, nodes: List<XdmNode>, attr: Map<QName, String> = emptyMap()): XvrlValidator {
+    fun validator(name: String, version: String, nodes: List<XdmNode>, attr: Map<QName,String?> = emptyMap()): XvrlValidator {
         validator = XvrlValidator.newInstance(stepConfig, name, version, nodes, attr)
         return validator!!
     }
 
     // ============================================================
 
-    fun creator(name: String, attr: Map<QName, String> = emptyMap()): XvrlCreator {
+    fun creator(name: String, attr: Map<QName,String?> = emptyMap()): XvrlCreator {
         creator = XvrlCreator.newInstance(stepConfig, name, null, attr)
         return creator!!
     }
 
-    fun creator(name: String, version: String, attr: Map<QName, String> = emptyMap()): XvrlCreator {
+    fun creator(name: String, version: String, attr: Map<QName,String?> = emptyMap()): XvrlCreator {
         creator = XvrlCreator.newInstance(stepConfig, name, version, attr)
         return creator!!
     }
 
-    fun creator(name: String, version: String, text: String, attr: Map<QName, String> = emptyMap()): XvrlCreator {
+    fun creator(name: String, version: String, text: String, attr: Map<QName,String?> = emptyMap()): XvrlCreator {
         creator = XvrlCreator.newInstance(stepConfig, name, version, text, attr)
         return creator!!
     }
 
-    fun creator(name: String, version: String, node: XdmNode, attr: Map<QName, String> = emptyMap()): XvrlCreator {
+    fun creator(name: String, version: String, node: XdmNode, attr: Map<QName,String?> = emptyMap()): XvrlCreator {
         creator = XvrlCreator.newInstance(stepConfig, name, version, node, attr)
         return creator!!
     }
 
-    fun creator(name: String, version: String, nodes: List<XdmNode>, attr: Map<QName, String> = emptyMap()): XvrlCreator {
+    fun creator(name: String, version: String, nodes: List<XdmNode>, attr: Map<QName,String?> = emptyMap()): XvrlCreator {
         creator = XvrlCreator.newInstance(stepConfig, name, version, nodes, attr)
         return creator!!
     }
 
     // ============================================================
 
-    fun document(href: URI?, attr: Map<QName, String> = emptyMap()): XvrlDocument {
+    fun document(href: URI?, attr: Map<QName,String?> = emptyMap()): XvrlDocument {
         val doc = XvrlDocument.newInstance(stepConfig, href, attr)
         document.add(doc)
         return doc
     }
 
-    fun document(href: URI?, content: String, attr: Map<QName, String> = emptyMap()): XvrlDocument {
+    fun document(href: URI?, content: String, attr: Map<QName,String?> = emptyMap()): XvrlDocument {
         val doc = XvrlDocument.newInstance(stepConfig, href, content, attr)
         document.add(doc)
         return doc
     }
 
-    fun document(href: URI?, content: XdmNode, attr: Map<QName, String> = emptyMap()): XvrlDocument {
+    fun document(href: URI?, content: XdmNode, attr: Map<QName,String?> = emptyMap()): XvrlDocument {
         val doc = XvrlDocument.newInstance(stepConfig, href, content, attr)
         document.add(doc)
         return doc
     }
 
-    fun document(href: URI?, content: List<XdmNode>, attr: Map<QName, String> = emptyMap()): XvrlDocument {
+    fun document(href: URI?, content: List<XdmNode>, attr: Map<QName,String?> = emptyMap()): XvrlDocument {
         val doc = XvrlDocument.newInstance(stepConfig, href, content, attr)
         document.add(doc)
         return doc
@@ -119,19 +119,19 @@ class XvrlReportMetadata private constructor(stepConfiguration: XProcStepConfigu
 
     // ============================================================
 
-    fun title(content: String, attr: Map<QName, String> = emptyMap()): XvrlTitle {
+    fun title(content: String, attr: Map<QName,String?> = emptyMap()): XvrlTitle {
         val xtitle = XvrlTitle.newInstance(stepConfig, content, attr)
         title.add(xtitle)
         return xtitle
     }
 
-    fun title(content: XdmNode, attr: Map<QName, String> = emptyMap()): XvrlTitle {
+    fun title(content: XdmNode, attr: Map<QName,String?> = emptyMap()): XvrlTitle {
         val xtitle = XvrlTitle.newInstance(stepConfig, content, attr)
         title.add(xtitle)
         return xtitle
     }
 
-    fun title(content: List<XdmNode>, attr: Map<QName, String> = emptyMap()): XvrlTitle {
+    fun title(content: List<XdmNode>, attr: Map<QName,String?> = emptyMap()): XvrlTitle {
         val xtitle = XvrlTitle.newInstance(stepConfig, content, attr)
         title.add(xtitle)
         return xtitle
@@ -139,19 +139,19 @@ class XvrlReportMetadata private constructor(stepConfiguration: XProcStepConfigu
 
     // ============================================================
 
-    fun summary(content: String, attr: Map<QName, String> = emptyMap()): XvrlSummary {
+    fun summary(content: String, attr: Map<QName,String?> = emptyMap()): XvrlSummary {
         val sum = XvrlSummary.newInstance(stepConfig, content, attr)
         summary.add(sum)
         return sum
     }
 
-    fun summary(content: XdmNode, attr: Map<QName, String> = emptyMap()): XvrlSummary {
+    fun summary(content: XdmNode, attr: Map<QName,String?> = emptyMap()): XvrlSummary {
         val sum = XvrlSummary.newInstance(stepConfig, content, attr)
         summary.add(sum)
         return sum
     }
 
-    fun summary(content: List<XdmNode>, attr: Map<QName, String> = emptyMap()): XvrlSummary {
+    fun summary(content: List<XdmNode>, attr: Map<QName,String?> = emptyMap()): XvrlSummary {
         val sum = XvrlSummary.newInstance(stepConfig, content, attr)
         summary.add(sum)
         return sum
@@ -159,19 +159,19 @@ class XvrlReportMetadata private constructor(stepConfiguration: XProcStepConfigu
 
     // ============================================================
 
-    fun category(content: String?, vocabulary: String? = null, attr: Map<QName, String> = emptyMap()): XvrlCategory {
+    fun category(content: String?, vocabulary: String? = null, attr: Map<QName,String?> = emptyMap()): XvrlCategory {
         val cat = XvrlCategory.newInstance(stepConfig, content, vocabulary, attr)
         category.add(cat)
         return cat
     }
 
-    fun category(content: XdmNode, vocabulary: String? = null, attr: Map<QName, String> = emptyMap()): XvrlCategory {
+    fun category(content: XdmNode, vocabulary: String? = null, attr: Map<QName,String?> = emptyMap()): XvrlCategory {
         val cat = XvrlCategory.newInstance(stepConfig, content, vocabulary, attr)
         category.add(cat)
         return cat
     }
 
-    fun category(content: List<XdmNode>, vocabulary: String? = null, attr: Map<QName, String> = emptyMap()): XvrlCategory {
+    fun category(content: List<XdmNode>, vocabulary: String? = null, attr: Map<QName,String?> = emptyMap()): XvrlCategory {
         val cat = XvrlCategory.newInstance(stepConfig, content, vocabulary, attr)
         category.add(cat)
         return cat
@@ -179,13 +179,13 @@ class XvrlReportMetadata private constructor(stepConfiguration: XProcStepConfigu
 
     // ============================================================
 
-    fun schema(href: URI?, typens: NamespaceUri, version: String? = null, attr: Map<QName, String> = emptyMap()): XvrlSchema {
+    fun schema(href: URI?, typens: NamespaceUri, version: String? = null, attr: Map<QName,String?> = emptyMap()): XvrlSchema {
         val sch = XvrlSchema.newInstance(stepConfig, href, typens, version)
         schema.add(sch)
         return sch
     }
 
-    fun schema(href: URI?, typens: NamespaceUri, version: String, content: String? = null, attr: Map<QName, String> = emptyMap()): XvrlSchema {
+    fun schema(href: URI?, typens: NamespaceUri, version: String, content: String? = null, attr: Map<QName,String?> = emptyMap()): XvrlSchema {
         val sch = if (content == null) {
             XvrlSchema.newInstance(stepConfig, href, typens, version)
         } else {
@@ -195,13 +195,13 @@ class XvrlReportMetadata private constructor(stepConfiguration: XProcStepConfigu
         return sch
     }
 
-    fun schema(href: URI?, typens: NamespaceUri, version: String? = null, content: XdmNode, attr: Map<QName, String> = emptyMap()): XvrlSchema {
+    fun schema(href: URI?, typens: NamespaceUri, version: String? = null, content: XdmNode, attr: Map<QName,String?> = emptyMap()): XvrlSchema {
         val sch = XvrlSchema.newInstance(stepConfig, href, typens, version, content)
         schema.add(sch)
         return sch
     }
 
-    fun schema(href: URI?, typens: NamespaceUri, version: String? = null, content: List<XdmNode>, attr: Map<QName, String> = emptyMap()): XvrlSchema {
+    fun schema(href: URI?, typens: NamespaceUri, version: String? = null, content: List<XdmNode>, attr: Map<QName,String?> = emptyMap()): XvrlSchema {
         val sch = XvrlSchema.newInstance(stepConfig, href, typens, version, content)
         schema.add(sch)
         return sch
@@ -209,30 +209,40 @@ class XvrlReportMetadata private constructor(stepConfiguration: XProcStepConfigu
 
     // ============================================================
 
-    fun supplemental(content: String?, attr: Map<QName, String> = emptyMap()): XvrlSupplemental {
+    fun supplemental(content: String?, attr: Map<QName,String?> = emptyMap()): XvrlSupplemental {
         val sup = XvrlSupplemental.newInstance(stepConfig, content, attr)
         supplemental.add(sup)
         return sup
     }
 
-    fun supplemental(content: XdmNode, attr: Map<QName, String> = emptyMap()): XvrlSupplemental {
+    fun supplemental(content: XdmNode, attr: Map<QName,String?> = emptyMap()): XvrlSupplemental {
         val sup = XvrlSupplemental.newInstance(stepConfig, content, attr)
         supplemental.add(sup)
         return sup
     }
 
-    fun supplemental(content: List<XdmNode>, attr: Map<QName, String> = emptyMap()): XvrlSupplemental {
+    fun supplemental(content: List<XdmNode>, attr: Map<QName,String?> = emptyMap()): XvrlSupplemental {
         val sup = XvrlSupplemental.newInstance(stepConfig, content, attr)
         supplemental.add(sup)
         return sup
+    }
+
+    // ============================================================
+
+    fun isEmpty(): Boolean {
+        return timestamp == null && isEffectivelyEmpty()
+    }
+
+    fun isEffectivelyEmpty(): Boolean {
+        return validator == null && creator == null
+                && document.isEmpty() && title.isEmpty() && summary.isEmpty()
+                && category.isEmpty() && schema.isEmpty() && supplemental.isEmpty()
     }
 
     // ============================================================
 
     override fun serialize(builder: SaxonTreeBuilder) {
-        if (timestamp == null && validator == null && creator == null
-            && document.isEmpty() && title.isEmpty() && summary.isEmpty()
-            && category.isEmpty() && schema.isEmpty() && supplemental.isEmpty()) {
+        if (isEmpty()) {
             return
         }
 

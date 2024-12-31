@@ -10,14 +10,14 @@ import java.net.URI
 
 class XvrlDocument private constructor(stepConfiguration: XProcStepConfiguration): XvrlContainer(stepConfiguration) {
     companion object {
-        fun newInstance(stepConfig: XProcStepConfiguration, href: URI?, attr: Map<QName,String> = emptyMap()): XvrlDocument {
+        fun newInstance(stepConfig: XProcStepConfiguration, href: URI?, attr: Map<QName,String?> = emptyMap()): XvrlDocument {
             val document = XvrlDocument(stepConfig)
             document.setAttributes(attr)
             href?.let { document.setAttribute(Ns.href, it.toString()) }
             return document
         }
 
-        fun newInstance(stepConfig: XProcStepConfiguration, href: URI?, node: XdmNode, attr: Map<QName,String> = emptyMap()): XvrlDocument {
+        fun newInstance(stepConfig: XProcStepConfiguration, href: URI?, node: XdmNode, attr: Map<QName,String?> = emptyMap()): XvrlDocument {
             val document = XvrlDocument(stepConfig)
             document.withNode(node)
             document.setAttributes(attr)
@@ -25,7 +25,7 @@ class XvrlDocument private constructor(stepConfiguration: XProcStepConfiguration
             return document
         }
 
-        fun newInstance(stepConfig: XProcStepConfiguration, href: URI?, text: String, attr: Map<QName,String> = emptyMap()): XvrlDocument {
+        fun newInstance(stepConfig: XProcStepConfiguration, href: URI?, text: String, attr: Map<QName,String?> = emptyMap()): XvrlDocument {
             val document = XvrlDocument(stepConfig)
             document.withText(text)
             document.setAttributes(attr)
@@ -33,7 +33,7 @@ class XvrlDocument private constructor(stepConfiguration: XProcStepConfiguration
             return document
         }
 
-        fun newInstance(stepConfig: XProcStepConfiguration, href: URI?, nodes: List<XdmNode>, attr: Map<QName,String> = emptyMap()): XvrlDocument {
+        fun newInstance(stepConfig: XProcStepConfiguration, href: URI?, nodes: List<XdmNode>, attr: Map<QName,String?> = emptyMap()): XvrlDocument {
             val document = XvrlDocument(stepConfig)
             document.withNodes(nodes)
             document.setAttributes(attr)
