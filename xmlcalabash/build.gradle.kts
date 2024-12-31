@@ -47,9 +47,9 @@ val dep_uuidCreator = project.findProperty("uuidCreator").toString()
 val dep_xmlResolver = project.findProperty("xmlResolver").toString()
 
 dependencies {
-  implementation("org.jetbrains.kotlin:kotlin-stdlib:2.0.0")
+  implementation("org.jetbrains.kotlin:kotlin-stdlib:2.0.21")
   implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.1")
-  implementation("org.jetbrains.kotlin:kotlin-reflect:2.0.0")
+  implementation("org.jetbrains.kotlin:kotlin-reflect:2.0.21")
 
   // implementation("name.dmaus.schxslt:schxslt:${dep_schxslt}")
   // The SchXslt2 transpiler is included in our resources
@@ -189,13 +189,6 @@ tasks.withType<Test> {
 
 tasks.register("helloWorld") {
   doLast {
-/*
-    val libs = mutableListOf<String>()
-    sourceSets.main.get().runtimeClasspath.forEach {
-                      if (it.isFile()) libs.add(it.getName())
-                    }
-    println(libs.joinToString(" "))
-*/
     println("Hello, world.")
   }
 }
