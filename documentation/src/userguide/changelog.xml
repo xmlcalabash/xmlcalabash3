@@ -13,6 +13,102 @@ See the commits and pull requests on
 finer detail.</para>
 
 <revhistory>
+<revision xml:id="r300-alpha9">
+<revnumber>3.0.0-alpha9</revnumber>
+<date>2025-01-01</date>
+<revdescription>
+<itemizedlist>
+<listitem>
+<para>Fixed
+<link xlink:href="https://github.com/xmlcalabash/xmlcalabash3/issues/92">issue #92</link>.
+Updated the <tag>p:archive</tag>, <tag>p:archive-manifest</tag>,
+and <tag>p:unarchive</tag> steps to support all of the formats
+supported by the Apache Commons Compression library. The “create”
+command on <tag>p:archive</tag> also supports merging multiple archives together.
+</para>
+</listitem>
+<listitem>
+<para>Added a “visualization” API for tracking pipeline progress.
+Extensively revised how <link linkend="logging">logging</link> works.
+Removed the now unnecessary “progress” level of verbosity.</para>
+<para>By default system logging only goes to the console and uses dynamic
+levels. For a different configuration, use a different <link linkend="logback-file">logback.xml
+configuration</link> file.</para>
+</listitem>
+<listitem>
+<para>Fixed bugs related to <code>[p:]message</code> attributes.
+Messages are now output through the message reporter at “info” level,
+rather than being printed directly to the console. Fixed a bug where static
+messages on compound steps were not being output at all.
+</para>
+</listitem>
+<listitem>
+<para>Completely reworked how XVRL is supported. There’s now an internal model for the
+report format. Conversion from SVRL to XVRL is done by constructing the XVRL model.
+</para>
+</listitem>
+<listitem>
+<para>Fixed
+<link xlink:href="https://github.com/xmlcalabash/xmlcalabash3/issues/90">issue #90</link>
+by correcting a typo in the SVG graphing stylesheet.
+</para>
+</listitem>
+<listitem>
+<para>Fixed
+<link xlink:href="https://github.com/xmlcalabash/xmlcalabash3/issues/93">issue #93</link>
+by removing the accidental restriction that <tag>p:variable</tag> was
+not allowed in <tag>p:if</tag>. Hat tip to Achim for reporting that
+one!
+</para>
+</listitem>
+<listitem>
+<para>Fixed
+<link xlink:href="https://github.com/xmlcalabash/xmlcalabash3/issues/96">issue #96</link>.
+An option that had no default value but whose type did not allow the
+empty sequence was generating a compile time error about the invalid
+(default) value. The initializer now defers the error until runtime (where it
+won’t happen if a value is provided for the option).
+</para>
+</listitem>
+<listitem>
+<para>Added <literal>application/epub+zip</literal>,
+<literal>application/java-archive</literal>,
+<literal>application/x-7z-compressed</literal>,
+<literal>application/x-archive</literal>,
+<literal>application/x-arj</literal>,
+<literal>application/x-cpio</literal>, and
+<literal>application/x-tar</literal> to the standard content type mapping.</para>
+</listitem>
+<listitem>
+<para>Added an experimental <command>xmlcalabash.sh</command> script to the distribution.
+This should make it easier to run XML Calabash with a modified classpath.
+</para>
+</listitem>
+<listitem>
+<para>Renamed a few build properties. The <code>BUILD_HASH</code> is now 
+<code>BUILD_ID</code> and is more sensitive to internal builds. Renamed <code>SAXON</code>
+to <code>SAXON_EDITION</code> and removed the misleading <code>SAXON_LICENSED</code> property.
+(If you run PE or EE without a license, the edition reported is HE.)
+</para>
+</listitem>
+<listitem>
+<para>Attempt to detect when PE or EE is running without a license and provide a more
+helpful version message.
+</para>
+</listitem>
+<listitem>
+<para>Upgraded to SchXslt 1.3.1. Upgrade to jing/trang 20241231. Upgraded a few Kotlin libraries.
+Added the brotli and xz libraries to the core build.
+</para>
+</listitem>
+<listitem>
+<para>Fixed a bug where the error location information for an error was getting lost.
+</para>
+</listitem>
+</itemizedlist>
+</revdescription>
+</revision>
+
 <revision xml:id="r300-alpha8">
 <revnumber>3.0.0-alpha8</revnumber>
 <date>2024-12-28</date>
@@ -99,7 +195,8 @@ assertions across pipelines.
 </para>
 </listitem>
 <listitem>
-<para>“<link linkend="upgrading-saxon">Fixed</link>” <link xlink:href="https://github.com/xmlcalabash/xmlcalabash3/issues/74">#74</link>
+<para>“<link linkend="upgrading-saxon">Fixed</link>”
+<link xlink:href="https://github.com/xmlcalabash/xmlcalabash3/issues/74">#74</link>
 by adding a hack to the manifest classpath.
 </para>
 </listitem>
