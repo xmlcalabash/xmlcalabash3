@@ -24,6 +24,9 @@ configurations.all {
     if (requested.group == "org.slf4j" && requested.name == "slf4j-api") {
       useVersion(project.findProperty("slf4j").toString())
     }
+    if (requested.group == "org.relaxng" && (requested.name == "jing" || requested.name == "trang")) {
+      useVersion(project.findProperty("jing").toString())
+    }
   }
 }
 

@@ -29,7 +29,7 @@ class XvrlReport private constructor(stepConfig: XProcStepConfiguration, val met
         }
     }
 
-    internal var digest = XvrlDigest(stepConfig)
+    var digest = XvrlDigest(stepConfig)
     val detections = mutableListOf<XvrlDetection>()
 
     fun detection(severity: String, code: String? = null, attr: Map<QName,String?> = emptyMap()): XvrlDetection {

@@ -485,7 +485,7 @@ class XProcError private constructor(val code: QName, val variant: Int, val loca
     }
 
     fun with(newCode: QName): XProcError {
-        return XProcError(newCode, 1, location, inputLocation)
+        return XProcError(newCode, 1, location, inputLocation, *details)
     }
 
     fun exception(): XProcException {

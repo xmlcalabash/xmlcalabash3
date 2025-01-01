@@ -51,41 +51,42 @@ class XvrlDetection private constructor(stepConfig: XProcStepConfiguration): Xvr
 
     // ============================================================
 
-    fun location(href: URI? = null): XvrlLocation {
-        location = XvrlLocation.newInstance(stepConfig, href)
+    fun location(href: URI? = null, attr: Map<QName,String?> = emptyMap()): XvrlLocation {
+        location = XvrlLocation.newInstance(stepConfig, href, attr)
         return location!!
     }
 
-    fun location(href: URI?, line: Int, column: Int = 0): XvrlLocation {
-        location = XvrlLocation.newInstance(stepConfig, href, line, column)
+    fun location(href: URI?, line: Int, column: Int = 0, attr: Map<QName,String?> = emptyMap()): XvrlLocation {
+        location = XvrlLocation.newInstance(stepConfig, href, line, column, attr)
         return location!!
     }
 
-    fun location(href: URI?, offset: Int): XvrlLocation {
-        location = XvrlLocation.newInstance(stepConfig, href, offset)
+    fun location(href: URI?, offset: Int, attr: Map<QName,String?> = emptyMap()): XvrlLocation {
+        location = XvrlLocation.newInstance(stepConfig, href, offset, attr)
         return location!!
     }
 
-    fun location(location: Location): XvrlLocation {
+    fun location(location: Location, attr: Map<QName,String?> = emptyMap()): XvrlLocation {
         if (location.lineNumber > 0) {
             if (location.columnNumber > 0) {
-                return XvrlLocation.newInstance(stepConfig, location.baseUri, location.lineNumber, location.columnNumber)
+                return XvrlLocation.newInstance(stepConfig, location.baseUri, location.lineNumber, location.columnNumber, attr)
             }
-            return XvrlLocation.newInstance(stepConfig, location.baseUri, location.lineNumber, 0)
+            return XvrlLocation.newInstance(stepConfig, location.baseUri, location.lineNumber, 0, attr)
         }
-        return XvrlLocation.newInstance(stepConfig, location.baseUri)
+        return XvrlLocation.newInstance(stepConfig, location.baseUri, attr)
     }
 
-    fun location(location: net.sf.saxon.s9api.Location): XvrlLocation {
-        val attr = mutableMapOf<QName, String>()
-        location.publicId?.let { attr[NsSaxon.publicIdentifier] = it }
+    fun location(location: net.sf.saxon.s9api.Location, attr: Map<QName,String?> = emptyMap()): XvrlLocation {
+        val localAttr = mutableMapOf<QName, String?>()
+        localAttr[NsSaxon.publicIdentifier] = location.publicId
+        localAttr.putAll(attr)
         if (location.lineNumber > 0) {
             if (location.columnNumber > 0) {
-                return XvrlLocation.newInstance(stepConfig, URI(location.systemId), location.lineNumber, location.columnNumber, attr)
+                return XvrlLocation.newInstance(stepConfig, URI(location.systemId), location.lineNumber, location.columnNumber, localAttr)
             }
-            return XvrlLocation.newInstance(stepConfig, URI(location.systemId), location.lineNumber, 0, attr)
+            return XvrlLocation.newInstance(stepConfig, URI(location.systemId), location.lineNumber, 0, localAttr)
         }
-        return XvrlLocation.newInstance(stepConfig, URI(location.systemId), attr)
+        return XvrlLocation.newInstance(stepConfig, URI(location.systemId), localAttr)
     }
 
     // ============================================================
