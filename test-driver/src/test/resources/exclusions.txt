@@ -1,3 +1,5 @@
+ab-p-archive-067 because multiple archives are supported for create
+
 ab-xslt-094 because https://github.com/xproc/3.0-steps/issues/642
 ab-import-functions-008 because https://saxonica.plan.io/issues/6603
 ab-import-functions-009 because https://saxonica.plan.io/issues/6603
