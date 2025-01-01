@@ -11,6 +11,7 @@ import com.xmlcalabash.xvrl.XvrlReports
 import net.sf.saxon.s9api.QName
 import net.sf.saxon.s9api.XdmDestination
 import net.sf.saxon.s9api.XdmNode
+import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -51,7 +52,7 @@ class XvrlReportTest {
         report.metadata.supplemental("Wat?")
 
         val node = report.asXml()
-        println(node)
+        Assertions.assertNotNull(node)
     }
 
     @Test
@@ -80,6 +81,7 @@ class XvrlReportTest {
         context.location(URI.create("file://tmp/out.xml"))
 
         val node = report.asXml()
+        Assertions.assertNotNull(node)
     }
 
     fun load(filename: String): XdmNode {
@@ -96,6 +98,7 @@ class XvrlReportTest {
         val schReport = SchematronImpl(stepConfig).report(doc, schema)
         val reports = XvrlReports.fromSvrl(stepConfig, schReport)
         val node = reports.asXml()
+        Assertions.assertNotNull(node)
     }
 
 }
