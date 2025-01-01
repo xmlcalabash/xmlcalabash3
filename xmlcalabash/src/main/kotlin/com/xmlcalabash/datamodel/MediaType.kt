@@ -27,6 +27,12 @@ class MediaType private constructor(val mediaType: String, val mediaSubtype: Str
         val XSLT = MediaType("application", "xslt", "xml")
         val YAML = MediaType("application", "vnd.yaml")
         val ZIP = MediaType("application", "zip")
+        val JAR = MediaType("application", "java-archive")
+        val TAR = MediaType("application", "x-tar")
+        val AR = MediaType("application", "x-archive")
+        val ARJ = MediaType("application", "x-arj")
+        val CPIO = MediaType("application", "x-cpio")
+        val SEVENZ = MediaType("application", "x-7z-compressed")
 
         private val extensionMap = HashMap<MediaType, String>()
 

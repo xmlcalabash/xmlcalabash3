@@ -3,6 +3,7 @@ package com.xmlcalabash.exceptions
 import com.xmlcalabash.datamodel.Location
 import com.xmlcalabash.datamodel.MediaType
 import com.xmlcalabash.documents.XProcDocument
+import com.xmlcalabash.namespace.Ns.prefix
 import com.xmlcalabash.namespace.NsErr
 import net.sf.saxon.s9api.*
 import java.net.URI
@@ -245,14 +246,15 @@ class XProcError private constructor(val code: QName, val variant: Int, val loca
         fun xcInvalidParameter(name: QName, value: String) = step(79, name, value)
         fun xcInvalidNumberOfArchives(number: Int) = step(80, number)
 
-        fun xcUnsupportedArchiveFormat(format: QName) = step(81, format)
+        fun xcArchiveFormatIncorrect(format: QName) = step(81, format)
 
         fun xcNoArchiveSourceUri() = step(Pair(84, 1))
         fun xcDuplicateArchiveSourceUri(uri: URI) = step(Pair(84, 2), uri)
         fun xcDuplicateArchiveSourceUri(name: String) = step(Pair(84, 3), name)
 
         fun xcInvalidArchiveFormat(format: QName) = step(Pair(85,1), format)
-        fun xcArchiveTooLarge(size: Long) = step(Pair(85,2), size)
+        fun xcCannotCreateArjArchives() = step(Pair(85, 2))
+        fun xcUnrecognizedArchiveFormat(ctype: MediaType) = step(Pair(85, 3), ctype)
 
         fun xcUnsupportedScheme(scheme: String) = step(90, scheme)
         fun xcAttributeNameCollision(name: String) = step(92, name)
@@ -380,6 +382,7 @@ class XProcError private constructor(val code: QName, val variant: Int, val loca
         fun xiCliDuplicateOutputFile(filename: String) = internal(206, filename)
         fun xiTooLateForStaticOptions(name: QName) = internal(213, name)
         fun xiCliDuplicateNamespace(prefix: String) = internal(214, prefix)
+        fun xiMergeDuplicatesError(name: String) = internal(215, name)
 
         fun xiXvrlInvalidValue(name: QName, value: String) = internal(300, name, value)
         fun xiXvrlIllegalMessageName(name: QName) = internal(301, name)

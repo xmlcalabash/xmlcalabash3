@@ -34,6 +34,7 @@ object Ns {
     val contentType = QName("content-type")
     val contentTypes = QName("content-types")
     val count = QName("count")
+    val cpio = QName("cpio")
     val crc = QName("crc")
     val cwd = QName("cwd")
     val date = QName("date")
@@ -174,7 +175,5 @@ object Ns {
     val z = QName("z")
     val zip = QName("zip")
     val valid = QName("valid")
-
-    val _7z = QName("_7z")
     val sevenZ = QName("sevenZ")
 }

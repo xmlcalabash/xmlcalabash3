@@ -58,8 +58,8 @@ dependencies {
   implementation("commons-codec:commons-codec:${dep_commonsCodec}")
 
   implementation("org.apache.commons:commons-compress:${dep_commonsCompress}")
-  //implementation("org.brotli:dec:${dep_brotliDec}")
-  //implementation("org.tukaani:xz:${dep_tukaaniXz}")
+  implementation("org.brotli:dec:${dep_brotliDec}")
+  implementation("org.tukaani:xz:${dep_tukaaniXz}")
 
   implementation("javax.activation:activation:1.1.1") // For mimetype mapping
   implementation("com.nwalsh:sinclude:${dep_sinclude}") {

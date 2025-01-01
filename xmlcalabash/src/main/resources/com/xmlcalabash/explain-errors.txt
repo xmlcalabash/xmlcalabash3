@@ -933,7 +933,11 @@ It is a dynamic error if the format of the archive cannot be understood,
 determined and/or processed.
 
 XC0085/2
-Archive too large: $1.
+Cannot create .arj archive files
+The .arj archive format can be read, but not written.
+
+XC0085/3
+Unrecognized archive format: “$1”.
 It is a dynamic error if the format of the archive cannot be understood,
 determined and/or processed.
 
@@ -1442,6 +1446,11 @@ Static options cannot be provided after the pipeline has been compiled: “$1”
 
 cxerr:XI0214
 Duplicate namespace prefix: “$1”.
+
+cxerr:XI0215
+Duplicated name encountered when combining archives: “$1”
+When the cx:merge-duplicates policy is “error”, it is an error if multiple
+entries with the same name are encountered when merging archive files.
 
 cxerr:XI9998
 This can’t happen: $1.

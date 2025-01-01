@@ -2,12 +2,30 @@ package com.xmlcalabash.steps
 
 import com.xmlcalabash.datamodel.MediaType
 import com.xmlcalabash.documents.DocumentProperties
+import com.xmlcalabash.documents.XProcBinaryDocument
 import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.exceptions.XProcException
 import com.xmlcalabash.io.XProcSerializer
 import com.xmlcalabash.namespace.Ns
 import com.xmlcalabash.namespace.NsC
+import com.xmlcalabash.namespace.NsCx
+import com.xmlcalabash.steps.archives.ArInputArchive
+import com.xmlcalabash.steps.archives.ArOutputArchive
+import com.xmlcalabash.steps.archives.ArjInputArchive
+import com.xmlcalabash.steps.archives.CpioInputArchive
+import com.xmlcalabash.steps.archives.CpioOutputArchive
+import com.xmlcalabash.steps.archives.InputArchive
+import com.xmlcalabash.steps.archives.JarInputArchive
+import com.xmlcalabash.steps.archives.JarOutputArchive
+import com.xmlcalabash.steps.archives.OutputArchive
+import com.xmlcalabash.steps.archives.SevenZInputArchive
+import com.xmlcalabash.steps.archives.SevenZOutputArchive
+import com.xmlcalabash.steps.archives.TarInputArchive
+import com.xmlcalabash.steps.archives.TarOutputArchive
+import com.xmlcalabash.steps.archives.XArchiveEntry
+import com.xmlcalabash.steps.archives.ZipInputArchive
+import com.xmlcalabash.steps.archives.ZipOutputArchive
 import com.xmlcalabash.util.S9Api
 import com.xmlcalabash.util.SaxonTreeBuilder
 import net.sf.saxon.om.AttributeMap
@@ -17,48 +35,72 @@ import net.sf.saxon.s9api.*
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry
 import org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream
 import org.apache.commons.compress.archivers.zip.ZipFile
+import org.apache.logging.log4j.kotlin.logger
 import java.io.ByteArrayOutputStream
+import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.net.URI
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
+import java.nio.file.attribute.FileTime
+import java.time.Instant
 import java.util.zip.ZipEntry
 
 open class ArchiveStep(): AbstractArchiveStep() {
+    private val archives = mutableListOf<InputArchive>()
     private val archiveMembers = mutableListOf<XProcDocument>()
     private var manifest: XProcDocument? = null
-    protected var defaultMethod: String? = null
     private var command: String? = null
+    protected var defaultMethod: String? = null
     private var defaultLevel: String? = null
+    private var mergeDuplicates: String = "error"
     private val sourceMap = mutableMapOf<URI, XProcDocument>()
     private val manifestList = mutableListOf<ManifestEntry>()
     private val extraList = mutableListOf<ManifestEntry>()
     private val nameMap = mutableMapOf<String, ManifestEntry>()
     private var origArchiveFiles = mutableListOf<Path>()
-    private var archiveFile: Path? = null
+    private lateinit var outputArchive: OutputArchive
 
     override fun run() {
         super.run()
         archiveMembers.addAll(queues["source"]!!)
-        archives.addAll(queues["archive"]!!)
+
+        for (archive in queues["archive"]!!) {
+            val format = selectFormat(archive.contentType ?: MediaType.OCTET_STREAM, Ns.zip)
+
+            if (archive !is XProcBinaryDocument) {
+                // If it isn't binary, it definitely doesn't match the format...
+                throw stepConfig.exception(XProcError.xcArchiveFormatIncorrect(format))
+            }
+
+            val archiveInput = when (format) {
+                Ns.zip -> ZipInputArchive(stepConfig, archive)
+                Ns.jar -> JarInputArchive(stepConfig, archive)
+                Ns.tar -> TarInputArchive(stepConfig, archive)
+                Ns.ar -> ArInputArchive(stepConfig, archive)
+                Ns.arj -> ArjInputArchive(stepConfig, archive)
+                Ns.cpio -> CpioInputArchive(stepConfig, archive)
+                Ns.sevenZ -> SevenZInputArchive(stepConfig, archive)
+                else -> throw stepConfig.exception(XProcError.xcInvalidArchiveFormat(format))
+            }
+
+            archiveInput.open()
+            archives.add(archiveInput)
+        }
+
         if (queues["manifest"]!!.size > 1) {
             throw stepConfig.exception(XProcError.xcMultipleManifests())
         }
         manifest = queues["manifest"]!!.firstOrNull()
 
-        val format = qnameBinding(Ns.format) ?: Ns.zip
+        val format = qnameBinding(Ns.format) ?: archives.firstOrNull()?.archiveFormat ?: Ns.zip
+        if (format == Ns.arj) {
+            throw stepConfig.exception(XProcError.xcCannotCreateArjArchives())
+        }
+
         val relativeTo = relativeTo()
-
-        if (format != Ns.zip) {
-            throw stepConfig.exception(XProcError.xcUnsupportedArchiveFormat(format))
-        }
-
-        for (archive in archives) {
-            archiveBytes(archive, format)
-        }
-
         val parameters = qnameMapBinding(Ns.parameters)
 
         command = parameters[Ns.command]?.underlyingValue?.stringValue
@@ -70,8 +112,53 @@ open class ArchiveStep(): AbstractArchiveStep() {
             }
         }
 
+        if (command != "create" && archives.size > 1) {
+            throw stepConfig.exception(XProcError.xcInvalidNumberOfArchives(archives.size))
+        }
+
+        if (command == "delete" && archives.size == 0) {
+            throw stepConfig.exception(XProcError.xcInvalidNumberOfArchives(archives.size))
+        }
+
         defaultMethod = parameters[Ns.method]?.underlyingValue?.stringValue
+        if (defaultMethod != null) {
+            when (format) {
+                Ns.ar, Ns.cpio, Ns.tar -> {
+                    throw stepConfig.exception(XProcError.xcInvalidParameter(Ns.method, defaultMethod!!))
+                }
+                Ns.sevenZ -> {
+                    if (defaultMethod !in listOf("none", "lzma", "lzma2", "bzip2", "deflate", "deflate64")) {
+                        throw stepConfig.exception(XProcError.xcInvalidParameter(Ns.method, defaultMethod!!))
+                    }
+
+                }
+                Ns.zip, Ns.jar -> {
+                    if (defaultMethod !in listOf("none", "deflated")) {
+                        throw stepConfig.exception(XProcError.xcInvalidParameter(Ns.method, defaultMethod!!))
+                    }
+                }
+            }
+        }
+
         defaultLevel = parameters[Ns.level]?.underlyingValue?.stringValue
+        if (defaultLevel != null) {
+            when (format) {
+                Ns.ar, Ns.cpio, Ns.tar, Ns.sevenZ -> {
+                    throw stepConfig.exception(XProcError.xcInvalidParameter(Ns.level, defaultLevel!!))
+                }
+                Ns.zip, Ns.jar -> {
+                    // FIXME: the level isn't actually used anywhere!
+                    if (defaultLevel !in listOf("smallest", "fastest", "default", "huffman", "none")) {
+                        throw stepConfig.exception(XProcError.xcInvalidParameter(Ns.level, defaultLevel!!))
+                    }
+                }
+            }
+        }
+
+        mergeDuplicates = parameters[NsCx.mergeDuplicates]?.underlyingValue?.stringValue ?: "error"
+        if (mergeDuplicates !in listOf("keep-first", "keep-last", "error")) {
+            throw stepConfig.exception(XProcError.xcInvalidParameter(NsCx.mergeDuplicates, mergeDuplicates))
+        }
 
         for (source in archiveMembers) {
             val uri = source.baseURI
@@ -128,7 +215,7 @@ open class ArchiveStep(): AbstractArchiveStep() {
                 path
             }
 
-            val entry = ManifestEntry(name, uri)
+            val entry = ManifestEntry(uri, mapOf(Ns.name to name))
             entry.document = source
             if (defaultMethod != null) {
                 entry.method = defaultMethod!!
@@ -144,48 +231,30 @@ open class ArchiveStep(): AbstractArchiveStep() {
             nameMap[entry.name] = entry
         }
 
-        // Archives can be large. We probably don't need them in memory and the
-        // XProcDocument class should have the ability to manage them on disk.
-        // Various aspects of creating an archive file are easier if the file is
-        // being written to disk, so let's just do that for now. (In particular,
-        // the ZIP archiver is very fussy if the output isn't going to a file.)
-        val tdir = if (System.getProperty("java.io.tmpdir") == null) {
-            Paths.get(".")
-        } else {
-            Paths.get(System.getProperty("java.io.tmpdir"))
-        }
-        archiveFile = Files.createTempFile(tdir, null, ".zip")
-        archiveFile!!.toFile().deleteOnExit()
-
-        for (archive in archives) {
-            val ofile =  Files.createTempFile(tdir, null, ".zip")
-            ofile.toFile().deleteOnExit()
-            val stream = FileOutputStream(ofile.toFile())
-            stream.write(archiveBytes(archive, format))
-            stream.close()
-            origArchiveFiles.add(ofile)
+        // Now work out what entries will go in the output archive...
+        val outputEntries = when (command) {
+            "create" -> createEntries()
+            "update" -> updateEntries(addNew = true)
+            "delete" -> deleteEntries()
+            "freshen" -> updateEntries(addNew = false)
+            else -> throw stepConfig.exception(XProcError.xcInvalidParameter(Ns.command, command!!))
         }
 
-        val archiver = ZipArchiver()
-
-        try {
-            archiver.processArchive()
-        } catch (ex: XProcException) {
-            throw ex
-        } catch (ex: Exception) {
-            throw stepConfig.exception(XProcError.xcInvalidArchiveFormat(format), ex)
+        outputArchive = when (format) {
+            Ns.zip -> ZipOutputArchive(stepConfig)
+            Ns.jar -> JarOutputArchive(stepConfig)
+            Ns.tar -> TarOutputArchive(stepConfig)
+            Ns.ar -> ArOutputArchive(stepConfig)
+            Ns.cpio -> CpioOutputArchive(stepConfig)
+            Ns.sevenZ -> SevenZOutputArchive(stepConfig)
+            else -> throw stepConfig.exception(XProcError.xcInvalidArchiveFormat(format))
         }
 
-        if (archiveFile!!.toFile().length() > Integer.MAX_VALUE) {
-            throw stepConfig.exception(XProcError.xcArchiveTooLarge(archiveFile!!.toFile().length()))
+        outputArchive.create()
+        for (entry in outputEntries) {
+            outputArchive.write(entry)
         }
-
-        val bytes = ByteArray(archiveFile!!.toFile().length().toInt())
-        val stream = FileInputStream(archiveFile!!.toFile())
-        stream.read(bytes)
-        stream.close()
-
-        archiveFile!!.toFile().delete()
+        outputArchive.close()
 
         val builder = SaxonTreeBuilder(stepConfig)
         builder.startDocument(stepConfig.baseUri)
@@ -210,8 +279,10 @@ open class ArchiveStep(): AbstractArchiveStep() {
 
         val props = DocumentProperties()
         props[Ns.baseUri] = XdmEmptySequence.getInstance()
-        props[Ns.contentType] = MediaType.ZIP
-        receiver.output("result", XProcDocument.ofBinary(bytes, stepConfig, props))
+        props[Ns.contentType] = formatMediaType(format)
+
+        val doc = stepConfig.environment.documentManager.load(outputArchive.baseUri, stepConfig, props)
+        receiver.output("result", doc)
     }
 
     private fun parseManifest(manifest: XProcDocument): MutableList<ManifestEntry> {
@@ -264,152 +335,181 @@ open class ArchiveStep(): AbstractArchiveStep() {
                 throw stepConfig.exception(XProcError.xdInvalidUri(properties[Ns.href]!!.toString()))
             }
 
-            val mentry = ManifestEntry(properties[Ns.name]!!, muri)
-            mentry.comment = properties[Ns.comment]
-            mentry.method = properties[Ns.method]
-            mentry.level = properties[Ns.level]
-            mentry.contentType = MediaType.parse(properties[Ns.contentType])
+            val mentry = ManifestEntry(muri, properties)
             entries.add(mentry)
         }
 
         return entries
     }
 
-    override fun toString(): String = "p:archive"
+    private fun createEntries(): List<XArchiveEntry> {
+        val outputEntries = mutableListOf<XArchiveEntry>()
+        val map = mutableMapOf<String, ManifestEntry>()
+        map.putAll(nameMap)
 
-    internal class ManifestEntry(val name: String, val href: URI) {
-        var document: XProcDocument? = null
-        var comment: String? = null
-        var method: String? = null
-        var level: String? = null
-        var contentType: MediaType? = null
-        override fun toString(): String {
-            return "${name}: ${href}"
+        for (entry in unduplicatedList()) {
+            val manentry = nameMap[entry.name]
+            if (manentry != null) {
+                val newEntry = XArchiveEntry(stepConfig, entry.name, manentry.document!!)
+                newEntry.properties.putAll(entry.properties)
+                newEntry.properties.putAll(manentry.properties)
+                outputEntries.add(newEntry)
+                map.remove(entry.name)
+            } else {
+                outputEntries.add(entry)
+            }
         }
+        for ((name, entry) in map) {
+            val newEntry = XArchiveEntry(stepConfig, name, entry.document!!)
+            newEntry.properties.putAll(entry.properties)
+            outputEntries.add(newEntry)
+        }
+
+        return outputEntries
     }
 
-    inner class ZipArchiver() {
-        var origZipFile: ZipFile? = null
-        var zipResultStream: ZipArchiveOutputStream? = null
+    private fun updateEntries(addNew: Boolean): List<XArchiveEntry> {
+        val outputEntries = mutableListOf<XArchiveEntry>()
+        val map = mutableMapOf<String, ManifestEntry>()
+        map.putAll(nameMap)
 
-        fun processArchive() {
-            when (command) {
-                null -> Unit
-                "update", "create", "freshen", "delete" -> Unit
-                else -> throw stepConfig.exception(XProcError.xcInvalidParameter(Ns.command, command!!))
-            }
-            when (defaultLevel) {
-                null -> Unit
-                "smallest", "fastest", "default", "huffman", "none" -> Unit
-                else -> throw stepConfig.exception(XProcError.xcInvalidParameter(Ns.level, defaultLevel!!))
-            }
-            when (defaultMethod) {
-                null -> Unit
-                "deflated", "none" -> Unit
-                else -> throw stepConfig.exception(XProcError.xcInvalidParameter(Ns.method, defaultMethod!!))
-            }
-
-            if (archives.size > 1) {
-                throw stepConfig.exception(XProcError.xcInvalidNumberOfArchives(archives.size))
-            } else if (command == "delete" && archives.size != 1) {
-                throw stepConfig.exception(XProcError.xcInvalidNumberOfArchives(archives.size))
-            }
-
-            if (origArchiveFiles.isNotEmpty()) {
-                val zipBuilder = ZipFile.Builder()
-                zipBuilder.setFile(origArchiveFiles.first().toFile())
-                origZipFile = zipBuilder.get()
-            }
-
-            zipResultStream = ZipArchiveOutputStream(archiveFile)
-
-            when (command) {
-                "delete" -> archiveDelete()
-                else -> archiveUpdate()
-            }
-
-            zipResultStream!!.close()
-        }
-
-        fun archiveUpdate() {
-            // If there's an original ZIP file, keep all the entries in the same order...
-            if (origZipFile != null) {
-                for (oentry in origZipFile!!.entries) {
-                    var copyEntry = true
-                    if (nameMap.containsKey(oentry.name)) {
-                        addToArchive(nameMap[oentry.name]!!)
-                        nameMap.remove(oentry.name)
-                        copyEntry = false
-                    }
-                    if (copyEntry) {
-                        addToArchive(oentry)
-                    }
-                }
-            }
-
-            if (command != "freshen") {
-                for (entry in manifestList) {
-                    if (!nameMap.containsKey(entry.name)) {
-                        continue // we already did this one
-                    }
-                    addToArchive(entry)
-                }
-                for (entry in extraList) {
-                    if (!nameMap.containsKey(entry.name)) {
-                        continue // we already did this one
-                    }
-                    addToArchive(entry)
+        for (entry in unduplicatedList()) {
+            val manentry = nameMap[entry.name]
+            if (manentry != null) {
+                val newEntry = XArchiveEntry(stepConfig, entry.name, manentry.document!!)
+                newEntry.properties.putAll(entry.properties)
+                newEntry.properties.putAll(manentry.properties)
+                outputEntries.add(newEntry)
+                map.remove(entry.name)
+            } else {
+                if (needsUpdating(entry)) {
+                    val localUri = entry.archive?.baseUri?.resolve(entry.name)
+                    val doc = stepConfig.environment.documentManager.load(localUri!!, stepConfig)
+                    val newEntry = XArchiveEntry(stepConfig, entry.name, doc)
+                    outputEntries.add(newEntry)
+                } else {
+                    outputEntries.add(entry)
                 }
             }
         }
 
-        fun archiveDelete() {
-            if (origZipFile != null) {
-                for (oentry in origZipFile!!.entries) {
-                    var copyEntry = true
-                    if (nameMap.containsKey(oentry.name)) {
-                        copyEntry = false
+        if (addNew) {
+            for ((name, entry) in map) {
+                val newEntry = XArchiveEntry(stepConfig, name, entry.document!!)
+                newEntry.properties.putAll(entry.properties)
+                outputEntries.add(newEntry)
+            }
+        }
+
+        return outputEntries
+    }
+
+    private fun unduplicatedList(): List<XArchiveEntry> {
+        val outputEntries = mutableListOf<XArchiveEntry>()
+        val seen = mutableMapOf<String, XArchiveEntry>()
+
+        for (archive in archives) {
+            for (entry in archive.entries) {
+                if (seen.contains(entry.name)) {
+                    if (mergeDuplicates == "error") {
+                        throw stepConfig.exception(XProcError.xiMergeDuplicatesError(entry.name))
                     }
-                    if (copyEntry) {
-                        addToArchive(oentry)
+                    if (mergeDuplicates == "keep-last") {
+                        outputEntries.remove(seen[entry.name]!!)
+                        outputEntries.add(entry)
                     }
+                } else {
+                    outputEntries.add(entry)
+                }
+                seen[entry.name] = entry
+            }
+        }
+
+        return outputEntries
+    }
+
+    private fun needsUpdating(entry: XArchiveEntry): Boolean {
+        val lastModifiedProperty = entry.properties[NsCx.lastModified]
+        val lastModified = if (lastModifiedProperty != null) {
+            FileTime.from(Instant.parse(lastModifiedProperty))
+        } else {
+            FileTime.from(Instant.EPOCH)
+        }
+
+        val localUri = entry.archive?.baseUri?.resolve(entry.name)
+        if (localUri?.scheme != "file") {
+            if (localUri != null) {
+                logger.warn { "Ignoring update for non-file URI: ${localUri}" }
+            }
+            return false
+        }
+
+        val file = File(localUri.path)
+        if (!file.exists()) {
+            return false
+        }
+
+        val fileTime = FileTime.fromMillis(file.lastModified())
+        return fileTime > lastModified
+    }
+
+    private fun deleteEntries(): List<XArchiveEntry> {
+        val outputEntries = mutableListOf<XArchiveEntry>()
+        for (archive in archives) {
+            for (entry in archive.entries) {
+                if (entry.name !in nameMap) {
+                    outputEntries.add(entry)
                 }
             }
         }
 
-        private fun addToArchive(oentry: ZipArchiveEntry) {
-            val zipEntry = ZipArchiveEntry(oentry.name)
-            zipEntry.comment = oentry.comment
-            zipEntry.method = oentry.method
-            zipResultStream!!.putArchiveEntry(zipEntry)
-            val inputStream = origZipFile!!.getInputStream(oentry)
-            val copybuf = ByteArray(4096)
-            var length = inputStream.read(copybuf)
-            while (length >= 0) {
-                zipResultStream!!.write(copybuf, 0, length)
-                length = inputStream.read(copybuf)
-            }
-            inputStream.close()
-            zipResultStream!!.closeArchiveEntry()
+        return outputEntries
+    }
+
+    override fun toString(): String = "p:archive"
+
+    internal class ManifestEntry(val href: URI, props: Map<QName,String>) {
+        val properties = mutableMapOf<QName,String>()
+        init {
+            properties.putAll(props)
         }
 
-        private fun addToArchive(entry: ManifestEntry) {
-            val zipEntry = ZipArchiveEntry(entry.name)
-            zipEntry.comment = entry.comment
-            if (entry.method != null) {
-                when (entry.method) {
-                    "none" -> zipEntry.method = ZipEntry.STORED
-                    "deflated" -> zipEntry.method = ZipEntry.DEFLATED
-                    else -> Unit
-                }
-            }
-            zipResultStream!!.putArchiveEntry(zipEntry)
+        var document: XProcDocument? = null
 
-            val entryBaos = ByteArrayOutputStream()
-            val serializer = XProcSerializer(stepConfig)
-            serializer.write(entry.document!!, entryBaos, "archive")
-            zipResultStream!!.write(entryBaos.toByteArray())
-            zipResultStream!!.closeArchiveEntry()
+        var contentType: MediaType?
+            get() {
+                val ctype = properties[Ns.contentType]
+                if (ctype != null) {
+                    return MediaType.parse(ctype)
+                }
+                return null
+            }
+            set(value) {
+                properties.remove(Ns.contentType)
+                value?.let { properties[Ns.contentType] = "${it}" }
+            }
+        val name: String
+            get() = properties[Ns.name]!!
+        var comment: String?
+            get() = properties[Ns.comment]
+            set(value) {
+                properties.remove(Ns.comment)
+                value?.let { properties[Ns.comment] = it }
+            }
+        var method: String?
+            get() = properties[Ns.method]
+            set(value) {
+                properties.remove(Ns.method)
+                value?.let { properties[Ns.method] = it }
+            }
+        var level: String?
+            get() = properties[Ns.level]
+            set(value) {
+                properties.remove(Ns.level)
+                value?.let { properties[Ns.level] = it }
+            }
+        override fun toString(): String {
+            return "${name}: ${href}"
         }
     }
 }

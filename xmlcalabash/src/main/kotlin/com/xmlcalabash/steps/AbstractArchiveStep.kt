@@ -6,12 +6,10 @@ import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.namespace.Ns
 import net.sf.saxon.s9api.QName
-import net.sf.saxon.s9api.XdmArray
 import java.net.URI
 import java.net.URISyntaxException
 
 abstract class AbstractArchiveStep(): AbstractAtomicStep() {
-    protected var archives = mutableListOf<XProcDocument>()
     protected var overrideContentTypes = mutableListOf<Pair<String,MediaType>>()
     protected var includeFilters = mutableListOf<String>()
     protected var excludeFilters = mutableListOf<String>()
@@ -56,7 +54,7 @@ abstract class AbstractArchiveStep(): AbstractAtomicStep() {
         if (archive is XProcBinaryDocument) {
             return archive.binaryValue
         }
-        throw stepConfig.exception(XProcError.xcUnsupportedArchiveFormat(format))
+        throw stepConfig.exception(XProcError.xcArchiveFormatIncorrect(format))
     }
 
     protected fun contentType(name: String): MediaType {
@@ -68,4 +66,31 @@ abstract class AbstractArchiveStep(): AbstractAtomicStep() {
         }
         return MediaType.parse(stepConfig.environment.mimeTypes.getContentType(name))
     }
+
+    protected fun selectFormat(contentType: MediaType, defaultFormat: QName?): QName {
+        return when (contentType) {
+            MediaType.JAR -> Ns.jar
+            MediaType.TAR -> Ns.tar
+            MediaType.AR -> Ns.ar
+            MediaType.ARJ -> Ns.arj
+            MediaType.CPIO -> Ns.cpio
+            MediaType.SEVENZ -> Ns.sevenZ
+            else -> defaultFormat
+                ?: throw stepConfig.exception(XProcError.xcUnrecognizedArchiveFormat(contentType))
+        }
+    }
+
+    protected fun formatMediaType(format: QName): MediaType {
+        return when (format) {
+            Ns.zip -> MediaType.ZIP
+            Ns.jar -> MediaType.JAR
+            Ns.tar -> MediaType.TAR
+            Ns.ar -> MediaType.AR
+            Ns.arj -> MediaType.ARJ
+            Ns.cpio -> MediaType.CPIO
+            Ns.sevenZ -> MediaType.SEVENZ
+            else -> MediaType.OCTET_STREAM
+        }
+    }
+
 }
