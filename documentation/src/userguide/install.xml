@@ -116,8 +116,12 @@ resources, XML Calabash defines a pragmatically more useful default.</para>
 </row>
 </thead>
 <tbody>
+<row><entry>7z</entry><entry>application/x-7z-compressed</entry></row>
+<row><entry>a</entry><entry>application/x-archive</entry></row>
+<row><entry>arj</entry><entry>application/x-arj</entry></row>
 <row><entry>bmp</entry><entry>image/bmp</entry></row>
 <row><entry>bz2</entry><entry>application/bzip2</entry></row>
+<row><entry>cpio</entry><entry>application/x-cpio</entry></row>
 <row><entry>css</entry><entry>text/plain</entry></row>
 <row><entry>eps</entry><entry>image/eps</entry></row>
 <row><entry>epub</entry><entry>application/epub+zip</entry></row>
@@ -125,6 +129,7 @@ resources, XML Calabash defines a pragmatically more useful default.</para>
 <row><entry>gif</entry><entry>image/gif</entry></row>
 <row><entry>gz</entry><entry>application/gzip</entry></row>
 <row><entry>gzip</entry><entry>application/gzip</entry></row>
+<row><entry>jar</entry><entry>application/java-archive</entry></row>
 <row><entry>jpg, jpeg</entry><entry>image/jpeg</entry></row>
 <row><entry>json</entry><entry>application/json</entry></row>
 <row><entry>lzma</entry><entry>application/lzma</entry></row>
@@ -134,6 +139,7 @@ resources, XML Calabash defines a pragmatically more useful default.</para>
 <row><entry>rng</entry><entry>application/relax-ng+xml</entry></row>
 <row><entry>sch</entry><entry>application/schematron+xml</entry></row>
 <row><entry>svg</entry><entry>image/svg+xml</entry></row>
+<row><entry>tar</entry><entry>application/x-tar</entry></row>
 <row><entry>text</entry><entry>text/plain</entry></row>
 <row><entry>txt</entry><entry>text/plain</entry></row>
 <row><entry>xml</entry><entry>application/xml</entry></row>

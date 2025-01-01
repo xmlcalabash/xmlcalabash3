@@ -63,62 +63,22 @@
 
 <para role="external-refs"/>
 
-<para>Compression is supported by the third party
-Apache Commons Compress™ library.</para>
-
-   <refsection>
-     <title>Supported formats</title>
-
-<para>The following formats are supported using the Apache Commons
-Compress™ library version <?dep commonsCompress?>.</para>
-
-<informaltable pgwide="1">
-<tgroup cols="3">
-<thead>
-  <row>
-    <entry>Archive format</entry>
-    <entry>Content type</entry>
-    <entry>Common file extensions</entry>
-  </row>
-</thead>
-<tbody>
-  <row>
-    <entry>7z</entry>
-    <entry><literal>application/x-7z-compressed</literal></entry>
-    <entry><filename class="extension">.7z</filename></entry>
-  </row>
-  <row>
-    <entry>AR</entry>
-    <entry><literal>application/x-archive</literal></entry>
-    <entry><filename class="extension">.a</filename>,
-       <filename class="extension">.lib</filename>,
-    <filename class="extension">.ar</filename></entry>
-  </row>
-  <row>
-    <entry>ARJ</entry>
-    <entry><emphasis>None</emphasis></entry>
-    <entry><filename class="extension">.arj</filename></entry>
-  </row>
-  <row>
-    <entry>Jar</entry>
-    <entry><literal>application/java-archive</literal></entry>
-    <entry><filename class="extension">.jar</filename></entry>
-  </row>
-  <row>
-    <entry>Tar</entry>
-    <entry><literal>application/x-tar</literal></entry>
-    <entry><filename class="extension">.tar</filename></entry>
-  </row>
-  <row>
-    <entry>Zip</entry>
-    <entry><literal>application/zip</literal></entry>
-    <entry><filename class="extension">.zip</filename></entry>
-  </row>
-</tbody>
-</tgroup>
-</informaltable>
-
 <refsection>
+<title>Supported formats</title>
+
+<para>The supported formats are
+<link linkend="am-entries-7z">7z</link>,
+<link linkend="am-entries-ar">Ar</link>,
+<link linkend="am-entries-arj">Arj</link>,
+<link linkend="am-entries-cpio">Cpio</link>,
+<link linkend="am-entries-zip">Jar</link>,
+<link linkend="am-entries-tar">Tar</link>, and
+<link linkend="am-entries-zip">Zip</link>. For more information, see the
+<tag>p:archive</tag> step.</para>
+
+<para>Details about the manifest entries for the various formats follow.</para>
+
+<refsection xml:id="am-entries-7z">
 <title>7z Archives</title>
 
 <para>Entries for 7z archives have the following format:</para>
@@ -141,7 +101,7 @@ It’s renamed to “none” here for consistency with the XProc archive format.
 </note>
 </refsection>
 
-<refsection>
+<refsection xml:id="am-entries-ar">
 <title>AR Archives</title>
 
 <para>Entries for AR archives have the following format:</para>
@@ -151,7 +111,7 @@ It’s renamed to “none” here for consistency with the XProc archive format.
 
 </refsection>
 
-<refsection>
+<refsection xml:id="am-entries-arj">
 <title>ARJ Archives</title>
 
 <para>Entries for ARJ archives have the following format:</para>
@@ -174,7 +134,19 @@ It’s renamed to “none” here for consistency with the XProc archive format.
 “<literal>Windows95</literal>”.</para>
 </refsection>
 
-<refsection>
+<refsection xml:id="am-entries-cpio">
+<title>Cpio Archives</title>
+
+<para>Entries for Cpio archives have the following format:</para>
+
+<rng-pattern schema="../../build/archive-manifest.rng"
+             name="c.cpioEntry" format="table"/>
+
+<para>Integer values are omitted if they are zero.</para>
+
+</refsection>
+
+<refsection xml:id="am-entries-tar">
 <title>Tar Archives</title>
 
 <para>Entries for tar archives have the following format:</para>
@@ -194,7 +166,7 @@ and is omited from the manifest.</para>
 <para>Sparse tar entries are not supported.</para>
 </refsection>
 
-<refsection>
+<refsection xml:id="am-entries-zip">
 <title>Zip (and Jar) Archives</title>
 
 <para>Jar archive files are just Zip archives with a different filename extension.
