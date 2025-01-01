@@ -148,6 +148,92 @@ c.arjEntry =
 
 # ============================================================
 
+c.cpioArchive =
+    element c:archive {
+        attribute format { "cpio" },
+        c.cpioEntry*
+    }
+
+c.cpioEntry =
+    element c:entry {
+        [ db:purpose
+              [ "The entry name." ]
+        ]
+            attribute name { text },
+        [ db:purpose
+              [ "The entry URI." ]
+        ]
+            attribute href { xsd:anyURI },
+        [ db:purpose
+              [ "The content-type." ]
+        ]
+            attribute content-type { text },
+        modeAttributes,
+        [ db:purpose
+              [ "The CPIO format." ]
+        ]
+        attribute cx:format { "new" | "new-crc" | "new-mask" | "old-ascii" | "old-binary" | "old-mask" | "unknown" },
+
+        [ db:purpose
+              [ "The check sum." ]
+        ]
+        attribute cx:check-sum { xsd:integer }?,
+        [ db:purpose
+              [ "The device major number." ]
+        ]
+        attribute cx:dev-major { xsd:integer }?,
+        [ db:purpose
+              [ "The device minor number." ]
+        ]
+        attribute cx:dev-minor { xsd:integer }?,
+        [ db:purpose
+              [ "The remote device major number." ]
+        ]
+        attribute cx:remote-dev-major { xsd:integer }?,
+        [ db:purpose
+              [ "The remote device minor number." ]
+        ]
+        attribute cx:remote-dev-minor { xsd:integer }?,
+        [ db:purpose
+              [ "The device number." ]
+        ]
+        attribute cx:device { text }?,
+        [ db:purpose
+              [ "The remote device number." ]
+        ]
+        attribute cx:remote-device { text }?,
+        [ db:purpose
+              [ "The user id." ]
+        ]
+        attribute cx:user-id { text }?,
+        [ db:purpose
+              [ "The group id." ]
+        ]
+        attribute cx:group-id { text }?,
+        [ db:purpose
+              [ "The last modification time." ]
+        ]
+        attribute cx:last-modified { xsd:dateTime }?,
+        [ db:purpose
+              [ "The number of links." ]
+        ]
+        attribute cx:number-of-links { text }?,
+        [ db:purpose
+              [ "The time of the entry." ]
+        ]
+        attribute cx:time { xsd:dateTime }?,
+        [ db:purpose
+              [ "The device type." ]
+        ]
+        attribute cx:device-type { "block-device" | "character-device" | "directory"
+                    | "network" | "pipe" | "socket" | "symbolic-link" }?,
+        sizeAttribute,
+        empty
+    }
+
+
+# ============================================================
+
 c.tarArchive =
     element c:archive {
         attribute format { "tar" },

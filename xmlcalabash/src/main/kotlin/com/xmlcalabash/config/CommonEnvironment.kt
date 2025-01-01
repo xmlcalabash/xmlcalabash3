@@ -28,8 +28,12 @@ class CommonEnvironment(private val xmlCalabash: XmlCalabash) {
     companion object {
         // N.B. This is used in reverse in MediaType.extension()
         val defaultContentTypes = mapOf(
+            "7z" to "application/x-7z-compressed",
+            "a" to "application/x-archive",
+            "arj" to "application/x-arj",
             "bmp" to "image/bmp",
             "bz2" to "application/bzip2",
+            "cpio" to "application/x-cpio",
             "css" to "text/plain",
             "epub" to "application/epub+zip",
             "eps" to "image/eps",
@@ -37,6 +41,7 @@ class CommonEnvironment(private val xmlCalabash: XmlCalabash) {
             "gif" to "image/gif",
             "gz" to "application/gzip",
             "gzip" to "application/gzip",
+            "jar" to "application/java-archive",
             "jpeg" to "image/jpeg",
             "jpg" to "image/jpeg",
             "json" to "application/json",
@@ -47,6 +52,7 @@ class CommonEnvironment(private val xmlCalabash: XmlCalabash) {
             "rng" to "application/relax-ng+xml",
             "sch" to "application/schematron+xml",
             "svg" to "image/svg+xml",
+            "tar" to "application/x-tar",
             "text" to "text/plain",
             "txt" to "text/plain",
             "xml" to "application/xml",
