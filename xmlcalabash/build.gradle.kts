@@ -198,7 +198,12 @@ tasks.register("helloWorld") {
 publishing {
   repositories {
     maven {
-      url = uri("https://github.com/xmlcalabash/xmlcalabash3")
+      credentials {
+        username = project.findProperty("sonatypeUsername").toString()
+        password = project.findProperty("sonatypePassword").toString()
+      }
+      //url = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
+      url = uri("https://oss.sonatype.org/content/repositories/snapshots/")
     }
   }
 
