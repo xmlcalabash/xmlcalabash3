@@ -5,13 +5,17 @@ plugins {
   id("com.xmlcalabash.build.xmlcalabash-build")
 }
 
+val dep_drewnoakes = project.findProperty("drewnoakesExtractor").toString()
+val dep_pdfbox = project.findProperty("pdfbox").toString()
+val dep_jaxb = project.findProperty("jaxbapi").toString()
+
 dependencies {
   implementation(project(":xmlcalabash"))
 
-  implementation("com.drewnoakes:metadata-extractor:2.19.0")
-  implementation("org.apache.pdfbox:pdfbox:2.0.31")
-  implementation("org.apache.pdfbox:xmpbox:2.0.31")
-  implementation("javax.xml.bind:jaxb-api:2.3.1") // pdfbox dep for parsing XML in pdfbox
+  implementation("com.drewnoakes:metadata-extractor:${dep_drewnoakes}")
+  implementation("org.apache.pdfbox:pdfbox:${dep_pdfbox}")
+  implementation("org.apache.pdfbox:xmpbox:${dep_pdfbox}")
+  implementation("javax.xml.bind:jaxb-api:${dep_jaxb}") // pdfbox dep for parsing XML in pdfbox
 }
 
 val xmlbuild = the<XmlCalabashBuildExtension>()

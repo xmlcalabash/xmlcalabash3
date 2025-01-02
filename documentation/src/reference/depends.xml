@@ -18,7 +18,7 @@ libraries for some functionality. In particular it was built with:
 <listitem>
 <para>XML Calabash 3.x is built on top of Saxon 12.5. There is no support for
 earlier releases of Saxon. It will work with Saxon HE, but you will have to provide Saxon EE and
-an appropriate license if you want to use EE features (like XML Schema validation).
+an appropriate license if you want to use licensed features (like XML Schema validation).
 </para>
 </listitem>
 </varlistentry>
@@ -50,6 +50,15 @@ an appropriate license if you want to use EE features (like XML Schema validatio
 </para>
 </listitem>
 </varlistentry>
+<!-- The polyglot steps are not yet published
+<varlistentry>
+<term>graalvmJS, version <?version DEPENDENCY_graalvmJS?></term>
+<listitem>
+<para>Used (only) by the “polyglot” steps for additional language support.
+</para>
+</listitem>
+</varlistentry>
+-->
 <varlistentry>
 <term>htmlparser, version <?version DEPENDENCY_htmlparser?></term>
 <listitem>
@@ -107,6 +116,13 @@ an appropriate license if you want to use EE features (like XML Schema validatio
 </listitem>
 </varlistentry>
 <varlistentry>
+<term>xercesImpl, version <?version DEPENDENCY_xercesImpl?></term>
+<listitem>
+<para>Where the Xerces XML parser is used.
+</para>
+</listitem>
+</varlistentry>
+<varlistentry>
 <term>uuidCreator, version <?version DEPENDENCY_uuidCreator?></term>
 <listitem>
 <para>To support UUIDs.
@@ -121,6 +137,9 @@ an appropriate license if you want to use EE features (like XML Schema validatio
 </listitem>
 </varlistentry>
 </variablelist>
+
+<para>Some extension steps require additional dependencies. Those
+dependencies are documented with the extension steps.</para>
 
 <para>If your pipelines don’t use features supported by third party libraries
 (for example, if you don’t have <literal>.br</literal> archives or convert

@@ -3,11 +3,13 @@ package com.xmlcalabash.build
 import java.io.ByteArrayOutputStream
 import java.io.InputStream
 import java.io.InputStreamReader
+import java.io.File
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
 
+import org.gradle.api.artifacts.Configuration
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.provider.Property
@@ -60,6 +62,29 @@ interface XmlCalabashBuildExtension {
 
   fun buildId(): String {
     return "${gitHash()}.${buildDateId.get()}"
+  }
+
+  fun unversionedName(name: String): String {
+    val vregex = "^(.*)-(\\d+)(\\.\\d+)?(\\.\\d+)?(-.*)?\\.jar$".toRegex()
+    val result = vregex.matchEntire(name)
+    if (result != null) {
+      val prefix = result.groups[1]!!.value
+      val suffix = result.groups[5]?.value ?: ""
+      return "${prefix}${suffix}.jar"
+    }
+    return name
+  }
+
+  fun dependencyMap(config: Configuration): Map<String,File> {
+    val versions = mutableMapOf<String,File>()
+    config.forEach {
+      val pathname = it.toString().replace("\\", "/")
+      val pos = pathname.lastIndexOf("/")
+      val filename = pathname.substring(pos+1)
+      versions[unversionedName(filename)] = it
+    }
+
+    return versions
   }
 }
 
