@@ -37,6 +37,7 @@ val dep_flexmarkAll = project.findProperty("flexmarkAll").toString()
 val dep_htmlparser = project.findProperty("htmlparser").toString()
 val dep_httpClient = project.findProperty("httpClient").toString()
 val dep_jing = project.findProperty("jing").toString()
+val dep_xerces = project.findProperty("xercesImpl").toString()
 val dep_jsonSchemaValidator = project.findProperty("jsonSchemaValidator").toString()
 val dep_graalvmJS = project.findProperty("graalvmJS").toString()
 val dep_schxslt2 = project.findProperty("schxslt2").toString()
@@ -70,6 +71,7 @@ dependencies {
   implementation("org.relaxng:jing:${dep_jing}") {
     exclude(group="net.sf.saxon", module="Saxon-HE")
   }
+  implementation("xerces:xercesImpl:${dep_xerces}")
   implementation("com.networknt:json-schema-validator:${dep_jsonSchemaValidator}")
   implementation("org.graalvm.polyglot:js:${dep_graalvmJS}")
   implementation("org.xmlresolver:xmlresolver:${dep_xmlResolver}")
