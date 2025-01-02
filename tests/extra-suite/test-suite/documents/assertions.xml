@@ -1,5 +1,8 @@
 <p:pipeinfo xmlns:p="http://www.w3.org/ns/xproc"
+            xmlns:c="http://www.w3.org/ns/xproc-step"
+            xmlns:cx="http://xmlcalabash.com/ns/extensions"
             xmlns:s="http://purl.oclc.org/dsdl/schematron">
+
   <s:schema queryBinding="xslt2" xml:id="input-correct">
     <s:pattern>
       <s:rule context="/">
@@ -26,6 +29,8 @@
         <s:assert test="number(fn:map/fn:number[@key='count']) le 16"
                   >Threshold exceeded: <s:value-of select="fn:map/fn:number[@key='count']"/> gt 16</s:assert>
       </s:rule>
+    </s:pattern>
+    <s:pattern>
       <s:rule context="/fn:map/fn:string">
         <s:report test="@key='now'">Test date: <s:value-of select="."/></s:report>
       </s:rule>
@@ -41,5 +46,25 @@
       </s:rule>
     </s:pattern>
   </s:schema>
+
+  <p:declare-step version="3.0" xml:id="root-has-id">
+    <p:input port="source"/>
+    <p:identity message="Starting assertion pipeline"/>
+    <p:if test="not(/*/@xml:id)">
+      <p:error code="cx:failed-assertion">
+        <p:with-input><doc>No xml:id on document root element</doc></p:with-input>
+      </p:error>
+    </p:if>
+  </p:declare-step>
+
+  <p:declare-step version="3.0" xml:id="zip-has-mimetype">
+    <p:input port="source"/>
+    <p:archive-manifest/>
+    <p:if test="not(/c:archive/c:entry[@name='mimetype'])">
+      <p:error code="cx:failed-assertion">
+        <p:with-input><doc>Mimetype file is missing from ZIP</doc></p:with-input>
+      </p:error>
+    </p:if>
+  </p:declare-step>
 </p:pipeinfo>
 

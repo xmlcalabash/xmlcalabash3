@@ -30,6 +30,8 @@
         <s:rule context="/">
           <s:assert test="cx:messages">The document root is not correct.</s:assert>
         </s:rule>
+      </s:pattern>
+      <s:pattern>
         <s:rule context="/cx:messages">
           <s:assert test="cx:message[@level='INFO' and contains(@message, 'The source document is a doc')]"
                     >Did not find Schematron report for doc.</s:assert>

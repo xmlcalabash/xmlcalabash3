@@ -37,7 +37,7 @@
       <p:output port="result"/>
 
       <p:identity name="identity" cx:assertions="map { 'result': 'correct-map' }">
-        <p:with-input select="map { 'now': current-dateTime(), 'count': 42 }">
+        <p:with-input select="map { 'now': current-dateTime(), 'count': 12 }">
           <irrelevant/>
         </p:with-input>
       </p:identity>
