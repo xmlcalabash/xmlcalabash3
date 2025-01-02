@@ -127,14 +127,22 @@ class CompoundStepHead(config: XProcStepConfiguration, val parent: CompoundStep,
 
     override fun prepare() {
         for ((name, details) in staticOptions) {
-            if ((type.namespaceUri == NsP.namespace && name == Ns.message)
-                || (type.namespaceUri != NsP.namespace && name == NsP.message)) {
+            if ((parent.type.namespaceUri == NsP.namespace && name == Ns.message)
+                || (parent.type.namespaceUri != NsP.namespace && name == NsP.message)) {
                 message = details.staticValue.evaluate(stepConfig)
             }
         }
     }
 
     override fun run() {
+        if (message == null) {
+            if (parent.type.namespaceUri == NsP.namespace) {
+                message = options[Ns.message]?.first()?.value
+            } else {
+                message = options[NsP.message]?.first()?.value
+            }
+        }
+
         if (showMessage && message != null) {
             stepConfig.info { "${message}" }
             message = null
