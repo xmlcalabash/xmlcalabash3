@@ -38,6 +38,7 @@ jobs:
     needs: check_branch
     env:
       HAVE_ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN != '' }}
+      HAVE_SONATYPE: ${{ secrets.SONATYPEUSER != '' }}
       HAVE_LIBRARIES: ${{ secrets.LIBURI != '' }}
       HAVE_DOCS: ${{ secrets.DOCS_REPOSITORY != '' }}
       HAVE_WWW: ${{ secrets.WWW_REPOSITORY != '' }}
@@ -122,6 +123,19 @@ jobs:
           files: |
             app/build/distributions/xmlcalabash-${{ env.CI_TAG }}.zip
             ext/epubcheck/build/distributions/epubcheck-${{ env.CI_TAG }}.zip
+
+      # N.B. This is **only** publishing the SNAPSHOT builds on the main branch
+      - name: Publish to Sonatype
+        if: ${{ env.HAVE_ACCESS_TOKEN == 'true' && env.HAVE_SONATYPE == 'true' && env.CI_BRANCH == 'main' && contains(env.XMLCALABASH_VER, 'SNAPSHOT') }}
+        run: |
+          curl -s -o secret.gpg ${{ secrets.GPGKEYURI }}
+          ./gradlew -PsonatypeUsername=${{ secrets.SONATYPEUSER }} \
+                  -PsonatypePassword="${{ secrets.SONATYPEPASS }}" \
+                  -Psigning.keyId="${{ secrets.SIGNKEY }}" \
+                  -Psigning.password="${{ secrets.SIGNPSW }}" \
+                  -Psigning.secretKeyRingFile=./secret.gpg \
+                  publish
+          rm -f secret.gpg
 
       - name: Checkout www
         if: ${{ env.HAVE_WWW == 'true' && env.HAVE_ACCESS_TOKEN == 'true' && env.CI_BRANCH == 'main' && !contains(env.XMLCALABASH_VER, 'SNAPSHOT') }}

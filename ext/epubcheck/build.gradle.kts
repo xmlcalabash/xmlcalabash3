@@ -127,8 +127,11 @@ publishing {
         username = project.findProperty("sonatypeUsername").toString()
         password = project.findProperty("sonatypePassword").toString()
       }
-      //url = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
-      url = uri("https://oss.sonatype.org/content/repositories/snapshots/")
+      url = if (xmlbuild.version.get().contains("SNAPSHOT")) {
+        uri("https://oss.sonatype.org/content/repositories/snapshots/")
+      } else {
+        uri("https://oss.sonatype.org/service/local/staging/deploy/maven2/")
+      }
     }
   }
 
