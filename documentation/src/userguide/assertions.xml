@@ -4,13 +4,64 @@
          version="5.2" xml:id="assertions">
 <info>
   <?db filename="assertions"?>
-  <title>Schematron assertions</title>
+  <title>Pipeline assertions</title>
 </info>
 
-<para>You can use Schematron assertions to test that your pipeline is processing
+<para>You can use assertions to test that your pipeline is processing
 documents the way you expect. In order to use assertions you must enable them
 with the <option linkend="cli-assertions">--assertions</option> option.
 </para>
+
+<section xml:id="assertion-types">
+<title>Assertion types</title>
+
+<para>An assertion can either be a Schematron schema or an XProc pipeline.</para>
+
+<section>
+<title>Schematron assertions</title>
+
+<para>A Schematron assertion is a <tag>s:schema</tag> element containing the
+Schematron to use for the assertion.</para>
+
+<note>
+<para>Schematron operates on XML documents. If you make an assertion on a
+document that contains a map or array (or simple atomic value), it will be
+converted to XML (as per <tag>p:cast-content-type</tag>) before the assertions
+are applied. Assertions cannot be applied to binary document.</para>
+</note>
+</section>
+
+<section>
+<title>XProc pipeline assertions</title>
+
+<para>A pipeline assertion is a <tag>p:declare-step</tag> element
+containing the pipeline to use for the assertion. The pipeline must
+have a single input port named <port>source</port>. It may have any
+number of output ports, but documents sent to them are ignored. No
+options are passed to an assertion pipeline.</para>
+
+<para>An assertion pipeline passes if it finishes without raising an error.
+To raise an assertion, cause an error, for example with <tag>p:error</tag>.
+</para>
+
+<para>The warning or error message used in the assertion is the string
+value of the error document, if there is one. For example:</para>
+
+<programlisting language="xml"><![CDATA[<p:error code="cx:failed-assertion">
+  <p:with-input><doc>Something went wrong</doc></p:with-input>
+</p:error>]]></programlisting>
+
+<para>will generate an assertion message something like the following:</para>
+
+<screen><computeroutput>Assert cx:failed-assertion on <replaceable>step-id</replaceable>/<replaceable>port</replaceable>: Something went wrong</computeroutput></screen>
+
+<para>There’s no equivalent of Schematron reports for assertion pipelines.</para>
+
+</section>
+</section>
+
+<section xml:id="assertion-placement">
+<title>Assertion placement</title>
 
 <para>There are two ways to use assertions: you can place them directly in
 <tag>p:input</tag>, <tag>p:output</tag>, or <tag>p:with-input</tag> elements, or
@@ -19,17 +70,10 @@ attribute.</para>
 
 <para>In either case, each document is tested against the specified schema(s).</para>
 
-<note>
-<para>Schematron operates on XML documents. If you make an assertion on a
-document that contains a map or array (or simple atomic value), it will be
-converted to XML (as per <tag>p:cast-content-type</tag>) before the assertions
-are applied. Assertions cannot be applied to binary document.</para>
-</note>
-
 <section xml:id="assert-embed">
 <title>Directly embedded assertions</title>
 
-<para>To use an assertion directly, simply place the Schematron schema in
+<para>To use an assertion directly, simply place the assertion in
 a <tag>p:pipeinfo</tag> element in the input or output. For example:</para>
 
 <programlisting language='xml'
@@ -116,5 +160,5 @@ documents in your pipeline. An empty <tag>p:pipeinfo</tag> element with a
 behave exactly as if it had been embedded in the pipeline.</para>
 </section>
 </section>
-
+</section>
 </chapter>

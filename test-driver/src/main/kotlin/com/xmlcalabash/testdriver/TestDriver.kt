@@ -5,7 +5,7 @@ import com.xmlcalabash.util.BufferingMessageReporter
 import com.xmlcalabash.util.DefaultXmlCalabashConfiguration
 import com.xmlcalabash.util.NopMessageReporter
 import com.xmlcalabash.util.SaxonTreeBuilder
-import com.xmlcalabash.util.SchematronAssertions
+import com.xmlcalabash.util.AssertionsLevel
 import net.sf.saxon.event.ReceiverOption
 import net.sf.saxon.om.AttributeInfo
 import net.sf.saxon.om.AttributeMap
@@ -111,12 +111,12 @@ class TestDriver(val testOptions: TestOptions, val exclusions: Map<String, Strin
         val licensedConfig = DefaultXmlCalabashConfiguration()
         licensedConfig.licensed = true
         licensedConfig.uniqueInlineUris = false
-        licensedConfig.assertions = SchematronAssertions.WARNING
+        licensedConfig.assertions = AssertionsLevel.WARNING
 
         val unlicensedConfig = DefaultXmlCalabashConfiguration()
         unlicensedConfig.licensed = false
         unlicensedConfig.uniqueInlineUris = false
-        unlicensedConfig.assertions = SchematronAssertions.WARNING
+        unlicensedConfig.assertions = AssertionsLevel.WARNING
 
         val xmlCalabash = XmlCalabash.newInstance(licensedConfig)
         xmlCalabash.commonEnvironment.messageReporter = { BufferingMessageReporter(100, NopMessageReporter()) }

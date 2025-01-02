@@ -3,19 +3,14 @@ package com.xmlcalabash.datamodel
 import com.xmlcalabash.XmlCalabashBuildConfig
 import com.xmlcalabash.config.CommonEnvironment
 import com.xmlcalabash.config.XmlCalabash
-import com.xmlcalabash.debugger.CliDebugger
-import com.xmlcalabash.debugger.Debugger
-import com.xmlcalabash.debugger.NopDebugger
 import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.exceptions.ErrorExplanation
 import com.xmlcalabash.io.DocumentManager
 import com.xmlcalabash.api.Monitor
 import com.xmlcalabash.runtime.XProcExecutionContext
 import com.xmlcalabash.runtime.XProcStepConfiguration
-import com.xmlcalabash.tracing.TraceListener
 import com.xmlcalabash.api.MessageReporter
-import com.xmlcalabash.util.SchematronAssertions
-import com.xmlcalabash.util.SchematronMonitor
+import com.xmlcalabash.util.AssertionsLevel
 import java.net.URI
 import java.util.*
 import javax.activation.MimetypesFileTypeMap
@@ -39,7 +34,7 @@ class PipelineCompilerContext(override val xmlCalabash: XmlCalabash): PipelineEn
     override val version = "3.0"
     override val xpathVersion = "3.1"
     override var uniqueInlineUris = true
-    override val assertions: SchematronAssertions = SchematronAssertions.IGNORE
+    override val assertions: AssertionsLevel = AssertionsLevel.IGNORE
 
     private var _documentManager: DocumentManager = commonEnvironment.documentManager
     private var _mimeTypes = commonEnvironment.mimeTypes

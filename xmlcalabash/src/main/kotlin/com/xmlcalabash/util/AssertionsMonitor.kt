@@ -11,53 +11,56 @@ import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.io.ContentTypeConverter
 import com.xmlcalabash.namespace.*
 import com.xmlcalabash.api.Monitor
+import com.xmlcalabash.exceptions.XProcException
 import com.xmlcalabash.runtime.PipelineReceiverProxy
 import com.xmlcalabash.runtime.XProcStepConfiguration
 import com.xmlcalabash.runtime.steps.*
 import net.sf.saxon.om.NamespaceUri
 import net.sf.saxon.s9api.Axis
-import net.sf.saxon.s9api.XdmArray
-import net.sf.saxon.s9api.XdmAtomicValue
 import net.sf.saxon.s9api.XdmMap
 import net.sf.saxon.s9api.XdmNode
 import net.sf.saxon.s9api.XdmNodeKind
-import net.sf.saxon.s9api.XdmValue
 import net.sf.saxon.value.StringValue
 import org.apache.logging.log4j.kotlin.logger
 
-class SchematronMonitor(): Monitor {
+class AssertionsMonitor(): Monitor {
     companion object {
         internal fun parseFromPipeinfo(step: XProcInstruction) {
             for (pipeinfo in step.pipeinfo) {
                 if (step is DeclareStepInstruction) {
                     when (step.parent) {
                         is DeclareStepInstruction -> {
-                            step.schematron.putAll((step.parent as DeclareStepInstruction).schematron)
+                            step.assertions.putAll((step.parent as DeclareStepInstruction).assertions)
                         }
                         is LibraryInstruction -> {
-                            step.schematron.putAll((step.parent as LibraryInstruction).schematron)
+                            step.assertions.putAll((step.parent as LibraryInstruction).assertions)
                         }
                     }
                 }
 
-                val schematron = when (step) {
-                    is DeclareStepInstruction -> step.schematron
-                    is LibraryInstruction -> step.schematron
-                    else -> throw XProcError.xiImpossible("Attempting to find schematron assertions in ${step}").exception()
+                val assertions = when (step) {
+                    is DeclareStepInstruction -> step.assertions
+                    is LibraryInstruction -> step.assertions
+                    else -> throw XProcError.xiImpossible("Attempting to find assertions in ${step}").exception()
                 }
 
                 val info = S9Api.documentElement(pipeinfo)
                 for (child in info.axisIterator(Axis.CHILD)) {
-                    if (child.nodeKind == XdmNodeKind.ELEMENT && child.nodeName == NsS.schema) {
+                    if (child.nodeKind == XdmNodeKind.ELEMENT) {
+                        if (child.nodeName != NsS.schema && child.nodeName != NsP.declareStep) {
+                            continue
+                        }
+
                         if (child.getAttributeValue(NsXml.id) == null) {
-                            step.stepConfig.warn { "Ignoring schematron schema without xml:id"}
+                            step.stepConfig.warn { "Ignoring ${child.nodeName} assertion without xml:id" }
+                            continue
+                        }
+                        val id = child.getAttributeValue(NsXml.id)!!
+
+                        if (assertions.containsKey(id)) {
+                            step.stepConfig.warn { "Error: duplicate xml:id in assertions" }
                         } else {
-                            val id = child.getAttributeValue(NsXml.id)!!
-                            if (schematron.containsKey(id)) {
-                                step.stepConfig.warn { "Error: duplicate xml:id in schematron schemas"}
-                            } else {
-                                schematron.put(id, child)
-                            }
+                            assertions.put(id, child)
                         }
                     }
                 }
@@ -69,10 +72,10 @@ class SchematronMonitor(): Monitor {
             while (schemaSource != null) {
                 when (schemaSource) {
                     is DeclareStepInstruction -> {
-                        return schemaSource.schematron
+                        return schemaSource.assertions
                     }
                     is LibraryInstruction -> {
-                        return schemaSource.schematron
+                        return schemaSource.assertions
                     }
                 }
                 schemaSource = schemaSource.parent
@@ -81,22 +84,20 @@ class SchematronMonitor(): Monitor {
         }
 
         internal fun parseStepAssertions(step: StepDeclaration) {
-            val schematron = SchematronMonitor.findSchemas(step)
-            if (schematron.isNotEmpty()) {
-                if (step.extensionAttributes.containsKey(NsCx.assertions)) {
-                    val assertions = getAssertions(step, step.extensionAttributes[NsCx.assertions]!!)
-                    for ((port, ids) in assertions) {
-                        val portBinding = step.namedInput(port) ?: step.namedOutput(port)
-                        if (portBinding == null) {
-                            step.stepConfig.warn { "Error: cx:assertion on non-existant port: $port" }
-                        } else {
-                            for (id in ids) {
-                                val schema = schematron[id]
-                                if (schema != null) {
-                                    portBinding.schematron.add(schema)
-                                } else {
-                                    step.stepConfig.warn { "Error: cx:assertion references non-existant schema: ${id}"}
-                                }
+            val assertionsMap = findSchemas(step)
+            if (step.extensionAttributes.containsKey(NsCx.assertions)) {
+                val assertions = getAssertions(step, step.extensionAttributes[NsCx.assertions]!!)
+                for ((port, ids) in assertions) {
+                    val portBinding = step.namedInput(port) ?: step.namedOutput(port)
+                    if (portBinding == null) {
+                        step.stepConfig.warn { "Warning: cx:assertion on non-existant port: $port" }
+                    } else {
+                        for (id in ids) {
+                            val schema = assertionsMap[id]
+                            if (schema != null) {
+                                portBinding.assertions.add(schema)
+                            } else {
+                                step.stepConfig.warn { "Warning: cx:assertion references non-existant schema: ${id}"}
                             }
                         }
                     }
@@ -165,9 +166,9 @@ class SchematronMonitor(): Monitor {
     ): XProcDocument {
         val outputSchemas = if (from.first is CompoundStepFoot) {
             // Inputs and outputs are "reversed" on a compound step foot.
-            from.first.params.inputs[from.second]?.schematron ?: emptyList()
+            from.first.params.inputs[from.second]?.assertions ?: emptyList()
         } else {
-            from.first.params.outputs[from.second]?.schematron ?: emptyList()
+            from.first.params.outputs[from.second]?.assertions ?: emptyList()
         }
 
         val fromType = when (from.first) {
@@ -190,10 +191,9 @@ class SchematronMonitor(): Monitor {
 
         if (outputSchemas.isNotEmpty()) {
             val stepid = "on ${fromType}${fromName}${fromPort}"
-            logger.debug { "Schematron ${stepid}"}
-
             for (schema in outputSchemas) {
-                schematron(from.first.stepConfig, stepid, schema, document)
+                from.first.stepConfig.debug { "Assertion ${schema.nodeName} ${stepid}"}
+                assertion(from.first.stepConfig, stepid, schema, document)
             }
         }
 
@@ -208,7 +208,7 @@ class SchematronMonitor(): Monitor {
                 return document
             }
             else -> {
-                logger.debug { "Unexpected SchematronMonitor target: ${to.first}" }
+                logger.warn { "Unexpected AssertionsMonitor target: ${to.first}" }
                 return document
             }
         }
@@ -231,17 +231,25 @@ class SchematronMonitor(): Monitor {
             "/${to.second}"
         }
 
-        val inputSchemas =  toStep.params.inputs[to.second]?.schematron ?: emptyList()
+        val inputSchemas =  toStep.params.inputs[to.second]?.assertions ?: emptyList()
 
         if (inputSchemas.isNotEmpty()) {
             val stepid = "on ${toType}${toName}${toPort}"
-            logger.debug { "Schematron ${stepid}" }
             for (schema in inputSchemas) {
-                schematron(toStep.stepConfig, stepid, schema, document)
+                toStep.stepConfig.debug { "Assertion ${schema.nodeName} ${stepid}"}
+                assertion(toStep.stepConfig, stepid, schema, document)
             }
         }
 
         return document
+    }
+
+    private fun assertion(stepConfig: XProcStepConfiguration, stepid: String, schema: XdmNode, document: XProcDocument) {
+        when (schema.nodeName) {
+            NsS.schema -> schematron(stepConfig, stepid, schema, document)
+            NsP.declareStep -> pipeline(stepConfig, stepid, schema, document)
+            else -> stepConfig.warn { "Unexpected assertion type ${schema.nodeName} ${stepid}" }
+        }
     }
 
     private fun schematron(stepConfig: XProcStepConfiguration, stepid: String, schema: XdmNode, document: XProcDocument) {
@@ -273,7 +281,7 @@ class SchematronMonitor(): Monitor {
                         stepConfig.info { "Report ${stepid}: ${text}" }
                     }
                     NsSvrl.failedAssert -> {
-                        if (level == SchematronAssertions.WARNING) {
+                        if (level == AssertionsLevel.WARNING) {
                             stepConfig.warn { "Assert ${stepid}: ${text}" }
                         } else {
                             stepConfig.error { "Assert ${stepid}: ${text}" }
@@ -288,16 +296,52 @@ class SchematronMonitor(): Monitor {
         }
     }
 
-    private fun convertToXml(stepConfig: XProcStepConfiguration, map: XdmMap): XdmNode {
-        return ContentTypeConverter.jsonToXml(stepConfig, map, MediaType.XML)
+    private fun pipeline(stepConfig: XProcStepConfiguration, stepid: String, schema: XdmNode, document: XProcDocument) {
+        val docBuilder = SaxonTreeBuilder(schema.processor)
+        docBuilder.startDocument(schema.baseURI)
+        docBuilder.addSubtree(schema)
+        docBuilder.endDocument()
+
+        val builder = stepConfig.xmlCalabash.newPipelineBuilder(3.0) // FIXME: track real versions?
+        val parser = stepConfig.xmlCalabash.newXProcParser(builder)
+        val declStep = parser.parse(docBuilder.result)
+        if (declStep.inputs().size != 1) {
+            stepConfig.warn { "Cannot use pipeline for assertion, pipeline has ${declStep.inputs().size} input ports" }
+            return
+        }
+        if (declStep.getInput("source") == null) {
+            stepConfig.warn { "Cannot use pipeline for assertion, pipeline must have a 'source' input port" }
+            return
+        }
+        val pipeline = declStep.runtime().executable()
+        pipeline.receiver = DiscardingReceiver()
+        pipeline.input("source", document)
+        try {
+            pipeline.run()
+        } catch (ex: Exception) {
+            val userMessage = detailMessage(ex)
+            val code = if (ex is XProcException) { "${ex.error.code} " } else { "" }
+            val level = stepConfig.environment.assertions
+            if (level == AssertionsLevel.WARNING) {
+                stepConfig.warn { "Assert ${code}${stepid}${userMessage}" }
+            } else {
+                stepConfig.error { "Assert ${code}${stepid}${userMessage}" }
+                throw XProcError.xiAssertionFailed(code, userMessage).exception(ex)
+            }
+        }
     }
 
-    private fun convertToXml(stepConfig: XProcStepConfiguration, map: XdmArray): XdmNode {
-        return ContentTypeConverter.jsonToXml(stepConfig, map, MediaType.XML)
-    }
-
-    private fun convertToXml(stepConfig: XProcStepConfiguration, map: XdmAtomicValue): XdmNode {
-        return ContentTypeConverter.jsonToXml(stepConfig, map, MediaType.XML)
+    private fun detailMessage(ex: Exception): String {
+        if (ex is XProcException) {
+            if (ex.error.details.isNotEmpty() && ex.error.details.first() is XProcDocument) {
+                val value = (ex.error.details.first() as XProcDocument).value
+                val text = value.underlyingValue.stringValue
+                if (text.isNotEmpty()) {
+                    return ": ${text}"
+                }
+            }
+        }
+        return ""
     }
 
     private fun getText(node: XdmNode): String {

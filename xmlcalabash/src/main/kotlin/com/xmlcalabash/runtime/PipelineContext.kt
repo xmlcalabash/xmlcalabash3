@@ -5,19 +5,13 @@ import com.xmlcalabash.api.XProcStep
 import com.xmlcalabash.config.XmlCalabash
 import com.xmlcalabash.datamodel.PipelineCompilerContext
 import com.xmlcalabash.datamodel.PipelineEnvironment
-import com.xmlcalabash.debugger.CliDebugger
-import com.xmlcalabash.debugger.Debugger
 import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.exceptions.ErrorExplanation
 import com.xmlcalabash.io.DocumentManager
 import com.xmlcalabash.runtime.parameters.StepParameters
-import com.xmlcalabash.tracing.DetailTraceListener
-import com.xmlcalabash.tracing.StandardTraceListener
-import com.xmlcalabash.tracing.TraceListener
 import com.xmlcalabash.api.MessageReporter
 import com.xmlcalabash.api.Monitor
-import com.xmlcalabash.util.SchematronAssertions
-import com.xmlcalabash.util.SchematronMonitor
+import com.xmlcalabash.util.AssertionsLevel
 import net.sf.saxon.s9api.QName
 import java.net.URI
 import java.util.*
@@ -41,7 +35,7 @@ class PipelineContext(compilerContext: PipelineCompilerContext): PipelineEnviron
     override val version = "3.0"
     override val xpathVersion = "3.1"
     override var uniqueInlineUris = compilerContext.uniqueInlineUris
-    override var assertions: SchematronAssertions = xmlCalabash.xmlCalabashConfig.assertions
+    override var assertions: AssertionsLevel = xmlCalabash.xmlCalabashConfig.assertions
 
     private var _documentManager = compilerContext.documentManager
     private var _mimeTypes = compilerContext.mimeTypes

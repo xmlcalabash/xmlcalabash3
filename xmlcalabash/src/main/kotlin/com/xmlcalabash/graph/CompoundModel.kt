@@ -2,7 +2,6 @@ package com.xmlcalabash.graph
 
 import com.xmlcalabash.datamodel.*
 import com.xmlcalabash.exceptions.XProcError
-import com.xmlcalabash.namespace.NsP
 import net.sf.saxon.s9api.XdmMap
 
 open class CompoundModel internal constructor(graph: Graph, parent: Model?, step: CompoundStepDeclaration, id: String): Model(graph, parent, step, id) {
@@ -87,7 +86,7 @@ open class CompoundModel internal constructor(graph: Graph, parent: Model?, step
                             is PipeInstruction -> {
                                 val from = graph.instructionMap[conn.readablePort!!.parent]!!
                                 val footPort = ModelPort(foot, child.port, false, child.primary == true, child.sequence == true, child.contentTypes)
-                                footPort.schematron.addAll(child.schematron)
+                                footPort.assertions.addAll(child.assertions)
                                 footPort.serialization = child.serialization.evaluate(child.stepConfig) as XdmMap
                                 foot.inputs[child.port] = footPort
 
@@ -132,7 +131,7 @@ open class CompoundModel internal constructor(graph: Graph, parent: Model?, step
             } else {
                 ModelPort(submodel, child.step.namedInput(input.name)!!)
             }
-            port.schematron.addAll(input.schematron)
+            port.assertions.addAll(input.assertions)
 
             val toEdges = graph.edges.filter { it.to == child }
             for (edge in toEdges) {
@@ -152,7 +151,7 @@ open class CompoundModel internal constructor(graph: Graph, parent: Model?, step
                 graph.edges.remove(edge)
                 val mport = ModelPort(child.outputs[oport]!!)
                 val outport = ModelPort(submodel, oport, false, mport.primary, mport.sequence, mport.contentTypes)
-                outport.schematron.addAll(output.schematron)
+                outport.assertions.addAll(output.assertions)
                 submodel.outputs[oport] = outport
             }
         }

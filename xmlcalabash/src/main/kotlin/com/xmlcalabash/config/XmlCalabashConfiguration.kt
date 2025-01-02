@@ -3,7 +3,7 @@ package com.xmlcalabash.config
 import com.xmlcalabash.api.Monitor
 import com.xmlcalabash.datamodel.MediaType
 import com.xmlcalabash.spi.PagedMediaManager
-import com.xmlcalabash.util.SchematronAssertions
+import com.xmlcalabash.util.AssertionsLevel
 import com.xmlcalabash.util.Verbosity
 import com.xmlcalabash.visualizers.Silent
 import net.sf.saxon.Configuration
@@ -18,7 +18,7 @@ abstract class XmlCalabashConfiguration {
     var verbosity = Verbosity.INFO
     var visualizer: Monitor = Silent(emptyMap())
     var messageBufferSize = 32
-    var assertions = SchematronAssertions.WARNING
+    var assertions = AssertionsLevel.WARNING
     var saxonConfigurationFile: File? = null
     var saxonConfigurationProperties: Map<String,String> = emptyMap()
     var uniqueInlineUris: Boolean = true

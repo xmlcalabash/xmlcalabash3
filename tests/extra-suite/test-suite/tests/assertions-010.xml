@@ -2,10 +2,10 @@
 <t:test expected="pass"
         xmlns:t="http://xproc.org/ns/testsuite/3.0">
   <t:info>
-    <t:title>assertions-008</t:title>
+    <t:title>assertions-010</t:title>
     <t:revision-history>
       <t:revision>
-        <t:date>2024-12-28</t:date>
+        <t:date>2025-01-02</t:date>
         <t:author>
           <t:name>Norm Tovey-Walsh</t:name>
         </t:author>
@@ -16,7 +16,7 @@
     </t:revision-history>
   </t:info>
   <t:description xmlns="http://www.w3.org/1999/xhtml">
-    <p>Tests a Schematron assertion.</p>
+    <p>Tests a pipeline assertion.</p>
   </t:description>
   <t:pipeline>
     <p:declare-step version="3.0"
@@ -27,9 +27,9 @@
       <p:import href="https://xmlcalabash.com/ext/library/pipeline-messages.xpl"/>
       <p:output port="result"/>
 
-      <p:identity name="identity" cx:assertions="map { 'result': 'life-the-universe-and-everything' }">
-        <p:with-input select="17">
-          <irrelevant/>
+      <p:identity name="identity" cx:assertions="map { 'result': 'root-has-id' }">
+        <p:with-input>
+          <doc-without-xml-id/>
         </p:with-input>
       </p:identity>
 
@@ -50,7 +50,7 @@
       </s:pattern>
       <s:pattern>
         <s:rule context="/cx:messages">
-          <s:assert test="cx:message[@level='WARN' and contains(@message, 'Wrong. The answer is 42')]"
+          <s:assert test="cx:message[@level='WARN' and contains(@message, 'No xml:id')]"
                     >Test did not detect error</s:assert>
         </s:rule>
       </s:pattern>

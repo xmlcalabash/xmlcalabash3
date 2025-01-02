@@ -3,7 +3,7 @@ package com.xmlcalabash.app
 import com.xmlcalabash.api.Monitor
 import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.exceptions.XProcException
-import com.xmlcalabash.util.SchematronAssertions
+import com.xmlcalabash.util.AssertionsLevel
 import com.xmlcalabash.util.UriUtils
 import com.xmlcalabash.util.Verbosity
 import com.xmlcalabash.visualizers.Detail
@@ -50,7 +50,7 @@ class CommandLine private constructor(val args: Array<out String>) {
     private var _debugger = false
     private var _visualizer: Monitor? = null
     private var _verbosity: Verbosity? = null
-    private var _assertions = SchematronAssertions.IGNORE
+    private var _assertions = AssertionsLevel.IGNORE
     private var _help = false
     private var _trace: File? = null
     private var _traceDocuments: File? = null
@@ -98,7 +98,7 @@ class CommandLine private constructor(val args: Array<out String>) {
         get() = _visualizer
 
     /** Evaluate assertions? */
-    val assertions: SchematronAssertions
+    val assertions: AssertionsLevel
         get() = _assertions
 
     /** Display command line help instructions?
@@ -199,10 +199,10 @@ class CommandLine private constructor(val args: Array<out String>) {
         ArgumentDescription("--assertions", listOf(),
             ArgumentType.STRING, "warn", listOf("ignore", "warn", "warning", "error")) { it ->
             _assertions = when(it) {
-                "ignore" -> SchematronAssertions.IGNORE
-                "warn", "warning" -> SchematronAssertions.WARNING
-                "error" -> SchematronAssertions.ERROR
-                else -> SchematronAssertions.IGNORE
+                "ignore" -> AssertionsLevel.IGNORE
+                "warn", "warning" -> AssertionsLevel.WARNING
+                "error" -> AssertionsLevel.ERROR
+                else -> AssertionsLevel.IGNORE
             }},
         ArgumentDescription("--visualizer", listOf("--vis"),
             ArgumentType.STRING, "plain", emptyList()) { it -> parseVisualizer(it) }
