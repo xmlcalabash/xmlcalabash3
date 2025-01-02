@@ -147,7 +147,7 @@ class TestCase(val suite: TestSuite, val testFile: File) {
 
             // Something of a hack...
             if (expected == "fail" && errorCodes.contains(NsErr.assertionFailed)) {
-                (runtime.environment as PipelineContext).assertions = SchematronAssertions.ERROR
+                (runtime.environment as PipelineContext).assertions = AssertionsLevel.ERROR
             }
 
             val pipeline = runtime.executable()

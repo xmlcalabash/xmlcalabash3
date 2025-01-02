@@ -36,7 +36,7 @@ abstract class StepModel(val runtime: XProcRuntime, model: Model) {
         for ((name, port) in model.inputs) {
             val rtport = RuntimePort(name, port.unbound, port.sequence, port.contentTypes)
             rtport.weldedShut = port.weldedShut
-            rtport.schematron.addAll(port.schematron)
+            rtport.assertions.addAll(port.assertions)
             if (port is ModelInputPort) {
                 rtport.defaultBindings.addAll(port.defaultBindings)
             }
@@ -48,7 +48,7 @@ abstract class StepModel(val runtime: XProcRuntime, model: Model) {
         for ((name, port) in model.outputs) {
             val rtport = RuntimePort(name, port.unbound, port.sequence, port.contentTypes, port.serialization)
             rtport.weldedShut = port.weldedShut
-            rtport.schematron.addAll(port.schematron)
+            rtport.assertions.addAll(port.assertions)
             ports[name] = rtport
         }
         _outputs = ports.toMutableMap()

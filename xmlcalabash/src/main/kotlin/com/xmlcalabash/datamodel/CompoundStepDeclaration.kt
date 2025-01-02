@@ -4,8 +4,8 @@ import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.namespace.Ns
 import com.xmlcalabash.namespace.NsCx
 import com.xmlcalabash.namespace.NsP
-import com.xmlcalabash.util.SchematronAssertions
-import com.xmlcalabash.util.SchematronMonitor
+import com.xmlcalabash.util.AssertionsLevel
+import com.xmlcalabash.util.AssertionsMonitor
 import net.sf.saxon.s9api.QName
 import net.sf.saxon.s9api.SequenceType
 
@@ -242,8 +242,8 @@ abstract class CompoundStepDeclaration(parent: XProcInstruction?, stepConfig: In
 
         checkInputBindings()
 
-        if (stepConfig.xmlCalabash.xmlCalabashConfig.assertions != SchematronAssertions.IGNORE) {
-            SchematronMonitor.parseStepAssertions(this)
+        if (stepConfig.xmlCalabash.xmlCalabashConfig.assertions != AssertionsLevel.IGNORE) {
+            AssertionsMonitor.parseStepAssertions(this)
         }
 
         open = false

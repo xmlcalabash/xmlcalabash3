@@ -2,19 +2,9 @@ package com.xmlcalabash.datamodel
 
 import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.exceptions.XProcException
-import com.xmlcalabash.namespace.NsCx
-import com.xmlcalabash.namespace.NsXml
-import com.xmlcalabash.util.SchematronAssertions
-import com.xmlcalabash.util.SchematronMonitor
-import net.sf.saxon.om.NamespaceUri
+import com.xmlcalabash.util.AssertionsLevel
+import com.xmlcalabash.util.AssertionsMonitor
 import net.sf.saxon.s9api.QName
-import net.sf.saxon.s9api.XdmMap
-import net.sf.saxon.s9api.XdmNode
-import net.sf.saxon.value.StringValue
-import org.apache.logging.log4j.kotlin.logger
-import kotlin.collections.component1
-import kotlin.collections.component2
-import kotlin.collections.iterator
 
 abstract class StepDeclaration(parent: XProcInstruction?, stepConfig: InstructionConfiguration, instructionType: QName): XProcInstruction(parent, stepConfig, instructionType) {
     private var nameAssigned = false
@@ -89,8 +79,8 @@ abstract class StepDeclaration(parent: XProcInstruction?, stepConfig: Instructio
         super.elaborateInstructions()
         checkInputBindings()
 
-        if (stepConfig.xmlCalabash.xmlCalabashConfig.assertions != SchematronAssertions.IGNORE) {
-            SchematronMonitor.parseStepAssertions(this)
+        if (stepConfig.xmlCalabash.xmlCalabashConfig.assertions != AssertionsLevel.IGNORE) {
+            AssertionsMonitor.parseStepAssertions(this)
         }
     }
 

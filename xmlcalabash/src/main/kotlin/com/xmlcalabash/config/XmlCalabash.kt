@@ -73,7 +73,6 @@ class XmlCalabash private constructor(val xmlCalabashConfig: XmlCalabashConfigur
     }
 
     private val executables = mutableMapOf<Long, Stack<XProcExecutionContext>>()
-    private val episodes = mutableMapOf<Long,String>()
 
     internal fun newExecutionContext(stepConfig: XProcStepConfiguration): XProcExecutionContext {
         synchronized(executables) {
@@ -130,6 +129,31 @@ class XmlCalabash private constructor(val xmlCalabashConfig: XmlCalabashConfigur
                 stack.clear()
             }
             //println("Discard ${this}: ${context} for ${Thread.currentThread().id}")
+        }
+    }
+
+    internal fun preserveExecutionContext(): Stack<XProcExecutionContext> {
+        synchronized(executables) {
+            val stack = executables[Thread.currentThread().id] ?: Stack()
+            val saveStack = Stack<XProcExecutionContext>()
+            while (stack.isNotEmpty()) {
+                saveStack.push(stack.pop())
+            }
+            return saveStack
+        }
+    }
+
+    internal fun restoreExecutionContext(contextStack: Stack<XProcExecutionContext>) {
+        synchronized(executables) {
+            var stack: Stack<XProcExecutionContext>? = executables[Thread.currentThread().id]
+            if (stack == null) {
+                stack = Stack()
+                executables[Thread.currentThread().id] = stack
+            }
+            stack.clear()
+            while (contextStack.isNotEmpty()) {
+                stack.push(contextStack.pop())
+            }
         }
     }
 

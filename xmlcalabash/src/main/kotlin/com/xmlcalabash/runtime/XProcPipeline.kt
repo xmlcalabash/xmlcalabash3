@@ -14,8 +14,8 @@ import com.xmlcalabash.tracing.DetailTraceListener
 import com.xmlcalabash.tracing.StandardTraceListener
 import com.xmlcalabash.tracing.TraceListener
 import com.xmlcalabash.util.DefaultOutputReceiver
-import com.xmlcalabash.util.SchematronAssertions
-import com.xmlcalabash.util.SchematronMonitor
+import com.xmlcalabash.util.AssertionsLevel
+import com.xmlcalabash.util.AssertionsMonitor
 import com.xmlcalabash.visualizers.Silent
 import net.sf.saxon.s9api.QName
 import net.sf.saxon.s9api.XdmAtomicValue
@@ -46,9 +46,9 @@ class XProcPipeline internal constructor(private val runtime: XProcRuntime, pipe
             }
         }
 
-        if (config.environment.assertions != SchematronAssertions.IGNORE) {
+        if (config.environment.assertions != AssertionsLevel.IGNORE) {
             if (config.environment is PipelineContext) {
-                monitors.add(SchematronMonitor())
+                monitors.add(AssertionsMonitor())
             } else {
                 pipeline.stepConfig.warn { "Cannot provide Schematron monitor on ${config.environment}" }
             }
@@ -121,10 +121,12 @@ class XProcPipeline internal constructor(private val runtime: XProcRuntime, pipe
             }
         }
 
+        val executionContext = config.xmlCalabash.preserveExecutionContext()
         try {
             runnable.runStep()
+            config.xmlCalabash.restoreExecutionContext(executionContext)
         } catch (e: Exception) {
-            config.xmlCalabash.discardExecutionContext()
+            config.xmlCalabash.restoreExecutionContext(executionContext)
             throw e
         }
 

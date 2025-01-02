@@ -2,16 +2,15 @@ package com.xmlcalabash.datamodel
 
 import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.namespace.NsCx
+import com.xmlcalabash.namespace.NsP
 import com.xmlcalabash.namespace.NsS
 import com.xmlcalabash.util.S9Api
-import com.xmlcalabash.util.SchematronAssertions
-import com.xmlcalabash.util.SchematronMonitor
+import com.xmlcalabash.util.AssertionsLevel
+import com.xmlcalabash.util.AssertionsMonitor
 import net.sf.saxon.s9api.Axis
 import net.sf.saxon.s9api.QName
 import net.sf.saxon.s9api.XdmNode
-import net.sf.saxon.s9api.XdmNodeKind
 import net.sf.saxon.value.StringValue
-import org.apache.logging.log4j.kotlin.logger
 import kotlin.collections.iterator
 
 open class PortBindingContainer(parent: XProcInstruction, stepConfig: InstructionConfiguration, instructionType: QName): BindingContainer(parent, stepConfig, instructionType) {
@@ -19,7 +18,7 @@ open class PortBindingContainer(parent: XProcInstruction, stepConfig: Instructio
         val UNSPECIFIED_PORT_NAME = "*** unspecified port name ***"
     }
 
-    val schematron = mutableListOf<XdmNode>()
+    val assertions = mutableListOf<XdmNode>()
 
     private var _portDefined = false
     val portDefined: Boolean
@@ -189,23 +188,23 @@ open class PortBindingContainer(parent: XProcInstruction, stepConfig: Instructio
         primary = primary == true
         sequence = sequence == true
 
-        if (stepConfig.xmlCalabash.xmlCalabashConfig.assertions != SchematronAssertions.IGNORE) {
+        if (stepConfig.xmlCalabash.xmlCalabashConfig.assertions != AssertionsLevel.IGNORE) {
             for (info in pipeinfo) {
                 val pipeinfo = S9Api.documentElement(info)
                 for (child in pipeinfo.axisIterator(Axis.CHILD)) {
-                    if (child.nodeKind == XdmNodeKind.ELEMENT && child.nodeName == NsS.schema) {
-                        schematron.add(child)
+                    if (child.nodeName == NsP.declareStep || child.nodeName == NsS.schema) {
+                        assertions.add(child)
                     }
                 }
             }
 
-            val assertions = extensionAttributes[NsCx.assertions]
-            if (assertions != null) {
-                val schematronMap = SchematronMonitor.findSchemas(this)
+            val assertionAttr = extensionAttributes[NsCx.assertions]
+            if (assertionAttr != null) {
+                val schematronMap = AssertionsMonitor.findSchemas(this)
 
                 try {
                     val compiler = stepConfig.newXPathCompiler()
-                    val exec = compiler.compile(assertions)
+                    val exec = compiler.compile(assertionAttr)
                     val selector = exec.load()
                     val values = selector.evaluate()
 
@@ -215,7 +214,7 @@ open class PortBindingContainer(parent: XProcInstruction, stepConfig: Instructio
                             val id = value.underlyingValue.stringValue
                             val schema = schematronMap[id]
                             if (schema != null) {
-                                schematron.add(schema)
+                                assertions.add(schema)
                             } else {
                                 stepConfig.warn { "Error: cx:assertion references non-existant schema: ${id}"}
                             }

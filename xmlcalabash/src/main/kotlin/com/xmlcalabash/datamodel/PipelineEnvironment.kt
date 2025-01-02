@@ -7,7 +7,7 @@ import com.xmlcalabash.exceptions.ErrorExplanation
 import com.xmlcalabash.io.DocumentManager
 import com.xmlcalabash.api.Monitor
 import com.xmlcalabash.api.MessageReporter
-import com.xmlcalabash.util.SchematronAssertions
+import com.xmlcalabash.util.AssertionsLevel
 import net.sf.saxon.s9api.QName
 import java.net.URI
 import javax.activation.MimetypesFileTypeMap
@@ -32,7 +32,7 @@ interface PipelineEnvironment: ExecutionContextManager {
     val errorExplanation: ErrorExplanation
     val messageReporter: MessageReporter
     val proxies: Map<String, String>
-    val assertions: SchematronAssertions
+    val assertions: AssertionsLevel
 
     val nextId: String
     fun uniqueName(base: String): String
