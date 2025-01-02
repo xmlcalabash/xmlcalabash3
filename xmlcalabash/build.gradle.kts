@@ -33,18 +33,22 @@ configurations.forEach {
 val dep_brotliDec = project.findProperty("brotliDec").toString()
 val dep_commonsCodec = project.findProperty("commonsCodec").toString()
 val dep_commonsCompress = project.findProperty("commonsCompress").toString()
+val dep_drewnoakesExtractor = project.findProperty("drewnoakesExtractor").toString()
+val dep_epubcheck = project.findProperty("epubcheck").toString()
 val dep_flexmarkAll = project.findProperty("flexmarkAll").toString()
+val dep_graalvmJS = project.findProperty("graalvmJS").toString()
 val dep_htmlparser = project.findProperty("htmlparser").toString()
 val dep_httpClient = project.findProperty("httpClient").toString()
+val dep_jaxbapi = project.findProperty("jaxbapi").toString()
 val dep_jing = project.findProperty("jing").toString()
-val dep_xerces = project.findProperty("xercesImpl").toString()
 val dep_jsonSchemaValidator = project.findProperty("jsonSchemaValidator").toString()
-val dep_graalvmJS = project.findProperty("graalvmJS").toString()
+val dep_pdfbox = project.findProperty("pdfbox").toString()
 val dep_schxslt2 = project.findProperty("schxslt2").toString()
 val dep_sinclude = project.findProperty("sinclude").toString()
 val dep_slf4j = project.findProperty("slf4j").toString()
 val dep_tukaaniXz = project.findProperty("tukaaniXz").toString()
 val dep_uuidCreator = project.findProperty("uuidCreator").toString()
+val dep_xerces = project.findProperty("xercesImpl").toString()
 val dep_xmlResolver = project.findProperty("xmlResolver").toString()
 
 dependencies {
@@ -73,7 +77,7 @@ dependencies {
   }
   implementation("xerces:xercesImpl:${dep_xerces}")
   implementation("com.networknt:json-schema-validator:${dep_jsonSchemaValidator}")
-  implementation("org.graalvm.polyglot:js:${dep_graalvmJS}")
+  //implementation("org.graalvm.polyglot:js:${dep_graalvmJS}")
   implementation("org.xmlresolver:xmlresolver:${dep_xmlResolver}")
 
   // I was using log4j but httpclient5 uses slf4j.
@@ -117,12 +121,16 @@ buildConfig {
   arrayOf<String>("brotliDec",
                   "commonsCodec",
                   "commonsCompress",
+                  "drewnoakesExtractor",
+                  "epubcheck",
                   "flexmarkAll",
+                  "graalvmJS",
                   "htmlparser",
                   "httpClient",
+                  "jaxbapi",
                   "jing",
                   "jsonSchemaValidator",
-                  "graalvmJS",
+                  "pdfbox",
                   "schxslt2",
                   "sinclude",
                   "slf4j",

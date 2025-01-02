@@ -11,6 +11,6 @@ include("xmlcalabash", "app", "test-driver",
         "paged-media:weasyprint", "paged-media:prince",
         "paged-media:antenna-house", "paged-media:fop",
         "ext:unique-id", "ext:metadata-extractor", "ext:cache",
-        "ext:pipeline-messages",
+        "ext:pipeline-messages", "ext:epubcheck",
         "template:kotlin", "template:java",
     )

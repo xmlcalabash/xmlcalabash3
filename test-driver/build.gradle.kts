@@ -31,6 +31,7 @@ dependencies {
   implementation(project(":ext:metadata-extractor"))
   implementation(project(":ext:pipeline-messages"))
   implementation(project(":ext:cache"))
+  implementation(project(":ext:epubcheck"))
   implementation(files("lib"))
   // WTF? Why is this necessary?
   implementation(files("build/classes/kotlin/main"))

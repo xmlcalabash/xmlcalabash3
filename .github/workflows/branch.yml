@@ -121,6 +121,7 @@ jobs:
           body_path: documentation/build/changes.txt
           files: |
             app/build/distributions/xmlcalabash-${{ env.CI_TAG }}.zip
+            ext/epubcheck/build/distributions/epubcheck-${{ env.CI_TAG }}.zip
 
       - name: Checkout www
         if: ${{ env.HAVE_WWW == 'true' && env.HAVE_ACCESS_TOKEN == 'true' && env.CI_BRANCH == 'main' && !contains(env.XMLCALABASH_VER, 'SNAPSHOT') }}

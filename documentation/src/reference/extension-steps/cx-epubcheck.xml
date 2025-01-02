@@ -1,0 +1,59 @@
+<refentry xmlns:p="http://www.w3.org/ns/xproc"
+          xmlns:e="http://www.w3.org/1999/XSL/Spec/ElementSyntax"
+          xmlns:xi="http://www.w3.org/2001/XInclude"
+          xmlns:xlink="http://www.w3.org/1999/xlink"
+          xmlns="http://docbook.org/ns/docbook"
+          xml:id="cx-epubcheck">
+<?db filename="cx-epubcheck"?>
+   <refnamediv>
+      <refname>cx:epubcheck</refname>
+      <refpurpose>A step for checking the conformance of EPUB files</refpurpose>
+   </refnamediv>
+   <refsynopsisdiv>
+     <xi:include href="../../../../ext/epubcheck/src/main/resources/com/xmlcalabash/ext/epubcheck.xpl"
+                 xpointer="xpath(/*/*[@type='cx:epubcheck'])"/>
+   </refsynopsisdiv>
+
+<refsection>
+<title>Installation</title>
+<para>The <tag>cx:epubcheck</tag> step is not included in the standard XML Calabash release.
+You must
+<link xlink:href="https://github.com/xmlcalabash/xmlcalabash3/releases">obtain it separately</link>
+and install it on your classpath before you can use this step.
+(More detailed instructions, T.B.D.)</para>
+</refsection>
+
+<refsection>
+<title>Description</title>
+
+<para>The <tag>cx:epubcheck</tag> step uses the
+<link xlink:href="https://www.w3.org/publishing/epubcheck/">W3C
+EPUBCheck</link> validator to check the conformance of EPUB files. It
+generates an XVRL report on the <port>report</port> port.</para>
+
+<para>If <option>assert-valid</option> is true, any errors reported by EPUBCheck will
+cause the step to fail.</para>
+
+<para>Regardless of whether or not any warnings or errors are reported, the original
+EPUB file is passed from the <port>source</port> port to the <port>result</port> port
+without change.</para>
+
+</refsection>
+
+<refsection>
+<title>Additional dependencies</title>
+
+<para>In addition to the <link xlink:href="dependencies">standard dependencies</link>, the
+<tag>cx:epubcheck</tag> step relies on these libraries:</para>
+
+<variablelist>
+<varlistentry>
+<term><link xlink:href="https://central.sonatype.com/artifact/org.w3c/epubcheck">epubcheck</link>, version <?version DEPENDENCY_epubcheck?></term>
+<listitem>
+<para>The underlying EPUBCheck library.</para>
+</listitem>
+</varlistentry>
+</variablelist>
+</refsection>
+
+</refentry>
