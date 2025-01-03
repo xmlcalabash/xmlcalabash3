@@ -32,6 +32,8 @@ dependencies {
   implementation(project(":ext:pipeline-messages"))
   implementation(project(":ext:cache"))
   implementation(project(":ext:epubcheck"))
+  implementation(project(":ext:xpath"))
+  implementation(project(":ext:polyglot"))
   implementation(files("lib"))
   // WTF? Why is this necessary?
   implementation(files("build/classes/kotlin/main"))

@@ -7,7 +7,7 @@
 <?db filename="cx-epubcheck"?>
    <refnamediv>
       <refname>cx:epubcheck</refname>
-      <refpurpose>A step for checking the conformance of EPUB files</refpurpose>
+      <refpurpose>Checks the conformance of EPUB files</refpurpose>
    </refnamediv>
    <refsynopsisdiv>
      <xi:include href="../../../../ext/epubcheck/src/main/resources/com/xmlcalabash/ext/epubcheck.xpl"

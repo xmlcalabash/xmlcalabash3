@@ -1,5 +1,5 @@
 namespace cx=http://xmlcalabash.com/ns/extensions
-namespace cxerr=https://xmlcalabash.com/ns/error
+namespace cxerr=http://xmlcalabash.com/ns/error
 
 XD0001/1
 The context must not be a sequence.

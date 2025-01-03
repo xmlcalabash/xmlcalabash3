@@ -7,7 +7,7 @@
 <?db filename="cx-pipeline-messages"?>
 <refnamediv>
   <refname>cx:pipeline-messages</refname>
-  <refpurpose>A step for accessing pipeline message output</refpurpose>
+  <refpurpose>Accesses pipeline message output</refpurpose>
 </refnamediv>
 <refsynopsisdiv>
   <xi:include href="../../../../ext/pipeline-messages/src/main/resources/com/xmlcalabash/ext/pipeline-messages.xpl"

@@ -11,10 +11,18 @@ import net.sf.saxon.trans.XPathException
 import kotlin.collections.set
 
 class SaxonErrorReporter(val stepConfig: XProcStepConfiguration): ErrorReporter {
+    private var _error: XmlProcessingError? = null
+    val error: XmlProcessingError?
+        get() = _error
+
     override fun report(error: XmlProcessingError?) {
         if (error == null) {
             stepConfig.error({ "Saxon error reporter called with null error?"} )
             return
+        }
+
+        if (!error.isWarning && _error == null) {
+            _error = error
         }
 
         val extra = mutableMapOf<QName, String>()

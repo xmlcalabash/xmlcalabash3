@@ -137,44 +137,15 @@ open class XQueryStep(): AbstractAtomicStep() {
 
         try {
             queryEval.run()
+            for (document in S9Api.makeDocuments(stepConfig, queryEval.evaluate())) {
+                receiver.output("result", document)
+            }
         } catch (ex: Throwable) {
+            underlyingConfig.collectionFinder = collectionFinder
             throw stepConfig.exception(XProcError.xcXQueryEvalError(ex.message ?: "null"), ex)
         }
 
-        try {
-            val seq = mutableListOf<XdmValue>()
-            val iter = queryEval.iterator()
-            while (iter.hasNext()) {
-                seq.add(iter.next())
-            }
-
-            for (item in seq) {
-                when (item) {
-                    is XdmNode -> {
-                        val props = DocumentProperties()
-                        if (item.baseURI != null) {
-                            props[Ns.baseUri] = item.baseURI
-                        }
-                        val doc = if (ValueUtils.contentClassification(item) == MediaType.TEXT) {
-                            XProcDocument.ofText(item, stepConfig, MediaType.TEXT, props)
-                        } else {
-                            XProcDocument.ofXml(item, stepConfig, props)
-                        }
-                        receiver.output("result", doc)
-                    }
-                    else -> {
-                        val doc = XProcDocument.ofValue(item, stepConfig, MediaType.JSON, DocumentProperties())
-                        receiver.output("result", doc)
-                    }
-                }
-            }
-        } catch (ex: Exception) {
-            if (goesBang != null) {
-                throw goesBang!!.exception()
-            }
-            throw ex
-        }
-
+        underlyingConfig.collectionFinder = collectionFinder
     }
 
     inner class MyDestination(var map: MutableMap<QName,XdmValue>): RawDestination() {
@@ -241,15 +212,21 @@ open class XQueryStep(): AbstractAtomicStep() {
 
     inner class MyErrorListener(val compileTime: Boolean): ErrorListener {
         override fun warning(e: TransformerException) {
-            // nop
+            stepConfig.warn { e.messageAndLocation }
         }
 
         override fun error(e: TransformerException) {
-            goesBang = XProcError.xcXQueryCompileError(e.message!!, e)
+            stepConfig.error { e.messageAndLocation }
+            if (compileTime) {
+                goesBang = XProcError.xcXQueryCompileError(e.message!!, e)
+            }
         }
 
         override fun fatalError(e: TransformerException) {
-            goesBang = XProcError.xcXQueryCompileError(e.message!!, e)
+            stepConfig.error { e.messageAndLocation }
+            if (compileTime) {
+                goesBang = XProcError.xcXQueryCompileError(e.message!!, e)
+            }
         }
     }
 }

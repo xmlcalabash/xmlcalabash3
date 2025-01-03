@@ -1,0 +1,34 @@
+<refentry xmlns:p="http://www.w3.org/ns/xproc"
+          xmlns:e="http://www.w3.org/1999/XSL/Spec/ElementSyntax"
+          xmlns:cxerr="http://xmlcalabash.com/ns/error"
+          xmlns:xi="http://www.w3.org/2001/XInclude"
+          xmlns:xlink="http://www.w3.org/1999/xlink"
+          xmlns="http://docbook.org/ns/docbook"
+          xml:id="cx-xpath">
+<?db filename="cx-xpath"?>
+
+<refnamediv>
+  <refname>cx:xpath</refname>
+  <refpurpose>Evalute XPath expressions</refpurpose>
+</refnamediv>
+<refsynopsisdiv>
+  <xi:include href="../../../../ext/xpath/src/main/resources/com/xmlcalabash/ext/xpath.xpl"
+              xpointer="xpath(/*/*[@type='cx:xpath'])"/>
+</refsynopsisdiv>
+
+<refsection>
+<title>Description</title>
+
+<para>This step is modeled on the <tag>p:xquery</tag> step, but for XPath.</para>
+
+<para>The context item is set by the <port>source</port> port. If more than one document
+appears on the <port>source</port> port, the context item is undefined and all of the
+documents from that port form the default collection.</para>
+
+<para>Any <option>parameters</option> passed are used to configure the in-scope
+variables for the expression.</para>
+
+<para>The <option>version</option> must be “3.1”, if it is specified.</para>
+
+</refsection>
+</refentry>

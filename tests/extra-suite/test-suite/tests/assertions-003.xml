@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<t:test expected="fail" code="Q{https://xmlcalabash.com/ns/error}XI0041"
+<t:test expected="pass"
         xmlns:t="http://xproc.org/ns/testsuite/3.0">
   <t:info>
     <t:title>assertions-003</t:title>

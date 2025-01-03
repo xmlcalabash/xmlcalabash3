@@ -334,7 +334,7 @@ an appropriate level:</para>
 <term><literal>error</literal></term>
 <listitem><para>Schematron reports are output and Schematron errors
 are treated as errors. (They cause the step to throw
-<code>Q{https://xmlcalabash.com/ns/error}XI0041</code>.)</para></listitem>
+<code>Q{http://xmlcalabash.com/ns/error}XI0041</code>.)</para></listitem>
 </varlistentry>
 <varlistentry>
 <term><literal>warning</literal> (or <literal>warn</literal>)</term>

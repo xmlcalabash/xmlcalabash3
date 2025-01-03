@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<t:test xmlns:cxerr="https://xmlcalabash.com/ns/error"
+<t:test xmlns:cxerr="http://xmlcalabash.com/ns/error"
         xmlns:t="http://xproc.org/ns/testsuite/3.0"
         expected="fail" code="cxerr:XI0037">
   <t:info>

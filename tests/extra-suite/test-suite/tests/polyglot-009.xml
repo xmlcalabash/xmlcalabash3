@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<t:test expected="pass"
+        xmlns:t="http://xproc.org/ns/testsuite/3.0">
+  <t:info>
+    <t:title>polyglot-009</t:title>
+    <t:revision-history>
+      <t:revision>
+        <t:date>2025-01-03</t:date>
+        <t:author>
+          <t:name>Norm Tovey-Walsh</t:name>
+        </t:author>
+        <t:description xmlns="http://www.w3.org/1999/xhtml">
+          <p>Created test.</p>
+        </t:description>
+      </t:revision>
+    </t:revision-history>
+  </t:info>
+  <t:description xmlns="http://www.w3.org/1999/xhtml">
+    <p>Tests that the cx:python polyglot step returns json.</p>
+  </t:description>
+  <t:pipeline>
+    <p:declare-step version="3.0"
+                    xmlns:err="http://www.w3.org/ns/xproc-error"
+                    xmlns:cx="http://xmlcalabash.com/ns/extensions"
+                    xmlns:p="http://www.w3.org/ns/xproc">
+      <p:import href="https://xmlcalabash.com/ext/library/polyglot.xpl"/>
+      <p:output port="result"/>
+
+      <cx:python parameters="map{'x': 7, 'y': 9, 'now': current-dateTime()}"
+                 result-content-type="application/json">
+        <p:with-input>
+          <doc>Test</doc>
+        </p:with-input>
+        <p:with-option name="args" select="('a', 'b', 'c')"/>
+        <p:with-input port="program">
+          <p:inline content-type="text/plain" expand-text="false">
+import sys
+import json
+print(json.dumps([1, 2, x*y, sys.argv[1]]))
+          </p:inline>
+        </p:with-input>
+      </cx:python>
+      <p:cast-content-type content-type="application/xml"/>
+    </p:declare-step>
+  </t:pipeline>
+  <t:schematron>
+    <s:schema queryBinding="xslt2"
+              xmlns:s="http://purl.oclc.org/dsdl/schematron">
+      <s:ns prefix="fn" uri="http://www.w3.org/2005/xpath-functions"/>
+      <s:pattern>
+        <s:rule context="/">
+          <s:assert test="fn:array">The result isn’t an array.</s:assert>
+        </s:rule>
+      </s:pattern>
+      <s:pattern>
+        <s:rule context="/fn:array">
+          <s:assert test="*[1]/self::fn:number and *[1] = '1'"
+                    >The first element is incorrect.</s:assert>
+          <s:assert test="*[2]/self::fn:number and *[2] = '2'"
+                    >The second element is incorrect.</s:assert>
+          <s:assert test="*[3]/self::fn:number and *[3] = '63'"
+                    >The third element is incorrect.</s:assert>
+          <s:assert test="*[4]/self::fn:string and *[4] = 'a'"
+                    >The fourth element is incorrect.</s:assert>
+        </s:rule>
+      </s:pattern>
+    </s:schema>
+  </t:schematron>
+</t:test>

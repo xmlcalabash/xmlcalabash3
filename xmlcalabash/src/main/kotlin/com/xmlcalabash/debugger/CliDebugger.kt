@@ -54,8 +54,8 @@ class CliDebugger(val runtime: XProcRuntime): Monitor {
             init()
         }
 
-        stack = stacks[Thread.currentThread().id] ?: Stack()
-        stacks[Thread.currentThread().id] = stack
+        stack = stacks[Thread.currentThread().threadId()] ?: Stack()
+        stacks[Thread.currentThread().threadId()] = stack
         curFrame = StackFrame(step)
         stack.push(curFrame)
         frameNumber = stack.size - 1
@@ -238,7 +238,7 @@ class CliDebugger(val runtime: XProcRuntime): Monitor {
                             println("Output from ${from.first} on ${from.second} satisfies ${bp.expr}")
                         }
 
-                        stack = stacks[Thread.currentThread().id] ?: Stack()
+                        stack = stacks[Thread.currentThread().threadId()] ?: Stack()
                         curFrame = stack.peek()
                         frameNumber = stack.size - 1
 

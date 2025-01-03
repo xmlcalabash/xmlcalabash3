@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<t:test expected="pass"
+        xmlns:t="http://xproc.org/ns/testsuite/3.0">
+  <t:info>
+    <t:title>polyglot-005</t:title>
+    <t:revision-history>
+      <t:revision>
+        <t:date>2025-01-03</t:date>
+        <t:author>
+          <t:name>Norm Tovey-Walsh</t:name>
+        </t:author>
+        <t:description xmlns="http://www.w3.org/1999/xhtml">
+          <p>Created test.</p>
+        </t:description>
+      </t:revision>
+    </t:revision-history>
+  </t:info>
+  <t:description xmlns="http://www.w3.org/1999/xhtml">
+    <p>Tests that the cx:javascript polyglot step returns a string.</p>
+  </t:description>
+  <t:pipeline>
+    <p:declare-step version="3.0"
+                    xmlns:err="http://www.w3.org/ns/xproc-error"
+                    xmlns:cx="http://xmlcalabash.com/ns/extensions"
+                    xmlns:p="http://www.w3.org/ns/xproc">
+      <p:import href="https://xmlcalabash.com/ext/library/polyglot.xpl"/>
+      <p:output port="result"/>
+
+      <cx:javascript parameters="map{'x': 7, 'y': 9, 'now': current-dateTime()}">
+        <p:with-input>
+          <doc>Test</doc>
+        </p:with-input>
+        <p:with-option name="args" select="('a', 'b', 'c')"/>
+        <p:with-input port="program">
+          <p:inline content-type="text/plain" expand-text="false">
+`The product is ${x*y}`
+          </p:inline>
+        </p:with-input>
+      </cx:javascript>
+      <p:wrap-sequence wrapper="doc"/>
+    </p:declare-step>
+  </t:pipeline>
+  <t:schematron>
+    <s:schema queryBinding="xslt2"
+              xmlns:s="http://purl.oclc.org/dsdl/schematron">
+      <s:ns prefix="fn" uri="http://www.w3.org/2005/xpath-functions"/>
+      <s:pattern>
+        <s:rule context="/">
+          <s:assert test="doc">The document element is wrong</s:assert>
+          <s:assert test="contains(doc, 'product is 63')">The string is incorrect.</s:assert>
+        </s:rule>
+      </s:pattern>
+    </s:schema>
+  </t:schematron>
+</t:test>

@@ -374,6 +374,8 @@ class XProcError private constructor(val code: QName, val variant: Int, val loca
         fun xiPipeinfoMustExist(message: String) = internal(44, message)
         fun xiPipeinfoMustBePipeinfo(message: String) = internal(Pair(45, 1), message)
         fun xiPipeinfoMustBePipeinfo(root: QName) = internal(Pair(45, 2), root)
+        fun xiXPathVersionNotSupported(version: String) = internal(46, version)
+        fun xiTooManySources(count: Int) = internal(47, count)
 
         fun xiCliInvalidValue(option: String, value: String) = internal(200, option, value)
         fun xiCliValueRequired(option: String) = internal(202, option)

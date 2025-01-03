@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<t:test expected="pass"
+        xmlns:t="http://xproc.org/ns/testsuite/3.0">
+  <t:info>
+    <t:title>polyglot-011</t:title>
+    <t:revision-history>
+      <t:revision>
+        <t:date>2025-01-03</t:date>
+        <t:author>
+          <t:name>Norm Tovey-Walsh</t:name>
+        </t:author>
+        <t:description xmlns="http://www.w3.org/1999/xhtml">
+          <p>Created test.</p>
+        </t:description>
+      </t:revision>
+    </t:revision-history>
+  </t:info>
+  <t:description xmlns="http://www.w3.org/1999/xhtml">
+    <p>Tests that standard error and standard output are processed.</p>
+  </t:description>
+  <t:pipeline>
+    <p:declare-step version="3.0"
+                    xmlns:err="http://www.w3.org/ns/xproc-error"
+                    xmlns:cx="http://xmlcalabash.com/ns/extensions"
+                    xmlns:p="http://www.w3.org/ns/xproc">
+      <p:import href="https://xmlcalabash.com/ext/library/polyglot.xpl"/>
+      <p:import href="https://xmlcalabash.com/ext/library/pipeline-messages.xpl"/>
+      <p:output port="result"/>
+
+      <cx:python name="python">
+        <p:with-input port="program">
+          <p:inline content-type="text/plain" expand-text="false">
+import sys
+print("This is stdout")
+print("This is stderr", file=sys.stderr)
+42
+          </p:inline>
+        </p:with-input>
+      </cx:python>
+      <cx:pipeline-messages p:depends="python" level="info" clear="true"/>
+    </p:declare-step>
+  </t:pipeline>
+  <t:schematron>
+    <s:schema queryBinding="xslt2"
+              xmlns:s="http://purl.oclc.org/dsdl/schematron">
+      <s:ns prefix="cx" uri="http://xmlcalabash.com/ns/extensions"/>
+      <s:pattern>
+        <s:rule context="/">
+          <s:assert test="cx:messages">The document root is not correct.</s:assert>
+        </s:rule>
+      </s:pattern>
+      <s:pattern>
+        <s:rule context="/cx:messages">
+          <s:assert test="cx:message[@level='WARN' and contains(@message, 'This is stderr')]"
+                    >No message on stderr.</s:assert>
+        </s:rule>
+        <s:rule context="/cx:messages">
+          <s:assert test="cx:message[@level='INFO' and contains(@message, 'This is stdout')]"
+                    >No message on stdout.</s:assert>
+        </s:rule>
+      </s:pattern>
+    </s:schema>
+  </t:schematron>
+</t:test>

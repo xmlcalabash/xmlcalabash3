@@ -7,7 +7,7 @@
 <?db filename="cx-metadata-extractor"?>
    <refnamediv>
       <refname>cx:metadata-extractor</refname>
-      <refpurpose>A step for extracting metadata from images and other files</refpurpose>
+      <refpurpose>Extracts metadata from images and other files</refpurpose>
    </refnamediv>
    <refsynopsisdiv>
      <xi:include href="../../../../ext/metadata-extractor/src/main/resources/com/xmlcalabash/ext/metadata-extractor.xpl"

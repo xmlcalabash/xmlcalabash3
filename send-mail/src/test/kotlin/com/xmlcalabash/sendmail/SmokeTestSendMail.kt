@@ -6,16 +6,17 @@ import org.json.JSONObject
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.fail
 import org.junit.jupiter.api.Test
-import java.io.*
+import java.io.BufferedReader
+import java.io.InputStreamReader
 import java.net.HttpURLConnection
-import java.net.URL
+import java.net.URI
 
 // These tests require the Sendria server to be standing up.
 // They also require single-threaded execution.
 
 class SmokeTestSendMail {
     companion object {
-        private val url = URL("http://localhost:1080/api/messages/")
+        private val url = URI("http://localhost:1080/api/messages/").toURL()
     }
 
     private fun clearMessages() {

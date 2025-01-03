@@ -5,7 +5,7 @@ import net.sf.saxon.s9api.QName
 
 object NsCx {
     val namespace: NamespaceUri = NamespaceUri.of("http://xmlcalabash.com/ns/extensions")
-    val errorNamespace: NamespaceUri = NamespaceUri.of("https://xmlcalabash.com/ns/error")
+    val errorNamespace: NamespaceUri = NamespaceUri.of("http://xmlcalabash.com/ns/error")
 
     val anonymous = QName(namespace, "cx:anonymous")
     val anonymousType = QName(namespace, "cx:anonymous-type")

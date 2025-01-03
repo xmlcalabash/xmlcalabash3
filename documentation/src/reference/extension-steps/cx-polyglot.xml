@@ -1,0 +1,121 @@
+<refentry xmlns:p="http://www.w3.org/ns/xproc"
+          xmlns:e="http://www.w3.org/1999/XSL/Spec/ElementSyntax"
+          xmlns:cxerr="http://xmlcalabash.com/ns/error"
+          xmlns:xi="http://www.w3.org/2001/XInclude"
+          xmlns:xlink="http://www.w3.org/1999/xlink"
+          xmlns="http://docbook.org/ns/docbook"
+          xml:id="cx-polyglot">
+<?db filename="cx-polyglot"?>
+
+<refnamediv>
+  <refname>cx:polyglot</refname>
+  <refpurpose>Evalute steps implemented in other programming languages</refpurpose>
+</refnamediv>
+<refsynopsisdiv>
+  <xi:include href="../../../../ext/polyglot/src/main/resources/com/xmlcalabash/ext/polyglot.xpl"
+              xpointer="xpath(/*/*[@type='cx:polyglot'])"/>
+
+<refsection role="errors">
+<title>Errors</title>
+<para>
+<error code="cxerr:XI0047">It is a <glossterm>dynamic error</glossterm> if more
+than one input appears on the <port>source</port> port.</error>
+</para>
+</refsection>
+</refsynopsisdiv>
+
+<refsection>
+<title>Installation</title>
+<para>The <tag>cx:polyglot</tag> step is not included in the standard XML Calabash release.
+You must
+<link xlink:href="https://github.com/xmlcalabash/xmlcalabash3/releases">obtain it separately</link>
+and install it on your classpath before you can use this step.
+(More detailed instructions, T.B.D.)</para>
+</refsection>
+
+<refsection>
+<title>Description</title>
+
+<para>The <tag>cx:polyglot</tag> step leverages the
+<link xlink:href="https://www.graalvm.org/latest/reference-manual/polyglot-programming/">GraalVM
+Polyglot Programming</link> library to evaluate other programming languages as the
+implementations of steps.</para>
+
+<para>The polyglot extension includes <tag>cx:javascript</tag> and <tag>cx:python</tag> for
+running JavaScript and Python scripts, respectively. Other languages are possible if
+the dependencies are installed and GraalVM is configured appropriately, including Ruby,
+R, and Java.</para>
+
+<para>If a document appears on the <port>source</port> port, it will be
+serialized and will appear on standard input for the program.
+<error code="cxerr:XI0047">It is a <glossterm>dynamic error</glossterm> if more than
+one input appears on the <port>source</port> port.</error></para>
+
+<para>The <option>language</option> option must be a GraalVM language
+identifier. For the <tag>cx:javascript</tag> and <tag>cx:python</tag> steps,
+this is set automatically.</para>
+
+<para>The program text must appear on the <port>program</port> port. The step will
+fail if the input is not syntactically correct for the specified language.</para>
+
+<para>The value of the <option>args</option> option will be passed as the
+arguments to the program. The first argument passed to scripts is conventionally
+the name of the script executable. The polyglot step sets that to the base URI of the
+invoking step.</para>
+
+<para>The <option>parameters</option> option is used to initialize the in-scope
+variables for the script. The names of the parameters must not be in a namespace.
+The values are converted to language-appropriate values where possible. XML values
+are serialized and passed as strings.
+</para>
+
+<para>The <option>result-content-type</option> controls how the script returns a value.</para>
+
+<para>If the script ends with an non-zero exit code, the step will fail.</para>
+
+<refsection>
+<title>Returning values</title>
+<para>There are two ways to return a value: directly as the last expression in the script, or
+by writing the result to standard output.</para>
+
+<refsection>
+<title>Direct results</title>
+<para>If there is no <option>result-content-type</option>, the step assumes
+that the result will be returned directly by the script.</para>
+
+<para>Returning results from a script is a bit unorthodox; scripts don’t usually
+return anything except an exit code. The GraalVM library treats the last
+expression in the script as the return value. For example, this Python script
+“returns” the number 42.</para>
+
+<programlisting language="python">print("It doesn’t matter what you do here")
+
+42</programlisting>
+
+<para>The advantage of using direct results is that they don’t have to be serialized
+and reparsed. Direct results can only be atomic values, maps, and arrays.</para>
+
+<warning>
+<para>The GraalVM library <emphasis>always</emphasis> returns something from
+your script. If you don’t provide a final expression, the resulting value 
+is likely to be uninterpretable. (It will probably appear to be a map that contains
+non-XML characters.)</para>
+</warning>
+
+<para>Always return <emphasis>something</emphasis>.</para>
+
+</refsection>
+
+<refsection>
+<title>On standard output</title>
+
+<para>If a <option>result-content-type</option> is specified, the step assumes
+that the result will be written to standard output. The result of the step
+will be the text that appears on standard output interpreted according to the
+<option>result-content-type</option>.</para>
+
+<para>This is the only way to return XML.</para>
+</refsection>
+</refsection>
+</refsection>
+</refentry>
