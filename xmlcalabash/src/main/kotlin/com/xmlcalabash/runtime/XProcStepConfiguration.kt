@@ -52,7 +52,6 @@ interface XProcStepConfiguration: DocumentContext {
     fun parseBoolean(bool: String): Boolean
     fun parseQName(name: String, inscopeNamespaces: Map<String, NamespaceUri>): QName
     fun parseQName(name: String, inscopeNamespaces: Map<String, NamespaceUri>, defaultNamespace: NamespaceUri): QName
-    fun parseNCName(name: String): String
     fun stringAttributeMap(attr: Map<String,String?>): AttributeMap
     fun attributeMap(attr: Map<QName,String?>): AttributeMap
     fun attributeMap(attributes: AttributeMap): Map<QName,String?>
@@ -66,7 +65,6 @@ interface XProcStepConfiguration: DocumentContext {
 
     fun stepDeclaration(name: QName): DeclareStepInstruction?
     fun stepAvailable(name: QName): Boolean
-    fun parseQName(name: String): QName
     fun checkType(varName: QName?, value: XdmValue, sequenceType: SequenceType?, values: List<XdmAtomicValue>): XdmValue
     fun forceQNameKeys(inputMap: MapItem): XdmMap
     fun forceQNameKeys(inputMap: XdmMap): XdmMap

@@ -1,11 +1,10 @@
 package com.xmlcalabash.steps
 
-import com.xmlcalabash.datamodel.MediaType
+import com.xmlcalabash.io.MediaType
 import com.xmlcalabash.documents.DocumentProperties
 import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.namespace.Ns
-import com.xmlcalabash.namespace.NsCx
 import com.xmlcalabash.namespace.NsFn
 import com.xmlcalabash.runtime.XProcStepConfiguration
 import com.xmlcalabash.runtime.parameters.RuntimeStepParameters
@@ -22,7 +21,6 @@ import net.sf.saxon.s9api.*
 import net.sf.saxon.serialize.SerializationProperties
 import net.sf.saxon.trans.XPathException
 import net.sf.saxon.tree.wrapper.RebasedDocument
-import org.apache.logging.log4j.kotlin.logger
 import java.net.URI
 
 open class XsltStep(): AbstractAtomicStep() {
@@ -114,7 +112,8 @@ open class XsltStep(): AbstractAtomicStep() {
             if (doc.contentType == null) {
                 throw stepConfig.exception(XProcError.xcXsltInputNot20Compatible())
             }
-            if (!doc.contentType!!.textContentType() && !doc.contentType!!.htmlContentType() && !doc.contentType!!.xmlContentType()) {
+            if (doc.contentType!!.classification() !in listOf(MediaClassification.XML, MediaClassification.XHTML,
+                    MediaClassification.HTML, MediaClassification.TEXT)) {
                 throw stepConfig.exception(XProcError.xcXsltInputNot20Compatible(doc.contentType!!))
             }
         }

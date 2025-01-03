@@ -1,12 +1,15 @@
 package com.xmlcalabash.io
 
-import com.xmlcalabash.datamodel.MediaType
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.dataformat.toml.TomlFactory
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory
 import com.xmlcalabash.documents.DocumentProperties
 import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.namespace.Ns
 import com.xmlcalabash.namespace.NsCx
 import com.xmlcalabash.runtime.XProcStepConfiguration
+import com.xmlcalabash.util.MediaClassification
 import com.xmlcalabash.util.SaxonTreeBuilder
 import com.xmlcalabash.util.UriUtils
 import net.sf.saxon.om.NamespaceUri
@@ -24,6 +27,7 @@ import org.xml.sax.SAXParseException
 import java.io.*
 import java.net.URI
 import java.nio.charset.Charset
+import java.nio.charset.StandardCharsets
 import java.time.ZoneOffset
 import java.util.*
 import javax.xml.transform.dom.DOMSource
@@ -123,23 +127,24 @@ class DocumentLoader(val context: XProcStepConfiguration,
             properties[Ns.baseUri] = uri
         }
 
-        if (mediaType.xmlContentType()) {
-            try {
-                return loadXml(uri, stream)
-            } catch (ex: SaxonApiException) {
-                throw context.exception(XProcError.xdNotWellFormed(), ex)
+        val classification = mediaType.classification()
+        when (classification) {
+            MediaClassification.XML, MediaClassification.XHTML -> {
+                try {
+                    return loadXml(uri, stream)
+                } catch (ex: SaxonApiException) {
+                    throw context.exception(XProcError.xdNotWellFormed(), ex)
+                }
             }
+            MediaClassification.HTML -> return loadHtml(uri, stream)
+            MediaClassification.JSON -> return loadJson(stream)
+            MediaClassification.TEXT -> return loadText(stream)
+            // I'm not sure what to do with CSV. Maybe wait for XPath 4?
+            // MediaType.CSV -> return loadCsv(stream)
+            MediaClassification.YAML -> return loadYaml(stream)
+            MediaClassification.TOML -> return loadToml(stream)
+            else -> return loadBinary(stream)
         }
-        if (mediaType.htmlContentType()) {
-            return loadHtml(uri, stream)
-        }
-        if (mediaType.jsonContentType()) {
-            return loadJson(stream)
-        }
-        if (mediaType.textContentType()) {
-            return loadText(stream)
-        }
-        return loadBinary(stream)
     }
 
     private fun loadXml(uri: URI?, stream: InputStream): XProcDocument {
@@ -237,6 +242,28 @@ class DocumentLoader(val context: XProcStepConfiguration,
 
             throw ex
         }
+    }
+
+    private fun loadYaml(stream: InputStream): XProcDocument {
+        val yamlReader = ObjectMapper(YAMLFactory())
+        val obj = yamlReader.readValue(stream, Object::class.java)
+        val jsonWriter = ObjectMapper()
+        val str = jsonWriter.writeValueAsString(obj)
+        // Hack
+        return loadJson(ByteArrayInputStream(str.toByteArray(StandardCharsets.UTF_8)))
+    }
+
+    private fun loadToml(stream: InputStream): XProcDocument {
+        val tomlReader = ObjectMapper(TomlFactory())
+        val obj = tomlReader.readValue(stream, Object::class.java)
+        val jsonWriter = ObjectMapper()
+        val str = jsonWriter.writeValueAsString(obj)
+        // Hack
+        return loadJson(ByteArrayInputStream(str.toByteArray(StandardCharsets.UTF_8)))
+    }
+
+    private fun loadCsv(stream: InputStream): XProcDocument {
+        throw RuntimeException("Bang")
     }
 
     private fun loadText(stream: InputStream): XProcDocument {

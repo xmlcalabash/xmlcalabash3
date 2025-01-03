@@ -1,6 +1,6 @@
 package com.xmlcalabash.pagedmedia.antennahouse
 
-import com.xmlcalabash.datamodel.MediaType
+import com.xmlcalabash.io.MediaType
 import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.runtime.XProcStepConfiguration
 import jp.co.antenna.XfoJavaCtl.MessageListener
@@ -8,7 +8,6 @@ import jp.co.antenna.XfoJavaCtl.XfoFormatPageListener
 import jp.co.antenna.XfoJavaCtl.XfoObj
 import net.sf.saxon.s9api.QName
 import net.sf.saxon.s9api.XdmValue
-import org.apache.logging.log4j.kotlin.logger
 
 abstract class AbstractAH() {
     companion object {

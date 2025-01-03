@@ -1,24 +1,19 @@
 package com.xmlcalabash.steps.archives
 
-import com.xmlcalabash.datamodel.MediaType
+import com.xmlcalabash.io.MediaType
 import com.xmlcalabash.documents.XProcBinaryDocument
 import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.namespace.Ns
 import com.xmlcalabash.namespace.NsCx
 import com.xmlcalabash.runtime.XProcStepConfiguration
 import net.sf.saxon.s9api.QName
-import org.apache.commons.compress.archivers.cpio.CpioArchiveInputStream
-import org.apache.commons.compress.archivers.cpio.CpioConstants
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream
-import org.apache.commons.compress.archivers.tar.TarConstants
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream
 import java.io.BufferedInputStream
 import java.io.ByteArrayInputStream
 import java.io.IOException
 import java.io.InputStream
-import java.nio.file.attribute.FileTime
-import java.time.Instant
 import kotlin.io.path.inputStream
 
 open class TarInputArchive(stepConfig: XProcStepConfiguration, doc: XProcBinaryDocument): InputArchive(stepConfig, doc) {

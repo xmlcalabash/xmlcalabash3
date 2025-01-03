@@ -1,11 +1,13 @@
 package com.xmlcalabash.pagedmedia.antennahouse
 
 import com.xmlcalabash.api.CssProcessor
-import com.xmlcalabash.datamodel.MediaType
+import com.xmlcalabash.io.MediaType
 import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.exceptions.XProcError
-import com.xmlcalabash.io.XProcSerializer
+import com.xmlcalabash.io.DocumentConverter
+import com.xmlcalabash.io.DocumentWriter
 import com.xmlcalabash.runtime.XProcStepConfiguration
+import com.xmlcalabash.util.MediaClassification
 import jp.co.antenna.XfoJavaCtl.XfoObj
 import net.sf.saxon.s9api.QName
 import net.sf.saxon.s9api.XdmValue
@@ -74,7 +76,7 @@ class CssAH(): AbstractAH(), CssProcessor {
     }
 
     override fun addStylesheet(document: XProcDocument) {
-        if (document.contentType == null || !document.contentType!!.textContentType()) {
+        if (document.contentClassification != MediaClassification.TEXT) {
             stepConfig.error { "Ignoring non-text CSS sytlesheet: ${document.baseURI}" }
             return
         }
@@ -112,18 +114,17 @@ class CssAH(): AbstractAH(), CssProcessor {
 
         stepConfig.debug { "css-formatter source: ${tempXml.absolutePath}" }
 
-        val serializer = XProcSerializer(stepConfig)
-
         // AH won't parse HTML
         val sourceContentType = document.contentType ?: MediaType.OCTET_STREAM
-        val overrideContentType = if (sourceContentType == MediaType.HTML) {
-            MediaType.XHTML
+        val ahDoc = if (sourceContentType == MediaType.HTML) {
+            DocumentConverter(stepConfig, document, MediaType.XHTML).convert()
         } else {
-            null
+            document
         }
 
-        serializer.write(document, tempXml, overrideContentType)
-
+        val fos = FileOutputStream(tempXml)
+        DocumentWriter(ahDoc, fos).write()
+        fos.close()
         val fis = FileInputStream(tempXml)
 
         try {

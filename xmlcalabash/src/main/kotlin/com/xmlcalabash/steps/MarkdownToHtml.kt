@@ -2,16 +2,14 @@ package com.xmlcalabash.steps
 
 import com.vladsch.flexmark.html.HtmlRenderer
 import com.vladsch.flexmark.parser.Parser
-import com.xmlcalabash.datamodel.MediaType
+import com.xmlcalabash.io.MediaType
 import com.xmlcalabash.documents.DocumentProperties
-import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.io.DocumentLoader
 import com.xmlcalabash.namespace.Ns
 import com.xmlcalabash.namespace.NsCx
 import com.xmlcalabash.util.MarkdownConfigurer
 import com.xmlcalabash.util.MarkdownExtensions
 import net.sf.saxon.s9api.*
-import org.apache.logging.log4j.kotlin.logger
 
 open class MarkdownToHtml(): AbstractAtomicStep() {
     companion object {

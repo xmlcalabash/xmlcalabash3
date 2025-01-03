@@ -1,12 +1,11 @@
 package com.xmlcalabash.steps
 
-import com.xmlcalabash.datamodel.MediaType
+import com.xmlcalabash.io.MediaType
 import com.xmlcalabash.documents.DocumentProperties
 import com.xmlcalabash.documents.XProcBinaryDocument
 import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.exceptions.XProcException
-import com.xmlcalabash.io.XProcSerializer
 import com.xmlcalabash.namespace.Ns
 import com.xmlcalabash.namespace.NsC
 import com.xmlcalabash.namespace.NsCx
@@ -28,25 +27,14 @@ import com.xmlcalabash.steps.archives.ZipInputArchive
 import com.xmlcalabash.steps.archives.ZipOutputArchive
 import com.xmlcalabash.util.S9Api
 import com.xmlcalabash.util.SaxonTreeBuilder
-import net.sf.saxon.om.AttributeMap
-import net.sf.saxon.om.EmptyAttributeMap
 import net.sf.saxon.om.NamespaceUri
 import net.sf.saxon.s9api.*
-import org.apache.commons.compress.archivers.zip.ZipArchiveEntry
-import org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream
-import org.apache.commons.compress.archivers.zip.ZipFile
 import org.apache.logging.log4j.kotlin.logger
-import java.io.ByteArrayOutputStream
 import java.io.File
-import java.io.FileInputStream
-import java.io.FileOutputStream
 import java.net.URI
-import java.nio.file.Files
 import java.nio.file.Path
-import java.nio.file.Paths
 import java.nio.file.attribute.FileTime
 import java.time.Instant
-import java.util.zip.ZipEntry
 
 open class ArchiveStep(): AbstractArchiveStep() {
     private val archives = mutableListOf<InputArchive>()

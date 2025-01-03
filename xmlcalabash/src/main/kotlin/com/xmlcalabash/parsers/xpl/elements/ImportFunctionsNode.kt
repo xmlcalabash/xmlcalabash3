@@ -1,7 +1,7 @@
 package com.xmlcalabash.parsers.xpl.elements
 
 import com.xmlcalabash.datamodel.ImportFunctionsInstruction
-import com.xmlcalabash.datamodel.MediaType
+import com.xmlcalabash.io.MediaType
 import com.xmlcalabash.namespace.Ns
 import net.sf.saxon.s9api.XdmNode
 

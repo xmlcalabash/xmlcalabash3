@@ -1,13 +1,14 @@
 package com.xmlcalabash.tracing
 
 import com.xmlcalabash.documents.XProcDocument
-import com.xmlcalabash.io.XProcSerializer
+import com.xmlcalabash.io.DocumentWriter
 import com.xmlcalabash.namespace.Ns
 import com.xmlcalabash.runtime.XProcStepConfiguration
 import com.xmlcalabash.runtime.steps.AbstractStep
 import com.xmlcalabash.runtime.steps.Consumer
 import com.xmlcalabash.util.SaxonTreeBuilder
 import net.sf.saxon.s9api.QName
+import java.io.FileOutputStream
 import java.nio.file.Files
 import kotlin.io.path.Path
 
@@ -24,8 +25,9 @@ class DetailTraceListener: StandardTraceListener() {
             val tempFile = Files.createTempFile(path, prefix, suffix).toFile()
             savedDocuments[document.id] = tempFile.absolutePath
 
-            val serializer = XProcSerializer(document.context)
-            serializer.write(document, tempFile)
+            val fos = FileOutputStream(tempFile)
+            DocumentWriter(document, fos).write()
+            fos.close()
         }
 
         return document

@@ -50,6 +50,7 @@ val dep_tukaaniXz = project.findProperty("tukaaniXz").toString()
 val dep_uuidCreator = project.findProperty("uuidCreator").toString()
 val dep_xerces = project.findProperty("xercesImpl").toString()
 val dep_xmlResolver = project.findProperty("xmlResolver").toString()
+val dep_jacksonDataformat = project.findProperty("jacksonDataformat").toString()
 
 dependencies {
   implementation("org.jetbrains.kotlin:kotlin-stdlib:2.0.21")
@@ -95,6 +96,10 @@ dependencies {
   implementation("org.jline:jline-terminal:3.28.0")
   implementation("org.jline:jline-terminal-jni:3.28.0")
   implementation("org.jline:jline-reader:3.28.0")
+
+  implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:{$dep_jacksonDataformat}")
+  implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-toml:{$dep_jacksonDataformat}")
+  implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-csv:{$dep_jacksonDataformat}")
 
   implementation(files("lib/"))
 }

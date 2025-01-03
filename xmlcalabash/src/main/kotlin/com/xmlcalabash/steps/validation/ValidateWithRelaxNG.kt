@@ -11,6 +11,7 @@ import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.namespace.Ns
 import com.xmlcalabash.steps.AbstractAtomicStep
+import com.xmlcalabash.util.MediaClassification
 import com.xmlcalabash.util.S9Api
 import net.sf.saxon.s9api.QName
 import net.sf.saxon.s9api.XdmNode
@@ -51,7 +52,7 @@ open class ValidateWithRelaxNG(): AbstractAtomicStep() {
             RngProperty.CHECK_ID_IDREF.add(properties)
         }
 
-        val compact = schema.contentType!!.textContentType()
+        val compact = schema.contentClassification == MediaClassification.TEXT
         var sr: SchemaReader? = null
         var schemaInputSource: InputSource? = null
 

@@ -1,6 +1,6 @@
 package com.xmlcalabash.util
 
-import com.xmlcalabash.datamodel.MediaType
+import com.xmlcalabash.io.MediaType
 import net.sf.saxon.om.NamespaceUri
 import net.sf.saxon.s9api.*
 import net.sf.saxon.value.StringValue

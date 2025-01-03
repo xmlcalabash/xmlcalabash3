@@ -1,7 +1,7 @@
 package com.xmlcalabash.steps.archives
 
 import com.xmlcalabash.documents.XProcDocument
-import com.xmlcalabash.io.XProcSerializer
+import com.xmlcalabash.io.DocumentWriter
 import com.xmlcalabash.namespace.Ns
 import com.xmlcalabash.runtime.XProcStepConfiguration
 import net.sf.saxon.s9api.QName
@@ -35,8 +35,7 @@ class XArchiveEntry private constructor(val stepConfig: XProcStepConfiguration, 
         if (document == null) {
             IOUtils.copy(inputStream!!, stream)
         } else {
-            val serializer = XProcSerializer(stepConfig)
-            serializer.write(document, stream, "archive")
+            DocumentWriter(document, stream).write()
         }
     }
 

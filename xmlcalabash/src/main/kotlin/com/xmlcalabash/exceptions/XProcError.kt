@@ -1,9 +1,8 @@
 package com.xmlcalabash.exceptions
 
 import com.xmlcalabash.datamodel.Location
-import com.xmlcalabash.datamodel.MediaType
+import com.xmlcalabash.io.MediaType
 import com.xmlcalabash.documents.XProcDocument
-import com.xmlcalabash.namespace.Ns.prefix
 import com.xmlcalabash.namespace.NsErr
 import net.sf.saxon.s9api.*
 import java.net.URI

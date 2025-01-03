@@ -5,7 +5,7 @@ import com.xmlcalabash.config.ConfigurationLoader
 import com.xmlcalabash.config.XmlCalabash
 import com.xmlcalabash.config.XmlCalabashConfiguration
 import com.xmlcalabash.datamodel.InstructionConfiguration
-import com.xmlcalabash.datamodel.MediaType
+import com.xmlcalabash.io.MediaType
 import com.xmlcalabash.datamodel.PipelineBuilder
 import com.xmlcalabash.documents.DocumentProperties
 import com.xmlcalabash.documents.XProcDocument

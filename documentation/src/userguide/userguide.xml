@@ -34,6 +34,7 @@
 
 <xi:include href="config.xml"/>
 <xi:include href="tracing.xml"/>
+<xi:include href="mediatypes.xml"/>
 <xi:include href="changelog.xml"/>
 
 </book>

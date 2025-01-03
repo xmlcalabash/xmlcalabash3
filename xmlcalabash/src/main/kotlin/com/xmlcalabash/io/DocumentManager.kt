@@ -9,7 +9,6 @@ import com.xmlcalabash.spi.DocumentResolver
 import net.sf.saxon.lib.ModuleURIResolver
 import net.sf.saxon.lib.ResourceResolver
 import net.sf.saxon.s9api.QName
-import net.sf.saxon.s9api.XdmNode
 import net.sf.saxon.s9api.XdmValue
 import org.apache.logging.log4j.kotlin.logger
 import org.xml.sax.EntityResolver
@@ -19,6 +18,7 @@ import org.xmlresolver.ResourceRequest
 import org.xmlresolver.XMLResolver
 import org.xmlresolver.XMLResolverConfiguration
 import org.xmlresolver.sources.ResolverSAXSource
+import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.net.URI
 import javax.xml.transform.Source
@@ -147,14 +147,9 @@ class DocumentManager(): EntityResolver, EntityResolver2, ResourceResolver, Modu
             val byteStream = if (doc is XProcBinaryDocument) {
                 doc.binaryValue.inputStream()
             } else {
-                if (doc.value is XdmNode) {
-                    val byteStream = ByteArrayOutputStream()
-                    val serializer = XProcSerializer(doc.context)
-                    serializer.write(doc, byteStream, "cached input")
-                    byteStream.toByteArray().inputStream()
-                } else {
-                    doc.value.toString().toByteArray().inputStream()
-                }
+                val byteStream = ByteArrayOutputStream()
+                DocumentWriter(doc, byteStream).write()
+                ByteArrayInputStream(byteStream.toByteArray())
             }
             val source = InputSource(byteStream)
             source.systemId = doc.baseURI?.toString()

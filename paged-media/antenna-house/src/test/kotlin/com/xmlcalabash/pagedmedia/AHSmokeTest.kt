@@ -1,7 +1,7 @@
 package com.xmlcalabash.pagedmedia
 
 import com.xmlcalabash.config.XmlCalabash
-import com.xmlcalabash.datamodel.MediaType
+import com.xmlcalabash.io.MediaType
 import com.xmlcalabash.documents.XProcBinaryDocument
 import com.xmlcalabash.spi.PagedMediaManager
 import com.xmlcalabash.spi.PagedMediaServiceProvider

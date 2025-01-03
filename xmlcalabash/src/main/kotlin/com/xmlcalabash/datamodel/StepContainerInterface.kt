@@ -1,7 +1,7 @@
 package com.xmlcalabash.datamodel
 
+import com.xmlcalabash.io.MediaType
 import net.sf.saxon.s9api.QName
-import net.sf.saxon.s9api.XdmNode
 import java.net.URI
 
 interface StepContainerInterface {

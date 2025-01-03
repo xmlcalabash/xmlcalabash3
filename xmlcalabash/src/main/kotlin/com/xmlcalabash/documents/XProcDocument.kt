@@ -1,20 +1,19 @@
 package com.xmlcalabash.documents
 
-import com.xmlcalabash.datamodel.MediaType
-import com.xmlcalabash.io.XProcSerializer
+import com.xmlcalabash.io.MediaType
+import com.xmlcalabash.io.DocumentWriter
 import com.xmlcalabash.namespace.Ns
 import com.xmlcalabash.namespace.NsXs
+import com.xmlcalabash.util.MediaClassification
 import com.xmlcalabash.util.SaxonTreeBuilder
 import com.xmlcalabash.util.ValueUtils
 import net.sf.saxon.om.NamespaceUri
 import net.sf.saxon.s9api.QName
 import net.sf.saxon.s9api.XdmAtomicValue
 import net.sf.saxon.s9api.XdmEmptySequence
-import net.sf.saxon.s9api.XdmMap
 import net.sf.saxon.s9api.XdmNode
 import net.sf.saxon.s9api.XdmValue
 import net.sf.saxon.value.EmptySequence
-import net.sf.saxon.value.QNameValue
 import java.io.OutputStream
 import java.net.URI
 
@@ -75,7 +74,8 @@ open class XProcDocument internal constructor() {
     }
 
     private fun adjustValue() {
-        if (contentType != null && !contentType!!.xmlContentType() && !contentType!!.textContentType()) {
+        val classification = contentType?.classification() ?: MediaClassification.BINARY
+        if (classification !in listOf(MediaClassification.XML, MediaClassification.TEXT)) {
             // Leave it alone
             return
         }
@@ -198,13 +198,18 @@ open class XProcDocument internal constructor() {
             return _properties.contentType
         }
 
+    val contentClassification: MediaClassification
+        get() {
+            return _properties.contentType?.classification() ?: MediaClassification.BINARY
+        }
+
     val inScopeNamespaces: Map<String,NamespaceUri>
         get() {
             return context.inscopeNamespaces
         }
 
     open fun with(newValue: ByteArray): XProcDocument {
-        if (_properties.contentClassification != MediaType.OCTET_STREAM) {
+        if (_properties.contentClassification != MediaClassification.BINARY) {
             val newProps = DocumentProperties(_properties)
             newProps[Ns.contentType] = MediaType.OCTET_STREAM
             return XProcBinaryDocument(newValue, context, newProps)
@@ -214,7 +219,7 @@ open class XProcDocument internal constructor() {
 
     open fun with(newValue: XdmValue): XProcDocument {
         // If the document is now just text, update the media type
-        if (ValueUtils.contentClassification(newValue) == MediaType.TEXT && _properties.contentClassification != MediaType.TEXT) {
+        if (ValueUtils.contentClassification(newValue) == MediaType.TEXT && _properties.contentClassification != MediaClassification.TEXT) {
             val newProps = DocumentProperties(_properties)
             newProps[Ns.contentType] = MediaType.TEXT
             return XProcDocument(newValue, context, newProps)
@@ -224,7 +229,7 @@ open class XProcDocument internal constructor() {
 
     open fun with(newValue: ByteArray, baseURI: URI?): XProcDocument {
         val newProps = DocumentProperties(_properties)
-        if (_properties.contentClassification != MediaType.OCTET_STREAM) {
+        if (_properties.contentClassification != MediaClassification.BINARY) {
             newProps[Ns.contentType] = MediaType.OCTET_STREAM
         }
         if (baseURI == null) {
@@ -265,6 +270,15 @@ open class XProcDocument internal constructor() {
         return ofValue(value, context, contentType, _properties)
     }
 
+    open fun with(baseUri: URI?): XProcDocument {
+        if (baseUri == null) {
+            return this
+        }
+        val newProps = DocumentProperties(_properties)
+        newProps[Ns.baseUri] = baseUri
+        return XProcDocument(value, context, newProps)
+    }
+
     open fun with(properties: DocumentProperties): XProcDocument {
         val baseURI = if (properties.has(Ns.baseUri)) {
             URI(properties[Ns.baseUri].toString())
@@ -290,10 +304,7 @@ open class XProcDocument internal constructor() {
     }
 
     fun serialize(out: OutputStream, defProp: Map<QName, XdmValue> = emptyMap()) {
-        val ctype = contentType ?: MediaType.OCTET_STREAM
-        val serializer = XProcSerializer(context)
-        serializer.setDefaultProperties(ctype, defProp)
-        serializer.write(this, out, "output stream")
+        DocumentWriter(this, out, defProp).write()
     }
 
     override fun toString(): String {

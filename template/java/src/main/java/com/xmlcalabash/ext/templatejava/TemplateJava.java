@@ -1,15 +1,15 @@
 package com.xmlcalabash.ext.templatejava;
 
-import com.xmlcalabash.datamodel.MediaType;
+import com.xmlcalabash.io.MediaType;
 import com.xmlcalabash.documents.XProcBinaryDocument;
 import com.xmlcalabash.documents.XProcDocument;
 import com.xmlcalabash.runtime.XProcStepConfiguration;
 import com.xmlcalabash.steps.AbstractAtomicStep;
+import com.xmlcalabash.util.MediaClassification;
 import com.xmlcalabash.util.SaxonTreeBuilder;
 import com.xmlcalabash.util.XAttributeMap;
 import net.sf.saxon.s9api.QName;
 import net.sf.saxon.s9api.XdmNode;
-import org.jetbrains.annotations.NotNull;
 
 public class TemplateJava extends AbstractAtomicStep {
     @Override
@@ -29,18 +29,18 @@ public class TemplateJava extends AbstractAtomicStep {
                 binary++;
                 byteCount += ((XProcBinaryDocument) doc).getBinaryValue().length;
             } else {
-                MediaType ct = doc.getContentType();
-                if (ct == null) {
-                    unknown++;
-                } else {
-                    if (ct.xmlContentType() || ct.htmlContentType()) {
+                MediaClassification ctc = doc.getContentClassification();
+                switch (ctc) {
+                    case XML, XHTML, HTML -> {
                         markup++;
-                    } else if (ct.textContentType()) {
-                        text++;
-                        lineCount += ((XdmNode) doc.getValue()).getStringValue().split("\\n").length;
-                    } else if (ct.jsonContentType()) {
+                    }
+                    case JSON, YAML, TOML -> {
                         json++;
-                    } else {
+                    }
+                    case TEXT -> {
+                        text++;
+                    }
+                    case BINARY -> {
                         unknown++;
                     }
                 }

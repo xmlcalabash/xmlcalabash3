@@ -3,11 +3,9 @@ package com.xmlcalabash.steps.validation
 import com.networknt.schema.*
 import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.exceptions.XProcError
-import com.xmlcalabash.io.XProcSerializer
+import com.xmlcalabash.io.DocumentWriter
 import com.xmlcalabash.namespace.Ns
-import com.xmlcalabash.namespace.NsXvrl
 import com.xmlcalabash.steps.AbstractAtomicStep
-import com.xmlcalabash.util.SaxonTreeBuilder
 import com.xmlcalabash.xvrl.XvrlReport
 import java.io.ByteArrayOutputStream
 import java.net.URI
@@ -30,11 +28,9 @@ open class ValidateWithJsonSchema(): AbstractAtomicStep() {
         }
 
         val jsonSchemaFactory = JsonSchemaFactory.getInstance(SpecVersion.VersionFlag.V202012)
-        val config = SchemaValidatorsConfig.builder().build()
 
-        val jserializer = XProcSerializer(stepConfig)
         var jbytes = ByteArrayOutputStream()
-        jserializer.write(schema, jbytes, "JSON Schema schema input")
+        DocumentWriter(schema, jbytes).write()
         val jschema = jbytes.toString(StandardCharsets.UTF_8)
 
         val jsonSchema = try {
@@ -58,7 +54,7 @@ open class ValidateWithJsonSchema(): AbstractAtomicStep() {
         }
 
         jbytes = ByteArrayOutputStream()
-        jserializer.write(document, jbytes, "JSON Schema document input")
+        DocumentWriter(document, jbytes).write()
         val jinput = jbytes.toString(StandardCharsets.UTF_8)
 
         val assertions = jsonSchema.validate(jinput, InputFormat.JSON) {

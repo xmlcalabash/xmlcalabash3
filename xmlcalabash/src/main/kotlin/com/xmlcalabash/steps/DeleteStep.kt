@@ -1,18 +1,15 @@
 package com.xmlcalabash.steps
 
-import com.xmlcalabash.datamodel.MediaType
+import com.xmlcalabash.io.MediaType
 import com.xmlcalabash.documents.DocumentProperties
 import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.namespace.Ns
 import com.xmlcalabash.runtime.ProcessMatch
 import com.xmlcalabash.runtime.ProcessMatchingNodes
-import com.xmlcalabash.runtime.parameters.StepParameters
 import com.xmlcalabash.util.S9Api
 import net.sf.saxon.om.AttributeMap
-import net.sf.saxon.s9api.QName
 import net.sf.saxon.s9api.XdmNode
-import net.sf.saxon.s9api.XdmValue
 
 class DeleteStep(): AbstractAtomicStep(), ProcessMatchingNodes {
     var pattern = ""

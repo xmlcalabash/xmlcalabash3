@@ -1,7 +1,7 @@
 package com.xmlcalabash.config
 
 import com.xmlcalabash.api.Monitor
-import com.xmlcalabash.datamodel.MediaType
+import com.xmlcalabash.io.MediaType
 import com.xmlcalabash.spi.PagedMediaManager
 import com.xmlcalabash.util.AssertionsLevel
 import com.xmlcalabash.util.Verbosity

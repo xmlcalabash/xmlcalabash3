@@ -1,10 +1,10 @@
 package com.xmlcalabash.util
 
-import com.xmlcalabash.datamodel.MediaType
+import com.xmlcalabash.io.MediaType
 import com.xmlcalabash.documents.DocumentProperties
 import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.exceptions.XProcError
-import com.xmlcalabash.io.XProcSerializer
+import com.xmlcalabash.io.DocumentWriter
 import com.xmlcalabash.namespace.Ns
 import com.xmlcalabash.namespace.NsXml
 import com.xmlcalabash.runtime.XProcStepConfiguration
@@ -218,8 +218,7 @@ class S9Api {
         // OMG! This is such a hack!
         fun xdmToInputSource(stepConfig: XProcStepConfiguration, doc: XProcDocument): InputSource {
             val out = ByteArrayOutputStream()
-            val serializer = XProcSerializer(stepConfig)
-            serializer.write(doc, out, "input source from document")
+            DocumentWriter(doc, out).write()
             val source = InputSource(ByteArrayInputStream(out.toByteArray()))
             if (doc.baseURI != null) {
                 source.systemId = doc.baseURI.toString()

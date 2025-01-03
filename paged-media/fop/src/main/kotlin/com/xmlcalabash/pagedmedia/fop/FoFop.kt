@@ -1,7 +1,7 @@
 package com.xmlcalabash.pagedmedia.fop
 
 import com.xmlcalabash.api.FoProcessor
-import com.xmlcalabash.datamodel.MediaType
+import com.xmlcalabash.io.MediaType
 import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.runtime.XProcStepConfiguration

@@ -1,12 +1,13 @@
 package com.xmlcalabash.steps.validation
 
-import com.xmlcalabash.datamodel.MediaType
+import com.xmlcalabash.io.MediaType
 import com.xmlcalabash.documents.DocumentProperties
 import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.exceptions.XProcError
-import com.xmlcalabash.io.XProcSerializer
+import com.xmlcalabash.io.DocumentWriter
 import com.xmlcalabash.namespace.Ns
 import com.xmlcalabash.steps.AbstractAtomicStep
+import com.xmlcalabash.util.MediaClassification
 import com.xmlcalabash.xvrl.XvrlReport
 import net.sf.saxon.lib.ErrorReporter
 import net.sf.saxon.s9api.*
@@ -98,10 +99,9 @@ class ValidateWithDTD(): AbstractAtomicStep() {
     }
 
     private fun serializeSource(serialization: Map<QName,XdmValue>): String {
-        if (source.contentType!!.xmlContentType()) {
+        if (source.contentClassification in listOf(MediaClassification.XML, MediaClassification.XHTML, MediaClassification.HTML)) {
             val baos = ByteArrayOutputStream()
-            val serializer = XProcSerializer(stepConfig)
-            serializer.write(source.value as XdmNode, baos, "DTD parse", serialization)
+            DocumentWriter(source, baos, serialization).write()
             return baos.toString(StandardCharsets.UTF_8)
         } else {
             return source.value.underlyingValue.stringValue

@@ -4,6 +4,7 @@ import com.xmlcalabash.documents.XProcBinaryDocument
 import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.documents.XProcDocument.Companion.ofXml
 import com.xmlcalabash.steps.AbstractAtomicStep
+import com.xmlcalabash.util.MediaClassification
 import com.xmlcalabash.util.SaxonTreeBuilder
 import com.xmlcalabash.util.XAttributeMap
 import net.sf.saxon.s9api.QName
@@ -28,20 +29,12 @@ class TemplateKotlin(): AbstractAtomicStep() {
                 binary++
                 byteCount += doc.binaryValue.size
             } else {
-                val ct = doc.contentType
-                if (ct == null) {
-                    unknown++
-                } else {
-                    if (ct.xmlContentType() || ct.htmlContentType()) {
-                        markup++
-                    } else if (ct.textContentType()) {
-                        text++
-                        lineCount += (doc.value as XdmNode).stringValue.split("\n").size
-                    } else if (ct.jsonContentType()) {
-                        json++
-                    } else {
-                        unknown++
-                    }
+                val ctc = doc.contentClassification
+                when (ctc) {
+                    MediaClassification.XML, MediaClassification.XHTML, MediaClassification.HTML -> markup++
+                    MediaClassification.JSON, MediaClassification.YAML, MediaClassification.TOML -> json++
+                    MediaClassification.TEXT -> text++
+                    MediaClassification.BINARY -> unknown++
                 }
             }
         }

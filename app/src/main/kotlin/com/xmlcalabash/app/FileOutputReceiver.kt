@@ -2,13 +2,11 @@ package com.xmlcalabash.app
 
 import com.xmlcalabash.config.XmlCalabash
 import com.xmlcalabash.documents.XProcDocument
-import com.xmlcalabash.io.XProcSerializer
-import com.xmlcalabash.namespace.Ns
+import com.xmlcalabash.io.DocumentWriter
 import com.xmlcalabash.util.DefaultOutputReceiver
 import net.sf.saxon.s9api.Processor
 import org.apache.logging.log4j.kotlin.logger
 import java.io.FileOutputStream
-import java.io.PrintStream
 
 class FileOutputReceiver(xmlCalabash: XmlCalabash, processor: Processor, val files: Map<String,OutputFilename>
 ): DefaultOutputReceiver(xmlCalabash, processor) {
@@ -25,8 +23,9 @@ class FileOutputReceiver(xmlCalabash: XmlCalabash, processor: Processor, val fil
             }
             wroteTo.add(port)
 
-            val serializer = XProcSerializer(xmlCalabash, processor)
-            serializer.write(document, outfile)
+            val fos = FileOutputStream(outfile)
+            DocumentWriter(document, fos).write()
+            fos.close()
         } else {
             super.output(port, document)
         }

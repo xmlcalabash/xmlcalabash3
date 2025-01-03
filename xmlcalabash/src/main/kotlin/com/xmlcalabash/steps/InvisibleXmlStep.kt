@@ -2,8 +2,10 @@ package com.xmlcalabash.steps
 
 import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.exceptions.XProcError
+import com.xmlcalabash.io.MediaType
 import com.xmlcalabash.namespace.Ns
 import com.xmlcalabash.namespace.NsP
+import com.xmlcalabash.util.MediaClassification
 import org.apache.logging.log4j.kotlin.logger
 import org.nineml.coffeefilter.InvisibleXml
 
@@ -27,7 +29,8 @@ class InvisibleXmlStep(): AbstractAtomicStep() {
                 throw stepConfig.exception(XProcError.Companion.xcAtMostOneGrammar())
             }
             val theGrammar = grammar.first()
-            if (theGrammar.contentType != null && theGrammar.contentType!!.textContentType()) {
+            val grammarCtc = (theGrammar.contentType ?: MediaType.TEXT).classification()
+            if (grammarCtc == MediaClassification.TEXT) {
                 invisibleXml.getParserFromIxml(theGrammar.value.underlyingValue.stringValue)
             } else {
                 throw IllegalArgumentException("Only text .ixml documents are supported")
@@ -36,7 +39,8 @@ class InvisibleXmlStep(): AbstractAtomicStep() {
             invisibleXml.getParser()
         }
 
-        if (source.contentType != null && source.contentType!!.textContentType()) {
+        val sourceCtc = (source.contentType ?: MediaType.TEXT).classification()
+        if (sourceCtc == MediaClassification.TEXT) {
             if (!parser.constructed()) {
                 throw stepConfig.exception(XProcError.Companion.xcInvalidIxmlGrammar())
             }

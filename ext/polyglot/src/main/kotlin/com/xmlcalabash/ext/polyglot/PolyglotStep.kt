@@ -1,14 +1,12 @@
 package com.xmlcalabash.ext.polyglot
 
-import com.xmlcalabash.datamodel.MediaType
 import com.xmlcalabash.documents.DocumentProperties
 import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.exceptions.XProcException
 import com.xmlcalabash.io.DocumentLoader
-import com.xmlcalabash.io.XProcSerializer
+import com.xmlcalabash.io.DocumentWriter
 import com.xmlcalabash.namespace.Ns
-import com.xmlcalabash.runtime.XProcRuntime
 import com.xmlcalabash.steps.AbstractAtomicStep
 import net.sf.saxon.om.NamespaceUri
 import net.sf.saxon.s9api.*
@@ -18,12 +16,9 @@ import org.graalvm.polyglot.Context
 import org.graalvm.polyglot.HostAccess
 import org.graalvm.polyglot.PolyglotException
 import org.graalvm.polyglot.Value
-import org.xml.sax.InputSource
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
-import java.io.InputStream
 import java.nio.charset.StandardCharsets
-import javax.xml.transform.sax.SAXSource
 
 class PolyglotStep(val stepLanguage: String): AbstractAtomicStep() {
     lateinit var jscontext: Context
@@ -66,8 +61,7 @@ class PolyglotStep(val stepLanguage: String): AbstractAtomicStep() {
             ByteArrayInputStream("".toByteArray(StandardCharsets.UTF_8))
         } else {
             val baos = ByteArrayOutputStream()
-            val serializer = XProcSerializer(stepConfig)
-            serializer.write(source, baos, "polyglot")
+            DocumentWriter(source, baos).write()
             ByteArrayInputStream(baos.toByteArray())
         }
         val outputStream = ByteArrayOutputStream()
@@ -193,11 +187,11 @@ class PolyglotStep(val stepLanguage: String): AbstractAtomicStep() {
                 return jscontext.asValue(xdmValue.asList().toTypedArray())
             }
             is XdmNode -> {
-                val serial = XProcSerializer(stepConfig)
+                val tempDoc = XProcDocument.ofXml(xdmValue, stepConfig)
                 val baos = ByteArrayOutputStream()
-                val prop = mutableMapOf<QName, XdmValue>()
-                prop[QName("omit-xml-declaration")] = XdmAtomicValue(true)
-                serial.write(xdmValue, baos, "for polyglot", prop)
+                val writer = DocumentWriter(tempDoc, baos)
+                writer[Ns.omitXmlDeclaration] = true
+                writer.write()
                 return jscontext.asValue(baos.toString(StandardCharsets.UTF_8))
             }
             else -> {

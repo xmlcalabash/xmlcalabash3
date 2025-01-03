@@ -1,6 +1,6 @@
 package com.xmlcalabash.ext.pipelinemessages
 
-import com.xmlcalabash.datamodel.MediaType
+import com.xmlcalabash.io.MediaType
 import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.io.DocumentLoader
 import com.xmlcalabash.io.DocumentManager
