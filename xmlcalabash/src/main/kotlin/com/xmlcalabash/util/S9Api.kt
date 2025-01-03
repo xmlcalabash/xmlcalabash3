@@ -1,8 +1,11 @@
 package com.xmlcalabash.util
 
+import com.xmlcalabash.datamodel.MediaType
+import com.xmlcalabash.documents.DocumentProperties
 import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.io.XProcSerializer
+import com.xmlcalabash.namespace.Ns
 import com.xmlcalabash.namespace.NsXml
 import com.xmlcalabash.runtime.XProcStepConfiguration
 import net.sf.saxon.s9api.*
@@ -175,6 +178,11 @@ class S9Api {
                             throw XProcError.xdInvalidSelection(value.nodeName).exception()
                         }
 
+                        val props = DocumentProperties()
+                        if (value.baseURI != null) {
+                            props[Ns.baseUri] = value.baseURI
+                        }
+
                         val builder = SaxonTreeBuilder(stepConfig.processor)
                         builder.startDocument(value.baseURI)
                         builder.addSubtree(value)
@@ -182,10 +190,10 @@ class S9Api {
 
                         when (value.nodeKind) {
                             XdmNodeKind.TEXT -> {
-                                selections.add(XProcDocument.ofText(builder.result, stepConfig))
+                                selections.add(XProcDocument.ofText(builder.result, stepConfig, MediaType.TEXT, props))
                             }
                             XdmNodeKind.ELEMENT, XdmNodeKind.DOCUMENT, XdmNodeKind.COMMENT, XdmNodeKind.PROCESSING_INSTRUCTION -> {
-                                selections.add(XProcDocument.ofXml(builder.result, stepConfig))
+                                selections.add(XProcDocument.ofXml(builder.result, stepConfig, MediaType.XML, props))
                             }
                             else -> {
                                 throw XProcError.xdInvalidSelection(value.nodeName).exception()
