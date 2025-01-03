@@ -76,10 +76,10 @@ class XmlCalabash private constructor(val xmlCalabashConfig: XmlCalabashConfigur
 
     internal fun newExecutionContext(stepConfig: XProcStepConfiguration): XProcExecutionContext {
         synchronized(executables) {
-            var stack = executables[Thread.currentThread().id]
+            var stack = executables[Thread.currentThread().threadId()]
             val context = if (stack == null) {
                 stack = Stack()
-                executables[Thread.currentThread().id] = stack
+                executables[Thread.currentThread().threadId()] = stack
                 XProcExecutionContext(stepConfig)
             } else {
                 if (stack.isEmpty()) {
@@ -89,52 +89,52 @@ class XmlCalabash private constructor(val xmlCalabashConfig: XmlCalabashConfigur
                 }
             }
             stack.push(context)
-            //println("New ${this}: ${context} for ${Thread.currentThread().id} (${stack.size})")
+            //println("New ${this}: ${context} for ${Thread.currentThread().threadId()} (${stack.size})")
             return context
         }
     }
 
     internal fun getExecutionContext(): XProcExecutionContext {
         synchronized(executables) {
-            val stack: Stack<XProcExecutionContext> = executables[Thread.currentThread().id]!!
-            //println("Get ${this}: ${stack.peek()} for ${Thread.currentThread().id} (${stack.size})")
+            val stack: Stack<XProcExecutionContext> = executables[Thread.currentThread().threadId()]!!
+            //println("Get ${this}: ${stack.peek()} for ${Thread.currentThread().threadId()} (${stack.size})")
             return stack.peek()
         }
     }
 
     internal fun setExecutionContext(dynamicContext: XProcExecutionContext) {
         synchronized(executables) {
-            var stack = executables[Thread.currentThread().id]
+            var stack = executables[Thread.currentThread().threadId()]
             if (stack == null) {
                 stack = Stack()
-                executables[Thread.currentThread().id] = stack
+                executables[Thread.currentThread().threadId()] = stack
             }
             stack.push(dynamicContext)
-            //println("Set ${this}: ${dynamicContext} for ${Thread.currentThread().id} (${stack.size})")
+            //println("Set ${this}: ${dynamicContext} for ${Thread.currentThread().threadId()} (${stack.size})")
         }
     }
 
     internal fun releaseExecutionContext() {
         synchronized(executables) {
-            val stack: Stack<XProcExecutionContext> = executables[Thread.currentThread().id]!!
+            val stack: Stack<XProcExecutionContext> = executables[Thread.currentThread().threadId()]!!
             val context = stack.pop()
-            //println("Rel ${this}: ${context} for ${Thread.currentThread().id} (${stack.size})")
+            //println("Rel ${this}: ${context} for ${Thread.currentThread().threadId()} (${stack.size})")
         }
     }
 
     internal fun discardExecutionContext() {
         synchronized(executables) {
-            val stack: Stack<XProcExecutionContext>? = executables[Thread.currentThread().id]
+            val stack: Stack<XProcExecutionContext>? = executables[Thread.currentThread().threadId()]
             if (stack != null) {
                 stack.clear()
             }
-            //println("Discard ${this}: ${context} for ${Thread.currentThread().id}")
+            //println("Discard ${this}: ${context} for ${Thread.currentThread().threadId()}")
         }
     }
 
     internal fun preserveExecutionContext(): Stack<XProcExecutionContext> {
         synchronized(executables) {
-            val stack = executables[Thread.currentThread().id] ?: Stack()
+            val stack = executables[Thread.currentThread().threadId()] ?: Stack()
             val saveStack = Stack<XProcExecutionContext>()
             while (stack.isNotEmpty()) {
                 saveStack.push(stack.pop())
@@ -145,10 +145,10 @@ class XmlCalabash private constructor(val xmlCalabashConfig: XmlCalabashConfigur
 
     internal fun restoreExecutionContext(contextStack: Stack<XProcExecutionContext>) {
         synchronized(executables) {
-            var stack: Stack<XProcExecutionContext>? = executables[Thread.currentThread().id]
+            var stack: Stack<XProcExecutionContext>? = executables[Thread.currentThread().threadId()]
             if (stack == null) {
                 stack = Stack()
-                executables[Thread.currentThread().id] = stack
+                executables[Thread.currentThread().threadId()] = stack
             }
             stack.clear()
             while (contextStack.isNotEmpty()) {
@@ -161,7 +161,7 @@ class XmlCalabash private constructor(val xmlCalabashConfig: XmlCalabashConfigur
         if (doc == null) {
             return
         }
-        val stack: Stack<XProcExecutionContext> = executables[Thread.currentThread().id]!!
+        val stack: Stack<XProcExecutionContext> = executables[Thread.currentThread().threadId()]!!
         stack.peek()!!.addProperties(doc)
     }
 
@@ -169,7 +169,7 @@ class XmlCalabash private constructor(val xmlCalabashConfig: XmlCalabashConfigur
         if (doc == null) {
             return
         }
-        val stack: Stack<XProcExecutionContext> = executables[Thread.currentThread().id]!!
+        val stack: Stack<XProcExecutionContext> = executables[Thread.currentThread().threadId()]!!
         stack.peek()!!.removeProperties(doc)
     }
 }
