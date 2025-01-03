@@ -7,9 +7,9 @@
 
 <p:output port="result"/>
 
-<cx:javascript variables="map { 'x': 17, 's': 'String', 'map': map { 'a': 1 },
-                          'a': [ map{'b': 2}, map{'c': 3}] }">
-  <p:with-input>
+<cx:javascript parameters="map { 'x': 17, 's': 'String', 'map': map { 'a': 1 },
+                                 'a': [ map{'b': 2}, map{'c': 3}] }">
+  <p:with-input port="program">
     <p:inline content-type="text/plain" expand-text="false">
       function f(x) { 
         let date1 = new Date(1999, 7, 5)
