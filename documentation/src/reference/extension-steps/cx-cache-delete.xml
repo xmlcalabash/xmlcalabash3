@@ -7,7 +7,7 @@
 <?db filename="cx-cache-delete"?>
    <refnamediv>
       <refname>cx:cache-delete</refname>
-      <refpurpose>A step for deleting documents from the runtime cache</refpurpose>
+      <refpurpose>Deletes documents from the runtime cache</refpurpose>
    </refnamediv>
    <refsynopsisdiv>
      <xi:include href="../../../../ext/cache/src/main/resources/com/xmlcalabash/ext/cache.xpl"

@@ -5,16 +5,18 @@
           xmlns="http://docbook.org/ns/docbook"
           xml:id="cx-unique-id">
 <?db filename="cx-unique-id"?>
-   <refnamediv>
-      <refname>cx:unique-id</refname>
-      <refpurpose>A step for generating unique identifiers</refpurpose>
-   </refnamediv>
-   <refsynopsisdiv>
-     <xi:include href="../../../../ext/unique-id/src/main/resources/com/xmlcalabash/ext/unique-id.xpl"
-                 xpointer="xpath(/*/*[@type='cx:unique-id'])"/>
-   </refsynopsisdiv>
-   <refsection>
-      <title>Description</title>
+<refnamediv>
+  <refname>cx:unique-id</refname>
+  <refpurpose>Generates unique identifiers</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv>
+  <xi:include href="../../../../ext/unique-id/src/main/resources/com/xmlcalabash/ext/unique-id.xpl"
+              xpointer="xpath(/*/*[@type='cx:unique-id'])"/>
+</refsynopsisdiv>
+
+<refsection>
+<title>Description</title>
 
 <para>The <tag>cx:unique-id</tag> step generates a unique identifier and injects
 it into the source document. UUID, ULID, and TypeID identifiers are supported.</para>

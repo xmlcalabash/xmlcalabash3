@@ -7,7 +7,7 @@
 <?db filename="cx-cache-add"?>
    <refnamediv>
       <refname>cx:cache-add</refname>
-      <refpurpose>A step for adding documents to the runtime cache</refpurpose>
+      <refpurpose>Adds documents to the runtime cache</refpurpose>
    </refnamediv>
    <refsynopsisdiv>
      <xi:include href="../../../../ext/cache/src/main/resources/com/xmlcalabash/ext/cache.xpl"
