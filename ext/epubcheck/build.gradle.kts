@@ -23,29 +23,6 @@ dependencies {
 
 val xmlbuild = the<XmlCalabashBuildExtension>()
 
-fun distClasspath(): List<File> {
-  val xmlcalabashMap = xmlbuild.dependencyMap(configurations["xmlcalabash"])
-  val stepMap = xmlbuild.dependencyMap(configurations["distributionClasspath"])
-
-  var message = false
-
-  val libs = mutableListOf<File>()
-  for ((name, jar) in stepMap) {
-    if (name !in xmlcalabashMap) {
-      libs.add(jar)
-    } else {
-      if (jar != xmlcalabashMap[name]) {
-        if (!message) {
-          println("Skipping local dependencies in favor of version in XML Calabash")
-          message = true
-        }
-        println("  Skip ${jar.name} for ${xmlcalabashMap[name]?.name}")
-      }
-    }
-  }
-  return libs
-}
-
 tasks.jar {
   archiveFileName.set(xmlbuild.jarArchiveFilename())
 }
@@ -57,12 +34,7 @@ val sourcesJar by tasks.registering(Jar::class) {
 
 tasks.register("helloWorld") {
   doLast {
-    println(xmlbuild.jarArchiveFilename())
-/*
-    for (jar in distClasspath()) {
-      println(jar.name)
-    }
-*/
+    println("Hello, world.")
   }
 }
 
@@ -79,14 +51,15 @@ tasks.register("stage-release") {
   }
 
   doLast {
-    distClasspath().forEach { path ->
-      copy {
-        from(path)
-        into(layout.buildDirectory.dir("stage/extra"))
-        exclude("META-INF/**")
-        exclude("com/**")
-      }                      
-    }
+    xmlbuild.distClasspath(configurations["xmlcalabash"], configurations["distributionClasspath"])
+        .forEach { path ->
+          copy {
+            from(path)
+            into(layout.buildDirectory.dir("stage/extra"))
+            exclude("META-INF/**")
+            exclude("com/**")
+          }                      
+        }
   }
 
   doLast {

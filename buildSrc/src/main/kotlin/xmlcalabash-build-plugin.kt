@@ -86,6 +86,29 @@ interface XmlCalabashBuildExtension {
 
     return versions
   }
+
+  fun distClasspath(mainConfig: Configuration, stepConfig: Configuration): List<File> {
+    val xmlcalabashMap = dependencyMap(mainConfig)
+    val stepMap = dependencyMap(stepConfig)
+
+    var message = false
+
+    val libs = mutableListOf<File>()
+    for ((name, jar) in stepMap) {
+      if (name !in xmlcalabashMap) {
+        libs.add(jar)
+      } else {
+        if (jar != xmlcalabashMap[name]) {
+          if (!message) {
+            println("Skipping local dependencies in favor of version in XML Calabash")
+            message = true
+          }
+          println("  Skip ${jar.name} for ${xmlcalabashMap[name]?.name}")
+        }
+      }
+    }
+    return libs
+  }
 }
 
 internal class ProcessOutputReader(val stream: InputStream,
