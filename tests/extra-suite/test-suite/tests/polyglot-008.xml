@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<t:test expected="pass"
+        xmlns:t="http://xproc.org/ns/testsuite/3.0">
+  <t:info>
+    <t:title>polyglot-008</t:title>
+    <t:revision-history>
+      <t:revision>
+        <t:date>2025-01-03</t:date>
+        <t:author>
+          <t:name>Norm Tovey-Walsh</t:name>
+        </t:author>
+        <t:description xmlns="http://www.w3.org/1999/xhtml">
+          <p>Created test.</p>
+        </t:description>
+      </t:revision>
+    </t:revision-history>
+  </t:info>
+  <t:description xmlns="http://www.w3.org/1999/xhtml">
+    <p>Tests that the cx:javascript polyglot step returns XML.</p>
+  </t:description>
+  <t:pipeline>
+    <p:declare-step version="3.0"
+                    xmlns:err="http://www.w3.org/ns/xproc-error"
+                    xmlns:cx="http://xmlcalabash.com/ns/extensions"
+                    xmlns:p="http://www.w3.org/ns/xproc">
+      <p:import href="https://xmlcalabash.com/ext/library/polyglot.xpl"/>
+      <p:output port="result"/>
+
+      <cx:javascript parameters="map{'x': 7, 'y': 9, 'now': current-dateTime()}"
+                     result-content-type="application/xml">
+        <p:with-input>
+          <doc>Test</doc>
+        </p:with-input>
+        <p:with-option name="args" select="('a', 'b', 'c')"/>
+        <p:with-input port="program">
+          <p:inline content-type="text/plain" expand-text="false"><![CDATA[
+console.log("<?xml version='1.0'?>")
+console.log(`<doc>${x*y}</doc>`)
+          ]]></p:inline>
+        </p:with-input>
+      </cx:javascript>
+    </p:declare-step>
+  </t:pipeline>
+  <t:schematron>
+    <s:schema queryBinding="xslt2"
+              xmlns:s="http://purl.oclc.org/dsdl/schematron">
+      <s:pattern>
+        <s:rule context="/">
+          <s:assert test="doc">The root element is incorrect.</s:assert>
+          <s:assert test="doc='63'">The document element value is incorrect.</s:assert>
+        </s:rule>
+      </s:pattern>
+    </s:schema>
+  </t:schematron>
+</t:test>
