@@ -13,6 +13,43 @@ See the commits and pull requests on
 finer detail.</para>
 
 <revhistory>
+<revision xml:id="r300-alpha10">
+<revnumber>3.0.0-alpha10</revnumber>
+<date>2025-01-04</date>
+<revdescription>
+<itemizedlist>
+
+<listitem>
+<para>Tinkered with the timeout and sleep duration options in advance of some
+anticipated specification changes. The sleep duration is now a number of seconds,
+not milliseconds. Both values can be either a number or a string in the form
+of an <type>xs:dayTimeDuration</type>.</para>
+</listitem>
+<listitem>
+<para>Completely refactored the code that parses and serializes documents.
+Added support for YAML and TOML content types.</para>
+</listitem>
+<listitem>
+<para>Added <tag>cx:xpath</tag> and <tag>cx:polyglot</tag> steps (<tag>cx:javascript</tag>,
+<tag>cx:python</tag>, etc.).</para>
+</listitem>
+<listitem>
+<para>Bumped the Java version to 21, fixed a number of deprecation warnings.</para>
+</listitem>
+<listitem>
+<para>Fixed a bug where <code>[p:]message</code> was <emphasis>still</emphasis> not
+being handled correctly.</para>
+</listitem>
+<listitem>
+<para>Added a <tag>cx:epubcheck</tag> step.</para>
+</listitem>
+<listitem>
+<para>Updated assertions to support using an XProc pipeline as an assertion.</para>
+</listitem>
+</itemizedlist>
+</revdescription>
+</revision>
+
 <revision xml:id="r300-alpha9">
 <revnumber>3.0.0-alpha9</revnumber>
 <date>2025-01-01</date>
