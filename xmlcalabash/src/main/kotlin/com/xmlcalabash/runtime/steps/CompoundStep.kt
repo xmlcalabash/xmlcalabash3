@@ -44,7 +44,7 @@ abstract class CompoundStep(config: XProcStepConfiguration, compound: CompoundSt
     internal val foot = CompoundStepFoot(config, this, compound.foot)
     internal var stepName: String? = null
     internal var stepType: QName? = null
-    override val stepTimeout = compound.timeout.toLong()
+    override val stepTimeout = compound.timeout
     protected val stepsToRun = mutableListOf<AbstractStep>()
 
     override val readyToRun: Boolean

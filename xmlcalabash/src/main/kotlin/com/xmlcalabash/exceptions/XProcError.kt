@@ -168,7 +168,7 @@ class XProcError private constructor(val code: QName, val variant: Int, val loca
         fun xdNotWellFormed() = dynamic(49)
         fun xdValueTemplateError(message: String) = dynamic(50, message)
         fun xdInvalidAvtResult(result: String) = dynamic(51, result)
-        fun xdStepTimeout(timeout: Long) = dynamic(53, timeout)
+        fun xdStepTimeout(timeout: String) = dynamic(53, timeout)
         fun xdEncodingWithXmlOrHtml(encoding: String) = dynamic(54, encoding)
         fun xdEncodingRequired(charset: String) = dynamic(55, charset)
         fun xdMarkupForbiddenWithEncoding(encoding: String) = dynamic(56, encoding)

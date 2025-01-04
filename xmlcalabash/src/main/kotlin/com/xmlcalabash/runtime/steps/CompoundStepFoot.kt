@@ -6,6 +6,7 @@ import com.xmlcalabash.namespace.NsCx
 import com.xmlcalabash.runtime.XProcStepConfiguration
 import com.xmlcalabash.runtime.model.FootModel
 import com.xmlcalabash.runtime.parameters.RuntimeStepParameters
+import java.time.Duration
 
 class CompoundStepFoot(config: XProcStepConfiguration, val parent: CompoundStep, step: FootModel): AbstractStep(config, step, NsCx.foot, "${step.name}/foot") {
     internal var alwaysAllowSequences = false
@@ -14,7 +15,7 @@ class CompoundStepFoot(config: XProcStepConfiguration, val parent: CompoundStep,
     override val params = RuntimeStepParameters(NsCx.foot, "!foot",
         step.location, step.inputs, step.outputs, step.options)
 
-    override val stepTimeout: Long = 0
+    override val stepTimeout: Duration = Duration.ZERO
 
     override val readyToRun: Boolean
         get() = true

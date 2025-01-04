@@ -4,7 +4,9 @@ import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.exceptions.XProcException
 import com.xmlcalabash.util.AssertionsLevel
 import com.xmlcalabash.util.AssertionsMonitor
+import com.xmlcalabash.util.DurationUtils
 import net.sf.saxon.s9api.QName
+import java.time.Duration
 
 abstract class StepDeclaration(parent: XProcInstruction?, stepConfig: InstructionConfiguration, instructionType: QName): XProcInstruction(parent, stepConfig, instructionType) {
     private var nameAssigned = false
@@ -26,7 +28,7 @@ abstract class StepDeclaration(parent: XProcInstruction?, stepConfig: Instructio
 
     val location = stepConfig.location
 
-    internal var timeout = 0
+    internal var timeout = Duration.ZERO
     internal var depends = mutableSetOf<String>()
     internal val _staticOptions = mutableMapOf<QName, StaticOptionDetails>()
     val staticOptions: Map<QName, StaticOptionDetails>
@@ -216,18 +218,7 @@ abstract class StepDeclaration(parent: XProcInstruction?, stepConfig: Instructio
     }
 
     fun timeout(value: String) {
-        try {
-            timeout(value.toInt())
-        } catch (_: NumberFormatException) {
-            throw stepConfig.exception(XProcError.xsValueDoesNotSatisfyType(value, "xs:nonNegativeInteger"))
-        }
-    }
-
-    fun timeout(value: Int) {
-        if (value < 0) {
-            throw stepConfig.exception(XProcError.xsValueDoesNotSatisfyType(value.toString(), "xs:nonNegativeInteger"))
-        }
-        timeout = value
+        timeout = DurationUtils.parseDuration(stepConfig, value)
     }
 
     fun inputs(): List<PortBindingContainer> {

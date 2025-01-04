@@ -14,6 +14,7 @@ import net.sf.saxon.s9api.XdmFunctionItem
 import net.sf.saxon.s9api.XdmNode
 import net.sf.saxon.s9api.XdmNodeKind
 import net.sf.saxon.s9api.XdmValue
+import java.time.Duration
 import kotlin.collections.component1
 import kotlin.collections.component2
 import kotlin.collections.iterator
@@ -29,7 +30,7 @@ class CompoundStepHead(config: XProcStepConfiguration, val parent: CompoundStep,
     internal val _cache = mutableMapOf<String, MutableList<XProcDocument>>()
     internal val _options = mutableMapOf<QName, MutableList<XProcDocument>>()
     private val inputErrors = mutableListOf<XProcError>()
-    override val stepTimeout: Long = 0
+    override val stepTimeout: Duration = Duration.ZERO
 
     val cache: Map<String, List<XProcDocument>>
         get() = _cache

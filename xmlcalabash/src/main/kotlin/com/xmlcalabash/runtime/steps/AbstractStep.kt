@@ -17,8 +17,10 @@ import com.xmlcalabash.runtime.parameters.RuntimeStepParameters
 import com.xmlcalabash.steps.internal.DocumentStep
 import com.xmlcalabash.steps.internal.InlineStep
 import com.xmlcalabash.util.BufferingReceiver
+import com.xmlcalabash.util.DurationUtils
 import net.sf.saxon.s9api.QName
 import org.apache.logging.log4j.kotlin.logger
+import java.time.Duration
 import java.util.concurrent.Callable
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
@@ -44,7 +46,7 @@ abstract class AbstractStep(val stepConfig: XProcStepConfiguration, step: StepMo
     val verbosity = stepConfig.saxonConfig.xmlCalabash.xmlCalabashConfig.verbosity
 
     var aborted = false
-    abstract val stepTimeout: Long
+    abstract val stepTimeout: Duration
     abstract val params: RuntimeStepParameters
     abstract val readyToRun: Boolean
     abstract fun output(port: String, document: XProcDocument)
@@ -132,15 +134,15 @@ abstract class AbstractStep(val stepConfig: XProcStepConfiguration, step: StepMo
                 monitor.startStep(this)
             }
 
-            if (stepTimeout > 0) {
+            if (stepTimeout.toMillis() > 0) {
                 val service = Executors.newSingleThreadExecutor()
                 val future = service.submit(RunTask())
                 try {
-                    future.get(stepTimeout, TimeUnit.SECONDS)
-                } catch (_: TimeoutException) {
+                    future.get(stepTimeout.toMillis(), TimeUnit.MILLISECONDS)
+                } catch (ex: TimeoutException) {
                     future.cancel(true)
                     service.shutdownNow()
-                    throw stepConfig.exception(XProcError.xdStepTimeout(stepTimeout))
+                    throw stepConfig.exception(XProcError.xdStepTimeout(DurationUtils.prettyPrint(stepTimeout)))
                 }
                 service.shutdownNow()
             } else {

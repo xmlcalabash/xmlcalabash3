@@ -21,7 +21,7 @@ open class AtomicStep(config: XProcStepConfiguration, atomic: AtomicBuiltinStepM
     val openPorts = mutableSetOf<String>()
     private var message: XdmValue? = null
     private val inputErrors = mutableListOf<XProcError>()
-    override val stepTimeout = atomic.model.step.timeout.toLong()
+    override val stepTimeout = atomic.model.step.timeout
 
     init {
         inputPorts.addAll(atomic.inputs.keys)
