@@ -123,7 +123,7 @@ jobs:
           files: |
             app/build/distributions/xmlcalabash-${{ env.CI_TAG }}.zip
             ext/epubcheck/build/distributions/epubcheck-${{ env.CI_TAG }}.zip
-            ext/polyglot/build/distributions/polyglot-3.0.0-${{ env.CI_TAG }}.zip
+            ext/polyglot/build/distributions/polyglot-${{ env.CI_TAG }}.zip
 
       # N.B. This is **only** publishing the SNAPSHOT builds on the main branch
       - name: Publish to Sonatype
