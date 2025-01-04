@@ -1,6 +1,7 @@
 package com.xmlcalabash.datamodel
 
 import com.xmlcalabash.config.SaxonConfiguration
+import com.xmlcalabash.io.MediaType
 import com.xmlcalabash.namespace.NsCx
 import com.xmlcalabash.namespace.NsP
 import com.xmlcalabash.namespace.NsXml

@@ -1,16 +1,15 @@
 package com.xmlcalabash.datamodel
 
 import com.xmlcalabash.exceptions.XProcError
+import com.xmlcalabash.io.MediaType
 import com.xmlcalabash.namespace.NsP
 import com.xmlcalabash.util.SaxonErrorReporter
-import net.sf.saxon.Configuration
 import net.sf.saxon.functions.ExecutableFunctionLibrary
 import net.sf.saxon.functions.FunctionLibrary
 import net.sf.saxon.functions.FunctionLibraryList
 import net.sf.saxon.om.NamespaceUri
 import net.sf.saxon.query.XQueryFunctionLibrary
 import net.sf.saxon.trans.XPathException
-import org.apache.logging.log4j.kotlin.logger
 import org.xml.sax.InputSource
 import java.io.InputStream
 import java.net.URI

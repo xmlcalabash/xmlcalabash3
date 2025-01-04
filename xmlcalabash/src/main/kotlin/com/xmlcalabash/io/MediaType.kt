@@ -1,11 +1,12 @@
-package com.xmlcalabash.datamodel
+package com.xmlcalabash.io
 
 import com.xmlcalabash.config.CommonEnvironment
 import com.xmlcalabash.exceptions.XProcError
-import com.xmlcalabash.runtime.XProcStepConfiguration
+import com.xmlcalabash.util.MediaClassification
 import net.sf.saxon.s9api.XdmAtomicValue
 import java.util.*
 import java.util.regex.Pattern
+import kotlin.collections.iterator
 
 class MediaType private constructor(val mediaType: String, val mediaSubtype: String,
                                     val suffix: String? = null, val inclusive: Boolean = true,
@@ -26,6 +27,8 @@ class MediaType private constructor(val mediaType: String, val mediaSubtype: Str
         val XQUERY = MediaType("application", "xquery")
         val XSLT = MediaType("application", "xslt", "xml")
         val YAML = MediaType("application", "vnd.yaml")
+        val TOML = MediaType("application", "toml")
+        val CSV = MediaType("text", "csv")
         val ZIP = MediaType("application", "zip")
         val JAR = MediaType("application", "java-archive")
         val TAR = MediaType("application", "x-tar")
@@ -71,7 +74,8 @@ class MediaType private constructor(val mediaType: String, val mediaSubtype: Str
             MediaType("application", "xquery"),
             MediaType("application", "javascript"),
             MediaType("text", "html", inclusive = false),
-            MediaType("text", "xml", inclusive = false)
+            MediaType("text", "xml", inclusive = false),
+            MediaType("text", "yaml", inclusive = false)
         )
 
         val MATCH_NOT_TEXT = listOf<MediaType>(
@@ -91,7 +95,19 @@ class MediaType private constructor(val mediaType: String, val mediaSubtype: Str
         )
 
         val MATCH_YAML = listOf<MediaType>(
-            MediaType("application", "vnd.yaml")
+            MediaType("application", "vnd.yaml"),
+            MediaType("text", "yaml"),
+            MediaType("application", "yaml"),
+            MediaType("application", "x-yaml"),
+            MediaType("application", "*", "yaml"),
+        )
+
+        val MATCH_TOML = listOf<MediaType>(
+            MediaType("application", "toml")
+        )
+
+        val MATCH_CSV = listOf<MediaType>(
+            MediaType("text", "csv")
         )
 
         val MATCH_ANY = listOf<MediaType>(
@@ -100,6 +116,16 @@ class MediaType private constructor(val mediaType: String, val mediaSubtype: Str
 
         val MATCH_NOT_ANY = listOf<MediaType>(
             MediaType("*", "*", inclusive = false)
+        )
+
+        val classifications = listOf<Pair<MediaClassification, List<MediaType>>> (
+            Pair(MediaClassification.XML, MATCH_XML),
+            Pair(MediaClassification.XHTML, listOf(XHTML)),
+            Pair(MediaClassification.HTML, MATCH_HTML),
+            Pair(MediaClassification.JSON, MATCH_JSON),
+            Pair(MediaClassification.YAML, MATCH_YAML),
+            Pair(MediaClassification.TOML, MATCH_TOML),
+            Pair(MediaClassification.TEXT, MATCH_TEXT),
         )
 
         fun parse(mtype: String?): MediaType? {
@@ -295,51 +321,14 @@ class MediaType private constructor(val mediaType: String, val mediaSubtype: Str
         return false
     }
 
-    fun textContentType(): Boolean {
-        val mtype = matchingMediaType(MATCH_TEXT)
-        return mtype != null && mtype.inclusive
-    }
-
-    fun xmlContentType(): Boolean {
-        val mtype = matchingMediaType(MATCH_XML)
-        return mtype != null && mtype.inclusive
-    }
-
-    fun jsonContentType(): Boolean {
-        val mtype = matchingMediaType(MATCH_JSON)
-        return mtype != null && mtype.inclusive
-    }
-
-    fun yamlContentType(): Boolean {
-        val mtype = matchingMediaType(MATCH_YAML)
-        return mtype != null && mtype.inclusive
-    }
-
-    fun htmlContentType(): Boolean {
-        val mtype = matchingMediaType(MATCH_HTML)
-        return mtype != null && mtype.inclusive
-    }
-
-    fun anyContentType(): Boolean {
-        return true
-    }
-
-    fun markupContentType(): Boolean {
-        return xmlContentType() || htmlContentType()
-    }
-
-    fun classification(): MediaType {
-        return if (xmlContentType()) {
-            XML
-        } else if (htmlContentType()) {
-            HTML
-        } else if (textContentType()) {
-            TEXT
-        } else if (jsonContentType()) {
-            JSON
-        } else {
-            OCTET_STREAM
+    fun classification(): MediaClassification {
+        for ((type, typeList) in classifications) {
+            val mtype = matchingMediaType(typeList)
+            if (mtype != null && mtype.inclusive) {
+                return type
+            }
         }
+        return MediaClassification.BINARY
     }
 
     fun extension(): String {

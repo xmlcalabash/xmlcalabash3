@@ -2,7 +2,7 @@ package com.xmlcalabash.util
 
 import com.xmlcalabash.config.XmlCalabash
 import com.xmlcalabash.documents.XProcDocument
-import com.xmlcalabash.io.XProcSerializer
+import com.xmlcalabash.io.DocumentWriter
 import com.xmlcalabash.namespace.Ns
 import com.xmlcalabash.runtime.XProcStepConfiguration
 import com.xmlcalabash.runtime.api.Receiver
@@ -44,16 +44,17 @@ open class DefaultOutputReceiver(val xmlCalabash: XmlCalabash, val processor: Pr
             println(header)
         }
         val contentType = document.contentType
-        val serializer = XProcSerializer(xmlCalabash, processor)
+        val writer = DocumentWriter(document, System.out)
 
         if (writingToTerminal && contentType != null) {
-            if (contentType.xmlContentType() || contentType.htmlContentType()) {
-                serializer.setOverrideProperty(contentType, Ns.omitXmlDeclaration, "true")
+            if (contentType.classification() in listOf(MediaClassification.XML, MediaClassification.XHTML, MediaClassification.HTML)) {
+                writer[Ns.omitXmlDeclaration] = true
             }
-            serializer.setOverrideProperty(contentType, Ns.indent, "true")
+            writer[Ns.indent] = true
         }
 
-        serializer.write(document, System.out, "standard output", contentType)
+        writer.write()
+
         if (writingToTerminal) {
             println("".padEnd(header.length, '='))
         }

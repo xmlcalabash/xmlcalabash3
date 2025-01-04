@@ -1,6 +1,6 @@
 package com.xmlcalabash.steps.file
 
-import com.xmlcalabash.datamodel.MediaType
+import com.xmlcalabash.io.MediaType
 import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.namespace.*
@@ -9,7 +9,6 @@ import com.xmlcalabash.util.SaxonTreeBuilder
 import com.xmlcalabash.util.XAttributeMap
 import net.sf.saxon.om.AttributeMap
 import net.sf.saxon.s9api.QName
-import net.sf.saxon.s9api.XdmArray
 import net.sf.saxon.s9api.XdmNode
 import java.io.File
 import java.net.URI

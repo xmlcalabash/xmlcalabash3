@@ -1,10 +1,11 @@
 package com.xmlcalabash.pagedmedia.antennahouse
 
 import com.xmlcalabash.api.FoProcessor
-import com.xmlcalabash.datamodel.MediaType
+import com.xmlcalabash.io.MediaType
 import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.exceptions.XProcError
-import com.xmlcalabash.io.XProcSerializer
+import com.xmlcalabash.io.DocumentConverter
+import com.xmlcalabash.io.DocumentWriter
 import com.xmlcalabash.runtime.XProcStepConfiguration
 import jp.co.antenna.XfoJavaCtl.XfoObj
 import net.sf.saxon.s9api.QName
@@ -73,14 +74,15 @@ class FoAH(): AbstractAH(), FoProcessor {
 
         // AH won't parse HTML
         val sourceContentType = document.contentType ?: MediaType.OCTET_STREAM
-        val overrideContentType = if (sourceContentType == MediaType.HTML) {
-            MediaType.XHTML
+        val ahDoc = if (sourceContentType == MediaType.HTML) {
+            DocumentConverter(stepConfig, document, MediaType.XHTML).convert()
         } else {
-            null
+            document
         }
 
-        val serializer = XProcSerializer(stepConfig)
-        serializer.write(document, temp, overrideContentType)
+        val fos = FileOutputStream(temp)
+        DocumentWriter(ahDoc, fos).write()
+        fos.close()
 
         val fis = FileInputStream(temp)
         ah.render(fis, out, outputFormat)

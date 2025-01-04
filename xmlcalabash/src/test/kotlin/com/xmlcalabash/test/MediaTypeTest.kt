@@ -1,10 +1,8 @@
 package com.xmlcalabash.test
 
-import com.xmlcalabash.datamodel.MediaType
+import com.xmlcalabash.io.MediaType
 import com.xmlcalabash.exceptions.XProcException
 import com.xmlcalabash.namespace.NsErr
-import com.xmlcalabash.namespace.NsP
-import net.sf.saxon.s9api.QName
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 

@@ -1,6 +1,6 @@
 package com.xmlcalabash.config
 
-import com.xmlcalabash.datamodel.MediaType
+import com.xmlcalabash.io.MediaType
 import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.namespace.Ns
 import com.xmlcalabash.spi.PagedMediaManager

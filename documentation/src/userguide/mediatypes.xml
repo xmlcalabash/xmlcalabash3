@@ -1,0 +1,94 @@
+<appendix xmlns="http://docbook.org/ns/docbook"
+          xmlns:xlink="http://www.w3.org/1999/xlink"
+          xmlns:xi='http://www.w3.org/2001/XInclude'
+          version="5.2" xml:id="mediatypes">
+<info>
+  <?db filename="mediatypes"?>
+  <title>Media types</title>
+</info>
+
+<para>XML Calabash recognizes the following media types:</para>
+
+<informaltable>
+<tgroup cols="3">
+<thead>
+<row>
+<entry>Type</entry><entry>Included media types</entry><entry>Excluded media types</entry>
+</row>
+</thead>
+<tbody>
+<row>
+  <entry morerows="2">XML</entry>
+  <entry>application/xml</entry>
+  <entry morerows="2">application/xhtml+xml</entry>
+</row>
+<row>
+  <entry>text/xml</entry>
+</row>
+<row>
+  <entry>*/*+xml</entry>
+</row>
+<row>
+  <entry morerows="1">HTML</entry>
+  <entry>text/html</entry>
+  <entry morerows="1"></entry>
+</row>
+<row>
+  <entry>application/xhtml+xml</entry>
+</row>
+
+<row>
+  <entry morerows="2">Text</entry>
+  <entry>text/*</entry>
+  <entry>text/html</entry>
+</row>
+<row>
+  <entry>application/relax-ng-compact-syntax</entry>
+  <entry>text/xml</entry>
+</row>
+<row>
+  <entry>application/javascript</entry>
+  <entry>text/yaml</entry>
+</row>
+
+<row>
+  <entry morerows="1">JSON</entry>
+  <entry>application/json</entry>
+  <entry morerows="1"></entry>
+</row>
+<row>
+  <entry>*/*+json</entry>
+</row>
+
+<row>
+  <entry morerows="4">YAML</entry>
+  <entry>application/vnd.yaml</entry>
+  <entry morerows="4"></entry>
+</row>
+<row>
+  <entry>text/yaml</entry>
+</row>
+<row>
+  <entry>application/yaml</entry>
+</row>
+<row>
+  <entry>application/x-yaml</entry>
+</row>
+<row>
+  <entry>application/*+yaml</entry>
+</row>
+
+<row>
+  <entry>TOML</entry>
+  <entry>application/toml</entry>
+  <entry></entry>
+</row>
+</tbody>
+</tgroup>
+</informaltable>
+
+<note>
+<para>Internally, YAML and TOML are treated exactly like JSON. Those content
+types only apply for loading and serializing documents.</para>
+</note>
+</appendix>

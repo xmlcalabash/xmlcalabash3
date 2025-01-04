@@ -1,6 +1,6 @@
 package com.xmlcalabash.api
 
-import com.xmlcalabash.datamodel.MediaType
+import com.xmlcalabash.io.MediaType
 import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.runtime.XProcStepConfiguration
 import net.sf.saxon.s9api.QName

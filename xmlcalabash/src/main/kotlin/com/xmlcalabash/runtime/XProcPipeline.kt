@@ -1,10 +1,9 @@
 package com.xmlcalabash.runtime
 
 import com.xmlcalabash.debugger.CliDebugger
-import com.xmlcalabash.documents.DocumentProperties
 import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.exceptions.XProcError
-import com.xmlcalabash.io.XProcSerializer
+import com.xmlcalabash.io.DocumentWriter
 import com.xmlcalabash.namespace.Ns
 import com.xmlcalabash.runtime.api.Receiver
 import com.xmlcalabash.runtime.model.CompoundStepModel
@@ -18,7 +17,7 @@ import com.xmlcalabash.util.AssertionsLevel
 import com.xmlcalabash.util.AssertionsMonitor
 import com.xmlcalabash.visualizers.Silent
 import net.sf.saxon.s9api.QName
-import net.sf.saxon.s9api.XdmAtomicValue
+import java.io.FileOutputStream
 
 class XProcPipeline internal constructor(private val runtime: XProcRuntime, pipeline: CompoundStepModel, val config: XProcStepConfiguration) {
     val inputManifold = pipeline.inputs
@@ -131,20 +130,15 @@ class XProcPipeline internal constructor(private val runtime: XProcRuntime, pipe
         }
 
         val trace = config.environment.xmlCalabash.xmlCalabashConfig.trace
-        if (trace != null) {
-            val props = DocumentProperties()
-            val serial = config.asXdmMap(mapOf(
-                Ns.method to XdmAtomicValue("xml"),
-                Ns.omitXmlDeclaration to XdmAtomicValue(true),
-                Ns.indent to XdmAtomicValue(true)
-            ))
-            props.set(Ns.serialization, serial)
-
-            if (traceListener != null) {
-                val doc = XProcDocument.ofXml(traceListener!!.summary(config), config, props)
-                val serializer = XProcSerializer(config)
-                serializer.write(doc, trace)
-            }
+        if (trace != null && traceListener != null) {
+            val doc = XProcDocument.ofXml(traceListener!!.summary(config), config)
+            val fos = FileOutputStream(trace)
+            val writer = DocumentWriter(doc, fos)
+            writer[Ns.method] = "xml"
+            writer[Ns.omitXmlDeclaration] = true
+            writer[Ns.indent] = true
+            writer.write()
+            fos.close()
         }
     }
 

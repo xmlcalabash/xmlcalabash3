@@ -1,7 +1,7 @@
 package com.xmlcalabash.runtime.api
 
 import com.xmlcalabash.datamodel.ConnectionInstruction
-import com.xmlcalabash.datamodel.MediaType
+import com.xmlcalabash.io.MediaType
 import net.sf.saxon.s9api.XdmMap
 import net.sf.saxon.s9api.XdmNode
 

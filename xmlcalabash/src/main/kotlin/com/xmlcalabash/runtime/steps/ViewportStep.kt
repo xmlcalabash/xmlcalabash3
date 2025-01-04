@@ -1,11 +1,12 @@
 package com.xmlcalabash.runtime.steps
 
-import com.xmlcalabash.datamodel.MediaType
+import com.xmlcalabash.io.MediaType
 import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.namespace.Ns
 import com.xmlcalabash.runtime.XProcStepConfiguration
 import com.xmlcalabash.runtime.model.CompoundStepModel
+import com.xmlcalabash.util.MediaClassification
 import com.xmlcalabash.util.S9Api
 import com.xmlcalabash.util.XmlViewportComposer
 import net.sf.saxon.ma.map.MapItem
@@ -101,8 +102,9 @@ open class ViewportStep(config: XProcStepConfiguration, compound: CompoundStepMo
 
                 val nodes = mutableListOf<XdmNode>()
                 for (doc in foot.cache[outputPort] ?: emptyList()) {
-                    val ct = doc.contentType ?: MediaType.XML
-                    if (ct.xmlContentType() || ct.htmlContentType() || ct.textContentType()) {
+                    // Different default here...
+                    val ctc = doc.contentType?.classification() ?: MediaClassification.XML
+                    if (ctc in listOf(MediaClassification.XML, MediaClassification.XHTML, MediaClassification.HTML, MediaClassification.TEXT)) {
                         when (doc.value) {
                             is XdmNode -> nodes.add(doc.value as XdmNode)
                             else -> throw stepConfig.exception(XProcError.xdViewportResultNotXml())

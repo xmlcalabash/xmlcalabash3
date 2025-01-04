@@ -3,6 +3,7 @@ package com.xmlcalabash.datamodel
 import com.xmlcalabash.runtime.XProcStepConfiguration
 import com.xmlcalabash.documents.DocumentProperties
 import com.xmlcalabash.documents.XProcDocument
+import com.xmlcalabash.io.MediaType
 import net.sf.saxon.om.NamespaceUri
 import net.sf.saxon.s9api.QName
 import net.sf.saxon.s9api.SequenceType

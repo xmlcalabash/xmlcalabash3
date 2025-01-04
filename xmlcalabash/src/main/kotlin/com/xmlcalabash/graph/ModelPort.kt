@@ -1,7 +1,7 @@
 package com.xmlcalabash.graph
 
 import com.xmlcalabash.datamodel.InputInstruction
-import com.xmlcalabash.datamodel.MediaType
+import com.xmlcalabash.io.MediaType
 import com.xmlcalabash.datamodel.OutputInstruction
 import com.xmlcalabash.datamodel.PortBindingContainer
 import com.xmlcalabash.datamodel.WithInputInstruction

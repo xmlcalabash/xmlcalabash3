@@ -1,6 +1,5 @@
 package com.xmlcalabash.io
 
-import com.xmlcalabash.datamodel.MediaType
 import com.xmlcalabash.documents.DocumentProperties
 import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.exceptions.XProcError
@@ -524,8 +523,7 @@ class InternetProtocolRequest(val stepConfig: XProcStepConfiguration, val uri: U
                 }
 
                 val baos = ByteArrayOutputStream()
-                val serializer = XProcSerializer(stepConfig)
-                serializer.write(source, baos, "HTTP request")
+                DocumentWriter(source, baos).write()
 
                 part.setBody(ByteArrayBody(baos.toByteArray(), ContentType.create(bodyContentType.toString(), charset)))
 
@@ -541,8 +539,7 @@ class InternetProtocolRequest(val stepConfig: XProcStepConfiguration, val uri: U
                 val charset = _sources[0].contentType?.paramValue("charset") ?: StandardCharsets.UTF_8.toString()
 
                 val baos = ByteArrayOutputStream()
-                val serializer = XProcSerializer(stepConfig)
-                serializer.write(_sources[0], baos, "HTTP request")
+                DocumentWriter(_sources[0], baos).write()
 
                 // This is a bit awkward.
                 // https://github.com/ndw/xmlcalabash1/issues/290
@@ -581,8 +578,7 @@ class InternetProtocolRequest(val stepConfig: XProcStepConfiguration, val uri: U
         val ebuilder = EntityBuilder.create()
 
         val baos = ByteArrayOutputStream()
-        val serializer = XProcSerializer(stepConfig)
-        serializer.write(doc, baos, "HTTP request")
+        DocumentWriter(doc, baos).write()
         ebuilder.setBinary(baos.toByteArray())
 
         val docctype = doc.contentType ?: MediaType.OCTET_STREAM

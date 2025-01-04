@@ -3,6 +3,7 @@ package com.xmlcalabash.parsers.xpl
 import com.xmlcalabash.datamodel.*
 import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.exceptions.XProcException
+import com.xmlcalabash.io.MediaType
 import com.xmlcalabash.namespace.Ns
 import com.xmlcalabash.namespace.NsCx
 import com.xmlcalabash.namespace.NsErr

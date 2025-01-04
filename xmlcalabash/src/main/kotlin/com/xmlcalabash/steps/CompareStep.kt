@@ -1,12 +1,14 @@
 package com.xmlcalabash.steps
 
-import com.xmlcalabash.datamodel.MediaType
+import com.xmlcalabash.documents.XProcBinaryDocument
+import com.xmlcalabash.io.MediaType
 import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.namespace.Ns
 import com.xmlcalabash.namespace.NsC
 import com.xmlcalabash.namespace.NsCx
 import com.xmlcalabash.namespace.NsFn
+import com.xmlcalabash.util.MediaClassification
 import com.xmlcalabash.util.S9Api
 import com.xmlcalabash.util.SaxonTreeBuilder
 import net.sf.saxon.lib.ErrorReporter
@@ -63,21 +65,31 @@ open class CompareStep(): AbstractAtomicStep() {
     }
 
     private fun deepEqualCompare() {
-        val sourceContentType = source.contentType ?: MediaType.XML
-        val alternateContentType = alternate.contentType ?: MediaType.XML
+        val sourceCt = source.contentType ?: MediaType.XML
+        val alternateCt = alternate.contentType ?: MediaType.XML
 
-        if (sourceContentType.textContentType() && alternateContentType.textContentType()) {
+        val sourceClass = sourceCt.classification()
+        val alternateClass = alternateCt.classification()
+
+        if (sourceClass == MediaClassification.TEXT && alternateClass == MediaClassification.TEXT) {
             deepEqualText()
             return
         }
 
-        if ((sourceContentType.xmlContentType() || sourceContentType.htmlContentType())
-            && (alternateContentType.xmlContentType() || alternateContentType.htmlContentType())) {
+        if (sourceClass in listOf(MediaClassification.XML, MediaClassification.XHTML, MediaClassification.HTML)
+            && alternateClass in listOf(MediaClassification.XML, MediaClassification.XHTML, MediaClassification.HTML)) {
             deepEqualXml()
             return
         }
 
-        throw stepConfig.exception(XProcError.xcComparisonNotPossible(sourceContentType, alternateContentType))
+        if (source is XProcBinaryDocument && alternate is XProcBinaryDocument) {
+            val sourceBytes = (source as XProcBinaryDocument).binaryValue
+            val alternateBytes = (alternate as XProcBinaryDocument).binaryValue
+            report(sourceBytes == alternateBytes)
+            return
+        }
+
+        throw stepConfig.exception(XProcError.xcComparisonNotPossible(sourceCt, alternateCt))
     }
 
     private fun deepEqualText() {

@@ -6,7 +6,7 @@ import com.adobe.epubcheck.messages.MessageId
 import com.adobe.epubcheck.messages.Severity
 import com.adobe.epubcheck.util.DefaultReportImpl
 import com.xmlcalabash.api.MessageReporter
-import com.xmlcalabash.datamodel.MediaType
+import com.xmlcalabash.io.MediaType
 import com.xmlcalabash.documents.DocumentProperties
 import com.xmlcalabash.documents.XProcBinaryDocument
 import com.xmlcalabash.documents.XProcDocument

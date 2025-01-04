@@ -1,7 +1,8 @@
 package com.xmlcalabash.documents
 
-import com.xmlcalabash.datamodel.MediaType
+import com.xmlcalabash.io.MediaType
 import com.xmlcalabash.namespace.Ns
+import com.xmlcalabash.util.MediaClassification
 import net.sf.saxon.s9api.QName
 import net.sf.saxon.s9api.XdmAtomicValue
 import net.sf.saxon.s9api.XdmMap
@@ -33,8 +34,16 @@ class DocumentProperties() {
             return
         }
         val curtype = contentType
-        if (name == Ns.contentType && curtype != null && curtype.classification() != newType.classification()) {
-            properties.remove(Ns.serialization)
+        if (name == Ns.contentType && curtype != null) {
+            val curclass = curtype.classification()
+            val newclass = newType.classification()
+            if (curclass != newclass) {
+                // Special case...XHTML and HTML are "the same" for this purpose...
+                if (curclass !in listOf(MediaClassification.HTML, MediaClassification.XHTML)
+                    || newclass !in listOf(MediaClassification.HTML, MediaClassification.XHTML)) {
+                    properties.remove(Ns.serialization)
+                }
+            }
         }
         properties[name] = XdmAtomicValue(newType.toString())
     }
@@ -138,8 +147,8 @@ class DocumentProperties() {
             return null
         }
 
-    val contentClassification: MediaType
+    val contentClassification: MediaClassification?
         get() {
-            return contentType?.classification() ?: MediaType.OCTET_STREAM
+            return contentType?.classification() ?: MediaClassification.BINARY
         }
 }

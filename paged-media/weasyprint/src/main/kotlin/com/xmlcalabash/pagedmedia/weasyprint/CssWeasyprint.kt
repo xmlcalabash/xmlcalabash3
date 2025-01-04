@@ -1,12 +1,13 @@
 package com.xmlcalabash.pagedmedia.weasyprint
 
 import com.xmlcalabash.api.CssProcessor
-import com.xmlcalabash.datamodel.MediaType
+import com.xmlcalabash.io.MediaType
 import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.exceptions.XProcError
-import com.xmlcalabash.io.XProcSerializer
+import com.xmlcalabash.io.DocumentWriter
 import com.xmlcalabash.namespace.NsC
 import com.xmlcalabash.runtime.XProcStepConfiguration
+import com.xmlcalabash.util.MediaClassification
 import com.xmlcalabash.util.SaxonTreeBuilder
 import net.sf.saxon.s9api.QName
 import net.sf.saxon.s9api.XdmValue
@@ -125,7 +126,7 @@ class CssWeasyprint: CssProcessor {
     }
 
     override fun addStylesheet(document: XProcDocument) {
-        if (document.contentType == null || !document.contentType!!.textContentType()) {
+        if (document.contentClassification != MediaClassification.TEXT) {
             stepConfig.error { "Ignoring non-text CSS sytlesheet: ${document.baseURI}" }
             return
         }
@@ -196,8 +197,9 @@ class CssWeasyprint: CssProcessor {
 
         stepConfig.debug { "css-formatter source: ${tempXml.absolutePath}" }
 
-        val serializer = XProcSerializer(stepConfig)
-        serializer.write(document, tempXml)
+        val fos = FileOutputStream(tempXml)
+        DocumentWriter(document, fos).write()
+        fos.close()
 
         val tempPdf = File.createTempFile("xmlcalabash-weasycss", ".pdf")
         tempPdf.deleteOnExit()

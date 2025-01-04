@@ -1,19 +1,17 @@
 package com.xmlcalabash.datamodel
 
 import com.xmlcalabash.exceptions.XProcError
+import com.xmlcalabash.io.MediaType
 import com.xmlcalabash.namespace.Ns
 import com.xmlcalabash.namespace.NsP
 import com.xmlcalabash.namespace.NsXs
+import com.xmlcalabash.util.MediaClassification
 import com.xmlcalabash.util.ValueTemplateFilter
 import com.xmlcalabash.util.ValueTemplateFilterNone
 import com.xmlcalabash.util.ValueTemplateFilterXml
 import net.sf.saxon.s9api.QName
-import net.sf.saxon.s9api.XdmEmptySequence
 import net.sf.saxon.s9api.XdmMap
 import net.sf.saxon.s9api.XdmNode
-import net.sf.saxon.s9api.XdmValue
-import org.apache.logging.log4j.kotlin.logger
-import java.lang.IllegalStateException
 
 class InlineInstruction(parent: XProcInstruction, xmlDocument: XdmNode): ConnectionInstruction(parent, NsP.inline) {
     private var _xml: XdmNode = xmlDocument
@@ -66,12 +64,13 @@ class InlineInstruction(parent: XProcInstruction, xmlDocument: XdmNode): Connect
         if (contentType == null) {
             _contentType = MediaType.XML
         }
+        val markupContentType = contentType!!.classification() in listOf(MediaClassification.XML, MediaClassification.XHTML, MediaClassification.HTML)
 
         if (encoding != null) {
             if (encoding != "base64") {
                 throw stepConfig.exception(XProcError.xsUnsupportedEncoding(encoding!!))
             }
-            if (contentType!!.xmlContentType() || contentType!!.htmlContentType()) {
+            if (markupContentType) {
                 throw stepConfig.exception(XProcError.xdEncodingWithXmlOrHtml(encoding!!))
             }
         }
@@ -93,7 +92,7 @@ class InlineInstruction(parent: XProcInstruction, xmlDocument: XdmNode): Connect
 
         _xml = _valueTemplateFilter.expandStaticValueTemplates(stepConfig, expandText!!, staticBindings)
 
-        if (!(contentType!!.xmlContentType() || contentType!!.htmlContentType()) && _valueTemplateFilter.containsMarkup(stepConfig)) {
+        if (!markupContentType && _valueTemplateFilter.containsMarkup(stepConfig)) {
             stepConfig.warn { "Markup detected in ${contentType} inline" }
         }
 

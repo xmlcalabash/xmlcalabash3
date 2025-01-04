@@ -4,6 +4,7 @@ import com.xmlcalabash.datamodel.*
 import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.exceptions.XProcException
+import com.xmlcalabash.io.MediaType
 import com.xmlcalabash.namespace.Ns
 import com.xmlcalabash.namespace.NsCx
 import com.xmlcalabash.runtime.LazyValue
@@ -13,13 +14,10 @@ import com.xmlcalabash.runtime.model.StepModel
 import com.xmlcalabash.runtime.parameters.DocumentStepParameters
 import com.xmlcalabash.runtime.parameters.InlineStepParameters
 import com.xmlcalabash.runtime.parameters.RuntimeStepParameters
-import com.xmlcalabash.steps.AbstractAtomicStep
 import com.xmlcalabash.steps.internal.DocumentStep
 import com.xmlcalabash.steps.internal.InlineStep
 import com.xmlcalabash.util.BufferingReceiver
-import com.xmlcalabash.util.SchematronImpl
 import net.sf.saxon.s9api.QName
-import net.sf.saxon.s9api.XdmNode
 import org.apache.logging.log4j.kotlin.logger
 import java.util.concurrent.Callable
 import java.util.concurrent.Executors

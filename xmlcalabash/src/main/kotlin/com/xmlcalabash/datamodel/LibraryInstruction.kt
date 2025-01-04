@@ -1,6 +1,7 @@
 package com.xmlcalabash.datamodel
 
 import com.xmlcalabash.exceptions.XProcError
+import com.xmlcalabash.io.MediaType
 import com.xmlcalabash.namespace.NsP
 import com.xmlcalabash.runtime.XProcPipeline
 import com.xmlcalabash.runtime.XProcRuntime

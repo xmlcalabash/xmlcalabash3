@@ -3,11 +3,12 @@ package com.xmlcalabash.pagedmedia.prince
 import com.princexml.Prince
 import com.princexml.PrinceEvents
 import com.xmlcalabash.api.CssProcessor
-import com.xmlcalabash.datamodel.MediaType
+import com.xmlcalabash.io.MediaType
 import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.exceptions.XProcError
-import com.xmlcalabash.io.XProcSerializer
+import com.xmlcalabash.io.DocumentWriter
 import com.xmlcalabash.runtime.XProcStepConfiguration
+import com.xmlcalabash.util.MediaClassification
 import net.sf.saxon.s9api.QName
 import net.sf.saxon.s9api.XdmValue
 import org.apache.logging.log4j.kotlin.logger
@@ -183,7 +184,7 @@ class CssPrince: CssProcessor {
     }
 
     override fun addStylesheet(document: XProcDocument) {
-        if (document.contentType == null || !document.contentType!!.textContentType()) {
+        if (document.contentClassification != MediaClassification.TEXT) {
             stepConfig.error { "Ignoring non-text CSS sytlesheet: ${document.baseURI}" }
             return
         }
@@ -220,8 +221,9 @@ class CssPrince: CssProcessor {
 
         stepConfig.debug { "css-formatter source: ${tempXml.absolutePath}" }
 
-        val serializer = XProcSerializer(stepConfig)
-        serializer.write(document, tempXml)
+        val fos = FileOutputStream(tempXml)
+        DocumentWriter(document, fos).write()
+        fos.close()
 
         val fis = FileInputStream(tempXml)
         prince.convert(fis, out)

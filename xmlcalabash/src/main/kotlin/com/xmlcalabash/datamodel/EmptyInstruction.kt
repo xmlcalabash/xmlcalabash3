@@ -1,5 +1,6 @@
 package com.xmlcalabash.datamodel
 
+import com.xmlcalabash.io.MediaType
 import com.xmlcalabash.namespace.NsCx
 import com.xmlcalabash.namespace.NsP
 

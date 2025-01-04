@@ -1,4 +1,4 @@
-package com.xmlcalabash.datamodel
+package com.xmlcalabash.io
 
 import org.apache.hc.core5.http.NameValuePair
 

@@ -1,12 +1,12 @@
 package com.xmlcalabash.steps
 
-import com.xmlcalabash.datamodel.MediaType
-import com.xmlcalabash.documents.DocumentProperties
+import com.xmlcalabash.io.MediaType
 import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.exceptions.XProcError
-import com.xmlcalabash.io.XProcSerializer
+import com.xmlcalabash.io.DocumentWriter
 import com.xmlcalabash.namespace.Ns
 import com.xmlcalabash.namespace.NsC
+import com.xmlcalabash.util.MediaClassification
 import com.xmlcalabash.util.S9Api
 import com.xmlcalabash.util.ValueUtils
 import com.xmlcalabash.util.XProcCollectionFinder
@@ -15,9 +15,9 @@ import net.sf.saxon.event.Receiver
 import net.sf.saxon.lib.SaxonOutputKeys
 import net.sf.saxon.s9api.*
 import net.sf.saxon.serialize.SerializationProperties
-import org.apache.logging.log4j.kotlin.logger
 import java.io.ByteArrayOutputStream
 import java.net.URI
+import java.nio.charset.StandardCharsets
 import javax.xml.transform.ErrorListener
 import javax.xml.transform.TransformerException
 
@@ -57,7 +57,8 @@ open class XQueryStep(): AbstractAtomicStep() {
     private fun xquery30() {
         for (doc in sources) {
             val ctype = doc.contentType ?: MediaType.OCTET_STREAM
-            if (!ctype.xmlContentType() && !ctype.htmlContentType() && !ctype.textContentType()) {
+            if (ctype.classification() !in listOf(MediaClassification.XML, MediaClassification.XHTML,
+                    MediaClassification.HTML, MediaClassification.TEXT)) {
                 throw stepConfig.exception(XProcError.xcXQueryInputNot30Compatible(ctype))
             }
         }
@@ -97,17 +98,15 @@ open class XQueryStep(): AbstractAtomicStep() {
         compiler.setErrorListener(MyErrorListener(true))
         val exec = try {
             var xquery = query.value.underlyingValue.stringValue
-            if (query.contentType != null && query.contentType!!.xmlContentType()) {
+            if (query.contentClassification == MediaClassification.XML) {
                 val root = S9Api.documentElement(query.value as XdmNode)
                 if (root.nodeName != NsC.query) {
                     val baos = ByteArrayOutputStream()
-
-                    val xserializer = XProcSerializer(stepConfig)
-                    xserializer.setOverrideProperty(MediaType.XML, Ns.encoding, "UTF-8")
-                    xserializer.setOverrideProperty(MediaType.XML, Ns.omitXmlDeclaration, "true")
-                    xserializer.write(query, baos, "XQuery query input", MediaType.XML)
-
-                    xquery = baos.toString("utf-8")
+                    val writer = DocumentWriter(query, baos)
+                    writer[Ns.encoding] = "UTF-8"
+                    writer[Ns.omitXmlDeclaration] = true
+                    writer.write()
+                    xquery = baos.toString(StandardCharsets.UTF_8)
                 }
             }
 

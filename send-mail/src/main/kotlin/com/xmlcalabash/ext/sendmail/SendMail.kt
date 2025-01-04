@@ -1,9 +1,8 @@
 package com.xmlcalabash.ext.sendmail
 
-import com.xmlcalabash.datamodel.MediaType
 import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.exceptions.XProcError
-import com.xmlcalabash.io.XProcSerializer
+import com.xmlcalabash.io.DocumentWriter
 import com.xmlcalabash.namespace.Ns
 import com.xmlcalabash.namespace.NsC
 import com.xmlcalabash.runtime.XProcStepConfiguration
@@ -18,6 +17,7 @@ import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.InputStream
 import java.io.OutputStream
+import java.nio.charset.StandardCharsets
 import java.util.*
 import javax.activation.DataHandler
 import javax.activation.DataSource
@@ -149,16 +149,14 @@ class SendMail(): AbstractAtomicStep() {
                     var content = ""
                     var contentType = ""
                     if (html) {
-                        val serializer = XProcSerializer(stepConfig)
-                        serializer.setDefaultProperties(MediaType.HTML, mapOf<QName, XdmValue>(
-                            QName("html-version") to XdmAtomicValue("5"),
-                            QName("encoding") to XdmAtomicValue("UTF-8"),
-                            QName("indent") to XdmAtomicValue("no"),
-                            QName("omit-xml-declaration") to XdmAtomicValue("yes")))
-
                         val stream = ByteArrayOutputStream()
-                        serializer.write(doc, stream, "sending mail", MediaType.HTML)
-                        content = stream.toString("UTF-8")
+                        val writer = DocumentWriter(doc, stream)
+                        writer[Ns.htmlVersion] = "5"
+                        writer[Ns.encoding] = "UTF-8"
+                        writer[Ns.indent] = false
+                        writer[Ns.omitXmlDeclaration] = true
+                        writer.write()
+                        content = stream.toString(StandardCharsets.UTF_8)
                         contentType = "text/html;charset=UTF-8"
                     } else {
                         content = field.stringValue.trim()
@@ -189,9 +187,8 @@ class SendMail(): AbstractAtomicStep() {
                     filename = filename.substring(pos+1)
                 }
 
-                val serializer = XProcSerializer(stepConfig)
                 val stream = ByteArrayOutputStream()
-                serializer.write(doc, stream, "sending mail")
+                DocumentWriter(doc, stream).write()
 
                 val bodyPart = MimeBodyPart()
                 val source = PartDataSource(stream.toByteArray(), contentType, filename)

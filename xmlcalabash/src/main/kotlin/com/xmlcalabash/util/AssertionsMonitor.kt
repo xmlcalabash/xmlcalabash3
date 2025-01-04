@@ -2,16 +2,16 @@ package com.xmlcalabash.util
 
 import com.xmlcalabash.datamodel.DeclareStepInstruction
 import com.xmlcalabash.datamodel.LibraryInstruction
-import com.xmlcalabash.datamodel.MediaType
+import com.xmlcalabash.io.MediaType
 import com.xmlcalabash.datamodel.StepDeclaration
 import com.xmlcalabash.datamodel.XProcInstruction
 import com.xmlcalabash.documents.XProcBinaryDocument
 import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.exceptions.XProcError
-import com.xmlcalabash.io.ContentTypeConverter
 import com.xmlcalabash.namespace.*
 import com.xmlcalabash.api.Monitor
 import com.xmlcalabash.exceptions.XProcException
+import com.xmlcalabash.io.DocumentConverter
 import com.xmlcalabash.runtime.PipelineReceiverProxy
 import com.xmlcalabash.runtime.XProcStepConfiguration
 import com.xmlcalabash.runtime.steps.*
@@ -263,9 +263,9 @@ class AssertionsMonitor(): Monitor {
             document.value
         } else {
             try {
-                ContentTypeConverter.jsonToXml(stepConfig, document.value, MediaType.XML)
+                DocumentConverter(stepConfig, document, MediaType.XML).convert().value as XdmNode
             } catch (ex: Exception) {
-                stepConfig.warn({ "Failed to convert non-XML input to XML for Schematron testing: ${document.contentType}"})
+                stepConfig.warn({ "Failed to convert non-XML input to XML for Schematron testing: ${document.contentType}: ${ex.message}" })
                 return
             }
         }

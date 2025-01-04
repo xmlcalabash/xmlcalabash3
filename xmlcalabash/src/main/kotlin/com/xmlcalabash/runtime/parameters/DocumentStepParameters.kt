@@ -1,7 +1,7 @@
 package com.xmlcalabash.runtime.parameters
 
 import com.xmlcalabash.datamodel.Location
-import com.xmlcalabash.datamodel.MediaType
+import com.xmlcalabash.io.MediaType
 import com.xmlcalabash.namespace.NsCx
 import com.xmlcalabash.runtime.api.RuntimeOption
 import com.xmlcalabash.runtime.api.RuntimePort

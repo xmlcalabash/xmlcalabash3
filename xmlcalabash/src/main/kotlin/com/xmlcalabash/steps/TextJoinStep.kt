@@ -1,12 +1,12 @@
 package com.xmlcalabash.steps
 
-import com.xmlcalabash.datamodel.MediaType
+import com.xmlcalabash.io.MediaType
 import com.xmlcalabash.documents.DocumentProperties
 import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.exceptions.XProcException
 import com.xmlcalabash.namespace.Ns
-import com.xmlcalabash.runtime.parameters.StepParameters
+import com.xmlcalabash.util.MediaClassification
 
 open class TextJoinStep(): AbstractTextStep() {
     override fun run() {
@@ -22,7 +22,7 @@ open class TextJoinStep(): AbstractTextStep() {
             throw XProcException(ex.error.at(stepParams.location))
         }
 
-        if (!contentType.textContentType()) {
+        if (contentType.classification() != MediaClassification.TEXT) {
             throw stepConfig.exception(XProcError.xcInvalidContentType(contentType.toString()))
         }
 

@@ -108,10 +108,16 @@ class PipelineVisualization private constructor(private val instruction: XProcIn
     }
 
     private fun expressionStep(step: AtomicExpressionStepInstruction) {
+        val expr = if (step.expression.toString().isEmpty()) {
+            "???"
+        } else {
+            step.expression.toString()
+        }
+
         val attr = mutableMapOf<String,String?>(
             "name" to step.name,
             "type" to step.instructionType.toString(),
-            "expression" to step.expression.toString(),
+            "expression" to expr,
             "as" to step.expression.asType.underlyingSequenceType.toString(),
         )
 

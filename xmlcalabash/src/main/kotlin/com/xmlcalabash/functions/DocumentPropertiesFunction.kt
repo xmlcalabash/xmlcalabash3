@@ -1,7 +1,7 @@
 package com.xmlcalabash.functions
 
 import com.xmlcalabash.config.SaxonConfiguration
-import com.xmlcalabash.datamodel.MediaType
+import com.xmlcalabash.io.MediaType
 import com.xmlcalabash.namespace.Ns
 import com.xmlcalabash.namespace.NsP
 import net.sf.saxon.expr.Expression
@@ -9,19 +9,14 @@ import net.sf.saxon.expr.StaticContext
 import net.sf.saxon.expr.XPathContext
 import net.sf.saxon.lib.ExtensionFunctionCall
 import net.sf.saxon.lib.ExtensionFunctionDefinition
-import net.sf.saxon.ma.arrays.ArrayItem
-import net.sf.saxon.ma.map.MapItem
 import net.sf.saxon.om.GroundedValue
 import net.sf.saxon.om.NodeInfo
 import net.sf.saxon.om.Sequence
 import net.sf.saxon.om.StructuredQName
 import net.sf.saxon.s9api.XdmAtomicValue
 import net.sf.saxon.s9api.XdmMap
-import net.sf.saxon.tree.tiny.TinyDocumentImpl
 import net.sf.saxon.type.Type
-import net.sf.saxon.value.AtomicValue
 import net.sf.saxon.value.SequenceType
-import net.sf.saxon.value.StringValue
 
 class DocumentPropertiesFunction(private val config: SaxonConfiguration): ExtensionFunctionDefinition() {
     override fun getFunctionQName(): StructuredQName {

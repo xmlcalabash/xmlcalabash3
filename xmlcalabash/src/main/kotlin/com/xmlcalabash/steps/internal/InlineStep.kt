@@ -1,15 +1,21 @@
 package com.xmlcalabash.steps.internal
 
-import com.xmlcalabash.datamodel.MediaType
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.dataformat.toml.TomlFactory
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory
+import com.xmlcalabash.io.MediaType
 import com.xmlcalabash.documents.DocumentProperties
 import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.exceptions.XProcError
+import com.xmlcalabash.io.DocumentReader
 import com.xmlcalabash.namespace.Ns
 import com.xmlcalabash.runtime.parameters.InlineStepParameters
 import com.xmlcalabash.steps.AbstractAtomicStep
+import com.xmlcalabash.util.MediaClassification
 import com.xmlcalabash.util.S9Api
 import com.xmlcalabash.util.SaxonTreeBuilder
 import net.sf.saxon.s9api.*
+import java.io.ByteArrayInputStream
 import java.nio.charset.Charset
 import java.nio.charset.StandardCharsets
 import java.util.*
@@ -61,9 +67,11 @@ open class InlineStep(val params: InlineStepParameters): AbstractAtomicStep() {
         }
 
         val ctype = MediaType.parse(props[Ns.contentType]!!.underlyingValue.stringValue)
+        val ctc = ctype.classification()
+        val ctypeMarkup = ctc in listOf(MediaClassification.XML, MediaClassification.XHTML, MediaClassification.HTML)
 
         // This is about whether the original inline contains markup
-        if (params.filter.containsMarkup(stepConfig) && !(ctype.xmlContentType() || ctype.htmlContentType())) {
+        if (params.filter.containsMarkup(stepConfig) && !ctypeMarkup) {
             throw stepConfig.exception(XProcError.xdMarkupForbidden(ctype.toString()))
         }
 
@@ -75,7 +83,7 @@ open class InlineStep(val params: InlineStepParameters): AbstractAtomicStep() {
                 throw stepConfig.exception(XProcError.xdEncodingRequired(ctype.charset()!!))
             }
         } else {
-            if (ctype.xmlContentType() || ctype.htmlContentType()) {
+            if (ctypeMarkup) {
                 throw stepConfig.exception(XProcError.xdEncodingWithXmlOrHtml(params.encoding))
             }
             if (markup) {
@@ -93,18 +101,19 @@ open class InlineStep(val params: InlineStepParameters): AbstractAtomicStep() {
             props.remove(Ns.baseUri)
         }
 
+
         if (markup) {
-            if (ctype.textContentType()) {
+            if (ctc == MediaClassification.TEXT) {
                 receiver.output("result", XProcDocument.ofText(xml.stringValue, stepConfig, ctype, props))
                 return
             } else {
-                if (!(ctype.xmlContentType() || ctype.htmlContentType())) {
+                if (!ctypeMarkup) {
                     throw stepConfig.exception(XProcError.xdMarkupForbidden(ctype.toString()))
                 }
             }
         }
 
-        if (ctype.xmlContentType() || ctype.htmlContentType()) {
+        if (ctypeMarkup) {
             val fixedXML = S9Api.adjustBaseUri(xml, props[Ns.baseUri])
             receiver.output("result", XProcDocument(fixedXML, stepConfig, props))
             return
@@ -112,13 +121,7 @@ open class InlineStep(val params: InlineStepParameters): AbstractAtomicStep() {
 
         val bytes = decode(xml.stringValue, params.encoding)
 
-        if (ctype.jsonContentType()) {
-            val json = parseJson(bytes, ctype)
-            receiver.output("result", XProcDocument(json, stepConfig, props))
-            return
-        }
-
-        if (ctype.textContentType()) {
+        if (ctc == MediaClassification.TEXT) {
             val baseURI = if (props.has(Ns.baseUri)) {
                 props.getUri(Ns.baseUri)
             } else {
@@ -139,7 +142,13 @@ open class InlineStep(val params: InlineStepParameters): AbstractAtomicStep() {
             return
         }
 
-        receiver.output("result", XProcDocument.ofBinary(bytes, stepConfig, props))
+        if (!props.has(Ns.baseUri) && stepConfig.baseUri != null) {
+            props[Ns.baseUri] = stepConfig.baseUri
+        }
+
+        val reader = DocumentReader(stepConfig, ByteArrayInputStream(bytes), ctype)
+        val result = reader.read().with(props)
+        receiver.output("result", result)
     }
 
     override fun reset() {
@@ -161,6 +170,28 @@ open class InlineStep(val params: InlineStepParameters): AbstractAtomicStep() {
         } catch (ex: SaxonApiException) {
             throw stepConfig.exception(XProcError.xdNotWellFormedJson(), ex)
         }
+    }
+
+    private fun parseYaml(bytes: ByteArray, contentType: MediaType?): XdmValue {
+        val charset = Charset.forName(contentType?.charset() ?: "UTF-8")
+        val text = bytes.toString(charset)
+
+        val yamlReader = ObjectMapper(YAMLFactory())
+        val obj = yamlReader.readValue(text, Object::class.java)
+        val jsonWriter = ObjectMapper()
+        val str = jsonWriter.writeValueAsString(obj)
+        return parseJson(str.toByteArray(StandardCharsets.UTF_8), contentType)
+    }
+
+    private fun parseToml(bytes: ByteArray, contentType: MediaType?): XdmValue {
+        val charset = Charset.forName(contentType?.charset() ?: "UTF-8")
+        val text = bytes.toString(charset)
+
+        val tomlReader = ObjectMapper(TomlFactory())
+        val obj = tomlReader.readValue(text, Object::class.java)
+        val jsonWriter = ObjectMapper()
+        val str = jsonWriter.writeValueAsString(obj)
+        return parseJson(str.toByteArray(StandardCharsets.UTF_8), contentType)
     }
 
     private fun decode(text: String, encoding: String?): ByteArray {

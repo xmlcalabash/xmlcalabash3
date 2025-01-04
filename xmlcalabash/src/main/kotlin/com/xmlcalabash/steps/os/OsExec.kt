@@ -1,17 +1,16 @@
 package com.xmlcalabash.steps.os
 
-import com.xmlcalabash.datamodel.MediaType
+import com.xmlcalabash.io.MediaType
 import com.xmlcalabash.documents.DocumentProperties
 import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.io.DocumentLoader
-import com.xmlcalabash.io.XProcSerializer
+import com.xmlcalabash.io.DocumentWriter
 import com.xmlcalabash.namespace.Ns
 import com.xmlcalabash.namespace.NsC
 import com.xmlcalabash.steps.AbstractAtomicStep
 import com.xmlcalabash.util.SaxonTreeBuilder
 import net.sf.saxon.s9api.SaxonApiException
-import org.apache.logging.log4j.kotlin.logger
 import java.io.*
 import java.nio.file.FileSystems
 import java.nio.file.Files
@@ -103,8 +102,7 @@ class OsExec(): AbstractAtomicStep() {
                 // can cause an error.
                 try {
                     val os = process.outputStream
-                    val serializer = XProcSerializer(stepConfig)
-                    serializer.write(documents.first(), os, "process input")
+                    DocumentWriter(documents.first(), os).write()
                     os.close()
                 } catch (ex: SaxonApiException) {
                     var ignore = false

@@ -1,18 +1,17 @@
 package com.xmlcalabash.steps
 
-import com.xmlcalabash.datamodel.MediaType
+import com.xmlcalabash.io.MediaType
+import com.xmlcalabash.documents.DocumentProperties
 import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.exceptions.XProcException
-import com.xmlcalabash.io.ContentTypeConverter
 import com.xmlcalabash.io.InternetProtocolRequest
+import com.xmlcalabash.io.DocumentConverter
 import com.xmlcalabash.namespace.Ns
 import com.xmlcalabash.namespace.NsErr
 import com.xmlcalabash.namespace.NsXs
 import com.xmlcalabash.runtime.ExpressionEvaluator
-import com.xmlcalabash.runtime.LazyValue
 import net.sf.saxon.s9api.*
-import org.apache.logging.log4j.kotlin.logger
 import java.net.URI
 import kotlin.math.floor
 
@@ -179,7 +178,9 @@ open class HttpRequestStep(): AbstractAtomicStep() {
             evaluator.setContext(response.report!!)
             val result = evaluator.evaluate()
             if (!result.underlyingValue.effectiveBooleanValue()) {
-                val xmlReport = ContentTypeConverter.jsonToXml(stepConfig, report, MediaType.XML)
+                val tempdoc = XProcDocument.ofJson(report, stepConfig, MediaType.JSON, DocumentProperties())
+                val xmldoc = DocumentConverter(stepConfig, tempdoc, MediaType.XML).convert()
+                val xmlReport = xmldoc.value as XdmNode
                 throw stepConfig.exception(XProcError.xcHttpAssertionFailed(xmlReport))
             }
         }

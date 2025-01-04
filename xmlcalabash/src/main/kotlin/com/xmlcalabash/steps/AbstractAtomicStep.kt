@@ -2,7 +2,7 @@ package com.xmlcalabash.steps
 
 import com.xmlcalabash.api.XProcStep
 import com.xmlcalabash.runtime.XProcStepConfiguration
-import com.xmlcalabash.datamodel.MediaType
+import com.xmlcalabash.io.MediaType
 import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.namespace.Ns
@@ -17,7 +17,6 @@ import net.sf.saxon.om.NodeInfo
 import net.sf.saxon.s9api.*
 import net.sf.saxon.value.QNameValue
 import net.sf.saxon.value.StringValue
-import org.apache.logging.log4j.kotlin.logger
 import java.net.URI
 
 abstract class AbstractAtomicStep(): XProcStep {

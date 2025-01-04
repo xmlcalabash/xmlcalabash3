@@ -35,6 +35,7 @@ class CommonEnvironment(private val xmlCalabash: XmlCalabash) {
             "bz2" to "application/bzip2",
             "cpio" to "application/x-cpio",
             "css" to "text/plain",
+            "csv" to "text/csv",
             "epub" to "application/epub+zip",
             "eps" to "image/eps",
             "fo" to "application/xml",
@@ -54,6 +55,7 @@ class CommonEnvironment(private val xmlCalabash: XmlCalabash) {
             "svg" to "image/svg+xml",
             "tar" to "application/x-tar",
             "text" to "text/plain",
+            "toml" to "application/toml",
             "txt" to "text/plain",
             "xml" to "application/xml",
             "xpl" to "application/xproc+xml",
@@ -63,6 +65,8 @@ class CommonEnvironment(private val xmlCalabash: XmlCalabash) {
             "xsl" to "application/xslt+xml",
             "xslt" to "application/xslt+xml",
             "xz" to "application/xz",
+            "yml" to "application/x-yaml",
+            "yaml" to "application/x-yaml",
             "zip" to "application/zip")
     }
 

@@ -3,26 +3,17 @@ package com.xmlcalabash.steps
 import com.xmlcalabash.documents.DocumentProperties
 import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.exceptions.XProcError
-import com.xmlcalabash.io.XProcSerializer
+import com.xmlcalabash.io.DocumentWriter
 import com.xmlcalabash.namespace.Ns
-import com.xmlcalabash.util.S9Api
-import net.sf.saxon.s9api.QName
-import net.sf.saxon.s9api.XdmAtomicValue
-import net.sf.saxon.s9api.XdmValue
 import net.sf.saxon.value.HexBinaryValue
 import org.apache.commons.compress.compressors.CompressorOutputStream
-import org.apache.commons.compress.compressors.brotli.BrotliCompressorInputStream
 import org.apache.commons.compress.compressors.bzip2.BZip2CompressorOutputStream
 import org.apache.commons.compress.compressors.deflate.DeflateCompressorOutputStream
 import org.apache.commons.compress.compressors.gzip.GzipCompressorOutputStream
 import org.apache.commons.compress.compressors.lzma.LZMACompressorOutputStream
 import org.apache.commons.compress.compressors.xz.XZCompressorOutputStream
-import org.apache.commons.compress.compressors.z.ZCompressorInputStream
 import java.io.BufferedOutputStream
 import java.io.ByteArrayOutputStream
-import java.io.File
-import java.io.FileOutputStream
-import java.net.URI
 
 open class CompressStep(): AbstractAtomicStep() {
     override fun run() {
@@ -40,8 +31,7 @@ open class CompressStep(): AbstractAtomicStep() {
             hexbin.binaryValue
         } else {
             val baos = ByteArrayOutputStream()
-            val serializer = XProcSerializer(stepConfig)
-            serializer.write(doc, baos, "compression")
+            DocumentWriter(doc, baos).write()
             baos.toByteArray()
         }
 

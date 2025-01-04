@@ -1,17 +1,15 @@
 package com.xmlcalabash.steps
 
-import com.xmlcalabash.datamodel.MediaType
+import com.xmlcalabash.io.MediaType
 import com.xmlcalabash.documents.DocumentProperties
 import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.namespace.Ns
 import com.xmlcalabash.namespace.NsCx
 import com.xmlcalabash.spi.PagedMediaManager
-import com.xmlcalabash.spi.PagedMediaServiceProvider
 import com.xmlcalabash.util.NopPagedMediaProvider
 import com.xmlcalabash.util.UriUtils
 import net.sf.saxon.s9api.QName
-import org.apache.logging.log4j.kotlin.logger
 import java.io.ByteArrayOutputStream
 import java.net.URI
 

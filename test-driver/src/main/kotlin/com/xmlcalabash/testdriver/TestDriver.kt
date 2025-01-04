@@ -270,13 +270,16 @@ class TestDriver(val testOptions: TestOptions, val exclusions: Map<String, Strin
         }
 
         if (testOptions.updateRegressions || !previousStatus.exists()) {
-            val out = PrintStream(FileOutputStream(previousStatus))
+            val fos = FileOutputStream(previousStatus)
+            val out = PrintStream(fos)
             for (suite in allSuites) {
                 for (testCase in suite.tests) {
                     val status = suite.testCases[testCase]!!
                     out.println("${status} ${testCase.testFile}")
                 }
             }
+            fos.close()
+            out.close()
         }
 
         if (testOptions.requirePass && fail > 0) {

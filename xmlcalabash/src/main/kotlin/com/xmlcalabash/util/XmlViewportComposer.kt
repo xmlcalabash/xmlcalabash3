@@ -1,7 +1,7 @@
 package com.xmlcalabash.util
 
 import com.xmlcalabash.runtime.XProcStepConfiguration
-import com.xmlcalabash.datamodel.MediaType
+import com.xmlcalabash.io.MediaType
 import com.xmlcalabash.documents.DocumentProperties
 import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.exceptions.XProcError
@@ -35,7 +35,8 @@ class XmlViewportComposer(val stepConfig: XProcStepConfiguration, val match: Str
         }
 
         contentType = document.contentType ?: MediaType.XML
-        if (!contentType.htmlContentType() && !contentType.xmlContentType()) {
+        val contentMarkup = contentType.classification() in listOf(MediaClassification.XML, MediaClassification.XHTML, MediaClassification.HTML)
+        if (!contentMarkup) {
             throw XProcError.xdViewportNotXml().exception()
         }
 
