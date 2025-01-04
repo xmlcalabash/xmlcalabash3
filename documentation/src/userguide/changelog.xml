@@ -13,12 +13,11 @@ See the commits and pull requests on
 finer detail.</para>
 
 <revhistory>
-<revision xml:id="r300-alpha10">
-<revnumber>3.0.0-alpha10</revnumber>
-<date>2025-01-04</date>
+<revision xml:id="r300-alpha11">
+<revnumber>3.0.0-alpha11</revnumber>
+<date>2025-01-05</date>
 <revdescription>
 <itemizedlist>
-
 <listitem>
 <para>Tinkered with the timeout and sleep duration options in advance of some
 anticipated specification changes. The sleep duration is now a number of seconds,
@@ -45,6 +44,20 @@ being handled correctly.</para>
 </listitem>
 <listitem>
 <para>Updated assertions to support using an XProc pipeline as an assertion.</para>
+</listitem>
+</itemizedlist>
+</revdescription>
+</revision>
+
+<revision xml:id="r300-alpha10">
+<revnumber>3.0.0-alpha10</revnumber>
+<date>2025-01-04</date>
+<revdescription>
+<itemizedlist>
+<listitem>
+<para>This release never actually happened. There was a typo in the build script.
+I opted to bump the version rather than moving a published tag.
+</para>
 </listitem>
 </itemizedlist>
 </revdescription>
