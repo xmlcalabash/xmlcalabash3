@@ -80,7 +80,7 @@
   <xsl:text>*</xsl:text>
 </xsl:template>
 
-<xsl:template match="db:code|db:literal|db:classname|db:option|db:filename|db:tag
+<xsl:template match="db:code|db:literal|db:classname|db:option|db:filename|db:tag|db:type
                      |db:interfacename">
   <code>
     <xsl:apply-templates/>
