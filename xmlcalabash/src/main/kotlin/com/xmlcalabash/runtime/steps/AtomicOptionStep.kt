@@ -5,12 +5,13 @@ import com.xmlcalabash.runtime.LazyValue
 import com.xmlcalabash.runtime.XProcStepConfiguration
 import com.xmlcalabash.runtime.model.AtomicBuiltinStepModel
 import net.sf.saxon.s9api.QName
+import java.time.Duration
 
 class AtomicOptionStep(config: XProcStepConfiguration, atomic: AtomicBuiltinStepModel, val externalName: QName): AtomicStep(config, atomic) {
     var externalValue: XProcDocument? = null
     internal val atomicOptionValues = mutableMapOf<QName, LazyValue>()
 
-    override val stepTimeout: Long = 0
+    override val stepTimeout: Duration = Duration.ZERO
 
     override fun instantiate() {
         // nop
