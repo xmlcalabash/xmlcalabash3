@@ -83,6 +83,7 @@ class SaxonConfiguration private constructor(
                 var styleStream = SaxonConfiguration::class.java.getResourceAsStream("/com/xmlcalabash/xpath.xsl")
                 var styleSource = SAXSource(InputSource(styleStream))
                 var xsltCompiler = processor.newXsltCompiler()
+                xsltCompiler.isSchemaAware = processor.isSchemaAware
                 var xsltExec = xsltCompiler.compile(styleSource)
                 _xpathTransformer = xsltExec.load30()
             }

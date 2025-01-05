@@ -15,7 +15,7 @@ open class TextReplaceStep(): AbstractTextStep() {
         val flags = stringBinding(Ns.flags) ?: ""
         val text = text(source)
 
-        val compiler = stepConfig.processor.newXPathCompiler()
+        val compiler = stepConfig.newXPathCompiler()
         compiler.declareVariable(Ns.pattern)
         compiler.declareVariable(Ns.replacement)
         compiler.declareVariable(Ns.text)

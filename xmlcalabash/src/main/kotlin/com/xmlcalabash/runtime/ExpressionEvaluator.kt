@@ -1,6 +1,5 @@
 package com.xmlcalabash.runtime
 
-import com.xmlcalabash.datamodel.XProcExpression
 import net.sf.saxon.om.NamespaceUri
 import net.sf.saxon.s9api.Processor
 import net.sf.saxon.s9api.QName
@@ -28,6 +27,7 @@ class ExpressionEvaluator(val processor: Processor, val select: String) {
 
     fun evaluate(): XdmValue {
         val compiler = processor.newXPathCompiler()
+        compiler.isSchemaAware = processor.isSchemaAware
         for ((prefix, uri) in namespaceBindings) {
             compiler.declareNamespace(prefix, uri.toString())
         }

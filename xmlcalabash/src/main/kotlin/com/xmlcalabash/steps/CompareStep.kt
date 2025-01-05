@@ -99,7 +99,7 @@ open class CompareStep(): AbstractAtomicStep() {
     }
 
     private fun deepEqualXml() {
-        val compiler = stepConfig.processor.newXPathCompiler()
+        val compiler = stepConfig.newXPathCompiler()
         compiler.declareVariable(QName("a"))
         compiler.declareVariable(QName("b"))
         // In Saxon 12+, we have access to the 4.0 version of deep-equal...

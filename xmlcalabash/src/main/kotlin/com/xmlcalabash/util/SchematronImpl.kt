@@ -70,6 +70,7 @@ class SchematronImpl(val stepConfig: XProcStepConfiguration) {
 
         val compiledSchema = S9Api.adjustBaseUri(destination.xdmNode, schema.baseURI)
         val compiler = stepConfig.processor.newXsltCompiler()
+        compiler.isSchemaAware = stepConfig.processor.isSchemaAware
         destination = XdmDestination()
 
         compiler.isSchemaAware = schemaAware
@@ -92,7 +93,7 @@ class SchematronImpl(val stepConfig: XProcStepConfiguration) {
         val nsBindings = mapOf("svrl" to "http://purl.oclc.org/dsdl/svrl")
         val xpath = "//svrl:failed-assert|//svrl:successful-report"
 
-        val xcomp = stepConfig.processor.newXPathCompiler()
+        val xcomp = stepConfig.newXPathCompiler()
         for ((prefix, value) in nsBindings) {
             xcomp.declareNamespace(prefix, value)
         }
@@ -116,6 +117,7 @@ class SchematronImpl(val stepConfig: XProcStepConfiguration) {
                 ?: throw XProcError.xiCannotLoadResource(transpilerResource).exception()
             val source = StreamSource(stream)
             val compiler = stepConfig.processor.newXsltCompiler()
+            compiler.isSchemaAware = stepConfig.processor.isSchemaAware
             transpilerExec = compiler.compile(source)
         }
 

@@ -605,7 +605,7 @@ class Marshall(val stepConfig: XProcStepConfiguration) {
     }
 
     private fun runFunction(function: String, values: List<XdmValue>): XdmValue {
-        var compiler = stepConfig.processor.newXPathCompiler()
+        var compiler = stepConfig.newXPathCompiler()
 
         when (values.size) {
             0 -> {

@@ -35,12 +35,8 @@ class XPathStep(): AbstractAtomicStep() {
         underlyingConfig.defaultCollection = XProcCollectionFinder.DEFAULT
         underlyingConfig.collectionFinder = XProcCollectionFinder(sources, collectionFinder)
 
-        val compiler = stepConfig.processor.newXPathCompiler()
-        compiler.isSchemaAware = stepConfig.processor.isSchemaAware
+        val compiler = stepConfig.newXPathCompiler()
         compiler.setWarningHandler(SaxonErrorReporter(stepConfig))
-        for ((prefix, ns) in stepConfig.inscopeNamespaces) {
-            compiler.declareNamespace(prefix, "${ns}")
-        }
         for ((name, _) in params) {
             compiler.declareVariable(name)
         }

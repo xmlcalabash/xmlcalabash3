@@ -25,6 +25,7 @@ object NsCx {
     val dynamicOptions = QName(namespace, "cx:dynamic-options")
     val eager = QName(namespace, "cx:eager")
     val empty = QName(namespace, "cx:empty")
+    val emptyGlobalContext = QName(namespace, "cx:empty-global-context")
     val encoding = QName(namespace, "cx:encoding")
     val executable = QName(namespace, "cx:executable")
     val expression = QName(namespace, "cx:expression")

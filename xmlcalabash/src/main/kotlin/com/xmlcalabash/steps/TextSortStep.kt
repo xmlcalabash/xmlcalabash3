@@ -82,6 +82,7 @@ open class TextSortStep(): AbstractTextStep() {
         try {
             val errorReporter = SaxonErrorReporter(stepConfig)
             val compiler = stepConfig.processor.newXsltCompiler()
+            compiler.isSchemaAware = stepConfig.processor.isSchemaAware
             compiler.resourceResolver = stepConfig.environment.documentManager
             compiler.setErrorReporter(errorReporter)
 

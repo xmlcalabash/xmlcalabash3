@@ -204,7 +204,7 @@ class DocumentLoader(val context: XProcStepConfiguration,
     }
 
     private fun loadJson(stream: InputStream): XProcDocument {
-        val compiler = context.processor.newXPathCompiler()
+        val compiler = context.newXPathCompiler()
         compiler.declareVariable(QName("a"))
         compiler.declareVariable(QName("opt"))
         val selector = compiler.compile("parse-json(\$a, \$opt)").load()

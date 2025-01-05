@@ -477,10 +477,7 @@ class TestCase(val suite: TestSuite, val testFile: File) {
             return
         }
 
-        val compiler = localConfig.processor.newXPathCompiler()
-        for ((prefix, uri) in localConfig.inscopeNamespaces) {
-            compiler.declareNamespace(prefix, uri.toString())
-        }
+        val compiler = localConfig.newXPathCompiler()
         for (oname in options.keys) {
             compiler.declareVariable(oname)
         }
@@ -655,6 +652,7 @@ class TestCase(val suite: TestSuite, val testFile: File) {
         var styleStream = TestCase::class.java.getResourceAsStream(stylesheet)
         var styleSource = SAXSource(InputSource(styleStream))
         var xsltCompiler = desc.processor.newXsltCompiler()
+        xsltCompiler.isSchemaAware = desc.processor.isSchemaAware
         var xsltExec = xsltCompiler.compile(styleSource)
 
         var transformer = xsltExec.load30()
@@ -665,6 +663,7 @@ class TestCase(val suite: TestSuite, val testFile: File) {
         styleStream = TestCase::class.java.getResourceAsStream("/com/xmlcalabash/dot2txt.xsl")
         styleSource = SAXSource(InputSource(styleStream))
         xsltCompiler = desc.processor.newXsltCompiler()
+        xsltCompiler.isSchemaAware = desc.processor.isSchemaAware
         xsltExec = xsltCompiler.compile(styleSource)
 
         transformer = xsltExec.load30()

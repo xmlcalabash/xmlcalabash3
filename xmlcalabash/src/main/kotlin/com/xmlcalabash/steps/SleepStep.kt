@@ -1,12 +1,7 @@
 package com.xmlcalabash.steps
 
-import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.namespace.Ns
-import com.xmlcalabash.namespace.NsXs
 import com.xmlcalabash.util.DurationUtils
-import net.sf.saxon.s9api.XdmNode
-import net.sf.saxon.value.DayTimeDurationValue
-import java.time.Duration
 
 open class SleepStep(): AbstractAtomicStep() {
     override fun run() {

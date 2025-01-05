@@ -153,6 +153,7 @@ open class XProcStepConfigurationImpl internal constructor(
 
     override fun newXPathCompiler(): XPathCompiler {
         val compiler = processor.newXPathCompiler()
+        compiler.isSchemaAware = processor.isSchemaAware
         for ((prefix, value) in inscopeNamespaces) {
             compiler.declareNamespace(prefix, value.toString())
         }
@@ -172,10 +173,7 @@ open class XProcStepConfigurationImpl internal constructor(
     }
 
     fun parseAsType(value: String, type: SequenceType, inscopeNamespaces: Map<String, NamespaceUri>): XdmValue {
-        val compiler = processor.newXPathCompiler()
-        for ((prefix, uri) in inscopeNamespaces) {
-            compiler.declareNamespace(prefix, uri.toString())
-        }
+        val compiler = newXPathCompiler()
         val exec = compiler.compile(value)
         val selector = exec.load()
         val result = selector.evaluate()
@@ -224,7 +222,7 @@ open class XProcStepConfigurationImpl internal constructor(
             throw exception(XProcError.xiImpossible("Attempt to cast to non-xs type"))
         }
 
-        val compiler = processor.newXPathCompiler()
+        val compiler = newXPathCompiler()
         compiler.declareVariable(vara)
         val exec = compiler.compile("\$a instance of Q{${NsXs.namespace}}${type.localName}")
         val selector = exec.load()
@@ -237,7 +235,7 @@ open class XProcStepConfigurationImpl internal constructor(
             throw exception(XProcError.xiImpossible("Attempt to cast to non-xs type"))
         }
 
-        val compiler = processor.newXPathCompiler()
+        val compiler = newXPathCompiler()
         compiler.declareVariable(vara)
         val exec = compiler.compile("\$a cast as Q{${NsXs.namespace}}${type.localName}")
         val selector = exec.load()
@@ -250,7 +248,7 @@ open class XProcStepConfigurationImpl internal constructor(
             throw exception(XProcError.xiImpossible("Attempt to cast to non-xs type"))
         }
 
-        val compiler = processor.newXPathCompiler()
+        val compiler = newXPathCompiler()
         compiler.declareVariable(vara)
         val exec = compiler.compile("\$a treat as Q{${NsXs.namespace}}${type.localName}")
         val selector = exec.load()
@@ -570,7 +568,7 @@ open class XProcStepConfigurationImpl internal constructor(
     }
 
     private fun xpathEqual(left: XdmValue, right: XdmValue, op: String): Boolean {
-        val compiler = processor.newXPathCompiler()
+        val compiler = newXPathCompiler()
         compiler.declareVariable(vara)
         compiler.declareVariable(varb)
         val exec = compiler.compile("\$a ${op} \$b")
@@ -581,7 +579,7 @@ open class XProcStepConfigurationImpl internal constructor(
     }
 
     override fun xpathDeepEqual(left: XdmValue, right: XdmValue): Boolean {
-        val compiler = processor.newXPathCompiler()
+        val compiler = newXPathCompiler()
         compiler.declareVariable(vara)
         compiler.declareVariable(varb)
         val exec = compiler.compile("deep-equal(\$a,\$b)")

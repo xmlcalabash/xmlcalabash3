@@ -229,7 +229,7 @@ class ProcessMatch(val stepConfig: XProcStepConfiguration,
      * checked statically.
      */
     fun compilePattern(pattern: String): XPathSelector {
-        val xcomp = processor.newXPathCompiler()
+        val xcomp = stepConfig.newXPathCompiler()
 
         for ((name, _) in bindings) {
             xcomp.declareVariable(name)
