@@ -5,6 +5,7 @@ import com.xmlcalabash.documents.DocumentProperties
 import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.namespace.Ns
+import com.xmlcalabash.namespace.NsCx
 import com.xmlcalabash.namespace.NsFn
 import com.xmlcalabash.runtime.XProcStepConfiguration
 import com.xmlcalabash.runtime.parameters.RuntimeStepParameters
@@ -46,6 +47,7 @@ open class XsltStep(): AbstractAtomicStep() {
 
     var goesBang: XProcError? = null
     var terminationError: XProcError? = null
+    var forceEmptyGlobalContextItem = false
 
     private var primaryDestination: Destination? = null
     private var primaryOutputProperties = mutableMapOf<QName, XdmValue>()
@@ -55,6 +57,18 @@ open class XsltStep(): AbstractAtomicStep() {
         // FIXME: I expect this could be more centrally handled...
         errorReporter = SaxonErrorReporter(stepConfig)
         stepConfig.saxonConfig.configuration.setErrorReporterFactory { config -> errorReporter }
+    }
+
+    override fun extensionAttributes(attributes: Map<QName, String>) {
+        super.extensionAttributes(attributes)
+        val value = attributes[NsCx.emptyGlobalContext]
+        if (value != null) {
+            if (value == "true" || value == "false") {
+                forceEmptyGlobalContextItem = value == "true"
+            } else {
+                stepConfig.debug { "Ignoring unexpected value for cx:empty-global-context: ${value}"}
+            }
+        }
     }
 
     override fun run() {
@@ -96,7 +110,10 @@ open class XsltStep(): AbstractAtomicStep() {
     }
 
     private fun xslt30() {
-        if (globalContextItem == null && sources.size == 1) {
+        if (globalContextItem != null && forceEmptyGlobalContextItem) {
+            stepConfig.warn { "cx:empty-global-context is ignored if an explicit global context item is specified" }
+        }
+        if (globalContextItem == null && sources.size == 1 && !forceEmptyGlobalContextItem) {
             globalContextItem = sources[0]
         }
         runXsltProcessor(sources.firstOrNull())
@@ -141,9 +158,9 @@ open class XsltStep(): AbstractAtomicStep() {
         val unparsedTextURIResolver = config.unparsedTextURIResolver
 
         val compiler = processor.newXsltCompiler()
+        compiler.isSchemaAware = processor.isSchemaAware
+        compiler.errorReporter = errorReporter
         compiler.resourceResolver = stepConfig.environment.documentManager
-        compiler.setSchemaAware(processor.isSchemaAware)
-        compiler.setErrorReporter(errorReporter)
 
         val exec = try {
             compiler.compile((stylesheet.value as XdmNode).asSource())
@@ -458,7 +475,7 @@ open class XsltStep(): AbstractAtomicStep() {
     }
 
     private fun xslt10() {
-        stepConfig.exception(XProcError.xcVersionNotAvailable(version ?: "null"))
+        throw stepConfig.exception(XProcError.xcVersionNotAvailable(version ?: "null"))
     }
 
     override fun toString(): String = "p:xslt"

@@ -114,7 +114,7 @@ open class LabelElementsStep(): AbstractAtomicStep(), ProcessMatchingNodes {
 
         val varname = QName(NsP.namespace, "${p_prefix}:index")
 
-        val compiler = stepConfig.processor.newXPathCompiler()
+        val compiler = stepConfig.newXPathCompiler()
         for ((prefix, uri) in nsMap) {
             compiler.declareNamespace(prefix, uri.toString())
         }

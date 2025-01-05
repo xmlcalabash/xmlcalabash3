@@ -32,6 +32,7 @@ class XProcRuntime private constructor(internal val start: DeclareStepInstructio
         }
     }
 
+    internal val graphList = mutableListOf<Graph>()
     internal lateinit var pipelines: Map<DeclareStepInstruction, SubpipelineModel>
     internal lateinit var pipelineStep: CompoundStepModel
     internal val runnables = mutableMapOf<String, CompoundStepModel>()
@@ -81,6 +82,7 @@ class XProcRuntime private constructor(internal val start: DeclareStepInstructio
         for ((decl, model) in pipelines) {
             val graph = model.graph
             val smodel = graph.models.filterIsInstance<SubpipelineModel>().first { it.model is PipelineModel }
+            graphList.add(graph)
 
             val pipelineUserStep = CompoundStepModel(this, smodel.model)  // YAtomicCompoundStep(this, smodel)
             runnables[smodel.step.id] = pipelineUserStep

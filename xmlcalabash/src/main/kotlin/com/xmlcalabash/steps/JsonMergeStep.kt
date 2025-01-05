@@ -62,7 +62,7 @@ open class JsonMergeStep(): AbstractAtomicStep() {
         val nsbindings = establishNamespaceBinding("p", NsP.namespace, stepConfig.inscopeNamespaces)
         val indexName = QName(nsbindings.first, NsP.namespace.toString(), "index")
 
-        val compiler = stepConfig.processor.newXPathCompiler()
+        val compiler = stepConfig.newXPathCompiler()
         for ((prefix, uri) in nsbindings.second) {
             compiler.declareNamespace(prefix, uri.toString())
         }

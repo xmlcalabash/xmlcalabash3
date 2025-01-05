@@ -27,8 +27,7 @@ class XProcSelectExpression private constructor(stepConfig: XProcStepConfigurati
     }
 
     override fun evaluate(config: XProcStepConfiguration): XdmValue {
-        val compiler = config.processor.newXPathCompiler()
-        compiler.isSchemaAware = config.processor.isSchemaAware
+        val compiler = config.newXPathCompiler()
 
         // Hack
         val uri = config.baseUri

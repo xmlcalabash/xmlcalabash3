@@ -46,7 +46,7 @@ class SmokeTestMetadataExtractor {
     @Test
     fun testPDF() {
         val result = runPipeline(File("src/test/resources/pipe.xpl").toURI(), "envelope.pdf")
-        val compiler = result.context.processor.newXPathCompiler()
+        val compiler = result.context.newXPathCompiler()
         compiler.declareNamespace("dc", "http://purl.org/dc/elements/1.1/")
         val selector = compiler.compile("/ * /dc:title").load()
         selector.contextItem = result.value as XdmNode
@@ -57,7 +57,7 @@ class SmokeTestMetadataExtractor {
     @Test
     fun testBMP() {
         val result = runPipeline(File("src/test/resources/pipe.xpl").toURI(), "amaryllis.bmp")
-        val compiler = result.context.processor.newXPathCompiler()
+        val compiler = result.context.newXPathCompiler()
         compiler.declareNamespace("c", "http://www.w3.org/ns/xproc-step")
         val selector = compiler.compile("/ * /c:tag[@name='Image Width']").load()
         selector.contextItem = result.value as XdmNode
@@ -68,7 +68,7 @@ class SmokeTestMetadataExtractor {
     @Test
     fun testEPS() {
         val result = runPipeline(File("src/test/resources/pipe.xpl").toURI(), "amaryllis.eps")
-        val compiler = result.context.processor.newXPathCompiler()
+        val compiler = result.context.newXPathCompiler()
         compiler.declareNamespace("c", "http://www.w3.org/ns/xproc-step")
         val selector = compiler.compile("/ * /c:tag[@name='Bounding Box']").load()
         selector.contextItem = result.value as XdmNode
@@ -79,7 +79,7 @@ class SmokeTestMetadataExtractor {
     @Test
     fun testJPEG() {
         val result = runPipeline(File("src/test/resources/pipe.xpl").toURI(), "amaryllis.jpg")
-        val compiler = result.context.processor.newXPathCompiler()
+        val compiler = result.context.newXPathCompiler()
         compiler.declareNamespace("c", "http://www.w3.org/ns/xproc-step")
         val selector = compiler.compile("/ * /c:tag[@name='Image Width']").load()
         selector.contextItem = result.value as XdmNode
@@ -90,7 +90,7 @@ class SmokeTestMetadataExtractor {
     @Test
     fun testImagePDF() {
         val result = runPipeline(File("src/test/resources/pipe.xpl").toURI(), "amaryllis.pdf")
-        val compiler = result.context.processor.newXPathCompiler()
+        val compiler = result.context.newXPathCompiler()
         compiler.declareNamespace("c", "http://www.w3.org/ns/xproc-step")
         val selector = compiler.compile("/ * /@width").load()
         selector.contextItem = result.value as XdmNode
@@ -101,7 +101,7 @@ class SmokeTestMetadataExtractor {
     @Test
     fun testPNG() {
         val result = runPipeline(File("src/test/resources/pipe.xpl").toURI(), "amaryllis.png")
-        val compiler = result.context.processor.newXPathCompiler()
+        val compiler = result.context.newXPathCompiler()
         compiler.declareNamespace("c", "http://www.w3.org/ns/xproc-step")
         val selector = compiler.compile("/ * /c:tag[@name='Image Width']").load()
         selector.contextItem = result.value as XdmNode

@@ -29,7 +29,7 @@ class ValueTemplateFilterXml(val originalNode: XdmNode, val baseUri: URI): Value
     private var contextItem: Any? = null
 
     override fun containsMarkup(config: XProcStepConfiguration): Boolean {
-        val compiler = config.processor.newXPathCompiler()
+        val compiler = config.newXPathCompiler()
         val exec = compiler.compile("//*")
         val selector = exec.load()
         selector.contextItem = originalNode

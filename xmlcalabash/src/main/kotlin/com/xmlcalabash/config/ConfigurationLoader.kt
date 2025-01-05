@@ -375,7 +375,7 @@ class ConfigurationLoader private constructor(private val config: XmlCalabashCon
         val value = node.getAttributeValue(Ns.name)
         val options = mutableMapOf<String, String>()
         for (attr in node.axisIterator(Axis.ATTRIBUTE)) {
-            if (attr.nodeName.namespaceUri == NamespaceUri.NULL) {
+            if (attr.nodeName != Ns.name && attr.nodeName.namespaceUri == NamespaceUri.NULL) {
                 options[attr.nodeName.localName] = value
             }
         }

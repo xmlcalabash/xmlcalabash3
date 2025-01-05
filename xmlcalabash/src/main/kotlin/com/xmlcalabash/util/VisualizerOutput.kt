@@ -8,7 +8,9 @@ import com.xmlcalabash.namespace.NsDescription
 import net.sf.saxon.s9api.*
 import org.apache.logging.log4j.kotlin.logger
 import org.xml.sax.InputSource
+import java.io.BufferedReader
 import java.io.File
+import java.io.InputStreamReader
 import java.io.PrintStream
 import javax.xml.transform.sax.SAXSource
 
@@ -61,6 +63,7 @@ class VisualizerOutput {
             var styleStream = VisualizerOutput::class.java.getResourceAsStream(stylesheet)
             var styleSource = SAXSource(InputSource(styleStream))
             var xsltCompiler = desc.processor.newXsltCompiler()
+            xsltCompiler.isSchemaAware = desc.processor.isSchemaAware
             var xsltExec = xsltCompiler.compile(styleSource)
 
             var transformer = xsltExec.load30()
@@ -72,6 +75,7 @@ class VisualizerOutput {
             styleStream = VisualizerOutput::class.java.getResourceAsStream("/com/xmlcalabash/dot2txt.xsl")
             styleSource = SAXSource(InputSource(styleStream))
             xsltCompiler = desc.processor.newXsltCompiler()
+            xsltCompiler.isSchemaAware = desc.processor.isSchemaAware
             xsltExec = xsltCompiler.compile(styleSource)
 
             transformer = xsltExec.load30()
@@ -100,6 +104,19 @@ class VisualizerOutput {
             val process = rt.exec(args)
             process.waitFor()
             if (process.exitValue() != 0) {
+                val errorReader = BufferedReader(InputStreamReader(process.errorStream))
+                var line = errorReader.readLine()
+                while (line != null) {
+                    logger.debug("ERR: $line")
+                    line = errorReader.readLine()
+                }
+
+                val outputReader = BufferedReader(InputStreamReader(process.inputStream))
+                line = outputReader.readLine()
+                while (line != null) {
+                    logger.debug("OUT: $line")
+                    line = outputReader.readLine()
+                }
                 logger.warn { "Graph generation failed for $filename" }
             }
             tempFile.delete()

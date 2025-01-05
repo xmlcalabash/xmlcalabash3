@@ -12,7 +12,7 @@ abstract class Marshaller(val docContext: DocumentContext) {
     }
 
     protected fun runFunction(function: String, values: List<XdmValue>): XdmValue {
-        var compiler = docContext.processor.newXPathCompiler()
+        var compiler = docContext.newXPathCompiler()
 
         when (values.size) {
             0 -> {

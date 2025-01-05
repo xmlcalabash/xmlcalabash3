@@ -5,6 +5,7 @@ import net.sf.saxon.ma.map.MapItem
 import net.sf.saxon.om.NamespaceUri
 import net.sf.saxon.s9api.Processor
 import net.sf.saxon.s9api.QName
+import net.sf.saxon.s9api.XPathCompiler
 import net.sf.saxon.s9api.XdmMap
 import java.net.URI
 
@@ -13,6 +14,8 @@ interface DocumentContext {
     val baseUri: URI?
     val inscopeNamespaces: Map<String, NamespaceUri>
     val processor: Processor
+
+    fun newXPathCompiler(): XPathCompiler
 
     fun resolve(href: String): URI
     fun parseQName(name: String): QName

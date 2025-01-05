@@ -22,7 +22,7 @@ open class SplitSequenceStep(): AbstractAtomicStep() {
                 continue
             }
 
-            val compiler = stepConfig.processor.newXPathCompiler()
+            val compiler = stepConfig.newXPathCompiler()
             compiler.baseURI = doc.baseURI
             for ((prefix, uri) in testContext.inscopeNamespaces) {
                 compiler.declareNamespace(prefix, uri.toString())

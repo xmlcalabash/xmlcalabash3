@@ -29,7 +29,7 @@ name-breakpoint>name = +"breakpoint" .
 
 -break-clear = name-break-clear, rs, -"clear", rs, id .
 name-break-clear>clear = +"true" .
--break-set = rs, (-"on" | -"set"), rs, id, bport?, when? .
+-break-set = rs, (-"at" | -"on" | -"set"), rs, id, bport?, when? .
 
 -bport = (rs, -"at")?, rs, (input|output) .
 input = -"input", rs, -port .

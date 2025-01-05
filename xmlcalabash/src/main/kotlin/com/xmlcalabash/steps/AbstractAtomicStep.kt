@@ -260,7 +260,7 @@ abstract class AbstractAtomicStep(): XProcStep {
             val ctstr = item.get(1).underlyingValue.stringValue
 
             try {
-                val compiler = stepConfig.processor.newXPathCompiler()
+                val compiler = stepConfig.newXPathCompiler()
                 compiler.declareVariable(vara)
                 compiler.declareVariable(varb)
                 val exec = compiler.compile("matches(\$a,\$b)")

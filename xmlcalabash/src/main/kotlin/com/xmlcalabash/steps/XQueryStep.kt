@@ -94,8 +94,8 @@ open class XQueryStep(): AbstractAtomicStep() {
         underlyingConfig.setCollectionFinder(XProcCollectionFinder(sources, collectionFinder))
 
         val compiler = processor.newXQueryCompiler()
-        compiler.setSchemaAware(processor.isSchemaAware)
-        compiler.setErrorListener(MyErrorListener(true))
+        compiler.isSchemaAware = processor.isSchemaAware
+        compiler.errorListener = MyErrorListener(true)
         val exec = try {
             var xquery = query.value.underlyingValue.stringValue
             if (query.contentClassification == MediaClassification.XML) {

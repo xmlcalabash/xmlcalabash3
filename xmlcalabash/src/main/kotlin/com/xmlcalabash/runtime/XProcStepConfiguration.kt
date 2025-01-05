@@ -1,25 +1,16 @@
 package com.xmlcalabash.runtime
 
-import com.xmlcalabash.api.MessageReporter
 import com.xmlcalabash.config.SaxonConfiguration
-import com.xmlcalabash.config.XmlCalabash
 import com.xmlcalabash.datamodel.DeclareStepInstruction
-import com.xmlcalabash.datamodel.InstructionConfiguration
 import com.xmlcalabash.datamodel.Location
 import com.xmlcalabash.datamodel.PipelineEnvironment
 import com.xmlcalabash.documents.DocumentContext
 import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.exceptions.XProcException
-import com.xmlcalabash.util.Verbosity
 import net.sf.saxon.ma.map.MapItem
 import net.sf.saxon.om.AttributeMap
 import net.sf.saxon.om.NamespaceUri
-import net.sf.saxon.s9api.QName
-import net.sf.saxon.s9api.SequenceType
-import net.sf.saxon.s9api.XPathCompiler
-import net.sf.saxon.s9api.XdmAtomicValue
-import net.sf.saxon.s9api.XdmMap
-import net.sf.saxon.s9api.XdmValue
+import net.sf.saxon.s9api.*
 
 interface XProcStepConfiguration: DocumentContext {
     val environment: PipelineEnvironment
@@ -46,8 +37,6 @@ interface XProcStepConfiguration: DocumentContext {
     fun putStepType(name: QName, declare: DeclareStepInstruction)
     fun putAllStepTypes(types: Map<QName, DeclareStepInstruction>)
     fun setLocation(location: Location)
-
-    fun newXPathCompiler(): XPathCompiler
 
     fun parseBoolean(bool: String): Boolean
     fun parseQName(name: String, inscopeNamespaces: Map<String, NamespaceUri>): QName

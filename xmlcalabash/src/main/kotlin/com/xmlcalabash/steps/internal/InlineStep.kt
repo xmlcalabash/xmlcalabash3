@@ -160,7 +160,7 @@ open class InlineStep(val params: InlineStepParameters): AbstractAtomicStep() {
         val text = bytes.toString(charset)
 
         try {
-            val compiler = stepConfig.processor.newXPathCompiler()
+            val compiler = stepConfig.newXPathCompiler()
             compiler.declareVariable(QName("a"))
             val selector = compiler.compile("parse-json(\$a)").load()
             selector.resourceResolver = stepConfig.environment.documentManager

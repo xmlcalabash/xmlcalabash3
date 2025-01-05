@@ -229,6 +229,7 @@ class XmlCalabashCli private constructor() {
         val processor = xmlCalabash.saxonConfig.newProcessor()
 
         val compiler = processor.newXPathCompiler()
+        compiler.isSchemaAware = processor.isSchemaAware
         for ((name, namespace) in nsmap) {
             compiler.declareNamespace(name, namespace.toString())
         }

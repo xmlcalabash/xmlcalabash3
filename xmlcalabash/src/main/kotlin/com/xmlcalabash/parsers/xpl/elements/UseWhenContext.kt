@@ -83,10 +83,7 @@ class UseWhenContext internal constructor(val builder: PipelineBuilder) {
     private fun makeSelector(stepConfig: InstructionConfiguration, expr: String): XPathSelector {
         val processor = stepConfig.saxonConfig.processor
 
-        val compiler = processor.newXPathCompiler()
-        for ((prefix, uri) in stepConfig.inscopeNamespaces) {
-            compiler.declareNamespace(prefix, uri.toString())
-        }
+        val compiler = stepConfig.newXPathCompiler()
         for ((option, value) in staticOptions) {
             if (value != null) {
                 compiler.declareVariable(option.name)

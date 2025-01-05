@@ -28,10 +28,7 @@ class XProcAvtExpression private constructor(stepConfig: XProcStepConfiguration,
             if (index % 2 == 0) {
                 sb.append(avt.value[index])
             } else {
-                val compiler = config.processor.newXPathCompiler()
-                for ((prefix, uri) in config.inscopeNamespaces) {
-                    compiler.declareNamespace(prefix, uri.toString())
-                }
+                val compiler = config.newXPathCompiler()
                 for (name in variableRefs) {
                     compiler.declareVariable(name)
                 }

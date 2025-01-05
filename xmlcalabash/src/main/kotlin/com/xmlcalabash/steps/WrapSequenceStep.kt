@@ -99,7 +99,7 @@ open class WrapSequenceStep(): AbstractAtomicStep() {
     }
 
     private fun adjacentValue(doc: XProcDocument): XdmValue {
-        val compiler = stepConfig.processor.newXPathCompiler()
+        val compiler = stepConfig.newXPathCompiler()
         compiler.baseURI = groupAdjacentContext!!.baseUri
         for ((prefix, uri) in groupAdjacentContext!!.inscopeNamespaces) {
             compiler.declareNamespace(prefix, uri.toString())
