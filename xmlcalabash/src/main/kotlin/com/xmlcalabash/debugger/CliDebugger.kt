@@ -4,6 +4,7 @@ import com.xmlcalabash.api.Monitor
 import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.exceptions.XProcException
+import com.xmlcalabash.graph.CompoundModel
 import com.xmlcalabash.graph.SubpipelineModel
 import com.xmlcalabash.namespace.NsCx
 import com.xmlcalabash.namespace.NsXmlns
@@ -48,6 +49,8 @@ class CliDebugger(val runtime: XProcRuntime): Monitor {
     lateinit var curFrame: StackFrame
     var stack: Stack<StackFrame> = Stack()
     var frameNumber = -1
+
+    val stepList = mutableListOf<String>()
 
     override fun startStep(step: AbstractStep) {
         if (parser == null) {
@@ -520,6 +523,7 @@ class CliDebugger(val runtime: XProcRuntime): Monitor {
                 print(if (start == key.id) "*" else " ")
                 println("${value.id.padEnd(maxlen)} ... ${value.model}")
             }
+
             return
         }
 
@@ -545,6 +549,42 @@ class CliDebugger(val runtime: XProcRuntime): Monitor {
 
         for (step in model.model.children) {
             println("${step.id.padEnd(maxlen)} ... ${step}")
+        }
+
+        val graph = runtime.graphList.first { it == model.model.graph }
+        showList("Steps: ", graph.models.filter { it !is SubpipelineModel }.map { it.id })
+    }
+
+    private fun showList(title: String, list: List<String>) {
+        val width = if (terminal.width > 12) {
+            terminal.width - 5 // leave a little space at the end of the line
+        } else {
+            60 // some random default that's not too wide for most terminals
+        }
+
+        val sb = StringBuilder()
+        var first = true
+        sb.append(title)
+
+        for (item in list) {
+            if (!first) {
+                sb.append(", ")
+            }
+
+            if (sb.length + item.length > width) {
+                println(sb)
+                sb.clear()
+                sb.append("".padEnd(title.length))
+                first = true
+            }
+
+            first = false
+
+            sb.append(item)
+        }
+
+        if (sb.toString().isNotBlank()) {
+            println(sb)
         }
     }
 
@@ -671,6 +711,15 @@ class CliDebugger(val runtime: XProcRuntime): Monitor {
         }
 
         val stepId = command["id"]!!
+
+        if (stepId !in stepList) {
+            println("Error: \"${stepId}\" does not identify a step")
+            val options = stepList.filter { it.startsWith(stepId.substring(0,1)) }
+            if (options.isNotEmpty()) {
+                showList("Similar: ", options)
+            }
+            return
+        }
 
         if ("clear" in command) {
             if (stepId in breakpoints) {
@@ -817,9 +866,14 @@ class CliDebugger(val runtime: XProcRuntime): Monitor {
         val invisibleXml = InvisibleXml()
         val stream = CliDebugger::class.java.getResourceAsStream("/com/xmlcalabash/debugger.ixml")
         parser = invisibleXml.getParser(stream, "https://xmlcalabash.com/grammar/debugger.ixml")
-    }
 
-    inner class DebuggerCommand(val command: String, val desc: String, val aliases: List<String>, val args: List<String>, val process: () -> Boolean) {
+        for (graph in runtime.graphList) {
+            for (model in graph.models) {
+                if (model !is SubpipelineModel) {
+                    stepList.add(model.id)
+                }
+            }
+        }
     }
 
     open inner class Breakpoint(val id: String, val expr: String) {
