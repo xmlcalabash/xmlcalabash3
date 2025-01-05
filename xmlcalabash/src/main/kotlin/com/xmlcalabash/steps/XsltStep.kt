@@ -475,7 +475,7 @@ open class XsltStep(): AbstractAtomicStep() {
     }
 
     private fun xslt10() {
-        stepConfig.exception(XProcError.xcVersionNotAvailable(version ?: "null"))
+        throw stepConfig.exception(XProcError.xcVersionNotAvailable(version ?: "null"))
     }
 
     override fun toString(): String = "p:xslt"

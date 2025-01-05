@@ -55,8 +55,12 @@ class ViewportInstruction(parent: XProcInstruction): CompoundLoopDeclaration(par
         super.elaborateInstructions()
 
         // The output port on viewport is always "result"
-        val output = children.filterIsInstance<OutputInstruction>().first()
-        output._port = "result"
+        val output = children.filterIsInstance<OutputInstruction>().firstOrNull()
+        if (output == null) {
+            throw stepConfig.exception(XProcError.xsNoOutputConnection("result"))
+        } else {
+            output._port = "result"
+        }
     }
 
     private class DummyProcessor: ProcessMatchingNodes {
