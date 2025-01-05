@@ -1,5 +1,6 @@
 package com.xmlcalabash.debugger
 
+import com.xmlcalabash.api.Monitor
 import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.exceptions.XProcException
@@ -7,7 +8,6 @@ import com.xmlcalabash.graph.SubpipelineModel
 import com.xmlcalabash.namespace.NsCx
 import com.xmlcalabash.namespace.NsXmlns
 import com.xmlcalabash.runtime.LazyValue
-import com.xmlcalabash.api.Monitor
 import com.xmlcalabash.runtime.XProcRuntime
 import com.xmlcalabash.runtime.steps.*
 import com.xmlcalabash.steps.AbstractAtomicStep
@@ -300,7 +300,29 @@ class CliDebugger(val runtime: XProcRuntime): Monitor {
 
     private fun doEval(command: Map<String,String>) {
         val value = evalExpression(command["expr"]!!)
-        println(value)
+        prettyPrint(value)
+    }
+
+    private fun prettyPrint(value: XdmValue) {
+        if (value !is XdmMap && value !is XdmArray) {
+            println(value)
+            return
+        }
+
+        try {
+            val var_a = QName("a")
+            val stepConfig = curFrame.step.stepConfig
+            val compiler = stepConfig.newXPathCompiler()
+            compiler.declareVariable(var_a)
+            val options = "map{'method':'json','indent':true(),'escape-solidus':false()}"
+            val exec = compiler.compile("serialize(\$a, ${options})")
+            val selector = exec.load()
+            selector.setVariable(var_a, value)
+            val value = selector.evaluate()
+            println(value)
+        } catch (ex: Exception) {
+            println(ex.message ?: "Exception while formatting ${value}")
+        }
     }
 
     private fun doSet(command: Map<String,String>) {
@@ -380,6 +402,13 @@ class CliDebugger(val runtime: XProcRuntime): Monitor {
         val variables = combinedVariables()
 
         try {
+            val execContext = curFrame.step.stepConfig.environment.newExecutionContext(curFrame.step.stepConfig)
+            for ((port, list) in curFrame.inputs) {
+                for (doc in list) {
+                    execContext.addProperties(doc)
+                }
+            }
+
             val stepConfig = curFrame.step.stepConfig
             val compiler = stepConfig.newXPathCompiler()
             for ((prefix, uri) in inscopeNs) {
@@ -416,6 +445,8 @@ class CliDebugger(val runtime: XProcRuntime): Monitor {
                 return XdmAtomicValue(false)
             }
             return XdmEmptySequence.getInstance()
+        } finally {
+            curFrame.step.stepConfig.environment.releaseExecutionContext()
         }
     }
 
