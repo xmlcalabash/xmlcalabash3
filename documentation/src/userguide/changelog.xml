@@ -13,6 +13,42 @@ See the commits and pull requests on
 finer detail.</para>
 
 <revhistory>
+<revision xml:id="r300-alpha12">
+<revnumber>3.0.0-alpha12</revnumber>
+<date>2025-01-05</date>
+<revdescription>
+<itemizedlist>
+<listitem>
+<para>Fixed a bug where lazily evaluated expressions might have the wrong
+in-scope namespaces.</para>
+</listitem>
+<listitem>
+<para>Fixed a bug where the schema-awareness of expressions and the schema-validity
+of documents could get out of sync causing errors.</para>
+</listitem>
+<listitem>
+<para>Fixed a bug where a spurious option was passed to visualizers established
+by the configuration file.</para>
+</listitem>
+<listitem>
+<para>Added Graphviz output to the debug log if generating SVG fails.</para>
+</listitem>
+<listitem>
+<para>Allow the debugger breakpoint syntax to begin “break at” as well as “break on”.</para>
+</listitem>
+<listitem>
+<para>Fixed an issue where the debugger was unable to inspect the document properties of
+step inputs.</para>
+</listitem>
+<listitem>
+<para>Improved the debugger breakpoint command to check that the specified breakpoint is
+possible. The command will now reject attempts to set breakpoints that don’t refer to a valid
+step id. The model command has been extended to print all of the possible ids in a pipeline.</para>
+</listitem>
+</itemizedlist>
+</revdescription>
+</revision>
+
 <revision xml:id="r300-alpha11">
 <revnumber>3.0.0-alpha11</revnumber>
 <date>2025-01-05</date>
