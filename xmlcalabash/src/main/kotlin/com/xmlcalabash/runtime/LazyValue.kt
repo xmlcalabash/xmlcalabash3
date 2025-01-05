@@ -15,6 +15,11 @@ import net.sf.saxon.s9api.XdmValue
 class LazyValue private constructor(val context: DocumentContext, config: XProcStepConfiguration) {
     private var expression: XProcExpression? = null
     private var constant: XdmValue? = null
+    private val resolvedConfig = config.copy()
+
+    init {
+        resolvedConfig.putAllNamespaces(context.inscopeNamespaces)
+    }
 
     constructor(context: DocumentContext, expression: XProcExpression, config: XProcStepConfiguration): this(context, config) {
         this.expression = expression
@@ -28,7 +33,7 @@ class LazyValue private constructor(val context: DocumentContext, config: XProcS
         if (constant != null) {
             constant!!
         } else {
-            expression!!.evaluate(config)
+            expression!!.evaluate(resolvedConfig)
         }
     }
 }
