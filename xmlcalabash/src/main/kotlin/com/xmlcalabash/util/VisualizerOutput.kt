@@ -8,7 +8,9 @@ import com.xmlcalabash.namespace.NsDescription
 import net.sf.saxon.s9api.*
 import org.apache.logging.log4j.kotlin.logger
 import org.xml.sax.InputSource
+import java.io.BufferedReader
 import java.io.File
+import java.io.InputStreamReader
 import java.io.PrintStream
 import javax.xml.transform.sax.SAXSource
 
@@ -102,6 +104,19 @@ class VisualizerOutput {
             val process = rt.exec(args)
             process.waitFor()
             if (process.exitValue() != 0) {
+                val errorReader = BufferedReader(InputStreamReader(process.errorStream))
+                var line = errorReader.readLine()
+                while (line != null) {
+                    logger.debug("ERR: $line")
+                    line = errorReader.readLine()
+                }
+
+                val outputReader = BufferedReader(InputStreamReader(process.inputStream))
+                line = outputReader.readLine()
+                while (line != null) {
+                    logger.debug("OUT: $line")
+                    line = outputReader.readLine()
+                }
                 logger.warn { "Graph generation failed for $filename" }
             }
             tempFile.delete()
