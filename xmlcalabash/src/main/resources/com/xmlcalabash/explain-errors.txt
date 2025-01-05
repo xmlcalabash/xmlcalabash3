@@ -1423,6 +1423,12 @@ If cx:href appears on p:pipeinfo, it must point to a p:pipeinfo document. $1
 cxerr:XI0045/2
 If cx:href appears on p:pipeinfo, it must point to a p:pipeinfo document. Error: $1
 
+cxerr:XI0046
+XPath version not supported: “$1”
+
+cxerr:XI0047
+At most one document is allowed on the source port, found $1.
+
 cxerr:XI0200
 Invalid option value “$2” for $1.
 
@@ -1451,6 +1457,37 @@ cxerr:XI0215
 Duplicated name encountered when combining archives: “$1”
 When the cx:merge-duplicates policy is “error”, it is an error if multiple
 entries with the same name are encountered when merging archive files.
+
+cxerr:XI0300
+Negative line and column numbers are not allowed: $1=$2
+
+cxerr:XI0301
+Message elements must not be in the XVRL namespace: $1
+
+cxerr:XI0302
+Message attributes must not be in the XML or XVRL namespaces: $1
+
+cxerr:XI0303
+Attribute name is not allowed: $1
+
+cxerr:XI0304
+Invalid severity value: $1
+
+cxerr:XI0305
+Invalid message content: $1
+Only text, message elements and value-of are allowed.
+
+cxerr:XI0306
+Invalid value for the “valid” attribute: $1
+
+cxerr:XI0307
+Invalid value for the “worst” attribute: $1
+
+cxerr:XI0308
+No code specified for xvrl:detection element.
+
+cxerr:XI9997
+User aborted execution from the debugger.
 
 cxerr:XI9998
 This can’t happen: $1.
