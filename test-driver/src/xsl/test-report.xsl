@@ -111,7 +111,7 @@
   <p class="properties">
     <xsl:text>{property[@name="processor"]/@value/string()} </xsl:text>
     <xsl:text>version {property[@name="version"]/@value/string()} </xsl:text>
-    <xsl:text>(build {property[@name="gitHash"]/@value/string()}); </xsl:text>
+    <xsl:text>(build {property[@name="buildId"]/@value/string()}); </xsl:text>
     <xsl:text>Saxon </xsl:text>
     <xsl:text>version {property[@name="saxonVersion"]/@value/string()}; </xsl:text>
     <xsl:text>XProc </xsl:text>
