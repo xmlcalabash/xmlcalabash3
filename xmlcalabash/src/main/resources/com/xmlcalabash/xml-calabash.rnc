@@ -100,7 +100,7 @@ cc.mimetype =
     }
 
 cc.pagedMedia =
-    element cc:mimetype {
+    element cc:paged-media {
         attribute css-formatter { text }?,
         attribute xsl-formatter { text }?,
         attribute * { text },
