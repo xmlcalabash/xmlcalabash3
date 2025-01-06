@@ -148,10 +148,11 @@ class TestDriver(val testOptions: TestOptions, val exclusions: Map<String, Strin
             allSuites.add(unlicensedSuite)
         }
 
+        val suiteStart = System.nanoTime()
         for (suite in allSuites) {
             allTestCases.addAll(suite.tests)
             val repeat = 0
-            val suiteStart = System.nanoTime()
+
             for (test in suite.tests) {
                 test.singleTest = testOptions.stopOnFirstFailed || testsToRun.size == 1
                 for (rep in 0..repeat) {
@@ -171,7 +172,6 @@ class TestDriver(val testOptions: TestOptions, val exclusions: Map<String, Strin
                     }
                 }
             }
-            suiteElapsed = (System.nanoTime() - suiteStart) / 1e9
 
             for (test in suite.tests) {
                 val status = suite.testCases[test]!!
@@ -185,6 +185,7 @@ class TestDriver(val testOptions: TestOptions, val exclusions: Map<String, Strin
                 }
             }
         }
+        suiteElapsed = (System.nanoTime() - suiteStart) / 1e9
 
         val attempted = total - notrun
         val percent = "%.1f".format(100.0 * (1.0 * pass) / (1.0 * attempted))
