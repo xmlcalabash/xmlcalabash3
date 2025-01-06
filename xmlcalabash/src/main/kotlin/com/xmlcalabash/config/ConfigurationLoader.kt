@@ -133,7 +133,10 @@ class ConfigurationLoader private constructor(private val config: XmlCalabashCon
             }
         }
 
-        config.licensed = booleanAttribute(root.getAttributeValue(_licensed), "licensed")
+        if (root.getAttributeValue(_licensed) != null) {
+            config.licensed = booleanAttribute(root.getAttributeValue(_licensed), "licensed")
+        }
+
         config.verbosity = verbosityAttribute(root.getAttributeValue(_verbosity))
 
         for (child in root.axisIterator(Axis.CHILD)) {

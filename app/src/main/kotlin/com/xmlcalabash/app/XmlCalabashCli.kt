@@ -338,7 +338,11 @@ class XmlCalabashCli private constructor() {
             println("(build ${XmlCalabashBuildConfig.BUILD_ID}, ${dateFormatter.format(date)})")
             println("Running with Saxon ${proc.saxonEdition} version ${proc.saxonProductVersion}")
             if (edition != proc.saxonEdition) {
-                println("(You appear to have ${edition}; perhaps a license wasn't found?)")
+                if (xmlCalabash.xmlCalabashConfig.licensed) {
+                    println("(You appear to have ${edition}; perhaps a license wasn't found?)")
+                } else {
+                    println("(You appear to have ${edition} but the license is explicitly disabled.)")
+                }
             }
         }
     }
