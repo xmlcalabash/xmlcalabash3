@@ -36,6 +36,8 @@
                     select="if (@prefix) then @prefix else substring-before($name, '.')"/>
     <xsl:with-param name="format" tunnel="yes"
                     select="@format"/>
+    <xsl:with-param name="namespace" tunnel="yes"
+                    select="@ns"/>
   </xsl:apply-templates>
 </xsl:template>
 
@@ -43,6 +45,7 @@
   <xsl:param name="schema" as="element(rng:grammar)" tunnel="yes"/>
   <xsl:param name="prefix" as="xs:string" tunnel="yes"/>
   <xsl:param name="format" as="xs:string?" tunnel="yes"/>
+  <xsl:param name="namespace" as="xs:string?" tunnel="yes"/>
 
   <xsl:variable name="rngpat" select="."/>
   <xsl:variable name="class" select="()"/>
@@ -387,6 +390,8 @@
 <!-- ============================================================ -->
 
 <xsl:template match="ss:element-summary">
+  <xsl:param name="namespace" as="xs:string?" tunnel="yes"/>
+
   <p id="{if (@xml:id) then @xml:id else generate-id(.)}">
     <!-- this generates the prefix= attribute ...
     <xsl:sequence select="f:html-attributes(., generate-id(.))"/>
@@ -408,6 +413,13 @@
 	  <xsl:value-of select="if (contains(@name,':'))
 				then substring-after(@name,':')
 				else @name"/>
+          <xsl:if test="$namespace">
+            <xsl:text> xmlns:</xsl:text>
+            <xsl:value-of select="@prefix"/>
+            <xsl:text>="</xsl:text>
+            <xsl:value-of select="$namespace"/>
+            <xsl:text>"</xsl:text>
+          </xsl:if>
 	</xsl:when>
 	<xsl:when test=".//ss:model[@name='subpipeline']">
 	  <var>

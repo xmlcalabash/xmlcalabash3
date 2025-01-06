@@ -32,6 +32,7 @@ rng.pattern =
     element rng-pattern {
         attribute schema { text }?,
         attribute name { text },
+        attribute ns { text }?,
         attribute prefix { text }?,
         attribute format { "table" }?,
         empty
