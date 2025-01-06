@@ -50,6 +50,7 @@ class CommandLine private constructor(val args: Array<out String>) {
     private var _debugger = false
     private var _visualizer: Monitor? = null
     private var _verbosity: Verbosity? = null
+    private var _explainErrors = false
     private var _assertions = AssertionsLevel.IGNORE
     private var _help = false
     private var _trace: File? = null
@@ -92,6 +93,10 @@ class CommandLine private constructor(val args: Array<out String>) {
     /** How chatty shall we be? */
     val verbosity: Verbosity?
         get() = _verbosity
+
+    /** Shall we try to explain errors? */
+    val explainErrors: Boolean
+        get() = _explainErrors
 
     /** Did we select a visualizer? */
     val visualizer: Monitor?
@@ -183,6 +188,7 @@ class CommandLine private constructor(val args: Array<out String>) {
         ArgumentDescription("--licensed", listOf(), ArgumentType.BOOLEAN, "true") { it -> _licensed = it == "true" },
         ArgumentDescription("--debug", listOf("-D"), ArgumentType.BOOLEAN, "true") { it -> _debug = it == "true" },
         ArgumentDescription("--debugger", listOf(), ArgumentType.BOOLEAN, "true") { it -> _debugger = it == "true" },
+        ArgumentDescription("--explain", listOf(), ArgumentType.BOOLEAN, "true") { it -> _explainErrors = it == "true" },
         ArgumentDescription("--help", listOf(), ArgumentType.BOOLEAN, "true") { it -> _help = it == "true" },
         ArgumentDescription("--trace", listOf(), ArgumentType.FILE) { it -> _trace = File(it) },
         ArgumentDescription("--trace-documents", listOf("--trace-docs"), ArgumentType.DIRECTORY) { it -> _traceDocuments = File(it) },
