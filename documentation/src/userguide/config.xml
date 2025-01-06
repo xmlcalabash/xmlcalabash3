@@ -22,6 +22,7 @@ The conventional prefix for this namespace in the documentation is <code>cc:</co
 </para>
 
 <rng-pattern schema="../../build/xml-calabash.rng"
+             ns="https://xmlcalabash.com/ns/configuration"
              name="cc.xmlCalabash"/>
 
 <variablelist>
