@@ -195,12 +195,12 @@ class XmlCalabashCli private constructor() {
                 }
             }
 
-            if (commandLine.verbosity != null && commandLine.verbosity!! <= Verbosity.DEBUG) {
-                ex.printStackTrace()
-            }
             if (ex is XProcException) {
                 abort(errorExplanation, ex)
             } else {
+                if (commandLine.verbosity != null && commandLine.verbosity!! <= Verbosity.DEBUG) {
+                    ex.printStackTrace()
+                }
                 System.err.println(ex)
                 exitProcess(1)
             }
@@ -277,7 +277,7 @@ class XmlCalabashCli private constructor() {
 
         for (error in errors) {
             errorExplanation.message(error.error)
-            if (verbosity < Verbosity.INFO) {
+            if (commandLine.explainErrors) {
                 errorExplanation.explanation(error.error)
             }
         }

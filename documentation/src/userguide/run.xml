@@ -77,6 +77,7 @@ given, the <command>run</command> command is assumed.</para>
   <arg rep="norepeat" linkend="cli-step">--step:<replaceable>step-name</replaceable></arg>
   <sbr/>
   <arg rep="norepeat" linkend="cli-verbosity">--verbosity:<replaceable>verbosity</replaceable></arg>
+  <arg rep="norepeat" linkend="cli-explain">--explain</arg>
   <arg rep="norepeat" linkend="cli-visualizer">--visualizer:<replaceable>name</replaceable></arg>
   <sbr/>
   <arg rep="norepeat" linkend="cli-trace">--trace:<replaceable>output-file</replaceable></arg>
@@ -258,6 +259,15 @@ detail is printed about the progress of a running pipeline.</para>
 </variablelist>
 <para>Setting the verbosity also sets the logging level.
 </para>
+</listitem>
+</varlistentry>
+
+<varlistentry xml:id="cli-explain">
+  <term><option>--explain</option>, explain errors</term>
+<listitem>
+<para>Enables error explanations. If error explanations are enabled, when a
+pipeline fails, in addition to the error message, a short explanation of the
+cause will be provided.</para>
 </listitem>
 </varlistentry>
 
