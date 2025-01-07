@@ -30,6 +30,13 @@ move forward. Java 17 seems like a reasonable compromise between 11 (2018) and
 </listitem>
 <listitem>
 <para>Fixed
+<link xlink:href="https://github.com/xmlcalabash/xmlcalabash3/issues/131">issue #131</link>.
+Clarified documentation of the CSS and XSL formatters teps. Fixed broken links
+between the user guide and the reference.
+</para>
+</listitem>
+<listitem>
+<para>Fixed
 <link xlink:href="https://github.com/xmlcalabash/xmlcalabash3/issues/130">issue #130</link>.
 There was a typo in the Relax NG grammar for the configuration file that caused
 <code>cc:mimetype</code> to appear twice when the second occurrence should have
