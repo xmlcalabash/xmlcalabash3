@@ -248,6 +248,11 @@ class TryInstruction(parent: XProcInstruction): CompoundStepDeclaration(parent, 
         return group!!.atomicStep(type)
     }
 
+    override fun variable(name: QName): VariableInstruction {
+        group = group ?: tryGroup()
+        return group!!.variable(name)
+    }
+
     private fun tryGroup(): GroupInstruction {
         group = GroupInstruction(this)
         _children.add(group!!)
