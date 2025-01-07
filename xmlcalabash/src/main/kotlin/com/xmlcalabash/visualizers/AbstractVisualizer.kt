@@ -17,8 +17,8 @@ abstract class AbstractVisualizer(val options: Map<String,String>): Monitor {
     override fun startStep(step: AbstractStep) {
         var depth = 0
         synchronized(stacks) {
-            val stack = stacks[Thread.currentThread().threadId()] ?: Stack()
-            stacks[Thread.currentThread().threadId()] = stack
+            val stack = stacks[Thread.currentThread().id] ?: Stack()
+            stacks[Thread.currentThread().id] = stack
             stack.push(step)
             depth = stack.size
         }
@@ -28,7 +28,7 @@ abstract class AbstractVisualizer(val options: Map<String,String>): Monitor {
     override fun endStep(step: AbstractStep) {
         var depth = 0
         synchronized(stacks) {
-            val stack = stacks[Thread.currentThread().threadId()]!!
+            val stack = stacks[Thread.currentThread().id]!!
             depth = stack.size
             stack.pop()
         }
@@ -42,8 +42,8 @@ abstract class AbstractVisualizer(val options: Map<String,String>): Monitor {
     override fun sendDocument(from: Pair<AbstractStep, String>, to: Pair<Consumer, String>, document: XProcDocument): XProcDocument {
         var depth = 0
         synchronized(stacks) {
-            val stack = stacks[Thread.currentThread().threadId()] ?: Stack()
-            stacks[Thread.currentThread().threadId()] = stack
+            val stack = stacks[Thread.currentThread().id] ?: Stack()
+            stacks[Thread.currentThread().id] = stack
             for (step in stack) {
                 depth++
                 if (step === from.first) {
