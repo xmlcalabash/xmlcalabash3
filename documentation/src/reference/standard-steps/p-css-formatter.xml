@@ -69,19 +69,55 @@ implementations can be provided by third parties. Several <link
 linkend="p-xsl-formatter">XSL formatters</link> are also
 supported.</para>
 
-<refsection>
+<para>Processors can be selected in the configuration file
+with the <tag>cc:paged-media</tag> element as described in the
+<link xlink:href="../../userguide/current/configuration.html#cc.paged-media">User Guide</link>.</para>
+
+<informaltable>
+<tgroup cols="2">
+<colspec colwidth="4*"/>
+<colspec colwidth="1*"/>
+<thead>
+<row><entry>Configuration URI</entry><entry>Processor selected</entry></row>
+</thead>
+<tbody>
+<row>
+  <entry><uri>https://xmlcalabash.com/paged-media/css-formatter/antenna-house</uri></entry>
+  <entry><link linkend="css-antennahouse">Antenna House</link></entry>
+</row>
+<row>
+  <entry><uri>https://xmlcalabash.com/paged-media/css-formatter/prince</uri></entry>
+  <entry><link linkend="css-princexml">Prince XML</link></entry>
+</row>
+<row>
+  <entry><uri>https://xmlcalabash.com/paged-media/css-formatter/weasyprint</uri></entry>
+  <entry><link linkend="css-weasyprint">Weasyprint</link></entry>
+</row>
+</tbody>
+</tgroup>
+</informaltable>
+
+<important>
+<para>You must also obtain and install the relevant processor, configure it on your
+system, and satisfy its licensing requirements. XML Calabash doesn’t ship with the
+processors themselves.</para>
+</important>
+
+<refsection xml:id="css-antennahouse">
 <title>Antenna House</title>
 
 <para>In order to use the Antenna House formatter, you must install and configure
 <link xlink:href="https://www.antennahouse.com/formatter-v7">Antenna House Formatter</link>.</para>
 
 <para>You can configure the formatter with
-<link xlink:href="https://docs.xmlcalabash.com/userguide/configuration.html#cc.paged-media">a
+<link xlink:href="../../userguide/current/configuration.html#cc.paged-media">a
 configuration property</link> or via the <option>parameters</option> option.
 The following configuration options are supported:</para>
 
 <informaltable>
 <tgroup cols="2">
+<colspec colwidth="2*"/>
+<colspec colwidth="1*"/>
 <thead>
 <row><entry>Property name</entry><entry>Type</entry></row>
 </thead>
@@ -109,6 +145,8 @@ The following configuration options are supported:</para>
 
 <informaltable>
 <tgroup cols="2">
+<colspec colwidth="2*"/>
+<colspec colwidth="1*"/>
 <thead>
 <row><entry>Content type</entry><entry>AH output format</entry></row>
 </thead>
@@ -125,19 +163,21 @@ The following configuration options are supported:</para>
 
 </refsection>
 
-<refsection>
+<refsection xml:id="css-princexml">
 <title>PrinceXML</title>
 
 <para>In order to use the PrinceXML formatter, you must install and configure
 <link xlink:href="https://www.princexml.com/">Prince</link>.</para>
 
 <para>You can configure the formatter with
-<link xlink:href="https://docs.xmlcalabash.com/userguide/configuration.html#cc.paged-media">a
+<link xlink:href="../../userguide/current/configuration.html#cc.paged-media">a
 configuration property</link> or via the <option>parameters</option> option.
 The following configuration options are supported:</para>
 
 <informaltable>
 <tgroup cols="2">
+<colspec colwidth="2*"/>
+<colspec colwidth="1*"/>
 <thead>
 <row><entry>Property name</entry><entry>Type</entry></row>
 </thead>
@@ -191,19 +231,21 @@ Each script will be added to the processor.</para>
 
 </refsection>
 
-<refsection>
+<refsection xml:id="css-weasyprint">
 <title>Weasyprint</title>
 
 <para>In order to use the Weasyprint formatter, you must install and configure
 <link xlink:href="https://weasyprint.org/">WeasyPrint</link>.</para>
 
 <para>You can configure the formatter with
-<link xlink:href="https://docs.xmlcalabash.com/userguide/configuration.html#cc.paged-media">a
+<link xlink:href="../../userguide/current/configuration.html#cc.paged-media">a
 configuration property</link> or via the <option>parameters</option> option.
 The following configuration options are supported:</para>
 
 <informaltable>
 <tgroup cols="2">
+<colspec colwidth="2*"/>
+<colspec colwidth="1*"/>
 <thead>
 <row><entry>Property name</entry><entry>Type</entry></row>
 </thead>

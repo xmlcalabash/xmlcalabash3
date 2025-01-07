@@ -13,6 +13,70 @@ See the commits and pull requests on
 finer detail.</para>
 
 <revhistory>
+<revision xml:id="r300-alpha13">
+<revnumber>3.0.0-alpha13</revnumber>
+<date>2025-01-07</date>
+<revdescription>
+<itemizedlist>
+<listitem>
+<para>Fixed
+<link xlink:href="https://github.com/xmlcalabash/xmlcalabash3/issues/134">issue #134</link>.
+The last release (perhaps the last couple of releases) have accidentally
+required Java 21. This release moves the requirement back to Java 17. Java 17 is
+a “long-term-support” release from 2021 so it’s not exactly cutting edge.
+Supporting Java 8, the historical favorite, is now deprecated, so it’s time to
+move forward. Java 17 seems like a reasonable compromise between 11 (2018) and
+21 (2023).</para>
+</listitem>
+<listitem>
+<para>Fixed
+<link xlink:href="https://github.com/xmlcalabash/xmlcalabash3/issues/131">issue #131</link>.
+Clarified documentation of the CSS and XSL formatters teps. Fixed broken links
+between the user guide and the reference.
+</para>
+</listitem>
+<listitem>
+<para>Fixed
+<link xlink:href="https://github.com/xmlcalabash/xmlcalabash3/issues/130">issue #130</link>.
+There was a typo in the Relax NG grammar for the configuration file that caused
+<code>cc:mimetype</code> to appear twice when the second occurrence should have
+been <code>cc:paged-media</code>.
+</para>
+</listitem>
+<listitem>
+<para>Fixed
+<link xlink:href="https://github.com/xmlcalabash/xmlcalabash3/issues/125">issue #125</link>.
+Corrected the explanation of verbosity in the <option>--help</option> output.
+</para>
+</listitem>
+<listitem>
+<para>Fixed
+<link xlink:href="https://github.com/xmlcalabash/xmlcalabash3/issues/124">issue #124</link>.
+Updated the way the configuration is parsed so that the absence of the
+<tag class="attribute">licensed</tag> attribute on the configuration isn’t interpreted as
+a request for a “non-licensed” configuration.
+</para>
+</listitem>
+<listitem>
+<para>Fixed
+<link xlink:href="https://github.com/xmlcalabash/xmlcalabash3/issues/123">issue #123</link>.
+Added a namespace declaration to the tableaux for the <tag>cc:xml-calabash</tag> configuration
+element.
+</para>
+</listitem>
+<listitem>
+<para>Fixed
+<link xlink:href="https://github.com/xmlcalabash/xmlcalabash3/issues/122">issue #122</link>.
+Added and documented the <option>--explain</option> command line argument.
+(Previously, the explanation behavior was tied to the verbosity level which
+doesn’t really make sense. I also fixed a bug where the stack trace was printed
+twice if debug verbosity was used.)
+</para>
+</listitem>
+</itemizedlist>
+</revdescription>
+</revision>
+
 <revision xml:id="r300-alpha12">
 <revnumber>3.0.0-alpha12</revnumber>
 <date>2025-01-05</date>

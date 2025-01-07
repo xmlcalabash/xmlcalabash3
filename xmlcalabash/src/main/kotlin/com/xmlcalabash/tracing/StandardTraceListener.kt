@@ -26,22 +26,22 @@ open class StandardTraceListener: TraceListener {
     protected val threads = mutableSetOf<Long>()
 
     override fun startStep(step: AbstractStep) {
-        threads.add(Thread.currentThread().threadId())
-        val detail = StepStartDetail(step, Thread.currentThread().threadId(), System.currentTimeMillis())
+        threads.add(Thread.currentThread().id)
+        val detail = StepStartDetail(step, Thread.currentThread().id, System.currentTimeMillis())
         synchronized(_trace) {
             _trace.add(detail)
         }
     }
 
     override fun endStep(step: AbstractStep) {
-        val detail = StepStopDetail(step, Thread.currentThread().threadId())
+        val detail = StepStopDetail(step, Thread.currentThread().id)
         synchronized(_trace) {
             _trace.add(detail)
         }
     }
 
     override fun abortStep(step: AbstractStep, ex: Exception) {
-        val detail = StepStopDetail(step, Thread.currentThread().threadId(), ex)
+        val detail = StepStopDetail(step, Thread.currentThread().id, ex)
         synchronized(_trace) {
             _trace.add(detail)
         }
@@ -51,7 +51,7 @@ open class StandardTraceListener: TraceListener {
         synchronized(_trace) {
             val fromDetail = Pair(from.first.id, from.second)
             val toDetail = Pair(to.first.id, to.second)
-            _trace.add(DocumentDetail(Thread.currentThread().threadId(), fromDetail, toDetail, document))
+            _trace.add(DocumentDetail(Thread.currentThread().id, fromDetail, toDetail, document))
         }
         return document
     }
