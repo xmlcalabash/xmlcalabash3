@@ -239,6 +239,12 @@ val reference = tasks.register<SaxonXsltTask>("reference") {
           "chunk-output-base-uri" to "${layout.buildDirectory.get()}/reference/current/"
       )
   )
+
+  doLast {
+    val stream = PrintStream(layout.buildDirectory.file("reference/details.json").get().asFile)
+    stream.println("{\"version\": \"${refVersion}\", \"pubdate\": \"${xmlbuild.buildTime.get()}\"}")
+    stream.close()
+  }
 }
 
 tasks.register("copyReferenceJarResources") {
@@ -357,6 +363,12 @@ val userguide = tasks.register<SaxonXsltTask>("userguide") {
           "chunk-output-base-uri" to "${layout.buildDirectory.get()}/userguide/current/"
       )
   )
+
+  doLast {
+    val stream = PrintStream(layout.buildDirectory.file("userguide/details.json").get().asFile)
+    stream.println("{\"version\": \"${guideVersion}\", \"pubdate\": \"${xmlbuild.buildTime.get()}\"}")
+    stream.close()
+  }
 }
 
 tasks.register<SaxonXsltTask>("changelog_html") {
