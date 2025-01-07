@@ -226,29 +226,23 @@ val reference = tasks.register<SaxonXsltTask>("reference") {
   inputs.file(layout.buildDirectory.file("version.json"))
   inputs.dir(layout.projectDirectory.dir("src/xsl"))
   inputs.file(layout.buildDirectory.file("archive-manifest.rng"))
-  outputs.files(fileTree("dir" to layout.buildDirectory.dir("reference"),
+  outputs.files(fileTree("dir" to layout.buildDirectory.dir("reference/current"),
                          "include" to "*.html"))
 
   input(validateReference.get().outputs.getFiles().getSingleFile())
   stylesheet(layout.projectDirectory.file("src/xsl/reference.xsl"))
-  output(layout.buildDirectory.file("reference/index.html").get())
+  output(layout.buildDirectory.file("reference/current/index.html").get())
   args(listOf("-init:org.docbook.xsltng.extensions.Register"))
   parameters (
       mapOf(
-          "mediaobject-input-base-uri" to "file:${layout.buildDirectory.get()}/reference/",
-          "chunk-output-base-uri" to "${layout.buildDirectory.get()}/reference/"
+          "mediaobject-input-base-uri" to "file:${layout.buildDirectory.get()}/reference/current/",
+          "chunk-output-base-uri" to "${layout.buildDirectory.get()}/reference/current/"
       )
   )
-
-  doLast {
-    val stream = PrintStream(layout.buildDirectory.file("reference/details.json").get().asFile)
-    stream.println("{\"version\": \"${refVersion}\", \"pubdate\": \"${xmlbuild.buildTime.get()}\"}")
-    stream.close()
-  }
 }
 
 tasks.register("copyReferenceJarResources") {
-  outputs.dir(project.layout.buildDirectory.dir("reference"))
+  outputs.dir(project.layout.buildDirectory.dir("reference/current"))
 
   val dbjar = configurations.named("transform").get().getFiles()
       .filter { jar -> jar.toString().contains("docbook-xslTNG") }
@@ -261,7 +255,7 @@ tasks.register("copyReferenceJarResources") {
 
     copy {
       from(zipTree(dbjar.toString()))
-      into(layout.buildDirectory.dir("reference"))
+      into(layout.buildDirectory.dir("reference/current"))
       include("org/docbook/xsltng/resources/**")
       eachFile {
         relativePath = RelativePath(true, *relativePath.segments.drop(4).toTypedArray())
@@ -275,7 +269,7 @@ tasks.register("copyReferenceJarResources") {
 }
 
 tasks.register<Copy>("copyReferenceStaticResources") {
-  into(layout.buildDirectory.dir("reference"))
+  into(layout.buildDirectory.dir("reference/current"))
   from(layout.projectDirectory.dir("src/resources")) {
     exclude("img/*.psd")
   }
@@ -350,25 +344,19 @@ val userguide = tasks.register<SaxonXsltTask>("userguide") {
 
   inputs.file(layout.buildDirectory.file("version.json"))
   inputs.dir(layout.projectDirectory.dir("src/xsl"))
-  outputs.files(fileTree("dir" to layout.buildDirectory.dir("userguide"),
+  outputs.files(fileTree("dir" to layout.buildDirectory.dir("userguide/current"),
                          "include" to "*.html"))
 
   input(validateUserguide.get().outputs.getFiles().getSingleFile())
   stylesheet(layout.projectDirectory.file("src/xsl/userguide.xsl"))
-  output(layout.buildDirectory.file("userguide/index.html").get())
+  output(layout.buildDirectory.file("userguide/current/index.html").get())
   args(listOf("-init:org.docbook.xsltng.extensions.Register"))
   parameters (
       mapOf(
-          "mediaobject-input-base-uri" to "file:${layout.buildDirectory.get()}/userguide/",
-          "chunk-output-base-uri" to "${layout.buildDirectory.get()}/userguide/"
+          "mediaobject-input-base-uri" to "file:${layout.buildDirectory.get()}/userguide/current/",
+          "chunk-output-base-uri" to "${layout.buildDirectory.get()}/userguide/current/"
       )
   )
-
-  doLast {
-    val stream = PrintStream(layout.buildDirectory.file("userguide/details.json").get().asFile)
-    stream.println("{\"version\": \"${guideVersion}\", \"pubdate\": \"${xmlbuild.buildTime.get()}\"}")
-    stream.close()
-  }
 }
 
 tasks.register<SaxonXsltTask>("changelog_html") {
@@ -407,7 +395,7 @@ tasks.register("release") {
 }
 
 tasks.register("copyUserguideJarResources") {
-  outputs.dir(project.layout.buildDirectory.dir("userguide"))
+  outputs.dir(project.layout.buildDirectory.dir("userguide/current"))
 
   val dbjar = configurations.named("transform").get().getFiles()
       .filter { jar -> jar.toString().contains("docbook-xslTNG") }
@@ -420,7 +408,7 @@ tasks.register("copyUserguideJarResources") {
 
     copy {
       from(zipTree(dbjar.toString()))
-      into(layout.buildDirectory.dir("userguide"))
+      into(layout.buildDirectory.dir("userguide/current"))
       include("org/docbook/xsltng/resources/**")
       eachFile {
         relativePath = RelativePath(true, *relativePath.segments.drop(4).toTypedArray())
@@ -429,12 +417,12 @@ tasks.register("copyUserguideJarResources") {
   }
 
   doLast {
-    delete(project.layout.buildDirectory.dir("userguide/org"))
+    delete(project.layout.buildDirectory.dir("userguide/current/org"))
   }
 }
 
 tasks.register<Copy>("copyUserguideStaticResources") {
-  into(layout.buildDirectory.dir("userguide"))
+  into(layout.buildDirectory.dir("userguide/current"))
   from(layout.projectDirectory.dir("src/resources")) {
     exclude("img/*.psd")
   }

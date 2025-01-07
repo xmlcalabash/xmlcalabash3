@@ -190,17 +190,23 @@ attribute should be the URI that identifies the processor that you want to selec
 <para>When searching for a CSS or XSL FO formatter, XML Calabash will try to instantiate
 the processors in the order you specify them, selecting the first one that’s successfully
 instantiated. To indicate that <emphasis>any</emphasis> acceptable processor can be used,
-add a configuration element for the generic CSS processor,
-<literal>https://xmlcalabash.com/paged-media/css-formatter</literal> or XSL FO processor,
-<literal>https://xmlcalabash.com/paged-media/xsl-formatter</literal>.</para>
+specify
+<literal>https://xmlcalabash.com/paged-media/css-formatter</literal> for a CSS
+processor, or
+<literal>https://xmlcalabash.com/paged-media/xsl-formatter</literal>
+for an XSL FO processor.
+</para>
 
 <para>Any additional attribute/value pairs on the element are passed to the
 processor as configuration data. The accepted attributes and their valid values
 vary depending on the processor. No configuration properties are supported for the generic
 processors.</para>
 
-<para>See <tag xlink:href="https://docs.xmlcalabash.com/reference/p-css-formatter.html">p:css-formatter</tag>
-in the <citetitle xlink:href="https://docs.xmlcalabash.com/reference">Reference Guide</citetitle>
+<para>See
+<tag xlink:href="../../reference/current/p-css-formatter.html">p:css-formatter</tag>
+and
+<tag xlink:href="../../reference/current/p-xsl-formatter.html">p:xsl-formatter</tag>
+in the <citetitle xlink:href="../../reference/current">Reference Guide</citetitle>
 for details.</para>
 
 </section>

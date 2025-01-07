@@ -58,19 +58,51 @@ a service provider interface so that additional implementations can be provided 
 third parties. Several <link linkend="p-css-formatter">CSS formatters</link> are
 also supported.</para>
 
-<refsection>
+<para>Processors can be selected in the configuration file
+with the <tag>cc:paged-media</tag> element as described in the
+<link xlink:href="../../userguide/current/configuration.html#cc.paged-media">User Guide</link>.</para>
+
+<informaltable>
+<tgroup cols="2">
+<colspec colwidth="4*"/>
+<colspec colwidth="1*"/>
+<thead>
+<row><entry>Configuration URI</entry><entry>Processor selected</entry></row>
+</thead>
+<tbody>
+<row>
+  <entry><uri>https://xmlcalabash.com/paged-media/xsl-formatter/antenna-house</uri></entry>
+  <entry><link linkend="xsl-antennahouse">Antenna House</link></entry>
+</row>
+<row>
+  <entry><uri>https://xmlcalabash.com/paged-media/xsl-formatter/fop</uri></entry>
+  <entry><link linkend="xsl-apachefop">Apache FOP</link></entry>
+</row>
+</tbody>
+</tgroup>
+</informaltable>
+
+<important>
+<para>You must also obtain and install the relevant processor, configure it on your
+system, and satisfy its licensing requirements. The XML Calabash distribution includes
+only the open source Apache FOP processor.</para>
+</important>
+
+<refsection xml:id="xsl-antennahouse">
 <title>Antenna House</title>
 
 <para>In order to use the Antenna House formatter, you must install and configure
 <link xlink:href="https://www.antennahouse.com/formatter-v7">Antenna House Formatter</link>.</para>
 
 <para>You can configure the formatter with
-<link xlink:href="https://docs.xmlcalabash.com/userguide/configuration.html#cc.paged-media">a
+<link xlink:href="../../userguide/current/configuration.html#cc.paged-media">a
 configuration property</link> or via the <option>parameters</option> option.
 The following configuration options are supported:</para>
 
 <informaltable>
 <tgroup cols="2">
+<colspec colwidth="2*"/>
+<colspec colwidth="1*"/>
 <thead>
 <row><entry>Property name</entry><entry>Type</entry></row>
 </thead>
@@ -98,6 +130,8 @@ The following configuration options are supported:</para>
 
 <informaltable>
 <tgroup cols="2">
+<colspec colwidth="2*"/>
+<colspec colwidth="1*"/>
 <thead>
 <row><entry>Content type</entry><entry>AH output format</entry></row>
 </thead>
@@ -114,16 +148,18 @@ The following configuration options are supported:</para>
 
 </refsection>
 
-<refsection>
+<refsection xml:id="xsl-apachefop">
 <title>Apache FOP</title>
 
 <para>You can configure the formatter with
-<link xlink:href="https://docs.xmlcalabash.com/userguide/configuration.html#cc.paged-media">a
+<link xlink:href="../../userguide/current/configuration.html#cc.paged-media">a
 configuration property</link> or via the <option>parameters</option> option.
 The following configuration options are supported:</para>
 
 <informaltable>
 <tgroup cols="2">
+<colspec colwidth="2*"/>
+<colspec colwidth="1*"/>
 <thead>
 <row><entry>Property name</entry><entry>Type</entry></row>
 </thead>
