@@ -13,7 +13,7 @@ repositories {
 }
 
 val saxonVersion = project.properties["saxonVersion"].toString()
-val requirePass = project.findProperty("requirePass")?.toString() ?: "false"
+val requirePass = project.findProperty("requirePass")?.toString() ?: "true"
 
 val transformation by configurations.creating
 val testrunner by configurations.creating {
