@@ -17,6 +17,7 @@ Where options are:
   --debug               To enable additional debugging output
   --verbosity:value     To set the general level of verbosity to "value"
                         Values are: trace, debug, info, warn, error
+  --explain             Provide more detailed explanatory messages for errors
 
 The pipeline identified by the URI "pipeline.xpl" will be run.
 
