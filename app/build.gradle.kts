@@ -163,10 +163,14 @@ tasks.jar {
 
 val copyScripts = tasks.register<Copy>("copyScripts") {
   inputs.file(layout.projectDirectory.file("src/main/scripts/xmlcalabash.sh"))
+  inputs.file(layout.projectDirectory.file("src/main/scripts/xmlcalabash.ps1"))
   outputs.file(layout.buildDirectory.file("stage/xmlcalabash.sh"))
+  outputs.file(layout.buildDirectory.file("stage/xmlcalabash.ps1"))
+
   from(layout.projectDirectory.dir("src/main/scripts"))
   into(layout.buildDirectory.dir("stage"))
   include("xmlcalabash.sh")
+  include("xmlcalabash.ps1")
   filter { line ->
     line.replace("@@VERSION@@", xmlbuild.version.get())
   }
