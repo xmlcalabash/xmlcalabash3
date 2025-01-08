@@ -159,6 +159,9 @@ abstract class VariableBindingContainer(
         }
 
         for (name in select!!.variableRefs) {
+            if (name !in stepConfig.inscopeVariables) {
+                throw stepConfig.exception(XProcError.xsXPathStaticError("Expression refers to \$${name} which is not in scope."))
+            }
             val variable = stepConfig.inscopeVariables[name]!!
             if (variable.withOutput != null) {
                 val wi = exprStep!!.withInput()
