@@ -7,10 +7,19 @@ import net.sf.saxon.s9api.QName
 class TryInstruction(parent: XProcInstruction): CompoundStepDeclaration(parent, parent.stepConfig.copy(), NsP.`try`) {
     override val contentModel = emptyMap<QName,Char>() // Not used by this instruction!
     private var group: GroupInstruction? = null
+    // I'm unpersuaded that this complexity is still required...
     private var provisionalPrimaryOutput: PortBindingContainer? = null
 
     override fun findDeclarations(stepTypes: Map<QName, DeclareStepInstruction>, stepNames: Map<String, StepDeclaration>, bindings: Map<QName, VariableBindingContainer>) {
         findAlternativeStepDeclarations(stepTypes, stepNames, bindings)
+    }
+
+    override fun findOutputDeclarations(): OutputInstruction? {
+        val output = super.findOutputDeclarations()
+        if (output?.primary == true) {
+            provisionalPrimaryOutput = output
+        }
+        return output
     }
 
     override fun findDefaultReadablePort(drp: PortBindingContainer?) {
