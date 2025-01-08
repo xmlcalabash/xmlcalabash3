@@ -41,6 +41,12 @@ dependencies {
   transformation ("net.sf.saxon:Saxon-HE:${saxonVersion}")
 }
 
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+}
+
 val xmlbuild = the<XmlCalabashBuildExtension>()
 
 if (project.findProperty("testPattern") == null) {

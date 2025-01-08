@@ -24,6 +24,12 @@ dependencies {
   xmlcalabash(project(":xmlcalabash"))
 }
 
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+}
+
 val xmlbuild = the<XmlCalabashBuildExtension>()
 
 val isGraalVM = Files.exists(Paths.get("${System.getProperty("java.home")}/lib/graalvm"))
