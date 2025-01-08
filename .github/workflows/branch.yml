@@ -106,7 +106,7 @@ jobs:
 
       - name: Build the test report
         run: |
-          ./gradlew -PrequirePass=false test-driver:test-report
+          ./gradlew test-driver:test-report
 
       - name: Build the documentation
         run: |
@@ -182,8 +182,8 @@ jobs:
           rm -rf docs/docs/userguide/$GUIDEVER
           mkdir -p docs/docs/userguide/current
           mkdir -p docs/docs/userguide/$GUIDEVER
-          rsync -ar documentation/build/userguide/ docs/docs/userguide/current/
-          rsync -ar documentation/build/userguide/ docs/docs/userguide/$GUIDEVER/
+          rsync -ar documentation/build/userguide/current/ docs/docs/userguide/current/
+          rsync -ar documentation/build/userguide/current/ docs/docs/userguide/$GUIDEVER/
 
       - name: Update reference
         run: |
@@ -192,8 +192,8 @@ jobs:
           rm -rf docs/docs/reference/$REFVER
           mkdir -p docs/docs/reference/current
           mkdir -p docs/docs/reference/$REFVER
-          rsync -ar documentation/build/reference/ docs/docs/reference/current/
-          rsync -ar documentation/build/reference/ docs/docs/reference/$REFVER/
+          rsync -ar documentation/build/reference/current/ docs/docs/reference/current/
+          rsync -ar documentation/build/reference/current/ docs/docs/reference/$REFVER/
 
       - name: Update api docs
         run: |
