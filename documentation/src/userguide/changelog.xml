@@ -13,6 +13,57 @@ See the commits and pull requests on
 finer detail.</para>
 
 <revhistory>
+<revision xml:id="r300-alpha14">
+<revnumber>3.0.0-alpha14</revnumber>
+<date>2025-01-08</date>
+<revdescription>
+<itemizedlist>
+<listitem>
+<para>Reworked Java versions again. This release attempts to move the
+requirement back to Java 11, except for the “polyglot” steps which require Java 17
+or later.</para>
+</listitem>
+<listitem>
+<para>Fixed
+<link xlink:href="https://github.com/xmlcalabash/xmlcalabash3/issues/144">issue #144</link>.
+The XPath parser is still a little ad hoc. Also improved the error message if this
+situation arises again.
+</para>
+</listitem>
+<listitem>
+<para>Fixed
+<link xlink:href="https://github.com/xmlcalabash/xmlcalabash3/issues/142">issue #142</link>.
+The default readable port of a step that followed a <tag>p:try</tag>, that itself
+had an implicit output port, was not computed correctly.
+</para>
+</listitem>
+<listitem>
+<para>Fixed
+<link xlink:href="https://github.com/xmlcalabash/xmlcalabash3/issues/141">issue #141</link>.
+Make sure the continuous integration build scripts use the correct documentation paths.
+(In order to make relative links between the guides easier to test, I moved the build
+directories.)
+</para>
+</listitem>
+<listitem>
+<para>Fixed
+<link xlink:href="https://github.com/xmlcalabash/xmlcalabash3/issues/144">issue #140</link>.
+Removed the accidental restriction that <tag>p:variable</tag> was
+not allowed in <tag>p:try</tag>.
+</para>
+</listitem>
+<listitem>
+<para>Fixed
+<link xlink:href="https://github.com/xmlcalabash/xmlcalabash3/issues/138">issue #138</link>.
+The Windows shell doesn’t support UTF-8 by default (checks calendar, yep, it
+<emphasis>is</emphasis> 2025) so back to plain old US ASCII for all messages by
+default. 🎵sad trombone🎶
+</para>
+</listitem>
+</itemizedlist>
+</revdescription>
+</revision>
+
 <revision xml:id="r300-alpha13">
 <revnumber>3.0.0-alpha13</revnumber>
 <date>2025-01-07</date>
