@@ -15,6 +15,7 @@ Where options are:
   --graph:file          To write the graph description to "file"
   --description:file    To write the pipeline description to "file"
   --debug               To enable additional debugging output
+  --pipe                To enable piped input on stdin and output on stdout
   --verbosity:value     To set the general level of verbosity to "value"
                         Values are: trace, debug, info, warn, error
   --explain             Provide more detailed explanatory messages for errors

@@ -167,6 +167,11 @@ val copyScripts = tasks.register<Copy>("copyScripts") {
   outputs.file(layout.buildDirectory.file("stage/xmlcalabash.sh"))
   outputs.file(layout.buildDirectory.file("stage/xmlcalabash.ps1"))
 
+  doFirst {
+    // Never let different versions get co-staged
+    delete(layout.buildDirectory.dir("stage"))
+  }
+
   from(layout.projectDirectory.dir("src/main/scripts"))
   into(layout.buildDirectory.dir("stage"))
   include("xmlcalabash.sh")

@@ -13,6 +13,8 @@ import com.xmlcalabash.exceptions.DefaultErrorExplanation
 import com.xmlcalabash.exceptions.ErrorExplanation
 import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.exceptions.XProcException
+import com.xmlcalabash.io.DocumentLoader
+import com.xmlcalabash.namespace.Ns.port
 import com.xmlcalabash.namespace.NsErr
 import com.xmlcalabash.namespace.NsFn
 import com.xmlcalabash.namespace.NsXs
@@ -57,6 +59,8 @@ class XmlCalabashCli private constructor() {
     lateinit private var commandLine: CommandLine
     lateinit private var config: XmlCalabashConfiguration
     lateinit private var stepConfig: InstructionConfiguration
+    private var sawStdin = false
+    private var sawStdout = false
 
     private fun run(args: Array<out String>) {
         var errorExplanation: ErrorExplanation = DefaultErrorExplanation()
@@ -83,7 +87,18 @@ class XmlCalabashCli private constructor() {
         try {
             config = loadConfiguration(commandLine.config)
 
-            config.verbosity = commandLine.verbosity ?: config.verbosity
+            if (config.verbosity != commandLine.verbosity) {
+                config.verbosity = commandLine.verbosity ?: config.verbosity
+                when (config.verbosity) {
+                    Verbosity.TRACE -> MDC.put("LOG_LEVEL", "TRACE")
+                    Verbosity.DEBUG -> MDC.put("LOG_LEVEL", "DEBUG")
+                    Verbosity.INFO -> MDC.put("LOG_LEVEL", "INFO")
+                    Verbosity.WARN -> MDC.put("LOG_LEVEL", "WARN")
+                    Verbosity.ERROR -> MDC.put("LOG_LEVEL", "ERROR")
+                }
+            }
+
+            config.pipe = commandLine.pipe ?: config.pipe
             config.trace = commandLine.trace
             config.traceDocuments = commandLine.traceDocuments
             config.assertions = commandLine.assertions
@@ -150,6 +165,38 @@ class XmlCalabashCli private constructor() {
             val runtime = declstep.runtime()
             val pipeline = runtime.executable()
 
+            var explicitStdin: String? = null
+            for ((port, uris) in commandLine.inputs) {
+                if (CommandLine.STDIO_URI in uris) {
+                    explicitStdin = port
+                }
+            }
+
+            var implicitStdin: String? = null
+            if (explicitStdin == null && xmlCalabash.xmlCalabashConfig.pipe) {
+                for ((port, input) in pipeline.inputManifold) {
+                    if (input.primary && port !in commandLine.inputs) {
+                        implicitStdin = port
+                    }
+                }
+            }
+
+            var explicitStdout: String? = null
+            for ((port, output) in commandLine.outputs) {
+                if (output.pattern == CommandLine.STDIO_NAME) {
+                    explicitStdout = port
+                }
+            }
+
+            var implicitStdout: String? = null
+            if (xmlCalabash.xmlCalabashConfig.pipe) {
+                for ((port, output) in pipeline.outputManifold) {
+                    if (output.primary) {
+                        implicitStdout = port
+                    }
+                }
+            }
+
             if (commandLine.pipelineDescription != null || commandLine.pipelineGraph != null) {
                 val description = runtime.description()
                 if (commandLine.pipelineDescription != null) {
@@ -165,18 +212,45 @@ class XmlCalabashCli private constructor() {
                 }
             }
 
+            if (implicitStdin != null) {
+                commandLine._inputs[implicitStdin] = mutableListOf(CommandLine.STDIO_URI)
+            }
+
+            val stdin = if (explicitStdin != null || implicitStdin != null) {
+                val port = explicitStdin ?: implicitStdin!!
+                val ctype = inputManifold[port]?.contentTypes?.firstOrNull() ?: MediaType.XML
+                val loader = DocumentLoader(pipeline.config, CommandLine.STDIO_URI)
+                loader.load(CommandLine.STDIO_URI, System.`in`, ctype)
+            } else {
+                null
+            }
+
             inputManifold.putAll(pipeline.inputManifold)
             for ((port, uris) in commandLine.inputs) {
                 for (uri in uris) {
-                    val doc = stepConfig.environment.documentManager.load(uri, pipeline.config)
-                    pipeline.input(port, doc)
+                    if (uri == CommandLine.STDIO_URI) {
+                        pipeline.input(port, stdin!!)
+                    } else {
+                        val doc = stepConfig.environment.documentManager.load(uri, pipeline.config)
+                        pipeline.input(port, doc)
+                    }
                 }
             }
 
+            if (implicitStdout != null && implicitStdout !in commandLine.outputs) {
+                commandLine._outputs[implicitStdout] = OutputFilename(CommandLine.STDIO_NAME)
+            }
+
             outputManifold.putAll(pipeline.outputManifold)
-            for ((port, _) in commandLine.outputs) {
+            for ((port, output) in commandLine.outputs) {
                 if (!outputManifold.containsKey(port)) {
                     throw XProcError.xiNoSuchOutputPort(port).exception()
+                }
+                if (output.pattern == "-") {
+                    if (sawStdout) {
+                        throw XProcError.xiAtMostOneStdout().exception()
+                    }
+                    sawStdout = true
                 }
             }
 
@@ -185,12 +259,11 @@ class XmlCalabashCli private constructor() {
                 pipeline.option(name, XProcDocument.ofValue(value, stepConfig, MediaType.ANY, DocumentProperties()))
             }
 
-            pipeline.receiver = FileOutputReceiver(xmlCalabash, xmlCalabash.saxonConfig.processor, commandLine.outputs)
-
+            pipeline.receiver = FileOutputReceiver(xmlCalabash, xmlCalabash.saxonConfig.processor, commandLine.outputs, explicitStdout ?: implicitStdout)
             pipeline.run()
         } catch (ex: Exception) {
             if (ex is XProcException) {
-                if (ex.error.code == NsErr.xi(9997)) { // FIXME: stupid literal constant
+                if (ex.error.code == NsErr.xi(XProcError.DEBUGGER_ABORT)) {
                     exitProcess(1)
                 }
             }

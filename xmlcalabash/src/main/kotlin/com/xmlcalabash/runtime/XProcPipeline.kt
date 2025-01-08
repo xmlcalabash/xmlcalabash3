@@ -19,7 +19,7 @@ import com.xmlcalabash.visualizers.Silent
 import net.sf.saxon.s9api.QName
 import java.io.FileOutputStream
 
-class XProcPipeline internal constructor(private val runtime: XProcRuntime, pipeline: CompoundStepModel, val config: XProcStepConfiguration) {
+class XProcPipeline internal constructor(runtime: XProcRuntime, pipeline: CompoundStepModel, val config: XProcStepConfiguration) {
     val inputManifold = pipeline.inputs
     val outputManifold = pipeline.outputs
     val optionManifold = pipeline.options
