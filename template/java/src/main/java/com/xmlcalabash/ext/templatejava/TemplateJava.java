@@ -31,18 +31,22 @@ public class TemplateJava extends AbstractAtomicStep {
             } else {
                 MediaClassification ctc = doc.getContentClassification();
                 switch (ctc) {
-                    case XML, XHTML, HTML -> {
+                    case XML:
+                    case XHTML:
+                    case HTML:
                         markup++;
-                    }
-                    case JSON, YAML, TOML -> {
+                        break;
+                    case JSON:
+                    case YAML:
+                    case TOML:
                         json++;
-                    }
-                    case TEXT -> {
+                        break;
+                    case TEXT:
                         text++;
-                    }
-                    case BINARY -> {
+                        break;
+                    case BINARY:
                         unknown++;
-                    }
+                        break;
                 }
             }
         }
