@@ -287,4 +287,15 @@ class XPathParserTest {
         Assertions.assertNull(details.error)
     }
 
+    @Test
+    fun forExpr() {
+        val parser = XPathExpressionParser(stepConfig)
+        val details = parser.parse("(for \$d in (1,2,3,3) return \$d) => distinct-values()")
+        Assertions.assertFalse(details.contextRef)
+        Assertions.assertFalse(details.alwaysDynamic)
+        Assertions.assertTrue(details.variableRefs.isEmpty())
+        Assertions.assertTrue(details.functionRefs.isEmpty())
+        Assertions.assertNull(details.error)
+    }
+
 }

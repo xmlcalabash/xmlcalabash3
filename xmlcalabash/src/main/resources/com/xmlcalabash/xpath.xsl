@@ -65,6 +65,9 @@
   <xsl:variable name="inlinefunc"
                 select="ancestor::nt:InlineFunctionExpr/nt:ParamList/nt:Param/t:QName[@name = $qname/@name]"/>
 
+  <xsl:variable name="for"
+                select="ancestor::nt:ForExpr/nt:SimpleForBinding/nt:VarName/t:QName[@name = $qname/@name]"/>
+
   <xsl:choose>
     <xsl:when test="some $v in $quantified satisfies $v/@name = $qname/@name and $v &lt;&lt; $qname">
       <!-- there's a local declaration -->
@@ -73,6 +76,9 @@
       <!-- there's a local declaration -->
     </xsl:when>
     <xsl:when test="some $v in $inlinefunc satisfies $v/@name = $qname/@name and $v &lt;&lt; $qname">
+      <!-- there's a local declaration -->
+    </xsl:when>
+    <xsl:when test="some $v in $for satisfies $v/@name = $qname/@name and $v &lt;&lt; $qname">
       <!-- there's a local declaration -->
     </xsl:when>
     <xsl:otherwise>
