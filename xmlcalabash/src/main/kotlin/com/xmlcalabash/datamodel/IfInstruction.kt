@@ -6,7 +6,7 @@ import net.sf.saxon.s9api.QName
 
 class IfInstruction(parent: XProcInstruction): ChooseInstruction(parent, NsP.`if`) {
     override val contentModel = mapOf(NsP.withInput to '1', NsP.`when` to '*', NsP.otherwise to '?')
-    private val whenInstruction = WhenInstruction(this)
+    internal val whenInstruction = WhenInstruction(this)
 
     init {
         _children.add(whenInstruction)
