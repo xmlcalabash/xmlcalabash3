@@ -1,4 +1,4 @@
-Usage: [command] [options] pipeline.xpl optname=value…
+Usage: [command] [options] pipeline.xpl optname=value...
 
 Where command is:
 
@@ -9,18 +9,19 @@ Where command is:
 Where options are:
 
   --help                To display this summary
-  --input:port=uri      To read input port “port” from “uri”
-  --output:port=file    To write output port “port” to “file”
-  --configuration:file  To read configuration from “file”
-  --graph:file          To write the graph description to “file”
-  --description:file    To write the pipeline description to “file”
+  --input:port=uri      To read input port "port" from "uri"
+  --output:port=file    To write output port "port" to "file"
+  --configuration:file  To read configuration from "file"
+  --graph:file          To write the graph description to "file"
+  --description:file    To write the pipeline description to "file"
   --debug               To enable additional debugging output
-  --verbosity:value     To set the general level of verbosity to “value”
+  --verbosity:value     To set the general level of verbosity to "value"
                         Values are: trace, debug, info, warn, error
+  --explain             Provide more detailed explanatory messages for errors
 
-The pipeline identified by the URI “pipeline.xpl” will be run.
+The pipeline identified by the URI "pipeline.xpl" will be run.
 
-Options can be assigned values by repeating “option=value”. The
+Options can be assigned values by repeating "option=value". The
 specified value will be used to initialize the option. (The value
 is created as an untyped atomic value.)
 
