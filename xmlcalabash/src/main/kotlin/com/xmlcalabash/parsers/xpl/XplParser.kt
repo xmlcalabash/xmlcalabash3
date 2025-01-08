@@ -634,6 +634,7 @@ class XplParser internal constructor(val builder: PipelineBuilder) {
         val ifInstr = step.ifInstruction()
         val stepConfig = ifInstr.stepConfig
         stepConfig.updateWith(node.node)
+        ifInstr.whenInstruction.stepConfig.updateWith(node.node)
 
         val attributeMapping = mapOf<QName, (String) -> Unit>(
             Ns.name to { value -> ifInstr.name = value },
