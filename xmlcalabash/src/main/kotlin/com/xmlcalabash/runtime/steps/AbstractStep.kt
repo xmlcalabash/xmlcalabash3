@@ -187,8 +187,8 @@ abstract class AbstractStep(val stepConfig: XProcStepConfiguration, step: StepMo
         when (binding) {
             is InlineInstruction -> {
                 val inlineReceiver = BufferingReceiver()
-                val source = RuntimePort("source", false, true, emptyList())
-                val result = RuntimePort("result", false, false, emptyList())
+                val source = RuntimePort("source", false, true, true, emptyList())
+                val result = RuntimePort("result", false, true, false, emptyList())
                 val inlineStepParams = InlineStepParameters("!inline", binding.stepConfig.location,
                     mapOf("source" to source), mapOf("result" to result), emptyMap(), binding.valueTemplateFilter, binding.contentType, binding.encoding)
                 val inlineStep = InlineStep(inlineStepParams)

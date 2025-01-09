@@ -1486,6 +1486,13 @@ Invalid value for the "worst" attribute: $1
 cxerr:XI0308
 No code specified for xvrl:detection element.
 
+cxerr:XI0320
+At most one output port can be bound to standard output.
+When piped output is enabled, at most one output port can be directed to
+standard output. If no explicit binding is provided, and the pipeline has a
+primary output port, the output of the primary output port will go to standard
+output.
+
 cxerr:XI9997
 User aborted execution from the debugger.
 

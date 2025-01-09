@@ -47,6 +47,7 @@ class ConfigurationLoader private constructor(private val config: XmlCalabashCon
         private val _mpt = QName("mpt")
         private val _password = QName("password")
         private val _port = QName("port")
+        private val _piped_io = QName("piped-io")
         private val _saxonConfiguration = QName("saxon-configuration")
         private val _scheme = QName("scheme")
         private val _trimWhitespace = QName("trim-whitespace")
@@ -54,7 +55,6 @@ class ConfigurationLoader private constructor(private val config: XmlCalabashCon
         private val _username = QName("username")
         private val _value = QName("value")
         private val _verbosity = QName("verbosity")
-        private val _visualizer = QName("visualizer")
         private val _xslFormatter = QName("xsl-formatter")
         private val _bufferSize = QName("buffer-size")
 
@@ -137,6 +137,7 @@ class ConfigurationLoader private constructor(private val config: XmlCalabashCon
             config.licensed = booleanAttribute(root.getAttributeValue(_licensed), "licensed")
         }
 
+        config.pipe = booleanAttribute(root.getAttributeValue(_piped_io), "piped-io")
         config.verbosity = verbosityAttribute(root.getAttributeValue(_verbosity))
 
         for (child in root.axisIterator(Axis.CHILD)) {

@@ -56,6 +56,21 @@ The command-line setting takes precedence.</para>
 linkend="cli-verbosity">on the command line</link>. The command-line setting takes precedence.</para>
 </listitem>
 </varlistentry>
+<varlistentry><term><tag class="attribute">piped-io</tag></term>
+<listitem>
+<para>If <tag class="attribute">piped-io</tag> is <literal>true</literal>, XML Calabash
+will behave like a Unix pipeline. If there is no binding for the primary input port, it will
+read it from standard input. If there is no binding for the primary output port, it will
+write it to standard output. Irrespective of this setting, an <emphasis>explicit</emphasis>
+binding to standard input is possible with the <option linkend="cli-input">--input</option>
+option
+and an explicit binding to standard output is possible with
+<option linkend="cli-output">--output</option> option.</para>
+<para>When standard input is read, it will be parsed as the (first) content type listed
+on the primary input port. It will be parsed as XML if the primary input port doesn’t
+specify any content types.</para>
+</listitem>
+</varlistentry>
 </variablelist>
 
 <para>For simplicity, the content model of <tag>cc:xml-calabash</tag> allows every element to

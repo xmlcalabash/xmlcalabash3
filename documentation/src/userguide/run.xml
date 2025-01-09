@@ -65,6 +65,7 @@ given, the <command>run</command> command is assumed.</para>
   <arg choice="opt">run</arg>
   <arg rep="norepeat" linkend="cli-configuration">--configuration:<replaceable>configuration-file</replaceable></arg>
   <sbr/>
+  <arg rep="norepeat" linkend="cli-pipe">--pipe</arg>
   <arg rep="repeat" linkend="cli-input">--input:<replaceable>port</replaceable>=<replaceable>uri</replaceable></arg>
   <arg rep="repeat" linkend="cli-output">--output:<replaceable>port</replaceable>=<replaceable>filespec</replaceable></arg>
   <sbr/>
@@ -114,6 +115,17 @@ directory and then in your home directory.</para>
 </listitem>
 </varlistentry>
 
+<varlistentry xml:id="cli-pipe">
+  <term><option>--pipe<replaceable>:boolean</replaceable></option>, sets piped mode</term>
+<listitem>
+<para>If piped mode is enabled, XML Calabash
+will behave like a Unix pipeline. If there is no binding for the primary input port, it will
+read it from standard input. If there is no binding for the primary output port, it will
+write it to standard output. If not specified, the default setting comes from
+the <option linkend="cc.xml-calabash">piped-io</option> configuration setting.</para>
+</listitem>
+</varlistentry>
+
 <varlistentry xml:id="cli-input">
   <term><option>--input:<replaceable>port</replaceable>=<replaceable>uri</replaceable></option>, identifies
   an input</term>
@@ -123,6 +135,10 @@ the input port named <replaceable>port</replaceable>. If the <option>--input</op
 is repeated for the same <replaceable>port</replaceable>, the resources become a sequence of
 documents on that port, in the order specified.</para>
 <para>The pipeline must have an input port named <replaceable>port</replaceable>.</para>
+<para>If the input <replaceable>uri</replaceable> provided is “<literal>-</literal>”, input
+will be read from standard input. When standard input is read, it will be parsed
+as the (first) content type listed on the named input port. It will be parsed
+as XML if the input port doesn’t specify any content types.</para>
 </listitem>
 </varlistentry>
 
@@ -145,9 +161,20 @@ in the <replaceable>filespec</replaceable>.</para>
 of the outputs on the port will be concatenated to the same file.
 You may not repeat the <option>--output</option> option for the same port.</para>
 <para>The pipeline must have an output port named <replaceable>port</replaceable>.</para>
-<para>If the pipeline writes to a port for which there is no corresponding
-<option>--output</option> option, the results will be written to “standard output”, usually
-the terminal window. When writing to the terminal:</para>
+
+<para>If the output <replaceable>filespec</replaceable> provided is “<literal>-</literal>”, output
+from that port will be written to standard output. At most one output port may be explicitly bound
+to standard output.</para>
+
+<para>In piped mode, at most one port will write to standard output. If there is no explicit
+binding to standard output, the primary output port writes to standard output. If the primary
+output port is bound to some other output, no output will be sent to standard output.</para>
+
+<para>If piped mode is not enabled, and no port is explicitly bound to standard
+output, the pipeline will write the output from all otherwise unbound output
+ports to standard output. If standard output appears to be going to a terminal
+window:</para>
+
 <itemizedlist>
 <listitem>
 <para>A header is printed before the output identifying the port name, document
@@ -168,7 +195,7 @@ one document is output).</para>
 <para>The method for determining whether output is going to a terminal or being
 redirected isn’t terribly sophisticated and may be wrong in some
 circumstances. It’s safer to use <option>--output</option> to write to a file
-if you want to save the output.</para>
+if you want to save the output or enable piped mode.</para>
 </listitem>
 </varlistentry>
 

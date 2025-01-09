@@ -10,6 +10,8 @@ import java.util.*
 
 class XProcError private constructor(val code: QName, val variant: Int, val location: Location, val inputLocation: Location, vararg val details: Any) {
     companion object {
+        val DEBUGGER_ABORT = 9997
+
         private fun staticError(code: Int): QName {
             return NsErr.xs(code)
         }
@@ -397,7 +399,9 @@ class XProcError private constructor(val code: QName, val variant: Int, val loca
         fun xiXvrlInvalidWorst(worst: String) = internal(307, worst)
         fun xiXvrlNullCode() = internal(308)
 
-        fun xiAbortDebugger() = internal(9997)
+        fun xiAtMostOneStdout() = internal(320)
+
+        fun xiAbortDebugger() = internal(DEBUGGER_ABORT) // 9997
         fun xiImpossible(message: String) = internal(9998, message)
         fun xiNotImplemented(message: String) = internal(9999, message)
     }

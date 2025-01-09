@@ -28,6 +28,9 @@ class CommandLine private constructor(val args: Array<out String>) {
      * Provides a static method to create a [CommandLine] from a list of arguments.
      */
     companion object {
+        val STDIO_NAME = "-"
+        val STDIO_URI = URI("https://xmlcalabash.com/ns/stdio")
+
         /**
          * Parse a set of arguments.
          *
@@ -45,6 +48,7 @@ class CommandLine private constructor(val args: Array<out String>) {
     private var _config: File? = null
     private var _pipelineGraph: String? = null
     private var _licensed = true
+    private var _pipe: Boolean? = null
     private var _pipelineDescription: String? = null
     private var _debug: Boolean? = null
     private var _debugger = false
@@ -56,8 +60,8 @@ class CommandLine private constructor(val args: Array<out String>) {
     private var _trace: File? = null
     private var _traceDocuments: File? = null
     private var _errors = mutableListOf<XProcException>()
-    private var _inputs = mutableMapOf<String, MutableList<URI>>()
-    private var _outputs = mutableMapOf<String, OutputFilename>()
+    internal var _inputs = mutableMapOf<String, MutableList<URI>>()
+    internal var _outputs = mutableMapOf<String, OutputFilename>()
     private var _options = mutableMapOf<String,List<String>>()
     private var _namespaces = mutableMapOf<String, NamespaceUri>()
     private var _initializers = mutableListOf<String>()
@@ -81,6 +85,10 @@ class CommandLine private constructor(val args: Array<out String>) {
      */
     val licensed: Boolean
         get() = _licensed
+
+    /** Enable Unix-style pipeline processing of stdin and stdout? */
+    val pipe: Boolean?
+        get() = _pipe
 
     /** The pipeline description output filename. */
     val pipelineDescription: String?
@@ -186,6 +194,7 @@ class CommandLine private constructor(val args: Array<out String>) {
         ArgumentDescription("--graph", listOf(), ArgumentType.FILE) { it -> _pipelineGraph = it },
         ArgumentDescription("--description", listOf(), ArgumentType.FILE) { it -> _pipelineDescription = it },
         ArgumentDescription("--licensed", listOf(), ArgumentType.BOOLEAN, "true") { it -> _licensed = it == "true" },
+        ArgumentDescription("--pipe", listOf(), ArgumentType.BOOLEAN, "true") { it -> _pipe = it == "true" },
         ArgumentDescription("--debug", listOf("-D"), ArgumentType.BOOLEAN, "true") { it -> _debug = it == "true" },
         ArgumentDescription("--debugger", listOf(), ArgumentType.BOOLEAN, "true") { it -> _debugger = it == "true" },
         ArgumentDescription("--explain", listOf(), ArgumentType.BOOLEAN, "true") { it -> _explainErrors = it == "true" },
@@ -341,7 +350,11 @@ class CommandLine private constructor(val args: Array<out String>) {
         if (!_inputs.containsKey(port)) {
             _inputs.put(port, mutableListOf())
         }
-        _inputs[port]!!.add(UriUtils.cwdAsUri().resolve(href))
+        if (href == STDIO_NAME) {
+            _inputs[port]!!.add(STDIO_URI)
+        } else {
+            _inputs[port]!!.add(UriUtils.cwdAsUri().resolve(href))
+        }
     }
 
     private fun parseOutput(arg: String) {

@@ -35,16 +35,23 @@ open class DefaultOutputReceiver(val xmlCalabash: XmlCalabash, val processor: Pr
     }
 
     fun write(port: String, document: XProcDocument, position: Int, total: Int) {
+        val contentType = document.contentType
+        val writer = DocumentWriter(document, System.out)
+
+        if (xmlCalabash.xmlCalabashConfig.pipe) {
+            writer.write()
+            return
+        }
+
         val header = if (total > 0) {
             "=== ${port} :: ${position}/${total} :: ${document.baseURI} ===".padEnd(72, '=')
         } else {
             "=== ${port} :: ${position} :: ${document.baseURI} ===".padEnd(72, '=')
         }
+
         if (writingToTerminal) {
             println(header)
         }
-        val contentType = document.contentType
-        val writer = DocumentWriter(document, System.out)
 
         if (writingToTerminal && contentType != null) {
             if (contentType.classification() in listOf(MediaClassification.XML, MediaClassification.XHTML, MediaClassification.HTML)) {
