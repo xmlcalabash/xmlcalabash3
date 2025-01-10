@@ -201,6 +201,12 @@ open class SaxonTreeBuilder(val processor: Processor) {
         if (!newName.namespaceUri.isEmpty) {
             nsmap = nsmap.put(newName.prefix, newName.namespaceUri)
         }
+        for (index in 0 until attrs.size()) {
+            val attr = attrs.itemAt(index)
+            if (attr.nodeName.namespaceUri != NamespaceUri.NULL) {
+                nsmap = nsmap.put(attr.nodeName.prefix, attr.nodeName.namespaceUri)
+            }
+        }
         addStartElement(newName, attrs, nsmap)
     }
 
