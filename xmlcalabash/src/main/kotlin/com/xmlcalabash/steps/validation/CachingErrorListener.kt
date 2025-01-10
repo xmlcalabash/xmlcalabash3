@@ -142,10 +142,11 @@ class CachingErrorListener(val stepConfig: XProcStepConfiguration, val errors: E
 
     override fun reportInvalidity(failure: Invalidity?) {
         invalidityHandler?.reportInvalidity(failure)
-
         if (failure == null) {
             return
         }
+
+        errors.xsdValidationError(failure)
 
         stepConfig.info { "${failure.message}" }
     }

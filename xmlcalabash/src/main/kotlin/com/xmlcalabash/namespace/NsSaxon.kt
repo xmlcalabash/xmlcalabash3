@@ -13,9 +13,9 @@ object NsSaxon {
     val terminationMessage = QName(namespace, "s:termination-message")
     val alreadyReported = QName(namespace, "s:already-reported")
     val publicIdentifier = QName(namespace, "s:public-identifier")
-    val systemIdentifier = QName(namespace, "s:system-identifier")
     val constraintName = QName(namespace, "s:constraint-name")
     val constraintClause = QName(namespace, "s:constraint-clause")
+    val constraintReference = QName(namespace, "s:constraint-reference")
     val schemaType = QName(namespace, "s:schema-type")
     val schemaPart = QName(namespace, "s:schema-part")
 }
