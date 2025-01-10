@@ -12,33 +12,33 @@ It is a dynamic error if an XPath expression makes reference to the context
 item, size, or position when the context item is undefined.
 
 XD0006
-A sequence of inputs is not allowed on the "$1" port.
+A sequence of inputs is not allowed on the “$1” port.
 If sequence is not specified, or has the value false, then it is a dynamic error
 unless exactly one document appears on the declared port.
 
 XD0007
-A sequence of outputs is not allowed on the "$1" port.
+A sequence of outputs is not allowed on the “$1” port.
 If sequence is not specified on p:output, or has the value false, then it is a
 dynamic error if the step does not produce exactly one document on the declared
 port.
 
 XD0010
-Invalid match expression for p:viewport: "$1".
+Invalid match expression for p:viewport: “$1”.
 It is a dynamic error if the match expression on p:viewport matches an attribute
 or a namespace node.
 
 XD0011/1
-URI does not exist: "$1".
+URI does not exist: “$1”.
 It is a dynamic error if the resource referenced by the href option does not
 exist, cannot be accessed or is not a file.
 
 XD0011/2
-Cannot read URI "$1": "$2".
+Cannot read URI “$1”: “$2”.
 It is a dynamic error if the resource referenced by the href option does not
 exist, cannot be accessed or is not a file.
 
 XD0015/1
-Invalid QName: "$1".
+Invalid QName: “$1”.
 It is a dynamic error if a QName is specified and it cannot be resolved with the
 in-scope namespace declarations.
 
@@ -48,7 +48,7 @@ It is a dynamic error if a QName is specified and it cannot be resolved with the
 in-scope namespace declarations.
 
 XD0016/1
-Select expression must not select attributes: "$1".
+Select expression must not select attributes: “$1”.
 It is a dynamic error if the select expression on a p:input or p:with-input
 returns attribute nodes or function items.
 
@@ -58,7 +58,7 @@ It is a dynamic error if the select expression on a p:input or p:with-input
 returns attribute nodes or function items.
 
 XD0019
-Invalid value: "$1" (not one of $2)
+Invalid value: “$1” (not one of $2)
 It is a dynamic error if an option declares a list of acceptable values and an
 attempt is made to specify a value that is not a member of that list.
 
@@ -73,46 +73,46 @@ It is a dynamic error if a processor that does not support PSVI annotations
 attempts to invoke a step which asserts that they are required.
 
 XD0023
-DTD validation failed: "$1".
+DTD validation failed: “$1”.
 It is a dynamic error if a DTD validation is performed and either the document
 is not valid or no DTD is found.
 
 XD0028
-Value "$1" does not satisfy type "$2".
+Value “$1” does not satisfy type “$2”.
 It is a dynamic error if any attribute value does not satisfy the type required
 for that attribute.
 
 XD0030
-Step failed: "$1".
+Step failed: “$1”.
 It is a dynamic error if a step is unable or incapable of performing its function.
 
 XD0036/1
-Value "$1" cannot be converted to type "$2".
+Value “$1” cannot be converted to type “$2”.
 It is a dynamic error if the supplied or defaulted value of a variable or option
 cannot be converted to the required type.
 
 XD0036/2
-Value "$1" cannot be converted to type "$2".
+Value “$1” cannot be converted to type “$2”.
 It is a dynamic error if the supplied or defaulted value of a variable or option
 cannot be converted to the required type.
 
 XD0036/3
-Value "$2" for "$1" cannot be converted to "$3".
+Value “$2” for “$1” cannot be converted to “$3”.
 It is a dynamic error if the supplied or defaulted value of a variable or option
 cannot be converted to the required type.
 
 XD0036/4
-Invalid type: "$1".
+Invalid type: “$1”.
 It is a dynamic error if the supplied or defaulted value of a variable or option
 cannot be converted to the required type.
 
 XD0038
-Input with content type "$2" not allowed on port "$1".
+Input with content type “$2” not allowed on port “$1”.
 It is a dynamic error if an input document arrives on a port and it does not
 match the allowed content types.
 
 XD0039
-Unsupported character set: "$1".
+Unsupported character set: “$1”.
 It is a dynamic error if the encoding attribute is present and content type
 value specifies a character set that is not supported by the implementation.
 
@@ -122,7 +122,7 @@ It is a dynamic error if the body is not correctly encoded per the value of the
 encoding attribute.
 
 XD0042
-Bad output content type "$2" on port "$1".
+Bad output content type “$2” on port “$1”.
 It is a dynamic error if a document arrives on an output port whose content type
 is not accepted by the output port specification.
 
@@ -131,26 +131,26 @@ Document is not well formed.
 It is a dynamic error if the text value is not a well-formed XML document
 
 XD0051
-Invalid result from attribute value template: "$1".
+Invalid result from attribute value template: “$1”.
 It is a dynamic error if the XPath expression in an AVT or TVT evaluates to
 something to other than a sequence containing atomic values or nodes.
 
 XD0053
-Step timeout; ran for more than "$1" seconds.
+Step timeout; ran for more than “$1” seconds.
 It is a dynamic error if a step runs longer than its timeout value.
 
 XD0054
-Encoding "$1" specified on HTML or XML document.
+Encoding “$1” specified on HTML or XML document.
 It is a dynamic error if an encoding is specified and the content type is an XML
 media type or an HTML media type.
 
 XD0055
-Character set "$1" specified, but no encoding provided.
+Character set “$1” specified, but no encoding provided.
 It is a dynamic error if the content type value specifies a character set and
 the encoding attribute is absent.
 
 XD0056
-Markup is forbidden if an encoding ("$1") is provided.
+Markup is forbidden if an encoding (“$1”) is provided.
 It is a dynamic error if an encoding is specified and the content of the
 p:inline contains any XML markup.
 
@@ -161,43 +161,43 @@ unless the parameter liberal is true and the processor chooses to accept the
 deviation.
 
 XD0058
-JSON object contains a duplicate "$1" key.
+JSON object contains a duplicate “$1” key.
 It is a dynamic error if the parameter duplicates is reject and the text
 document contains a JSON object with duplicate keys.
 
 XD0059
-Invalid parameter: "$1".
+Invalid parameter: “$1”.
 It is a dynamic error if the parameter map contains an entry whose key is
 defined in the specification of fn:parse-json and whose value is not valid for
 that key, or if it contains an entry with the key fallback when the parameter
 escape with true() is also present.
 
 XD0060
-Unsupported document character set "$1".
+Unsupported document character set “$1”.
 It is a dynamic error if the text document can not be converted into the XPath
 data model
 
 XD0061
-The key "$1" cannot be converted to a QName.
+The key “$1” cannot be converted to a QName.
 It is a dynamic error if $key is of type xs:string and cannot be converted into
 a xs:QName.
 
 XD0062
-Content types don’t match: document is "$1", content-type property is "$2".
+Content types don’t match: document is “$1”, content-type property is “$2”.
 It is a dynamic error if the content-type is specified and the
-document-properties has a "content-type" that is not the same.
+document-properties has a “content-type” that is not the same.
 
 XD0063
-Markup not allowed if content type "$1" specified.
+Markup not allowed if content type “$1” specified.
 It is a dynamic error if the p:inline contains any XML markup and has a content
 type that is not an XML media type or an HTML media type.
 
 XD0064/1
-Invalid URI: "$1".
+Invalid URI: “$1”.
 It is a dynamic error if the base URI is not both absolute and valid according to RFC 3986.
 
 XD0064/2
-A relative URI is invalid: "$1".
+A relative URI is invalid: “$1”.
 It is a dynamic error if the base URI is not both absolute and valid according to RFC 3986.
 
 XD0065
@@ -206,7 +206,7 @@ It is a dynamic error to refer to the context item, size, or position in a value
 template if a sequence of documents appears on the default readable port.
 
 XD0069
-There is no namespace binding for "$2" in "$1".
+There is no namespace binding for “$2” in “$1”.
 It is a dynamic error if the string value contains a colon and the designated
 prefix is not declared in the in-scope namespaces.
 
@@ -216,7 +216,7 @@ It is a dynamic error if a value is assigned to the serialization document
 property that cannot be converted into map(xs:QName, item()*).
 
 XD0070/2
-Invalid serialization value: "$1".
+Invalid serialization value: “$1”.
 It is a dynamic error if a value is assigned to the serialization document
 property that cannot be converted into map(xs:QName, item()*).
 
@@ -231,71 +231,71 @@ It is a dynamic error if the document returned by applying the subpipeline to
 the matched node is not an XML document, an HTML document, or a text document.
 
 XD0074
-Cannot infer base URI from current working directory: "$1".
+Cannot infer base URI from current working directory: “$1”.
 It is a dynamic error if no absolute base URI is supplied to p:urify and none
 can be inferred from the current working directory.
 
 XD0075
-Path ("$1") and base URI ("$2") must be on the same drive.
+Path (“$1”) and base URI (“$2”) must be on the same drive.
 It is a dynamic error if the relative path has a drive letter and the base URI
 has a different drive letter or does not have a drive letter.
 
 XD0076
-Path ("$1") and base URI ("$2") mix drive letters and authorities.
+Path (“$1”) and base URI (“$2”) mix drive letters and authorities.
 It is a dynamic error if the relative path has a drive letter and the base URI
 has an authority or if the relative path has an authority and the base URI has a
 drive letter.
 
 XD0077
-Path ("$1") and base URI ("$2") have different schemes.
+Path (“$1”) and base URI (“$2”) have different schemes.
 It is a dynamic error if the relative path has a scheme that differs from the
 scheme of the base URI.
 
 XD0079
-Invalid content type: "$1".
+Invalid content type: “$1”.
 It is a dynamic error if a supplied content-type is not a valid media type of
-the form "type/subtype+ext" or "type/subtype".
+the form “type/subtype+ext” or “type/subtype”.
 
 XD0080
-Cannot resolve path ("$1") with a non-hierarchical base URI: "$2".
+Cannot resolve path (“$1”) with a non-hierarchical base URI: “$2”.
 It is a dynamic error if the basedir has a non-hierarchical scheme.
 
 XS0001
-Pipeline contains a loop through "$1".
+Pipeline contains a loop through “$1”.
 It is a static error if there are any loops in the connections between steps,
 variables, and options: no step, variable, or option can be connected to itself
 nor can there be any sequence of connections through other steps that leads back
 to itself.
 
 XS0002
-Duplicate step name: "$1".
+Duplicate step name: “$1”.
 All steps in the same scope must have unique names: it is a static error if two
 steps with the same name appear in the same scope.
 
 XS0003/1
-There is no connection for the input port "$1".
+There is no connection for the input port “$1”.
 It is a static error if any declared input is not connected.
 
 XS0004
-Duplicate option name: "$1".
+Duplicate option name: “$1”.
 It is a static error to declare two or more options on the same step with the same name.
 
 XS0006
-No connection for primary output port "$1".
+No connection for primary output port “$1”.
 It is a static error if the primary output port has no explicit connection and
 the last step in the subpipeline does not have a primary output port.
 
 XS0008
-Forbidden attribute: "$1".
+Forbidden attribute: “$1”.
 It is a static error if any element in the XProc namespace has attributes not
 defined by this specification unless they are extension attributes.
 
 XS0011
-Duplicate port name: "$1".
+Duplicate port name: “$1”.
 It is a static error to identify two ports with the same name on the same step.
 
 XS0014
-Multiple primary output ports: "$1".
+Multiple primary output ports: “$1”.
 It is a static error to identify more than one output port as primary.
 
 XS0015
@@ -303,67 +303,67 @@ Compound step contains no subpipeline.
 It is a static error if a compound step has no contained steps.
 
 XS0017
-Option is both required and declares a default value: "$1".
+Option is both required and declares a default value: “$1”.
 It is a static error to specify that an option is both required and has a default value.
 
 XS0018
-Required option "$1" has not been provided.
+Required option “$1” has not been provided.
 If an option is required, it is a static error to invoke the step without
 specifying a value for that option.
 
 XS0022/1
-Attempt to connect to port on unknown or out-of-scope step: "$1".
+Attempt to connect to port on unknown or out-of-scope step: “$1”.
 In all cases except when the p:pipe is within an p:output of a compound step, it
 is a static error if the port identified by the p:pipe is not in the readable
 ports of the step that contains the p:pipe.
 
 XS0022/2
-Cannot read from "$2" on "$1".
+Cannot read from “$2” on “$1”.
 In all cases except when the p:pipe is within an p:output of a compound step, it
 is a static error if the port identified by the p:pipe is not in the readable
 ports of the step that contains the p:pipe.
 
 XS0025/1
-Step types must be in a namespace, "$1" is invalid.
+Step types must be in a namespace, “$1” is invalid.
 It is a static error if the expanded-QName value of the type attribute is in no
 namespace or in the XProc namespace.
 
 XS0025/2
-Step types must not be in the XProc namespace, "$1" is invalid.
+Step types must not be in the XProc namespace, “$1” is invalid.
 It is a static error if the expanded-QName value of the type attribute is in no
 namespace or in the XProc namespace.
 
 XS0028
-Options and variables may not be in the XProc namespace: "$1".
+Options and variables may not be in the XProc namespace: “$1”.
 It is a static error to declare an option or variable in the XProc namespace.
 
 XS0030
-Multiple primary input ports: "$1".
+Multiple primary input ports: “$1”.
 It is a static error to specify that more than one input port is the primary.
 
 XS0031
-The step has no option named "$1".
+The step has no option named “$1”.
 It is a static error to use an option name in p:with-option if the step type
 being invoked has not declared an option with that name.
 
 XS0032
-No connection for port "$1".
+No connection for port “$1”.
 It is a static error if no connection is provided and the default readable port is undefined.
 
 XS0036
-Multiple steps named "$1" in the same scope.
+Multiple steps named “$1” in the same scope.
 All the step types in a pipeline or library must have unique names: it is a
 static error if any step type name is built-in and/or declared or defined more
 than once in the same scope.
 
 XS0037
-Text not allowed here: "$1".
+Text not allowed here: “$1”.
 It is a static error if any user extension step or any element in the XProc
 namespace other than p:inline directly contains text nodes that do not consist
 entirely of whitespace.
 
 XS0038
-The "$1" attribute is required.
+The “$1” attribute is required.
 It is a static error if any required attribute is not provided.
 
 XS0043
@@ -372,11 +372,11 @@ It is a static error to specify a port name on p:with-input for p:for-each,
 p:viewport, p:choose, p:when, or p:if.
 
 XS0044
-No declaration for step "$1".
+No declaration for step “$1”.
 It is a static error if any step contains an atomic step for which there is no visible declaration.
 
 XS0052
-Cannot import from "$1".
+Cannot import from “$1”.
 It is a static error if the URI of a p:import cannot be retrieved or if, once
 retrieved, it does not point to a p:library or p:declare-step.
 
@@ -388,7 +388,7 @@ prefix bound to a namespace in the in-scope namespaces of the element on which
 it occurs.
 
 XS0057/2
-Invalid token in exclude-inline-prefixes: "$1".
+Invalid token in exclude-inline-prefixes: “$1”.
 It is a static error if the exclude-inline-prefixes attribute does not contain a
 list of tokens or if any of those tokens (except #all or #default) is not a
 prefix bound to a namespace in the in-scope namespaces of the element on which
@@ -400,20 +400,20 @@ It is a static error if the value #default is used within the
 exclude-inline-prefixes attribute and there is no default namespace in scope.
 
 XS0059
-Pipelines cannot have the root element "$1".
+Pipelines cannot have the root element “$1”.
 It is a static error if the pipeline element is not p:declare-step or p:library.
 
 XS0060
-Unsupported pipeline version: "$1".
+Unsupported pipeline version: “$1”.
 It is a static error if the processor encounters an explicit request for a
-version of the language other than "3.0".
+version of the language other than “3.0”.
 
 XS0062
 A version attribute is required on the pipeline document element.
 It is a static error if a required version attribute is not present.
 
 XS0063
-Invalid pipeline version: "$1".
+Invalid pipeline version: “$1”.
 It is a static error if the value of the version attribute is not a xs:decimal.
 
 XS0064/1
@@ -429,7 +429,7 @@ p:catch or if any error code occurs in more than one code attribute among
 sibling p:catch elements.
 
 XS0064/3
-The code "$1" appears in more than one p:catch.
+The code “$1” appears in more than one p:catch.
 It is a static error if the code attribute is missing from any but the last
 p:catch or if any error code occurs in more than one code attribute among
 sibling p:catch elements.
@@ -454,27 +454,27 @@ It is a static error if the port attribute is not specified, and the step
 identified has no primary output port.
 
 XS0069
-Unsupported encoding: "$1".
+Unsupported encoding: “$1”.
 It is a static error if the encoding specified is not supported by the implementation.
 
 XS0071
-Duplicate static option: "$1".
+Duplicate static option: “$1”.
 All the static options in a pipeline or library must have unique names: it is a
 static error if any static option name is declared more than once in the same
 scope.
 
 XS0072
-Conflicting output port on p:finally: "$1".
+Conflicting output port on p:finally: “$1”.
 It is a static error if the name of any output port on the p:finally is the same
 as the name of any other output port in the p:try or any of its sibling p:catch
 elements.
 
 XS0073/1
-Cannot depend on "$1". It is not the name of an in-scope step.
+Cannot depend on “$1”. It is not the name of an in-scope step.
 It is a static error if any specified name is not the name of an in-scope step.
 
 XS0073/2
-Cannot depend on child steps: "$1".
+Cannot depend on child steps: “$1”.
 It is a static error if any specified name is not the name of an in-scope step.
 
 XS0074
@@ -497,7 +497,7 @@ It is a static error if a p:try does not have at least one subpipeline step, at
 least one of p:catch or p:finally, and at most one p:finally.
 
 XS0077
-Value "$1" does not satisfy type "$2".
+Value “$1” does not satisfy type “$2”.
 It is a static error if the value on an attribute of an XProc element does not
 satisfy the type required for that attribute.
 
@@ -508,7 +508,7 @@ instructions occur as siblings of an element node that would be treated as an
 implicit inline.
 
 XS0080
-Duplicate option name: "$1".
+Duplicate option name: “$1”.
 It is a static error to include more than one p:with-option with the same option
 name as part of the same step invocation.
 
@@ -523,7 +523,7 @@ If pipe is specified, it is a static error any child elements other than
 p:documentation and p:pipeinfo are present.
 
 XS0083
-The specified code is not an EQName: "$1".
+The specified code is not an EQName: “$1”.
 It is a static error if the value of the code attribute is not a whitespace
 separated list of EQNames.
 
@@ -532,11 +532,11 @@ If a href attribute is provided, a pipe attribute is not allowed.
 It is a static error if both a href attribute and a pipe attribute are present.
 
 XS0086
-Duplicate port: "$1".
+Duplicate port: “$1”.
 It is a static error to provide more than one p:with-input for the same port.
 
 XS0087
-There is no in-scope prefix for "$1".
+There is no in-scope prefix for “$1”.
 It is a static error if the name attribute on p:option or p:variable has a
 prefix which is not bound to a namespace.
 
@@ -550,47 +550,47 @@ A p:empty element must be the only binding.
 It is a static error if the p:empty binding appears as a sibling of any other binding, including itself.
 
 XS0090
-The value of the pipe attribute is invalid: "$1".
+The value of the pipe attribute is invalid: “$1”.
 It is a static error if the value of the pipe attribute contains any tokens not
 of the form port-name, port-name@step-name, or @step-name.
 
 XS0091
-A variable may not shadow a static option: "$1".
+A variable may not shadow a static option: “$1”.
 It is a static error if an p:option shadows another option declared within the
 same p:declare-step.
 
 XS0092
-The value of a static option cannot be changed at run time: "$1".
+The value of a static option cannot be changed at run time: “$1”.
 It is a static error if a p:with-option attempts to change the value of an
 option that is declared static.
 
 XS0095
-An option may not be both required and static: "$1".
+An option may not be both required and static: “$1”.
 It is a static error to specify that an option is both required and static.
 
 XS0096
-Invalid sequence type: "$1".
+Invalid sequence type: “$1”.
 It is a static error if the sequence type is not syntactically valid.
 
 XS0097
-Attributes in the XProc namespace aren’t allowed on elements in the XProc namespace: "$1".
+Attributes in the XProc namespace aren’t allowed on elements in the XProc namespace: “$1”.
 It is a static error if an attribute in the XProc namespace appears on an
 element in the XProc namespace.
 
 XS0100/1
-Invalid element: "$1".
+Invalid element: “$1”.
 It is a static error if the pipeline document does not conform to the grammar for pipeline documents.
 
 XS0100/2
-Invalid element (implicit and explicit inlines cannot be mixed): "$1".
+Invalid element (implicit and explicit inlines cannot be mixed): “$1”.
 It is a static error if the pipeline document does not conform to the grammar for pipeline documents.
 
 XS0100/3
-Invalid attribute: "$1".
+Invalid attribute: “$1”.
 It is a static error if the pipeline document does not conform to the grammar for pipeline documents.
 
 XS0101
-Invalid values: "$1".
+Invalid values: “$1”.
 It is a static error if the values list is not an XPath sequence of atomic values.
 
 XS0102
@@ -598,11 +598,11 @@ Alternative subpipelines must have the same primary output port.
 It is a static error if alternative subpipelines have different primary output ports.
 
 XS0104
-Unexpected media type for function loading: "$1".
+Unexpected media type for function loading: “$1”.
 Only XSLT and XQuery function libraries can be loaded by p:import-functions.
 
 XS0106
-Functions cannot be imported: "$1".
+Functions cannot be imported: “$1”.
 It is a static error if the processor detects that a particular library is unloadable.
 
 XS0107/1
@@ -612,7 +612,7 @@ pattern in option match on p:viewport contains a static error (error in
 expression syntax, references to unknown variables or functions, etc.).
 
 XS0107/2
-Static error for binding "$1".
+Static error for binding “$1”.
 It is a static error in XProc if any XPath expression or the XSLT selection
 pattern in option match on p:viewport contains a static error (error in
 expression syntax, references to unknown variables or functions, etc.).
@@ -622,66 +622,66 @@ A primary output port is required on p:if.
 It is a static error if the p:if step does not specify a primary output port.
 
 XS0109
-All p:library options must be static: "$1".
+All p:library options must be static: “$1”.
 It is a static error if options that are the direct children of p:library are
-not declared "static"
+not declared “static”
 
 XS0111
-Invalid content type shortcut: "$1".
+Invalid content type shortcut: “$1”.
 It is a static error if an unrecognized content type shortcut is specified.
 
 XS0112
-A p:finally must not have a primary output port: "$port".
+A p:finally must not have a primary output port: “$port”.
 It is a static error if p:finally declares a primary output port either
 explicitly or implicitly.
 
 XS0113
-Invalid value for expand text: "$1".
+Invalid value for expand text: “$1”.
 It is a static error if either [p:]expand-text or [p:]inline-expand-text is to
-be interpreted by the processor and it does not have the value "true" or
-"false".
+be interpreted by the processor and it does not have the value “true” or
+“false”.
 
 XS0114
-Step has no "$1" input port.
+Step has no “$1” input port.
 It is a static error if a port name is specified and the step type being invoked
 does not have an input port declared with that name.
 
 XS0115
-Cannot resolve use-when attributes, deadlock in "$1".
+Cannot resolve use-when attributes, deadlock in “$1”.
 It is a static error if two or more elements are contained within a deadlocked
 network of [p:]use-when expressions.
 
 XC0001
-Invalid content type: "$1".
+Invalid content type: “$1”.
 It is a dynamic error if the value of option override-content-type is not a text media type.
 
 XC0003
 Bad authentication: $1.
-It is a dynamic error if a "username" or a "password" key is present without
-specifying a value for the "auth-method" key, if the requested auth-method isn't
+It is a dynamic error if a “username” or a “password” key is present without
+specifying a value for the “auth-method” key, if the requested auth-method isn't
 supported, or the authentication challenge contains an authentication method
 that isn't supported.
 
 XC0007
-The value of "$1" has an incompatible type: "$2".
+The value of “$1” has an incompatible type: “$2”.
 It is a dynamic error if any key in parameters is associated to a value which is
 not an instance of the XQuery 1.0 and XPath 2.0 Data Model, e.g. with a map, an
 array, or a function.
 
 XC0008
-Styelsheet mode "$1" invalid: $2.
+Styelsheet mode “$1” invalid: $2.
 It is a dynamic error if the stylesheet does not support a given mode.
 
 XC0009
-XQuery version "$1" is not available.
+XQuery version “$1” is not available.
 It is a dynamic error if the specified XQuery version is not available.
 
 XC0011
-XML Schema version "$1" is not available.
+XML Schema version “$1” is not available.
 It is a dynamic error if the specified schema version is not available.
 
 XC0012
-Cannot access "$1".
+Cannot access “$1”.
 It is a dynamic error if the contents of the directory path are not available to
 the step due to access restrictions in the environment in which the pipeline is
 run.
@@ -692,7 +692,7 @@ It is a dynamic error if the pattern matches a processing instruction and the
 new name has a non-null namespace.
 
 XC0017
-Path is not a directory: "$1".
+Path is not a directory: “$1”.
 It is a dynamic error if the absolute path does not identify a directory.
 
 XC0019
@@ -701,11 +701,11 @@ It is a dynamic error if the documents are not equal according to the specified
 comparison method, and the value of the fail-if-not-equal option is true.
 
 XC0023/1
-Invalid selection pattern: "$1".
+Invalid selection pattern: “$1”.
 It is a dynamic error if the selection pattern matches a node which is not an element.
 
 XC0023/2
-Invalid selection pattern: "$1" matches "$2".
+Invalid selection pattern: “$1” matches “$2”.
 It is a dynamic error if the selection pattern matches a node which is not an element.
 
 XC0023/3
@@ -713,22 +713,22 @@ Selection matches $1 attributes.
 It is a dynamic error if the selection pattern matches a node which is not an element.
 
 XC0024
-The position "$2" is invalid for the selection pattern "$1".
+The position “$2” is invalid for the selection pattern “$1”.
 It is a dynamic error if the selection pattern matches a document node and the
-value of the position is "before" or "after".
+value of the position is “before” or “after”.
 
 XC0025
-The position "$2" is invalid for the selection pattern "$1".
+The position “$2” is invalid for the selection pattern “$1”.
 It is a dynamic error if the selection pattern matches anything other than an
-element or a document node and the value of the position option is "first-child"
-or "last-child".
+element or a document node and the value of the position option is “first-child”
+or “last-child”.
 
 XC0029
 XInclude failed: $1.
 It is a dynamic error if an XInclude error occurs during processing.
 
 XC0030
-Response body cannot be interpreted as "$1".
+Response body cannot be interpreted as “$1”.
 It is a dynamic error if the response body cannot be interpreted as requested
 (e.g. application/json to override application/xml content).
 
@@ -742,24 +742,24 @@ The p:os-exec step could not run the command.
 It is a dynamic error if the command cannot be run.
 
 XC0034
-The specified working directory is invalid: "$1".
+The specified working directory is invalid: “$1”.
 It is a dynamic error if the current working directory cannot be changed to the
 value of the cwd option.
 
 XC0036/1
-Invalid CRC version: "$1".
+Invalid CRC version: “$1”.
 It is a dynamic error if the requested hash algorithm is not one that the
 processor understands or if the value or parameters are not appropriate for that
 algorithm.
 
 XC0036/2
-Invalid MD version: "$1".
+Invalid MD version: “$1”.
 It is a dynamic error if the requested hash algorithm is not one that the
 processor understands or if the value or parameters are not appropriate for that
 algorithm.
 
 XC0036/3
-Invalid SHA version: "$1".
+Invalid SHA version: “$1”.
 It is a dynamic error if the requested hash algorithm is not one that the
 processor understands or if the value or parameters are not appropriate for that
 algorithm.
@@ -801,25 +801,25 @@ processor understands or if the value or parameters are not appropriate for that
 algorithm.
 
 XC0038
-XSLT version "$1" is not available.
+XSLT version “$1” is not available.
 It is a dynamic error if the specified XSLT version is not available.
 
 XC0050/1
-Invalid URI: "$1".
+Invalid URI: “$1”.
 It is a dynamic error if the URI scheme is not supported or the step cannot
 store to the specified location.
 
 XC0050/2
-Cannot copy "$1" to "$2".
+Cannot copy “$1” to “$2”.
 It is a dynamic error if the URI scheme is not supported or the step cannot
 store to the specified location.
 
 XC0054/1
-Schematron validation failed: "$1".
+Schematron validation failed: “$1”.
 It is a dynamic error if the assert-valid option is true and any Schematron assertions fail.
 
 XC0054/2
-Schematron validation failed for "$2": "$1".
+Schematron validation failed for “$2”: “$1”.
 It is a dynamic error if the assert-valid option is true and any Schematron assertions fail.
 
 XC0053
@@ -828,43 +828,43 @@ It is a dynamic error if the assert-valid option on p:validate-with-nvdl is true
 and the input document is not va lid.
 
 XC0056
-No such template in stylesheet: "$1".
+No such template in stylesheet: “$1”.
 It is a dynamic error if the stylesheet does not provide a given template.
 
 XC0058
-It is an error if both the "all" and "relative" options are true.
+It is an error if both the “all” and “relative” options are true.
 It is a dynamic error if the all and relative options are both true.
 
 XC0059/1
-Cannot add namespaces as attributes: "$1".
-It is a dynamic error if the QName value in the attribute-name option is "xmlns"
-or uses the prefix "xmlns" or any other prefix that resolves to the namespace
+Cannot add namespaces as attributes: “$1”.
+It is a dynamic error if the QName value in the attribute-name option is “xmlns”
+or uses the prefix “xmlns” or any other prefix that resolves to the namespace
 name http://www.w3.org/2000/xmlns/.
 
 XC0059/2
 Cannot set namespaces as attributes.
-It is a dynamic error if the QName value in the attribute-name option is "xmlns"
-or uses the prefix "xmlns" or any other prefix that resolves to the namespace
+It is a dynamic error if the QName value in the attribute-name option is “xmlns”
+or uses the prefix “xmlns” or any other prefix that resolves to the namespace
 name http://www.w3.org/2000/xmlns/.
 
 XC0060
-Unsupported UUID version: "$1".
+Unsupported UUID version: “$1”.
 It is a dynamic error if the processor does not support the specified version of
 the UUID algorithm.
 
 XC0063
-Invalid path separator: "$1".
+Invalid path separator: “$1”.
 It is a dynamic error if the path-separator option is specified and is not
 exactly one character long.
 
 XC0064
-Return code from p:os-exec exceeded failure threshold: "$1".
+Return code from p:os-exec exceeded failure threshold: “$1”.
 It is a dynamic error if the exit code from the command is greater than the
 specified failure-threshold value
 
 XC0069
-The "content-type" property cannot be set.
-It is a dynamic error if the properties map contains a key equal to the string "content-type".
+The “content-type” property cannot be set.
+It is a dynamic error if the properties map contains a key equal to the string “content-type”.
 
 XC0072
 Data is not base64 encoded: $1.
@@ -875,27 +875,27 @@ The content-type attribute is required.
 It is a dynamic error if the c:data element does not have a content-type attribute.
 
 XC0074
-The content types "$1" and "$2" are different.
+The content types “$1” and “$2” are different.
 It is a dynamic error if the content-type is supplied and is not the same as the
 content-type specified on the c:data element.
 
 XC0076
-Comparison method not supported: "$1".
+Comparison method not supported: “$1”.
 It is a dynamic error if the comparison method specified in p:compare is not
 supported by the implementation.
 
 XC0077
-Media types "$1" and "$2" are incompatible for the comparison.
+Media types “$1” and “$2” are incompatible for the comparison.
 It is a dynamic error if the media types of the documents supplied are
 incompatible with the comparison method.
 
 XC0078
-HTTP request timeout, response took more than "$1" seconds.
-It is a dynamic error "fail-on-timeout" is true a HTTP status code 408 is
+HTTP request timeout, response took more than “$1” seconds.
+It is a dynamic error “fail-on-timeout” is true a HTTP status code 408 is
 encountered.
 
 XC0079
-Invalid $1 parameter value: "$2".
+Invalid $1 parameter value: “$2”.
 It is a dynamic error if the map parameters contains an entry whose key is
 defined by the implementation and whose value is not valid for that key.
 
@@ -905,7 +905,7 @@ It is a dynamic error if the number of documents on the archive does not match
 the expected number of archive input documents for the given format and command.
 
 XC0081
-Unsupported archive format: "$1".
+Unsupported archive format: “$1”.
 It is a dynamic error if the format of the archive does not match the format as
 specified in the format option.
 
@@ -916,19 +916,19 @@ source port that have the same base URI or if any document that appears on the
 source port has no base URI.
 
 XC0084/2
-Duplicate base URI in source document list: "$1".
+Duplicate base URI in source document list: “$1”.
 It is a dynamic error if two or more documents appear on the p:archive step's
 source port that have the same base URI or if any document that appears on the
 source port has no base URI.
 
 XC0084/3
-Duplicate base URI in source document list: "$1".
+Duplicate base URI in source document list: “$1”.
 It is a dynamic error if two or more documents appear on the p:archive step's
 source port that have the same base URI or if any document that appears on the
 source port has no base URI.
 
 XC0085/1
-Invalid archive format: "$1".
+Invalid archive format: “$1”.
 It is a dynamic error if the format of the archive cannot be understood,
 determined and/or processed.
 
@@ -937,7 +937,7 @@ Cannot create .arj archive files
 The .arj archive format can be read, but not written.
 
 XC0085/3
-Unrecognized archive format: "$1".
+Unrecognized archive format: “$1”.
 It is a dynamic error if the format of the archive cannot be understood,
 determined and/or processed.
 
@@ -947,7 +947,7 @@ It is a dynamic error if an implementation does not support directory listing
 for a specified scheme.
 
 XC0092
-Attribute names collide: "$1".
+Attribute names collide: “$1”.
 It is a dynamic error if as a consequence of changing or removing the namespace
 of an attribute the attribute's name is not unique on the respective element.
 
@@ -962,7 +962,7 @@ It is a dynamic error if any document supplied on the source port is not an XML
 document, an HTML documents, or a Text document if XSLT 2.0 is used.
 
 XC0094/2
-Invalid type: "$1". Only XML, HTML, and text documents can be used with XSLT 2.0.
+Invalid type: “$1”. Only XML, HTML, and text documents can be used with XSLT 2.0.
 It is a dynamic error if any document supplied on the source port is not an XML
 document, an HTML documents, or a Text document if XSLT 2.0 is used.
 
@@ -971,7 +971,7 @@ XSLT error: $1
 It is a dynamic error if an error occurred during the transformation.
 
 XC0096
-Stylesheet terminated with xsl:message: "$1".
+Stylesheet terminated with xsl:message: “$1”.
 It is a dynamic error if the transformation is terminated by XSLT message termination.
 
 XC0100/1
@@ -979,11 +979,11 @@ Invalid manifest.
 It is a dynamic error if the document on port manifest does not conform to the given schema.
 
 XC0100/2
-Invalid element in manifest: "$1".
+Invalid element in manifest: “$1”.
 It is a dynamic error if the document on port manifest does not conform to the given schema.
 
 XC0100/3
-Invalid attribute on manifest entry: "$1".
+Invalid attribute on manifest entry: “$1”.
 It is a dynamic error if the document on port manifest does not conform to the given schema.
 
 XC0100/4
@@ -995,13 +995,13 @@ An href is required for each manifest entry.
 It is a dynamic error if the document on port manifest does not conform to the given schema.
 
 XC0101
-Incompatible content type: "$1".
+Incompatible content type: “$1”.
 It is a dynamic error if a document appearing on port source cannot be
 represented in the XDM version associated with the chosen XQuery version, e.g.
 when a JSON document contains a map and XDM 3.0 is used.
 
 XC0102
-The parameter $1 has invalid type: "$2".
+The parameter $1 has invalid type: “$2”.
 It is a dynamic error if any key in option parameters is associated to a value
 that cannot be represented in the XDM version associated with the chosen XQuery
 version, e.g. with a map, an array, or a function when XDM 3.0 is used.
@@ -1015,19 +1015,19 @@ XQuery failed: $1.
 It is a dynamic error if any error occurs during XQuery’s dynamic evaluation phase.
 
 XC0106
-Duplicate keys in JSON: "$1".
-It is a dynamic error if duplicate keys are encountered and option duplicates has value "reject".
+Duplicate keys in JSON: “$1”.
+It is a dynamic error if duplicate keys are encountered and option duplicates has value “reject”.
 
 XC0107
 Unsupported document for p:json-merge.
 It is a dynamic error if a document of an unsupported document type appears on port source of p:json-merge.
 
 XC0108
-No binding in scope for prefix: "$1".
+No binding in scope for prefix: “$1”.
 It is a dynamic error if any prefix is not in-scope at the point where the p:namespace-delete occurs.
 
 XC0109
-Attribute name collision: "$1".
+Attribute name collision: “$1”.
 It is a dynamic error if a namespace is to be removed from an attribute and the
 element already has an attribute with the resulting name.
 
@@ -1046,16 +1046,16 @@ Multiple manifest documents.
 It is a dynamic error if more than one document appears on the port manifest.
 
 XC0113
-Delete failed for "$1".
+Delete failed for “$1”.
 It is a dynamic error if an attempt is made to delete a non-empty directory and
 the recursive option was set to false.
 
 XC0114
-Attempt to create directory failed: "$1".
+Attempt to create directory failed: “$1”.
 It is a dynamic error if the directory referenced by the href option cannot be created.
 
 XC0115
-Cannot overwrite "$1".
+Cannot overwrite “$1”.
 It is a dynamic error if the resource referenced by the target option is an
 existing file or other file system object.
 
@@ -1064,13 +1064,13 @@ Failed to create temporary file.
 It is a dynamic error if the temporary file could not be created.
 
 XC0117
-Unsupported report format: "$1".
+Unsupported report format: “$1”.
 It is a dynamic error if a report-format option was specified that the processor
 does not support.
 
 XC0119
-Invalid flatten value: "$1".
-It is a dynamic error if flatten is neither "unbounded", nor a string that may
+Invalid flatten value: “$1”.
+It is a dynamic error if flatten is neither “unbounded”, nor a string that may
 be cast to a non-negative integer.
 
 XC0120
@@ -1079,74 +1079,74 @@ It is a dynamic error if the relative-to option is not present and the document
 on the source port does not have a base URI.
 
 XC0123
-Invalid HTTP authentication value "$2" for "$1".
-It is a dynamic error if any key in the "auth" map is associated with a value
+Invalid HTTP authentication value “$2” for “$1”.
+It is a dynamic error if any key in the “auth” map is associated with a value
 that is not an instance of the required type.
 
 XC0124/1
-Invalid HTTP parameter value "$2" for "$1".
-It is a dynamic error if any key in the "parameters" map is associated with a
+Invalid HTTP parameter value “$2” for “$1”.
+It is a dynamic error if any key in the “parameters” map is associated with a
 value that is not an instance of the required type.
 
 XC0124/2
-Invalid HTTP parameter type "$2" for "$1".
-It is a dynamic error if any key in the "parameters" map is associated with a
+Invalid HTTP parameter type “$2” for “$1”.
+It is a dynamic error if any key in the “parameters” map is associated with a
 value that is not an instance of the required type.
 
 XC0125
 Multipart response but accept-multipart is false.
-It is a dynamic error if the key "accept-multipart" as the value false and a multipart response is detected.
+It is a dynamic error if the key “accept-multipart” as the value false and a multipart response is detected.
 
 XC0126
-Assertion failed in p:http-request: "$1".
+Assertion failed in p:http-request: “$1”.
 It is a dynamic error if the XPath expression in assert evaluates to false.
 
 XC0127
-Duplicate header: "$1".
+Duplicate header: “$1”.
 It is a dynamic error if the headers map contains two keys that are the same
 when compared in a case-insensitive manner.
 
 XC0128
-Unsupported scheme: "$1".
+Unsupported scheme: “$1”.
 It is a dynamic error if the URI’s scheme is unknown or not supported.
 
 XC0129
-Unsupported version "$1".
+Unsupported version “$1”.
 
 XC0131
-Unsupported transfer encoding: "$1".
+Unsupported transfer encoding: “$1”.
 It is a dynamic error if the processor cannot support the requested encoding.
 
 XC0133
-Cannot process multiple inputs with the content type "$1".
+Cannot process multiple inputs with the content type “$1”.
 It is a dynamic error if more than one document appears on the source port and a
 content-type header is present and the content type specified is not a multipart
 content type.
 
 XC0134
-Unsupported scheme: "$1".
+Unsupported scheme: “$1”.
 It is a dynamic error if an implementation does not support p:file-info for a specified scheme.
 
 XC0136
-Unsupported scheme: "$1".
+Unsupported scheme: “$1”.
 It is a dynamic error if an implementation does not support p:file-touch for a
 specified scheme.
 
 XC0138
-Unsupported scheme: "$1".
+Unsupported scheme: “$1”.
 It is a dynamic error if an implementation does not support
 p:file-create-tempfile for a specified scheme.
 
 XC0140
-Unsupported scheme: "$1".
+Unsupported scheme: “$1”.
 It is a dynamic error if an implementation does not support p:file-mkdir for a specified scheme.
 
 XC0142
-Unsupported scheme: "$1".
+Unsupported scheme: “$1”.
 It is a dynamic error if an implementation does not support p:file-delete for a specified scheme.
 
 XC0144
-Unsupported scheme: "$1".
+Unsupported scheme: “$1”.
 It is a dynamic error if an implementation does not support p:file-copy for a specified scheme.
 
 XC0146/1
@@ -1168,15 +1168,15 @@ option is not an array of arrays, where the inner arrays have exactly two
 members of type xs:string.
 
 XC0147
-Invalid pattern: "$1".
+Invalid pattern: “$1”.
 It is a dynamic error if the specified value is not a valid XPath regular expression.
 
 XC0148
-Unsupported scheme: "$1".
+Unsupported scheme: “$1”.
 It is a dynamic error if an implementation does not support p:file-move for a specified scheme.
 
 XC0151
-Not a Schematron schema: "$1".
+Not a Schematron schema: “$1”.
 It is a dynamic error if the document supplied on schema port is not a valid Schematron document.
 
 XC0152/1
@@ -1185,7 +1185,7 @@ It is a dynamic error if the document supplied on schema port is not a valid XML
 schema document.
 
 XC0152/2
-Invalid XML Schema: "$1".
+Invalid XML Schema: “$1”.
 It is a dynamic error if the document supplied on schema port is not a valid XML
 schema document.
 
@@ -1195,7 +1195,7 @@ It is a dynamic error if the document supplied on schema port cannot be
 interpreted as an RELAX NG Grammar.
 
 XC0153/2
-Not a RELAX NG schema: "$1" ($2).
+Not a RELAX NG schema: “$1” ($2).
 It is a dynamic error if the document supplied on schema port cannot be
 interpreted as an RELAX NG Grammar.
 
@@ -1205,7 +1205,7 @@ It is a dynamic error if the assert-valid option on p:validate-with-relax-ng is
 true and the input document is not valid.
 
 XC0155/2
-Not valid: "$1" ($2).
+Not valid: “$1” ($2).
 It is a dynamic error if the assert-valid option on p:validate-with-relax-ng is
 true and the input document is not valid.
 
@@ -1215,7 +1215,7 @@ It is a dynamic error if the assert-valid option on p:validate-with-xml-schema
 is true and the input document is not valid.
 
 XC0156/2
-Not valid: "$1" ($2).
+Not valid: “$1” ($2).
 It is a dynamic error if the assert-valid option on p:validate-with-xml-schema
 is true and the input document is not valid.
 
@@ -1235,7 +1235,7 @@ It is a dynamic error if the document supplied on schema port is not a valid
 JSON schema document in the selected version.
 
 XC0164/2
-JSON schema invalid: "$1".
+JSON schema invalid: “$1”.
 It is a dynamic error if the document supplied on schema port is not a valid
 JSON schema document in the selected version.
 
@@ -1245,7 +1245,7 @@ It is a dynamic error if the assert-valid option on p:validate-with-json-schema
 is true and the input document is not valid.
 
 XC0165/2
-Not valid: "$1".
+Not valid: “$1”.
 It is a dynamic error if the assert-valid option on p:validate-with-json-schema
 is true and the input document is not valid.
 
@@ -1255,11 +1255,11 @@ It is a dynamic error if the pipeline input to the p:run step is not a valid
 pipeline.
 
 XC0201/1
-Cannot uncompress to "$1".
+Cannot uncompress to “$1”.
 It is a dynamic error if the p:uncompress step cannot perform the requested content-type cast.
 
 XC0202/1
-Unsupported compression format: "$1".
+Unsupported compression format: “$1”.
 It is a dynamic error if the compression format cannot be understood, determined and/or processed.
 
 XC0202/2
@@ -1268,12 +1268,12 @@ It is a dynamic error if the compression format cannot be understood, determined
 and/or processed.
 
 XC0203
-Invalid HTTP mulitipart boundary: "$1".
+Invalid HTTP mulitipart boundary: “$1”.
 It is a dynamic error if the specified boundary is not valid (for example, if it
-begins with two hyphens "--").
+begins with two hyphens “--”).
 
 XC0204
-Unsupported content type: "$1".
+Unsupported content type: “$1”.
 It is a dynamic error if the requested content-type is not supported.
 
 XC0205
@@ -1281,37 +1281,37 @@ Invalid grammar provided.
 It is a dynamic error if the source document cannot be parsed by the provided grammar.
 
 XC0206/1
-Primary input port mismatch: "$1".
+Primary input port mismatch: “$1”.
 It is a dynamic error if the dynamically executed pipeline implicitly or
 explicitly declares a primary input port with a different name than implicitly
 or explicitly specified in the p:run invocation.
 
 XC0206/2
-Primary input port mismatch: "$1" and "$2".
+Primary input port mismatch: “$1” and “$2”.
 It is a dynamic error if the dynamically executed pipeline implicitly or
 explicitly declares a primary input port with a different name than implicitly
 or explicitly specified in the p:run invocation.
 
 XC0206/3
-Primary input undeclared: "$1"
+Primary input undeclared: “$1”
 It is a dynamic error if the dynamically executed pipeline implicitly or
 explicitly declares a primary input port with a different name than implicitly
 or explicitly specified in the p:run invocation.
 
 XC0207/1
-Primary output port mismatch: "$1".
+Primary output port mismatch: “$1”.
 It is a dynamic error if the dynamically executed pipeline implicitly or
 explicitly declares a primary output port with a different name than implicitly
 or explicitly specified in the p:run invocation.
 
 XC0207/2
-Primary output port mismatch: "$1" and "$2".
+Primary output port mismatch: “$1” and “$2”.
 It is a dynamic error if the dynamically executed pipeline implicitly or
 explicitly declares a primary output port with a different name than implicitly
 or explicitly specified in the p:run invocation.
 
 XC0207/3
-Pirmary output port mismatch: "$1".
+Pirmary output port mismatch: “$1”.
 It is a dynamic error if the dynamically executed pipeline implicitly or
 explicitly declares a primary output port with a different name than implicitly
 or explicitly specified in the p:run invocation.
@@ -1330,47 +1330,47 @@ Invalid Invisible XML grammar.
 It is a dynamic error if the grammar provided is not a valid Invisible XML grammar.
 
 cxerr:XI0001
-Pipeline has no "$1" output port.
+Pipeline has no “$1” output port.
 Cannot save the output from a port that doesn’t exist.
 
 cxerr:XI0002
-Impossible node type: "$1".
+Impossible node type: “$1”.
 
 cxerr:XI0004
-Cannot cast to "$1".
+Cannot cast to “$1”.
 
 cxerr:XI0005
 Failed to load resource: $1
 
 cxerr:XI0017/1
-Configuration invalid: "$1".
+Configuration invalid: “$1”.
 
 cxerr:XI0017/2
-Configuration invalid: "$1": $2.
+Configuration invalid: “$1”: $2.
 
 cxerr:XI0021
-Unreadable: "$1".
+Unreadable: “$1”.
 
 cxerr:XI0022
-Unrecognized configuration property: "$1".
+Unrecognized configuration property: “$1”.
 
 cxerr:XI0025
-Unrecognized configuration attribute "$2" on "$1".
+Unrecognized configuration attribute “$2” on “$1”.
 
 cxerr:XI0026/1
-Missing configuration attribute "$2" on "$1".
+Missing configuration attribute “$2” on “$1”.
 
 cxerr:XI0026/2
-Missing configuration attributes "$1": $2.
+Missing configuration attributes “$1”: $2.
 
 cxerr:XI0026/3
-Configuration attributes forbidden for generic processor: "$1".
+Configuration attributes forbidden for generic processor: “$1”.
 
 cxerr:XI0027
-Unrecognized configuration value for "$2" on "$1": "$3".
+Unrecognized configuration value for “$2” on “$1”: “$3”.
 
 cxerr:XI0028
-Unrecognized configuration property: "$1".
+Unrecognized configuration property: “$1”.
 
 cxerr:XI0029
 Invalid Saxon configuration property $1=$2.
@@ -1379,31 +1379,31 @@ cxerr:XI0030
 Cache requires a base URI.
 
 cxerr:XI0031
-Graphviz not found: "$1".
+Graphviz not found: “$1”.
 
 cxerr:XI0032
-Graphviz not executable: "$1".
+Graphviz not executable: “$1”.
 
 cxerr:XI0033
-Cannot write to output: "$1".
+Cannot write to output: “$1”.
 
 cxerr:XI0035
 No runnable steps.
 
 cxerr:XI0036
-Invalid type value: "$1".
+Invalid type value: “$1”.
 
 cxerr:XI0037
-Document already in cache: "$1".
+Document already in cache: “$1”.
 
 cxerr:XI0038
-Document not in cache: "$1".
+Document not in cache: “$1”.
 
 cxerr:XI0039/1
-No steps in library ("$1").
+No steps in library (“$1”).
 
 cxerr:XI0039/2
-No step named "$1" in library ("$2").
+No step named “$1” in library (“$2”).
 
 cxerr:XI0040/1
 Initializer failed: $1
@@ -1424,38 +1424,38 @@ cxerr:XI0045/2
 If cx:href appears on p:pipeinfo, it must point to a p:pipeinfo document. Error: $1
 
 cxerr:XI0046
-XPath version not supported: "$1"
+XPath version not supported: “$1”
 
 cxerr:XI0047
 At most one document is allowed on the source port, found $1.
 
 cxerr:XI0200
-Invalid option value "$2" for $1.
+Invalid option value “$2” for $1.
 
 cxerr:XI0202
-Value required for "$1".
+Value required for “$1”.
 
 cxerr:XI0203
-Unrecognized option "$1".
+Unrecognized option “$1”.
 
 cxerr:XI0204
-More than one pipeline: "$1", "$2", …
+More than one pipeline: “$1”, “$2”, …
 
 cxerr:XI0205
-Command line option malformed: "$2" ($1).
+Command line option malformed: “$2” ($1).
 
 cxerr:XI0206
-Duplicate output file: "$1".
+Duplicate output file: “$1”.
 
 cxerr:XI0213
-Static options cannot be provided after the pipeline has been compiled: "$1".
+Static options cannot be provided after the pipeline has been compiled: “$1”.
 
 cxerr:XI0214
-Duplicate namespace prefix: "$1".
+Duplicate namespace prefix: “$1”.
 
 cxerr:XI0215
-Duplicated name encountered when combining archives: "$1"
-When the cx:merge-duplicates policy is "error", it is an error if multiple
+Duplicated name encountered when combining archives: “$1”
+When the cx:merge-duplicates policy is “error”, it is an error if multiple
 entries with the same name are encountered when merging archive files.
 
 cxerr:XI0300
@@ -1478,10 +1478,10 @@ Invalid message content: $1
 Only text, message elements and value-of are allowed.
 
 cxerr:XI0306
-Invalid value for the "valid" attribute: $1
+Invalid value for the “valid” attribute: $1
 
 cxerr:XI0307
-Invalid value for the "worst" attribute: $1
+Invalid value for the “worst” attribute: $1
 
 cxerr:XI0308
 No code specified for xvrl:detection element.
@@ -1501,4 +1501,3 @@ This can’t happen: $1.
 
 cxerr:XI9999
 This isn’t implemented: $1.
-

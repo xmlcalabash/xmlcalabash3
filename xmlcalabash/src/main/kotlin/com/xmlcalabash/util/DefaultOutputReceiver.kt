@@ -55,7 +55,10 @@ open class DefaultOutputReceiver(val xmlCalabash: XmlCalabash, val processor: Pr
 
         if (writingToTerminal && contentType != null) {
             if (contentType.classification() in listOf(MediaClassification.XML, MediaClassification.XHTML, MediaClassification.HTML)) {
-                writer[Ns.omitXmlDeclaration] = true
+                writer[Ns.encoding] = xmlCalabash.xmlCalabashConfig.consoleEncoding
+                if (xmlCalabash.xmlCalabashConfig.consoleEncoding.lowercase() == "utf-8") {
+                    writer[Ns.omitXmlDeclaration] = true
+                }
             }
             writer[Ns.indent] = true
         }

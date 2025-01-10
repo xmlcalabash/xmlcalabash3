@@ -36,7 +36,7 @@ class XmlCalabash private constructor(val xmlCalabashConfig: XmlCalabashConfigur
             val xmlCalabash = XmlCalabash(config)
             xmlCalabash._commonEnvironment = CommonEnvironment(xmlCalabash)
 
-            val defaultReporter = DefaultMessageReporter(LoggingMessageReporter())
+            val defaultReporter = DefaultMessageReporter(xmlCalabash.xmlCalabashConfig.messagePrinter, LoggingMessageReporter())
             defaultReporter.threshold = config.verbosity
             xmlCalabash._commonEnvironment.messageReporter = { BufferingMessageReporter(config.messageBufferSize, defaultReporter) }
 
@@ -54,6 +54,14 @@ class XmlCalabash private constructor(val xmlCalabashConfig: XmlCalabashConfigur
 
             return xmlCalabash
         }
+    }
+
+    fun print(message: String) {
+        xmlCalabashConfig.messagePrinter.print(message)
+    }
+
+    fun println(message: String) {
+        xmlCalabashConfig.messagePrinter.println(message)
     }
 
     fun newPipelineBuilder(): PipelineBuilder {

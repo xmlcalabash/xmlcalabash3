@@ -1,9 +1,10 @@
 package com.xmlcalabash.util
 
 import com.xmlcalabash.api.MessageReporter
+import com.xmlcalabash.io.MessagePrinter
 import net.sf.saxon.s9api.QName
 
-class DefaultMessageReporter(nextReporter: MessageReporter? = null): NopMessageReporter(nextReporter) {
+class DefaultMessageReporter(val printer: MessagePrinter, nextReporter: MessageReporter? = null): NopMessageReporter(nextReporter) {
     override fun report(verbosity: Verbosity, extraAttributes: Map<QName, String>, message: () -> String) {
         if (verbosity >= threshold) {
             val prefix = when (verbosity) {
@@ -13,7 +14,7 @@ class DefaultMessageReporter(nextReporter: MessageReporter? = null): NopMessageR
                 Verbosity.WARN -> "Warning: "
                 Verbosity.ERROR -> "Error: "
             }
-            println("${prefix}${message()}")
+            printer.println("${prefix}${message()}")
         }
         nextReporter?.report(verbosity, extraAttributes, message)
     }

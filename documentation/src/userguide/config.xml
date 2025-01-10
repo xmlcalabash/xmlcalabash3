@@ -71,6 +71,16 @@ on the primary input port. It will be parsed as XML if the primary input port do
 specify any content types.</para>
 </listitem>
 </varlistentry>
+<varlistentry><term><tag class="attribute">console-output-encoding</tag></term>
+<listitem>
+<para>When XML Calabash writes to the console, it attempts to make sure that
+the output is consistent with the <tag class="attribute">console-output-encoding</tag>.
+On Windows, this is
+<link xlink:href="https://en.wikipedia.org/wiki/Windows-1252">Windows code page 1252</link>
+by default, on other platforms it is
+<link xlink:href="https://en.wikipedia.org/wiki/UTF-8">UTF-8</link> by default.</para>
+</listitem>
+</varlistentry>
 </variablelist>
 
 <para>For simplicity, the content model of <tag>cc:xml-calabash</tag> allows every element to

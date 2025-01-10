@@ -2,8 +2,10 @@ package com.xmlcalabash.config
 
 import com.xmlcalabash.api.Monitor
 import com.xmlcalabash.io.MediaType
+import com.xmlcalabash.io.MessagePrinter
 import com.xmlcalabash.spi.PagedMediaManager
 import com.xmlcalabash.util.AssertionsLevel
+import com.xmlcalabash.util.DefaultMessagePrinter
 import com.xmlcalabash.util.Verbosity
 import com.xmlcalabash.visualizers.Silent
 import net.sf.saxon.Configuration
@@ -12,6 +14,10 @@ import java.io.File
 import java.net.URI
 
 abstract class XmlCalabashConfiguration {
+    companion object {
+        val DEFAULT_CONSOLE_ENCODING = "utf-8"
+    }
+
     abstract fun saxonConfigurer(saxon: Configuration)
     abstract fun xmlCalabashConfigurer(xmlCalabash: XmlCalabash)
 
@@ -32,6 +38,8 @@ abstract class XmlCalabashConfiguration {
     var traceDocuments: File? = null
     var debugger = false
     var pipe = false
+    var consoleEncoding = DEFAULT_CONSOLE_ENCODING
+    var messagePrinter: MessagePrinter = DefaultMessagePrinter(DEFAULT_CONSOLE_ENCODING)
     var mimetypes: Map<String, String> = emptyMap()
     var sendmail: Map<String, String> = emptyMap()
     var pagedMediaManagers: List<PagedMediaManager> = emptyList()

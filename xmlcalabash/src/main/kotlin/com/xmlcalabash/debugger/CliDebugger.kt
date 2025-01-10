@@ -33,6 +33,7 @@ class CliDebugger(val runtime: XProcRuntime): Monitor {
     val terminal = TerminalBuilder.terminal()
     var reader: LineReader? = null
     val prompt = "> "
+    val printer = runtime.environment.xmlCalabash.xmlCalabashConfig.messagePrinter
 
     var parser: InvisibleXmlParser? = null
     val stacks = mutableMapOf<Long, Stack<StackFrame>>()
@@ -108,7 +109,7 @@ class CliDebugger(val runtime: XProcRuntime): Monitor {
                 try {
                     step.stepConfig.parseQName(point.code)
                 } catch (_: Exception) {
-                    println("Catch failed to parse ${point.code}")
+                    printer.println("Catch failed to parse ${point.code}")
                     continue
                 }
             } else {
@@ -119,15 +120,15 @@ class CliDebugger(val runtime: XProcRuntime): Monitor {
                 && (catchCode == null || catchCode == code)) {
                 if (point.id == null) {
                     if (code == null) {
-                        println("Debugger caught error")
+                        printer.println("Debugger caught error")
                     } else {
-                        println("Debugger caught ${code}")
+                        printer.println("Debugger caught ${code}")
                     }
                 } else {
                     if (code == null) {
-                        println("Debugger caught error on ${point.id}")
+                        printer.println("Debugger caught error on ${point.id}")
                     } else {
-                        println("Debugger caught ${code} on ${point.id}")
+                        printer.println("Debugger caught ${code} on ${point.id}")
                     }
                 }
 
@@ -153,13 +154,13 @@ class CliDebugger(val runtime: XProcRuntime): Monitor {
 
 
         if (start) {
-            println("Debugger at ${step.id}")
+            printer.println("Debugger at ${step.id}")
         } else {
-            println("Debugger at end of ${step.id}")
+            printer.println("Debugger at end of ${step.id}")
         }
 
         if (curFrame.cx != "cx") {
-            println("xmlns:${curFrame.cx} = ${NsCx.namespace}")
+            printer.println("xmlns:${curFrame.cx} = ${NsCx.namespace}")
         }
 
         try {
@@ -171,7 +172,7 @@ class CliDebugger(val runtime: XProcRuntime): Monitor {
 
                 val doc = parser!!.parse(line)
                 if (!doc.succeeded()) {
-                    println("Syntax error: ${line}")
+                    printer.println("Syntax error: ${line}")
                     continue
                 }
 
@@ -186,7 +187,7 @@ class CliDebugger(val runtime: XProcRuntime): Monitor {
                 val command = parseJson(dtree.asJSON())
                 when (command["name"]) {
                     null -> {
-                        println("Parse failed: ${line}")
+                        printer.println("Parse failed: ${line}")
                         continue
                     }
                     "base-uri" -> doBaseUri(command)
@@ -214,7 +215,7 @@ class CliDebugger(val runtime: XProcRuntime): Monitor {
                     "subpipeline" -> doSubpipeline(command)
                     "up" -> doUp(command)
                     else -> {
-                        println("Unexpected command: ${command["name"]}")
+                        printer.println("Unexpected command: ${command["name"]}")
                         continue
                     }
                 }
@@ -236,9 +237,9 @@ class CliDebugger(val runtime: XProcRuntime): Monitor {
                     val ebv = evalExpression(bp.expr, document.value as XdmItem, true)
                     if ((ebv.underlyingValue as BooleanValue).booleanValue) {
                         if (bp.expr == "true()") {
-                            println("Output from ${from.first} on ${from.second}")
+                            printer.println("Output from ${from.first} on ${from.second}")
                         } else {
-                            println("Output from ${from.first} on ${from.second} satisfies ${bp.expr}")
+                            printer.println("Output from ${from.first} on ${from.second} satisfies ${bp.expr}")
                         }
 
                         stack = stacks[Thread.currentThread().id] ?: Stack()
@@ -288,12 +289,12 @@ class CliDebugger(val runtime: XProcRuntime): Monitor {
         val varname = try {
             curFrame.step.stepConfig.parseQName(command["varname"]!!, inscopeNS)
         } catch (ex: Exception) {
-            println(ex.message ?: "Cannot parse name: ${command["varname"]}: ${ex.message ?: ""}")
+            printer.println(ex.message ?: "Cannot parse name: ${command["varname"]}: ${ex.message ?: ""}")
             return
         }
 
         if (varname in localVariables) {
-            println("You cannot define a variable that already exists; use set")
+            printer.println("You cannot define a variable that already exists; use set")
             return
         }
 
@@ -308,7 +309,7 @@ class CliDebugger(val runtime: XProcRuntime): Monitor {
 
     private fun prettyPrint(value: XdmValue) {
         if (value !is XdmMap && value !is XdmArray) {
-            println(value)
+            printer.println("${value}")
             return
         }
 
@@ -322,9 +323,9 @@ class CliDebugger(val runtime: XProcRuntime): Monitor {
             val selector = exec.load()
             selector.setVariable(var_a, value)
             val value = selector.evaluate()
-            println(value)
+            printer.println("${value}")
         } catch (ex: Exception) {
-            println(ex.message ?: "Exception while formatting ${value}")
+            printer.println(ex.message ?: "Exception while formatting ${value}")
         }
     }
 
@@ -334,27 +335,27 @@ class CliDebugger(val runtime: XProcRuntime): Monitor {
         val varname = try {
             curFrame.step.stepConfig.parseQName(command["varname"]!!, inscopeNS)
         } catch (ex: Exception) {
-            println(ex.message ?: "Cannot parse name: ${command["varname"]}: ${ex.message ?: ""}")
+            printer.println(ex.message ?: "Cannot parse name: ${command["varname"]}: ${ex.message ?: ""}")
             return
         }
 
         val value = evalExpression(command["expr"]!!)
         if (varname in localVariables) {
             if (varname != NsCx.document) {
-                println("Setting local variable \$${command["varname"]}...")
+                printer.println("Setting local variable \$${command["varname"]}...")
             }
             localVariables[varname] = value
             return
         }
 
         if (varname in curFrame.options) {
-            println("Setting step option \$${command["varname"]}...")
+            printer.println("Setting step option \$${command["varname"]}...")
             val lazyValue = LazyValue(curFrame.step.stepConfig, value, curFrame.step.stepConfig)
             curFrame.options[varname] = lazyValue
             return
         }
 
-        println("No local variable or step option named \$${command["varname"]}...")
+        printer.println("No local variable or step option named \$${command["varname"]}...")
     }
 
     private fun combinedNamespaces(): Map<String,NamespaceUri> {
@@ -443,7 +444,7 @@ class CliDebugger(val runtime: XProcRuntime): Monitor {
 
             return value
         } catch (ex: Exception) {
-            println(ex.message ?: "Exception while evaluating: ${expr}")
+            printer.println(ex.message ?: "Exception while evaluating: ${expr}")
             if (ebv) {
                 return XdmAtomicValue(false)
             }
@@ -475,9 +476,9 @@ class CliDebugger(val runtime: XProcRuntime): Monitor {
                 val ebv = (evalExpression(bp.expr, doc.value as XdmItem, true).underlyingValue as BooleanValue).booleanValue
                 if (ebv) {
                     if (bp.expr == "true()") {
-                        println("Input to ${bp.id} on ${bp.port}")
+                        printer.println("Input to ${bp.id} on ${bp.port}")
                     } else {
-                        println("Input to ${bp.id} on ${bp.port} satisfies ${bp.expr}")
+                        printer.println("Input to ${bp.id} on ${bp.port} satisfies ${bp.expr}")
                     }
                     return true
                 }
@@ -489,22 +490,22 @@ class CliDebugger(val runtime: XProcRuntime): Monitor {
 
     fun doOptions() {
         if (curFrame.options.isNotEmpty()) {
-            println("Step options:")
+            printer.println("Step options:")
             for ((name, _) in curFrame.options) {
-                println("  \$${name}")
+                printer.println("  \$${name}")
             }
         }
         if (localVariables.isNotEmpty()) {
-            println("Local variables:")
+            printer.println("Local variables:")
             for ((name, _) in localVariables) {
-                println("  \$${name}")
+                printer.println("  \$${name}")
             }
         }
     }
 
     fun doInputs() {
         for ((port, value) in curFrame.inputs) {
-            println("${port}: ${value.size} documents")
+            printer.println("${port}: ${value.size} documents")
         }
     }
 
@@ -520,8 +521,8 @@ class CliDebugger(val runtime: XProcRuntime): Monitor {
             }
 
             for ((key, value) in runtime.pipelines) {
-                print(if (start == key.id) "*" else " ")
-                println("${value.id.padEnd(maxlen)} ... ${value.model}")
+                printer.print(if (start == key.id) "*" else " ")
+                printer.println("${value.id.padEnd(maxlen)} ... ${value.model}")
             }
 
             return
@@ -536,7 +537,7 @@ class CliDebugger(val runtime: XProcRuntime): Monitor {
         }
 
         if (model == null) {
-            println("No model: ${id}")
+            printer.println("No model: ${id}")
             return
         }
 
@@ -548,7 +549,7 @@ class CliDebugger(val runtime: XProcRuntime): Monitor {
         }
 
         for (step in model.model.children) {
-            println("${step.id.padEnd(maxlen)} ... ${step}")
+            printer.println("${step.id.padEnd(maxlen)} ... ${step}")
         }
 
         val graph = runtime.graphList.first { it == model.model.graph }
@@ -572,7 +573,7 @@ class CliDebugger(val runtime: XProcRuntime): Monitor {
             }
 
             if (sb.length + item.length > width) {
-                println(sb)
+                printer.println(sb.toString())
                 sb.clear()
                 sb.append("".padEnd(title.length))
                 first = true
@@ -584,14 +585,14 @@ class CliDebugger(val runtime: XProcRuntime): Monitor {
         }
 
         if (sb.toString().isNotBlank()) {
-            println(sb)
+            printer.println(sb.toString())
         }
     }
 
     fun doStack(command: Map<String,String>) {
         val frame = command["frame"]?.toInt() ?: frameNumber
         if (frame < 0 || frame > stack.size) {
-            println("Cannot move to stack frame ${frame}")
+            printer.println("Cannot move to stack frame ${frame}")
             return
         }
 
@@ -600,7 +601,7 @@ class CliDebugger(val runtime: XProcRuntime): Monitor {
 
         for (index in 0 ..< stack.size) {
             val frame = stack[index]
-            println("${if (frameNumber == index) "*" else " "}[${index}] ${frame.step.name}")
+            printer.println("${if (frameNumber == index) "*" else " "}[${index}] ${frame.step.name}")
         }
     }
 
@@ -617,7 +618,7 @@ class CliDebugger(val runtime: XProcRuntime): Monitor {
     fun doSubpipeline(command: Map<String,String>) {
         var step = curFrame.step
         if (step !is CompoundStep) {
-            println("This step has no subpipeline")
+            printer.println("This step has no subpipeline")
         }
 
         val target = command["id"]
@@ -631,7 +632,7 @@ class CliDebugger(val runtime: XProcRuntime): Monitor {
                 }
             }
             if (!found) {
-                println("No subpipeline: ${target}")
+                printer.println("No subpipeline: ${target}")
                 return
             }
         }
@@ -645,7 +646,7 @@ class CliDebugger(val runtime: XProcRuntime): Monitor {
                     }
                 }
                 for ((model, _) in step.runnableProviders) {
-                    println("${model.id.padEnd(maxlen)} ... ${model.type}")
+                    printer.println("${model.id.padEnd(maxlen)} ... ${model.type}")
                 }
             } else {
                 for (step in step.runnables) {
@@ -654,11 +655,11 @@ class CliDebugger(val runtime: XProcRuntime): Monitor {
                     }
                 }
                 for (step in step.runnables) {
-                    println("${step.id.padEnd(maxlen)} ... ${step.type}")
+                    printer.println("${step.id.padEnd(maxlen)} ... ${step.type}")
                 }
             }
         } else {
-            println("Step has no subpipeline")
+            printer.println("Step has no subpipeline")
         }
     }
 
@@ -679,30 +680,30 @@ class CliDebugger(val runtime: XProcRuntime): Monitor {
             try {
                 localBaseUri = URI(command["uri"]!!)
             } catch (ex: URISyntaxException) {
-                println("Not a valid URI: ${command["uri"]!!}")
+                printer.println("Not a valid URI: ${command["uri"]!!}")
             }
             return
         }
         if (localBaseUri != null) {
-            println(localBaseUri)
+            printer.println("${localBaseUri}")
         } else {
-            println("The base URI is undefined.")
+            printer.println("The base URI is undefined.")
         }
     }
 
     fun doBreakpoint(command: Map<String,String>) {
         if ("id" !in command) {
             if (breakpoints.isEmpty()) {
-                println("No breakpoints")
+                printer.println("No breakpoints")
             } else {
-                println("Active breakpoints:")
+                printer.println("Active breakpoints:")
                 for ((id, list) in breakpoints) {
                     if (list.size == 1) {
-                        println("${id}: ${list.first()}")
+                        printer.println("${id}: ${list.first()}")
                     } else {
-                        println("${id}:")
+                        printer.println("${id}:")
                         for (bp in list) {
-                            println("  ${bp}")
+                            printer.println("  ${bp}")
                         }
                     }
                 }
@@ -713,7 +714,7 @@ class CliDebugger(val runtime: XProcRuntime): Monitor {
         val stepId = command["id"]!!
 
         if (stepId !in stepList) {
-            println("Error: \"${stepId}\" does not identify a step")
+            printer.println("Error: \"${stepId}\" does not identify a step")
             val options = stepList.filter { it.startsWith(stepId.substring(0,1)) }
             if (options.isNotEmpty()) {
                 showList("Similar: ", options)
@@ -725,7 +726,7 @@ class CliDebugger(val runtime: XProcRuntime): Monitor {
             if (stepId in breakpoints) {
                 breakpoints.remove(stepId)
             } else {
-                println("No breakpoints set on ${stepId}")
+                printer.println("No breakpoints set on ${stepId}")
             }
             return
         }
@@ -751,20 +752,20 @@ class CliDebugger(val runtime: XProcRuntime): Monitor {
     fun doCatchpoint(command: Map<String,String>) {
         if ("id" !in command && "code" !in command) {
             if (catchpoints.isEmpty()) {
-                println("No catch points")
+                printer.println("No catch points")
             } else {
-                println("Active catch points:")
+                printer.println("Active catch points:")
                 for (point in catchpoints) {
                     if (point.id == null && point.code == null) {
-                        println("  Catch any error on any step")
+                        printer.println("  Catch any error on any step")
                     } else if (point.id != null) {
                         if (point.code == null) {
-                            println("  Catch any error on ${point.id}")
+                            printer.println("  Catch any error on ${point.id}")
                         } else {
-                            println("  Catch ${point.code} on ${point.id}")
+                            printer.println("  Catch ${point.code} on ${point.id}")
                         }
                     } else {
-                        println("  Catch ${point.code} on any step")
+                        printer.println("  Catch ${point.code} on any step")
                     }
                 }
             }
@@ -791,7 +792,7 @@ class CliDebugger(val runtime: XProcRuntime): Monitor {
             val text = CliDebugger::class.java.getResource("/com/xmlcalabash/debugger.txt")
                 ?.readText(StandardCharsets.UTF_8)
             if (text == null) {
-                println("Help is not available.")
+                printer.println("Help is not available.")
                 return
             }
             help.addAll(text.split("\n").map { it.trimEnd() })
@@ -800,7 +801,7 @@ class CliDebugger(val runtime: XProcRuntime): Monitor {
         val topic = command["topic"]
         if (topic == null) {
             for (line in help.filter { it != "" && !it.startsWith(" ") }) {
-                println(line)
+                printer.println(line)
             }
             return
         }
@@ -816,7 +817,7 @@ class CliDebugger(val runtime: XProcRuntime): Monitor {
             }
 
             if (doPrint) {
-                println(line)
+                printer.println(line)
             }
         }
 
@@ -836,17 +837,17 @@ class CliDebugger(val runtime: XProcRuntime): Monitor {
             for ((prefix, uri) in localNamespaces) {
                 inscopeNs[prefix] = uri
             }
-            println("xmlns = \"\"")
+            printer.println("xmlns = \"\"")
             for ((prefix, uri) in inscopeNs) {
                 if (prefix != "xml") {
-                    println("xmlns:${prefix} = \"${uri}\"")
+                    printer.println("xmlns:${prefix} = \"${uri}\"")
                 }
             }
             return
         }
 
         if (prefix == "xml" || prefix == "xmlns") {
-            println("You cannot change the ${prefix} prefix.")
+            printer.println("You cannot change the ${prefix} prefix.")
             return
         }
 
@@ -855,7 +856,7 @@ class CliDebugger(val runtime: XProcRuntime): Monitor {
             localNamespaces.remove(prefix)
         } else {
             if (uri == NsXmlns.namespace.toString()) {
-                println("You cannot change the ${uri} URI.")
+                printer.println("You cannot change the ${uri} URI.")
             } else {
                 localNamespaces[prefix] = NamespaceUri.of(uri)
             }
@@ -941,7 +942,7 @@ class CliDebugger(val runtime: XProcRuntime): Monitor {
                 else -> {
                     inputs = mutableMapOf()
                     options = mutableMapOf()
-                    println("Unexpected step type: ${step}")
+                    printer.println("Unexpected step type: ${step}")
                 }
             }
         }
