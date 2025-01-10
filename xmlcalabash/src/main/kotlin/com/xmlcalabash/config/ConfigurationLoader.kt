@@ -5,6 +5,7 @@ import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.namespace.Ns
 import com.xmlcalabash.spi.PagedMediaManager
 import com.xmlcalabash.spi.PagedMediaServiceProvider
+import com.xmlcalabash.util.DefaultMessagePrinter
 import com.xmlcalabash.util.DefaultXmlCalabashConfiguration
 import com.xmlcalabash.util.NopPagedMediaProvider
 import com.xmlcalabash.util.S9Api
@@ -19,7 +20,9 @@ import org.apache.logging.log4j.kotlin.logger
 import org.xml.sax.InputSource
 import java.io.File
 import java.io.FileInputStream
+import java.io.IOException
 import java.net.URI
+import java.nio.charset.Charset
 import javax.xml.transform.sax.SAXSource
 
 class ConfigurationLoader private constructor(private val config: XmlCalabashConfiguration) {
@@ -48,6 +51,7 @@ class ConfigurationLoader private constructor(private val config: XmlCalabashCon
         private val _password = QName("password")
         private val _port = QName("port")
         private val _piped_io = QName("piped-io")
+        private val _console_output_encoding = QName("console-output-encoding")
         private val _saxonConfiguration = QName("saxon-configuration")
         private val _scheme = QName("scheme")
         private val _trimWhitespace = QName("trim-whitespace")
@@ -139,6 +143,28 @@ class ConfigurationLoader private constructor(private val config: XmlCalabashCon
 
         config.pipe = booleanAttribute(root.getAttributeValue(_piped_io), "piped-io")
         config.verbosity = verbosityAttribute(root.getAttributeValue(_verbosity))
+
+        // If this is Windows, assume the console output is in Windows CP 1252
+        if (System.getProperty("os.name")?.lowercase()?.startsWith("windows") == true) {
+            config.consoleEncoding = "windows-1252"
+        }
+
+        if (root.getAttributeValue(_console_output_encoding) != null) {
+            val encoding = root.getAttributeValue(_console_output_encoding)
+            try {
+                if (Charset.isSupported(encoding)) {
+                    config.consoleEncoding = encoding
+                } else {
+                    logger.warn { "Console encoding is not supported: ${encoding}, using ${config.consoleEncoding}" }
+                }
+            } catch (_: IOException) {
+                logger.warn { "Console encoding is not supported: ${encoding}, using ${config.consoleEncoding}" }
+            }
+        }
+
+        if (config.consoleEncoding.lowercase() != XmlCalabashConfiguration.DEFAULT_CONSOLE_ENCODING) {
+            config.messagePrinter = DefaultMessagePrinter(config.consoleEncoding)
+        }
 
         for (child in root.axisIterator(Axis.CHILD)) {
             when (child.nodeKind) {
@@ -384,11 +410,12 @@ class ConfigurationLoader private constructor(private val config: XmlCalabashCon
             }
         }
 
+        val printer = config
         when (value) {
             null -> Unit
             "silent" -> config.visualizer = Silent(options)
-            "plain" -> config.visualizer = Plain(options)
-            "detail" -> config.visualizer = Detail(options)
+            "plain" -> config.visualizer = Plain(config.messagePrinter, options)
+            "detail" -> config.visualizer = Detail(config.messagePrinter, options)
             else -> throw XProcError.xiUnrecognizedConfigurationValue(ccVisualizer, Ns.name, value).exception()
         }
     }

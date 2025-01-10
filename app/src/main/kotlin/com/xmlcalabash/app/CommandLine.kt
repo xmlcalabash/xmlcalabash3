@@ -52,7 +52,8 @@ class CommandLine private constructor(val args: Array<out String>) {
     private var _pipelineDescription: String? = null
     private var _debug: Boolean? = null
     private var _debugger = false
-    private var _visualizer: Monitor? = null
+    private var _visualizer: String? = null
+    private val _visualizerOptions = mutableMapOf<String,String>()
     private var _verbosity: Verbosity? = null
     private var _explainErrors = false
     private var _assertions = AssertionsLevel.IGNORE
@@ -107,8 +108,12 @@ class CommandLine private constructor(val args: Array<out String>) {
         get() = _explainErrors
 
     /** Did we select a visualizer? */
-    val visualizer: Monitor?
+    val visualizer: String?
         get() = _visualizer
+
+    /** Did it have options? */
+    val visualizerOptions: Map<String,String>
+        get() = _visualizerOptions
 
     /** Evaluate assertions? */
     val assertions: AssertionsLevel
@@ -416,8 +421,6 @@ class CommandLine private constructor(val args: Array<out String>) {
             ""
         }
 
-        val options = mutableMapOf<String,String>()
-
         // Cheap and cheerful. And keep it that way.
         if (opts.trim().isNotEmpty()) {
             for (nvpair in opts.split(";")) {
@@ -427,15 +430,14 @@ class CommandLine private constructor(val args: Array<out String>) {
                 }
                 val key = nvpair.substring(0, eqpos).trim()
                 val value = nvpair.substring(eqpos + 1).trim()
-                options[key] = value
+                _visualizerOptions[key] = value
             }
         }
 
-        _visualizer = when(name) {
-            "silent" -> Silent(options)
-            "plain" -> Plain(options)
-            "detail" -> Detail(options)
-            else -> throw XProcError.xiCliInvalidValue("--visualizer", arg).exception()
+        _visualizer = if (name in listOf("silent", "plain", "detail")) {
+            name
+        } else {
+            throw XProcError.xiCliInvalidValue("--visualizer", arg).exception()
         }
     }
 

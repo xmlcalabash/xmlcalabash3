@@ -3,6 +3,7 @@ package com.xmlcalabash.visualizers
 import com.xmlcalabash.datamodel.XProcConstantExpression
 import com.xmlcalabash.datamodel.XProcSelectExpression
 import com.xmlcalabash.documents.XProcDocument
+import com.xmlcalabash.io.MessagePrinter
 import com.xmlcalabash.namespace.Ns
 import com.xmlcalabash.namespace.NsCx
 import com.xmlcalabash.runtime.steps.AbstractStep
@@ -13,7 +14,7 @@ import com.xmlcalabash.steps.AbstractAtomicStep
 import com.xmlcalabash.steps.internal.ExpressionStep
 import com.xmlcalabash.steps.internal.GuardStep
 
-open class Plain(options: Map<String,String>): AbstractVisualizer(options) {
+open class Plain(val printer: MessagePrinter, options: Map<String,String>): AbstractVisualizer(options) {
     val width = 0.coerceAtLeast(options["indent"]?.toInt() ?: 1)
 
     override fun showStart(step: AbstractStep, depth: Int) {
@@ -23,9 +24,9 @@ open class Plain(options: Map<String,String>): AbstractVisualizer(options) {
         }
 
         if (depth == 1 || width == 0) {
-            println("Running ${name(step)}${extra(step)}")
+            printer.println("Running ${name(step)}${extra(step)}")
         } else {
-            println("Running ${"".padEnd((depth-1)*width, '.')} ${name(step)}${extra(step)}")
+            printer.println("Running ${"".padEnd((depth-1)*width, '.')} ${name(step)}${extra(step)}")
         }
     }
 

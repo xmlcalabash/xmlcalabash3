@@ -10,6 +10,7 @@ cc.xmlCalabash =
         attribute licensed { xsd:boolean }?,
         attribute verbosity { "trace" | "debug" | "progress" | "info" | "warn" | "error" }?,
         attribute piped-io { xsd:boolean }?,
+        attribute console-output-encoding { xsd:string }?,
         (cc.graphviz
         | cc.inline
         | cc.mimetype

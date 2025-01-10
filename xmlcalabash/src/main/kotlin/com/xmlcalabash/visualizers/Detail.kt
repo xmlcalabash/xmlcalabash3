@@ -2,12 +2,10 @@ package com.xmlcalabash.visualizers
 
 import com.xmlcalabash.documents.XProcBinaryDocument
 import com.xmlcalabash.documents.XProcDocument
-import com.xmlcalabash.namespace.NsXs.boolean
+import com.xmlcalabash.io.MessagePrinter
 import com.xmlcalabash.runtime.steps.AbstractStep
-import com.xmlcalabash.runtime.steps.AtomicStep
 import com.xmlcalabash.runtime.steps.CompoundStep
 import com.xmlcalabash.runtime.steps.PipelineStep
-import com.xmlcalabash.steps.AbstractAtomicStep
 import com.xmlcalabash.util.S9Api
 import net.sf.saxon.s9api.XdmArray
 import net.sf.saxon.s9api.XdmAtomicValue
@@ -16,9 +14,17 @@ import net.sf.saxon.s9api.XdmNode
 import net.sf.saxon.s9api.XdmNodeKind
 import org.apache.logging.log4j.kotlin.logger
 
-class Detail(options: Map<String,String>): Plain(emptyMap()) {
+class Detail(printer: MessagePrinter, options: Map<String,String>): Plain(printer, emptyMap()) {
     private var showsteps = true
     private var showdocs = false
+    private val t_start: String
+    private val t_end: String
+    private val t_indent: String
+    private val t_tee: String
+    private val t_dots: String
+    private val t_arrow: String
+    private val t_leftg: String
+    private val t_rightg: String
 
     init {
         for ((key, value) in options) {
@@ -28,6 +34,27 @@ class Detail(options: Map<String,String>): Plain(emptyMap()) {
                 else -> logger.warn("Unknown detail visualizer option: $key")
             }
         }
+
+        if (printer.encoding.lowercase().startsWith("utf")) {
+            t_start = "┌─ "
+            t_end = "└─ "
+            t_indent = "│  "
+            t_tee = "├─ "
+            t_dots = "┄"
+            t_arrow = "⟶"
+            t_leftg = "«"
+            t_rightg = "»"
+        } else {
+            t_start = "+- "
+            t_end = "+- "
+            t_indent = "|  "
+            t_tee = "+- "
+            t_dots = "---"
+            t_arrow = "-->"
+            t_leftg = "<<"
+            t_rightg = ">>"
+        }
+
     }
 
     override fun showStart(step: AbstractStep, depth: Int) {
@@ -36,14 +63,12 @@ class Detail(options: Map<String,String>): Plain(emptyMap()) {
         }
 
         if (depth == 1) {
-            print("┌─ ")
+            printer.print(t_start)
         } else {
-            for (index in 1 ..< depth) {
-                print("│  ")
-            }
-            print("├─ ")
+            printer.print(t_indent.repeat(depth-1))
+            printer.print(t_tee)
         }
-        println("${name(step)}${extra(step)}")
+        printer.println("${name(step)}${extra(step)}")
     }
 
     override fun showEnd(step: AbstractStep, depth: Int) {
@@ -52,15 +77,13 @@ class Detail(options: Map<String,String>): Plain(emptyMap()) {
         }
 
         if (depth == 1) {
-            print("└─ ")
+            printer.print(t_end)
         } else {
-            for (index in 1 ..< depth) {
-                print("│  ")
-            }
-            print("├─ ")
+            printer.print(t_indent.repeat(depth-1))
+            printer.print(t_tee)
         }
 
-        println("${name(step)}${extra(step)} (ends)")
+        printer.println("${name(step)}${extra(step)} (ends)")
     }
 
     override fun showDocument(step: AbstractStep, port: String, depth: Int, document: XProcDocument) {
@@ -71,7 +94,7 @@ class Detail(options: Map<String,String>): Plain(emptyMap()) {
         val value = document.value
 
         val type = if (document is XProcBinaryDocument) {
-            "«binary»"
+            "${t_leftg}binary${t_rightg}"
         } else {
             when (value) {
                 is XdmNode -> {
@@ -79,7 +102,7 @@ class Detail(options: Map<String,String>): Plain(emptyMap()) {
                         XdmNodeKind.DOCUMENT -> {
                             val root = S9Api.firstElement(value)?.nodeName
                             if (root == null) {
-                                "«empty document»"
+                                "${t_leftg}empty document${t_rightg}"
                             } else {
                                 "<${root} ...>"
                             }
@@ -93,7 +116,7 @@ class Detail(options: Map<String,String>): Plain(emptyMap()) {
                                 "\"${str}\""
                             }
                         }
-                        else -> "«${value.nodeKind.toString().lowercase()}»"
+                        else -> "${t_leftg}${value.nodeKind.toString().lowercase()}${t_rightg}"
                     }
                 }
                 is XdmMap -> "map"
@@ -103,12 +126,9 @@ class Detail(options: Map<String,String>): Plain(emptyMap()) {
             }
         }
 
-        for (index in 1 ..< depth) {
-            print("│  ")
-        }
-        print("│  ")
-
-        println("┄ ${name(step)}.${port} ⟶ ${type}")
+        printer.print(t_indent.repeat(depth-1))
+        printer.print(t_indent)
+        printer.println("${t_dots} ${name(step)}.${port} ${t_arrow} ${type}")
     }
 
     override fun name(step: AbstractStep): String {

@@ -24,6 +24,8 @@ import com.xmlcalabash.util.DefaultXmlCalabashConfiguration
 import com.xmlcalabash.util.UriUtils
 import com.xmlcalabash.util.Verbosity
 import com.xmlcalabash.util.VisualizerOutput
+import com.xmlcalabash.visualizers.Detail
+import com.xmlcalabash.visualizers.Plain
 import com.xmlcalabash.visualizers.Silent
 import net.sf.saxon.Configuration
 import net.sf.saxon.lib.Initializer
@@ -105,10 +107,22 @@ class XmlCalabashCli private constructor() {
             config.licensed = config.licensed && commandLine.licensed
 
             config.debugger = commandLine.debugger
-            if (commandLine.debugger) {
-                config.visualizer = commandLine.visualizer ?: Silent(emptyMap())
-            } else {
-                commandLine.visualizer?.let { config.visualizer = it }
+            when (commandLine.visualizer) {
+                null -> {
+                    // If the user didn't specify one on the command line, use the one from
+                    // the configuration file, unless --debugger has been specified, in which
+                    // case turn it off. Debugging and visualization don't play nicely together.
+                    if (config.debugger) {
+                        Silent(emptyMap())
+                    }
+                }
+                "silent" -> config.visualizer = Silent(commandLine.visualizerOptions)
+                "plain" -> config.visualizer = Plain(config.messagePrinter, commandLine.visualizerOptions)
+                "detail" -> config.visualizer = Detail(config.messagePrinter, commandLine.visualizerOptions)
+                else -> {
+                    logger.warn("Unexpected visualizer: ${commandLine.visualizer}")
+                    config.visualizer = Silent(emptyMap())
+                }
             }
 
             if (config.trace == null && config.traceDocuments != null) {
@@ -365,12 +379,12 @@ class XmlCalabashCli private constructor() {
     private fun help() {
         val stream = XmlCalabashCli::class.java.getResourceAsStream("/com/xmlcalabash/help.txt")
         if (stream == null) {
-            print("Error: help is not available.")
+            xmlCalabash.println("Error: help is not available.")
             return
         }
         val reader = BufferedReader(InputStreamReader(stream))
         for (line in reader.lines()) {
-            println(line)
+            xmlCalabash.println(line)
         }
     }
 
@@ -407,9 +421,9 @@ class XmlCalabashCli private constructor() {
             val date = LocalDateTime.ofInstant(dateInstant, ZoneId.systemDefault())
             val dateFormatter = DateTimeFormatter.ofPattern("dd LLLL yyyy")
 
-            print("${XmlCalabashBuildConfig.PRODUCT_NAME} version ${XmlCalabashBuildConfig.VERSION} ")
-            println("(build ${XmlCalabashBuildConfig.BUILD_ID}, ${dateFormatter.format(date)})")
-            println("Running with Saxon ${proc.saxonEdition} version ${proc.saxonProductVersion}")
+            xmlCalabash.print("${XmlCalabashBuildConfig.PRODUCT_NAME} version ${XmlCalabashBuildConfig.VERSION} ")
+            xmlCalabash.println("(build ${XmlCalabashBuildConfig.BUILD_ID}, ${dateFormatter.format(date)})")
+            xmlCalabash.println("Running with Saxon ${proc.saxonEdition} version ${proc.saxonProductVersion}")
             if (edition != proc.saxonEdition) {
                 if (xmlCalabash.xmlCalabashConfig.licensed) {
                     println("(You appear to have ${edition}; perhaps a license wasn't found?)")

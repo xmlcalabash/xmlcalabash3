@@ -19,7 +19,7 @@ class SmokeTestPipelineMessages {
     fun runPipeline() {
         val pipeline = File("src/test/resources/pipe.xpl").toURI()
         val config = DefaultXmlCalabashConfiguration()
-        config.visualizer = Detail(emptyMap())
+        config.visualizer = Detail(config.messagePrinter, emptyMap())
         val calabash = XmlCalabash.newInstance(config)
         val parser = calabash.newXProcParser()
         val decl = parser.parse(pipeline)

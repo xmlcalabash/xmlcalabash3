@@ -2,9 +2,6 @@ package com.xmlcalabash.config
 
 import com.xmlcalabash.api.XProcStep
 import com.xmlcalabash.datamodel.DeclareStepInstruction
-import com.xmlcalabash.datamodel.PipelineBuilder
-import com.xmlcalabash.datamodel.StandardLibrary
-import com.xmlcalabash.datamodel.Visibility
 import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.exceptions.DefaultErrorExplanation
 import com.xmlcalabash.exceptions.ErrorExplanation
@@ -18,7 +15,8 @@ import com.xmlcalabash.spi.AtomicStepServiceProvider
 import com.xmlcalabash.spi.DocumentResolverServiceProvider
 import com.xmlcalabash.util.DefaultMessageReporter
 import com.xmlcalabash.api.MessageReporter
-import com.xmlcalabash.util.Verbosity
+import com.xmlcalabash.io.MessagePrinter
+import com.xmlcalabash.util.DefaultMessagePrinter
 import net.sf.saxon.s9api.QName
 import org.apache.logging.log4j.kotlin.logger
 import java.net.URI
@@ -82,6 +80,10 @@ class CommonEnvironment(private val xmlCalabash: XmlCalabash) {
     private val knownAtomicSteps = mutableSetOf<QName>()
 
     init {
+        if (xmlCalabash.xmlCalabashConfig.pipe) {
+            xmlCalabash.xmlCalabashConfig.messagePrinter.setPrintStream(System.err)
+        }
+
         for ((contentType, extensions) in xmlCalabash.xmlCalabashConfig.mimetypes) {
             _mimeTypes.addMimeTypes("${contentType} ${extensions}")
         }
@@ -123,7 +125,7 @@ class CommonEnvironment(private val xmlCalabash: XmlCalabash) {
     var messageReporter: () -> MessageReporter
         get() {
             if (_messageReporter == null) {
-                _messageReporter = { DefaultMessageReporter() }
+                _messageReporter = { DefaultMessageReporter(xmlCalabash.xmlCalabashConfig.messagePrinter) }
             }
             return _messageReporter!!
         }
