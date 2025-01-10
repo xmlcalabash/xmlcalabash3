@@ -49,6 +49,7 @@ object NsCx {
     val pipeline = QName(namespace, "cx:pipeline")
     val processor = QName(namespace, "cx:processor")
     val productBuild = QName(namespace, "cx:product-build")
+    val publicIdentifier = QName(namespace, "cx:public-identifier")
     val report = QName(namespace, "cx:report")
     val saxonEdition = QName(namespace, "saxon-edition")
     val saxonVersion = QName(namespace, "saxon-version")

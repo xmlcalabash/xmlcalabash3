@@ -131,6 +131,10 @@ class CachingErrorListener(val stepConfig: XProcStepConfiguration, val errors: E
                 val fail = exception.validationFailure
                 errors.xsdValidationError(msg, fail)
             }
+            is SAXParseException -> {
+                val msg = exception.message!!
+                errors.validationError(msg, exception)
+            }
             else ->
                 errors.xsdValidationError(exception.localizedMessage!!)
         }

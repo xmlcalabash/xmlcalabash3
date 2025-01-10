@@ -1,5 +1,6 @@
 package com.xmlcalabash.steps.validation
 
+import com.xmlcalabash.namespace.NsCx
 import com.xmlcalabash.namespace.NsSaxon
 import com.xmlcalabash.runtime.XProcStepConfiguration
 import com.xmlcalabash.xvrl.XvrlReport
@@ -7,6 +8,7 @@ import net.sf.saxon.lib.Invalidity
 import net.sf.saxon.s9api.QName
 import net.sf.saxon.s9api.XdmNode
 import net.sf.saxon.type.ValidationFailure
+import org.xml.sax.SAXParseException
 import java.net.URI
 
 class Errors(stepConfig: XProcStepConfiguration, uri: URI?) {
@@ -73,6 +75,17 @@ class Errors(stepConfig: XProcStepConfiguration, uri: URI?) {
 
     fun xsdValidationError(msg: String) {
         report.detection("error", null, msg)
+    }
+
+    fun validationError(msg: String, fail: SAXParseException) {
+        val detection = report.detection("error", null, msg)
+        if (fail.systemId != null) {
+            val amap = mutableMapOf<QName, String?>(
+                NsCx.publicIdentifier to fail.publicId
+            )
+            val uri = URI(fail.systemId!!)
+            val loc = detection.location(uri, fail.lineNumber, fail.columnNumber, amap)
+        }
     }
 
     fun jsonValidationError(code: String, message: String) {
