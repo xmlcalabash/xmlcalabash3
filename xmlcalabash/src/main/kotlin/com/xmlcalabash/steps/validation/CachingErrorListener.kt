@@ -131,6 +131,10 @@ class CachingErrorListener(val stepConfig: XProcStepConfiguration, val errors: E
                 val fail = exception.validationFailure
                 errors.xsdValidationError(msg, fail)
             }
+            is SAXParseException -> {
+                val msg = exception.message!!
+                errors.validationError(msg, exception)
+            }
             else ->
                 errors.xsdValidationError(exception.localizedMessage!!)
         }
@@ -142,10 +146,11 @@ class CachingErrorListener(val stepConfig: XProcStepConfiguration, val errors: E
 
     override fun reportInvalidity(failure: Invalidity?) {
         invalidityHandler?.reportInvalidity(failure)
-
         if (failure == null) {
             return
         }
+
+        errors.xsdValidationError(failure)
 
         stepConfig.info { "${failure.message}" }
     }
