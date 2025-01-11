@@ -151,8 +151,6 @@ class CachingErrorListener(val stepConfig: XProcStepConfiguration, val errors: E
         }
 
         errors.xsdValidationError(failure)
-
-        stepConfig.info { "${failure.message}" }
     }
 
     override fun endReporting(): Sequence {
