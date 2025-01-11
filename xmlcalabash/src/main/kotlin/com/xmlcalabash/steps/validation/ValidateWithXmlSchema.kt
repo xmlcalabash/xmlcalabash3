@@ -112,8 +112,12 @@ open class ValidateWithXmlSchema(): AbstractAtomicStep() {
             val ns = sourceNode.nodeName.namespaceUri
             if (ns != NamespaceUri.NULL) {
                 val docManager = stepConfig.environment.documentManager
-                val doc = docManager.load(URI(ns.toString()), stepConfig)
-                schemaDocuments.add(doc.value as XdmNode)
+                try {
+                    val doc = docManager.load(URI(ns.toString()), stepConfig)
+                    schemaDocuments.add(doc.value as XdmNode)
+                } catch (ex: Exception) {
+                    stepConfig.debug { "Failed to load XML Shema from ${ns}: ${ex.message}" }
+                }
             }
         }
 
