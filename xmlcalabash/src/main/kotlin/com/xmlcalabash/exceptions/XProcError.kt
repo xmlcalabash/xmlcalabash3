@@ -147,7 +147,7 @@ class XProcError private constructor(val code: QName, val variant: Int, val loca
         fun xdInputSequenceForbidden(port: String) = dynamic(6, port)
         fun xdOutputSequenceForbidden(port: String) = dynamic(7, port)
         fun xdViewportOnAttribute(expr: String) = dynamic(10, expr)
-        fun xdDoesNotExist(path: String) = dynamic(Pair(11, 1), path)
+        fun xdDoesNotExist(path: String, message: String) = dynamic(Pair(11, 1), path, message)
         fun xdIsNotReadable(path: String, message: String) = dynamic(Pair(11, 2), path, message)
         fun xdInvalidQName(name: String) = dynamic(Pair(15, 1), name)
         fun xdNoBindingInScope(message: String) = dynamic(Pair(15, 2), message)
@@ -496,6 +496,11 @@ class XProcError private constructor(val code: QName, val variant: Int, val loca
 
     fun with(newCode: QName): XProcError {
         return XProcError(newCode, 1, location, inputLocation, *details)
+    }
+
+    fun with(cause: Throwable): XProcError {
+        _throwable = cause
+        return this
     }
 
     fun exception(): XProcException {

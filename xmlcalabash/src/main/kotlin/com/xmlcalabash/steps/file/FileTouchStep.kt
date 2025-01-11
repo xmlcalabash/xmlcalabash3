@@ -37,7 +37,7 @@ class FileTouchStep(): FileStep(NsP.fileTouch) {
         try {
             if (!file.exists()) {
                 if (!file.createNewFile()) {
-                    maybeThrow(XProcError.xdDoesNotExist(href.path), href)
+                    maybeThrow(XProcError.xdDoesNotExist(href.path, "does not exist and failed to create"), href)
                     return
                 }
             }
@@ -45,7 +45,7 @@ class FileTouchStep(): FileStep(NsP.fileTouch) {
             val millis = timestamp.toInstant().toEpochMilli()
             file.setLastModified(millis)
         } catch (ex: IOException) {
-            maybeThrow(XProcError.xdDoesNotExist(href.path), href)
+            maybeThrow(XProcError.xdDoesNotExist(href.path, ex.message ?: "???").with(ex), href)
             return
         }
 

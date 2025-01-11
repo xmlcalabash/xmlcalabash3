@@ -177,7 +177,7 @@ open class ArchiveStep(): AbstractArchiveStep() {
                     } catch (ex: XProcException) {
                         throw ex
                     } catch (ex: Exception) {
-                        throw stepConfig.exception(XProcError.xdDoesNotExist(entry.href.toString()))
+                        throw stepConfig.exception(XProcError.xdDoesNotExist(entry.href.toString(), ex.message ?: "???"), ex)
                     }
                 }
             }
