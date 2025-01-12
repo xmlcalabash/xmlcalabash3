@@ -3,6 +3,7 @@ package com.xmlcalabash.namespace
 import net.sf.saxon.s9api.QName
 
 object Ns {
+    val adaptive = QName("adaptive")
     val acceptMultipart = QName("accept-multipart")
     val accessKey = QName("access-key")
     val algorithm = QName("algorithm")
@@ -21,6 +22,7 @@ object Ns {
     val auth = QName("auth")
     val baseUri = QName("base-uri")
     val brotli = QName("brotli")
+    val byteOrderMark = QName("byte-order-mark")
     val bzip2 = QName("bzip2")
     val caseOrder = QName("case-order")
     val code = QName("code")

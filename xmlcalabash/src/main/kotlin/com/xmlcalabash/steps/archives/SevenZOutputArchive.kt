@@ -55,7 +55,7 @@ class SevenZOutputArchive(stepConfig: XProcStepConfiguration): OutputArchive(ste
                     "deflate" -> methods.add(SevenZMethodConfiguration(SevenZMethod.DEFLATE))
                     "deflate64" -> methods.add(SevenZMethodConfiguration(SevenZMethod.DEFLATE64))
                     "bzip2" -> methods.add(SevenZMethodConfiguration(SevenZMethod.BZIP2))
-                    else -> logger.debug("Ignoring unknown 7z compression method: ${token}")
+                    else -> stepConfig.debug { "Ignoring unknown 7z compression method: ${token}" }
                 }
             }
             if (methods.isNotEmpty()) {

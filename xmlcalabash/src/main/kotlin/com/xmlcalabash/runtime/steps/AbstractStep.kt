@@ -125,7 +125,7 @@ abstract class AbstractStep(val stepConfig: XProcStepConfiguration, step: StepMo
     }
 
     open fun runStep() {
-        logger.debug { "Running ${this}" }
+        stepConfig.debug { "Running ${this}" }
 
         try {
             prepare()
