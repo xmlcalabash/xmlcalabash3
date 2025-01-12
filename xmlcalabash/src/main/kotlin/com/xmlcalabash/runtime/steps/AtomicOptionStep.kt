@@ -8,7 +8,12 @@ import net.sf.saxon.s9api.QName
 import java.time.Duration
 
 class AtomicOptionStep(config: XProcStepConfiguration, atomic: AtomicBuiltinStepModel, val externalName: QName): AtomicStep(config, atomic) {
-    var externalValue: XProcDocument? = null
+    private var _externalValue: XProcDocument? = null
+    var externalValue: XProcDocument?
+        get() = _externalValue
+        set(value) {
+            _externalValue = value
+        }
     internal val atomicOptionValues = mutableMapOf<QName, LazyValue>()
 
     override val stepTimeout: Duration = Duration.ZERO
@@ -29,8 +34,10 @@ class AtomicOptionStep(config: XProcStepConfiguration, atomic: AtomicBuiltinStep
 
     override fun runImplementation() {
         if (externalValue == null) {
+            stepConfig.debug { "  Compute option value" }
             super.runImplementation()
         } else {
+            stepConfig.debug { "  Option value: ${externalValue!!.value}" }
             output("result", externalValue!!)
         }
     }
