@@ -18,6 +18,7 @@ class AtomicUserStepModel(runtime: XProcRuntime, model: AtomicModel, private val
     override fun initialize(model: Model) {
         super.initialize(model)
 
+        impl.userStep = this
         extensionAttributes.putAll(model.step.extensionAttributes)
 
         for ((name, moption) in model.options) {

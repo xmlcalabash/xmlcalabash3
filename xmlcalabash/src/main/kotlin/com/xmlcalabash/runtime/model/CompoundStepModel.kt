@@ -16,6 +16,7 @@ import com.xmlcalabash.runtime.steps.AbstractStep
 import com.xmlcalabash.runtime.steps.CompoundStep
 
 class CompoundStepModel(runtime: XProcRuntime, model: CompoundModel): StepModel(runtime, model) {
+    internal var userStep: AtomicUserStepModel? = null
     lateinit var head: HeadModel
     lateinit var foot: FootModel
     lateinit var params: RuntimeStepParameters
@@ -70,7 +71,16 @@ class CompoundStepModel(runtime: XProcRuntime, model: CompoundModel): StepModel(
                 params = RunStepStepParameters(type, name, location, inputs, outputs, options, primaryInput, primaryOutput)
             }
             else -> {
-                params = RuntimeStepParameters(type, name, location, inputs, outputs, options)
+                val pinputs = mutableMapOf<String, RuntimePort>()
+                pinputs.putAll(inputs)
+                if (userStep != null) {
+                    for ((name, port) in userStep!!.inputs) {
+                        if (name !in pinputs && !port.weldedShut) {
+                            pinputs[name] = RuntimePort(port)
+                        }
+                    }
+                }
+                params = RuntimeStepParameters(type, name, location, pinputs, outputs, options)
             }
         }
 
