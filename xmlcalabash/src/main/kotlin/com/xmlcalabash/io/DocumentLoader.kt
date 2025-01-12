@@ -69,7 +69,7 @@ class DocumentLoader(val context: XProcStepConfiguration,
             try {
                 return loadFile()
             } catch (ex: IOException) {
-                throw context.exception(XProcError.xdDoesNotExist(absURI.path), ex)
+                throw context.exception(XProcError.xdDoesNotExist(absURI.path, ex.message ?: "???"), ex)
             }
         }
 
@@ -81,7 +81,7 @@ class DocumentLoader(val context: XProcStepConfiguration,
                 throw context.exception(XProcError.xdIsNotReadable(absURI.toString(), "HTTP response code: ${resp.statusCode}"))
             }
             if (resp.statusCode >= 400) {
-                throw context.exception(XProcError.xdDoesNotExist(absURI.toString()))
+                throw context.exception(XProcError.xdDoesNotExist(absURI.toString(), "HTTP response code: ${resp.statusCode}"))
             }
 
             return resp.response.first()

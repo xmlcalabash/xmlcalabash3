@@ -26,7 +26,7 @@ class FileInfoStep(): FileStep(NsP.fileInfo) {
 
         val file = File(href.path)
         if (!file.exists()) {
-            maybeThrow(XProcError.xdDoesNotExist(href.path), href)
+            maybeThrow(XProcError.xdDoesNotExist(href.path, "path does not exist"), href)
             return
         }
 

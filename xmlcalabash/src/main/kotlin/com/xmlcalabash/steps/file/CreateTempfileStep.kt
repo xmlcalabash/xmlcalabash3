@@ -38,7 +38,7 @@ class CreateTempfileStep(): FileStep(NsP.fileCreateTempfile) {
                 dir = Paths.get(href.path)
                 if (!Files.exists(dir) || !Files.isDirectory(dir)) {
                     if (failOnError) {
-                        throw stepConfig.exception(XProcError.xdDoesNotExist(dir.toString()))
+                        throw stepConfig.exception(XProcError.xdDoesNotExist(dir.toString(), "path is not a directory"))
                     } else {
                         val err = errorDocument(href, NsErr.xd(11))
                         receiver.output("result", XProcDocument.ofXml(err, stepConfig))

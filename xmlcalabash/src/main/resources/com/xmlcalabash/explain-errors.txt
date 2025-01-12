@@ -28,7 +28,7 @@ It is a dynamic error if the match expression on p:viewport matches an attribute
 or a namespace node.
 
 XD0011/1
-URI does not exist: “$1”.
+URI does not exist “$1”: “$2”.
 It is a dynamic error if the resource referenced by the href option does not
 exist, cannot be accessed or is not a file.
 

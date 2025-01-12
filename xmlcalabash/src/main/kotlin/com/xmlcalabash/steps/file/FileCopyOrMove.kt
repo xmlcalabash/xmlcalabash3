@@ -46,7 +46,7 @@ abstract class FileCopyOrMove(stepType: QName): FileStep(stepType) {
 
         val source = File(href.path)
         if (!source.exists()) {
-            maybeThrow(XProcError.xdDoesNotExist(href.path), href)
+            maybeThrow(XProcError.xdDoesNotExist(href.path, "path does not exist"), href)
             return
         }
 
