@@ -30,7 +30,7 @@ class XProcSelectExpression private constructor(stepConfig: XProcStepConfigurati
         val compiler = config.newXPathCompiler()
 
         // Hack
-        val uri = config.baseUri
+        val uri = stepConfig.baseUri // stepConfig, not config!
         if (uri != null && !uri.toString().startsWith("?uniqueid")) {
             compiler.baseURI = uri
         }
