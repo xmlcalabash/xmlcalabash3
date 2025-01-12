@@ -2,6 +2,7 @@ package com.xmlcalabash.runtime
 
 import com.xmlcalabash.datamodel.XProcExpression
 import com.xmlcalabash.documents.DocumentContext
+import com.xmlcalabash.documents.XProcDocument
 import net.sf.saxon.s9api.XdmValue
 
 /**
@@ -14,7 +15,7 @@ import net.sf.saxon.s9api.XdmValue
  */
 class LazyValue private constructor(val context: DocumentContext, config: XProcStepConfiguration) {
     private var expression: XProcExpression? = null
-    private var constant: XdmValue? = null
+    private var constant: XProcDocument? = null
     private val resolvedConfig = config.copy()
 
     init {
@@ -25,13 +26,13 @@ class LazyValue private constructor(val context: DocumentContext, config: XProcS
         this.expression = expression
     }
 
-    constructor(context: DocumentContext, value: XdmValue, config: XProcStepConfiguration): this(context, config) {
-        this.constant = value
+    constructor(doc: XProcDocument, config: XProcStepConfiguration): this(doc.context, config) {
+        this.constant = doc
     }
 
     val value: XdmValue by lazy {
         if (constant != null) {
-            constant!!
+            constant!!.value
         } else {
             expression!!.evaluate(resolvedConfig)
         }

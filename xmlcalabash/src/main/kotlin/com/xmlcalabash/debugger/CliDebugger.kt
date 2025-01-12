@@ -350,7 +350,7 @@ class CliDebugger(val runtime: XProcRuntime): Monitor {
 
         if (varname in curFrame.options) {
             printer.println("Setting step option \$${command["varname"]}...")
-            val lazyValue = LazyValue(curFrame.step.stepConfig, value, curFrame.step.stepConfig)
+            val lazyValue = LazyValue(XProcDocument.ofValue(value, curFrame.step.stepConfig), curFrame.step.stepConfig)
             curFrame.options[varname] = lazyValue
             return
         }
@@ -925,7 +925,8 @@ class CliDebugger(val runtime: XProcRuntime): Monitor {
                 is AtomicStep -> {
                     val impl = step.implementation as AbstractAtomicStep
                     inputs = impl._queues
-                    options = impl._options
+                    options = mutableMapOf()
+                    options.putAll(impl._options)
                 }
                 is CompoundStepHead -> {
                     inputs = step._cache
@@ -938,6 +939,10 @@ class CliDebugger(val runtime: XProcRuntime): Monitor {
                 is PipelineStep, is CompoundStep -> {
                     inputs = mutableMapOf()
                     options = mutableMapOf()
+                    for ((name, value) in step.staticOptions) {
+                        val svalue = value.staticValue.evaluate(value.stepConfig)
+                        options.put(name, LazyValue(XProcDocument.ofValue(svalue, value.stepConfig), value.stepConfig))
+                    }
                 }
                 else -> {
                     inputs = mutableMapOf()
