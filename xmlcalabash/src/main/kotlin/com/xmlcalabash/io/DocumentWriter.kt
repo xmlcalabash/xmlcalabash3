@@ -102,9 +102,7 @@ class DocumentWriter(val doc: XProcDocument,
                 MediaClassification.JSON -> _params.put(Ns.method, XdmAtomicValue("json"))
                 MediaClassification.YAML -> _params.put(Ns.method, XdmAtomicValue(NsCx.yaml))
                 MediaClassification.TOML -> _params.put(Ns.method, XdmAtomicValue(NsCx.toml))
-                else -> {
-                    throw XProcError.xiImpossible("Called writeJson for ${doc.contentType}").exception()
-                }
+                else -> _params.put(Ns.method, XdmAtomicValue("json"))
             }
         }
 
@@ -116,7 +114,7 @@ class DocumentWriter(val doc: XProcDocument,
             docContext.parseQName(serMethod.underlyingValue.stringValue)
         }
 
-        if (method == Ns.json) {
+        if (method == Ns.json || method == Ns.adaptive) {
             val serializer = docContext.processor.newSerializer(stream)
             setSerializationProperties(serializer)
             serializer.serializeXdmValue(doc.value)
@@ -175,7 +173,11 @@ class DocumentWriter(val doc: XProcDocument,
     }
 
     private fun writeOther() {
-        stream.write((doc as XProcBinaryDocument).binaryValue)
+        if (doc is XProcBinaryDocument) {
+            stream.write(doc.binaryValue)
+        } else {
+            stream.write(doc.value.toString().toByteArray(StandardCharsets.UTF_8))
+        }
     }
 
     private fun setSerializationProperties(serializer: Serializer) {
