@@ -51,6 +51,13 @@ class CompoundStepHead(config: XProcStepConfiguration, val parent: CompoundStep,
                 openPorts.add(name)
             }
         }
+
+        // Also wait for any bindings that are expected
+        for ((name, port) in parent.params.inputs) {
+            if (name.startsWith("Q{") && !port.weldedShut) {
+                openPorts.add(name)
+            }
+        }
     }
 
     override val readyToRun: Boolean

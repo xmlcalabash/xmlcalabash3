@@ -427,7 +427,7 @@ open class ArchiveStep(): AbstractArchiveStep() {
         val localUri = entry.archive?.baseUri?.resolve(entry.name)
         if (localUri?.scheme != "file") {
             if (localUri != null) {
-                logger.warn { "Ignoring update for non-file URI: ${localUri}" }
+                stepConfig.warn { "Ignoring update for non-file URI: ${localUri}" }
             }
             return false
         }

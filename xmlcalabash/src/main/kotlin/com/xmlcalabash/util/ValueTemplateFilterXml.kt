@@ -1,19 +1,21 @@
 package com.xmlcalabash.util
 
-import com.xmlcalabash.runtime.XProcStepConfiguration
 import com.xmlcalabash.datamodel.XProcExpression
 import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.exceptions.XProcException
+import com.xmlcalabash.io.MediaType
 import com.xmlcalabash.namespace.Ns
 import com.xmlcalabash.namespace.NsP
 import com.xmlcalabash.runtime.LazyValue
+import com.xmlcalabash.runtime.XProcStepConfiguration
 import net.sf.saxon.s9api.*
-import org.apache.logging.log4j.kotlin.logger
+import java.io.ByteArrayOutputStream
 import java.net.URI
+import java.nio.charset.StandardCharsets
 import java.util.*
 
-class ValueTemplateFilterXml(val originalNode: XdmNode, val baseUri: URI): ValueTemplateFilter {
+class ValueTemplateFilterXml(val originalNode: XdmNode, val contentType: MediaType, val baseUri: URI): ValueTemplateFilter {
     private var xmlNode = originalNode
     private var static = true
     private var onlyChecking = false
@@ -25,6 +27,7 @@ class ValueTemplateFilterXml(val originalNode: XdmNode, val baseUri: URI): Value
     private val variableBindings = mutableMapOf<QName,XdmValue>()
     private val staticVariableBindings = mutableMapOf<QName,XProcExpression>()
     private val expandText = Stack<Boolean>()
+    private val xmlMediaType = contentType.classification() in listOf(MediaClassification.XML, MediaClassification.XHTML, MediaClassification.HTML)
 
     private var contextItem: Any? = null
 
@@ -173,10 +176,10 @@ class ValueTemplateFilterXml(val originalNode: XdmNode, val baseUri: URI): Value
                 if (expandText.peek()) {
                     considerValueTemplates(config, builder, node.parent, node.stringValue)
                 } else {
-                    builder.addSubtree(node)
+                    addSubtree(builder, node)
                 }
             }
-            else -> builder.addSubtree(node)
+            else -> addSubtree(builder, node)
         }
     }
 
@@ -194,7 +197,7 @@ class ValueTemplateFilterXml(val originalNode: XdmNode, val baseUri: URI): Value
                 node.axisIterator(Axis.CHILD).forEach { removeInlineExpandText(config, builder, it) }
                 builder.addEndElement()
             }
-            else -> builder.addSubtree(node)
+            else -> addSubtree(builder, node)
         }
     }
 
@@ -264,7 +267,7 @@ class ValueTemplateFilterXml(val originalNode: XdmNode, val baseUri: URI): Value
                 if (expr.canBeResolvedStatically()) {
                     try {
                         val value = expr.evaluate(config)
-                        builder.addSubtree(value)
+                        addSubtree(builder, value)
                     } catch (ex: Exception) {
                         if (onlyChecking) {
                             val message = ex.message ?: ""
@@ -299,10 +302,31 @@ class ValueTemplateFilterXml(val originalNode: XdmNode, val baseUri: URI): Value
                             expr.setBinding(name, value)
                         }
                         val value = expr.evaluate(config)
-                        builder.addSubtree(value)
+                        addSubtree(builder, value)
                     }
                 }
             }
+        }
+    }
+
+    private fun addSubtree(builder: SaxonTreeBuilder, value: XdmValue) {
+        if (xmlMediaType) {
+            builder.addSubtree(value)
+        } else {
+            if (value is XdmNode && value.nodeKind == XdmNodeKind.ATTRIBUTE) {
+                builder.addText(value.underlyingNode.stringValue)
+                return
+            }
+
+            val baos = ByteArrayOutputStream()
+            val serializer = originalNode.processor.newSerializer(baos)
+            serializer.setOutputProperty(Ns.byteOrderMark, "false")
+            serializer.setOutputProperty(Ns.method, "text")
+            serializer.setOutputProperty(Ns.encoding, "UTF-8")
+            serializer.setOutputProperty(Ns.omitXmlDeclaration, "true")
+            serializer.serializeXdmValue(value)
+            val str = baos.toString(StandardCharsets.UTF_8)
+            builder.addText(str)
         }
     }
 

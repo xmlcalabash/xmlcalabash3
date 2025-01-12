@@ -230,18 +230,12 @@ open class LibraryInstruction(stepConfig: InstructionConfiguration): XProcInstru
         findDefaultReadablePort(null)
         elaborateInstructions()
 
-        rewrite()
+        for (child in children.filterIsInstance<DeclareStepInstruction>()) {
+            child.validate()
+        }
     }
 
     // ========================================================================================
-
-    fun rewrite() {
-        for (child in children.filterIsInstance<DeclareStepInstruction>()) {
-            if (!child.isAtomic) {
-                child.rewrite()
-            }
-        }
-    }
 
     fun getPipeline(name: String?): DeclareStepInstruction {
         for (child in children.filterIsInstance<DeclareStepInstruction>()) {

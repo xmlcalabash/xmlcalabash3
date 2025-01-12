@@ -40,7 +40,7 @@ open class InlineStep(val params: InlineStepParameters): AbstractAtomicStep() {
                 if (ex.message != null && ex.message!!.contains("Namespace prefix") && ex.message!!.contains("has not been declared")) {
                     throw stepConfig.exception(XProcError.xdNoBindingInScope(ex.message!!))
                 }
-                throw stepConfig.exception(XProcError.xsXPathStaticError(ex.message ?: ""), ex)
+                throw ex
             }
         }
 

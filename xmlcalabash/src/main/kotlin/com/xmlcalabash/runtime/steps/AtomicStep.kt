@@ -56,7 +56,7 @@ open class AtomicStep(config: XProcStepConfiguration, atomic: AtomicBuiltinStepM
                     || (type.namespaceUri != NsP.namespace && name == NsP.message)) {
                     message = doc.value
                 } else {
-                    implementation.option(name, LazyValue(doc.context, doc.value, stepConfig))
+                    implementation.option(name, LazyValue(doc, stepConfig))
                 }
                 return
             }

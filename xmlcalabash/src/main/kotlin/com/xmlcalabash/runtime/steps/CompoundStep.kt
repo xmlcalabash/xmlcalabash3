@@ -174,7 +174,7 @@ abstract class CompoundStep(config: XProcStepConfiguration, compound: CompoundSt
                     if (runMe.externalValue == null) {
                         atomicOptionValues[runMe.externalName] = LazyValue(runMe.stepConfig, (runMe.implementation as ExpressionStep).expression, stepConfig)
                     } else {
-                        atomicOptionValues[runMe.externalName] = LazyValue(runMe.stepConfig, runMe.externalValue!!.value, stepConfig)
+                        atomicOptionValues[runMe.externalName] = LazyValue(XProcDocument.ofValue(runMe.externalValue!!.value, runMe.stepConfig), stepConfig)
                     }
                 } else {
                     runMe.runStep()

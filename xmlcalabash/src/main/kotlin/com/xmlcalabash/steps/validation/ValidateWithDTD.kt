@@ -111,7 +111,7 @@ class ValidateWithDTD(): AbstractAtomicStep() {
     inner class MyErrorReporter : ErrorReporter {
         override fun report(error: XmlProcessingError?) {
             if (error == null) {
-                logger.warn { "DTD validation reported \"null\" error?" }
+                stepConfig.warn { "DTD validation reported \"null\" error?" }
                 return
             }
 

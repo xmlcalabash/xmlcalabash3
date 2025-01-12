@@ -148,7 +148,6 @@ abstract class StepDeclaration(parent: XProcInstruction?, stepConfig: Instructio
                 _staticOptions[option.name] = builder.staticOptionsManager.get(option)
             } else {
                 val exprStep = AtomicExpressionStepInstruction(this, option.select!!)
-                exprStep.externalName = option.name
                 exprStep.depends.addAll(depends)
                 stepConfig.addVisibleStepName(exprStep)
 

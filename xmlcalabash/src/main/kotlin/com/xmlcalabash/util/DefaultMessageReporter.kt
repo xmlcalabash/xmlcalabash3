@@ -14,7 +14,11 @@ class DefaultMessageReporter(val printer: MessagePrinter, nextReporter: MessageR
                 Verbosity.WARN -> "Warning: "
                 Verbosity.ERROR -> "Error: "
             }
-            printer.println("${prefix}${message()}")
+            try {
+                printer.println("${prefix}${message()}")
+            } catch (ex: Exception) {
+                printer.println("${prefix} failed to evaluate message: ${ex.message}")
+            }
         }
         nextReporter?.report(verbosity, extraAttributes, message)
     }

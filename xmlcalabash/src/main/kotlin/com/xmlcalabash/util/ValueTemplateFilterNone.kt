@@ -1,12 +1,11 @@
 package com.xmlcalabash.util
 
-import com.xmlcalabash.runtime.XProcStepConfiguration
-import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.datamodel.XProcExpression
+import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.runtime.LazyValue
+import com.xmlcalabash.runtime.XProcStepConfiguration
 import net.sf.saxon.s9api.QName
 import net.sf.saxon.s9api.XdmNode
-import net.sf.saxon.s9api.XdmValue
 import java.net.URI
 
 class ValueTemplateFilterNone(val encodedNode: XdmNode, val baseUri: URI): ValueTemplateFilter {

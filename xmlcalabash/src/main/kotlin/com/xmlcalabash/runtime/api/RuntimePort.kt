@@ -10,6 +10,12 @@ open class RuntimePort(val name: String, val unbound: Boolean, val primary: Bool
     val defaultBindings = mutableListOf<ConnectionInstruction>()
     internal var weldedShut = false
 
+    constructor(port: RuntimePort): this(port.name, port.unbound, port.primary, port.sequence, port.contentTypes, port.serialization) {
+        assertions.addAll(port.assertions)
+        defaultBindings.addAll(port.defaultBindings)
+        weldedShut = port.weldedShut
+    }
+
     override fun toString(): String {
         return name
     }

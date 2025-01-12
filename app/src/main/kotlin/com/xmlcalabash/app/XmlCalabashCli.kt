@@ -91,12 +91,14 @@ class XmlCalabashCli private constructor() {
 
             if (config.verbosity != commandLine.verbosity) {
                 config.verbosity = commandLine.verbosity ?: config.verbosity
-                when (config.verbosity) {
-                    Verbosity.TRACE -> MDC.put("LOG_LEVEL", "TRACE")
-                    Verbosity.DEBUG -> MDC.put("LOG_LEVEL", "DEBUG")
-                    Verbosity.INFO -> MDC.put("LOG_LEVEL", "INFO")
-                    Verbosity.WARN -> MDC.put("LOG_LEVEL", "WARN")
-                    Verbosity.ERROR -> MDC.put("LOG_LEVEL", "ERROR")
+                if (commandLine.debug == true) {
+                    when (config.verbosity) {
+                        Verbosity.TRACE -> MDC.put("LOG_LEVEL", "TRACE")
+                        Verbosity.DEBUG -> MDC.put("LOG_LEVEL", "DEBUG")
+                        Verbosity.INFO -> MDC.put("LOG_LEVEL", "INFO")
+                        Verbosity.WARN -> MDC.put("LOG_LEVEL", "WARN")
+                        Verbosity.ERROR -> MDC.put("LOG_LEVEL", "ERROR")
+                    }
                 }
             }
 
@@ -270,7 +272,7 @@ class XmlCalabashCli private constructor() {
 
             optionManifold.putAll(pipeline.optionManifold)
             for ((name, value) in xprocParser.builder.staticOptionsManager.useWhenOptions) {
-                pipeline.option(name, XProcDocument.ofValue(value, stepConfig, MediaType.ANY, DocumentProperties()))
+                pipeline.option(name, XProcDocument.ofValue(value, stepConfig, MediaType.OCTET_STREAM, DocumentProperties()))
             }
 
             pipeline.receiver = FileOutputReceiver(xmlCalabash, xmlCalabash.saxonConfig.processor, commandLine.outputs, explicitStdout ?: implicitStdout)

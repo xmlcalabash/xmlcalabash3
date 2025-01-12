@@ -316,16 +316,6 @@ open class XProcStepConfigurationImpl internal constructor(
                     return value
                 }
                 throw exception(XProcError.xdBadType("Empty sequence not allowed"))
-                /*
-                if (code == "AB") {
-                    return XdmAtomicValue(false)
-                }
-                if (varName == null) {
-                    throw exception(XProcError.xdBadType(value.underlyingValue.stringValue, sequenceType.underlyingSequenceType.toString()))
-                } else {
-                    throw exception(XProcError.xdBadType(varName, value.toString(), sequenceType.underlyingSequenceType.toString()))
-                }
-                 */
             }
 
             // We've got a bit of a hack here. If the input is a string, but the type is a
@@ -811,7 +801,7 @@ open class XProcStepConfigurationImpl internal constructor(
                 if (value.underlyingValue is Int64Value) {
                     return value
                 }
-                typeName = NsXs.decimal
+                typeName = NsXs.integer
             }
 
             "ADIN" -> {

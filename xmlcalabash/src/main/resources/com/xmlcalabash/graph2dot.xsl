@@ -125,11 +125,15 @@
 
   <xsl:variable name="edges" select="//g:edge[@to = $this/@id]"/>
   <xsl:if test="count($edges) gt 1">
-    <xsl:message terminate="yes" select="'Not exactly one edge to sink: ' || $this/@id || '?'"/>
+    <xsl:message select="'Not exactly one edge to sink: ' || $this/@id || '?'"/>
   </xsl:if>
-  <xsl:if test="not(starts-with($edges/@from, '!foot'))">
-    <dot:node xml:id="{@gid}" dot:shape="point"/>
-  </xsl:if>
+
+  <xsl:for-each select="$edges">
+    <xsl:variable name="edge" select="."/>
+    <xsl:if test="not(starts-with($edge/@from, '!foot'))">
+      <dot:node xml:id="{$this/@gid}" dot:shape="point"/>
+    </xsl:if>
+  </xsl:for-each>
 </xsl:template>
 
 <xsl:template match="g:atomic[@tag='cx:sink']" priority="10">

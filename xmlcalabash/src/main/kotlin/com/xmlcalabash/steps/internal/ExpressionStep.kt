@@ -26,7 +26,15 @@ open class ExpressionStep(val params: ExpressionStepParameters): AbstractAtomicS
         // Expression steps are unusual in that source may not exist
         contextItems.addAll(queues["source"] ?: emptyList())
 
+        stepConfig.debug { "  Expression: ${params.expression}" }
+        stepConfig.debug { "  Context items: ${contextItems.size}" }
+
+        for (item in contextItems) {
+            stepConfig.debug { "  Context item: ${item.value}" }
+        }
+
         if (override != null) {
+            stepConfig.debug { "  Override: ${override}" }
             receiver.output("result", override!!)
             override = null
             return
@@ -43,15 +51,18 @@ open class ExpressionStep(val params: ExpressionStepParameters): AbstractAtomicS
             }
         }
 
-        // Some options may have been passed to us
-        for ((name, doc) in options) {
-            expression.setBinding(name, doc.value)
-        }
-
-        // Any options that haven't been passed, may have statically computed values
+        // All the required variable bindings are in params.options; but
+        // some of those may have been provided at runtime...
         for ((name, option) in params.options) {
-            if (name !in options) {
-                expression.setBinding(name, option.staticValue!!.evaluate(stepConfig))
+            if (name in options) {
+                val value = options[name]!!.value
+                stepConfig.checkType(name, value, option.asType, option.values)
+                stepConfig.debug { "  ${name} = ${value}" }
+                expression.setBinding(name, value)
+            } else {
+                val value = option.staticValue!!.evaluate(stepConfig)
+                stepConfig.debug { "  ${name} = ${value}" }
+                expression.setBinding(name, value)
             }
         }
 
@@ -68,8 +79,7 @@ open class ExpressionStep(val params: ExpressionStepParameters): AbstractAtomicS
                 && !expression.functionRefs.contains(Pair(NsFn.collection,1))
 
         val lazy: () -> XdmValue = {
-            try {
-                expression.evaluate(stepConfig)
+            try { expression.evaluate(stepConfig)
             } catch (ex: SaxonApiException) {
                 if (ex.message != null && ex.message!!.contains("context item is absent")) {
                     if (contextItems.size > 1) {
@@ -83,8 +93,10 @@ open class ExpressionStep(val params: ExpressionStepParameters): AbstractAtomicS
         }
 
         if (canBeLazy) {
+            stepConfig.debug { "  expression will be lazily evaluated" }
             receiver.output("result", XProcDocument(lazy, stepConfig))
         } else {
+            stepConfig.debug { "  expression=${lazy()}" }
             receiver.output("result", XProcDocument(lazy(), stepConfig))
         }
     }
