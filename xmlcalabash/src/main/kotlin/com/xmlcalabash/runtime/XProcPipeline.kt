@@ -18,6 +18,8 @@ import com.xmlcalabash.util.AssertionsMonitor
 import com.xmlcalabash.visualizers.Silent
 import net.sf.saxon.s9api.QName
 import java.io.FileOutputStream
+import java.nio.file.Path
+import java.nio.file.Paths
 
 class XProcPipeline internal constructor(runtime: XProcRuntime, pipeline: CompoundStepModel, val config: XProcStepConfiguration) {
     val inputManifold = pipeline.inputs
@@ -56,7 +58,7 @@ class XProcPipeline internal constructor(runtime: XProcRuntime, pipeline: Compou
         if (xconfig.trace != null || xconfig.traceDocuments != null) {
             if (config.environment is PipelineContext) {
                 traceListener = if (xconfig.traceDocuments != null) {
-                    DetailTraceListener()
+                    DetailTraceListener(xconfig.traceDocuments!!.toPath())
                 } else {
                     StandardTraceListener()
                 }
