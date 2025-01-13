@@ -13,6 +13,115 @@ See the commits and pull requests on
 finer detail.</para>
 
 <revhistory>
+<revision xml:id="r300-alpha15">
+<revnumber>3.0.0-alpha15</revnumber>
+<date>2025-01-13</date>
+<revdescription>
+<itemizedlist>
+<listitem><para>Fixed
+<link xlink:href="https://github.com/xmlcalabash/xmlcalabash3/issues/167">issue #167</link>.
+Make sure that the <option linkend="cli-init">--init</option> functions are applied
+to every configuration.</para>
+</listitem>
+<listitem><para>Fixed issues
+<link xlink:href="https://github.com/xmlcalabash/xmlcalabash3/issues/164">#164</link> and
+<link xlink:href="https://github.com/xmlcalabash/xmlcalabash3/issues/165">#165</link>.
+Improved XVRL reporting and metadata.
+</para>
+</listitem>
+<listitem><para>Fixed
+<link xlink:href="https://github.com/xmlcalabash/xmlcalabash3/issues/159">issue #159</link>.
+Make sure that validity errors are reported in XVRL. Improve reports associated
+with RELAX NG validation failures.</para>
+</listitem>
+<listitem><para>Fixed
+<link xlink:href="https://github.com/xmlcalabash/xmlcalabash3/issues/157">issue #157</link>.
+In <tag>p:validate-with-xml-schema</tag>, ignore any errors that arise when
+attempting to locate a schema at the namespace URI. (It’s not absolutely certain
+that this was the cause of #157, but it’s my best guess.)</para>
+</listitem>
+<listitem><para>Fixed
+<link xlink:href="https://github.com/xmlcalabash/xmlcalabash3/issues/167">issue #156</link>
+and related knock-on issues, including:</para>
+<itemizedlist>
+<listitem><para>Make sure that steps wait for all of their option binding inputs.
+(Previous releases worked accidentally in this regard.)
+</para></listitem>
+<listitem><para>Make sure the base URI of an expression is always resolved
+against the point of definition, not the point of use.
+</para></listitem>
+<listitem><para>Only apply external option bindings to
+<tag>p:option</tag> instructions. (And not also <tag>p:with-option</tag> instructions!)
+</para></listitem>
+<listitem><para>Make sure steps declared in libraries are always fully
+validated. 
+</para></listitem>
+<listitem><para>Fixed bug where values cast to <type>xs:integer</type> were returned as
+<type>xs:decimal</type> values.
+</para></listitem>
+<listitem><para>Reworked how lazy bindings are managed; they’re now always documents.
+</para></listitem>
+<listitem><para>General improvements to logging, trace listening, message reporting,
+and serialization.
+</para></listitem>
+</itemizedlist>
+</listitem>
+<listitem><para>Fixed
+<link xlink:href="https://github.com/xmlcalabash/xmlcalabash3/issues/153">issue #153</link>.
+Setup the correct namespace context in <tag>p:if</tag>.
+A <tag>p:if</tag> is rewritten as a <tag>p:choose</tag> containing a <tag>p:when</tag>; make
+sure that the <tag>p:when</tag> constructed for this purpose has the right namespace
+context.</para>
+</listitem>
+<listitem><para>Fixed
+<link xlink:href="https://github.com/xmlcalabash/xmlcalabash3/issues/152">issue #152</link>.
+Discard unused inputs on <tag>p:inline</tag> steps.
+</para>
+</listitem>
+<listitem>
+<para>When constructing SVG graph output, ignore stylesheet errors rather
+than causing the processing to fail. (This hasn’t fixed the errors, but it
+makes it possible to ignore them in the short term.)
+</para>
+</listitem>
+<listitem>
+<para>Found and fixed (some) issues related to how text value templates are expanded.
+(There are still <link xlink:href="https://github.com/xproc/3.0-specification/issues/1131">open
+questions</link>.)</para>
+</listitem>
+<listitem>
+<para>Improved handling of <code>err:XD0011</code>. Always provide a reason.</para>
+</listitem>
+<listitem>
+<para>Fix bug where namespace bindings on attributes could be lost</para>
+</listitem>
+<listitem>
+<para>Attempt to manage the console output encoding.</para>
+<para>There’s a new configuration file setting,
+<code linkend="cc.xml-calabash">console-output-encoding</code>. When
+XML Calabash writes to the console, it attempts to assure that the output is
+appropriate for that encoding. There’s a bit of a messy interaction between the
+new “message printer” class and the existing “message reporter” class. More
+refactoring may be useful.</para>
+</listitem>
+<listitem>
+<para>Added “piped mode” to support processing XML in a unix-style pipeline.
+</para>
+<para>In piped mode (<code linkend="cli-pipe">--pipe</code> or
+<code linkend="cc.xml-calabash">piped-io</code>),
+primary input comes
+from stdin by default and the primary output goes to stdout by default. Explicit
+bindings are still possible. The pretty printing associated with console output
+is disabled.</para>
+</listitem>
+<listitem>
+<para>Added a (somewhat crude) Powershell script to the distribution to run XML
+Calabash on Windows.</para>
+</listitem>
+</itemizedlist>
+</revdescription>
+</revision>
+
 <revision xml:id="r300-alpha14">
 <revnumber>3.0.0-alpha14</revnumber>
 <date>2025-01-08</date>
