@@ -24,8 +24,8 @@ open class InlineStep(val params: InlineStepParameters): AbstractAtomicStep() {
     override fun run() {
         super.run()
 
-        val contextItem = queues["source"]!!.firstOrNull()
-        val contextSequence = queues["source"]!!.size > 1
+        val contextItem = queues["source"]?.firstOrNull()
+        val contextSequence = (queues["source"]?.size ?: 0) > 1
 
         if (contextSequence && !params.filter.isStatic()) {
             throw stepConfig.exception(XProcError.xdInlineContextSequence().at(stepParams.location))
