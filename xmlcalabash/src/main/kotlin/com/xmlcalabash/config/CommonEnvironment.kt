@@ -17,6 +17,7 @@ import com.xmlcalabash.util.DefaultMessageReporter
 import com.xmlcalabash.api.MessageReporter
 import com.xmlcalabash.io.MessagePrinter
 import com.xmlcalabash.util.DefaultMessagePrinter
+import net.sf.saxon.lib.Initializer
 import net.sf.saxon.s9api.QName
 import org.apache.logging.log4j.kotlin.logger
 import java.net.URI
@@ -73,6 +74,7 @@ class CommonEnvironment(private val xmlCalabash: XmlCalabash) {
     private var _messageReporter: (() -> MessageReporter)? = null
     private var _mimeTypes = MimetypesFileTypeMap()
     private var _proxies = mutableMapOf<String, String>()
+    private val _additionalInitializers = mutableListOf<Initializer>()
     internal val _standardSteps = mutableMapOf<QName, DeclareStepInstruction>()
 
     private val uniqueUris = mutableMapOf<String, Int>()
@@ -136,6 +138,13 @@ class CommonEnvironment(private val xmlCalabash: XmlCalabash) {
         get() = _proxies
     val standardSteps: Map<QName, DeclareStepInstruction>
         get() = _standardSteps
+
+    val additionalInitializers: List<Initializer>
+        get() = _additionalInitializers
+
+    fun addInitializer(initializer: Initializer) {
+        _additionalInitializers.add(initializer)
+    }
 
     fun uniqueUri(base: String): URI {
         if (!xmlCalabash.xmlCalabashConfig.uniqueInlineUris) {
