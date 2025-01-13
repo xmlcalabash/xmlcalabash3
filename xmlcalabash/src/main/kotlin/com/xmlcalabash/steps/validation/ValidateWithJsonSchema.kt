@@ -1,12 +1,15 @@
 package com.xmlcalabash.steps.validation
 
 import com.networknt.schema.*
+import com.xmlcalabash.XmlCalabashBuildConfig
 import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.io.DocumentWriter
 import com.xmlcalabash.namespace.Ns
 import com.xmlcalabash.steps.AbstractAtomicStep
 import com.xmlcalabash.xvrl.XvrlReport
+import net.sf.saxon.om.NamespaceUri
+import net.sf.saxon.s9api.XdmNode
 import java.io.ByteArrayOutputStream
 import java.net.URI
 import java.nio.charset.StandardCharsets
@@ -62,6 +65,19 @@ open class ValidateWithJsonSchema(): AbstractAtomicStep() {
         }
 
         val report = XvrlReport.newInstance(stepConfig)
+        report.metadata.creator(stepConfig.saxonConfig.environment.productName,
+            stepConfig.saxonConfig.environment.productVersion)
+        report.metadata.validator("jsonSchemaValidator", XmlCalabashBuildConfig.DEPENDENCIES["jsonSchemaValidator"] ?: "unknown")
+
+        if (stepConfig.baseUri != null && schema.baseURI != null
+            && schema.baseURI.toString().startsWith(stepConfig.baseUri.toString())
+            && schema.value is XdmNode) {
+            // It looks like this one was inline...
+            report.metadata.schema(schema.baseURI, NamespaceUri.of("https://json-schema.org/draft/2020-12/schema"), null, schema.value as XdmNode)
+        } else {
+            report.metadata.schema(schema.baseURI, NamespaceUri.of("https://json-schema.org/draft/2020-12/schema"))
+        }
+
         document.baseURI?.let { report.metadata.document(it) }
         for (assertion in assertions) {
             val detection = report.detection("error", assertion.code, assertion.message)

@@ -3,6 +3,7 @@ package com.xmlcalabash.steps.validation
 import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.namespace.Ns
+import com.xmlcalabash.namespace.NsXs
 import com.xmlcalabash.namespace.NsXsi
 import com.xmlcalabash.runtime.XProcStepConfiguration
 import com.xmlcalabash.runtime.api.Receiver
@@ -69,6 +70,10 @@ open class ValidateWithXmlSchema(): AbstractAtomicStep() {
             throw stepConfig.exception(XProcError.xcUnsupportedReportFormat(reportFormat))
         }
 
+        val report = Errors(stepConfig, document.baseURI)
+        report.report.metadata.validator("Saxon ${stepConfig.processor.saxonEdition}",
+            stepConfig.processor.saxonProductVersion)
+
         if (version != "1.0" && version != "1.1") {
             throw stepConfig.exception(XProcError.xcXmlSchemaVersionNotAvailable(version))
         }
@@ -78,6 +83,14 @@ open class ValidateWithXmlSchema(): AbstractAtomicStep() {
             val schemaNode = S9Api.documentElement(schema.value as XdmNode)
             val targetNS = schemaNode.getAttributeValue(_targetNamespace) ?: ""
             stepConfig.debug { "Caching input schema ${schema.baseURI} for ${targetNS}"}
+
+            if (stepConfig.baseUri != null && schema.baseURI != null && schema.baseURI.toString().startsWith(stepConfig.baseUri.toString())) {
+                // It looks like this one was inline...
+                report.report.metadata.schema(schema.baseURI, NsXs.namespace, version, schemaNode)
+            } else {
+                report.report.metadata.schema(schema.baseURI, NsXs.namespace, version)
+            }
+
             schemaDocuments.add(schema.value as XdmNode)
         }
 
@@ -149,7 +162,6 @@ open class ValidateWithXmlSchema(): AbstractAtomicStep() {
         val validator = manager.newSchemaValidator()
         val invalidityHandler = validator.invalidityHandler
 
-        val report = Errors(stepConfig, document.baseURI)
         val listener = CachingErrorListener(stepConfig, report, invalidityHandler)
 
         validator.destination = destination

@@ -204,11 +204,18 @@ class XvrlReports private constructor(stepConfig: XProcStepConfiguration): XvrlE
     }
 
     private fun metadataFromSvrl(metadata: XvrlReportMetadata, svrl: XdmNode) {
+        val seen = mutableSetOf<URI>()
         for (node in svrl.axisIterator(Axis.CHILD)) {
             when (node.nodeName) {
                 NsSvrl.activePattern -> {
                     val documents = node.getAttributeValue(_documents) ?: node.getAttributeValue(_document)
-                    documents?.let { metadata.document(URI.create(it)) }
+                    if (documents != null) {
+                        val uri = URI(documents)
+                        if (uri !in seen) {
+                            metadata.document(uri)
+                            seen.add(uri)
+                        }
+                    }
                 }
                 else -> Unit
             }
