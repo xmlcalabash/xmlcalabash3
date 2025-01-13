@@ -2,10 +2,10 @@
 <t:test expected="pass"
         xmlns:t="http://xproc.org/ns/testsuite/3.0">
   <t:info>
-    <t:title>validate-rng-001</t:title>
+    <t:title>validate-json-schema-001</t:title>
     <t:revision-history>
       <t:revision>
-        <t:date>2025-01-10</t:date>
+        <t:date>2025-01-13</t:date>
         <t:author>
           <t:name>Norm Tovey-Walsh</t:name>
         </t:author>
@@ -16,7 +16,7 @@
     </t:revision-history>
   </t:info>
   <t:description xmlns="http://www.w3.org/1999/xhtml">
-    <p>Tests that RNG errors are reported in the XVRL.</p>
+    <p>Tests that metadata is correct for JSON schema validation.</p>
   </t:description>
   <t:pipeline>
     <p:declare-step version="3.0"
@@ -25,26 +25,11 @@
                     xmlns:p="http://www.w3.org/ns/xproc">
       <p:output port="result" pipe="report@validation"/>
 
-      <p:validate-with-relax-ng name="validation" assert-valid="false">
-        <p:with-input port="source">
-          <doc id="foo bar">
-            <q>This is a test</q>
-          </doc>
-        </p:with-input>
-        <p:with-input port="schema" expand-text="false">
-          <p:inline content-type="application/relax-ng-compact-syntax">
-start = doc
+      <p:validate-with-json-schema name="validation">
+        <p:with-input href="../../../3.0-test-suite/test-suite/documents/valid.json" />
+        <p:with-input port="schema" href="../../../3.0-test-suite/test-suite/documents/schema.json" />
+      </p:validate-with-json-schema>
 
-doc = element doc {
-          attribute id { xsd:NCName },
-          attribute class { text }?,
-          p+
-      }
-
-p = element p { text }
-          </p:inline>
-        </p:with-input>
-      </p:validate-with-relax-ng>
       <p:sink/>
     </p:declare-step>
   </t:pipeline>
@@ -59,25 +44,18 @@ p = element p { text }
       </s:pattern>
       <s:pattern>
         <s:rule context="/xvrl:report">
-          <s:assert test="xvrl:digest">The report doesn’t include a digest.</s:assert>
-          <s:assert test="xvrl:detection[@severity='error']">The result doesn’t include an error</s:assert>
+          <s:assert test="xvrl:metadata">The report doesn’t include metadata.</s:assert>
         </s:rule>
       </s:pattern>
       <s:pattern>
         <s:rule context="/xvrl:report/xvrl:metadata">
           <s:assert test="xvrl:timestamp">The metadata isn’t timestamped.</s:assert>
           <s:assert test="xvrl:validator">The metadata doesn’t include the validator.</s:assert>
-          <s:assert test="xvrl:validator[@name='Jing']">The validator is unexpected.</s:assert>
+          <s:assert test="xvrl:validator[@name='jsonSchemaValidator']">The validator is unexpected.</s:assert>
           <s:assert test="xvrl:creator">The metadata doesn’t include the creator.</s:assert>
           <s:assert test="xvrl:creator[@name='XML Calabash']">The creator is unexpected.</s:assert>
           <s:assert test="xvrl:schema">The metadata doesn’t include the schema.</s:assert>
-          <s:assert test="xvrl:schema[@schematypens='http://relaxng.org/ns/structure/1.0']">The schema type is unexpected.</s:assert>
-        </s:rule>
-      </s:pattern>
-      <s:pattern>
-        <s:rule context="/xvrl:report/xvrl:digest">
-          <s:assert test="@warning-count=0">The warning count is wrong</s:assert>
-          <s:assert test="@error-count=3">The error count is wrong</s:assert>
+          <s:assert test="xvrl:schema[@schematypens='https://json-schema.org/draft/2020-12/schema']">The schema type is unexpected.</s:assert>
         </s:rule>
       </s:pattern>
     </s:schema>

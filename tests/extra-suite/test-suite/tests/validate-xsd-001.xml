@@ -69,6 +69,17 @@
         </s:rule>
       </s:pattern>
       <s:pattern>
+        <s:rule context="/xvrl:report/xvrl:metadata">
+          <s:assert test="xvrl:timestamp">The metadata isn’t timestamped.</s:assert>
+          <s:assert test="xvrl:validator">The metadata doesn’t include the validator.</s:assert>
+          <s:assert test="xvrl:validator[@name='Saxon EE']">The validator is unexpected.</s:assert>
+          <s:assert test="xvrl:creator">The metadata doesn’t include the creator.</s:assert>
+          <s:assert test="xvrl:creator[@name='XML Calabash']">The creator is unexpected.</s:assert>
+          <s:assert test="xvrl:schema">The metadata doesn’t include the schema.</s:assert>
+          <s:assert test="xvrl:schema[@schematypens='http://www.w3.org/2001/XMLSchema']">The schema type is unexpected.</s:assert>
+        </s:rule>
+      </s:pattern>
+      <s:pattern>
         <s:rule context="/xvrl:report/xvrl:digest">
           <s:assert test="@warning-count=0">The warning count is wrong</s:assert>
           <s:assert test="@error-count=1">The error count is wrong</s:assert>

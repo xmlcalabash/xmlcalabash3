@@ -7,12 +7,15 @@ import com.thaiopensource.validate.ValidationDriver
 import com.thaiopensource.validate.auto.AutoSchemaReader
 import com.thaiopensource.validate.prop.rng.RngProperty
 import com.thaiopensource.validate.rng.CompactSchemaReader
+import com.xmlcalabash.XmlCalabashBuildConfig
+import com.xmlcalabash.config.XmlCalabashConfiguration
 import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.namespace.Ns
 import com.xmlcalabash.steps.AbstractAtomicStep
 import com.xmlcalabash.util.MediaClassification
 import com.xmlcalabash.util.S9Api
+import net.sf.saxon.om.NamespaceUri
 import net.sf.saxon.s9api.QName
 import net.sf.saxon.s9api.XdmNode
 import org.xml.sax.InputSource
@@ -42,6 +45,17 @@ open class ValidateWithRelaxNG(): AbstractAtomicStep() {
         }
 
         val report = Errors(stepConfig, document.baseURI)
+        report.report.metadata.validator("Jing", XmlCalabashBuildConfig.DEPENDENCIES["jing"] ?: "unknown")
+
+        if (stepConfig.baseUri != null && schema.baseURI != null
+            && schema.baseURI.toString().startsWith(stepConfig.baseUri.toString())
+            && schema.value is XdmNode) {
+            // It looks like this one was inline...
+            report.report.metadata.schema(schema.baseURI, NamespaceUri.of("http://relaxng.org/ns/structure/1.0"), null, schema.value as XdmNode)
+        } else {
+            report.report.metadata.schema(schema.baseURI, NamespaceUri.of("http://relaxng.org/ns/structure/1.0"))
+        }
+
         val listener = CachingErrorListener(stepConfig, report)
         val properties = PropertyMapBuilder()
         properties.put(ValidateProperty.ERROR_HANDLER, listener)
