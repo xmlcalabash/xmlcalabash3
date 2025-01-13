@@ -26,6 +26,7 @@ class SaxonConfiguration private constructor(
             // but I need a Processor to do that.
             val newConfiguration = newConfiguration(environment.xmlCalabash)
             val processor = Processor(newConfiguration)
+            newConfiguration.processor = processor
 
             val saxon = SaxonConfiguration(environment, newConfiguration, processor)
 
@@ -59,6 +60,12 @@ class SaxonConfiguration private constructor(
                 } else {
                     newConfiguration.setConfigurationProperty(key, value)
                 }
+            }
+
+            newConfiguration.processor = Processor(newConfiguration)
+
+            for (init in xmlCalabash.commonEnvironment.additionalInitializers) {
+                init.initialize(newConfiguration)
             }
 
             xmlCalabash.xmlCalabashConfig.saxonConfigurer(newConfiguration)
@@ -114,11 +121,13 @@ class SaxonConfiguration private constructor(
         val saxon = SaxonConfiguration(environment, newConfig, processor)
         saxon.configuration.namePool = configuration.namePool
         saxon.configuration.documentNumberAllocator = configuration.documentNumberAllocator
+        saxon.configuration.processor = processor
 
         saxon._xmlCalabash = xmlCalabash
         saxon.configurationFile = configurationFile
         saxon.configurationProperties.putAll(configurationProperties)
         saxon.functionLibraries.addAll(functionLibraries)
+
         saxon.configureProcessor(processor)
         return saxon
     }

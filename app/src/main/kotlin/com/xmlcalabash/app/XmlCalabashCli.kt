@@ -150,6 +150,7 @@ class XmlCalabashCli private constructor() {
                     val init = constructor.newInstance()
                     if (init is Initializer) {
                         init.initialize(xmlCalabash.saxonConfig.configuration)
+                        xmlCalabash.commonEnvironment.addInitializer(init)
                     } else {
                         throw XProcError.xiInitializerError("${name} is not a net.sf.saxon.lib.Initializer").exception()
                     }
