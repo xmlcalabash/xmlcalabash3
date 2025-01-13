@@ -54,7 +54,8 @@ class Graph private constructor(val environment: PipelineEnvironment) {
         addJoiners()
         patchEdges()
 
-        // Discard empty nodes; weld the ports shut...
+        // Discard empty nodes, discard unused source inputs on p:inline.
+        // Weld the ports shut.
         val discardNodes = mutableListOf<Model>()
         val discardEdges = mutableListOf<Edge>()
         for (edge in edges.filter { it.from.step.instructionType == NsCx.empty }) {
@@ -72,6 +73,18 @@ class Graph private constructor(val environment: PipelineEnvironment) {
             }
             discardNodes.add(edge.from)
             discardEdges.add(edge)
+        }
+        for (model in models.filter { it.step.instructionType == NsCx.inline }) {
+            var found = false
+            for (edge in edges.filter { it.to.step.instructionType == NsCx.inline}) {
+                if (edge.to == model) {
+                    found = true
+                    break
+                }
+            }
+            if (!found) {
+                model.inputs.clear()
+            }
         }
         for (node in discardNodes) {
             models.remove(node)
