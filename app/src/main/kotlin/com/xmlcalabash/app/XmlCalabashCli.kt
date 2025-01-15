@@ -5,15 +5,20 @@ import com.xmlcalabash.config.ConfigurationLoader
 import com.xmlcalabash.config.XmlCalabash
 import com.xmlcalabash.config.XmlCalabashConfiguration
 import com.xmlcalabash.datamodel.InstructionConfiguration
+import com.xmlcalabash.datamodel.Location
 import com.xmlcalabash.io.MediaType
 import com.xmlcalabash.datamodel.PipelineBuilder
 import com.xmlcalabash.documents.DocumentProperties
+import com.xmlcalabash.documents.XProcBinaryDocument
 import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.exceptions.DefaultErrorExplanation
 import com.xmlcalabash.exceptions.ErrorExplanation
 import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.exceptions.XProcException
+import com.xmlcalabash.exceptions.XProcUserError
 import com.xmlcalabash.io.DocumentLoader
+import com.xmlcalabash.io.DocumentWriter
+import com.xmlcalabash.namespace.Ns
 import com.xmlcalabash.namespace.Ns.port
 import com.xmlcalabash.namespace.NsErr
 import com.xmlcalabash.namespace.NsFn
@@ -21,6 +26,8 @@ import com.xmlcalabash.namespace.NsXs
 import com.xmlcalabash.runtime.api.RuntimeOption
 import com.xmlcalabash.runtime.api.RuntimePort
 import com.xmlcalabash.util.DefaultXmlCalabashConfiguration
+import com.xmlcalabash.util.MediaClassification
+import com.xmlcalabash.util.S9Api
 import com.xmlcalabash.util.UriUtils
 import com.xmlcalabash.util.Verbosity
 import com.xmlcalabash.util.VisualizerOutput
@@ -30,15 +37,20 @@ import com.xmlcalabash.visualizers.Silent
 import net.sf.saxon.Configuration
 import net.sf.saxon.lib.Initializer
 import net.sf.saxon.om.NamespaceUri
+import net.sf.saxon.s9api.Axis
 import net.sf.saxon.s9api.ItemType
 import net.sf.saxon.s9api.QName
 import net.sf.saxon.s9api.XdmAtomicValue
+import net.sf.saxon.s9api.XdmNode
+import net.sf.saxon.s9api.XdmNodeKind
 import net.sf.saxon.s9api.XdmValue
 import org.apache.logging.log4j.kotlin.logger
 import org.slf4j.MDC
 import java.io.BufferedReader
+import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.InputStreamReader
+import java.nio.charset.StandardCharsets
 import java.text.SimpleDateFormat
 import java.time.LocalDateTime
 import java.time.ZoneId
@@ -283,9 +295,6 @@ class XmlCalabashCli private constructor() {
                 if (ex.error.code == NsErr.xi(XProcError.DEBUGGER_ABORT)) {
                     exitProcess(1)
                 }
-            }
-
-            if (ex is XProcException) {
                 abort(errorExplanation, ex)
             } else {
                 if (commandLine.verbosity != null && commandLine.verbosity!! <= Verbosity.DEBUG) {
@@ -366,9 +375,13 @@ class XmlCalabashCli private constructor() {
         val verbosity = commandLine.verbosity ?: Verbosity.INFO
 
         for (error in errors) {
-            errorExplanation.message(error.error)
-            if (commandLine.explainErrors) {
-                errorExplanation.explanation(error.error)
+            if (error.error is XProcUserError) {
+                showUserError(error.error as XProcUserError)
+            } else {
+                errorExplanation.message(error.error)
+                if (commandLine.explainErrors) {
+                    errorExplanation.explanation(error.error)
+                }
             }
         }
 
@@ -377,6 +390,51 @@ class XmlCalabashCli private constructor() {
         }
 
         exitProcess(1)
+    }
+
+    private fun showUserError(error: XProcUserError) {
+        // TODO: error explanations should use the message reporter, no?
+        var message: String? = null
+        if (error.details.isNotEmpty()) {
+            val doc = error.details.first() as XProcDocument
+            if (doc is XProcBinaryDocument) {
+                message = "...binary message cannot be displayed..."
+            } else if (doc.contentType?.classification() == MediaClassification.TEXT) {
+                message = doc.value.underlyingValue.stringValue
+            } else if (doc.contentType?.classification() == MediaClassification.XML) {
+                val root = S9Api.documentElement(doc.value as XdmNode)
+                var markup = false
+                for (node in root.axisIterator(Axis.CHILD)) {
+                    if (node.nodeKind != XdmNodeKind.TEXT) {
+                        markup = true
+                        break
+                    }
+                }
+                if (!markup) {
+                    message = root.underlyingValue.stringValue
+                }
+            }
+
+            if (message == null) {
+                val baos = ByteArrayOutputStream()
+                val writer = DocumentWriter(doc, baos)
+                writer.set(Ns.omitXmlDeclaration, "true")
+                writer.write()
+                message = baos.toString(config.consoleEncoding)
+            }
+        }
+        if (message == null) {
+            message = "...no explanation provided..."
+        }
+
+
+        System.err.println("Fatal ${error.code}: ${message}")
+        if (error.location != Location.NULL) {
+            System.err.println("   at ${error.location}")
+        }
+        if (error.inputLocation != Location.NULL) {
+            System.err.println("   in ${error.inputLocation}")
+        }
     }
 
     private fun help() {

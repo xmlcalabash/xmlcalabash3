@@ -8,7 +8,7 @@ import net.sf.saxon.s9api.*
 import java.net.URI
 import java.util.*
 
-class XProcError private constructor(val code: QName, val variant: Int, val location: Location, val inputLocation: Location, vararg val details: Any) {
+open class XProcError protected constructor(val code: QName, val variant: Int, val location: Location, val inputLocation: Location, vararg val details: Any) {
     companion object {
         val DEBUGGER_ABORT = 9997
 
@@ -411,14 +411,6 @@ class XProcError private constructor(val code: QName, val variant: Int, val loca
     val throwable: Throwable?
         get() = _throwable
     val stackTrace = Stack<ErrorStackFrame>()
-
-    // So that p:error can throw an error
-    constructor(code: QName, location: Location = Location.NULL, inputLocation: Location = Location.NULL, vararg details: Any): this(code, 1, location, inputLocation, *details)
-
-    private constructor(error: XProcError): this(error.code, error.variant, error.location, error.inputLocation, *error.details) {
-        _throwable = error.throwable
-        stackTrace.addAll(error.stackTrace)
-    }
 
     private constructor(error: XProcError, location: Location, inputLocation: Location): this(error.code, error.variant, location, inputLocation, *error.details) {
         _throwable = error.throwable
