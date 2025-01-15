@@ -79,6 +79,9 @@ class CommandLine private constructor(val args: Array<out String>) {
     /** The pipeline graph description output filename. */
     val pipelineGraphs: String?
         get() {
+            if (_pipelineGraphs == null) {
+                return null
+            }
             if (_pipelineGraphs != null && _pipelineGraphs!!.endsWith("/")) {
                 return _pipelineGraphs
             }

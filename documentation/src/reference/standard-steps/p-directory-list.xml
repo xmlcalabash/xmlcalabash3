@@ -62,5 +62,107 @@
 <refsection>
   <title>Description</title>
   <para role="external-refs"/>
+
+<refsection>
+<title>Detailed attributes</title>
+
+<para>When the <option>detailed</option> option is <code>true()</code>, the
+<tag>p:directory-list</tag> step provides additional information about each entry.
+For directories, those details are:
+<tag class="attribute">readable</tag> (is the entry readable by the current user),
+<tag class="attribute">writable</tag> (is the entry writable by the current user),
+<tag class="attribute">hidden</tag> (is the entry “hidden”),
+<tag class="attribute">size</tag> (the size of the entry in bytes), and
+<tag class="attribute">last-modified</tag> (the date and time of the last modification).
+Precisely what “hidden” means varies by platform. On Unix-based systems, it often means only
+that the filename begins with a “.”. On Windows systems, it reports the setting of the
+filesystem’s hidden attribute on filesystems that support it.
+XML Calabash also reports if the entry is “executable” in the
+<tag class="attribute">cx:executable</tag> attribute.
+</para>
+
+<note>
+<title>Directory size</title>
+<para>On most systems, the size of a directory is a reflection of the amount of
+space the directory data structure itself occupies: it is not the sum of the sizes
+of all of the files contained in the directory.</para>
+</note>
+
+<para>On systems that support POSIX file attributes, readable, writable, and executable are
+taken from the POSIX subsystem. On systems that don’t support POSIX, they’re taken
+from Java methods on <classname>File</classname> objects. If the system supports
+POSIX file attributes, XML Calabash reports additional details:
+<tag class="attribute">cx:group-readable</tag>,
+<tag class="attribute">cx:group-writable</tag>, and
+<tag class="attribute">cx:group-executable</tag> (is the entry readable, writable,
+and executable by members of the current group) and
+<tag class="attribute">cx:other-readable</tag>,
+<tag class="attribute">cx:other-writable</tag>, and
+<tag class="attribute">cx:other-executable</tag> (is the entry readable, writable,
+and executable by others).</para>
+
+<para>For files, all of the preceding details are provided as well as the
+<tag class="attribute">content-type</tag> of the file. Content types are determined
+from the filename (generally, the extension), <emphasis>not</emphasis> by inspecting
+the contents of the file.</para>
+
+</refsection>
+</refsection>
+
+<refsection>
+<title>Examples</title>
+
+<para>Applied to the <link linkend="running-example">running example</link>, the
+<tag>p:directory-list</tag> step with the <option>detailed</option> option enabled,
+returns a result like this on a system that supports POSIX file attributes:</para>
+
+<programlisting language="xml"><![CDATA[<c:directory xmlns:c="http://www.w3.org/ns/xproc-step"
+             xmlns:cx="http://xmlcalabash.com/ns/extensions"
+             xml:base="file:/path/to/examples/xml/"
+             name="xml"
+             readable="true"
+             writable="true"
+             cx:executable="true"
+             cx:group-readable="true"
+             cx:group-writable="false"
+             cx:group-executable="true"
+             cx:other-readable="true"
+             cx:other-writable="false"
+             cx:other-executable="true"
+             hidden="false"
+             size="160"
+             last-modified="2024-12-29T18:25:10Z">
+   <c:file xml:base="default-ch2.xml"
+           name="default-ch2.xml"
+           content-type="application/xml"
+           readable="true"
+           writable="true"
+           cx:executable="false"
+           cx:group-readable="true"
+           cx:group-writable="false"
+           cx:group-executable="false"
+           cx:other-readable="true"
+           cx:other-writable="false"
+           cx:other-executable="false"
+           hidden="false"
+           size="100"
+           last-modified="2024-11-24T17:23:22Z"/>
+   <c:file xml:base="default-input.xml"
+           name="default-input.xml"
+           content-type="application/xml"
+           readable="true"
+           writable="true"
+           cx:executable="false"
+           cx:group-readable="true"
+           cx:group-writable="false"
+           cx:group-executable="false"
+           cx:other-readable="true"
+           cx:other-writable="false"
+           cx:other-executable="false"
+           hidden="false"
+           size="366"
+           last-modified="2024-11-24T17:23:22Z"/>
+</c:directory>]]></programlisting>
+
 </refsection>
 </refentry>
