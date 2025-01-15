@@ -1,11 +1,13 @@
 package com.xmlcalabash.graph
 
+import com.xmlcalabash.datamodel.DeclareStepInstruction
 import com.xmlcalabash.datamodel.InstructionConfiguration
+import com.xmlcalabash.namespace.NsCx
 import com.xmlcalabash.namespace.NsDescription
 import com.xmlcalabash.util.SaxonTreeBuilder
 import net.sf.saxon.s9api.XdmNode
 
-class   GraphVisualization private constructor(val graph: Graph) {
+class GraphVisualization private constructor(val graph: Graph) {
     companion object {
         fun build(graph: Graph, root: PipelineModel): XdmNode {
             val vis = GraphVisualization(graph)
@@ -77,6 +79,7 @@ class   GraphVisualization private constructor(val graph: Graph) {
             when (model) {
                 is AtomicModel -> addNode(AtomicStepNode(model))
                 is SubpipelineModel -> addNode(SubpipelineNode(model))
+                is PipelineModel -> addNode(PipelineNode(model))
                 is CompoundModel -> addNode(CompoundNode(model))
                 else -> throw IllegalArgumentException("Model contains unexpected model: ${model}")
             }
@@ -157,7 +160,8 @@ class   GraphVisualization private constructor(val graph: Graph) {
     }
 
     inner class SinkNode(): Node() {
-        override val id = "sink_${++sinkid}";
+        override val id = "_g_sink_${++sinkid}";
+
         override fun addSinks() {
             // nop
         }
@@ -286,13 +290,30 @@ class   GraphVisualization private constructor(val graph: Graph) {
         }
 
         override fun describe(builder: SaxonTreeBuilder) {
-            val name = if (model is PipelineModel) {
-                NsDescription.pipeline
-            } else {
-                NsDescription.compound
-            }
-            builder.addStartElement(name, stepConfig.stringAttributeMap(mapOf(
+            builder.addStartElement(NsDescription.compound, stepConfig.stringAttributeMap(mapOf(
                 "object" to this.toString(),
+                "id" to id,
+                "tag" to model.step.instructionType.toString(),
+                "name" to model.step.name)))
+            connections(builder)
+            head.describe(builder)
+            for (child in children) {
+                child.describe(builder)
+            }
+            foot.describe(builder)
+            builder.addEndElement()
+        }
+    }
+
+    open inner class PipelineNode(model: PipelineModel): CompoundNode(model) {
+        override fun describe(builder: SaxonTreeBuilder) {
+            val baseUri = model.step.stepConfig.baseUri?.toString()
+            val type = (model.step as DeclareStepInstruction).type?.toString()
+
+            builder.addStartElement(NsDescription.pipeline, stepConfig.stringAttributeMap(mapOf(
+                "base-uri" to baseUri,
+                "object" to this.toString(),
+                "type" to type,
                 "id" to id,
                 "tag" to model.step.instructionType.toString(),
                 "name" to model.step.name)))

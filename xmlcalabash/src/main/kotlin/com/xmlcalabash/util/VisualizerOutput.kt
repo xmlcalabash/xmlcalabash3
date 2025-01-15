@@ -1,10 +1,14 @@
 package com.xmlcalabash.util
 
+import com.xmlcalabash.XmlCalabashBuildConfig
 import com.xmlcalabash.config.XmlCalabash
 import com.xmlcalabash.documents.XProcDocument
+import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.io.DocumentWriter
 import com.xmlcalabash.namespace.Ns
 import com.xmlcalabash.namespace.NsDescription
+import net.sf.saxon.lib.ResourceRequest
+import net.sf.saxon.lib.ResourceResolver
 import net.sf.saxon.s9api.*
 import org.apache.logging.log4j.kotlin.logger
 import org.xml.sax.InputSource
@@ -12,7 +16,9 @@ import java.io.BufferedReader
 import java.io.File
 import java.io.InputStreamReader
 import java.io.PrintStream
+import javax.xml.transform.Source
 import javax.xml.transform.sax.SAXSource
+import kotlin.io.path.toPath
 
 class VisualizerOutput {
     companion object {
@@ -26,100 +32,71 @@ class VisualizerOutput {
             writer.write()
         }
 
-        fun svg(description: XdmNode, basename: String, graphviz: String) {
-            val root = S9Api.documentElement(description)
-            var pipeCount = 0
-            var graphCount = 0
-
-            for (child in root.axisIterator(Axis.CHILD)) {
-                if (child.nodeKind == XdmNodeKind.ELEMENT) {
-                    when (child.nodeName) {
-                        NsDescription.declareStep -> pipeCount++
-                        NsDescription.graph -> graphCount++
-                    }
-                }
-            }
-
-            val dot = mutableListOf<String>()
-            for (count in 1..pipeCount) {
-                dot.add(toDot(root, "/com/xmlcalabash/pipeline2dot.xsl", count))
-            }
-            dotSvg(graphviz, dot, "${basename}.pipeline.svg")
-
-            dot.clear()
-            for (count in 1..pipeCount) {
-                dot.add(toDot(root, "/com/xmlcalabash/graph2dot.xsl", count))
-            }
-            dotSvg(graphviz, dot, "${basename}.graph.svg")
-        }
-
-        private fun toDot(node: XdmNode, stylesheet: String, number: Int): String {
-            val builder = SaxonTreeBuilder(node.processor)
-            builder.startDocument(null)
-            builder.addSubtree(node)
-            builder.endDocument()
-            val desc = builder.result
-
+        fun svg(node: XdmNode, outdir: String, graphviz: String) {
+            val stylesheet = "/com/xmlcalabash/graphviz.xsl"
             var styleStream = VisualizerOutput::class.java.getResourceAsStream(stylesheet)
             var styleSource = SAXSource(InputSource(styleStream))
-            var xsltCompiler = desc.processor.newXsltCompiler()
-            xsltCompiler.isSchemaAware = desc.processor.isSchemaAware
+            styleSource.systemId = "/com/xmlcalabash/graphviz"
+            var xsltCompiler = node.processor.newXsltCompiler()
+            xsltCompiler.isSchemaAware = node.processor.isSchemaAware
+            xsltCompiler.resourceResolver = VisualizerResourceResolver()
             var xsltExec = xsltCompiler.compile(styleSource)
 
+            val outputBaseURI = UriUtils.cwdAsUri().resolve(outdir)
+
             var transformer = xsltExec.load30()
-            transformer.setStylesheetParameters(mapOf(Ns.number to XdmAtomicValue(number)))
+            transformer.setStylesheetParameters(mapOf(Ns.version to XdmAtomicValue(XmlCalabashBuildConfig.VERSION)))
+            transformer.globalContextItem = node
+            transformer.baseOutputURI = "${outputBaseURI}"
             val xmlResult = XdmDestination()
-            transformer.applyTemplates(desc.asSource(), xmlResult)
+            transformer.applyTemplates(node.asSource(), xmlResult)
             val dotxml = xmlResult.xdmNode
-
-            styleStream = VisualizerOutput::class.java.getResourceAsStream("/com/xmlcalabash/dot2txt.xsl")
-            styleSource = SAXSource(InputSource(styleStream))
-            xsltCompiler = desc.processor.newXsltCompiler()
-            xsltCompiler.isSchemaAware = desc.processor.isSchemaAware
-            xsltExec = xsltCompiler.compile(styleSource)
-
-            transformer = xsltExec.load30()
-            val textResult = XdmDestination()
-            transformer.applyTemplates(dotxml.asSource(), textResult)
-
-            return textResult.xdmNode.underlyingNode.stringValue
-        }
-
-        private fun dotSvg(graphviz: String, dotFiles: List<String>, filename: String) {
-            val tempFile = File.createTempFile("xmlcalabash-", ".dot")
-            tempFile.deleteOnExit()
-
-            val dot = PrintStream(tempFile)
-            dot.println("digraph {")
-            dot.println("compound=true")
-            dot.println("rankdir=TB")
-            dot.println()
-            for (text in dotFiles) {
-                dot.println(text)
-            }
-            dot.println("}")
+            val dotFiles = dotxml.underlyingNode.stringValue.trim().split('\n')
 
             val rt = Runtime.getRuntime()
-            val args = arrayOf(graphviz, "-Tsvg", tempFile.getAbsolutePath().toString(), "-o", filename)
-            val process = rt.exec(args)
-            process.waitFor()
-            if (process.exitValue() != 0) {
-                val errorReader = BufferedReader(InputStreamReader(process.errorStream))
-                var line = errorReader.readLine()
-                while (line != null) {
-                    logger.debug("ERR: $line")
-                    line = errorReader.readLine()
-                }
+            for (filename in dotFiles) {
+                val dotUri = outputBaseURI.resolve(filename)
+                val dotFile = File("${dotUri.toPath()}.dot")
+                val svgFile = File("${dotUri.toPath()}.svg")
+                val args = arrayOf(graphviz, "-Tsvg", dotFile.absolutePath, "-o", svgFile.absolutePath)
+                val process = rt.exec(args)
+                process.waitFor()
+                if (process.exitValue() != 0) {
+                    val errorReader = BufferedReader(InputStreamReader(process.errorStream))
+                    var line = errorReader.readLine()
+                    while (line != null) {
+                        logger.debug("ERR: $line")
+                        line = errorReader.readLine()
+                    }
 
-                val outputReader = BufferedReader(InputStreamReader(process.inputStream))
-                line = outputReader.readLine()
-                while (line != null) {
-                    logger.debug("OUT: $line")
+                    val outputReader = BufferedReader(InputStreamReader(process.inputStream))
                     line = outputReader.readLine()
+                    while (line != null) {
+                        logger.debug("OUT: $line")
+                        line = outputReader.readLine()
+                    }
+                    logger.warn { "Graph generation failed for $filename" }
                 }
-                logger.warn { "Graph generation failed for $filename" }
+                dotFile.delete()
             }
-            tempFile.delete()
         }
     }
+
+    private class VisualizerResourceResolver : ResourceResolver {
+        override fun resolve(request: ResourceRequest?): Source? {
+            if (request == null) {
+                return null
+            }
+
+            val pos = request.uri.lastIndexOf('/')
+            if (pos < 0) {
+                throw XProcError.xiImpossible("Request for graphviz unexpected stylesheet: ${request.uri}").exception()
+            }
+
+            val resource= "/com/xmlcalabash/${request.uri.substring(pos+1)}"
+            var styleStream = VisualizerOutput::class.java.getResourceAsStream(resource)
+            return SAXSource(InputSource(styleStream))
+        }
+    }
+
 }

@@ -22,4 +22,4 @@ ForEach-Object {
 
 # FIXME: should there be some attempt to look for $Env:JAVA_HOME here?
 
-java -cp "$cp" com.xmlcalabash.app.Main "$args"
+java -cp "$cp" com.xmlcalabash.app.Main $args

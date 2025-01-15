@@ -72,8 +72,7 @@ given, the <command>run</command> command is assumed.</para>
   <arg rep="repeat" linkend="cli-namespace">--namespace:<replaceable>prefix</replaceable>=<replaceable>uri</replaceable></arg>
   <arg rep="repeat" linkend="cli-init">--init:<replaceable>class-name</replaceable></arg>
   <sbr/>
-  <arg rep="norepeat" linkend="cli-description">--description:<replaceable>description-file</replaceable></arg>
-  <arg rep="norepeat" linkend="cli-graph">--graph:<replaceable>graph-file</replaceable></arg>
+  <arg rep="norepeat" linkend="cli-graphs">--graphs:<replaceable>graph-output-directory</replaceable></arg>
   <sbr/>
   <arg rep="norepeat" linkend="cli-step">--step:<replaceable>step-name</replaceable></arg>
   <sbr/>
@@ -227,25 +226,20 @@ API.)
 </listitem>
 </varlistentry>
 
-<varlistentry xml:id="cli-description">
-  <term><option>--description:<replaceable>description-file</replaceable></option>, pipeline description</term>
+<varlistentry xml:id="cli-graphs">
+  <term><option>--graphs:<replaceable>graph-output-directory</replaceable></option>, SVG graph outputs</term>
 <listitem>
-<para>This option writes an XML description of the pipeline and the corresponding graphs
-to <filename><replaceable>description-file</replaceable>.xml</filename>.
-</para>
-</listitem>
-</varlistentry>
-
-<varlistentry xml:id="cli-graph">
-  <term><option>--graph:<replaceable>graph-file</replaceable></option>, SVG graph outputs</term>
-<listitem>
-<para>This option writes two SVG descriptions of the pipeline. The first, named
-<filename><replaceable>graph-file</replaceable>.pipeline.svg</filename>, is a “boxes and arrows”
-diagram of the pipeline(s) to run, as interpreted by XML Calabash. The second, named
-<filename><replaceable>graph-file</replaceable>.graph.svg</filename>, is a diagram
-of the graph(s) that were constructed from the pipeline(s). The XML Calabash runtime executes
-the graphs, not the pipelines.
-</para>
+<para>This option writes hyperlinked SVG descriptions of pipelines, and their <link
+linkend="graphs">corresponding graphs</link>, to the
+<replaceable>graph-output-directory</replaceable>. The descriptions are “boxes and arrows”
+diagrams of the connections between the steps. One SVG diagram is produced for each declared
+pipeline and its corresponding graph. An HTML index in the
+<replaceable>graph-output-directory</replaceable> makes them easy to browse.</para>
+<note>
+<para>Some browsers have better support for SVG than others. If the diagrams are difficult
+to view, or if links don’t work correctly, a good first step is to try a different
+browser.</para>
+</note>
 </listitem>
 </varlistentry>
 

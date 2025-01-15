@@ -4,29 +4,37 @@
                 xmlns:p="http://www.w3.org/ns/xproc"
                 xmlns:dot="http://xmlcalabash.com/ns/dot"
                 expand-text="yes"
-                exclude-result-prefixes="g p xs"
+                default-mode="graphs"
                 version="3.0">
 
-<xsl:output method="xml" encoding="utf-8" indent="yes"
-            omit-xml-declaration="yes"/>
-
-<xsl:param name="number" select="1" as="xs:integer"/>
-
-<xsl:param name="debug" select="0"/>
-<xsl:param name="arrows-to-subpipelines" select="'false'"/>
+<xsl:strip-space elements="*"/>
 
 <xsl:key name="id" match="g:atomic|g:head|g:foot|g:sink|g:pipeline|g:subpipeline|g:compound" use="@id"/>
 <xsl:key name="sid" match="g:subpipeline" use="@id"/>
 
-<xsl:strip-space elements="*"/>
+<xsl:variable name="typed-pipelines" select="//g:pipeline[@type]"/>
 
 <xsl:template match="g:description">
-  <xsl:variable name="labeled" as="document-node()">
-    <xsl:document>
-      <xsl:apply-templates select="g:graph[position() = $number]" mode="label"/>
-    </xsl:document>
-  </xsl:variable>
-  <xsl:apply-templates select="$labeled/g:graph"/>
+  <xsl:for-each select="g:graph">
+    <xsl:variable name="labeled" as="document-node()">
+      <xsl:document>
+        <xsl:apply-templates select="." mode="label"/>
+      </xsl:document>
+    </xsl:variable>
+    <xsl:variable name="dotxml">
+      <xsl:apply-templates select="$labeled/g:graph"/>
+    </xsl:variable>
+
+    <xsl:if test="$debug != 0">
+      <xsl:result-document href="graphs/{g:pipeline/@id}.xml" method="xml" indent="yes">
+        <xsl:sequence select="$dotxml"/>
+      </xsl:result-document>
+    </xsl:if>
+
+    <xsl:result-document href="graphs/{g:pipeline/@id}.dot" method="text">
+      <xsl:apply-templates select="$dotxml" mode="dot-to-text"/>
+    </xsl:result-document>
+  </xsl:for-each>
 </xsl:template>
 
 <xsl:template match="g:graph">
@@ -51,34 +59,13 @@
 
       <xsl:apply-templates select="$graph/*"/>
     </xsl:for-each>
-
-    <xsl:if test="$arrows-to-subpipelines != 'false'">
-      <xsl:for-each select="g:compound">
-        <xsl:variable name="compound" select="."/>
-        <xsl:variable name="atomic" select="key('sid', @id)"/>
-
-        <xsl:for-each select="$atomic">
-          <xsl:variable name="subpipeline" select="."/>
-
-          <!-- Something we can actually point at! -->
-          <xsl:variable name="target"
-                        select="($compound/*/g:output, $compound/*/g:input)[1]"/>
-
-          <dot:edge from="{$subpipeline/@gid}"
-                    output="{$subpipeline/@gid}_name"
-                    to="{$target/../@gid}"
-                    input="{$target/@gid}"
-                    dot:lhead="cluster_{$compound/@gid}"/>
-        </xsl:for-each>
-      </xsl:for-each>
-    </xsl:if>
   </dot:digraph>
 </xsl:template>
 
 <xsl:template match="g:pipeline|g:compound">
   <xsl:apply-templates select="g:input"/>
 
-  <dot:subgraph xml:id="cluster_{@gid}" label="{@name}">
+  <dot:subgraph xml:id="cluster_{@gid}" label="{@name}" id="{@id}">
     <xsl:apply-templates select="* except (g:input|g:output)"/>
   </dot:subgraph>
 
@@ -141,16 +128,31 @@
   <dot:node xml:id="{@gid}" dot:shape="point"/>
 </xsl:template>
 
-<xsl:template match="g:atomic|g:subpipeline">
+<xsl:template match="g:atomic">
+  <xsl:variable name="tag" select="@tag/string()"/>
+  <xsl:variable name="pipeline" select="$typed-pipelines[@type = $tag]"/>
   <dot:subgraph xml:id="{@gid}">
     <xsl:call-template name="generate-table">
       <xsl:with-param name="label" select="@name"/>
+      <xsl:with-param name="xref" select="if ($pipeline)
+                                          then $pipeline/@id || '.svg'
+                                          else ()"/>
+    </xsl:call-template>
+  </dot:subgraph>
+</xsl:template>
+
+<xsl:template match="g:subpipeline">
+  <dot:subgraph xml:id="{@gid}">
+    <xsl:call-template name="generate-table">
+      <xsl:with-param name="label" select="@name"/>
+      <xsl:with-param name="xref" select="'#' || substring(@id, 1, string-length(@id) - 9)"/>
     </xsl:call-template>
   </dot:subgraph>
 </xsl:template>
 
 <xsl:template name="generate-table">
   <xsl:param name="label" as="xs:string"/>
+  <xsl:param name="xref" as="xs:string?" select="()"/>
 
   <xsl:variable name="head_inputs" as="element(g:output)*">
     <xsl:if test="self::g:head">
@@ -210,12 +212,29 @@
         <xsl:if test="$total-span ne 1">
           <xsl:attribute name="colspan" select="$total-span"/>
         </xsl:if>
+        <xsl:if test="$xref">
+          <xsl:attribute name="href" select="$xref"/>
+        </xsl:if>
         <xsl:if test="@tag">
           <xsl:text>{string(@tag)}</xsl:text>
           <br/>
         </xsl:if>
         <xsl:if test="true() or self::g:subpipeline or not(starts-with($label, '!'))">
-          <xsl:text>{@id}</xsl:text>
+          <xsl:choose>
+            <xsl:when test="$xref and starts-with($xref, '#')">
+              <font color="#0000ff">
+                <xsl:text>{$xref}</xsl:text>
+              </font>
+            </xsl:when>
+            <xsl:when test="$xref">
+              <font color="#0000ff">
+                <xsl:text>{@id}</xsl:text>
+              </font>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:text>{@id}</xsl:text>
+            </xsl:otherwise>
+          </xsl:choose>
         </xsl:if>
       </td>
     </tr>
@@ -259,7 +278,7 @@
     <dot:edge from="{$fromStep/@gid}" output="{$from/@gid}"
               to="{$toStep/@gid}">
       <!-- p:sink edges don't have an @input -->
-      <xsl:if test="@input">
+      <xsl:if test="@input and $toStep/@tag != 'cx:sink'">
         <xsl:attribute name="input" select="$to/@gid"/>
       </xsl:if>
       <xsl:if test="$style ne 'solid'">

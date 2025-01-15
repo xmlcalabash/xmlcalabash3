@@ -46,10 +46,9 @@ class CommandLine private constructor(val args: Array<out String>) {
     private val validCommands = listOf("version", "run", "help")
     private var _command: String = "run"
     private var _config: File? = null
-    private var _pipelineGraph: String? = null
+    private var _pipelineGraphs: String? = null
     private var _licensed = true
     private var _pipe: Boolean? = null
-    private var _pipelineDescription: String? = null
     private var _debug: Boolean? = null
     private var _debugger = false
     private var _visualizer: String? = null
@@ -78,8 +77,13 @@ class CommandLine private constructor(val args: Array<out String>) {
         get() = _config
 
     /** The pipeline graph description output filename. */
-    val pipelineGraph: String?
-        get() = _pipelineGraph
+    val pipelineGraphs: String?
+        get() {
+            if (_pipelineGraphs != null && _pipelineGraphs!!.endsWith("/")) {
+                return _pipelineGraphs
+            }
+            return "${_pipelineGraphs}/"
+        }
 
     /** Enable licensed features?
      * <p>Setting licensed to false will disable licensed features in Saxon PE and Saxon EE.</p>
@@ -90,10 +94,6 @@ class CommandLine private constructor(val args: Array<out String>) {
     /** Enable Unix-style pipeline processing of stdin and stdout? */
     val pipe: Boolean?
         get() = _pipe
-
-    /** The pipeline description output filename. */
-    val pipelineDescription: String?
-        get() = _pipelineDescription
 
     /** Enable debugging output? Adjust the logging level accordingly. */
     val debug: Boolean?
@@ -196,8 +196,7 @@ class CommandLine private constructor(val args: Array<out String>) {
         ArgumentDescription("--init", listOf(), ArgumentType.STRING) { it -> _initializers.add(it) },
         ArgumentDescription("--configuration", listOf("-c", "--config"), ArgumentType.EXISTING_FILE) { it -> _config = File(it) },
         ArgumentDescription("--step", listOf(), ArgumentType.STRING) { it -> _step = it },
-        ArgumentDescription("--graph", listOf(), ArgumentType.FILE) { it -> _pipelineGraph = it },
-        ArgumentDescription("--description", listOf(), ArgumentType.FILE) { it -> _pipelineDescription = it },
+        ArgumentDescription("--graphs", listOf(), ArgumentType.DIRECTORY) { it -> _pipelineGraphs = it },
         ArgumentDescription("--licensed", listOf(), ArgumentType.BOOLEAN, "true") { it -> _licensed = it == "true" },
         ArgumentDescription("--pipe", listOf(), ArgumentType.BOOLEAN, "true") { it -> _pipe = it == "true" },
         ArgumentDescription("--debug", listOf("-D"), ArgumentType.BOOLEAN, "true") { it -> _debug = it == "true" },
