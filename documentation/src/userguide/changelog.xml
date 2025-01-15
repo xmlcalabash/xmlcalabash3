@@ -13,6 +13,42 @@ See the commits and pull requests on
 finer detail.</para>
 
 <revhistory>
+<revision xml:id="r300-alpha16">
+<revnumber>3.0.0-alpha16</revnumber>
+<date>2025-01-15</date>
+<revdescription>
+<itemizedlist>
+<listitem><para>Fixed
+<link xlink:href="https://github.com/xmlcalabash/xmlcalabash3/issues/167">issue #175</link>.
+Make sure directories are created before attempting to write files.
+</para>
+</listitem>
+<listitem><para>Fixed
+<link xlink:href="https://github.com/xmlcalabash/xmlcalabash3/issues/174">issue #174</link>.
+Improved reporting of user-defined errors.
+If a pipeline author aborts a pipeline with <tag>p:error</tag>, make sure that any details
+provided are presented when the pipeline fails. (Don’t attempt to use the error
+explainer, it won’t know anything about that error.)
+</para>
+</listitem>
+<listitem><para>Fixed
+<link xlink:href="https://github.com/xmlcalabash/xmlcalabash3/issues/167">issue #173</link>.
+The “detailed” option on <tag>p:directory-list</tag> didn’t work on Windows because
+Windows doesn’t support POSIX file permissions. On Windows, the step succeeds but provides
+slightly less detail.
+</para>
+</listitem>
+<listitem><para>Reworked how Graphviz visualizations are created and stored. The
+<option>--description</option> and <option>--graph</option> options have been replaced
+with a single <option>--graphs</option> option. The new option
+writes all of the descriptions to an output directory. Instead of one,
+potentially huge, SVG diagram of the entire set of pipelines, there are now
+distinct graphs for each pipeline with hyperlinks between them.</para>
+</listitem>
+</itemizedlist>
+</revdescription>
+</revision>
+
 <revision xml:id="r300-alpha15">
 <revnumber>3.0.0-alpha15</revnumber>
 <date>2025-01-13</date>
