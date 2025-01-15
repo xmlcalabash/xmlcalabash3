@@ -3,6 +3,7 @@ package com.xmlcalabash.steps.archives
 import com.xmlcalabash.namespace.Ns
 import com.xmlcalabash.namespace.NsCx
 import com.xmlcalabash.runtime.XProcStepConfiguration
+import com.xmlcalabash.util.FileUtils
 import org.apache.commons.compress.archivers.cpio.CpioArchiveEntry
 import org.apache.commons.compress.archivers.cpio.CpioArchiveOutputStream
 import org.apache.commons.compress.archivers.cpio.CpioConstants
@@ -22,7 +23,7 @@ open class CpioOutputArchive(stepConfig: XProcStepConfiguration): OutputArchive(
             archiveFile = file.toPath()
         }
 
-        val stream = BufferedOutputStream(FileOutputStream(archiveFile.toFile()))
+        val stream = BufferedOutputStream(FileUtils.outputStream(archiveFile))
         cpioStream = CpioArchiveOutputStream(stream)
     }
 

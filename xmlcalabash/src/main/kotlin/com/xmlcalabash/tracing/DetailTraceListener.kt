@@ -6,6 +6,7 @@ import com.xmlcalabash.namespace.Ns
 import com.xmlcalabash.runtime.XProcStepConfiguration
 import com.xmlcalabash.runtime.steps.AbstractStep
 import com.xmlcalabash.runtime.steps.Consumer
+import com.xmlcalabash.util.FileUtils
 import com.xmlcalabash.util.SaxonTreeBuilder
 import net.sf.saxon.s9api.QName
 import org.apache.logging.log4j.kotlin.logger
@@ -25,7 +26,7 @@ class DetailTraceListener(val path: Path): StandardTraceListener() {
             val tempFile = Files.createTempFile(path, prefix, suffix).toFile()
             savedDocuments[document.id] = tempFile.absolutePath
 
-            val fos = FileOutputStream(tempFile)
+            val fos = FileUtils.outputStream(tempFile)
             try {
                 val writer = DocumentWriter(document, fos)
                 writer.set(Ns.method, "adaptive")
