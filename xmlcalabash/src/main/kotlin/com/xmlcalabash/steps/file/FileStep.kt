@@ -51,10 +51,24 @@ abstract class FileStep(val stepType: QName): AbstractAtomicStep() {
             if (contentType != null) {
                 amap[Ns.contentType] = contentType.toString()
             }
-            val attr = Files.getPosixFilePermissions(file.toPath())
-            amap[Ns.readable] = attr.contains(PosixFilePermission.OWNER_READ).toString()
-            amap[Ns.writable] = attr.contains(PosixFilePermission.OWNER_WRITE).toString()
-            amap[NsCx.executable] = attr.contains(PosixFilePermission.OWNER_EXECUTE).toString()
+            try {
+                // This fails on some platforms, for example Windows. I wonder if
+                // it's even worth doing.
+                val attr = Files.getPosixFilePermissions(file.toPath())
+                amap[Ns.readable] = attr.contains(PosixFilePermission.OWNER_READ).toString()
+                amap[Ns.writable] = attr.contains(PosixFilePermission.OWNER_WRITE).toString()
+                amap[NsCx.executable] = attr.contains(PosixFilePermission.OWNER_EXECUTE).toString()
+                amap[NsCx.groupReadable] = attr.contains(PosixFilePermission.GROUP_READ).toString()
+                amap[NsCx.groupWritable] = attr.contains(PosixFilePermission.GROUP_WRITE).toString()
+                amap[NsCx.groupExecutable] = attr.contains(PosixFilePermission.GROUP_EXECUTE).toString()
+                amap[NsCx.otherReadable] = attr.contains(PosixFilePermission.OTHERS_READ).toString()
+                amap[NsCx.otherWritable] = attr.contains(PosixFilePermission.OTHERS_WRITE).toString()
+                amap[NsCx.otherExecutable] = attr.contains(PosixFilePermission.OTHERS_EXECUTE).toString()
+            } catch (_: UnsupportedOperationException) {
+                amap[Ns.readable] = file.canRead().toString()
+                amap[Ns.writable] = file.canWrite().toString()
+                amap[NsCx.executable] = file.canExecute().toString()
+            }
             amap[Ns.hidden] = file.isHidden.toString()
             amap[Ns.size] = file.length().toString()
             val stamp = LocalDateTime.ofInstant(Files.getLastModifiedTime(file.toPath()).toInstant(), ZoneId.of("UTC"))
