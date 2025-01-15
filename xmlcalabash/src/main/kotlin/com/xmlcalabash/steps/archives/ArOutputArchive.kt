@@ -3,6 +3,7 @@ package com.xmlcalabash.steps.archives
 import com.xmlcalabash.namespace.Ns
 import com.xmlcalabash.namespace.NsCx
 import com.xmlcalabash.runtime.XProcStepConfiguration
+import com.xmlcalabash.util.FileUtils
 import org.apache.commons.compress.archivers.ar.ArArchiveEntry
 import org.apache.commons.compress.archivers.ar.ArArchiveOutputStream
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry
@@ -25,7 +26,7 @@ open class ArOutputArchive(stepConfig: XProcStepConfiguration): OutputArchive(st
             archiveFile = file.toPath()
         }
 
-        val stream = BufferedOutputStream(FileOutputStream(archiveFile.toFile()))
+        val stream = BufferedOutputStream(FileUtils.outputStream(archiveFile))
         arStream = ArArchiveOutputStream(stream)
     }
 

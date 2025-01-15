@@ -2,7 +2,7 @@ package com.xmlcalabash.steps.archives
 
 import com.xmlcalabash.documents.XProcBinaryDocument
 import com.xmlcalabash.runtime.XProcStepConfiguration
-import java.io.FileOutputStream
+import com.xmlcalabash.util.FileUtils
 import java.io.InputStream
 import java.net.URI
 import java.nio.file.Files
@@ -19,7 +19,7 @@ abstract class InputArchive(stepConfig: XProcStepConfiguration, val doc: XProcBi
         archiveFile = Files.createTempFile(tdir, null, ext)
         archiveFile.toFile().deleteOnExit()
         temporary = true
-        val stream = FileOutputStream(archiveFile.toFile())
+        val stream = FileUtils.outputStream(archiveFile)
         stream.write(doc.binaryValue)
         stream.close()
     }

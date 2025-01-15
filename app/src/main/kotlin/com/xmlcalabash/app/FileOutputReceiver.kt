@@ -30,6 +30,7 @@ class FileOutputReceiver(xmlCalabash: XmlCalabash,
                 System.out
             } else {
                 val outfile = files[port]!!.nextFile()
+                outfile.parentFile.mkdirs()
 
                 logger.debug { "Writing $port to ${outfile.absolutePath}" }
 

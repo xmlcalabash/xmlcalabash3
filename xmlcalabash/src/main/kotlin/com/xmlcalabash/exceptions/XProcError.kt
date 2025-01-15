@@ -149,6 +149,7 @@ class XProcError private constructor(val code: QName, val variant: Int, val loca
         fun xdViewportOnAttribute(expr: String) = dynamic(10, expr)
         fun xdDoesNotExist(path: String, message: String) = dynamic(Pair(11, 1), path, message)
         fun xdIsNotReadable(path: String, message: String) = dynamic(Pair(11, 2), path, message)
+        fun xdIsNotWriteable(path: String, message: String) = dynamic(Pair(11, 3), path, message)
         fun xdInvalidQName(name: String) = dynamic(Pair(15, 1), name)
         fun xdNoBindingInScope(message: String) = dynamic(Pair(15, 2), message)
         fun xdInvalidSelection(name: QName) = dynamic(Pair(16, 1), name)

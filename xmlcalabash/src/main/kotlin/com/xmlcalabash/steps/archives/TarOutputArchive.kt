@@ -3,14 +3,13 @@ package com.xmlcalabash.steps.archives
 import com.xmlcalabash.namespace.Ns
 import com.xmlcalabash.namespace.NsCx
 import com.xmlcalabash.runtime.XProcStepConfiguration
-import org.apache.commons.compress.archivers.cpio.CpioArchiveEntry
+import com.xmlcalabash.util.FileUtils
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry
 import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream
 import org.apache.commons.compress.archivers.tar.TarConstants
 import java.io.BufferedOutputStream
 import java.io.ByteArrayOutputStream
 import java.io.File
-import java.io.FileOutputStream
 import java.nio.file.attribute.FileTime
 import java.time.Instant
 
@@ -25,7 +24,7 @@ open class TarOutputArchive(stepConfig: XProcStepConfiguration): OutputArchive(s
             archiveFile = file.toPath()
         }
 
-        val stream = BufferedOutputStream(FileOutputStream(archiveFile.toFile()))
+        val stream = BufferedOutputStream(FileUtils.outputStream(archiveFile))
         tarStream = TarArchiveOutputStream(stream)
     }
 

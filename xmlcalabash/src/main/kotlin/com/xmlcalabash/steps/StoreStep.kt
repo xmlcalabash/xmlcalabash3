@@ -5,9 +5,8 @@ import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.io.DocumentWriter
 import com.xmlcalabash.namespace.Ns
 import com.xmlcalabash.namespace.NsC
+import com.xmlcalabash.util.FileUtils
 import com.xmlcalabash.util.SaxonTreeBuilder
-import java.io.File
-import java.io.FileOutputStream
 
 open class StoreStep(): AbstractAtomicStep() {
     override fun run() {
@@ -25,8 +24,7 @@ open class StoreStep(): AbstractAtomicStep() {
         }
 
         val serialization = qnameMapBinding(Ns.serialization)
-        val outFile = File(href.path)
-        val fos = FileOutputStream(outFile)
+        val fos = FileUtils.outputStream(href)
         DocumentWriter(document, fos, serialization).write()
         fos.close()
 
