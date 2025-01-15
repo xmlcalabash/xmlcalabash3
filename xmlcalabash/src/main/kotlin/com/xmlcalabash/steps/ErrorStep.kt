@@ -3,6 +3,7 @@ package com.xmlcalabash.steps
 import com.xmlcalabash.datamodel.Location
 import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.exceptions.XProcError
+import com.xmlcalabash.exceptions.XProcUserError
 import com.xmlcalabash.namespace.Ns
 import com.xmlcalabash.namespace.NsC
 import com.xmlcalabash.namespace.NsP
@@ -75,7 +76,7 @@ class ErrorStep(): AbstractAtomicStep() {
             Location.NULL
         }
 
-        throw stepConfig.exception(XProcError(code, stepParams.location, location, XProcDocument.ofXml(builder.result, stepConfig)))
+        throw XProcUserError(code, stepParams.location, location, XProcDocument.ofXml(builder.result, stepConfig)).exception()
     }
 
     override fun toString(): String = "p:error"
