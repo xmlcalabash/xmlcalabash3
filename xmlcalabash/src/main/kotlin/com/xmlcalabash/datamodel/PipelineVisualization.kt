@@ -92,6 +92,7 @@ class PipelineVisualization private constructor(private val instruction: XProcIn
 
     private fun declareStep(pipeline: DeclareStepInstruction) {
         startElement(pipeline.instructionType, mapOf(
+            "base-uri" to pipeline.stepConfig.baseUri?.toString(),
             "name" to pipeline.name,
             "id" to pipeline.id.toString(),
             "type" to pipeline.type?.toString(),

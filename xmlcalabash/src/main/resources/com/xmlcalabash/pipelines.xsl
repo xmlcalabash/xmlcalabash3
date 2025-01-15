@@ -4,46 +4,40 @@
                 xmlns:p="http://www.w3.org/ns/xproc"
                 xmlns:xs="http://www.w3.org/2001/XMLSchema"
                 expand-text="yes"
-                exclude-result-prefixes="#all"
+                default-mode="pipelines"
                 version="3.0">
-
-<xsl:output method="xml" encoding="utf-8" indent="yes"
-            omit-xml-declaration="yes"/>
-
-<xsl:param name="number" select="0" as="xs:integer"/>
-
-<xsl:param name="debug" select="0"/>
-<xsl:param name="arrows-to-subpipelines" select="'false'"/>
-
-<xsl:key name="step" match="ns:atomic-step|ns:compound-step|ns:declare-step" use="@name"/>
 
 <xsl:strip-space elements="*"/>
 
+<xsl:param name="debug" select="1"/>
+
+<xsl:key name="step" match="ns:atomic-step|ns:compound-step|ns:declare-step" use="@name"/>
+
 <xsl:variable name="nl" select="'&#10;'"/>
 
+<xsl:variable name="typed-declare-steps" select="//ns:declare-step[@type]"/>
+
 <xsl:template match="ns:description">
-  <xsl:choose>
-    <xsl:when test="$number = 0">
-      <dot:digraph-wrapper>
-        <xsl:for-each select="ns:declare-step">
-          <xsl:variable name="pipeline" as="document-node()">
-            <xsl:document>
-              <xsl:sequence select="."/>
-            </xsl:document>
-          </xsl:variable>
-          <xsl:apply-templates select="$pipeline"/>
-        </xsl:for-each>
-      </dot:digraph-wrapper>
-    </xsl:when>
-    <xsl:otherwise>
-      <xsl:variable name="pipeline" as="document-node()">
-        <xsl:document>
-          <xsl:sequence select="ns:declare-step[position() = $number]"/>
-        </xsl:document>
-      </xsl:variable>
+  <xsl:for-each select="ns:declare-step">
+    <xsl:variable name="pipeline" as="document-node()">
+      <xsl:document>
+        <xsl:sequence select="."/>
+      </xsl:document>
+    </xsl:variable>
+    <xsl:variable name="dotxml">
       <xsl:apply-templates select="$pipeline"/>
-    </xsl:otherwise>
-  </xsl:choose>
+    </xsl:variable>
+
+    <xsl:if test="$debug != 0">
+      <xsl:result-document href="pipelines/{@id}.xml" method="xml" indent="yes">
+        <xsl:sequence select="$dotxml"/>
+      </xsl:result-document>
+    </xsl:if>
+
+    <xsl:result-document href="pipelines/{@id}.dot" method="text">
+      <xsl:apply-templates select="$dotxml" mode="dot-to-text"/>
+    </xsl:result-document>
+  </xsl:for-each>
 </xsl:template>
 
 <xsl:template match="ns:declare-step|ns:library">
@@ -195,6 +189,8 @@
 <xsl:template match="ns:atomic-step">
   <xsl:variable name="icount" select="count(ns:with-input)"/>
   <xsl:variable name="ocount" select="count(ns:with-output)"/>
+  <xsl:variable name="tag" select="@type"/>
+  <xsl:variable name="pipeline" select="$typed-declare-steps[@type = $tag]"/>
 
   <xsl:variable name="total-span"
                 select="if ($icount gt 0 and $ocount gt 0)
@@ -230,7 +226,21 @@
           <xsl:if test="$total-span ne 1">
             <xsl:attribute name="colspan" select="$total-span"/>
           </xsl:if>
-          <xsl:text>{@type/string()}</xsl:text>
+          <xsl:if test="$pipeline">
+            <xsl:attribute name="href" select="$pipeline/@id || '.svg'"/>
+          </xsl:if>
+
+          <xsl:choose>
+            <xsl:when test="$pipeline">
+              <font color="#0000ff">
+                <xsl:text>{@type/string()}</xsl:text>
+              </font>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:text>{@type/string()}</xsl:text>
+            </xsl:otherwise>
+          </xsl:choose>
+
           <xsl:if test="not(starts-with(@name, '!'))">
             <xsl:text> / {@name/string()}</xsl:text>
           </xsl:if>
@@ -242,7 +252,20 @@
             <xsl:if test="$total-span ne 1">
               <xsl:attribute name="colspan" select="$total-span"/>
             </xsl:if>
-            <i>{@expression/string()}</i>
+
+            <xsl:choose>
+              <xsl:when test="contains(@expression, 'Q{http://xmlcalabash.com/ns/extensions}')
+                              and contains(@expression, 'static')
+                              and contains(@expression, '18,')">
+                <i>«required»</i>
+              </xsl:when>
+              <xsl:when test="string-length(@expression) gt 17">
+                <i>{substring(@expression, 1, 17)}…</i>
+              </xsl:when>
+              <xsl:otherwise>
+                <i>{@expression/string()}</i>
+              </xsl:otherwise>
+            </xsl:choose>
           </td>
         </tr>
       </xsl:if>
@@ -252,7 +275,15 @@
             <xsl:if test="$total-span ne 1">
               <xsl:attribute name="colspan" select="$total-span"/>
             </xsl:if>
-            <i>{@select/string()}</i>
+
+            <xsl:choose>
+              <xsl:when test="string-length(@select) gt 17">
+                <i>{substring(@select, 1, 17)}…</i>
+              </xsl:when>
+              <xsl:otherwise>
+                <i>{@select/string()}</i>
+              </xsl:otherwise>
+            </xsl:choose>
           </td>
         </tr>
       </xsl:if>
@@ -401,6 +432,11 @@
 -->
 
   <xsl:choose>
+    <xsl:when test="$from_port/self::ns:input">
+      <dot:edge x="10" to="cluster_{generate-id($to_step)}_foot" input="{generate-id($to_port)}_foot"
+                from="cluster_{generate-id($from_step)}_head" output="{generate-id($from_port)}_head_input"/>
+    </xsl:when>
+
     <xsl:when test="$from_step/self::ns:compound-step and $from_port/self::ns:output">
       <dot:edge x="8" to="cluster_{generate-id($to_step)}_foot" input="{generate-id($to_port)}_foot"
                 from="cluster_{generate-id($from_step)}_foot" output="{generate-id($from_port)}_foot"/>

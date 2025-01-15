@@ -226,18 +226,12 @@ class XmlCalabashCli private constructor() {
                 }
             }
 
-            if (commandLine.pipelineDescription != null || commandLine.pipelineGraph != null) {
-                val description = runtime.description()
-                if (commandLine.pipelineDescription != null) {
-                    VisualizerOutput.xml(xmlCalabash, description, commandLine.pipelineDescription!!)
-                }
-
-                if (commandLine.pipelineGraph != null) {
-                    if (config.graphviz == null) {
-                        logger.warn { "Cannot create SVG descriptions, graphviz is not configured"}
-                    } else {
-                        VisualizerOutput.svg(description, commandLine.pipelineGraph!!, config.graphviz!!.absolutePath)
-                    }
+            if (commandLine.pipelineGraphs != null) {
+                if (config.graphviz == null) {
+                    logger.warn { "Cannot create SVG, graphviz is not configured"}
+                } else {
+                    val description = runtime.description()
+                    VisualizerOutput.svg(description, commandLine.pipelineGraphs!!, config.graphviz!!.absolutePath)
                 }
             }
 
@@ -387,6 +381,9 @@ class XmlCalabashCli private constructor() {
 
         if (verbosity <= Verbosity.DEBUG) {
             errors[0].printStackTrace()
+            if (errors[0].cause != null && errors[0].cause != errors[0]) {
+                errors[0].cause!!.printStackTrace()
+            }
         }
 
         exitProcess(1)

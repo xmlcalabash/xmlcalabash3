@@ -6,30 +6,19 @@
                 xmlns:f="http://xmlcalabash.com/ns/functions"
                 xmlns:dot="http://xmlcalabash.com/ns/dot"
                 expand-text="yes"
+                default-mode="dot-to-text"
                 exclude-result-prefixes="#all"
                 version="3.0">
 
-<xsl:output method="text" encoding="utf-8"/>
-
-<xsl:strip-space elements="*"/>
-
 <xsl:variable name="nl" select="'&#10;'"/>
 
-<xsl:template match="dot:digraph-wrapper">
-  <!-- special case, mostly when debugging -->
-  <xsl:text>digraph </xsl:text>
-  <xsl:value-of select="@xml:id"/>
+<xsl:template match="dot:digraph">
+  <xsl:text>digraph pipeline</xsl:text>
   <xsl:text> {{&#10;</xsl:text>
   <xsl:text>compound=true{$nl}</xsl:text>
   <xsl:text>rankdir=TB{$nl}</xsl:text>
   <xsl:apply-templates/>
   <xsl:text>}}&#10;</xsl:text>
-</xsl:template>
-
-<xsl:template match="dot:digraph">
-  <!-- The digraph {} wrapper is added by the caller because
-       it may be combining several graphs into one. -->
-  <xsl:apply-templates/>
 </xsl:template>
 
 <xsl:template match="dot:subgraph[table]">
