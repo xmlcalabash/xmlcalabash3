@@ -56,10 +56,6 @@ class SaxonErrorReporter(val stepConfig: XProcStepConfiguration): ErrorReporter 
             error.message
         }
 
-        if (error.isWarning) {
-            stepConfig.environment.messageReporter.report(Verbosity.WARN, extra) { message }
-        } else {
-            stepConfig.environment.messageReporter.report(Verbosity.ERROR, extra) { message }
-        }
+        stepConfig.environment.messageReporter.report(Verbosity.DEBUG, extra) { message }
     }
 }

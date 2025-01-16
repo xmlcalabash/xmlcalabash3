@@ -20,6 +20,7 @@ import com.xmlcalabash.io.DocumentLoader
 import com.xmlcalabash.io.DocumentWriter
 import com.xmlcalabash.namespace.Ns
 import com.xmlcalabash.namespace.Ns.port
+import com.xmlcalabash.namespace.NsC.environment
 import com.xmlcalabash.namespace.NsErr
 import com.xmlcalabash.namespace.NsFn
 import com.xmlcalabash.namespace.NsXs
@@ -187,6 +188,7 @@ class XmlCalabashCli private constructor() {
             val xprocParser = xmlCalabash.newXProcParser()
             stepConfig = xprocParser.builder.stepConfig
             errorExplanation = stepConfig.environment.errorExplanation
+            errorExplanation.setEnvironment(xmlCalabash.commonEnvironment)
 
             evaluateOptions(xprocParser.builder, commandLine)
 
@@ -369,13 +371,9 @@ class XmlCalabashCli private constructor() {
         val verbosity = commandLine.verbosity ?: Verbosity.INFO
 
         for (error in errors) {
-            if (error.error is XProcUserError) {
-                showUserError(error.error as XProcUserError)
-            } else {
-                errorExplanation.message(error.error)
-                if (commandLine.explainErrors) {
-                    errorExplanation.explanation(error.error)
-                }
+            errorExplanation.message(error.error)
+            if (commandLine.explainErrors) {
+                errorExplanation.explanation(error.error)
             }
         }
 
@@ -387,51 +385,6 @@ class XmlCalabashCli private constructor() {
         }
 
         exitProcess(1)
-    }
-
-    private fun showUserError(error: XProcUserError) {
-        // TODO: error explanations should use the message reporter, no?
-        var message: String? = null
-        if (error.details.isNotEmpty()) {
-            val doc = error.details.first() as XProcDocument
-            if (doc is XProcBinaryDocument) {
-                message = "...binary message cannot be displayed..."
-            } else if (doc.contentType?.classification() == MediaClassification.TEXT) {
-                message = doc.value.underlyingValue.stringValue
-            } else if (doc.contentType?.classification() == MediaClassification.XML) {
-                val root = S9Api.documentElement(doc.value as XdmNode)
-                var markup = false
-                for (node in root.axisIterator(Axis.CHILD)) {
-                    if (node.nodeKind != XdmNodeKind.TEXT) {
-                        markup = true
-                        break
-                    }
-                }
-                if (!markup) {
-                    message = root.underlyingValue.stringValue
-                }
-            }
-
-            if (message == null) {
-                val baos = ByteArrayOutputStream()
-                val writer = DocumentWriter(doc, baos)
-                writer.set(Ns.omitXmlDeclaration, "true")
-                writer.write()
-                message = baos.toString(config.consoleEncoding)
-            }
-        }
-        if (message == null) {
-            message = "...no explanation provided..."
-        }
-
-
-        System.err.println("Fatal ${error.code}: ${message}")
-        if (error.location != Location.NULL) {
-            System.err.println("   at ${error.location}")
-        }
-        if (error.inputLocation != Location.NULL) {
-            System.err.println("   in ${error.inputLocation}")
-        }
     }
 
     private fun help() {

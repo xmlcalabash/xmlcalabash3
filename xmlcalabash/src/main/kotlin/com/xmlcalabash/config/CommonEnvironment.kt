@@ -82,6 +82,8 @@ class CommonEnvironment(private val xmlCalabash: XmlCalabash) {
     private val knownAtomicSteps = mutableSetOf<QName>()
 
     init {
+        errorExplanation.setEnvironment(this)
+
         if (xmlCalabash.xmlCalabashConfig.pipe) {
             xmlCalabash.xmlCalabashConfig.messagePrinter.setPrintStream(System.err)
         }
@@ -108,6 +110,7 @@ class CommonEnvironment(private val xmlCalabash: XmlCalabash) {
         }
     }
 
+    val config = xmlCalabash.xmlCalabashConfig
     var eagerEvaluation = false
     var documentManager: DocumentManager
         get() = _documentManager
