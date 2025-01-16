@@ -24,7 +24,7 @@ open class AtomicModel(graph: Graph, parent: Model, step: AtomicStepInstruction,
                                 graph.addEdge(from, conn.port!!, to, child.port)
                             }
                             else -> {
-                                throw XProcError.xiImpossible("Connection is not a pipe: ${conn}").exception()
+                                throw step.stepConfig.exception(XProcError.xiImpossible("Connection is not a pipe: ${conn}"))
                             }
                         }
                     }
