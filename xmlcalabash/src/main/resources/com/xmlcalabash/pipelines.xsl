@@ -186,6 +186,10 @@
   </table>
 </xsl:template>
 
+<xsl:template match="ns:atomic-step[@type='cx:sink']">
+  <dot:node xml:id="{generate-id(.)}" dot:shape="point"/>
+</xsl:template>
+
 <xsl:template match="ns:atomic-step">
   <xsl:variable name="icount" select="count(ns:with-input)"/>
   <xsl:variable name="ocount" select="count(ns:with-output)"/>
@@ -377,8 +381,16 @@
     -->
 
       <xsl:for-each select="$from_port">
-        <dot:edge x="5" to="cluster_{generate-id($to_step)}" input="{generate-id($to_port)}"
-                  from="cluster_{generate-id($from_step)}" output="{generate-id(.)}"/>
+        <xsl:choose>
+          <xsl:when test="$to_step/@type = 'cx:sink'">
+            <dot:edge x="5a" to="{generate-id($to_step)}"
+                      from="cluster_{generate-id($from_step)}" output="{generate-id(.)}"/>
+          </xsl:when>
+          <xsl:otherwise>
+            <dot:edge x="5b" to="cluster_{generate-id($to_step)}" input="{generate-id($to_port)}"
+                      from="cluster_{generate-id($from_step)}" output="{generate-id(.)}"/>
+          </xsl:otherwise>
+        </xsl:choose>
       </xsl:for-each>
     </xsl:otherwise>
   </xsl:choose>

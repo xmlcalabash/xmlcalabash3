@@ -27,6 +27,7 @@ import com.xmlcalabash.namespace.NsXs
 import com.xmlcalabash.runtime.api.RuntimeOption
 import com.xmlcalabash.runtime.api.RuntimePort
 import com.xmlcalabash.util.DefaultXmlCalabashConfiguration
+import com.xmlcalabash.util.FileUtils
 import com.xmlcalabash.util.MediaClassification
 import com.xmlcalabash.util.S9Api
 import com.xmlcalabash.util.UriUtils
@@ -233,6 +234,15 @@ class XmlCalabashCli private constructor() {
                     logger.warn { "Cannot create SVG, graphviz is not configured"}
                 } else {
                     val description = runtime.description()
+                    if (commandLine.debug == true) {
+                        val stream = FileUtils.outputStream("${commandLine.pipelineGraphs!!}pipeline.xml")
+                        val writer = DocumentWriter(XProcDocument.ofXml(description, declstep.stepConfig), stream)
+                        writer.set(Ns.method, "xml")
+                        writer.set(Ns.indent, "true")
+                        writer.write()
+                        stream.close()
+                    }
+
                     VisualizerOutput.svg(description, commandLine.pipelineGraphs!!, config.graphviz!!.absolutePath)
                 }
             }

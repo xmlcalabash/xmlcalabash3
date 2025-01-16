@@ -29,6 +29,10 @@
     <p:output port="result" sequence="true" content-types="any"/>
   </p:declare-step>
 
+   <p:declare-step type="cx:sink">
+      <p:input port="source" content-types="any" sequence="true"/>
+   </p:declare-step>
+
   <p:declare-step type="cx:expression">
     <p:input port="source" content-types="any" sequence="true" primary="false">
       <p:empty/>

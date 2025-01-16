@@ -284,7 +284,7 @@ abstract class CompoundStepDeclaration(parent: XProcInstruction?, stepConfig: In
     }
 
     protected open fun sinkUnreadablePort(wo: PortBindingContainer) {
-        val sink = atomicStep(NsP.sink)
+        val sink = atomicStep(NsCx.sink)
         val wi = sink.withInput()
         wi.port = "source"
         wi.sequence = true
