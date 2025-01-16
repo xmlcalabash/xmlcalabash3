@@ -56,7 +56,11 @@ open class ValidateWithSchematron(): AbstractAtomicStep() {
 
         if (assertValid) {
             if (failed.isNotEmpty()) {
-                val xvrl = xvrlReport(report, reportFormat, schema)
+                val xvrl = if (reportFormat == "xvrl") {
+                    report
+                } else {
+                    xvrlReport(report, "xvrl", schema)
+                }
                 val doc = XProcDocument.ofXml(xvrl, document.context)
                 if (document.baseURI == null) {
                     throw stepConfig.exception(XProcError.xcNotSchemaValidSchematron(doc))
@@ -70,7 +74,7 @@ open class ValidateWithSchematron(): AbstractAtomicStep() {
     }
 
     private fun xvrlReport(report: XdmNode, reportFormat: String, schema: XProcDocument): XdmNode {
-        if (reportFormat == "xvrl") {
+        if (reportFormat != "xvrl") {
             return report
         }
 
