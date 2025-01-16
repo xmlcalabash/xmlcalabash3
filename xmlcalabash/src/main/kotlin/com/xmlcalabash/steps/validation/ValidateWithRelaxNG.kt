@@ -103,40 +103,9 @@ open class ValidateWithRelaxNG(): AbstractAtomicStep() {
 
         val din = S9Api.xdmToInputSource(stepConfig, document)
         if (!driver.validate(din)) {
+            val xvrl = XProcDocument.ofXml(report.asXml(), stepConfig)
             if (assertValid) {
-                errors = report.asXml()
-                for (lex in listener.exceptions) {
-                    when (lex) {
-                        is SAXParseException -> {
-                            // FIXME: errloc
-                            if (except == null) {
-                                if (document.baseURI == null) {
-                                    except = XProcError.xcNotSchemaValidRelaxNG(lex.message ?: "null")
-                                } else {
-                                    except = XProcError.xcNotSchemaValidRelaxNG(document.baseURI!!, lex.message ?: "null")
-                                }
-                            }
-                        }
-                        else -> {
-                            if (except == null) {
-                                if (document.baseURI == null) {
-                                    except = XProcError.xcNotSchemaValidRelaxNG(lex.message ?: "null")
-                                } else {
-                                    except = XProcError.xcNotSchemaValidRelaxNG(document.baseURI!!, lex.message ?: "null")
-                                }
-                            }
-                        }
-                    }
-                }
-                if (except == null) {
-                    if (document.baseURI == null) {
-                        except = XProcError.xcNotSchemaValidRelaxNG("RELAX NG validation failed")
-                    } else {
-                        except = XProcError.xcNotSchemaValidRelaxNG(document.baseURI!!, "RELAX NG validation failed")
-                    }
-                }
-
-                throw except.exception()
+                throw stepConfig.exception(XProcError.xcNotSchemaValidRelaxNG(xvrl))
             }
         }
 

@@ -1,14 +1,28 @@
 package com.xmlcalabash.exceptions
 
+import com.xmlcalabash.config.CommonEnvironment
 import com.xmlcalabash.datamodel.Location
+import com.xmlcalabash.documents.XProcBinaryDocument
+import com.xmlcalabash.documents.XProcDocument
+import com.xmlcalabash.io.DocumentWriter
+import com.xmlcalabash.namespace.Ns
+import com.xmlcalabash.namespace.NsCx
 import com.xmlcalabash.namespace.NsErr
-import net.sf.saxon.s9api.QName
+import com.xmlcalabash.namespace.NsXvrl
+import com.xmlcalabash.util.MediaClassification
+import com.xmlcalabash.util.S9Api
+import net.sf.saxon.s9api.*
+import org.xml.sax.InputSource
 import java.io.BufferedReader
+import java.io.ByteArrayOutputStream
 import java.io.InputStream
 import java.io.InputStreamReader
 import java.nio.charset.StandardCharsets
+import javax.xml.transform.sax.SAXSource
 
 class DefaultErrorExplanation(): ErrorExplanation {
+    private var environment: CommonEnvironment? = null
+
     companion object {
         private var loaded = false
         private val messages = mutableListOf<ErrorExplanationTemplate>()
@@ -37,17 +51,32 @@ class DefaultErrorExplanation(): ErrorExplanation {
         }
     }
 
+    override fun setEnvironment(environment: CommonEnvironment) {
+        this.environment = environment
+    }
+
     override fun message(error: XProcError) {
-        val message = template(error.code, error.variant, error.details.size).message
-        System.err.println("Fatal ${error.code}: ${substitute(message, *error.details)}")
         if (error.location != Location.NULL) {
-            System.err.println("   at ${error.location}")
+            System.err.println("Fatal ${error.code} at ${error.location}")
+        } else {
+            System.err.println("Fatal ${error.code}")
         }
         if (error.inputLocation != Location.NULL) {
             System.err.println("   in ${error.inputLocation}")
         }
         if (error.throwable != null && error.throwable?.message != null) {
             System.err.println("   cause: ${error.throwable!!.toString()}")
+        }
+
+        if (error.code.namespaceUri in listOf(NsErr.namespace, NsCx.errorNamespace)) {
+            val message = template(error.code, error.variant, error.details.size).message
+            System.err.println(substitute(message, *error.details))
+        }
+
+        for (detail in error.details) {
+            if (detail is XProcDocument) {
+                showDetail(detail)
+            }
         }
     }
 
@@ -222,6 +251,78 @@ class DefaultErrorExplanation(): ErrorExplanation {
             messages.add(ErrorExplanationTemplate(code, variant, message, explanation))
         }
     }
+
+    private fun showDetail(doc: XProcDocument) {
+        var message: String? = null
+        if (doc is XProcBinaryDocument) {
+            message = "...binary message cannot be displayed..."
+        } else if (doc.contentType?.classification() == MediaClassification.TEXT) {
+            message = doc.value.underlyingValue.stringValue
+        } else if (doc.contentType?.classification() == MediaClassification.XML) {
+            val root = S9Api.documentElement(doc.value as XdmNode)
+
+            if (root.nodeName in listOf(NsXvrl.reports, NsXvrl.report)) {
+                showXvrl(doc)
+                return
+            }
+
+            var markup = false
+            for (node in root.axisIterator(Axis.CHILD)) {
+                if (node.nodeKind != XdmNodeKind.TEXT) {
+                    markup = true
+                    break
+                }
+            }
+            if (!markup) {
+                message = root.underlyingValue.stringValue
+            }
+        }
+
+        if (message == null) {
+            val baos = ByteArrayOutputStream()
+            val writer = DocumentWriter(doc, baos)
+            writer.set(Ns.omitXmlDeclaration, "true")
+            writer.set(Ns.indent, "true")
+            writer.write()
+            message = baos.toString(environment?.config?.consoleEncoding ?: "US-ASCII")
+        }
+
+        if (message == null) {
+            message = "...no explanation provided..."
+        }
+
+        System.err.println(message.trim())
+    }
+
+    private fun showXvrl(doc: XProcDocument) {
+        val node = doc.value as XdmNode
+
+        if (environment?.messageReporter != null) {
+            environment!!.messageReporter().debug { "${node}" }
+        }
+
+        val stylesheet = "/com/xmlcalabash/format-xvrl.xsl"
+        var styleStream = DefaultErrorExplanation::class.java.getResourceAsStream(stylesheet)
+        var styleSource = SAXSource(InputSource(styleStream))
+        styleSource.systemId = "/com/xmlcalabash/format-report.xsl"
+        var xsltCompiler = node.processor.newXsltCompiler()
+        xsltCompiler.isSchemaAware = node.processor.isSchemaAware
+        var xsltExec = xsltCompiler.compile(styleSource)
+
+        var transformer = xsltExec.load30()
+        transformer.globalContextItem = node
+        val xmlResult = XdmDestination()
+        transformer.applyTemplates(node.asSource(), xmlResult)
+
+        val baos = ByteArrayOutputStream()
+        val writer = DocumentWriter(XProcDocument.ofText(xmlResult.xdmNode, doc.context), baos)
+        writer.set(Ns.method, "text")
+        writer.set(Ns.encoding, environment?.config?.consoleEncoding ?: "UTF-8")
+        writer.write()
+        val text = baos.toString(StandardCharsets.UTF_8)
+        System.err.println(text)
+    }
+
 
     class ErrorExplanationTemplate(val code: String, val variant: Int, val message: String, val explanation: String) {
         val cardinality: Int = message.count { ch -> ch == '\$' }

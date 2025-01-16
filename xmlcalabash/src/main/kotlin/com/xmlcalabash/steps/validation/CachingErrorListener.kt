@@ -44,7 +44,7 @@ class CachingErrorListener(val stepConfig: XProcStepConfiguration, val errors: E
             return
         }
 
-        stepConfig.warn { "${exception}" }
+        //stepConfig.warn { "${exception}" }
         if (handler != null) {
             handler!!.warning(exception)
         }
@@ -57,7 +57,7 @@ class CachingErrorListener(val stepConfig: XProcStepConfiguration, val errors: E
             return
         }
 
-        stepConfig.error { "${exception}" }
+        //stepConfig.error { "${exception}" }
         if (handler != null) {
             handler!!.error(exception)
         }
@@ -71,7 +71,7 @@ class CachingErrorListener(val stepConfig: XProcStepConfiguration, val errors: E
             return
         }
 
-        stepConfig.error { "${exception}" }
+        //stepConfig.error { "${exception}" }
         if (handler != null) {
             handler!!.fatalError(exception)
         }
@@ -85,7 +85,7 @@ class CachingErrorListener(val stepConfig: XProcStepConfiguration, val errors: E
             return
         }
 
-        stepConfig.warn { "${exception}" }
+        //stepConfig.warn { "${exception}" }
         if (listener != null) {
             listener!!.warning(exception)
         }
@@ -98,7 +98,7 @@ class CachingErrorListener(val stepConfig: XProcStepConfiguration, val errors: E
             return
         }
 
-        stepConfig.error { "${exception}" }
+        //stepConfig.error { "${exception}" }
         if (listener != null) {
             listener!!.error(exception)
         }
@@ -112,7 +112,7 @@ class CachingErrorListener(val stepConfig: XProcStepConfiguration, val errors: E
             return
         }
 
-        stepConfig.error { "${exception}" }
+        //stepConfig.error { "${exception}" }
         if (listener != null) {
             listener!!.fatalError(exception)
         }

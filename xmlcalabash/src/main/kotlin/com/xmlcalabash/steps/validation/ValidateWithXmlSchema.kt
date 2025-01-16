@@ -3,6 +3,7 @@ package com.xmlcalabash.steps.validation
 import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.namespace.Ns
+import com.xmlcalabash.namespace.NsErr
 import com.xmlcalabash.namespace.NsXs
 import com.xmlcalabash.namespace.NsXsi
 import com.xmlcalabash.runtime.XProcStepConfiguration
@@ -170,12 +171,11 @@ open class ValidateWithXmlSchema(): AbstractAtomicStep() {
         validator.isUseXsiSchemaLocation = useLocationHints
 
         var raisedException: XProcError? = null
-        var errors: XdmNode? = null
 
         try {
             validator.validate((document.value as XdmNode).asSource())
         } catch (ex: SaxonApiException) {
-            errors = report.asXml()
+            val errors = report.asXml()
             var msg = ex.message
             if (listener.exceptions.isNotEmpty()) {
                 val lex = listener.exceptions.first()
@@ -208,16 +208,21 @@ open class ValidateWithXmlSchema(): AbstractAtomicStep() {
             raisedException = except
         }
 
+        val xvrl = XProcDocument.ofXml(report.asXml(), stepConfig)
+
         if (raisedException != null) {
             if (assertValid) {
+                if (raisedException.code == NsErr.xc(156)) {
+                    throw stepConfig.exception(XProcError.xcNotSchemaValidXmlSchema(xvrl))
+                }
                 throw raisedException.exception()
             } else {
                 receiver.output("result", document)
-                receiver.output("report", XProcDocument.ofXml(errors!!, stepConfig))
+                receiver.output("report", xvrl)
             }
         } else {
             receiver.output("result", XProcDocument.ofXml(destination.xdmNode, stepConfig))
-            receiver.output("report", XProcDocument.ofXml(report.asXml(), stepConfig))
+            receiver.output("report", xvrl)
         }
     }
 

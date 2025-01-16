@@ -83,13 +83,14 @@ class ValidateWithDTD(): AbstractAtomicStep() {
             receiver.output("report", XProcDocument.ofXml(report.asXml(), stepConfig, MediaType.XML, DocumentProperties()))
         } catch (ex: Exception) {
             report.detection("error", null, ex.message ?: "(no message)")
+            val xvrl = XProcDocument.ofXml(report.asXml(), stepConfig)
 
             if (assertValid) {
-                throw stepConfig.exception(XProcError.xcDtdValidationFailed())
+                throw stepConfig.exception(XProcError.xcDtdValidationFailed(xvrl))
             }
 
             receiver.output("result", source)
-            receiver.output("report", XProcDocument.ofXml(report.asXml(), stepConfig, MediaType.XML, DocumentProperties()))
+            receiver.output("report", xvrl)
         }
     }
 

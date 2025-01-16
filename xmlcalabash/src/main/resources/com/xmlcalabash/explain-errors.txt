@@ -829,7 +829,7 @@ Schematron validation failed: “$1”.
 It is a dynamic error if the assert-valid option is true and any Schematron assertions fail.
 
 XC0054/2
-Schematron validation failed for “$2”: “$1”.
+Schematron validation failed for “$2”.
 It is a dynamic error if the assert-valid option is true and any Schematron assertions fail.
 
 XC0053
@@ -1219,6 +1219,11 @@ Not valid: “$1” ($2).
 It is a dynamic error if the assert-valid option on p:validate-with-relax-ng is
 true and the input document is not valid.
 
+XC0155/3
+RELAX NG validation failed.
+It is a dynamic error if the assert-valid option on p:validate-with-relax-ng is
+true and the input document is not valid.
+
 XC0156/1
 Not valid: $1.
 It is a dynamic error if the assert-valid option on p:validate-with-xml-schema
@@ -1226,6 +1231,11 @@ is true and the input document is not valid.
 
 XC0156/2
 Not valid: “$1” ($2).
+It is a dynamic error if the assert-valid option on p:validate-with-xml-schema
+is true and the input document is not valid.
+
+XC0156/3
+XML Schema validation failed.
 It is a dynamic error if the assert-valid option on p:validate-with-xml-schema
 is true and the input document is not valid.
 
@@ -1256,6 +1266,11 @@ is true and the input document is not valid.
 
 XC0165/2
 Not valid: “$1”.
+It is a dynamic error if the assert-valid option on p:validate-with-json-schema
+is true and the input document is not valid.
+
+XC0165/3
+JSON Schema validation failed.
 It is a dynamic error if the assert-valid option on p:validate-with-json-schema
 is true and the input document is not valid.
 

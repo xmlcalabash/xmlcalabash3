@@ -94,21 +94,20 @@ open class ValidateWithJsonSchema(): AbstractAtomicStep() {
             }
         }
 
+        val xvrl = XProcDocument.ofXml(report.asXml(), stepConfig)
+
         if (assertions.isEmpty()) {
             receiver.output("result", document)
-            receiver.output("report", XProcDocument.ofXml(report.asXml(), stepConfig))
+            receiver.output("report", xvrl)
             return
         }
 
         if (assertValid) {
-            if (document.baseURI == null) {
-                throw stepConfig.exception(XProcError.xcNotSchemaValidJson())
-            }
-            throw stepConfig.exception(XProcError.xcNotSchemaValidJson(document.baseURI!!))
+            throw stepConfig.exception(XProcError.xcNotSchemaValidJson(xvrl))
         }
 
         receiver.output("result", document)
-        receiver.output("report", XProcDocument.ofXml(report.asXml(), stepConfig))
+        receiver.output("report", xvrl)
     }
 
     override fun toString(): String = "p:validate-with-json-schema"

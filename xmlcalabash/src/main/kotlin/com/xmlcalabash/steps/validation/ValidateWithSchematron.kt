@@ -51,24 +51,13 @@ open class ValidateWithSchematron(): AbstractAtomicStep() {
         val failed = impl.failedAssertions(report)
 
         if (reportFormat == "xvrl") {
-            val xvrl = XvrlReports.fromSvrl(stepConfig, report)
-            xvrl.metadata.validator("SchXslt", XmlCalabashBuildConfig.DEPENDENCIES["schxslt2"] ?: "unknown")
-
-            if (stepConfig.baseUri != null && schema.baseURI != null
-                && schema.baseURI.toString().startsWith(stepConfig.baseUri.toString())
-                && schema.value is XdmNode) {
-                // It looks like this one was inline...
-                xvrl.metadata.schema(schema.baseURI, NamespaceUri.of("http://purl.oclc.org/dsdl/schematron"), null, schema.value as XdmNode)
-            } else {
-                xvrl.metadata.schema(schema.baseURI, NamespaceUri.of("http://purl.oclc.org/dsdl/schematron"))
-            }
-
-            report = xvrl.asXml()
+            report = xvrlReport(report, reportFormat, schema)
         }
 
         if (assertValid) {
             if (failed.isNotEmpty()) {
-                val doc = XProcDocument.ofXml(report, document.context)
+                val xvrl = xvrlReport(report, reportFormat, schema)
+                val doc = XProcDocument.ofXml(xvrl, document.context)
                 if (document.baseURI == null) {
                     throw stepConfig.exception(XProcError.xcNotSchemaValidSchematron(doc))
                 }
@@ -78,6 +67,26 @@ open class ValidateWithSchematron(): AbstractAtomicStep() {
 
         receiver.output("report", XProcDocument.ofXml(report, stepConfig))
         receiver.output("result", document)
+    }
+
+    private fun xvrlReport(report: XdmNode, reportFormat: String, schema: XProcDocument): XdmNode {
+        if (reportFormat == "xvrl") {
+            return report
+        }
+
+        val xvrl = XvrlReports.fromSvrl(stepConfig, report)
+        xvrl.metadata.validator("SchXslt2", XmlCalabashBuildConfig.DEPENDENCIES["schxslt2"] ?: "unknown")
+
+        if (stepConfig.baseUri != null && schema.baseURI != null
+            && schema.baseURI.toString().startsWith(stepConfig.baseUri.toString())
+            && schema.value is XdmNode) {
+            // It looks like this one was inline...
+            xvrl.metadata.schema(schema.baseURI, NamespaceUri.of("http://purl.oclc.org/dsdl/schematron"), null, schema.value as XdmNode)
+        } else {
+            xvrl.metadata.schema(schema.baseURI, NamespaceUri.of("http://purl.oclc.org/dsdl/schematron"))
+        }
+
+        return xvrl.asXml()
     }
 
     override fun toString(): String = "p:validate-with-schematron"
