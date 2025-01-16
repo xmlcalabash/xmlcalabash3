@@ -11,8 +11,13 @@ There must be a context item for this expression.
 It is a dynamic error if an XPath expression makes reference to the context
 item, size, or position when the context item is undefined.
 
-XD0006
+XD0006/1
 A sequence of inputs is not allowed on the “$1” port.
+If sequence is not specified, or has the value false, then it is a dynamic error
+unless exactly one document appears on the declared port.
+
+XD0006/2
+An input must be provided for the “$1” port.
 If sequence is not specified, or has the value false, then it is a dynamic error
 unless exactly one document appears on the declared port.
 

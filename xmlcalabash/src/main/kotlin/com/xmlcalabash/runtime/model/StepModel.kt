@@ -58,7 +58,7 @@ abstract class StepModel(val runtime: XProcRuntime, model: Model) {
             // Don't report [p:]messages as options
             if ((type.namespaceUri == NsP.namespace && name != Ns.message)
                 || (type.namespaceUri != NsP.namespace && name != NsP.message)) {
-                roptions[name] = RuntimeOption(name, option.asType, option.values, option.static, option.staticValue)
+                roptions[name] = RuntimeOption(name, option.required, option.asType, option.values, option.static, option.staticValue)
             }
         }
         options = roptions.toMap()

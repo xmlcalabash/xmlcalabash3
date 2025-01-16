@@ -1,10 +1,8 @@
 package com.xmlcalabash.datamodel
 
-import com.xmlcalabash.runtime.XProcStepConfiguration
 import com.xmlcalabash.exceptions.XProcError
 import net.sf.saxon.s9api.QName
 import net.sf.saxon.s9api.SequenceType
-import net.sf.saxon.s9api.XdmValue
 
 abstract class VariableBindingContainer(
     parent: XProcInstruction,

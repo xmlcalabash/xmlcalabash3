@@ -144,7 +144,8 @@ open class XProcError protected constructor(val code: QName, val variant: Int, v
 
         fun xdSequenceForbidden() = dynamic(Pair(1,1))
         fun xdEmptySequenceForbidden() = dynamic(Pair(1,2))
-        fun xdInputSequenceForbidden(port: String) = dynamic(6, port)
+        fun xdInputSequenceForbidden(port: String) = dynamic(Pair(6, 1), port)
+        fun xdInputRequiredOnPort(port: String) = dynamic(Pair(6, 2), port)
         fun xdOutputSequenceForbidden(port: String) = dynamic(7, port)
         fun xdViewportOnAttribute(expr: String) = dynamic(10, expr)
         fun xdDoesNotExist(path: String, message: String) = dynamic(Pair(11, 1), path, message)
