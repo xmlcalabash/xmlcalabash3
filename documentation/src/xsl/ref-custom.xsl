@@ -156,7 +156,47 @@
 
 <xsl:variable name="standard-map"
               select="map { '3.0': 'https://spec.xproc.org/3.0/steps/',
-                            '3.1': 'https://spec.xproc.org/master/head/steps/' }"/>
+                            '3.1': 'https://spec.xproc.org/master/head/steps/',
+
+'3.1/p:css-formatter': 'https://spec.xproc.org/master/head/paged-media#c.css-formatter',
+'3.1/p:directory-list': 'https://spec.xproc.org/master/head/file#c.directory-list',
+'3.1/p:file-copy': 'https://spec.xproc.org/master/head/file#c.file-copy',
+'3.1/p:file-create-tempfile': 'https://spec.xproc.org/master/head/file#c.file-create-tempfile',
+'3.1/p:file-delete': 'https://spec.xproc.org/master/head/file#c.file-delete',
+'3.1/p:file-info': 'https://spec.xproc.org/master/head/file#c.file-info',
+'3.1/p:file-mkdir': 'https://spec.xproc.org/master/head/file#c.file-mkdir',
+'3.1/p:file-move': 'https://spec.xproc.org/master/head/file#c.file-move',
+'3.1/p:file-touch': 'https://spec.xproc.org/master/head/file#c.file-touch',
+'3.1/p:invisible-xml': 'https://spec.xproc.org/master/head/ixml#c.invisible-xml',
+'3.1/p:markdown-to-html': 'https://spec.xproc.org/master/head/text#c.markdown-to-html',
+'3.1/p:os-exec': 'https://spec.xproc.org/master/head/os#c.os-exec',
+'3.1/p:os-info': 'https://spec.xproc.org/master/head/os#c.os-info',
+'3.1/p:run': 'https://spec.xproc.org/master/head/run#c.run',
+'3.1/p:send-mail': 'https://spec.xproc.org/master/head/mail#c.send-mail',
+'3.1/p:validate-with-dtd': 'https://spec.xproc.org/master/head/validation#c.validate-with-dtd',
+'3.1/p:validate-with-json-schema': 'https://spec.xproc.org/master/head/validation#c.validate-with-json-schema',
+'3.1/p:validate-with-nvdl': 'https://spec.xproc.org/master/head/validation#c.validate-with-nvdl',
+'3.1/p:validate-with-relax-ng': 'https://spec.xproc.org/master/head/validation#c.validate-with-relax-ng',
+'3.1/p:validate-with-schematron': 'https://spec.xproc.org/master/head/validation#c.validate-with-schematron',
+'3.1/p:validate-with-xml-schema': 'https://spec.xproc.org/master/head/validation#c.validate-with-xml-schema',
+'3.1/p:xsl-formatter': 'https://spec.xproc.org/master/head/paged-media#c.xsl-formatter'
+
+ }"/>
+
+<xsl:variable name="xprocref" select="('p:add-attribute', 'p:add-xml-base',
+  'p:archive', 'p:archive-manifest', 'p:cast-content-type', 'p:compare',
+  'p:compress', 'p:count', 'p:delete', 'p:directory-list', 'p:error',
+  'p:file-copy', 'p:file-create-tempfile', 'p:file-delete', 'p:file-info',
+  'p:file-mkdir', 'p:file-move', 'p:file-touch', 'p:filter', 'p:hash',
+  'p:http-request', 'p:identity', 'p:insert', 'p:json-join', 'p:json-merge',
+  'p:label-elements', 'p:load', 'p:make-absolute-uris', 'p:namespace-delete',
+  'p:namespace-rename', 'p:os-exec', 'p:os-info', 'p:pack', 'p:rename',
+  'p:replace', 'p:set-attributes', 'p:set-properties', 'p:sink',
+  'p:split-sequence', 'p:store', 'p:string-replace', 'p:text-count',
+  'p:text-head', 'p:text-join', 'p:text-replace', 'p:text-sort', 'p:text-tail',
+  'p:unarchive', 'p:uncompress', 'p:unwrap', 'p:uuid', 'p:wrap',
+  'p:wrap-sequence', 'p:www-form-urldecode', 'p:www-form-urlencode', 'p:xinclude',
+  'p:xquery', 'p:xslt')"/>
 
 <xsl:template match="db:para[@role='external-refs']">
   <xsl:if test="node()">
@@ -171,10 +211,29 @@
     <xsl:message terminate="yes">Unsupported version {$version}.</xsl:message>
   </xsl:if>
 
-  <p>The <code>{$name}</code> step is defined in the
-  <a href="{map:get($standard-map, $version)}#{replace($name, 'p:', 'c.')}">XProc {$version}:
-  Standard Step Library</a>. It is also described on
-  <a href="https://xprocref.org/{$version}/{replace($name, ':', '.')}.html">XProcRef.org</a>.
+  <xsl:variable name="link" as="xs:string">
+    <xsl:choose>
+      <xsl:when test="map:contains($standard-map, $version||'/'||$name)">
+        <xsl:sequence select="map:get($standard-map, $version||'/'||$name)"/>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:sequence select="map:get($standard-map, $version) || '#' || replace($name, 'p:', 'c.')"/>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:variable>
+
+  <p>The <code>{$name}</code> step is a
+  <a href="{$link}">standard XProc {$version} step</a>.
+  <xsl:choose>
+    <xsl:when test="$name = $xprocref">
+      <xsl:text>It is also described on </xsl:text>
+      <a href="https://xprocref.org/{$version}/{replace($name, ':', '.')}.html">XProcRef.org</a>
+      <xsl:text>.</xsl:text>
+    </xsl:when>
+    <xsl:otherwise>
+      <xsl:message>Not on XProcRef.org? {$name}</xsl:message>
+    </xsl:otherwise>
+  </xsl:choose>
   </p>
 </xsl:template>
 
