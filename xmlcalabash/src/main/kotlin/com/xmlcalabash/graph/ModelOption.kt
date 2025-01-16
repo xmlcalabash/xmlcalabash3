@@ -10,7 +10,7 @@ import net.sf.saxon.s9api.QName
 import net.sf.saxon.s9api.SequenceType
 import net.sf.saxon.s9api.XdmAtomicValue
 
-class ModelOption private constructor(val parent: Model, val name: QName) {
+class ModelOption private constructor(val parent: Model, val name: QName, val required: Boolean) {
     private var _static = false
     val static: Boolean
         get() = _static
@@ -27,7 +27,7 @@ class ModelOption private constructor(val parent: Model, val name: QName) {
     val values: List<XdmAtomicValue>
         get() = _values
 
-    constructor(parent: Model, option: OptionInstruction): this(parent, option.name) {
+    constructor(parent: Model, option: OptionInstruction): this(parent, option.name, option.required == true) {
         _static = option.static
         _asType = option.asType!!
         _values = option.values
@@ -36,7 +36,7 @@ class ModelOption private constructor(val parent: Model, val name: QName) {
         }
     }
 
-    constructor(parent: Model, option: WithOptionInstruction): this(parent, option.name) {
+    constructor(parent: Model, option: WithOptionInstruction): this(parent, option.name, false) {
         _static = false
         _asType = option.asType!!
         _values = option.optionValues
@@ -45,7 +45,7 @@ class ModelOption private constructor(val parent: Model, val name: QName) {
         }
     }
 
-    constructor(parent: Model, option: StaticOptionDetails): this(parent, option.name) {
+    constructor(parent: Model, option: StaticOptionDetails): this(parent, option.name, false) {
         _static = true
         _asType = option.asType
         _values = option.values
