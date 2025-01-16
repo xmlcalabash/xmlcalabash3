@@ -4,12 +4,14 @@ import com.thaiopensource.util.PropertyMapBuilder
 import com.thaiopensource.validate.ValidateProperty
 import com.thaiopensource.validate.ValidationDriver
 import com.thaiopensource.validate.prop.rng.RngProperty
+import com.xmlcalabash.XmlCalabashBuildConfig
 import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.io.DocumentManager
 import com.xmlcalabash.namespace.Ns
 import com.xmlcalabash.steps.AbstractAtomicStep
 import com.xmlcalabash.util.S9Api
+import net.sf.saxon.om.NamespaceUri
 import net.sf.saxon.s9api.XdmNode
 import org.xml.sax.InputSource
 
@@ -32,6 +34,8 @@ open class ValidateWithNVDL(): AbstractAtomicStep() {
         }
 
         val report = Errors(stepConfig, document.baseURI)
+        report.report.metadata.validator("Jing", XmlCalabashBuildConfig.DEPENDENCIES["jing"] ?: "unknown")
+
         val listener = CachingErrorListener(stepConfig, report)
         val properties = PropertyMapBuilder()
         properties.put(ValidateProperty.ERROR_HANDLER, listener)
@@ -42,8 +46,17 @@ open class ValidateWithNVDL(): AbstractAtomicStep() {
         val srcdoc = document.value as XdmNode
         val nvdldoc = nvdl.value as XdmNode
 
+        if (stepConfig.baseUri != null && nvdldoc.baseURI != null
+            && nvdldoc.baseURI.toString().startsWith(stepConfig.baseUri.toString())) {
+            // It looks like this one was inline...
+            report.report.metadata.schema(nvdldoc.baseURI, NamespaceUri.of("http://purl.oclc.org/dsdl/nvdl/ns/structure/1.0"), null, nvdldoc)
+        } else {
+            report.report.metadata.schema(nvdldoc.baseURI, NamespaceUri.of("http://purl.oclc.org/dsdl/nvdl/ns/structure/1.0"))
+        }
+
         for (schema in schemas) {
             localDocumentManager.cache(schema)
+            // TODO: if additional schemas are provided, what type are they? Add them to the metadata.
         }
 
         val driver = ValidationDriver(properties.toPropertyMap())
@@ -59,12 +72,14 @@ open class ValidateWithNVDL(): AbstractAtomicStep() {
 
         try {
             if (!driver.validate(docSource)) {
+                val xvrl = XProcDocument.ofXml(report.asXml(), stepConfig)
                 if (assertValid) {
-                    throw stepConfig.exception(XProcError.xcNotSchemaValidNVDL())
+                    throw stepConfig.exception(XProcError.xcNotSchemaValidNVDL(xvrl))
                 }
             }
         } catch (ex: Exception) {
-            throw stepConfig.exception(XProcError.xcNotSchemaValidNVDL(), ex)
+            val xvrl = XProcDocument.ofXml(report.asXml(), stepConfig)
+            throw stepConfig.exception(XProcError.xcNotSchemaValidNVDL(xvrl), ex)
         }
 
         receiver.output("result", document)

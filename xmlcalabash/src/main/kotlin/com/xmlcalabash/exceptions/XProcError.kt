@@ -231,7 +231,7 @@ open class XProcError protected constructor(val code: QName, val variant: Int, v
         fun xcCannotCopy(source: URI, target: URI) = step(Pair(50,2), source, target)
         fun xcNotSchemaValidSchematron(report: XProcDocument) = step(Pair(54, 1), report)
         fun xcNotSchemaValidSchematron(report: XProcDocument, uri: URI) = step(Pair(54, 2), report, uri)
-        fun xcNotSchemaValidNVDL() = step(53)
+        fun xcNotSchemaValidNVDL(xvrl: XProcDocument) = step(53, xvrl)
         fun xcXsltNoTemplate(template: QName) = step(56, template)
         fun xcAllAndRelative() = step(58)
         fun xcCannotAddNamespaces(attName: QName) = step(Pair(59, 1), attName)
