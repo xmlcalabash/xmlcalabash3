@@ -40,6 +40,7 @@ class StandardLibrary private constructor(builder: PipelineBuilder, private val 
         cxDefaultInput()
         cxDocument()
         cxEmpty()
+        cxSink()
         cxExpression()
         cxGuard()
         cxInline()
@@ -176,6 +177,16 @@ class StandardLibrary private constructor(builder: PipelineBuilder, private val 
 
         val output = decl.output("result", primary=true, sequence=true)
         output.contentTypes = MediaType.parseList("any")
+
+        return decl
+    }
+
+    private fun cxSink(): DeclareStepInstruction {
+        val decl = library.declareStep()
+        decl._type = stepConfig.parseQName("cx:sink")
+
+        val input = decl.input("source", primary=true, sequence=true)
+        input.contentTypes = MediaType.parseList("any")
 
         return decl
     }

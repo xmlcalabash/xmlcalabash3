@@ -100,7 +100,7 @@ class StandardStepProvider: AtomicStepManager, AtomicStepProvider {
         NsCx.document           to { p: StepParameters? -> DocumentStep(p as DocumentStepParameters) },
         NsCx.empty              to { p: StepParameters? -> EmptyStep(p as EmptyStepParameters) },
         NsCx.joiner             to { _: StepParameters? -> JoinerStep() },
-        NsCx.sink                to { _: StepParameters? -> SinkStep() },
+        NsCx.sink               to { _: StepParameters? -> SinkStep() },
         NsCx.splitter           to { _: StepParameters? -> SplitterStep() },
         NsCx.select             to { p: StepParameters? -> SelectStep(p as SelectStepParameters) },
         NsCx.head               to { _: StepParameters? -> NullStep() },
