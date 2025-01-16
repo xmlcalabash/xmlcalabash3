@@ -87,9 +87,12 @@ class XProcPipeline internal constructor(runtime: XProcRuntime, pipeline: Compou
         if (option == null) {
             throw XProcError.xsNoSuchOption(name).exception()
         }
+
         if (name in setOptions) {
             throw XProcError.xsDuplicateOption(name).exception() // not really exactly the right error
         }
+        setOptions.add(name)
+
         try {
             config.checkType(name, value.value, option.asType, config.inscopeNamespaces, option.values)
         } catch (_: Exception) {
@@ -116,9 +119,18 @@ class XProcPipeline internal constructor(runtime: XProcRuntime, pipeline: Compou
             proxy.serialization(port, manifold.serialization)
         }
 
-        for ((port, _) in inputManifold) {
+        for ((port, manifold) in inputManifold) {
             if (port !in boundInputs) {
+                if (!manifold.sequence && manifold.defaultBindings.isEmpty()) {
+                    throw XProcError.xdInputRequiredOnPort(port).exception()
+                }
                 runnable.head.unboundInputs.add(port)
+            }
+        }
+
+        for ((name, manifold) in optionManifold) {
+            if (name !in setOptions && manifold.required) {
+                throw XProcError.xsMissingRequiredOption(name).exception()
             }
         }
 
