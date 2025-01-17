@@ -19,60 +19,26 @@ open class ChooseWhenStep(config: XProcStepConfiguration, compound: CompoundStep
         stepConfig.environment.newExecutionContext(stepConfig)
 
         localStepsToRun.clear()
+        localStepsToRun.addAll(runnables)
+
+        // Run everything up to, and including, the guard expression,
+        // leave everything else to be run after, if the expression is true
+        var guardStep: AbstractStep? = null
+        val guardSteps = mutableListOf<AbstractStep>()
+        while (localStepsToRun.isNotEmpty()) {
+            val step = localStepsToRun.removeFirst()
+            guardSteps.add(step)
+            if (step.type == NsCx.guard) {
+                guardStep = step
+                break
+            }
+        }
 
         head.runStep()
 
-        // Run everything up to the first expression...and any runnable splitters and joiners
-        var guardStep: AbstractStep? = null
-        val guardSteps = mutableListOf<AbstractStep>()
-        var found = false
-        for (step in runnables) {
-            if (found) {
-                if ((step.type == NsCx.splitter || step.type == NsCx.joiner) && step.readyToRun) {
-                    guardSteps.add(step)
-                } else {
-                    localStepsToRun.add(step)
-                }
-            } else {
-                guardSteps.add(step)
-            }
-            if (step.type == NsCx.guard) {
-                guardStep = step
-                found = true
-            }
-        }
-
-        var more = true
-        while (more) {
-            more = false
-            val remaining = try {
-                runStepsExhaustively(guardSteps)
-            } catch (ex: XProcException) {
-                if (ex.error.code == NsErr.threadInterrupted) {
-                    for (step in stepsToRun) {
-                        step.abort()
-                    }
-                }
-                throw ex
-            }
-
-            if (remaining.isNotEmpty()) {
-                guardSteps.clear()
-                guardSteps.addAll(remaining)
-
-                for (step in localStepsToRun.toList()) {
-                    if ((step.type == NsCx.splitter || step.type == NsCx.joiner) && step.readyToRun) {
-                        guardSteps.add(step)
-                        localStepsToRun.remove(step)
-                        more = true
-                    }
-                }
-
-                if (!more) {
-                    throw stepConfig.exception(XProcError.xiNoRunnableSteps())
-                }
-            }
-        }
+        stepsToRun.clear()
+        stepsToRun.addAll(guardSteps)
+        runSubpipeline()
 
         stepConfig.environment.releaseExecutionContext()
 
