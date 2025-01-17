@@ -243,7 +243,7 @@ class XmlCalabashCli private constructor() {
                         stream.close()
                     }
 
-                    VisualizerOutput.svg(description, commandLine.pipelineGraphs!!, config.graphviz!!.absolutePath)
+                    VisualizerOutput.svg(description, commandLine.pipelineGraphs!!, config.graphviz!!.absolutePath, commandLine.debug == true)
                 }
             }
 

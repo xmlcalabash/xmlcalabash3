@@ -32,7 +32,7 @@ class VisualizerOutput {
             writer.write()
         }
 
-        fun svg(node: XdmNode, outdir: String, graphviz: String) {
+        fun svg(node: XdmNode, outdir: String, graphviz: String, debug: Boolean = false) {
             val stylesheet = "/com/xmlcalabash/graphviz.xsl"
             var styleStream = VisualizerOutput::class.java.getResourceAsStream(stylesheet)
             var styleSource = SAXSource(InputSource(styleStream))
@@ -46,6 +46,10 @@ class VisualizerOutput {
 
             var transformer = xsltExec.load30()
             transformer.setStylesheetParameters(mapOf(Ns.version to XdmAtomicValue(XmlCalabashBuildConfig.VERSION)))
+            if (debug) {
+                transformer.setStylesheetParameters(mapOf(Ns.debug to XdmAtomicValue("1")))
+            }
+
             transformer.globalContextItem = node
             transformer.baseOutputURI = "${outputBaseURI}"
             val xmlResult = XdmDestination()

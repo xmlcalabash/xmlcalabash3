@@ -172,7 +172,7 @@ a, a:visited {
       <code><xsl:value-of select="substring-after(@base-uri, $trim-prefix)"/></code>
     </td>
     <td>
-      <a href="pipelines/{@id}.svg">{(@type, @id)[1]/string()}</a>
+      <a href="pipelines/{@id}.svg">{(@type/string(), "«anonymous»")[1]}</a>
     </td>
     <td>
       <xsl:variable name="graph" select="(following-sibling::ns:graph)[1]"/>
