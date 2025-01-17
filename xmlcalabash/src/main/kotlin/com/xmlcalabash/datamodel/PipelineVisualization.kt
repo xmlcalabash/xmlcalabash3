@@ -120,6 +120,7 @@ class PipelineVisualization private constructor(private val instruction: XProcIn
             "type" to step.instructionType.toString(),
             "expression" to expr,
             "as" to step.expression.asType.underlyingSequenceType.toString(),
+            "option-name" to step.externalName?.toString()
         )
 
         if (step.expression.values.isNotEmpty()) {

@@ -41,6 +41,7 @@ object Ns {
     val cwd = QName("cwd")
     val date = QName("date")
     val dtdValidate = QName("dtd-validate")
+    val debug = QName("debug")
     val deepEqual = QName("deep-equal")
     val deflate = QName("deflate")
     val defaultVersion = QName("default-version")

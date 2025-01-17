@@ -9,7 +9,7 @@
 
 <xsl:strip-space elements="*"/>
 
-<xsl:param name="debug" select="1"/>
+<xsl:param name="debug" select="'0'"/>
 
 <xsl:key name="step" match="ns:atomic-step|ns:compound-step|ns:declare-step" use="@name"/>
 
@@ -28,7 +28,7 @@
       <xsl:apply-templates select="$pipeline"/>
     </xsl:variable>
 
-    <xsl:if test="$debug != 0">
+    <xsl:if test="$debug != '0'">
       <xsl:result-document href="pipelines/{@id}.xml" method="xml" indent="yes">
         <xsl:sequence select="$dotxml"/>
       </xsl:result-document>
@@ -234,14 +234,19 @@
             <xsl:attribute name="href" select="$pipeline/@id || '.svg'"/>
           </xsl:if>
 
+          <xsl:variable name="display-name" as="xs:string"
+                        select="if (@option-name)
+                                then '$' || @option-name
+                                else @type"/>
+
           <xsl:choose>
             <xsl:when test="$pipeline">
               <font color="#0000ff">
-                <xsl:text>{@type/string()}</xsl:text>
+                <xsl:text>{$display-name}</xsl:text>
               </font>
             </xsl:when>
             <xsl:otherwise>
-              <xsl:text>{@type/string()}</xsl:text>
+              <xsl:text>{$display-name}</xsl:text>
             </xsl:otherwise>
           </xsl:choose>
 

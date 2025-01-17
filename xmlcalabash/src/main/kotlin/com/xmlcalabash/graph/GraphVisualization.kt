@@ -1,5 +1,6 @@
 package com.xmlcalabash.graph
 
+import com.xmlcalabash.datamodel.AtomicExpressionStepInstruction
 import com.xmlcalabash.datamodel.DeclareStepInstruction
 import com.xmlcalabash.datamodel.InstructionConfiguration
 import com.xmlcalabash.namespace.NsCx
@@ -234,10 +235,17 @@ class GraphVisualization private constructor(val graph: Graph) {
 
     open inner class AtomicNode(model: Model): ModelNode(model) {
         override fun describe(builder: SaxonTreeBuilder) {
+            val optName = if (model.step is AtomicExpressionStepInstruction) {
+                model.step.externalName?.toString()
+            } else {
+                null
+            }
+
             builder.addStartElement(NsDescription.atomic, stepConfig.stringAttributeMap(mapOf(
                 "id" to id,
                 "tag" to model.step.instructionType.toString(),
-                "name" to model.step.name)))
+                "name" to model.step.name,
+                "option-name" to optName)))
             connections(builder)
             builder.addEndElement()
         }

@@ -25,7 +25,7 @@
       <xsl:apply-templates select="$labeled/g:graph"/>
     </xsl:variable>
 
-    <xsl:if test="$debug != 0">
+    <xsl:if test="$debug != '0'">
       <xsl:result-document href="graphs/{g:pipeline/@id}.xml" method="xml" indent="yes">
         <xsl:sequence select="$dotxml"/>
       </xsl:result-document>
@@ -215,10 +215,21 @@
         <xsl:if test="$xref">
           <xsl:attribute name="href" select="$xref"/>
         </xsl:if>
-        <xsl:if test="@tag">
-          <xsl:text>{string(@tag)}</xsl:text>
-          <br/>
-        </xsl:if>
+
+        <xsl:choose>
+          <xsl:when test="@option-name">
+            <xsl:text>${@option-name/string()}</xsl:text>
+            <br/>
+          </xsl:when>
+          <xsl:when test="@tag">
+            <xsl:text>{@tag/string()}</xsl:text>
+            <br/>
+          </xsl:when>
+          <xsl:otherwise>
+            <!-- nop -->
+          </xsl:otherwise>
+        </xsl:choose>
+
         <xsl:if test="true() or self::g:subpipeline or not(starts-with($label, '!'))">
           <xsl:choose>
             <xsl:when test="$xref and starts-with($xref, '#')">
