@@ -28,6 +28,7 @@ val metadataextractorRelease by configurations.dependencyScope("metadataextracto
 val cacheRelease by configurations.dependencyScope("cacheRelease")
 val xpathRelease by configurations.dependencyScope("xpathRelease")
 val pipelineMessagesRelease by configurations.dependencyScope("pipelineMessagesRelease")
+val waitForUpdateRelease by configurations.dependencyScope("waitforUpdateRelease")
 
 val dep_slf4j = project.findProperty("slf4j").toString()
 
@@ -54,6 +55,8 @@ dependencies {
                              "configuration" to "releaseArtifacts")))
   pipelineMessagesRelease(project(mapOf("path" to ":ext:pipeline-messages",
                                         "configuration" to "releaseArtifacts")))
+  waitForUpdateRelease(project(mapOf("path" to ":ext:wait-for-update",
+                                     "configuration" to "releaseArtifacts")))
 
   implementation(project(":xmlcalabash"))
   implementation(project(":send-mail"))
@@ -66,6 +69,7 @@ dependencies {
   implementation(project(":ext:cache"))
   implementation(project(":ext:xpath"))
   implementation(project(":ext:pipeline-messages"))
+  implementation(project(":ext:wait-for-update"))
 
   implementation("org.slf4j:slf4j-api:${dep_slf4j}")
 }
@@ -102,6 +106,9 @@ val xpathJar = configurations.resolvable("xpathJar") {
 }
 val pipelineMessagesJar = configurations.resolvable("pipelineMessagesJar") {
   extendsFrom(pipelineMessagesRelease)
+}
+val waitforUpdateJar = configurations.resolvable("waitforUpdateJar") {
+  extendsFrom(waitForUpdateRelease)
 }
 
 application {
@@ -193,6 +200,7 @@ tasks.register("stage-release") {
   inputs.files(cacheJar)
   inputs.files(xpathJar)
   inputs.files(pipelineMessagesJar)
+  inputs.files(waitforUpdateJar)
   inputs.files(copyScripts)
   dependsOn("jar")
 
@@ -289,6 +297,12 @@ tasks.register("stage-release") {
   doLast {
     copy {
       from(pipelineMessagesJar)
+      into(layout.buildDirectory.dir("stage/lib"))
+    }
+  }
+  doLast {
+    copy {
+      from(waitforUpdateJar)
       into(layout.buildDirectory.dir("stage/lib"))
     }
   }

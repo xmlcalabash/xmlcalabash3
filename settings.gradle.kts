@@ -12,6 +12,6 @@ include("xmlcalabash", "app", "test-driver",
         "paged-media:antenna-house", "paged-media:fop",
         "ext:unique-id", "ext:metadata-extractor", "ext:cache",
         "ext:pipeline-messages", "ext:epubcheck",
-        "ext:polyglot", "ext:xpath",
+        "ext:polyglot", "ext:xpath", "ext:wait-for-update",
         "template:kotlin", "template:java",
     )
