@@ -1,0 +1,52 @@
+<refentry xmlns:p="http://www.w3.org/ns/xproc"
+          xmlns:e="http://www.w3.org/1999/XSL/Spec/ElementSyntax"
+          xmlns:cxerr="http://xmlcalabash.com/ns/error"
+          xmlns:xi="http://www.w3.org/2001/XInclude"
+          xmlns:xlink="http://www.w3.org/1999/xlink"
+          xmlns="http://docbook.org/ns/docbook"
+          xml:id="cx-until">
+<?db filename="cx-until"?>
+
+<refnamediv>
+  <refname>cx:until</refname>
+  <refpurpose>Loop until an expression is true</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv>
+<para>An until step is specified by the <tag>cx:until</tag> element. It
+is a <glossterm>compound step</glossterm> that processes single documents,
+applying its <glossterm>subpipeline</glossterm> until the
+<tag class="attribute">test</tag> expression is true.</para>
+
+<programlisting><![CDATA[<cx:until
+  name? = NCName
+  test = xs:string>
+    ((p:with-input? & 
+      p:output?),
+     subpipeline)
+</cx:until>]]></programlisting>
+</refsynopsisdiv>
+
+<refsection>
+<title>Description</title>
+
+<para>The result of the <tag>cx:until</tag> step is first document for which
+the test expression is true.</para>
+
+<para>The <tag>cx:until</tag> has a single <glossterm>anonymous input</glossterm>: its
+<glossterm>connection</glossterm> is provided by the
+<tag>p:with-input</tag>. If no document is explicitly provided,
+then the source is read from the <glossterm>default readable
+port</glossterm>. It is a
+dynamic error (<code>err:XC????</code>) if the source is not a single
+document.</para>
+
+<para>The subpipeline is always run at least once.</para>
+
+<para>The <tag class="attribute">test</tag> attribute specifies an
+XPath expression. The result of the subpipeline is provided as the context item.
+The <emphasis>previous</emphasis> result is provided in the variable
+<varname>cx:previous</varname>.</para>
+
+</refsection>
+</refentry>

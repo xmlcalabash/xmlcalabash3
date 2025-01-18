@@ -74,6 +74,8 @@ object NsCx {
     val unimplemented = QName(namespace, "cx:unimplemented")
     val yaml = QName(namespace, "cx:yaml")
     val toml = QName(namespace, "cx:toml")
+    val `while` = QName(namespace, "cx:while")
+    val until = QName(namespace, "cx:until")
 
     val unusedValue = QName(namespace, "cx:never-used-for-anything")
     val fakeOptionName = QName(namespace, "cx:fake-option-name")

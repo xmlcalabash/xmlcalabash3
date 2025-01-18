@@ -19,6 +19,8 @@ abstract class CompoundStepDeclaration(parent: XProcInstruction?, stepConfig: In
         NsP.group to '*',
         NsP.`try` to '*',
         NsP.run to '*',
+        NsCx.`while` to '*',
+        NsCx.until to '*',
         NsCx.atomicStep to '*'
     )
 
@@ -462,6 +464,18 @@ abstract class CompoundStepDeclaration(parent: XProcInstruction?, stepConfig: In
         val run = RunInstruction(this)
         addInstruction(run)
         return run
+    }
+
+    open fun whileInstruction(): WhileInstruction {
+        val `while` = WhileInstruction(this)
+        addInstruction(`while`)
+        return `while`
+    }
+
+    open fun untilInstruction(): UntilInstruction {
+        val until = UntilInstruction(this)
+        addInstruction(until)
+        return until
     }
 
     open fun atomicStep(type: QName): AtomicStepInstruction {
