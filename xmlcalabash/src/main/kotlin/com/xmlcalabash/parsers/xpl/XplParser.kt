@@ -188,6 +188,8 @@ class XplParser internal constructor(val builder: PipelineBuilder) {
             NsP.group to { child -> parseGroup(decl, child) },
             NsP.`try` to { child -> parseTry(decl, child) },
             NsP.run to { child -> parseRun(decl, child) },
+            NsCx.`while` to { child -> parseWhile(decl, child) },
+            NsCx.until to { child -> parseUntil(decl, child) },
             NsCx.defaultElement to { child -> parseAtomicStep(decl, child) }
         )
     }
@@ -765,6 +767,46 @@ class XplParser internal constructor(val builder: PipelineBuilder) {
         elementMapping.putAll(subpipelineElementMapping(finally))
 
         processElements(node, finally, elementMapping)
+    }
+
+    private fun parseWhile(step: CompoundStepDeclaration, node: ElementNode) {
+        val whileInstruction = step.whileInstruction()
+        whileInstruction.stepConfig.updateWith(node.node)
+
+        val attributeMapping = mapOf<QName, (String) -> Unit>(
+            Ns.name to { value -> whileInstruction.name = value },
+            Ns.test to { value -> whileInstruction.test = value }
+        )
+
+        processAttributes(node, whileInstruction, attributeMapping)
+
+        val elementMapping = mutableMapOf<QName, (ElementNode) -> Unit>(
+            NsP.withInput to { child -> parseWithInput(whileInstruction, child) },
+            NsP.output to { child -> parseOutput(whileInstruction, child) },
+        )
+        elementMapping.putAll(subpipelineElementMapping(whileInstruction))
+
+        processElements(node, whileInstruction, elementMapping)
+    }
+
+    private fun parseUntil(step: CompoundStepDeclaration, node: ElementNode) {
+        val untilInstruction = step.untilInstruction()
+        untilInstruction.stepConfig.updateWith(node.node)
+
+        val attributeMapping = mapOf<QName, (String) -> Unit>(
+            Ns.name to { value -> untilInstruction.name = value },
+            Ns.test to { value -> untilInstruction.test = value }
+        )
+
+        processAttributes(node, untilInstruction, attributeMapping)
+
+        val elementMapping = mutableMapOf<QName, (ElementNode) -> Unit>(
+            NsP.withInput to { child -> parseWithInput(untilInstruction, child) },
+            NsP.output to { child -> parseOutput(untilInstruction, child) },
+        )
+        elementMapping.putAll(subpipelineElementMapping(untilInstruction))
+
+        processElements(node, untilInstruction, elementMapping)
     }
 
     private fun parseAtomicStep(step: CompoundStepDeclaration, node: ElementNode) {

@@ -1,0 +1,50 @@
+<refentry xmlns:p="http://www.w3.org/ns/xproc"
+          xmlns:e="http://www.w3.org/1999/XSL/Spec/ElementSyntax"
+          xmlns:cxerr="http://xmlcalabash.com/ns/error"
+          xmlns:xi="http://www.w3.org/2001/XInclude"
+          xmlns:xlink="http://www.w3.org/1999/xlink"
+          xmlns="http://docbook.org/ns/docbook"
+          xml:id="cx-while">
+<?db filename="cx-while"?>
+
+<refnamediv>
+  <refname>cx:while</refname>
+  <refpurpose>Loop while an expression is true</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv>
+<para>A while step is specified by the <tag>cx:while</tag> element. It
+is a <glossterm>compound step</glossterm> that processes single documents,
+applying its <glossterm>subpipeline</glossterm> while the
+<tag class="attribute">test</tag> expression is true.</para>
+
+<programlisting><![CDATA[<cx:while
+  name? = NCName
+  test = xs:string>
+    ((p:with-input? & 
+      p:output?),
+     subpipeline)
+</cx:while>]]></programlisting>
+</refsynopsisdiv>
+
+<refsection>
+<title>Description</title>
+
+<para>The result of the <tag>cx:while</tag> step is first document for which
+the test expression did not have an effective boolean value of true.
+</para>
+
+<para>The <tag>cx:while</tag> has a single <glossterm>anonymous input</glossterm>: its
+<glossterm>connection</glossterm> is provided by the
+<tag>p:with-input</tag>. If no document is explicitly provided,
+then the source is read from the <glossterm>default readable
+port</glossterm>. It is a
+dynamic error (<code>err:XC????</code>) if the source is not a single
+document.</para>
+
+<para>The <tag class="attribute">test</tag> attribute specifies an
+XPath expression. The document is provided as the context item. If the
+expression is false, the loop is not run (or run again).</para>
+
+</refsection>
+</refentry>

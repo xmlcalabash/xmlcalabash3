@@ -3,6 +3,7 @@ package com.xmlcalabash.runtime.steps
 import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.exceptions.XProcException
+import com.xmlcalabash.namespace.NsCx
 import com.xmlcalabash.namespace.NsErr
 import com.xmlcalabash.namespace.NsP
 import com.xmlcalabash.runtime.LazyValue
@@ -29,6 +30,8 @@ abstract class CompoundStep(config: XProcStepConfiguration, compound: CompoundSt
                 NsP.catch -> return TryCatchStep(newConfig, compound)
                 NsP.finally -> return TryFinallyStep(newConfig, compound)
                 NsP.run -> return RunStep(newConfig, compound)
+                NsCx.`while` -> return WhileStep(newConfig, compound)
+                NsCx.until -> return UntilStep(newConfig, compound)
                 else -> throw config.exception(XProcError.xiImpossible("Unsupported compound step type: ${compound.type}"))
             }
         }
