@@ -40,7 +40,9 @@
   <xsl:choose>
     <xsl:when test=". castable as xs:dateTime">
       <xsl:variable name="dt"
-                    select="format-dateTime(xs:dateTime(.), '[D01] [MNn,*-3] [Y0001] at [h01]:[m01]:[s01]Z')"/>
+                    select="format-dateTime(xs:dateTime(.),
+                              '[D01] [MNn,*-3] [Y0001] '
+                              || 'at [h01]:[m01]:[s01]Z')"/>
       <xsl:choose>
         <xsl:when test="../../self::xvrl:reports">
           <xsl:text>XVRL Reports on {$dt}</xsl:text>
@@ -99,7 +101,8 @@
       <xsl:text>  {xvrl:message/node()}</xsl:text>
     </xsl:when>
     <xsl:otherwise>
-      <xsl:text>  {xvrl:message/node() ! serialize(., map{'method':'xml', 'indent':true()})}</xsl:text>
+      <xsl:text>  {xvrl:message/node()
+        ! serialize(., map{'method':'xml', 'indent':true()})}</xsl:text>
     </xsl:otherwise>
   </xsl:choose>
   <xsl:text>{$nl}</xsl:text>
