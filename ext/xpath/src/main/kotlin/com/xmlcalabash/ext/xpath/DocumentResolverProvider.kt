@@ -17,6 +17,10 @@ class DocumentResolverProvider:  DocumentResolverProvider, DocumentResolver {
         var library: XProcDocument? = null
     }
 
+    override fun resolvableUris(): List<URI> {
+        return listOf(MAGIC_URI)
+    }
+
     override fun create(): DocumentResolver {
         return this
     }

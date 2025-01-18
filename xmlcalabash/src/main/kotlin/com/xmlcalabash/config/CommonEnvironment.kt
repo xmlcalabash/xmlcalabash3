@@ -17,6 +17,7 @@ import com.xmlcalabash.util.DefaultMessageReporter
 import com.xmlcalabash.api.MessageReporter
 import com.xmlcalabash.io.MessagePrinter
 import com.xmlcalabash.util.DefaultMessagePrinter
+import com.xmlcalabash.util.InternalDocumentResolver
 import net.sf.saxon.lib.Initializer
 import net.sf.saxon.s9api.QName
 import org.apache.logging.log4j.kotlin.logger
@@ -101,12 +102,25 @@ class CommonEnvironment(private val xmlCalabash: XmlCalabash) {
 
         for (provider in AtomicStepServiceProvider.providers()) {
             val manager = provider.create();
-            knownAtomicSteps.addAll(manager.stepTypes())
+            for (stepType in manager.stepTypes()) {
+                logger.debug { "Added available step type '$stepType'" }
+                knownAtomicSteps.add(stepType)
+            }
             stepManagers.add(manager)
         }
 
+        val internalManager = InternalDocumentResolver()
+        for (uri in internalManager.resolvableUris()) {
+            logger.debug { "Added resolvable URI: ${uri}" }
+        }
+        internalManager.configure(_documentManager)
+
         for (provider in DocumentResolverServiceProvider.providers()) {
-            provider.create().configure(_documentManager)
+            val manager = provider.create();
+            for (uri in manager.resolvableUris()) {
+                logger.debug { "Added resolvable URI: ${uri}" }
+            }
+            manager.configure(_documentManager)
         }
     }
 
