@@ -2,6 +2,8 @@ package com.xmlcalabash.graph
 
 import com.xmlcalabash.datamodel.*
 import com.xmlcalabash.exceptions.XProcError
+import com.xmlcalabash.namespace.NsCx
+import com.xmlcalabash.namespace.NsP
 import net.sf.saxon.s9api.XdmMap
 
 open class CompoundModel internal constructor(graph: Graph, parent: Model?, step: CompoundStepDeclaration, id: String): Model(graph, parent, step, id) {
@@ -157,6 +159,144 @@ open class CompoundModel internal constructor(graph: Graph, parent: Model?, step
         }
 
         return submodel
+    }
+
+    internal fun computeOrder() {
+        when (step.instructionType) {
+            NsP.choose -> computeChooseOrder()
+            NsP.`when` -> computeWhenOrder()
+            NsP.`try` -> computeTryOrder()
+            else -> {
+                val orderedChildren = computePipelineOrder(children)
+                _children.clear()
+                addOrderedChildren(orderedChildren)
+            }
+        }
+    }
+
+    private fun computeChooseOrder() {
+        // The when/otherwise steps come in order at the end, everything else is ordered
+        val other = mutableListOf<Model>()
+        val wotherwise = mutableListOf<Model>()
+        for (child in children) {
+            if (child.step.instructionType in listOf(NsP.`when`, NsP.otherwise)) {
+                wotherwise.add(child)
+            } else {
+                other.add(child)
+            }
+        }
+
+        _children.clear()
+        addOrderedChildren(computePipelineOrder(other))
+        addOrderedChildren(wotherwise)
+    }
+
+    private fun computeWhenOrder() {
+        val save = mutableListOf<Model>()
+        save.addAll(children)
+
+        // Annoyingly, sometimes spitters and joiners are necessary for
+        // the guard expression or something that leads up to it. They
+        // don't necessarily come before the cx:guard, so we have to do
+        // this the hard way...
+        val guard = children.first { it.step.instructionType == NsCx.guard }
+        _children.remove(guard)
+
+        val before = mutableListOf<Model>()
+
+        var done = false
+        while (!done) {
+            done = true
+
+            var move: Model? = null
+            for (child in children) {
+                for (edge in graph.edges.filter { it.from == child }) {
+                    if (edge.to == guard || edge.to in before) {
+                        move = child
+                        break
+                    }
+                }
+            }
+
+            if (move != null) {
+                done = false
+                before.add(move)
+                _children.remove(move)
+            }
+        }
+
+        val after = mutableListOf<Model>()
+        after.addAll(children)
+
+        _children.clear()
+        addOrderedChildren(computePipelineOrder(before))
+        _children.add(guard)
+        addOrderedChildren(computePipelineOrder(after, before))
+    }
+
+    private fun computeTryOrder() {
+        // The catch/finally steps come in order at the end, everything else is ordered
+        val other = mutableListOf<Model>()
+        val cfinally = mutableListOf<Model>()
+        for (child in children) {
+            if (child.step.instructionType in listOf(NsP.catch, NsP.finally)) {
+                cfinally.add(child)
+            } else {
+                other.add(child)
+            }
+        }
+
+        _children.clear()
+        addOrderedChildren(computePipelineOrder(other))
+        addOrderedChildren(cfinally)
+    }
+
+    private fun computePipelineOrder(subpipeline: List<Model>, preceding: List<Model> = emptyList()): List<Model> {
+        val orderedChildren = mutableListOf<Model>()
+        val precedingChildren = mutableListOf<Model>()
+        val allChildren = mutableListOf<Model>()
+        allChildren.addAll(subpipeline)
+
+        precedingChildren.add(head)
+        precedingChildren.addAll(preceding)
+
+        while (allChildren.isNotEmpty()) {
+            val selectedChildren = mutableListOf<Model>()
+            for (child in allChildren) {
+                var wait = false
+                for (edge in graph.edges) {
+                    if (edge.to == child) {
+                        if (edge.from !in precedingChildren) {
+                            wait = true
+                            break
+                        }
+                    }
+                }
+                if (!wait) {
+                    selectedChildren.add(child)
+                    orderedChildren.add(child)
+                }
+            }
+            if (selectedChildren.isEmpty()) {
+                throw step.stepConfig.exception(XProcError.xiImpossible("Failed to find a partial order for all steps"))
+            }
+            precedingChildren.addAll(selectedChildren)
+            for (child in selectedChildren) {
+                allChildren.remove(child)
+            }
+            selectedChildren.clear()
+        }
+
+        return orderedChildren
+    }
+
+    private fun addOrderedChildren(orderedChildren: List<Model>) {
+        for (child in orderedChildren) {
+            if (child is SubpipelineModel) {
+                child.model.computeOrder()
+            }
+            _children.add(child)
+        }
     }
 
     override fun toString(): String {

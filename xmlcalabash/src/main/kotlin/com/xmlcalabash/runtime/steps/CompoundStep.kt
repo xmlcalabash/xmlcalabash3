@@ -105,7 +105,7 @@ abstract class CompoundStep(config: XProcStepConfiguration, compound: CompoundSt
     }
 
     protected fun runSubpipeline() {
-        val left = try {
+        try {
             runStepsExhaustively(stepsToRun)
         } catch (ex: XProcException) {
             if (ex.error.code == NsErr.threadInterrupted) {
@@ -114,10 +114,6 @@ abstract class CompoundStep(config: XProcStepConfiguration, compound: CompoundSt
                 }
             }
             throw ex
-        }
-
-        if (left.isNotEmpty()) {
-            throw RuntimeException("did not run all steps")
         }
     }
 
@@ -146,7 +142,7 @@ abstract class CompoundStep(config: XProcStepConfiguration, compound: CompoundSt
         }
     }
 
-    open fun runStepsExhaustively(steps: List<AbstractStep>): List<AbstractStep> {
+    open fun runStepsExhaustively(steps: List<AbstractStep>) {
         val stepsToRun = mutableListOf<AbstractStep>()
         stepsToRun.addAll(steps)
 
@@ -154,35 +150,19 @@ abstract class CompoundStep(config: XProcStepConfiguration, compound: CompoundSt
         // must be available for computing subsequent options.
         val atomicOptionValues = mutableMapOf<QName, LazyValue>()
 
-        var done = false
-        while (!done) {
-            done = true
-            var runMe: AbstractStep? = null
-            for (step in stepsToRun) {
-                if (step.readyToRun) {
-                    runMe = step
-                    stepsToRun.remove(step)
-                    break
-                }
-            }
-            if (runMe != null) {
-                done = false
-
-                if (runMe is AtomicOptionStep) {
-                    runMe.atomicOptionValues.putAll(atomicOptionValues)
-                    runMe.runStep()
-                    if (runMe.externalValue == null) {
-                        atomicOptionValues[runMe.externalName] = LazyValue(runMe.stepConfig, (runMe.implementation as ExpressionStep).expression, stepConfig)
-                    } else {
-                        atomicOptionValues[runMe.externalName] = LazyValue(XProcDocument.ofValue(runMe.externalValue!!.value, runMe.stepConfig), stepConfig)
-                    }
+        for (runMe in steps) {
+            if (runMe is AtomicOptionStep) {
+                runMe.atomicOptionValues.putAll(atomicOptionValues)
+                runMe.runStep()
+                if (runMe.externalValue == null) {
+                    atomicOptionValues[runMe.externalName] = LazyValue(runMe.stepConfig, (runMe.implementation as ExpressionStep).expression, stepConfig)
                 } else {
-                    runMe.runStep()
+                    atomicOptionValues[runMe.externalName] = LazyValue(XProcDocument.ofValue(runMe.externalValue!!.value, runMe.stepConfig), stepConfig)
                 }
+            } else {
+                runMe.runStep()
             }
         }
-
-        return stepsToRun
     }
 
     override fun toString(): String {

@@ -4,9 +4,7 @@ import com.xmlcalabash.datamodel.*
 import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.namespace.NsCx
 import com.xmlcalabash.namespace.NsP
-import com.xmlcalabash.steps.internal.SelectStep
 import net.sf.saxon.s9api.XdmNode
-import java.io.PrintStream
 import java.util.*
 
 class Graph private constructor(val environment: PipelineEnvironment) {
@@ -116,6 +114,8 @@ class Graph private constructor(val environment: PipelineEnvironment) {
 
         node.decompose()
         makeConnections()
+
+        (node as CompoundModel).computeOrder()
 
         pipelineNode = node
         return node
