@@ -1,0 +1,34 @@
+<chapter xmlns="http://docbook.org/ns/docbook"
+         xmlns:xlink="http://www.w3.org/1999/xlink"
+         xmlns:xi='http://www.w3.org/2001/XInclude'
+         version="5.2" xml:id="errors">
+<info>
+  <?db filename="errors"?>
+  <title>Errors and error messages</title>
+</info>
+
+<para>It is an explicit goal of XML Calabash that it should produce reasonable
+and useful error messages. <link xlink:href="https://github.com/xmlcalabash/xmlcalabash3/issues">Bug
+reports</link> to the effect that “such and such an error is confusing” are
+most welcome.</para>
+
+<section>
+<title>Validation errors</title>
+
+<para>The validation steps produce error reports using the
+<link xlink:href="https://spec.xproc.org/master/head/xvrl/">Extensible
+Validation Reporting Language (XVRL)</link>. When a validation step
+fails and the error causes pipeline execution to fail, this report
+is formatted as a text document for the purpose of the error message.</para>
+
+<para>The formatting is done by this stylesheet:</para>
+
+<programlisting language='xml'
+><xi:include href="../../../xmlcalabash/src/main/resources/com/xmlcalabash/format-xvrl.xsl"
+parse="text"/></programlisting>
+
+<para>If you find XVRL reports that aren’t usefully summarized, please
+report them.</para>
+
+</section>
+</chapter>

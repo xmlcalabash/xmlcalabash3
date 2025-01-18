@@ -1,12 +1,12 @@
 package com.xmlcalabash.ext.uniqueid
 
-import com.xmlcalabash.io.MediaType
 import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.io.DocumentLoader
 import com.xmlcalabash.io.DocumentManager
+import com.xmlcalabash.io.MediaType
+import com.xmlcalabash.runtime.XProcStepConfiguration
 import com.xmlcalabash.spi.DocumentResolver
 import com.xmlcalabash.spi.DocumentResolverProvider
-import com.xmlcalabash.runtime.XProcStepConfiguration
 import java.io.IOException
 import java.net.URI
 
@@ -15,6 +15,10 @@ class DocumentResolverProvider:  DocumentResolverProvider, DocumentResolver {
         val MAGIC_URI = URI("https://xmlcalabash.com/ext/library/unique-id.xpl")
         val RESOURCE_PATH = "/com/xmlcalabash/ext/unique-id.xpl"
         var library: XProcDocument? = null
+    }
+
+    override fun resolvableUris(): List<URI> {
+        return listOf(MAGIC_URI)
     }
 
     override fun create(): DocumentResolver {

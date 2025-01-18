@@ -9,6 +9,7 @@ import com.xmlcalabash.namespace.Ns
 import com.xmlcalabash.namespace.NsCx
 import com.xmlcalabash.namespace.NsErr
 import com.xmlcalabash.namespace.NsXvrl
+import com.xmlcalabash.util.InternalDocumentResolver
 import com.xmlcalabash.util.MediaClassification
 import com.xmlcalabash.util.S9Api
 import net.sf.saxon.s9api.*
@@ -301,7 +302,11 @@ class DefaultErrorExplanation(): ErrorExplanation {
             environment!!.messageReporter().debug { "${node}" }
         }
 
-        val stylesheet = "/com/xmlcalabash/format-xvrl.xsl"
+        // This is a slightly odd context, we don't have access to a step configuration
+        // so we can't call on the document manager to load the stylesheet. But we
+        // can make sure we get the same one...
+        val stylesheet = InternalDocumentResolver.URI_MAP[InternalDocumentResolver.XVRL_TO_TEXT]!!
+
         var styleStream = DefaultErrorExplanation::class.java.getResourceAsStream(stylesheet)
         var styleSource = SAXSource(InputSource(styleStream))
         styleSource.systemId = "/com/xmlcalabash/format-report.xsl"
