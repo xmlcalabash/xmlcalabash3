@@ -347,7 +347,7 @@ class TestCase(val suite: TestSuite, val testFile: File) {
         for (message in messages) {
             builder.addStartElement(NsCx.message, attributeMap(mapOf(
                 Ns.level to "${message.level}",
-                Ns.message to message.message(),
+                Ns.message to message.message,
                 Ns.date to "${message.timestamp}"
             )))
             builder.addEndElement()
