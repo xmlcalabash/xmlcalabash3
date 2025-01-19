@@ -33,7 +33,12 @@ class BufferingMessageReporter(val maxsize: Int, nextReporter: MessageReporter):
         }
     }
 
-    class Message(val level: Verbosity, extra: Map<QName, String>, val message: () -> String) {
+    class Message(val level: Verbosity, extra: Map<QName, String>, val messageFunction: () -> String) {
+        val message = try {
+            messageFunction()
+        } catch (ex: Exception) {
+            "(Attempting to evaluate message raised error: ${ex})"
+        }
         val attributes = mutableMapOf<QName, String>()
         val timestamp = LocalDateTime.now()
         init {
