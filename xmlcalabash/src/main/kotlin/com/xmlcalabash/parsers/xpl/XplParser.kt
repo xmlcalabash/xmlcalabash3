@@ -1182,17 +1182,39 @@ class XplParser internal constructor(val builder: PipelineBuilder) {
         return builder.result
     }
 
-    private fun filterXml(builder: SaxonTreeBuilder, stepConfig: InstructionConfiguration, node: AnyNode, excludeNamespaceUris: Set<NamespaceUri>, baseUri: URI?) {
+    private fun filterXml(builder: SaxonTreeBuilder,
+                          stepConfig: InstructionConfiguration,
+                          node: AnyNode, excludeNamespaceUris: Set<NamespaceUri>,
+                          baseUri: URI?,
+                          bindings: MutableMap<NamespaceUri, String> = mutableMapOf()) {
         when (node) {
             is ElementNode -> {
+                var nodePrefix = node.node.nodeName.prefix ?: ""
+                var nodeNamespace = node.node.nodeName.namespaceUri
+                val nodeLocalName = node.node.nodeName.localName
+
                 val includeNS = mutableMapOf<String, NamespaceUri>()
+                val includeURI = mutableMapOf<NamespaceUri, String>()
                 var nsMap = NamespaceMap.emptyMap()
                 for ((prefix, uri) in ValueUtils.inscopeNamespaces(node.node)) {
                     if (!excludeNamespaceUris.contains(uri)) {
                         includeNS[prefix] = uri
+                        includeURI[uri] = prefix
                         nsMap = nsMap.put(prefix, uri)
                     }
                 }
+
+                if (nodeNamespace != NamespaceUri.NULL) {
+                    // Ruh-roh, we need a binding for this...
+                    if (nodeNamespace in bindings) {
+                        nodePrefix = bindings[nodeNamespace]!!
+                    } else {
+                        bindings[nodeNamespace] = nodePrefix
+                    }
+                    includeNS[nodePrefix] = nodeNamespace
+                    nsMap = nsMap.put(nodePrefix, nodeNamespace)
+                }
+
                 var adjBaseUri = baseUri
                 val attrMap = mutableMapOf<QName,String>()
                 for (attr in node.node.axisIterator(Axis.ATTRIBUTE)) {
@@ -1224,12 +1246,12 @@ class XplParser internal constructor(val builder: PipelineBuilder) {
                 }
 
                 val attMap = stepConfig.attributeMap(attrMap)
-                val elemName = FingerprintedQName(node.node.nodeName.prefix, node.node.nodeName.namespaceUri, node.node.nodeName.localName)
+                val elemName = FingerprintedQName(nodePrefix, nodeNamespace, nodeLocalName)
                 builder.location = BuilderLocation(node.node)
                 builder.addStartElement(elemName, attMap, Untyped.getInstance(), nsMap, adjBaseUri)
 
                 for (child in node.children.filter { it.useWhen == true }) {
-                    filterXml(builder, stepConfig, child, excludeNamespaceUris, child.baseUri)
+                    filterXml(builder, stepConfig, child, excludeNamespaceUris, child.baseUri, bindings)
                 }
 
                 builder.addEndElement()
