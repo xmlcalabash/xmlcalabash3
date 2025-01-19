@@ -1,0 +1,77 @@
+<refentry xmlns:p="http://www.w3.org/ns/xproc"
+          xmlns:e="http://www.w3.org/1999/XSL/Spec/ElementSyntax"
+          xmlns:xi="http://www.w3.org/2001/XInclude"
+          xmlns:xlink="http://www.w3.org/1999/xlink"
+          xmlns="http://docbook.org/ns/docbook"
+          xml:id="cx-wait-for-update">
+<?db filename="cx-wait-for-update"?>
+<refnamediv>
+  <refname>cx:wait-for-update</refname>
+  <refpurpose>Wait for a document to change</refpurpose>
+</refnamediv>
+<refsynopsisdiv>
+  <xi:include href="../../../../ext/wait-for-update/src/main/resources/com/xmlcalabash/ext/wait-for-update.xpl"
+              xpointer="xpath(/*/*[@type='cx:wait-for-update'])"/>
+</refsynopsisdiv>
+
+<refsection>
+<title>Description</title>
+
+<para>The <tag>cx:wait-for-update</tag> step waits for the document identified by the
+<option>href</option> option to change. The updated document appars on the
+<port>result</port> port.</para>
+
+<para>Only <code>file:</code>, <code>http:</code>, and <code>https:</code> URIs
+are supported.
+</para>
+
+<para>The <option>pause</option> and <option>pause-after</option> options specify
+durations. Each duration may be specified as an <code>xs:double</code>, indicating a number of seconds,
+or as a duration using a string that satisfies the constraints of an
+<code>xs:dayTimeDuration</code>. The duration <rfc2119>must not</rfc2119> be
+negative. 
+<error code="D0036">It is a <glossterm>dynamic error</glossterm> if the
+specified duration is not a positive number or a valid 
+<code>xs:dayTimeDuration</code>.</error>
+</para>
+
+<para>The step checks if the document exists, then enters a loop: it waits for a
+duration equal to <option>pause</option> then checks again if the document has
+changed.</para>
+
+<para>When the document has changed, it waits for a duration equal to
+<option>pause-after</option>, then loads the document and returns it on the
+<port>result</port> port.</para>
+
+<refsection xml:id="wfu-file">
+<title>Waiting for file updates</title>
+
+<para>If the file exists when the step begins, then the step waits until the
+last modification time on the file becomes greater than the last modification
+time it had initially.</para>
+
+<para>If the file does not exist when the step begins, then the step waits until
+the file exists.</para>
+
+</refsection>
+
+<refsection xml:id="wfu-http">
+<title>Waiting for http/https updates</title>
+
+<para>The step begins by attempting a HEAD request on the URI. If the head
+request returns a 200 response, then the step waits until the resource has
+changed. If the initial request does not return a 200 response, then the step
+waits until a subsequent request does return a 200 response.</para>
+
+<para>The resource is deemed to have changed if it returns a 200 response and
+the ETag header value has changed or the last modification time reported is
+greater than initial last modification time reported.</para>
+
+<para>The last modification time is taken from the Last-Modified header, if it’s
+present, or the Date header. Note: if no last modification time is returned, the
+step will only return when the ETag changes. If there’s no ETag either, the step
+will never return.</para>
+</refsection>
+
+</refsection>
+</refentry>

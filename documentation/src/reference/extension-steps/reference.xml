@@ -16,6 +16,7 @@
 <xi:include href="cx-python.xml"/>
 <xi:include href="cx-unique-id.xml"/>
 <xi:include href="cx-until.xml"/>
+<xi:include href="cx-wait-for-update.xml"/>
 <xi:include href="cx-while.xml"/>
 <xi:include href="cx-xpath.xml"/>
 
