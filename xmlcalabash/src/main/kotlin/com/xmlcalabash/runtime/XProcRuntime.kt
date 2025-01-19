@@ -39,7 +39,8 @@ class XProcRuntime private constructor(internal val start: DeclareStepInstructio
     val environment = config.environment
 
     fun stepConfiguration(instructionConfig: InstructionConfiguration): XProcStepConfiguration {
-        val impl = XProcStepConfigurationImpl(config.environment, instructionConfig.saxonConfig.newConfiguration(), instructionConfig.location)
+        // Issue #160, don't create a new Saxon configuration here
+        val impl = XProcStepConfigurationImpl(config.environment, instructionConfig.saxonConfig, instructionConfig.location)
         impl.putAllNamespaces(instructionConfig.inscopeNamespaces)
         impl.putAllStepTypes(instructionConfig.inscopeStepTypes)
         impl.stepName = instructionConfig.stepName
