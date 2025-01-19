@@ -13,13 +13,97 @@ See the commits and pull requests on
 finer detail.</para>
 
 <revhistory>
+<revision xml:id="r300-alpha17">
+<revnumber>3.0.0-alpha17</revnumber>
+<date>2025-01-19</date>
+<revdescription>
+<itemizedlist>
+<listitem><para>Fixed
+<link xlink:href="https://github.com/xmlcalabash/xmlcalabash3/issues/189">issue #189</link>.
+Generate an XVRL report for NVDL validation.
+</para>
+</listitem>
+<listitem><para>Fixed
+<link xlink:href="https://github.com/xmlcalabash/xmlcalabash3/issues/186">issue #186</link>.
+Fix links to standard libraries and XProcRef.org in the reference guide.
+</para>
+</listitem>
+<listitem><para>Fixed
+<link xlink:href="https://github.com/xmlcalabash/xmlcalabash3/issues/185">issue #185</link>.
+Check for required inputs and options before running a pipeline.
+When a top-level pipeline is run, check that required options and required
+inputs have been provided. (Checking for required inputs here is an opportunity
+to improve the error message.)
+Keep track of the required state of options until runtime.
+Within a pipeline, failing to provide a required option is a static error. But
+“top level” pipelines can’t be checked before they run. When they run, it must
+be possible to determine which options were declared as required.
+</para>
+</listitem>
+<listitem><para>Fixed
+<link xlink:href="https://github.com/xmlcalabash/xmlcalabash3/issues/184">issue #184</link>.
+Fix bugs in Schematron XVRL reporting. (Generally,
+improve error reporting for validation steps.)
+</para>
+</listitem>
+<listitem><para>Fixed
+<link xlink:href="https://github.com/xmlcalabash/xmlcalabash3/issues/160">issue #160</link>.
+The code was over-zealous when constructing step configurations. It created a
+new Saxon Configuration for every step. That’s not necessary; it’s only
+necessary that each <tag>p:library</tag> and <tag>p:declare-step</tag> (and
+their descendants) have a new configuration. Configurations are required at that
+level because any use of <tag>p:import-functions</tag> has to be isolated.
+</para>
+</listitem>
+<listitem>
+<para>Compute a total order over subpipeline steps during graph building.
+This change replaces the, in retrospect very strange, approach previously taken
+where the steps were effectively unordered and at runtime each was tested to see
+if it could be run. Now we work out in advance a total order such that no step
+runs before any step that it depends on. (With some special cases to deal with
+the when/otherwise clauses in a choose.)</para>
+</listitem>
+<listitem><para>Fixed bug where buffered messages (accessible through
+<tag>p:pipeline-messages</tag>) could be “null” instead of the correct
+message.</para>
+</listitem>
+<listitem><para>Implemented the
+<tag xlink:href="https://docs.xmlcalabash.com/reference/current/cx-wait-for-update.html"
+>cx:wait-for-update</tag> step.</para>
+</listitem>
+<listitem><para>Implemented the
+<tag xlink:href="https://docs.xmlcalabash.com/reference/current/cx-until.html"
+>cx:until</tag> and
+<tag xlink:href="https://docs.xmlcalabash.com/reference/current/cx-while.html"
+>cx:while</tag> steps.</para>
+</listitem>
+<listitem>
+<para>Added an
+“<link xlink:href="https://docs.xmlcalabash.com/userguide/current/errors.html"
+>Errors and error messages</link>” chapter to the user guide.
+Reworked document resolver APIs; made it possible to publish the
+XVRL-to-text stylesheet in the user guide.</para>
+</listitem>
+<listitem>
+<para>Tidy up the pipeline/graph visualization output.
+Output option names for options, use the command line <option>--debug</option>
+flag to control debugging output. Use <code>«anonymous»</code> instead of the
+arbitrary step ID for the root pipeline if it has no declared type.</para>
+</listitem>
+<listitem><para>Fixed bug in <tag class="attribute">exclude-inline-prefixes</tag> where
+it was possible to generate a document that was not namespace well-formed.</para>
+</listitem>
+</itemizedlist>
+</revdescription>
+</revision>
+
 <revision xml:id="r300-alpha16">
 <revnumber>3.0.0-alpha16</revnumber>
 <date>2025-01-15</date>
 <revdescription>
 <itemizedlist>
 <listitem><para>Fixed
-<link xlink:href="https://github.com/xmlcalabash/xmlcalabash3/issues/167">issue #175</link>.
+<link xlink:href="https://github.com/xmlcalabash/xmlcalabash3/issues/175">issue #175</link>.
 Make sure directories are created before attempting to write files.
 </para>
 </listitem>
