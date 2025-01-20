@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<t:test expected="pass"
+        xmlns:t="http://xproc.org/ns/testsuite/3.0">
+  <t:info>
+    <t:title>java-properties-001</t:title>
+    <t:revision-history>
+      <t:revision>
+        <t:date>2025-01-20</t:date>
+        <t:author>
+          <t:name>Norm Tovey-Walsh</t:name>
+        </t:author>
+        <t:description xmlns="http://www.w3.org/1999/xhtml">
+          <p>Created test.</p>
+        </t:description>
+      </t:revision>
+    </t:revision-history>
+  </t:info>
+  <t:description xmlns="http://www.w3.org/1999/xhtml">
+    <p>Tests that a Java properties file can be cast to XML.</p>
+  </t:description>
+<t:pipeline>
+<p:declare-step xmlns:p="http://www.w3.org/ns/xproc"
+                xmlns:ex="https://xmlcalabash.com/ns/examples"
+                xmlns:xs="http://www.w3.org/2001/XMLSchema"
+                xmlns:cx="http://xmlcalabash.com/ns/extensions"
+                exclude-inline-prefixes="ex xs cx"
+                name="main"
+                version="3.0">
+  <p:output port="result"/>
+
+  <p:cast-content-type content-type="application/xml">
+    <p:with-input>
+      <p:inline content-type="text/x-java-properties"
+># With a comment.
+version=1.0
+name=TestApp
+date=2016-11-12</p:inline>
+    </p:with-input>
+  </p:cast-content-type>
+
+</p:declare-step>
+</t:pipeline>
+  <t:schematron>
+    <s:schema queryBinding="xslt2"
+              xmlns:s="http://purl.oclc.org/dsdl/schematron">
+      <s:pattern>
+        <s:rule context="/">
+          <s:assert test="properties">The document root is not correct.</s:assert>
+        </s:rule>
+      </s:pattern>
+      <s:pattern>
+        <s:rule context="/properties">
+          <s:assert test="count(comment) = 1">Wrong number of comments.</s:assert>
+          <s:assert test="contains(comment, 'With a comment.')">Comment is wrong.</s:assert>
+          <s:assert test="count(entry) = 3">Wrong number of entries.</s:assert>
+          <s:assert test="entry[@key='version'] = '1.0'">Version is wrong.</s:assert>
+          <s:assert test="entry[@key='name'] = 'TestApp'">Name is wrong.</s:assert>
+          <s:assert test="entry[@key='date'] = '2016-11-12'">Date is wrong.</s:assert>
+        </s:rule>
+      </s:pattern>
+    </s:schema>
+  </t:schematron>
+</t:test>

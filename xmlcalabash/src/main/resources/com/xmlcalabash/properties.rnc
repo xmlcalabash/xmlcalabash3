@@ -1,0 +1,30 @@
+# https://docs.oracle.com/javase/8/docs/api/java/util/Properties.html
+#
+# Defines a DTD for properties files:
+#
+# <!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+# <!-- DTD for properties -->
+# <!ELEMENT properties ( comment?, entry* ) >
+# <!ATTLIST properties version CDATA #FIXED "1.0">
+# <!ELEMENT comment (#PCDATA) >
+# <!ELEMENT entry (#PCDATA) >
+# <!ATTLIST entry key CDATA #REQUIRED>
+#
+
+start = properties
+
+properties =
+    element properties {
+        attribute version { "1.0" }?,
+        comment?,
+        entry*
+    }
+
+comment =
+    element comment { text }
+
+entry =
+    element entry {
+        attribute key { text },
+        text
+    }

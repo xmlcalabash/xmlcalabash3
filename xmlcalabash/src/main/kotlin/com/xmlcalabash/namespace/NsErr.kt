@@ -10,6 +10,7 @@ object NsErr {
     private val dynamicErrors = mutableMapOf<Int, QName>()
     private val stepErrors = mutableMapOf<Int, QName>()
     private val internalErrors = mutableMapOf<Int, QName>()
+    private val xstepErrors = mutableMapOf<Int, QName>()
 
     val threadInterrupted = xi(3)
     val assertionFailed = xi(41)
@@ -38,6 +39,15 @@ object NsErr {
         }
         val err = QName(NsCx.errorNamespace, "cxerr:XI${code.toString().padStart(4, '0')}")
         internalErrors[code] = err
+        return err
+    }
+
+    fun xxc(code: Int): QName {
+        if (code in xstepErrors) {
+            return xstepErrors[code]!!
+        }
+        val err = QName(NsCx.errorNamespace, "cxerr:XC${code.toString().padStart(4, '0')}")
+        xstepErrors[code] = err
         return err
     }
 

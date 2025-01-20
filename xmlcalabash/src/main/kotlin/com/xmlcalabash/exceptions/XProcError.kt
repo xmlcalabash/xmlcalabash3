@@ -28,6 +28,10 @@ open class XProcError protected constructor(val code: QName, val variant: Int, v
             return NsErr.xi(code)
         }
 
+        private fun xstepError(code: Int): QName {
+            return NsErr.xxc(code)
+        }
+
         private fun static(code: Pair<Int, Int>, vararg details: Any): XProcError {
             val ecode = staticError(code.first)
             return XProcError(ecode, code.second, Location.NULL, Location.NULL, *details)
@@ -55,6 +59,13 @@ open class XProcError protected constructor(val code: QName, val variant: Int, v
         }
 
         fun internal(code: Int, vararg details: Any): XProcError = internal(Pair(code, 1), *details)
+
+        private fun xstep(code: Pair<Int,Int>, vararg details: Any): XProcError {
+            val ecode = xstepError(code.first)
+            return XProcError(ecode, code.second, Location.NULL, Location.NULL, *details)
+        }
+
+        fun xstep(code: Int, vararg details: Any): XProcError = xstep(Pair(code, 1), *details)
 
         // ====================================================================================
 
@@ -347,6 +358,9 @@ open class XProcError protected constructor(val code: QName, val variant: Int, v
         fun xcAtMostOneGrammar() = step(211)
         fun xcInvalidIxmlGrammar() = step(212)
 
+        fun xiCastUnsupported(message: String) = xstep(1, message)
+        fun xiCastInputIncorrect(message: String) = xstep(2, message)
+
         fun xiNoSuchOutputPort(port: String)= internal(1, port)
         fun xiImpossibleNodeType(type: XdmNodeKind) = internal(2, type)
         fun xiThreadInterrupted() = internal(3)
@@ -367,7 +381,6 @@ open class XProcError protected constructor(val code: QName, val variant: Int, v
         fun xiCannotFindGraphviz(value: String) = internal(31, value)
         fun xiCannotExecuteGraphviz(value: String) = internal(32, value)
         fun xiUnwritableOutputFile(filename: String) = internal(33, filename)
-        fun xiNoRunnableSteps() = internal(35)
         fun xiNotASpecialType(type: String) = internal(36, type)
         fun xiDocumentInCache(href: URI) = internal(37, href)
         fun xiDocumentNotInCache(href: URI) = internal(38, href)

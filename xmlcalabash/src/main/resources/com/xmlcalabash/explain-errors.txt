@@ -1354,6 +1354,10 @@ XC0212
 Invalid Invisible XML grammar.
 It is a dynamic error if the grammar provided is not a valid Invisible XML grammar.
 
+cxerr:XC0001
+Cannot cast: $1.
+The requested content-type cast is not supported.
+
 cxerr:XI0001
 Pipeline has no “$1” output port.
 Cannot save the output from a port that doesn’t exist.
