@@ -6,6 +6,6 @@ interface ErrorExplanation {
     fun setEnvironment(environment: CommonEnvironment)
     fun report(error: XProcError)
     fun reportExplanation(error: XProcError)
-    fun message(error: XProcError, includeCause: Boolean): String
+    fun message(error: XProcError, includeDetails: Boolean): String
     fun explanation(error: XProcError): String
 }

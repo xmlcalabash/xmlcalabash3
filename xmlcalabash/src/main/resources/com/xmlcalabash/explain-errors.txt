@@ -72,8 +72,8 @@ Invalid value: “$1” (not one of $2)
 It is a dynamic error if an option declares a list of acceptable values and an
 attempt is made to specify a value that is not a member of that list.
 
-XD0020/1
-Serialization properties are not compatible.
+XD0020
+Invalid value, or combination of values, in serialization options.
 It is a dynamic error if the combination of serialization options specified or
 defaulted is not allowed.
 

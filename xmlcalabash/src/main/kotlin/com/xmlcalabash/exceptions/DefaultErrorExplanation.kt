@@ -56,7 +56,18 @@ class DefaultErrorExplanation(): ErrorExplanation {
         this.environment = environment
     }
 
-    override fun message(error: XProcError, includeCause: Boolean): String {
+    override fun message(error: XProcError, includeDetails: Boolean): String {
+        val errorMessage = if (error.code.namespaceUri in listOf(NsErr.namespace, NsCx.errorNamespace)) {
+            val message = template(error.code, error.variant, error.details.size).message
+            substitute(message, *error.details)
+        } else {
+            "(no message for error)"
+        }
+
+        if (!includeDetails) {
+            return errorMessage
+        }
+
         val sb = StringBuilder()
         if (error.location != Location.NULL) {
             sb.append("Fatal ${error.code} at ${error.location}")
@@ -64,17 +75,18 @@ class DefaultErrorExplanation(): ErrorExplanation {
             sb.append("Fatal ${error.code}")
         }
 
-        if (error.code.namespaceUri in listOf(NsErr.namespace, NsCx.errorNamespace)) {
-            val message = template(error.code, error.variant, error.details.size).message
-            sb.append(": ").append(substitute(message, *error.details))
-        }
+        sb.append(": ").append(errorMessage)
 
         if (error.inputLocation != Location.NULL) {
             sb.append("\n").append("   in ${error.inputLocation}")
         }
 
-        if (includeCause && error.throwable != null && error.throwable?.message != null) {
+        if (error.throwable != null && error.throwable?.message != null) {
             sb.append("\n").append("   cause: ${error.throwable!!.toString()}")
+        }
+
+        if (error.details.isNotEmpty()) {
+            sb.append("\n")
         }
 
         for (detail in error.details) {

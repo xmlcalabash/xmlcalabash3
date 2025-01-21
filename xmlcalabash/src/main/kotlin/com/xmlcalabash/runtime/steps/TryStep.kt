@@ -1,6 +1,7 @@
 package com.xmlcalabash.runtime.steps
 
 import com.xmlcalabash.documents.XProcDocument
+import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.exceptions.XProcException
 import com.xmlcalabash.namespace.NsC
 import com.xmlcalabash.namespace.NsCx
@@ -99,6 +100,18 @@ open class TryStep(config: XProcStepConfiguration, compound: CompoundStepModel):
         nsmap = nsmap.put("c", NsC.namespace)
         nsmap = nsmap.put("cx", NsCx.namespace)
 
+        if (exception is XProcException) {
+            if (exception.error.code.prefix.isNotEmpty()) {
+                nsmap = nsmap.put(exception.error.code.prefix, exception.error.code.namespaceUri)
+            }
+            val type = exception.error.stackTrace[0]?.stepType
+            if (type != null) {
+                if (type.prefix.isNotEmpty()) {
+                    nsmap = nsmap.put(type.prefix, type.namespaceUri)
+                }
+            }
+        }
+
         val builder = SaxonTreeBuilder(stepConfig)
         builder.startDocument(null)
         builder.addStartElement(NsC.errors, step.stepConfig.stringAttributeMap(emptyMap()), nsmap)
@@ -110,24 +123,48 @@ open class TryStep(config: XProcStepConfiguration, compound: CompoundStepModel):
             attr["name"] = error.stackTrace[0]?.stepName
             attr["type"] = error.stackTrace[0]?.stepType.toString()
             attr["code"] = error.code.toString()
-            attr["href"] = error.inputLocation.baseUri?.toString()
-            if (error.inputLocation.lineNumber > 0) {
-                attr["line"] = error.inputLocation.lineNumber.toString()
+            attr["href"] = error.location.baseUri?.toString()
+            if (error.location.lineNumber > 0) {
+                attr["line"] = error.location.lineNumber.toString()
             }
-            if (error.inputLocation.columnNumber > 0) {
-                attr["column"] = error.inputLocation.columnNumber.toString()
+            if (error.location.columnNumber > 0) {
+                attr["column"] = error.location.columnNumber.toString()
             }
 
             builder.addStartElement(NsC.error, step.stepConfig.stringAttributeMap(attr), nsmap)
 
+            if (error.inputLocation.baseUri != null || error.inputLocation.lineNumber > 0) {
+                attr.clear()
+                attr["href"] = error.inputLocation.baseUri?.toString()
+                if (error.inputLocation.lineNumber > 0) {
+                    attr["line"] = error.inputLocation.lineNumber.toString()
+                }
+                if (error.inputLocation.columnNumber > 0) {
+                    attr["column"] = error.inputLocation.columnNumber.toString()
+                }
+                builder.addStartElement(NsCx.inputLocation, step.stepConfig.stringAttributeMap(attr), nsmap)
+                builder.addEndElement()
+            }
+
+            builder.addStartElement(NsCx.message)
+            builder.addText(stepConfig.environment.errorExplanation.message(exception.error, false))
+            builder.addEndElement()
+
+            val explanation = stepConfig.environment.errorExplanation.explanation(exception.error)
+            if (explanation.isNotBlank()) {
+                builder.addStartElement(NsCx.explanation)
+                builder.addText(explanation)
+                builder.addEndElement()
+            }
+
+            if (exception.cause != null && exception.cause!!.message != null) {
+                builder.addStartElement(NsCx.cause)
+                builder.addText(exception.cause!!.message!!)
+                builder.addEndElement()
+            }
+
             if (error.details.isNotEmpty() && error.details[0] is XProcDocument) {
                 builder.addSubtree((error.details[0] as XProcDocument).value)
-            } else {
-                if (exception.message != null) {
-                    builder.addStartElement(NsCx.message)
-                    builder.addText(exception.message!!)
-                    builder.addEndElement()
-                }
             }
 
             if (error.stackTrace.isNotEmpty()) {
