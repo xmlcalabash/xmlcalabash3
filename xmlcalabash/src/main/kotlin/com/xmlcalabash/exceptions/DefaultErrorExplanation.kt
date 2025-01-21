@@ -56,34 +56,47 @@ class DefaultErrorExplanation(): ErrorExplanation {
         this.environment = environment
     }
 
-    override fun message(error: XProcError) {
+    override fun message(error: XProcError, includeCause: Boolean): String {
+        val sb = StringBuilder()
         if (error.location != Location.NULL) {
-            System.err.println("Fatal ${error.code} at ${error.location}")
+            sb.append("Fatal ${error.code} at ${error.location}")
         } else {
-            System.err.println("Fatal ${error.code}")
-        }
-        if (error.inputLocation != Location.NULL) {
-            System.err.println("   in ${error.inputLocation}")
-        }
-        if (error.throwable != null && error.throwable?.message != null) {
-            System.err.println("   cause: ${error.throwable!!.toString()}")
+            sb.append("Fatal ${error.code}")
         }
 
         if (error.code.namespaceUri in listOf(NsErr.namespace, NsCx.errorNamespace)) {
             val message = template(error.code, error.variant, error.details.size).message
-            System.err.println(substitute(message, *error.details))
+            sb.append(": ").append(substitute(message, *error.details))
+        }
+
+        if (error.inputLocation != Location.NULL) {
+            sb.append("\n").append("   in ${error.inputLocation}")
+        }
+
+        if (includeCause && error.throwable != null && error.throwable?.message != null) {
+            sb.append("\n").append("   cause: ${error.throwable!!.toString()}")
         }
 
         for (detail in error.details) {
             if (detail is XProcDocument) {
-                showDetail(detail)
+                sb.append(showDetail(detail))
             }
         }
+
+        return sb.toString()
     }
 
-    override fun explanation(error: XProcError) {
+    override fun report(error: XProcError) {
+        System.err.println(message(error, true))
+    }
+
+    override fun explanation(error: XProcError): String {
         val message = template(error.code, error.variant, error.details.size).explanation
-        System.err.println(substitute(message, *error.details))
+        return substitute(message, *error.details)
+    }
+
+    override fun reportExplanation(error: XProcError) {
+        System.err.println(explanation(error))
     }
 
     private fun template(code: QName, variant: Int, count: Int): ErrorExplanationTemplate {
@@ -253,7 +266,9 @@ class DefaultErrorExplanation(): ErrorExplanation {
         }
     }
 
-    private fun showDetail(doc: XProcDocument) {
+    private fun showDetail(doc: XProcDocument): String {
+        val sb = StringBuilder()
+
         var message: String? = null
         if (doc is XProcBinaryDocument) {
             message = "...binary message cannot be displayed..."
@@ -263,8 +278,7 @@ class DefaultErrorExplanation(): ErrorExplanation {
             val root = S9Api.documentElement(doc.value as XdmNode)
 
             if (root.nodeName in listOf(NsXvrl.reports, NsXvrl.report)) {
-                showXvrl(doc)
-                return
+                return showXvrl(doc)
             }
 
             var markup = false
@@ -292,10 +306,11 @@ class DefaultErrorExplanation(): ErrorExplanation {
             message = "...no explanation provided..."
         }
 
-        System.err.println(message.trim())
+        return message.trim()
     }
 
-    private fun showXvrl(doc: XProcDocument) {
+    private fun showXvrl(doc: XProcDocument): String {
+        val sb = StringBuilder()
         val node = doc.value as XdmNode
 
         if (environment?.messageReporter != null) {
@@ -325,7 +340,7 @@ class DefaultErrorExplanation(): ErrorExplanation {
         writer.set(Ns.encoding, environment?.config?.consoleEncoding ?: "UTF-8")
         writer.write()
         val text = baos.toString(StandardCharsets.UTF_8)
-        System.err.println(text)
+        return text
     }
 
 

@@ -15,6 +15,7 @@ object NsCx {
     val blake3 = QName(namespace, "cx:blake3")
     val cacheAddDocument = QName(namespace, "cx:cache-add-document")
     val cacheRemoveDocument = QName(namespace, "cx:cache-remove-document")
+    val cause = QName(namespace, "cx:cause")
     val contentTypeCheck = QName(namespace, "cx:content-type-check")
     val crc = QName(namespace, "cx:crc")
     val defaultAttribute = QName(namespace, "cx:default-attribute") // Used in the XProc parser
