@@ -15,6 +15,7 @@ import com.xmlcalabash.util.SaxonTreeBuilder
 import net.sf.saxon.s9api.QName
 import net.sf.saxon.s9api.Serializer
 import net.sf.saxon.s9api.XdmAtomicValue
+import net.sf.saxon.s9api.XdmEmptySequence
 import net.sf.saxon.s9api.XdmValue
 import net.sf.saxon.value.QNameValue
 import java.io.ByteArrayOutputStream
@@ -187,7 +188,10 @@ class DocumentWriter(val doc: XProcDocument,
                     val qname = (value.underlyingValue as QNameValue)
                     serializer.setOutputProperty(name, "Q{${qname.namespaceURI}}${qname.localName}")
                 } else {
-                    serializer.setOutputProperty(name, value.underlyingValue.stringValue)
+                    // Ignore the empty sequence...
+                    if (value != XdmEmptySequence.getInstance()) {
+                        serializer.setOutputProperty(name, value.underlyingValue.stringValue)
+                    }
                 }
             }
         } catch (ex: Exception) {
