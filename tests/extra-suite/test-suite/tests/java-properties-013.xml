@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<t:test  expected="fail" code="cxerr:XC0001"
+        xmlns:cxerr="http://xmlcalabash.com/ns/error"
+        xmlns:t="http://xproc.org/ns/testsuite/3.0">
+  <t:info>
+    <t:title>java-properties-013</t:title>
+    <t:revision-history>
+      <t:revision>
+        <t:date>2025-01-20</t:date>
+        <t:author>
+          <t:name>Norm Tovey-Walsh</t:name>
+        </t:author>
+        <t:description xmlns="http://www.w3.org/1999/xhtml">
+          <p>Created test.</p>
+        </t:description>
+      </t:revision>
+    </t:revision-history>
+  </t:info>
+  <t:description xmlns="http://www.w3.org/1999/xhtml">
+    <p>Tests that an atomic cannot be cast to Java properties.</p>
+  </t:description>
+<t:pipeline>
+<p:declare-step xmlns:p="http://www.w3.org/ns/xproc"
+                xmlns:ex="https://xmlcalabash.com/ns/examples"
+                xmlns:xs="http://www.w3.org/2001/XMLSchema"
+                xmlns:cx="http://xmlcalabash.com/ns/extensions"
+                exclude-inline-prefixes="ex xs cx"
+                name="main"
+                version="3.0">
+  <p:output port="result"/>
+
+  <p:cast-content-type content-type="text/x-java-properties">
+    <p:with-input>
+      <p:inline content-type="text/html"><body/></p:inline>
+    </p:with-input>
+  </p:cast-content-type>
+</p:declare-step>
+</t:pipeline>
+</t:test>

@@ -36,6 +36,7 @@ class MediaType private constructor(val mediaType: String, val mediaSubtype: Str
         val ARJ = MediaType("application", "x-arj")
         val CPIO = MediaType("application", "x-cpio")
         val SEVENZ = MediaType("application", "x-7z-compressed")
+        val JAVA_PROPERTIES = MediaType("text", "x-java-properties")
 
         private val extensionMap = HashMap<MediaType, String>()
 
@@ -119,9 +120,9 @@ class MediaType private constructor(val mediaType: String, val mediaSubtype: Str
         )
 
         val classifications = listOf<Pair<MediaClassification, List<MediaType>>> (
-            Pair(MediaClassification.XML, MATCH_XML),
             Pair(MediaClassification.XHTML, listOf(XHTML)),
             Pair(MediaClassification.HTML, MATCH_HTML),
+            Pair(MediaClassification.XML, MATCH_XML),
             Pair(MediaClassification.JSON, MATCH_JSON),
             Pair(MediaClassification.YAML, MATCH_YAML),
             Pair(MediaClassification.TOML, MATCH_TOML),

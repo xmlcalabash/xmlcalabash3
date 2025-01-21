@@ -10,10 +10,13 @@ import com.xmlcalabash.runtime.XProcStepConfiguration
 import com.xmlcalabash.util.MediaClassification
 import com.xmlcalabash.util.S9Api
 import com.xmlcalabash.util.SaxonTreeBuilder
+import net.sf.saxon.om.NamespaceUri
 import net.sf.saxon.s9api.Axis
 import net.sf.saxon.s9api.QName
 import net.sf.saxon.s9api.SaxonApiException
+import net.sf.saxon.s9api.XdmArray
 import net.sf.saxon.s9api.XdmAtomicValue
+import net.sf.saxon.s9api.XdmFunctionItem
 import net.sf.saxon.s9api.XdmMap
 import net.sf.saxon.s9api.XdmNode
 import net.sf.saxon.s9api.XdmNodeKind
@@ -25,6 +28,7 @@ import java.io.ByteArrayOutputStream
 import java.lang.IllegalArgumentException
 import java.nio.charset.StandardCharsets
 import java.util.Base64
+import java.util.Properties
 import javax.xml.transform.dom.DOMSource
 import kotlin.collections.iterator
 
@@ -32,8 +36,9 @@ class DocumentConverter(val stepConfig: XProcStepConfiguration,
                         val doc: XProcDocument,
                         val contentType: MediaType,
                         externalSerialization: Map<QName, XdmValue> = emptyMap()): Marshaller(stepConfig) {
-    val outType = contentType.classification()
+    private val outType = contentType.classification()
     private val _params = mutableMapOf<QName, XdmValue>()
+    lateinit private var inType: MediaClassification
     val serializationParameters: Map<QName, XdmValue>
         get() = _params
 
@@ -59,7 +64,7 @@ class DocumentConverter(val stepConfig: XProcStepConfiguration,
     }
 
     fun convert(): XProcDocument {
-        val inType = doc.contentType?.classification() ?: MediaClassification.BINARY
+        inType = doc.contentType?.classification() ?: MediaClassification.BINARY
         when (inType) {
             MediaClassification.XML, MediaClassification.XHTML, MediaClassification.HTML -> {
                 return fromMarkup()
@@ -111,13 +116,23 @@ class DocumentConverter(val stepConfig: XProcStepConfiguration,
                     return doc.with(map).with(contentType, true)
                 } else {
                     throw stepConfig.exception(
-                        XProcError.xiNotImplemented
+                        XProcError.xiCastUnsupported
                             ("${doc.contentType ?: MediaType.OCTET_STREAM} from markup")
                     )
                 }
             }
 
             MediaClassification.TEXT -> {
+                if (contentType == MediaType.JAVA_PROPERTIES) {
+                    if (inType == MediaClassification.XML ) {
+                        return javaPropertiesFromMarkup()
+                    } else {
+                        throw stepConfig.exception(
+                            XProcError.xiCastUnsupported
+                                ("${doc.contentType ?: MediaType.OCTET_STREAM} from ${doc.contentType}")
+                        )
+                    }
+                }
                 val baos = ByteArrayOutputStream()
                 val writer = DocumentWriter(doc, baos, serializationParameters)
                 writer[Ns.encoding] = XdmAtomicValue("UTF-8")
@@ -160,6 +175,57 @@ class DocumentConverter(val stepConfig: XProcStepConfiguration,
         }
     }
 
+    private fun javaPropertiesFromMarkup(): XProcDocument {
+        val root = S9Api.documentElement(doc.value as XdmNode)
+        if (root.nodeName != QName(NamespaceUri.NULL, "properties")) {
+            throw stepConfig.exception(XProcError.xiCastInputIncorrect("Unsupported root element: ${root.nodeName}"))
+        }
+        var comment: String? = null
+        val properties = Properties()
+        for (child in root.axisIterator(Axis.CHILD)) {
+            when (child.nodeKind) {
+                XdmNodeKind.ELEMENT -> {
+                    if (child.nodeName == QName(NamespaceUri.NULL, "comment")) {
+                        comment = child.underlyingNode.stringValue
+                    } else if (child.nodeName == QName(NamespaceUri.NULL, "entry")) {
+                        val key = child.getAttributeValue(Ns.key)
+                        if (key == null) {
+                            throw stepConfig.exception(XProcError.xiCastInputIncorrect("No key attribute on entry"))
+                        }
+                        properties.setProperty(key, child.underlyingNode.stringValue)
+                    } else {
+                        throw stepConfig.exception(XProcError.xiCastInputIncorrect("Unsupported element: ${child.nodeName}"))
+                    }
+                }
+                XdmNodeKind.TEXT -> {
+                    if (child.underlyingNode.stringValue.trim().isNotBlank()) {
+                        throw stepConfig.exception(XProcError.xiCastInputIncorrect("Unsupported non-whitespace text: ${child.underlyingNode.stringValue.trim()}"))
+                    }
+                }
+                else -> Unit
+            }
+        }
+
+        // It irks me that storing properties always adds a date comment...
+        val sb = StringBuilder()
+        if (comment != null) {
+            for (line in comment.split("\n")) {
+                sb.append("#").append(line).append("\n")
+            }
+        }
+
+        val baos = ByteArrayOutputStream()
+        properties.store(baos, null)
+        for (line in baos.toString(Charsets.UTF_8).split("\n")) {
+            if (!line.startsWith("#")) {
+                sb.append(line).append("\n")
+            }
+        }
+
+        val text = sb.toString()
+        return XProcDocument.ofText(text, stepConfig).with(contentType, true)
+    }
+
     private fun fromJson(): XProcDocument {
         when (outType) {
             MediaClassification.XML -> {
@@ -176,7 +242,7 @@ class DocumentConverter(val stepConfig: XProcStepConfiguration,
 
             MediaClassification.XHTML, MediaClassification.HTML -> {
                 throw stepConfig.exception(
-                    XProcError.xiNotImplemented
+                    XProcError.xiCastUnsupported
                         ("${doc.contentType ?: MediaType.OCTET_STREAM} to HTML")
                 )
             }
@@ -186,6 +252,9 @@ class DocumentConverter(val stepConfig: XProcStepConfiguration,
             }
 
             MediaClassification.TEXT -> {
+                if (contentType == MediaType.JAVA_PROPERTIES) {
+                    return toJavaProperties()
+                }
                 val baos = ByteArrayOutputStream()
                 val writer = DocumentWriter(doc, baos, serializationParameters)
                 writer[Ns.encoding] = XdmAtomicValue("UTF-8")
@@ -200,14 +269,51 @@ class DocumentConverter(val stepConfig: XProcStepConfiguration,
 
             MediaClassification.BINARY -> {
                 throw stepConfig.exception(
-                    XProcError.xiNotImplemented
+                    XProcError.xiCastUnsupported
                         ("${doc.contentType ?: MediaType.OCTET_STREAM} to binary")
                 )
             }
         }
     }
 
+    private fun toJavaProperties(): XProcDocument {
+        if (doc.value !is XdmMap) {
+            throw stepConfig.exception(XProcError.xiCastUnsupported("Only JSON maps can be cast to ${contentType}"))
+        }
+
+        val properties = Properties()
+        val map = doc.value as XdmMap
+        for (mapKey in map.keySet()) {
+            val key = mapKey.underlyingValue.stringValue
+            val mapValue = map.get(mapKey)
+            if (mapValue is XdmFunctionItem) {
+                throw stepConfig.exception(XProcError.xiCastUnsupported("Array/map/function values cannot be cast to ${contentType}"))
+            }
+            properties.setProperty(key, mapValue.underlyingValue.stringValue)
+        }
+
+        // It irks me that storing properties always adds a date comment...
+        val sb = StringBuilder()
+        val baos = ByteArrayOutputStream()
+        properties.store(baos, null)
+        for (line in baos.toString(Charsets.UTF_8).split("\n")) {
+            if (!line.startsWith("#")) {
+                sb.append(line).append("\n")
+            }
+        }
+
+        val text = sb.toString()
+        return XProcDocument.ofText(text, stepConfig).with(contentType, true)
+    }
+
     private fun fromText(): XProcDocument {
+        if (doc.contentType == MediaType.JAVA_PROPERTIES) {
+            return fromJavaProperties()
+        }
+        return fromPlainText()
+    }
+
+    private fun fromPlainText(): XProcDocument {
         when (outType) {
             MediaClassification.XML -> {
                 try {
@@ -258,7 +364,80 @@ class DocumentConverter(val stepConfig: XProcStepConfiguration,
 
             MediaClassification.BINARY -> {
                 throw stepConfig.exception(
-                    XProcError.xiNotImplemented
+                    XProcError.xiCastUnsupported
+                        ("${doc.contentType ?: MediaType.OCTET_STREAM} to binary")
+                )
+            }
+        }
+    }
+
+    private fun fromJavaProperties(): XProcDocument {
+        // Java makes no effort to preserve the comment, but since it can be in the XML...
+        val text = doc.value.underlyingValue.stringValue.trim()
+        val commentBuilder = StringBuilder()
+        for (line in text.split('\n')) {
+            if (line.trim().startsWith('#')) {
+                commentBuilder.append(line.trim().substring(1)).append("\n")
+            } else {
+                break
+            }
+        }
+        val comment = commentBuilder.toString().trimEnd()
+
+        // Is this a properties file?
+        val properties = Properties()
+        val istream = ByteArrayInputStream(text.toByteArray(StandardCharsets.UTF_8))
+        properties.load(istream)
+
+        when (outType) {
+            MediaClassification.XML -> {
+                val _properties = QName("properties")
+                val _entry = QName("entry")
+
+                val builder = SaxonTreeBuilder(stepConfig)
+                builder.startDocument(doc.baseURI)
+                builder.addStartElement(_properties, stepConfig.attributeMap(mapOf(
+                    Ns.version to "1.0"
+                )))
+                if (comment.isNotBlank()) {
+                    builder.addStartElement(Ns.comment)
+                    builder.addText(comment)
+                    builder.addEndElement()
+                }
+                for (key in properties.stringPropertyNames()) {
+                    builder.addStartElement(_entry, stepConfig.attributeMap(mapOf(
+                        Ns.key to key
+                    )))
+                    builder.addText(properties.getProperty(key))
+                    builder.addEndElement()
+                }
+                builder.addEndElement()
+                builder.endDocument()
+                return doc.with(builder.result).with(contentType, true)
+            }
+
+            MediaClassification.XHTML, MediaClassification.HTML -> {
+                throw stepConfig.exception(
+                    XProcError.xiCastUnsupported
+                        ("${doc.contentType ?: MediaType.OCTET_STREAM} to HTML or XHTML")
+                )
+            }
+
+            MediaClassification.JSON, MediaClassification.YAML, MediaClassification.TOML -> {
+                var xdmMap = XdmMap()
+                for (key in properties.stringPropertyNames()) {
+                    xdmMap = xdmMap.put(XdmAtomicValue(key), XdmAtomicValue(properties.getProperty(key)))
+                }
+                return doc.with(xdmMap).with(contentType, true)
+            }
+
+            MediaClassification.TEXT -> {
+                return doc.with(contentType)
+            }
+
+            MediaClassification.BINARY -> {
+                throw stepConfig.exception(
+                    XProcError.xiCastUnsupported
                         ("${doc.contentType ?: MediaType.OCTET_STREAM} to binary")
                 )
             }
@@ -287,7 +466,7 @@ class DocumentConverter(val stepConfig: XProcStepConfiguration,
 
             else -> {
                 throw stepConfig.exception(
-                    XProcError.xiNotImplemented
+                    XProcError.xiCastUnsupported
                         ("${doc.contentType ?: MediaType.OCTET_STREAM} to ${contentType}")
                 )
             }
