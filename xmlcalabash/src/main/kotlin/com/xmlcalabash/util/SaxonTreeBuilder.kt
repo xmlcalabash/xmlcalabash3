@@ -2,6 +2,8 @@ package com.xmlcalabash.util
 
 import com.xmlcalabash.runtime.XProcStepConfiguration
 import com.xmlcalabash.documents.DocumentContext
+import com.xmlcalabash.exceptions.XProcError
+import com.xmlcalabash.exceptions.XProcException
 import com.xmlcalabash.xslt.XsltStylesheet
 import com.xmlcalabash.xslt.stylesheet
 import net.sf.saxon.Controller
@@ -284,7 +286,7 @@ open class SaxonTreeBuilder(val processor: Processor) {
             return nsmap
         }
 
-        throw RuntimeException("Bang") // XProcError.xiImpossibleNamespaceConfiguration(prefix ?: "", uri).exception()
+        throw XProcError.xiImpossible("Unresolvable conflicting namespace bindings for ${prefix}").exception()
     }
 
     fun addEndElement() {
