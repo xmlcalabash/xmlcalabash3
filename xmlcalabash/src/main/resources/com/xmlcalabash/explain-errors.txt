@@ -93,7 +93,7 @@ It is a dynamic error if any attribute value does not satisfy the type required
 for that attribute.
 
 XD0030
-Step failed: “$1”.
+Step failed: $1.
 It is a dynamic error if a step is unable or incapable of performing its function.
 
 XD0036/1
