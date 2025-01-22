@@ -51,6 +51,9 @@ val dep_uuidCreator = project.findProperty("uuidCreator").toString()
 val dep_xerces = project.findProperty("xercesImpl").toString()
 val dep_xmlResolver = project.findProperty("xmlResolver").toString()
 val dep_jacksonDataformat = project.findProperty("jacksonDataformat").toString()
+val dep_plantuml = project.findProperty("plantUml").toString()
+val dep_jeuclid = project.findProperty("jeuclidCore").toString()
+val dep_ditaa = project.findProperty("ditaa").toString()
 
 dependencies {
   implementation("org.jetbrains.kotlin:kotlin-stdlib:2.0.21")
@@ -126,6 +129,7 @@ buildConfig {
   arrayOf<String>("brotliDec",
                   "commonsCodec",
                   "commonsCompress",
+                  "ditaa",
                   "drewnoakesExtractor",
                   "epubcheck",
                   "flexmarkAll",
@@ -133,9 +137,11 @@ buildConfig {
                   "htmlparser",
                   "httpClient",
                   "jaxbapi",
+                  "jeuclidCore",
                   "jing",
                   "jsonSchemaValidator",
                   "pdfbox",
+                  "plantUml",
                   "schxslt2",
                   "sinclude",
                   "slf4j",

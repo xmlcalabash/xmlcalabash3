@@ -1,0 +1,61 @@
+<refentry xmlns:p="http://www.w3.org/ns/xproc"
+          xmlns:e="http://www.w3.org/1999/XSL/Spec/ElementSyntax"
+          xmlns:xi="http://www.w3.org/2001/XInclude"
+          xmlns:xlink="http://www.w3.org/1999/xlink"
+          xmlns="http://docbook.org/ns/docbook"
+          xml:id="cx-mathml-to-svg">
+<?db filename="cx-mathml-to-svg"?>
+   <refnamediv>
+      <refname>cx:mathml-to-svg</refname>
+      <refpurpose>Draws diagrams with mathml-to-svg</refpurpose>
+   </refnamediv>
+   <refsynopsisdiv>
+     <xi:include href="../../../../ext/diagramming/src/main/resources/com/xmlcalabash/ext/diagramming.xpl"
+                 xpointer="xpath(/*/*[@type='cx:mathml-to-svg'])"/>
+   </refsynopsisdiv>
+
+<refsection>
+<title>Description</title>
+
+<para>The <tag>cx:mathml-to-svg</tag> step uses
+<link xlink:href="http://jeuclid.sourceforge.net/">JEuclid</link> to convert
+MathML to SVG.</para>
+
+<note>
+<para>The actual implementation used is
+version <?version DEPENDENCY_jeuclidCore?> of
+a <link xlink:href="https://github.com/rototor/jeuclid">modern fork</link> of
+JEuclid that supports recent versions of Java and the underlying
+<link xlink:href="https://xmlgraphics.apache.org/batik/">Batik</link> libraries.</para>
+</note>
+
+</refsection>
+
+<refsection>
+<title>Example</title>
+
+<para>The equation rendered in <xref linkend="fig.mathml-to-svg"/> is one of
+the more interesting (looking) examples from the Mozilla MathML torture test.</para>
+
+<figure xml:id="fig.mathml-to-svg">
+<title>Example MathML converted to SVG</title>
+<mediaobject>
+<imageobject>
+<imagedata fileref="img/det-a.svg"/>
+</imageobject>
+</mediaobject>
+</figure>
+
+<para>Correct rendering of <xref linkend="fig.mathml-to-svg"/> relies on support
+for SVG in your user agent. If your user agent also supports MathML, it can
+render the equation directly, as (possibly) shown in <xref linkend="fig.mathml"/>.</para>
+
+<figure xml:id="fig.mathml">
+<title>Example MathML</title>
+<informalequation>
+<xi:include href="../../examples/xml/det-a.xml"/>
+</informalequation>
+</figure>
+
+</refsection>
+</refentry>

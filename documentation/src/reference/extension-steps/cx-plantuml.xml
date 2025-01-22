@@ -1,0 +1,198 @@
+<refentry xmlns:p="http://www.w3.org/ns/xproc"
+          xmlns:xi="http://www.w3.org/2001/XInclude"
+          xmlns:xlink="http://www.w3.org/1999/xlink"
+          xmlns="http://docbook.org/ns/docbook"
+          xml:id="cx-plantuml">
+<?db filename="cx-plantuml"?>
+   <refnamediv>
+      <refname>cx:plantuml</refname>
+      <refpurpose>Draws diagrams with PlantUML</refpurpose>
+   </refnamediv>
+   <refsynopsisdiv>
+     <xi:include href="../../../../ext/diagramming/src/main/resources/com/xmlcalabash/ext/diagramming.xpl"
+                 xpointer="xpath(/*/*[@type='cx:plantuml'])"/>
+   </refsynopsisdiv>
+
+<refsection>
+<title>Description</title>
+
+<para>The <tag>cx:plantuml</tag> step constructs diagrams with
+<link xlink:href="https://plantuml.com/">PlantUML</link>.
+PlantUML supports a wide variety of diagrams, not just UML diagrams.</para>
+
+<para>The mapping from output formats to content types isn’t 1:1, so you
+must specify the format explicitly. Available formats (at the time of writing) are:</para>
+
+<informaltable>
+<tgroup cols="2">
+<colspec colwidth="10em"/>
+<thead>
+<row><entry>Format</entry><entry>Content type</entry></row>
+</thead>
+<tbody>
+<row>
+  <entry><literal>atxt</literal></entry>
+  <entry><literal>text/plain</literal></entry>
+</row>
+<row>
+  <entry><literal>base64</literal></entry>
+  <entry><literal>text/plain;charset=x-user-defined</literal></entry>
+</row>
+<row>
+  <entry><literal>braille-png</literal></entry>
+  <entry><literal>image/png</literal></entry>
+</row>
+<row>
+  <entry><literal>debug</literal></entry>
+  <entry><literal>text/plain</literal></entry>
+</row>
+<row>
+  <entry><literal>eps</literal></entry>
+  <entry><literal>application/postscript</literal></entry>
+</row>
+<row>
+  <entry><literal>eps-text</literal></entry>
+  <entry><literal>application/postscript</literal></entry>
+</row>
+<row>
+  <entry><literal>graphml</literal></entry>
+  <entry><literal>application/graphml+xml</literal></entry>
+</row>
+<row>
+  <entry><literal>html</literal></entry>
+  <entry><literal>text/html</literal></entry>
+</row>
+<row>
+  <entry><literal>html5</literal></entry>
+  <entry><literal>text/html</literal></entry>
+</row>
+<row>
+  <entry><literal>latex</literal></entry>
+  <entry><literal>application/x-latex</literal></entry>
+</row>
+<row>
+  <entry><literal>latex-no-preamble</literal></entry>
+  <entry><literal>application/x-latex</literal></entry>
+</row>
+<row>
+  <entry><literal>pdf</literal></entry>
+  <entry><literal>application/pdf</literal></entry>
+</row>
+<row>
+  <entry><literal>png</literal></entry>
+  <entry><literal>image/png</literal></entry>
+</row>
+<row>
+  <entry><literal>preproc</literal></entry>
+  <entry><literal>text/plain</literal></entry>
+</row>
+<row>
+  <entry><literal>raw</literal></entry>
+  <entry><literal>image/raw</literal></entry>
+</row>
+<row>
+  <entry><literal>scxml</literal></entry>
+  <entry><literal>application/scxml+xml</literal></entry>
+</row>
+<row>
+  <entry><literal>svg</literal></entry>
+  <entry><literal>image/svg+xml</literal></entry>
+</row>
+<row>
+  <entry><literal>utxt</literal></entry>
+  <entry><literal>text/plain;charset=UTF-8</literal></entry>
+</row>
+<row>
+  <entry><literal>vdx</literal></entry>
+  <entry><literal>application/vnd.visio.xml</literal></entry>
+</row>
+<row>
+  <entry><literal>xmi-argo</literal></entry>
+  <entry><literal>application/vnd.xmi+xml</literal></entry>
+</row>
+<row>
+  <entry><literal>xmi-script</literal></entry>
+  <entry><literal>application/vnd.xmi+xml</literal></entry>
+</row>
+<row>
+  <entry><literal>xmi-standard</literal></entry>
+  <entry><literal>application/vnd.xmi+xml</literal></entry>
+</row>
+<row>
+  <entry><literal>xmi-star</literal></entry>
+  <entry><literal>application/vnd.xmi+xml</literal></entry>
+</row>
+</tbody>
+</tgroup>
+</informaltable>
+
+<para>XML Calabash uses <?version DEPENDENCY_plantUml?> of the PlantUML library.</para>
+</refsection>
+
+<refsection>
+<title>Examples</title>
+
+<para>The PlantUML user guide includes many examples. The UML source
+in <xref linkend="ex.plantuml001-source"/> renders to the image
+show in <xref linkend="fig.plantuml001"/>.</para>
+
+<example xml:id="ex.plantuml001-source">
+<title>UML source</title>
+<literallayout class="monospaced"
+><xi:include href="../../txt/plantuml-001.txt" parse="text"/></literallayout>
+</example>
+
+<figure xml:id="fig.plantuml001">
+<title>UML diagram</title>
+<mediaobject>
+<imageobject>
+<imagedata fileref="img/plantuml-001.png"/>
+</imageobject>
+</mediaobject>
+</figure>
+
+<para>Another example shows how JSON can be rendered. The object
+in <xref linkend="ex.plantuml002-source"/> renders to the image
+show in <xref linkend="fig.plantuml002"/>. (Note the use of pragmas
+for highlighting.)</para>
+
+<example xml:id="ex.plantuml002-source">
+<title>JSON source</title>
+<literallayout class="monospaced"
+><xi:include href="../../txt/plantuml-002.txt" parse="text"/></literallayout>
+</example>
+
+<figure xml:id="fig.plantuml002">
+<title>JSON diagram</title>
+<mediaobject>
+<imageobject>
+<imagedata fileref="img/plantuml-002.png"/>
+</imageobject>
+</mediaobject>
+</figure>
+
+<para>A final example (but by no means an exhaustive list of all of the possible
+examples) shows the PlantUML EBNF for PlantUML. The EBNF in
+<xref linkend="ex.plantuml003-source"/> renders to the image
+show in <xref linkend="fig.plantuml003"/>. (Note the use of pragmas
+for highlighting.)</para>
+
+<example xml:id="ex.plantuml003-source">
+<title>JSON source</title>
+<literallayout class="monospaced"
+><xi:include href="../../txt/plantuml-003.txt" parse="text"/></literallayout>
+</example>
+
+<figure xml:id="fig.plantuml003">
+<title>EBNF diagram</title>
+<mediaobject>
+<imageobject>
+<imagedata fileref="img/plantuml-003.png"/>
+</imageobject>
+</mediaobject>
+</figure>
+
+</refsection>
+</refentry>
+
+
