@@ -99,7 +99,11 @@ open class XQueryStep(): AbstractAtomicStep() {
         val exec = try {
             var xquery = query.value.underlyingValue.stringValue
             if (query.contentClassification == MediaClassification.XML) {
-                val root = S9Api.documentElement(query.value as XdmNode)
+                val root = try {
+                    S9Api.documentElement(query.value as XdmNode)
+                } catch (ex: IllegalArgumentException) {
+                    throw stepConfig.exception(XProcError.xdStepFailed("XQuery query input is ${query.contentType}, but ${ex.message}"), ex)
+                }
                 if (root.nodeName != NsC.query) {
                     val baos = ByteArrayOutputStream()
                     val writer = DocumentWriter(query, baos)

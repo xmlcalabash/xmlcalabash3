@@ -25,14 +25,14 @@ class S9Api {
             for (child in node.axisIterator(Axis.CHILD)) {
                 if (child.nodeKind == XdmNodeKind.ELEMENT) {
                     if (root != null) {
-                        throw RuntimeException("Multiple root nodes")
+                        throw IllegalArgumentException("XML document has multiple top-level elements")
                     }
                     root = child
                 }
             }
 
             if (root == null) {
-                throw RuntimeException("No root")
+                throw IllegalArgumentException("XML document has no document element")
             }
 
             return root
