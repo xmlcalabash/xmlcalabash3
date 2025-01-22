@@ -1,0 +1,64 @@
+<refentry xmlns:p="http://www.w3.org/ns/xproc"
+          xmlns:e="http://www.w3.org/1999/XSL/Spec/ElementSyntax"
+          xmlns:xi="http://www.w3.org/2001/XInclude"
+          xmlns:xlink="http://www.w3.org/1999/xlink"
+          xmlns="http://docbook.org/ns/docbook"
+          xml:id="cx-ditaa">
+<?db filename="cx-ditaa"?>
+   <refnamediv>
+      <refname>cx:ditaa</refname>
+      <refpurpose>Draws diagrams with ditaa</refpurpose>
+   </refnamediv>
+   <refsynopsisdiv>
+     <xi:include href="../../../../ext/diagramming/src/main/resources/com/xmlcalabash/ext/diagramming.xpl"
+                 xpointer="xpath(/*/*[@type='cx:ditaa'])"/>
+   </refsynopsisdiv>
+
+<refsection>
+<title>Description</title>
+
+<para>The <tag>cx:ditaa</tag> step constructs diagrams with
+<link xlink:href="https://ditaa.sourceforge.net/">ditaa</link>
+(DIagrams Through Ascii Art).</para>
+
+<para>The supported content types are the content types supported by the
+<classname>javax.imageio.ImageWriter</classname> class. At the time of this 
+writing:
+<literal>image/png</literal>
+(or <literal>image/x-png</literal>),
+<literal>image/gif</literal>,
+<literal>image/jpeg</literal>,
+<literal>image/tiff</literal>, and
+<literal>image/bmp</literal>
+(or <literal>image/vnd.wap.wbmp</literal>)
+</para>
+
+<para>XML Calabash is built with ditaa version <?version DEPENDENCY_ditaa?>.</para>
+</refsection>
+
+<refsection>
+<title>Example</title>
+
+<para>The ditaa user guide includes the example shown in
+<xref linkend="ex.ditaa-source"/>. It renders to the image
+show in <xref linkend="fig.ditaa"/>.</para>
+
+<example xml:id="ex.ditaa-source">
+<title>Example ditaa source</title>
+<literallayout class="monospaced"
+><xi:include href="../../txt/ditaa.txt" parse="text"/></literallayout>
+</example>
+
+<figure xml:id="fig.ditaa">
+<title>Example ditaa</title>
+<mediaobject>
+<imageobject>
+<imagedata fileref="img/ditaa.png"/>
+</imageobject>
+</mediaobject>
+</figure>
+</refsection>
+
+</refentry>
+
+

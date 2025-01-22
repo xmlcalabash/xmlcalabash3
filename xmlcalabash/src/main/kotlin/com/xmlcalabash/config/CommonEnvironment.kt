@@ -103,7 +103,7 @@ class CommonEnvironment(private val xmlCalabash: XmlCalabash) {
         for (provider in AtomicStepServiceProvider.providers()) {
             val manager = provider.create();
             for (stepType in manager.stepTypes()) {
-                logger.debug { "Added available step type '$stepType'" }
+                logger.trace { "Added available step type '$stepType'" }
                 knownAtomicSteps.add(stepType)
             }
             stepManagers.add(manager)
@@ -111,14 +111,14 @@ class CommonEnvironment(private val xmlCalabash: XmlCalabash) {
 
         val internalManager = InternalDocumentResolver()
         for (uri in internalManager.resolvableUris()) {
-            logger.debug { "Added resolvable URI: ${uri}" }
+            logger.trace { "Added resolvable URI: ${uri}" }
         }
         internalManager.configure(_documentManager)
 
         for (provider in DocumentResolverServiceProvider.providers()) {
             val manager = provider.create();
             for (uri in manager.resolvableUris()) {
-                logger.debug { "Added resolvable URI: ${uri}" }
+                logger.trace { "Added resolvable URI: ${uri}" }
             }
             manager.configure(_documentManager)
         }

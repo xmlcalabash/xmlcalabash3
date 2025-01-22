@@ -1,0 +1,17 @@
+:PROPERTIES:
+:ID:       F538A400-37DE-402C-B482-91B8A9AD7994
+:END:
+#+title: Pipeline messages
+#+date: 2024-12-27
+#+author: Norman Tovey-Walsh
+
+The ~cx:pipeline-messages~ step returns the pipeline messages that have
+been generated up to the point of execution. Returns an empty document unless
+the pipeline has been configured to use a ~BufferingMessageReporter~.
+
+#+BEGIN_SRC xml
+<p:declare-step type="cx:pipeline-messages">
+  <p:option name="verbosity" as="xs:string?" select="()"/>
+  <p:output port="result"/>
+</p:declare-step>
+#+END_SRC

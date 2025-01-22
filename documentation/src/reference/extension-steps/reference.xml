@@ -8,11 +8,14 @@
 
 <xi:include href="cx-cache-add.xml"/>
 <xi:include href="cx-cache-delete.xml"/>
+<xi:include href="cx-ditaa.xml"/>
 <xi:include href="cx-epubcheck.xml"/>
 <xi:include href="cx-javascript.xml"/>
+<xi:include href="cx-mathml-to-svg.xml"/>
 <xi:include href="cx-metadata-extractor.xml"/>
 <xi:include href="cx-pipeline-messages.xml"/>
 <xi:include href="cx-polyglot.xml"/>
+<xi:include href="cx-plantuml.xml"/>
 <xi:include href="cx-python.xml"/>
 <xi:include href="cx-unique-id.xml"/>
 <xi:include href="cx-until.xml"/>
