@@ -189,7 +189,10 @@ abstract class StepDeclaration(parent: XProcInstruction?, stepConfig: Instructio
 
     open protected fun variableBindings(expr: XProcExpression, step: StepDeclaration) {
         for (name in expr.variableRefs) {
-            //if (staticOptions[name] == null) {
+            if (name !in step.stepConfig.inscopeVariables) {
+                throw stepConfig.exception(XProcError.xsXPathStaticError(name))
+            }
+
             if (!step.stepConfig.inscopeVariables[name]!!.canBeResolvedStatically()) {
                 // What if it hasn't been promoted yet?
                 val exprStep = step.stepConfig.inscopeVariables[name]!!.exprStep!!
