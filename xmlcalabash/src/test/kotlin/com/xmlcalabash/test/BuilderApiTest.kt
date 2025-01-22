@@ -735,7 +735,7 @@ class BuilderApiTest {
 
         val declStep = builder.newDeclareStep()
         declStep.stepConfig.putNamespace("xs", NsXs.namespace)
-        declStep.stepConfig.putNamespace("cx", NsCx.errorNamespace)
+        declStep.stepConfig.putNamespace("cxerr", NsCx.errorNamespace)
         declStep.name = "main"
         declStep.version = 3.1
         val input = declStep.input("source")
@@ -758,20 +758,20 @@ class BuilderApiTest {
         val cwhen = choose.whenInstruction()
         cwhen.test = "xs:integer(.) mod 2 = 0"
         val evenError = cwhen.atomicStep(NsP.error)
-        evenError.withOption(Ns.code, "cx:even")
+        evenError.withOption(Ns.code, "cxerr:even")
 
         val cother = choose.otherwise()
         val oddError = cother.atomicStep(NsP.error)
-        oddError.withOption(Ns.code, "cx:odd")
+        oddError.withOption(Ns.code, "cxerr:odd")
 
         val oddCatch = tryCatch.catch()
-        oddCatch.code = listOf(oddCatch.stepConfig.parseQName("cx:odd"))
+        oddCatch.code = listOf(oddCatch.stepConfig.parseQName("cxerr:odd"))
         val id1 = oddCatch.atomicStep(NsP.identity)
         val wi1 = id1.withInput()
         wi1.inline(wi1.fromString("<doc>Successfully caught odd</doc>"))
 
         val evenCatch = tryCatch.catch()
-        evenCatch.code = listOf(oddCatch.stepConfig.parseQName("cx:even"))
+        evenCatch.code = listOf(oddCatch.stepConfig.parseQName("cxerr:even"))
         val id2 = evenCatch.atomicStep(NsP.identity)
         val wi2 = id2.withInput()
         wi2.inline(wi2.fromString("<doc>Successfully caught even</doc>"))

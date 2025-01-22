@@ -5,22 +5,17 @@ import com.xmlcalabash.config.ConfigurationLoader
 import com.xmlcalabash.config.XmlCalabash
 import com.xmlcalabash.config.XmlCalabashConfiguration
 import com.xmlcalabash.datamodel.InstructionConfiguration
-import com.xmlcalabash.datamodel.Location
 import com.xmlcalabash.io.MediaType
 import com.xmlcalabash.datamodel.PipelineBuilder
 import com.xmlcalabash.documents.DocumentProperties
-import com.xmlcalabash.documents.XProcBinaryDocument
 import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.exceptions.DefaultErrorExplanation
 import com.xmlcalabash.exceptions.ErrorExplanation
 import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.exceptions.XProcException
-import com.xmlcalabash.exceptions.XProcUserError
 import com.xmlcalabash.io.DocumentLoader
 import com.xmlcalabash.io.DocumentWriter
 import com.xmlcalabash.namespace.Ns
-import com.xmlcalabash.namespace.Ns.port
-import com.xmlcalabash.namespace.NsC.environment
 import com.xmlcalabash.namespace.NsErr
 import com.xmlcalabash.namespace.NsFn
 import com.xmlcalabash.namespace.NsXs
@@ -28,8 +23,6 @@ import com.xmlcalabash.runtime.api.RuntimeOption
 import com.xmlcalabash.runtime.api.RuntimePort
 import com.xmlcalabash.util.DefaultXmlCalabashConfiguration
 import com.xmlcalabash.util.FileUtils
-import com.xmlcalabash.util.MediaClassification
-import com.xmlcalabash.util.S9Api
 import com.xmlcalabash.util.UriUtils
 import com.xmlcalabash.util.Verbosity
 import com.xmlcalabash.util.VisualizerOutput
@@ -39,20 +32,15 @@ import com.xmlcalabash.visualizers.Silent
 import net.sf.saxon.Configuration
 import net.sf.saxon.lib.Initializer
 import net.sf.saxon.om.NamespaceUri
-import net.sf.saxon.s9api.Axis
 import net.sf.saxon.s9api.ItemType
 import net.sf.saxon.s9api.QName
 import net.sf.saxon.s9api.XdmAtomicValue
-import net.sf.saxon.s9api.XdmNode
-import net.sf.saxon.s9api.XdmNodeKind
 import net.sf.saxon.s9api.XdmValue
 import org.apache.logging.log4j.kotlin.logger
 import org.slf4j.MDC
 import java.io.BufferedReader
-import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.InputStreamReader
-import java.nio.charset.StandardCharsets
 import java.text.SimpleDateFormat
 import java.time.LocalDateTime
 import java.time.ZoneId
@@ -381,9 +369,9 @@ class XmlCalabashCli private constructor() {
         val verbosity = commandLine.verbosity ?: Verbosity.INFO
 
         for (error in errors) {
-            errorExplanation.message(error.error)
+            errorExplanation.report(error.error)
             if (commandLine.explainErrors) {
-                errorExplanation.explanation(error.error)
+                errorExplanation.reportExplanation(error.error)
             }
         }
 

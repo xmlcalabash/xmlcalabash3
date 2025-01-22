@@ -8,7 +8,7 @@ import net.sf.saxon.s9api.*
 import java.net.URI
 import java.util.*
 
-open class XProcError protected constructor(val code: QName, val variant: Int, val location: Location, val inputLocation: Location, vararg val details: Any) {
+open class XProcError protected constructor(val code: QName, val variant: Int, errorLocation: Location, val inputLocation: Location, vararg val details: Any) {
     companion object {
         val DEBUGGER_ABORT = 9997
 
@@ -424,6 +424,10 @@ open class XProcError protected constructor(val code: QName, val variant: Int, v
         fun xiNotImplemented(message: String) = internal(9999, message)
     }
 
+    var _location = errorLocation
+    val location: Location
+        get() = _location
+
     var _throwable: Throwable? = null
     val throwable: Throwable?
         get() = _throwable
@@ -493,14 +497,21 @@ open class XProcError protected constructor(val code: QName, val variant: Int, v
         return XProcError(this, location, Location(doc.baseURI))
     }
 
-    fun at(type: QName, name: String): XProcError {
+    fun updateAt(type: QName, name: String): XProcError {
         // N.B. mutates the object, doesn't make a copy
-        return at(ErrorStackFrame(type, name))
+        return updateAt(ErrorStackFrame(type, name))
     }
 
-    fun at(frame: ErrorStackFrame): XProcError {
+    fun updateAt(frame: ErrorStackFrame): XProcError {
         // N.B. mutates the object, doesn't make a copy
         stackTrace.push(frame)
+        return this
+    }
+
+    fun updateAt(location: Location): XProcError {
+        if (location != Location.NULL) {
+            this._location = location
+        }
         return this
     }
 

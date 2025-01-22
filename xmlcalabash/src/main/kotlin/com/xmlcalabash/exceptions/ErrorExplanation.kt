@@ -4,6 +4,8 @@ import com.xmlcalabash.config.CommonEnvironment
 
 interface ErrorExplanation {
     fun setEnvironment(environment: CommonEnvironment)
-    fun message(error: XProcError)
-    fun explanation(error: XProcError)
+    fun report(error: XProcError)
+    fun reportExplanation(error: XProcError)
+    fun message(error: XProcError, includeDetails: Boolean): String
+    fun explanation(error: XProcError): String
 }

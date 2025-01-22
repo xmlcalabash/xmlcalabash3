@@ -15,6 +15,7 @@ object NsCx {
     val blake3 = QName(namespace, "cx:blake3")
     val cacheAddDocument = QName(namespace, "cx:cache-add-document")
     val cacheRemoveDocument = QName(namespace, "cx:cache-remove-document")
+    val cause = QName(namespace, "cx:cause")
     val contentTypeCheck = QName(namespace, "cx:content-type-check")
     val crc = QName(namespace, "cx:crc")
     val defaultAttribute = QName(namespace, "cx:default-attribute") // Used in the XProc parser
@@ -28,6 +29,7 @@ object NsCx {
     val emptyGlobalContext = QName(namespace, "cx:empty-global-context")
     val encoding = QName(namespace, "cx:encoding")
     val executable = QName(namespace, "cx:executable")
+    val explanation = QName(namespace, "cx:explanation")
     val expression = QName(namespace, "cx:expression")
     val fallback = QName(namespace, "cx:fallback")
     val foot = QName(namespace, "cx:foot")
@@ -40,6 +42,7 @@ object NsCx {
     val hmac = QName(namespace, "cx:hmac")
     val inline = QName(namespace, "cx:inline")
     val inputFilter = QName(namespace, "cx:input-filter")
+    val inputLocation = QName(namespace, "cx:input-location")
     val joiner = QName(namespace, "cx:joiner")
     val link = QName(namespace, "cx:link")
     val mergeDuplicates = QName(namespace, "cx:merge-duplicates")
