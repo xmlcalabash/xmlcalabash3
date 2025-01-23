@@ -18,10 +18,6 @@ step.</para>
 <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="../../../../xmlcalabash/src/main/resources/com/xmlcalabash/library.xpl" xpointer="xpath(/*/*[@type='p:error'])"/>
 </refsection>
 
-<refsection role="errors"><title>Errors</title><para>
-</para>
-</refsection>
-
 <refsection role="implementation-features"><title>Implementation-defined and -dependent features</title>
 <para>
 </para>

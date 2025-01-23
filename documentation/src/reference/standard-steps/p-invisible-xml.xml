@@ -24,6 +24,12 @@ the specified Invisible XML grammar.</para>
 </refsection>
 
 <refsection role="errors"><title>Errors</title><para>
+<error code="C0212">It is a <glossterm>dynamic error</glossterm> if the grammar
+provided is not a valid Invisible XML grammar.</error>
+<error code="C0211">It is a <glossterm>dynamic error</glossterm> if more than one
+document appears on the <port>grammar</port> port.</error>
+<error code="C0205">It is a <glossterm>dynamic error</glossterm>
+if the source document cannot be parsed by the provided grammar.</error>
 </para>
 </refsection>
 

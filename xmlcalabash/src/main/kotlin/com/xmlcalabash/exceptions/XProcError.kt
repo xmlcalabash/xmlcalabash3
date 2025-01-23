@@ -360,6 +360,10 @@ open class XProcError protected constructor(val code: QName, val variant: Int, e
 
         fun xiCastUnsupported(message: String) = xstep(1, message)
         fun xiCastInputIncorrect(message: String) = xstep(2, message)
+        fun xcxResourceWithoutUri() = xstep(3)
+        fun xcxResourceWithDuplicateUri(uri: URI) = xstep(4, uri)
+        fun xcxResourceWithoutValue(uri: URI) = xstep(5, uri)
+        fun xcxCannotModifyStableCollection(uri: String) = xstep(6, uri)
 
         fun xiNoSuchOutputPort(port: String)= internal(1, port)
         fun xiImpossibleNodeType(type: XdmNodeKind) = internal(2, type)

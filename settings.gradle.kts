@@ -13,6 +13,6 @@ include("xmlcalabash", "app", "test-driver",
         "ext:unique-id", "ext:metadata-extractor", "ext:cache",
         "ext:pipeline-messages", "ext:epubcheck",
         "ext:polyglot", "ext:xpath", "ext:wait-for-update",
-        "ext:diagramming",
+        "ext:diagramming", "ext:collection-manager",
         "template:kotlin", "template:java",
     )

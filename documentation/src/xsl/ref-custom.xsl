@@ -98,7 +98,25 @@
   <xsl:variable name="errors" select="../db:refsection[contains-token(@role, 'errors')]"/>
   <xsl:variable name="impls" select="../db:refsection[contains-token(@role, 'implementation-features')]"/>
 
-  <xsl:if test="$errors">
+  <xsl:variable name="errlist" as="element(db:error)*">
+    <xsl:choose>
+      <xsl:when test="$errors//db:error">
+        <xsl:sequence select="$errors//db:error"/>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:sequence select="ancestor::db:refentry//db:error"/>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:variable>
+
+  <xsl:if test="exists($errors) and empty($errlist)">
+    <xsl:message>
+      <xsl:text>Pointless errors in </xsl:text>
+      <xsl:value-of select="ancestor::db:refentry/db:refnamediv/db:refname"/>
+    </xsl:message>
+  </xsl:if>
+
+  <xsl:if test="exists($errlist)">
     <details>
       <summary>Errors</summary>
       <table class="tableaux error-list">
@@ -106,16 +124,23 @@
           <tr><th class="code">Code</th><th>Description</th></tr>
         </thead>
         <tbody>
-          <xsl:for-each-group group-by="@code" select="$errors//db:error">
+          <xsl:for-each-group group-by="@code" select="$errlist">
             <xsl:sort select="@code"/>
 
             <xsl:variable name="code" as="xs:string" select="current-group()[1]/@code"/>
 
             <tr>
               <td class="code">
-                <a class="exlink" href="{$steps-base-uri}#err.{$code}">
-                  <code>err:X{$code}</code>
-                </a>
+                <xsl:choose>
+                  <xsl:when test="contains($code, ':')">
+                    <code>{$code}</code>
+                  </xsl:when>
+                  <xsl:otherwise>
+                    <a class="exlink" href="{$steps-base-uri}#err.{$code}">
+                      <code>err:X{$code}</code>
+                    </a>
+                  </xsl:otherwise>
+                </xsl:choose>
               </td>
               <td><xsl:apply-templates select="current-group()[1]/node()"/></td>
             </tr>

@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<t:test expected="pass"
+        xmlns:t="http://xproc.org/ns/testsuite/3.0">
+  <t:info>
+    <t:title>collmgr-004</t:title>
+    <t:revision-history>
+      <t:revision>
+        <t:date>2025-01-23</t:date>
+        <t:author>
+          <t:name>Norm Tovey-Walsh</t:name>
+        </t:author>
+        <t:description xmlns="http://www.w3.org/1999/xhtml">
+          <p>Created test.</p>
+        </t:description>
+      </t:revision>
+    </t:revision-history>
+  </t:info>
+  <t:description xmlns="http://www.w3.org/1999/xhtml">
+    <p>Tests that cx:collection-manager can modify an unstable collection.</p>
+  </t:description>
+  <t:pipeline>
+    <p:declare-step version="3.0"
+                    xmlns:err="http://www.w3.org/ns/xproc-error"
+                    xmlns:cx="http://xmlcalabash.com/ns/extensions"
+                    xmlns:p="http://www.w3.org/ns/xproc">
+      <p:import href="https://xmlcalabash.com/ext/library/collection-manager.xpl"/>
+      <p:output port="result"/>
+
+      <!-- N.B. The test-driver does not make inline URIs unique -->
+      <cx:collection-manager source="http://example.com/c1" stable="false">
+        <p:with-input>
+          <p:inline><doc/></p:inline>
+        </p:with-input>
+      </cx:collection-manager>
+
+      <cx:collection-manager source="http://example.com/c1">
+        <p:with-input>
+          <p:inline><doc/></p:inline>
+        </p:with-input>
+      </cx:collection-manager>
+
+      <p:identity>
+        <p:with-input>
+          <p:inline><count>{count(collection("http://example.com/c1"))}</count></p:inline>
+        </p:with-input>
+      </p:identity>
+    </p:declare-step>
+  </t:pipeline>
+  <t:schematron>
+    <s:schema queryBinding="xslt2"
+              xmlns:s="http://purl.oclc.org/dsdl/schematron">
+      <s:pattern>
+        <s:rule context="/">
+          <s:assert test="count">The document root is not correct.</s:assert>
+          <s:assert test="count = 1">The number of documents is not correct.</s:assert>
+        </s:rule>
+      </s:pattern>
+    </s:schema>
+  </t:schematron>
+</t:test>
