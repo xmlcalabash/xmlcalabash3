@@ -71,6 +71,9 @@
     <xsl:text> (</xsl:text>
     <code>
       <xsl:choose>
+        <xsl:when test="contains(../@code, ':')">
+          <xsl:value-of select="../@code"/>
+        </xsl:when>
         <xsl:when test="starts-with(../@code, 'I')">
           <xsl:text>cxerr:X</xsl:text>
           <xsl:value-of select="../@code"/>

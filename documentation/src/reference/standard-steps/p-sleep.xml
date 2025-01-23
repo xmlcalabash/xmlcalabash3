@@ -20,6 +20,9 @@
 </refsection>
 
 <refsection role="errors"><title>Errors</title><para>
+<error code="D0036">It is a <glossterm>dynamic error</glossterm> if the
+specified duration is not a positive number or a valid 
+<code>xs:dayTimeDuration</code>.</error>
 </para>
 </refsection>
 
