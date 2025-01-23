@@ -1,0 +1,101 @@
+<refentry xmlns:p="http://www.w3.org/ns/xproc"
+          xmlns:e="http://www.w3.org/1999/XSL/Spec/ElementSyntax"
+          xmlns:xi="http://www.w3.org/2001/XInclude"
+          xmlns:xlink="http://www.w3.org/1999/xlink"
+          xmlns="http://docbook.org/ns/docbook"
+          xml:id="cx-collection-manager">
+<?db filename="cx-collection-manager"?>
+<refnamediv>
+  <refname>cx:collection-manager</refname>
+  <refpurpose>Create or update a named collection</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv>
+
+<refsection role="introduction">
+<title>Introduction</title>
+<para>The <tag>cx:collection-manager</tag> step creates or updates a named
+collection.</para>
+</refsection>
+
+<refsection role="step-declaration">
+<title>Step declaration</title>
+<xi:include href="../../../../ext/collection-manager/src/main/resources/com/xmlcalabash/ext/collection-manager.xpl"
+            xpointer="xpath(/*/*[@type='cx:collection-manager'])"/>
+</refsection>
+
+<refsection role="errors">
+<title>Errors</title>
+<para>Errors from the entry body are summarized here.</para>
+</refsection>
+</refsynopsisdiv>
+
+<refsection>
+<title>Description</title>
+
+<para>The scope of a collection is only the pipeline in which it appears. Collections
+cannot be shared across pipelines by name. (Technically, the limitation is that collections
+are only shared among steps that have the same Saxon <classname>Configuration</classname>, but
+that tends to be individual pipelines.)</para>
+
+<para>Steps that use a named collection must have some implicit or explicit dependency on 
+the <tag>cx:collection-manager</tag> function.</para>
+
+<para>Every document in the collection must have a unique URI.
+<error code="cxerr:XC0003">It
+is a <glossterm>dynamic error</glossterm> if any input document does
+not have a base URI.</error>
+<error code="cxerr:XC0004">It
+is a <glossterm>dynamic error</glossterm> if any input document has the
+same base URI as any other input document.</error></para>
+
+<para>All documents must have a value that is an “XDM item”.
+<error code="cxerr:XC0005">It
+is a <glossterm>dynamic error</glossterm> if any input document does
+not have an XDM item value.</error> (It’s not clear that this error is
+<emphasis>possible</emphasis> in practice, but in theory…)</para>
+
+<para>A collection created with <option>stable</option> set to <code>true()</code>
+cannot be changed by another call to <tag>cx:collection-manager</tag>.
+<error code="cxerr:XC0006">It
+is a <glossterm>dynamic error</glossterm> if an attempt is made to change a previously
+constructed stable collection.</error></para>
+<refsection>
+<title>Examples</title>
+
+<para>This pipeline adds two documents to a collection, then refers to that collection
+in XSLT.</para>
+
+<programlisting language="xml"><![CDATA[<p:declare-step xmlns:cx="http://xmlcalabash.com/ns/extensions"
+                xmlns:p="http://www.w3.org/ns/xproc"
+                version="3.0">
+  <p:import href="https://xmlcalabash.com/ext/library/collection-manager.xpl"/>
+  <p:output port="result"/>
+
+  <cx:collection-manager name="coll" source="http://example.com/c1" stable="false">
+    <p:with-input>
+      <p:inline document-properties="map {'base-uri': 'http://example.com/doc1'}"><doc/></p:inline>
+      <p:inline document-properties="map {'base-uri': 'http://example.com/doc2'}"><doc/></p:inline>
+    </p:with-input>
+  </cx:collection-manager>
+
+  <p:xslt template-name="main" depends="coll">
+    <p:with-input port="source">
+      <p:empty/>
+    </p:with-input>
+    <p:with-input port="stylesheet">
+      <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+                      version="3.0">
+        <xsl:template name="main">
+          <count><xsl:value-of select="count(collection('http://example.com/c1'))"/></count>
+        </xsl:template>
+      </xsl:stylesheet>
+    </p:with-input>
+  </p:xslt>
+</p:declare-step>]]></programlisting>
+
+<para>The output it produces is <literal>&lt;count>2&lt;/count></literal>.</para>
+
+</refsection>
+</refsection>
+</refentry>

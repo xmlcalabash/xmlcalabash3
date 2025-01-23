@@ -34,6 +34,9 @@ dependencies {
   implementation(project(":ext:epubcheck"))
   implementation(project(":ext:xpath"))
   implementation(project(":ext:polyglot"))
+  implementation(project(":ext:wait-for-update"))
+  implementation(project(":ext:diagramming"))
+  implementation(project(":ext:collection-manager"))
   implementation(files("lib"))
   // WTF? Why is this necessary?
   implementation(files("build/classes/kotlin/main"))

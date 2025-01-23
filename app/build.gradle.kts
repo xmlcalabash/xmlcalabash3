@@ -30,6 +30,7 @@ val xpathRelease by configurations.dependencyScope("xpathRelease")
 val pipelineMessagesRelease by configurations.dependencyScope("pipelineMessagesRelease")
 val waitForUpdateRelease by configurations.dependencyScope("waitforUpdateRelease")
 val diagrammingRelease by configurations.dependencyScope("diagrammingRelease")
+val collectionManagerRelease by configurations.dependencyScope("collectionManagerRelease")
 
 val dep_slf4j = project.findProperty("slf4j").toString()
 
@@ -59,7 +60,9 @@ dependencies {
   waitForUpdateRelease(project(mapOf("path" to ":ext:wait-for-update",
                                      "configuration" to "releaseArtifacts")))
   diagrammingRelease(project(mapOf("path" to ":ext:diagramming",
-                                     "configuration" to "releaseArtifacts")))
+                                   "configuration" to "releaseArtifacts")))
+  collectionManagerRelease(project(mapOf("path" to ":ext:collection-manager",
+                                         "configuration" to "releaseArtifacts")))
 
   implementation(project(":xmlcalabash"))
   implementation(project(":send-mail"))
@@ -74,6 +77,7 @@ dependencies {
   implementation(project(":ext:pipeline-messages"))
   implementation(project(":ext:wait-for-update"))
   implementation(project(":ext:diagramming"))
+  implementation(project(":ext:collection-manager"))
 
   implementation("org.slf4j:slf4j-api:${dep_slf4j}")
 }
@@ -116,6 +120,9 @@ val waitforUpdateJar = configurations.resolvable("waitforUpdateJar") {
 }
 val diagrammingJar = configurations.resolvable("diagrammingJar") {
   extendsFrom(diagrammingRelease)
+}
+val collectionManagerJar = configurations.resolvable("collectionManagerJar") {
+  extendsFrom(collectionManagerRelease)
 }
 
 application {
@@ -209,6 +216,7 @@ tasks.register("stage-release") {
   inputs.files(pipelineMessagesJar)
   inputs.files(waitforUpdateJar)
   inputs.files(diagrammingJar)
+  inputs.files(collectionManagerJar)
   inputs.files(copyScripts)
   dependsOn("jar")
 
@@ -317,6 +325,12 @@ tasks.register("stage-release") {
   doLast {
     copy {
       from(diagrammingJar)
+      into(layout.buildDirectory.dir("stage/lib"))
+    }
+  }
+  doLast {
+    copy {
+      from(collectionManagerJar)
       into(layout.buildDirectory.dir("stage/lib"))
     }
   }
