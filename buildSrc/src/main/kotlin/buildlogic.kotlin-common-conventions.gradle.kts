@@ -18,6 +18,9 @@ val releaseArtifacts by configurations.consumable("releaseArtifacts")
 // Force some versions across all the projects
 configurations.all {
   resolutionStrategy.eachDependency {
+    if (requested.group == "xml-apis" && requested.name == "xml-apis") {
+      useVersion("1.4.01")
+    }
     if (requested.group == "xerces" && requested.name == "xercesImpl") {
       useVersion(project.findProperty("xercesImpl").toString())
     }
@@ -26,6 +29,9 @@ configurations.all {
     }
     if (requested.group == "org.relaxng" && (requested.name == "jing" || requested.name == "trang")) {
       useVersion(project.findProperty("jing").toString())
+    }
+    if (requested.group == "org.xmlresolver") {
+      useVersion(project.findProperty("xmlResolver").toString())
     }
   }
 }

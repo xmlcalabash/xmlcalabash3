@@ -22,14 +22,8 @@ buildscript {
 
   configurations.all {
     resolutionStrategy.eachDependency {
-      if (requested.group == "xml-apis" && requested.name == "xml-apis") {
-        useVersion("1.4.01")
-      }
       if (requested.group == "net.sf.saxon" && requested.name == "Saxon-HE") {
         useVersion(project.properties["saxonVersion"].toString())
-      }
-      if (requested.group == "org.xmlresolver" && requested.name == "xmlresolver") {
-        useVersion(project.properties["xmlResolverVersion"].toString())
       }
     }
   }
@@ -60,14 +54,8 @@ val xmlbuild = the<XmlCalabashBuildExtension>()
 
 configurations.all {
   resolutionStrategy.eachDependency {
-    if (requested.group == "xml-apis" && requested.name == "xml-apis") {
-      useVersion("1.4.01")
-    }
     if (requested.group == "net.sf.saxon" && requested.name == "Saxon-HE") {
       useVersion(saxonVersion)
-    }
-    if (requested.group == "org.xmlresolver" && requested.name == "xmlresolver") {
-      useVersion(project.properties["xmlResolverVersion"].toString())
     }
   }
 }
