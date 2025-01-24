@@ -75,6 +75,7 @@ class DocumentLoader(val context: XProcStepConfiguration,
 
         if (absURI.scheme == "http" || absURI.scheme == "https") {
             val req = InternetProtocolRequest(context, absURI)
+            req.overrideContentType = documentProperties.contentType
             val resp = req.execute("GET")
 
             if (resp.statusCode >= 500) {
