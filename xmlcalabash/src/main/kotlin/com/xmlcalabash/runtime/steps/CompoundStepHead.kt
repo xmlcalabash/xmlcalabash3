@@ -266,6 +266,7 @@ class CompoundStepHead(config: XProcStepConfiguration, val parent: CompoundStep,
         openPorts.addAll(params.inputs.keys)
         _cache.clear()
         inputCount.clear()
+        _options.clear()
         showMessage = true
     }
 
