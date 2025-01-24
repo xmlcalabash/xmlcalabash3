@@ -387,59 +387,63 @@ open class XsltStep(): AbstractAtomicStep() {
 
             when (destination) {
                 is RawDestination -> {
-                    var empty = true
                     val iter = destination.xdmValue.iterator()
+                    val items = mutableListOf<XdmItem>()
                     while (iter.hasNext()) {
-                        empty = false
-                        val next = iter.next()
-                        consumeSecondary(next, uri, serprops)
+                        items.add(iter.next())
                     }
-                    if (empty) {
+
+                    if (items.isEmpty()) {
                         val props = DocumentProperties()
                         if (serprops.isNotEmpty()) {
                             props[Ns.serialization] = stepConfig.asXdmMap(serprops)
                         }
                         receiver.output("secondary", XProcDocument.ofText(XdmEmptySequence.getInstance(), stepConfig, MediaType.XML, props))
+                    } else {
+                        consumeSecondary(items, uri, serprops)
                     }
                 }
                 is XdmDestination -> {
-                    consumeSecondary(destination.xdmNode, uri, serprops)
+                    consumeSecondary(listOf(destination.xdmNode), uri, serprops)
                 }
             }
         }
     }
 
-    private fun consumeSecondary(result: XdmItem, uri: URI, serprops: Map<QName,XdmValue>) {
+    private fun consumeSecondary(results: List<XdmItem>, uri: URI, serprops: Map<QName,XdmValue>) {
         val prop = DocumentProperties()
         prop[Ns.baseUri] = uri
         if (primaryOutputProperties.isNotEmpty()) {
             prop[Ns.serialization] = serializationProperties(primaryOutputProperties)
         }
 
-        when (result) {
-            is XdmNode -> {
-                // Sigh. Secondary output documents don't have the correct intrinsict base URI,
-                // so we rebuild documents around them where we can with the correct URI.
-                // Also make sure they're always documents, not just elements.
-                val builder = SaxonTreeBuilder(stepConfig)
-                builder.startDocument(uri)
-                builder.addSubtree(S9Api.adjustBaseUri(result, uri))
-                builder.endDocument()
-                val doc = builder.result
-
-                prop[Ns.contentType] =  serializationContentType(primaryOutputProperties, ValueUtils.contentClassification(result) ?: MediaType.XML)
-
-                if (ValueUtils.contentClassification(result) == MediaType.TEXT) {
-                    receiver.output("secondary", XProcDocument.ofText(doc, stepConfig, MediaType.TEXT, prop))
+        if (results.get(0) is XdmNode) {
+            // Sigh. Secondary output documents don't have the correct intrinsict base URI,
+            // so we rebuild documents around them where we can with the correct URI.
+            // Also make sure they're always documents, not just elements.
+            val builder = SaxonTreeBuilder(stepConfig)
+            builder.startDocument(uri)
+            for (item in results) {
+                if (item is XdmNode) {
+                    builder.addSubtree(S9Api.adjustBaseUri(item, uri))
                 } else {
-                    receiver.output("secondary", XProcDocument.ofXml(doc, stepConfig, prop))
+                    builder.addSubtree(item)
                 }
             }
-            else -> {
-                for (item in result.iterator()) {
-                    val doc = XProcDocument.ofValue(item, stepConfig, MediaType.JSON, prop)
-                    receiver.output("secondary", doc)
-                }
+            builder.endDocument()
+            val doc = builder.result
+
+            prop[Ns.contentType] =  serializationContentType(primaryOutputProperties, ValueUtils.contentClassification(doc) ?: MediaType.XML)
+
+            if (ValueUtils.contentClassification(doc) == MediaType.TEXT) {
+                receiver.output("secondary", XProcDocument.ofText(doc, stepConfig, MediaType.TEXT, prop))
+            } else {
+                receiver.output("secondary", XProcDocument.ofXml(doc, stepConfig, prop))
+            }
+        } else {
+            for (item in results) {
+                val doc = XProcDocument.ofValue(item, stepConfig, MediaType.JSON, prop)
+                receiver.output("secondary", doc)
             }
         }
     }
