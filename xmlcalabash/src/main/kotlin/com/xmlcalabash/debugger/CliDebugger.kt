@@ -4,7 +4,6 @@ import com.xmlcalabash.api.Monitor
 import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.exceptions.XProcException
-import com.xmlcalabash.graph.CompoundModel
 import com.xmlcalabash.graph.SubpipelineModel
 import com.xmlcalabash.namespace.NsCx
 import com.xmlcalabash.namespace.NsXmlns
@@ -38,6 +37,7 @@ class CliDebugger(val runtime: XProcRuntime): Monitor {
     var parser: InvisibleXmlParser? = null
     val stacks = mutableMapOf<Long, Stack<StackFrame>>()
     val breakpoints = mutableMapOf<String, MutableList<Breakpoint>>()
+    var breakNext: Breakpoint? = null
     val catchpoints = mutableListOf<Catchpoint>()
     var stepping = true
     var stopOnEnd = false
@@ -77,8 +77,12 @@ class CliDebugger(val runtime: XProcRuntime): Monitor {
                 }
             }
         }
+        if (!stopHere && breakNext?.id == step.id) {
+            stopHere = true
+        }
 
         if (stopHere) {
+            breakNext = null
             localBaseUri = curFrame.step.stepConfig.baseUri
             cli(step, true)
         }
@@ -201,6 +205,12 @@ class CliDebugger(val runtime: XProcRuntime): Monitor {
                     "inputs" -> doInputs()
                     "models" -> doModels(command)
                     "namespace" -> doNamespace(command)
+                    "next" -> {
+                        doNext(command)
+                        if (breakNext != null) {
+                            return
+                        }
+                    }
                     "options" -> doOptions()
                     "run" -> {
                         doRun(command)
@@ -615,16 +625,80 @@ class CliDebugger(val runtime: XProcRuntime): Monitor {
         stopOnEnd = command["end"] != null
     }
 
+    fun doNext(command: Map<String,String>) {
+        breakNext = null
+        val next = nextStep(stack.size - 1)
+        if (next != null) {
+            breakNext = Breakpoint(next.id, "true()")
+            stepping = false
+            stopOnEnd = false
+        }
+    }
+
+    private fun nextStep(frameNo: Int): AbstractStep? {
+        val frame = stack[frameNo]
+        val upNo = frameNo - 1
+        val up = if (upNo >= 0) {
+            stack[upNo]
+        } else {
+            null
+        }
+
+        val curStep = frame.step
+
+        when (curStep) {
+            is CompoundStepHead -> {
+                if (up != null) {
+                    return up.subpipeline[0]
+                }
+            }
+            is CompoundStepFoot -> {
+                if (frameNo > 0) {
+                    return nextStep(frameNo - 1)
+                }
+            }
+            else -> {
+                if (up == null && curStep is PipelineStep) {
+                    return curStep.head
+                }
+
+                var nextStep: AbstractStep? = null
+                if (up != null) {
+                    for ((cidx, child) in up.subpipeline.withIndex()) {
+                        if (child == curStep) {
+                            if (cidx + 1 < up.subpipeline.size) {
+                                nextStep = up.subpipeline[cidx + 1]
+                            } else {
+                                nextStep = (up.step as CompoundStep).foot
+                            }
+                        }
+                    }
+                }
+
+                if (nextStep != null) {
+                    return nextStep
+                }
+
+                if (frameNo > 0) {
+                    return nextStep(frameNo - 1)
+                }
+            }
+        }
+
+        return null
+    }
+
     fun doSubpipeline(command: Map<String,String>) {
         var step = curFrame.step
         if (step !is CompoundStep) {
             printer.println("This step has no subpipeline")
+            return
         }
 
         val target = command["id"]
         if (target != null) {
             var found = false
-            for (substep in (step as CompoundStep).runnables) {
+            for (substep in step.runnables) {
                 if (target == substep.id) {
                     found = true
                     step = substep
@@ -910,6 +984,7 @@ class CliDebugger(val runtime: XProcRuntime): Monitor {
     inner class StackFrame(val step: AbstractStep) {
         val options: MutableMap<QName, LazyValue>
         val inputs: MutableMap<String, MutableList<XProcDocument>>
+        val subpipeline = mutableListOf<AbstractStep>()
         val cx: String
 
         init {
@@ -937,6 +1012,7 @@ class CliDebugger(val runtime: XProcRuntime): Monitor {
                     options = mutableMapOf()
                 }
                 is PipelineStep, is CompoundStep -> {
+                    subpipeline.addAll(step.runnables)
                     inputs = mutableMapOf()
                     options = mutableMapOf()
                     for ((name, value) in step.staticOptions) {

@@ -64,6 +64,9 @@ may be a stack of open steps. Moving around in the stack changes the context.</p
 <simpara><command linkend="dbg-namespace">namespace</command>, set or display namespace bindings.</simpara>
 </listitem>
 <listitem>
+<simpara><command linkend="dbg-next">next</command>, run to the next step.</simpara>
+</listitem>
+<listitem>
 <simpara><command linkend="dbg-options">options</command>, show step options and local variables.</simpara>
 </listitem>
 <listitem>
@@ -386,6 +389,26 @@ bindings.</para>
 synonym for <command>namespace</command>.</para>
 </section>
 
+<section xml:id="dbg-next">
+<title>next</title>
+
+<para>Run until the next step (or some other breakpoint), then return to the debugger.</para>
+
+<cmdsynopsis>
+<command>next</command>
+</cmdsynopsis>
+
+<para>Executes the current step and any of its descendants, then returns to the
+debugger. (If a breakpoint occurs before the next step, execution will stop at
+the breakpoint.)</para>
+
+<para>Unlike <link linkend="dbg-step">step</link>, the <literal>next</literal> command
+steps “over” subpipelines, rather than into them.</para>
+
+<para>The command <command>n</command> is a synonym for
+<command>next</command>.</para>
+</section>
+
 <section xml:id="dbg-options">
 <title>options</title>
 
@@ -474,7 +497,7 @@ current context is marked with a <literal>*</literal>.
 <section xml:id="dbg-step">
 <title>step</title>
 
-<para>Run the current step, the return to the debugger.</para>
+<para>Run the current step, then return to the debugger.</para>
 
 <cmdsynopsis>
 <command>step</command>
