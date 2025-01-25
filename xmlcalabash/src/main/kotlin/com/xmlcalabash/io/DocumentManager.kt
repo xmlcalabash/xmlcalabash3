@@ -75,6 +75,15 @@ class DocumentManager(): EntityResolver, EntityResolver2, ResourceResolver, Modu
         return current
     }
 
+    fun lookup(href: URI): URI {
+        val req = resolver.getRequest("${href}")
+        val resp = resolver.lookup(req)
+        if (resp.resolvedURI != null) {
+            return resp.resolvedURI
+        }
+        return href
+    }
+
     fun load(href: URI, stepConfig: XProcStepConfiguration, properties: DocumentProperties = DocumentProperties(), parameters: Map<QName, XdmValue> = mapOf()): XProcDocument {
         val cached = getCached(href)
         if (cached != null) {
