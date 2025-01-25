@@ -8,6 +8,7 @@ class NsT {
         val namespace: NamespaceUri = NamespaceUri.of("http://xproc.org/ns/testsuite/3.0")
         val errorNamespace: NamespaceUri = NamespaceUri.of("http://www.w3.org/ns/xproc-error")
 
+        val catalog = QName(namespace, "catalog")
         val test = QName(namespace, "t:test")
         val info = QName(namespace, "t:info")
         val description = QName(namespace, "t:description")
