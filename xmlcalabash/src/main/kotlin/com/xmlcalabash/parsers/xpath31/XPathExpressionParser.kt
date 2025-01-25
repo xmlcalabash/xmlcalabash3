@@ -30,7 +30,7 @@ class XPathExpressionParser(val stepConfig: XProcStepConfiguration) {
 
         val alwaysDynamicFunctions = setOf(
             NsP.systemProperty, NsP.iterationPosition, NsP.iterationSize, NsP.documentProperties,
-            NsP.documentPropertiesDocument, NsP.documentProperty,
+            NsP.documentPropertiesDocument, NsP.documentProperty, NsP.lookupUri,
             NsFn.currentDate, NsFn.currentDateTime, NsFn.currentTime,
             NsFn.doc, NsFn.docAvailable, NsFn.document, NsFn.unparsedText,
             NsFn.unparsedTextAvailable)
