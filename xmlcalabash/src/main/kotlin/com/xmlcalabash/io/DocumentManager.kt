@@ -1,10 +1,10 @@
 package com.xmlcalabash.io
 
-import com.xmlcalabash.runtime.XProcStepConfiguration
 import com.xmlcalabash.documents.DocumentProperties
 import com.xmlcalabash.documents.XProcBinaryDocument
 import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.exceptions.XProcError
+import com.xmlcalabash.runtime.XProcStepConfiguration
 import com.xmlcalabash.spi.DocumentResolver
 import net.sf.saxon.lib.ModuleURIResolver
 import net.sf.saxon.lib.ResourceResolver
@@ -14,7 +14,7 @@ import org.apache.logging.log4j.kotlin.logger
 import org.xml.sax.EntityResolver
 import org.xml.sax.InputSource
 import org.xml.sax.ext.EntityResolver2
-import org.xmlresolver.ResourceRequest
+import org.xmlresolver.ResourceRequestImpl
 import org.xmlresolver.XMLResolver
 import org.xmlresolver.XMLResolverConfiguration
 import org.xmlresolver.sources.ResolverSAXSource
@@ -191,7 +191,7 @@ class DocumentManager(): EntityResolver, EntityResolver2, ResourceResolver, Modu
             }
         }
 
-        val request = ResourceRequest(resolverConfiguration, saxonRequest.nature, saxonRequest.purpose)
+        val request = ResourceRequestImpl(resolverConfiguration, saxonRequest.nature, saxonRequest.purpose)
         request.uri = saxonRequest.uri
         request.baseURI = saxonRequest.baseUri
         request.encoding = saxonRequest.entityName
