@@ -11,6 +11,7 @@ command = base-uri
           | inputs
           | models
           | namespace
+          | next
           | options
           | run
           | set 
@@ -79,6 +80,9 @@ name-models>name = +"models" .
 -namespace = namespace-command, (s, prefix, s, -"=", s, uri?)? .
 -namespace-command = name-namespace, s, (-"namespace" | -"ns") .
 name-namespace>name = +"namespace" .
+
+-next = name-next, s, (-"next" | -"n") .
+name-next>name = +"next" .
 
 prefix = [L | P | Nd]+ .
 

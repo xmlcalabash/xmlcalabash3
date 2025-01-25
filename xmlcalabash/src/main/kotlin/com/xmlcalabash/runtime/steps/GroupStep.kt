@@ -8,12 +8,14 @@ open class GroupStep(config: XProcStepConfiguration, compound: CompoundStepModel
         stepsToRun.clear()
         stepsToRun.addAll(runnables)
 
-        stepConfig.environment.newExecutionContext(stepConfig)
+        try {
+            stepConfig.environment.newExecutionContext(stepConfig)
 
-        head.runStep()
-        runSubpipeline()
-        foot.runStep()
-
-        stepConfig.environment.releaseExecutionContext()
+            head.runStep()
+            runSubpipeline()
+            foot.runStep()
+        } finally {
+            stepConfig.environment.releaseExecutionContext()
+        }
     }
 }
