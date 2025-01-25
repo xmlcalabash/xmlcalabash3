@@ -368,11 +368,23 @@
     </xsl:when>
     <xsl:when test="($from_step/self::ns:compound-step or $from_step/self::ns:declare-step)
                     and $from_port/self::ns:output">
+
+      <xsl:variable name="to_label" as="xs:string">
+        <xsl:choose>
+          <xsl:when test="$to_step/@type = 'cx:sink'">
+            <xsl:sequence select="generate-id($to_step)"/>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:sequence select="'cluster_' || generate-id($to_step)"/>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+
 <!--
-      <xsl:message>cluster_{generate-id($from_step)}_head . {generate-id($from_port)}_head_output → cluster_{generate-id($to_step)} . {generate-id($to_port)}</xsl:message>
+      <xsl:message>cluster_{generate-id($from_step)}_head . {generate-id($from_port)}_head_output → {$to_label} . {generate-id($to_port)}</xsl:message>
 -->
 
-      <dot:edge x="4" to="cluster_{generate-id($to_step)}" input="{generate-id($to_port)}"
+      <dot:edge x="4" to="{$to_label}" input="{generate-id($to_port)}"
                 from="cluster_{generate-id($from_step)}_foot" output="{generate-id($from_port)}_foot"/>
     </xsl:when>
     <xsl:otherwise>
@@ -426,8 +438,21 @@
 <!--
       <xsl:message>cluster_{generate-id($from_step)}. {generate-id($from_port)} → cluster_{generate-id($to_step)}_head . {generate-id($to_port)}_head_input</xsl:message>
 -->
-      <dot:edge x="7" to="cluster_{generate-id($to_step)}_head" input="{generate-id($to_port)}_head_input"
-                from="cluster_{generate-id($from_step)}" output="{generate-id($from_port)}"/>
+
+      <dot:edge x="7" 
+                to="cluster_{generate-id($to_step)}_head" input="{generate-id($to_port)}_head_input"
+                output="{generate-id($from_port)}">
+        <xsl:attribute name="from">
+          <xsl:choose>
+            <xsl:when test="$from_port/parent::ns:compound-step">
+              <xsl:sequence select="'cluster_' || generate-id($from_step) || '_foot'"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:sequence select="'cluster_' || generate-id($from_step)"/>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:attribute>
+      </dot:edge>
     </xsl:otherwise>
   </xsl:choose>
 </xsl:template>
