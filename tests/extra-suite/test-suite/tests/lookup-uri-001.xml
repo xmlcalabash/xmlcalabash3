@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<t:test expected="pass"
+        xmlns:t="http://xproc.org/ns/testsuite/3.0">
+  <t:info>
+    <t:title>lookup-uri-001</t:title>
+    <t:revision-history>
+      <t:revision>
+        <t:date>2025-01-25</t:date>
+        <t:author>
+          <t:name>Norm Tovey-Walsh</t:name>
+        </t:author>
+        <t:description xmlns="http://www.w3.org/1999/xhtml">
+          <p>Created test.</p>
+        </t:description>
+      </t:revision>
+    </t:revision-history>
+  </t:info>
+  <t:description xmlns="http://www.w3.org/1999/xhtml">
+    <p>Tests that lookup URI returns the original URI if there’s no catalog.</p>
+  </t:description>
+  <t:pipeline>
+    <p:declare-step version="3.0"
+                    xmlns:err="http://www.w3.org/ns/xproc-error"
+                    xmlns:cx="http://xmlcalabash.com/ns/extensions"
+                    xmlns:p="http://www.w3.org/ns/xproc">
+      <p:output port="result"/>
+
+      <p:identity>
+        <p:with-input>
+          <doc>{p:lookup-uri("http://example.com/some/uri")}</doc>
+        </p:with-input>
+      </p:identity>
+    </p:declare-step>
+  </t:pipeline>
+  <t:schematron>
+    <s:schema queryBinding="xslt2"
+              xmlns:s="http://purl.oclc.org/dsdl/schematron">
+      <s:ns prefix="fn" uri="http://www.w3.org/2005/xpath-functions"/>
+      <s:pattern>
+        <s:rule context="/">
+          <s:assert test="doc">The result isn’t doc.</s:assert>
+          <s:assert test="doc = 'http://example.com/some/uri'">The result is wrong.</s:assert>
+        </s:rule>
+      </s:pattern>
+    </s:schema>
+  </t:schematron>
+</t:test>

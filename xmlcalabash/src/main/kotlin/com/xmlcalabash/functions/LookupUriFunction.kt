@@ -9,6 +9,7 @@ import net.sf.saxon.om.Sequence
 import net.sf.saxon.om.StructuredQName
 import net.sf.saxon.value.SequenceType
 import net.sf.saxon.value.StringValue
+import java.net.URI
 
 class LookupUriFunction(private val config: SaxonConfiguration): ExtensionFunctionDefinition() {
     override fun getFunctionQName(): StructuredQName {
@@ -31,10 +32,9 @@ class LookupUriFunction(private val config: SaxonConfiguration): ExtensionFuncti
         override fun call(context: XPathContext?, arguments: Array<out Sequence>?): Sequence {
             val uri = arguments!![0].head().stringValue
 
-            val dynamicContext = config.environment.getExecutionContext()
-            config.environment.documentManager
+            val lookup = config.environment.documentManager.lookup(URI(uri))
 
-            return StringValue(uri)
+            return StringValue("${lookup}")
         }
     }
 }

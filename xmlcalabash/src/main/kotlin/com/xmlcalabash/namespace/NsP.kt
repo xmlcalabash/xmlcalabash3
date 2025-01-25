@@ -60,6 +60,7 @@ object NsP {
     val invisibleXml                = QName(namespace, "p:invisible-xml")
     val iterationPosition           = QName(namespace, "p:iteration-position")
     val iterationSize               = QName(namespace, "p:iteration-size")
+    val lookupUri                   = QName(namespace, "p:lookup-uri")
     val ixml                        = QName(namespace, "p:ixml")
     val jsonJoin                    = QName(namespace, "p:json-join")
     val jsonMerge                   = QName(namespace, "p:json-merge")

@@ -19,6 +19,7 @@ import net.sf.saxon.s9api.*
 import net.sf.saxon.type.BuiltInAtomicType
 import org.apache.logging.log4j.kotlin.logger
 import org.xml.sax.InputSource
+import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
@@ -77,6 +78,7 @@ class TestCase(val suite: TestSuite, val testFile: File) {
     var stderrOutput = ""
     var stdoutOutput = ""
     var messages: XdmNode? = null
+    val catalogs = mutableListOf<String>()
 
     var stdoutBais: ByteArrayOutputStream? = null
     var stderrBais: ByteArrayOutputStream? = null
@@ -142,6 +144,13 @@ class TestCase(val suite: TestSuite, val testFile: File) {
 
             val decl = parser.parse(document)
             val runtime = decl.runtime()
+
+            for (catalog in catalogs) {
+                val stream = ByteArrayInputStream(catalog.toByteArray(StandardCharsets.UTF_8))
+                val source = InputSource(stream)
+                source.systemId = testFile.absolutePath
+                runtime.environment.documentManager.resolverConfiguration.addCatalog(testFile.toURI(), source)
+            }
 
             messageReporter = runtime.environment.messageReporter as BufferingMessageReporter
 
@@ -403,6 +412,7 @@ class TestCase(val suite: TestSuite, val testFile: File) {
                     NsT.schematron -> loadSchematron(node)
                     NsT.option -> loadOption(node)
                     NsT.fileEnvironment -> loadFileEnvironment(node)
+                    NsT.catalog -> loadCatalog(node)
                     else -> println("${testFile}: unexpected element: ${node.nodeName}")
                 }
             }
@@ -530,6 +540,20 @@ class TestCase(val suite: TestSuite, val testFile: File) {
         }
 
         schematron = xml
+    }
+
+    private fun loadCatalog(catalog: XdmNode) {
+        val xml = if (catalog.getAttributeValue(SRC) != null) {
+            val builder = testConfig.processor.newDocumentBuilder()
+            builder.isLineNumbering = true
+            val fn = catalog.baseURI.resolve(catalog.getAttributeValue(SRC))
+            val xml = builder.build(SAXSource(InputSource(fn.toString())))
+            rootElement(xml).toString()
+        } else {
+            rootElement(catalog).toString()
+        }
+
+        catalogs.add(xml)
     }
 
     private fun loadFileEnvironment(node: XdmNode) {
