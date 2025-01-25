@@ -29,7 +29,6 @@ val cacheRelease by configurations.dependencyScope("cacheRelease")
 val xpathRelease by configurations.dependencyScope("xpathRelease")
 val pipelineMessagesRelease by configurations.dependencyScope("pipelineMessagesRelease")
 val waitForUpdateRelease by configurations.dependencyScope("waitforUpdateRelease")
-val diagrammingRelease by configurations.dependencyScope("diagrammingRelease")
 val collectionManagerRelease by configurations.dependencyScope("collectionManagerRelease")
 
 val dep_slf4j = project.findProperty("slf4j").toString()
@@ -59,8 +58,6 @@ dependencies {
                                         "configuration" to "releaseArtifacts")))
   waitForUpdateRelease(project(mapOf("path" to ":ext:wait-for-update",
                                      "configuration" to "releaseArtifacts")))
-  diagrammingRelease(project(mapOf("path" to ":ext:diagramming",
-                                   "configuration" to "releaseArtifacts")))
   collectionManagerRelease(project(mapOf("path" to ":ext:collection-manager",
                                          "configuration" to "releaseArtifacts")))
 
@@ -76,7 +73,6 @@ dependencies {
   implementation(project(":ext:xpath"))
   implementation(project(":ext:pipeline-messages"))
   implementation(project(":ext:wait-for-update"))
-  implementation(project(":ext:diagramming"))
   implementation(project(":ext:collection-manager"))
 
   implementation("org.slf4j:slf4j-api:${dep_slf4j}")
@@ -117,9 +113,6 @@ val pipelineMessagesJar = configurations.resolvable("pipelineMessagesJar") {
 }
 val waitforUpdateJar = configurations.resolvable("waitforUpdateJar") {
   extendsFrom(waitForUpdateRelease)
-}
-val diagrammingJar = configurations.resolvable("diagrammingJar") {
-  extendsFrom(diagrammingRelease)
 }
 val collectionManagerJar = configurations.resolvable("collectionManagerJar") {
   extendsFrom(collectionManagerRelease)
@@ -215,7 +208,6 @@ tasks.register("stage-release") {
   inputs.files(xpathJar)
   inputs.files(pipelineMessagesJar)
   inputs.files(waitforUpdateJar)
-  inputs.files(diagrammingJar)
   inputs.files(collectionManagerJar)
   inputs.files(copyScripts)
   dependsOn("jar")
@@ -251,87 +243,14 @@ tasks.register("stage-release") {
   }
 
   doLast {
-    copy {
-      from(xmlcalabashJar)
-      into(layout.buildDirectory.dir("stage/lib"))
-    }
-  }
-  doLast {
-    copy {
-      from(sendmailJar)
-      into(layout.buildDirectory.dir("stage/lib"))
-    }
-  }
-  doLast {
-    copy {
-      from(weasyprintJar)
-      into(layout.buildDirectory.dir("stage/lib"))
-    }
-  }
-  doLast {
-    copy {
-      from(princeJar)
-      into(layout.buildDirectory.dir("stage/lib"))
-    }
-  }
-  doLast {
-    copy {
-      from(antennahouseJar)
-      into(layout.buildDirectory.dir("stage/lib"))
-    }
-  }
-  doLast {
-    copy {
-      from(fopJar)
-      into(layout.buildDirectory.dir("stage/lib"))
-    }
-  }
-  doLast {
-    copy {
-      from(uniqueidJar)
-      into(layout.buildDirectory.dir("stage/lib"))
-    }
-  }
-  doLast {
-    copy {
-      from(metadataextractorJar)
-      into(layout.buildDirectory.dir("stage/lib"))
-    }
-  }
-  doLast {
-    copy {
-      from(cacheJar)
-      into(layout.buildDirectory.dir("stage/lib"))
-    }
-  }
-  doLast {
-    copy {
-      from(xpathJar)
-      into(layout.buildDirectory.dir("stage/lib"))
-    }
-  }
-  doLast {
-    copy {
-      from(pipelineMessagesJar)
-      into(layout.buildDirectory.dir("stage/lib"))
-    }
-  }
-  doLast {
-    copy {
-      from(waitforUpdateJar)
-      into(layout.buildDirectory.dir("stage/lib"))
-    }
-  }
-  doLast {
-    copy {
-      from(diagrammingJar)
-      into(layout.buildDirectory.dir("stage/lib"))
-    }
-  }
-  doLast {
-    copy {
-      from(collectionManagerJar)
-      into(layout.buildDirectory.dir("stage/lib"))
+    listOf(xmlcalabashJar, sendmailJar,
+           weasyprintJar, princeJar, antennahouseJar, fopJar,
+           uniqueidJar, metadataextractorJar, cacheJar, xpathJar,
+           pipelineMessagesJar, waitforUpdateJar, collectionManagerJar).forEach { jar ->
+      copy {
+        from(jar)
+        into(layout.buildDirectory.dir("stage/lib"))
+      }
     }
   }
 }
