@@ -75,7 +75,13 @@ db.error =
         db.all.inlines*
     }
 
-db.error.inlines |= db.error
+db.ghissue =
+    element db:ghissue {
+        attribute number { xsd:integer },
+        empty
+    }
+
+db.error.inlines |= db.error | db.ghissue
 
 # ======================================================================
 
