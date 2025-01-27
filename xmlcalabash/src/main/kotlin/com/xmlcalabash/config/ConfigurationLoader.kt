@@ -122,7 +122,8 @@ class ConfigurationLoader private constructor(private val config: XmlCalabashCon
     private fun parse(root: XdmNode): XmlCalabashConfiguration {
         val saxonConfig = root.getAttributeValue(_saxonConfiguration)
         if (saxonConfig != null) {
-            config.saxonConfigurationFile = File(saxonConfig)
+            val uri = root.baseURI!!.resolve(saxonConfig)
+            config.saxonConfigurationFile = File(uri.path)
             if (!config.saxonConfigurationFile!!.exists()) {
                 throw XProcError.xiConfigurationInvalid(configFile, "file does not exist: ${saxonConfig}").exception()
             }
