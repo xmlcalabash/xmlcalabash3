@@ -16,6 +16,7 @@ import org.xml.sax.InputSource
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.net.URI
+import java.net.URISyntaxException
 import java.nio.charset.StandardCharsets
 
 class S9Api {
@@ -107,7 +108,11 @@ class S9Api {
             if (baseUri == null) {
                 return xml
             }
-            return adjustBaseUri(xml, URI(baseUri.toString()))
+            try {
+                return adjustBaseUri(xml, URI(baseUri.toString()))
+            } catch (ex: URISyntaxException) {
+                throw XProcError.xdInvalidUri(baseUri.toString()).exception(ex)
+            }
         }
 
         fun adjustBaseUri(xml: XdmNode, baseUri: URI?): XdmNode {
