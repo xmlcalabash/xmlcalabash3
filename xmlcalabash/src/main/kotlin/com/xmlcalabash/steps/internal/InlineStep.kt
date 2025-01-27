@@ -16,6 +16,8 @@ import com.xmlcalabash.util.S9Api
 import com.xmlcalabash.util.SaxonTreeBuilder
 import net.sf.saxon.s9api.*
 import java.io.ByteArrayInputStream
+import java.net.URI
+import java.net.URISyntaxException
 import java.nio.charset.Charset
 import java.nio.charset.StandardCharsets
 import java.util.*
@@ -91,7 +93,20 @@ open class InlineStep(val params: InlineStepParameters): AbstractAtomicStep() {
             }
         }
 
-        if (!props.has(Ns.baseUri)) {
+        if (props.has(Ns.baseUri)) {
+            val pbaseUri = props[Ns.baseUri]
+            if (pbaseUri != null && pbaseUri != XdmEmptySequence.getInstance()) {
+                val uristr = pbaseUri.underlyingValue.stringValue
+                try {
+                    val uri = URI(uristr)
+                    if (!uri.isAbsolute) {
+                        throw stepConfig.exception(XProcError.xdInvalidUri(uristr))
+                    }
+                } catch (ex: URISyntaxException) {
+                    throw stepConfig.exception(XProcError.xdInvalidUri(uristr))
+                }
+            }
+        } else {
             props[Ns.baseUri] = xml.baseURI
         }
 
