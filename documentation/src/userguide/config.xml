@@ -500,4 +500,20 @@ the documents produced during execution are recorded. (Defaults to false.)</para
 
 </section>
 
+<section xml:id="cc.any-name">
+<info>
+<?db filename="cc-any-name"?>
+<title>Any other name</title>
+</info>
+
+<para>Configuration for extension steps can also be provided.</para>
+
+<rng-pattern schema="../../build/xml-calabash.rng"
+             name="any-other-name"/>
+
+<para>Any element name can be used as long as it is not in the configuration
+namespace.</para>
+
+</section>
+
 </appendix>

@@ -183,7 +183,12 @@ class ConfigurationLoader private constructor(private val config: XmlCalabashCon
                         ccPagedMedia -> parsePagedMedia(child)
                         ccMessageReporter -> parseMessageReporter(child)
                         ccVisualizer -> parseVisualizer(child)
-                        else -> throw XProcError.xiUnrecognizedConfigurationProperty(child.nodeName).exception()
+                        else -> {
+                            if (child.nodeName.namespaceUri == ns) {
+                                throw XProcError.xiUnrecognizedConfigurationProperty(child.nodeName).exception()
+                            }
+                            parseOther(child)
+                        }
                     }
                 }
                 XdmNodeKind.TEXT -> {
@@ -411,7 +416,6 @@ class ConfigurationLoader private constructor(private val config: XmlCalabashCon
             }
         }
 
-        val printer = config
         when (value) {
             null -> Unit
             "silent" -> config.visualizer = Silent(options)
@@ -419,6 +423,20 @@ class ConfigurationLoader private constructor(private val config: XmlCalabashCon
             "detail" -> config.visualizer = Detail(config.messagePrinter, options)
             else -> throw XProcError.xiUnrecognizedConfigurationValue(ccVisualizer, Ns.name, value).exception()
         }
+    }
+
+    private fun parseOther(node: XdmNode) {
+        val map = mutableMapOf<QName,String>()
+        for (attr in node.axisIterator(Axis.ATTRIBUTE)) {
+            map[attr.nodeName] = attr.stringValue
+        }
+        val list = mutableListOf<Map<QName, String>>()
+        if (node.nodeName in config.other) {
+            list.addAll(config.other[node.nodeName]!!)
+        }
+        list.add(map)
+
+        config.other[node.nodeName] = list
     }
 
     private fun checkAttributes(node: XdmNode, attributes: List<QName>, optionalAttributes: List<QName> = listOf()) {
