@@ -22,7 +22,8 @@ cc.xmlCalabash =
         | cc.systemProperty
         | cc.messageReporter
         | cc.visualizer
-        | cc.threading)*
+        | cc.threading
+        | any-other-name)*
     }
 
 cc.systemProperty =
@@ -105,7 +106,7 @@ cc.pagedMedia =
     element cc:paged-media {
         attribute css-formatter { text }?,
         attribute xsl-formatter { text }?,
-        attribute * { text },
+        attribute * - (css-formatter|xsl-formatter) { text }*,
         empty
     }
 
@@ -127,6 +128,12 @@ cc.messageReporter =
 cc.visualizer =
     element cc:visualizer {
         attribute name { "silent" | "plain" | "detail" },
-        attribute * { text },
+        attribute * - name { text }*,
+        empty
+    }
+
+any-other-name =
+    element * - cc:* {
+        attribute * { text }*,
         empty
     }

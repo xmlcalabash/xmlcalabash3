@@ -55,11 +55,11 @@
   </xsl:variable>
 
   <!--
-  <xsl:result-document href="rng.xml" method="xml" indent="yes">
+  <xsl:message>
     <rng>
       <xsl:copy-of select="$summary-body"/>
     </rng>
-  </xsl:result-document>
+  </xsl:message>
   -->
 
   <xsl:variable name="summary" as="element()*">
@@ -100,7 +100,14 @@
 
 <xsl:template match="rng:element">
   <xsl:param name="repeat" select="''"/>
-  <ss:element name="{@name}" repeat="{$repeat}"/>
+  <xsl:choose>
+    <xsl:when test="@name">
+      <ss:element name="{@name}" repeat="{$repeat}"/>
+    </xsl:when>
+    <xsl:otherwise>
+      <ss:element name="{{any-name}}" repeat="{$repeat}"/>
+    </xsl:otherwise>
+  </xsl:choose>
 </xsl:template>
 
 <xsl:template match="rng:anyName"/>
@@ -429,8 +436,8 @@
 	</xsl:when>
 	<xsl:otherwise>
 	  <var>
-	    <xsl:value-of select="@prefix"/>
-	    <xsl:text>:atomic-step</xsl:text>
+	    <xsl:value-of select="if (@prefix != '') then @prefix || ':' else ''"/>
+	    <xsl:text>{any-name}</xsl:text>
 	  </var>
 	</xsl:otherwise>
       </xsl:choose>
@@ -560,7 +567,9 @@
 
   <xsl:variable name="basename" select="if (contains(@name,':'))
 			                then substring-after(@name,':')
-			                else @name"/>
+			                else if (@name = '{any-name}')
+                                             then 'any-name'
+                                             else @name"/>
 
   <xsl:choose>
     <xsl:when test="$idpfx = ''">
@@ -568,6 +577,12 @@
 	<xsl:value-of select="$basename"/>
 	<xsl:value-of select="@repeat"/>
       </var>
+    </xsl:when>
+    <xsl:when test="@name = '{any-name}'">
+      <a href="#{$idpfx}{$basename}">
+	<xsl:value-of select="$basename"/>
+      </a>
+      <xsl:value-of select="@repeat"/>
     </xsl:when>
     <xsl:otherwise>
       <a href="#{$idpfx}{$basename}">

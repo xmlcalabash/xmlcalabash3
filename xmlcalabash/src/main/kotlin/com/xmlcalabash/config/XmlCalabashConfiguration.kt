@@ -9,6 +9,7 @@ import com.xmlcalabash.util.DefaultMessagePrinter
 import com.xmlcalabash.util.Verbosity
 import com.xmlcalabash.visualizers.Silent
 import net.sf.saxon.Configuration
+import net.sf.saxon.om.NamespaceUri
 import net.sf.saxon.s9api.QName
 import java.io.File
 import java.net.URI
@@ -46,4 +47,5 @@ abstract class XmlCalabashConfiguration {
     var pagedMediaXslProcessors: List<URI> = emptyList()
     var pagedMediaCssProcessors: List<URI> = emptyList()
     var threadPoolSize: Int = 1
+    var other = mutableMapOf<QName, List<Map<QName, String>>>()
 }
