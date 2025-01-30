@@ -76,11 +76,11 @@ table.tableaux tbody td.check {
 }
 
 table.tableaux thead th.optname {
-    width: 20%;
+    width: 40%;
 }
 
 table.tableaux tbody td.optname {
-    width: 20%;
+    width: 40%;
 }
 
 table.tableaux thead th.binding {

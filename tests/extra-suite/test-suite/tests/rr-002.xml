@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<t:test expected="pass"
+        xmlns:t="http://xproc.org/ns/testsuite/3.0">
+  <t:info>
+    <t:title>railroad-002</t:title>
+    <t:revision-history>
+      <t:revision>
+        <t:date>2025-01-30</t:date>
+        <t:author>
+          <t:name>Norm Tovey-Walsh</t:name>
+        </t:author>
+        <t:description xmlns="http://www.w3.org/1999/xhtml">
+          <p>Created test.</p>
+        </t:description>
+      </t:revision>
+    </t:revision-history>
+  </t:info>
+  <t:description xmlns="http://www.w3.org/1999/xhtml">
+    <p>Tests that cx:railroad returns the right properties.</p>
+  </t:description>
+  <t:pipeline>
+<p:declare-step xmlns:p="http://www.w3.org/ns/xproc"
+                xmlns:cx="http://xmlcalabash.com/ns/extensions"
+                name="main" version="3.0">
+  <p:import href="https://xmlcalabash.com/ext/library/railroad.xpl"/>
+  <p:output port="result" sequence="true"/>
+
+  <cx:railroad>
+    <p:with-input>
+      <p:inline content-type="text/plain">
+S ::= a b
+      </p:inline>
+    </p:with-input>
+  </cx:railroad>
+  <p:identity>
+    <p:with-input select="p:document-properties(.)"/>
+  </p:identity>
+  <p:cast-content-type content-type="application/xml"/>
+</p:declare-step>
+  </t:pipeline>
+  <t:schematron>
+    <s:schema queryBinding="xslt2"
+              xmlns:s="http://purl.oclc.org/dsdl/schematron">
+      <s:ns prefix="svg" uri="http://www.w3.org/2000/svg"/>
+      <s:ns prefix="fn" uri="http://www.w3.org/2005/xpath-functions"/>
+      <s:pattern>
+        <s:rule context="/">
+          <s:assert test="fn:map">Result isn’t a map.</s:assert>
+        </s:rule>
+      </s:pattern>
+      <s:pattern>
+        <s:rule context="/fn:map">
+          <s:assert test="fn:string[@key='cx:ebnf']">No EBNF property.</s:assert>
+          <s:assert test="fn:string[@key='cx:nonterminal'] = 'S'">No nonterminal property.</s:assert>
+        </s:rule>
+      </s:pattern>
+    </s:schema>
+  </t:schematron>
+</t:test>

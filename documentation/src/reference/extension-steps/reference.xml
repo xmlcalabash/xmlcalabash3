@@ -18,6 +18,7 @@
 <xi:include href="cx-polyglot.xml"/>
 <xi:include href="cx-plantuml.xml"/>
 <xi:include href="cx-python.xml"/>
+<xi:include href="cx-railroad.xml"/>
 <xi:include href="cx-unique-id.xml"/>
 <xi:include href="cx-until.xml"/>
 <xi:include href="cx-wait-for-update.xml"/>

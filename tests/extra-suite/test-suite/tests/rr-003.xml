@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<t:test expected="pass"
+        xmlns:t="http://xproc.org/ns/testsuite/3.0">
+  <t:info>
+    <t:title>railroad-003</t:title>
+    <t:revision-history>
+      <t:revision>
+        <t:date>2025-01-30</t:date>
+        <t:author>
+          <t:name>Norm Tovey-Walsh</t:name>
+        </t:author>
+        <t:description xmlns="http://www.w3.org/1999/xhtml">
+          <p>Created test.</p>
+        </t:description>
+      </t:revision>
+    </t:revision-history>
+  </t:info>
+  <t:description xmlns="http://www.w3.org/1999/xhtml">
+    <p>Tests that cx:railroad returns multiple, cross-referenced images.</p>
+  </t:description>
+  <t:pipeline>
+<p:declare-step xmlns:p="http://www.w3.org/ns/xproc"
+                xmlns:cx="http://xmlcalabash.com/ns/extensions"
+                name="main" version="3.0">
+  <p:import href="https://xmlcalabash.com/ext/library/railroad.xpl"/>
+  <p:output port="result" sequence="true"/>
+
+  <cx:railroad inline-literals="false">
+    <p:with-input>
+      <p:inline content-type="text/plain">
+S ::= A B
+A ::= "a"
+B ::= B1 | B2
+B1 ::= B2
+B2 ::= "b"
+      </p:inline>
+    </p:with-input>
+  </cx:railroad>
+  <p:for-each>
+    <p:identity>
+      <p:with-input select="p:document-properties(.)"/>
+    </p:identity>
+    <p:cast-content-type content-type="application/xml"/>
+  </p:for-each>
+
+  <p:wrap-sequence wrapper="properties"/>
+</p:declare-step>
+  </t:pipeline>
+  <t:schematron>
+    <s:schema queryBinding="xslt2"
+              xmlns:s="http://purl.oclc.org/dsdl/schematron">
+      <s:ns prefix="svg" uri="http://www.w3.org/2000/svg"/>
+      <s:ns prefix="fn" uri="http://www.w3.org/2005/xpath-functions"/>
+      <s:ns prefix="array" uri="http://www.w3.org/2005/xpath-functions/array"/>
+      <s:pattern>
+        <s:rule context="/">
+          <s:assert test="properties">Result isn’t a properties document.</s:assert>
+        </s:rule>
+      </s:pattern>
+      <s:pattern>
+        <s:rule context="/properties">
+          <s:assert test="count(fn:map) = 5">There are not five maps.</s:assert>
+        </s:rule>
+      </s:pattern>
+      <s:pattern>
+        <s:rule context="/properties/fn:map[1]">
+          <s:assert test="fn:string['cx:nonterminal'] = 'S'">The nonterminal is incorrect.</s:assert>
+          <s:assert test="empty(fn:array[@key = 'cx:referenced-by'])">The references are incorrect.</s:assert>
+        </s:rule>
+      </s:pattern>
+      <s:pattern>
+        <s:rule context="/properties/fn:map[2]">
+          <s:assert test="fn:string['cx:nonterminal'] = 'A'">The nonterminal is incorrect.</s:assert>
+          <s:assert test="exists(fn:array[@key = 'cx:referenced-by'])">The references are absent.</s:assert>
+          <s:assert test="count(fn:array[@key='cx:referenced-by']/*) = 1">The references are incorrect.</s:assert>
+          <s:assert test="fn:array[@key='cx:referenced-by'][1] = 'S'">The references are incorrect.</s:assert>
+        </s:rule>
+      </s:pattern>
+    </s:schema>
+  </t:schematron>
+</t:test>

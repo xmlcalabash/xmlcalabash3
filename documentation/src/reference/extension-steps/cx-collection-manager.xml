@@ -2,6 +2,8 @@
           xmlns:e="http://www.w3.org/1999/XSL/Spec/ElementSyntax"
           xmlns:xi="http://www.w3.org/2001/XInclude"
           xmlns:xlink="http://www.w3.org/1999/xlink"
+          xmlns:cx="http://xmlcalabash.com/ns/extensions"
+          xmlns:cxerr="http://xmlcalabash.com/ns/error"
           xmlns="http://docbook.org/ns/docbook"
           xml:id="cx-collection-manager">
 <?db filename="cx-collection-manager"?>

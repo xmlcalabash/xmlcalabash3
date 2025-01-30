@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<t:test expected="fail" code="cxerr:XC0010"
+        xmlns:cxerr="http://xmlcalabash.com/ns/error"
+        xmlns:t="http://xproc.org/ns/testsuite/3.0">
+  <t:info>
+    <t:title>railroad-005</t:title>
+    <t:revision-history>
+      <t:revision>
+        <t:date>2025-01-30</t:date>
+        <t:author>
+          <t:name>Norm Tovey-Walsh</t:name>
+        </t:author>
+        <t:description xmlns="http://www.w3.org/1999/xhtml">
+          <p>Created test.</p>
+        </t:description>
+      </t:revision>
+    </t:revision-history>
+  </t:info>
+  <t:description xmlns="http://www.w3.org/1999/xhtml">
+    <p>Tests that cx:railroad fails if a non-existant nonterminal option is specified.</p>
+  </t:description>
+  <t:pipeline>
+<p:declare-step xmlns:p="http://www.w3.org/ns/xproc"
+                xmlns:cx="http://xmlcalabash.com/ns/extensions"
+                name="main" version="3.0">
+  <p:import href="https://xmlcalabash.com/ext/library/railroad.xpl"/>
+  <p:output port="result" sequence="true"/>
+
+  <cx:railroad inline-literals="false"
+               nonterminal="spoon">
+    <p:with-input>
+      <p:inline content-type="text/plain">
+S ::= A B
+A ::= "a"
+B ::= B1 | B2
+B1 ::= B2
+B2 ::= "b"
+      </p:inline>
+    </p:with-input>
+  </cx:railroad>
+</p:declare-step>
+  </t:pipeline>
+</t:test>

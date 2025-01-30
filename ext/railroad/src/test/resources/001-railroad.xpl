@@ -4,7 +4,7 @@
   <p:import href="https://xmlcalabash.com/ext/library/railroad.xpl"/>
   <p:output port="result" sequence="true"/>
 
-  <cx:railroad parameters="map{'color': '#FFAAAA', 'color-offset': 50, 'stroke-width': 5}">
+  <cx:railroad color="#FFAAAA" color-offset="50" stroke-width="5">
     <p:with-input>
       <p:inline content-type="text/plain">
 script   ::= versionDecl s page s statement ( RS statement )* s
