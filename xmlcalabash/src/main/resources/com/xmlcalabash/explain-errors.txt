@@ -1358,6 +1358,48 @@ cxerr:XC0001
 Cannot cast: $1.
 The requested content-type cast is not supported.
 
+cxerr:XC0002
+Cast input incorrect: $1.
+The requested content-type cast is not supported.
+
+cxerr:XC0003
+Collection candidate document has no base URI.
+All of the documents added to a collection must have a base URI.
+
+cxerr:XC0004
+Two collection candidate documents have the same URI.
+All of the documents added to a collection must have unique base URIs.
+
+cxerr:XC0005
+Collection candidate document has no value.
+All of the documents added to a collection must values that are XDM items.
+
+cxerr:XC0006
+Cannot modify a stable collection.
+It is an error to attempt to change the members of a collection that was
+declared to be stable.
+
+cxerr:XC0007
+Offset out of range: $1
+The color offset must be a value between 0 and 359. It is the degree offset in
+the hue, saturation, lightness color space.
+
+cxerr:XC0008
+Invalid hex color: $1
+The color value must be a valid hexidecimal (RGB) color specification.
+
+cxerr:XC0009
+No style definitions.
+The railroad diagram did not contain any style definitions.
+
+cxerr:XC0010
+Nonterminal not in output: $1
+The grammar converted did not contain the specified nonterminal.
+
+cxerr:XC0011
+Invalid width: $1
+The width must be greater than 0.
+
 cxerr:XI0001
 Pipeline has no “$1” output port.
 Cannot save the output from a port that doesn’t exist.
