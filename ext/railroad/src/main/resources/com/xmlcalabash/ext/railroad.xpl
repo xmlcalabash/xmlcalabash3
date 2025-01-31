@@ -1,5 +1,6 @@
 <p:library xmlns:p="http://www.w3.org/ns/xproc"
            xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns:e="http://www.w3.org/1999/XSL/Spec/ElementSyntax"
            xmlns:cx="http://xmlcalabash.com/ns/extensions"
            version="3.0">
 
@@ -8,6 +9,8 @@
   <p:output port="result" content-types="image/svg+xml" primary="true" sequence="true"/>
   <p:output port="html" content-types="html"/>
   <p:option name="nonterminal" as="xs:string?"/>
+  <p:option name="transform-links" as="xs:string" e:type="XPathExpression"
+            select="&quot;'#' || $p:nonterminal&quot;"/>
   <p:option name="color" as="xs:string?" select="'#FFDB4D'"/>
   <p:option name="color-offset" as="xs:integer" select="0"/>
   <p:option name="padding" as="xs:integer?"/>
