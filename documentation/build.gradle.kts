@@ -196,15 +196,30 @@ val xincludeReference = tasks.register<SaxonXsltTask>("xincludeReference") {
   )
 }
 
-val validateReference = tasks.register<RelaxNGValidateTask>("validateReference") {
+val processReference = tasks.register<JavaExec>("processReference") {
   dependsOn("translateDocBook")
   dependsOn("xincludeReference")
 
-  inputs.file(docbookRNG.get().outputs.getFiles().getSingleFile())
   inputs.file(xincludeReference.get().outputs.getFiles().getSingleFile())
+  inputs.file(layout.projectDirectory.file("src/xpl/process.xpl"))
+  outputs.file(layout.buildDirectory.file("refbuild/processed.xml"))
+
+  classpath = configurations.named("documentation").get()
+  mainClass = "com.xmlcalabash.app.Main"
+  args(layout.projectDirectory.file("src/xpl/process.xpl"),
+       "-i:source=${xincludeReference.get().outputs.getFiles().getSingleFile()}",
+       "-o:result=${layout.buildDirectory.file("refbuild/processed.xml").get()}")
+}
+
+val validateReference = tasks.register<RelaxNGValidateTask>("validateReference") {
+  dependsOn("translateDocBook")
+  dependsOn("processReference")
+
+  inputs.file(docbookRNG.get().outputs.getFiles().getSingleFile())
+  inputs.file(processReference.get().outputs.getFiles().getSingleFile())
   outputs.file(layout.buildDirectory.file("refbuild/validated.xml"))
 
-  input(xincludeReference.get().outputs.getFiles().getSingleFile())
+  input(processReference.get().outputs.getFiles().getSingleFile())
   schema(docbookRNG.get().outputs.getFiles().getSingleFile())
   output(layout.buildDirectory.file("refbuild/validated.xml").get())
 }

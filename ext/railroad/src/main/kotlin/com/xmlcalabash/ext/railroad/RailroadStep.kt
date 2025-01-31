@@ -8,7 +8,9 @@ import com.xmlcalabash.io.MediaType
 import com.xmlcalabash.namespace.Ns
 import com.xmlcalabash.namespace.NsCx
 import com.xmlcalabash.namespace.NsHtml
+import com.xmlcalabash.namespace.NsP
 import com.xmlcalabash.namespace.NsSvg
+import com.xmlcalabash.namespace.NsXlink
 import com.xmlcalabash.steps.AbstractAtomicStep
 import com.xmlcalabash.util.SaxonTreeBuilder
 import de.bottlecaps.railroad.RailroadGenerator
@@ -19,6 +21,7 @@ import net.sf.saxon.s9api.XdmAtomicValue
 import net.sf.saxon.s9api.XdmDestination
 import net.sf.saxon.s9api.XdmEmptySequence
 import net.sf.saxon.s9api.XdmNode
+import net.sf.saxon.s9api.XdmNodeKind
 import net.sf.saxon.s9api.XdmValue
 import org.xml.sax.InputSource
 import java.awt.Color
@@ -34,6 +37,7 @@ import kotlin.collections.iterator
 class RailroadStep(): AbstractAtomicStep() {
     companion object {
         val _nonterminal = QName("nonterminal")
+        val _transformLinks = QName("transform-links")
         val _color = QName("color")
         val _colorOffset = QName("color-offset")
         val _padding = QName("padding")
@@ -43,9 +47,12 @@ class RailroadStep(): AbstractAtomicStep() {
         val _factoring = QName("factoring")
         val _inlineLiterals = QName("inline-literals")
         val _keepEpsilonNonterminals = QName("keep-epsilon-nonterminals")
+        val p_nonterminal = QName(NsP.namespace, "p:nonterminal")
     }
 
     lateinit var source: XProcDocument
+    lateinit var transform: String
+    var nullTransform = false
     var nonterminal: String? = null
     var found = false
 
@@ -55,7 +62,13 @@ class RailroadStep(): AbstractAtomicStep() {
         source = queues["source"]!!.first()
         val ebnf = source.value.underlyingValue.stringValue
 
+        stepConfig.debug { "EBNF:\n${ebnf}" }
+
         nonterminal = stringBinding(_nonterminal)
+        transform = stringBinding(_transformLinks)!!
+
+        nullTransform = transform.replace(" ", "") in listOf("'#'||\$p:nonterminal", "\"#\"||\$p:nonterminal")
+
         val pcolor = (stringBinding(_color) ?: "#FFDB4D").trim()
         var colorOffset = integerBinding(_colorOffset) ?: 0
         val width = integerBinding(_width) ?: 992
@@ -161,7 +174,11 @@ class RailroadStep(): AbstractAtomicStep() {
             builder.addStartElement(node)
             builder.addSubtree(defs)
             for (node in node.axisIterator(Axis.CHILD)) {
-                builder.addSubtree(node)
+                if (nullTransform) {
+                    builder.addSubtree(node)
+                } else {
+                    addSubtree(builder, node)
+                }
             }
             builder.addEndElement()
             builder.endDocument()
@@ -245,6 +262,50 @@ class RailroadStep(): AbstractAtomicStep() {
         }
 
         return decimal
+    }
+
+    private fun addSubtree(builder: SaxonTreeBuilder, node: XdmNode) {
+        when (node.nodeKind) {
+            XdmNodeKind.ELEMENT -> {
+                if (node.getAttributeValue(NsXlink.href) == null) {
+                    builder.addStartElement(node)
+                    for (child in node.axisIterator(Axis.CHILD)) {
+                        addSubtree(builder, child)
+                    }
+                    builder.addEndElement()
+                } else {
+                    if (transform == "") {
+                        for (child in node.axisIterator(Axis.CHILD)) {
+                            addSubtree(builder, child)
+                        }
+                    } else {
+                        val amap = mutableMapOf<QName, String?>()
+                        for (attr in node.axisIterator(Axis.ATTRIBUTE)) {
+                            val value = attr.stringValue
+                            if (attr.nodeName == NsXlink.href && value.startsWith("#")) {
+                                val compiler = stepConfig.newXPathCompiler()
+                                compiler.declareNamespace("p", NsP.namespace.toString())
+                                compiler.declareVariable(p_nonterminal)
+                                val exec = compiler.compile(transform)
+                                val selector = exec.load()
+                                selector.setVariable(p_nonterminal, XdmAtomicValue(value.substring(1)))
+                                selector.contextItem = node
+                                val evalue = selector.evaluate()
+                                amap[attr.nodeName] = evalue.underlyingValue.stringValue
+                            } else {
+                                amap[attr.nodeName] = value
+                            }
+                        }
+                        builder.addStartElement(node, stepConfig.attributeMap(amap))
+                        for (child in node.axisIterator(Axis.CHILD)) {
+                            addSubtree(builder, child)
+                        }
+                        builder.addEndElement()
+                    }
+                }
+            }
+            else -> builder.addSubtree(node)
+        }
     }
 
     private fun getProperties(svg: XdmNode): Map<String, XdmValue> {

@@ -40,7 +40,7 @@
 
 <para>The Railroad Daigram Generator produces a single XHTML page containing all
 of the diagrams; this appears on the <port>html</port> port. The
-<tag>cx:railroad</tag> step breaks them down into a sequence of individual SVG diagrams;
+<tag>cx:railroad</tag> step also extracts each individual SVG diagram;
 these appear on the <port>result</port> port.</para>
 
 <para>The <option>nonterminal</option> option allows you to select a single SVG
@@ -48,6 +48,17 @@ diagram from a grammar. <error code="cxerr:XC0010">It is a <glossterm>dynamic
 error</glossterm> if the specified nonterminal does not appear in the
 grammar.</error> It is also possible to filter the diagrams with their document
 properties, see <xref linkend="railroad.properties"/>.</para>
+
+<para>The <option>transform-links</option> option controls how cross reference
+links are transformed in the individual SVG diagrams. It is an XPath expression.
+On each link element, the <option>transform-links</option> expression will be
+evaluated with the linked nonterminal in the <varname>$p:nonterminal</varname>
+attribute. The result of the expression is used in the link.
+The default value leaves the links unchanged, but you could add a prefix or
+a suffix. For example, <code>"'#pfx-' || $p:nonterminal"</code> would transform
+the link <literal>#name</literal> into <literal>#pfx-name</literal>. Setting
+the <option>transform-links</option> option to the empty string removes the
+links entirely.</para>
 
 <para>The other step options correspond directly to the options on the generator.</para>
 
@@ -86,29 +97,25 @@ reference it.</para>
 
 <para>A simple grammar like the one shown in
 <xref linkend="ex.railroad-source"/> has three productions. They can be
-rendered as shown in <xref linkend="fig.railroad-1"/>,
-<xref linkend="fig.railroad-2"/>, and
-<xref linkend="fig.railroad-3"/>.</para>
+rendered as shown in <xref linkend="fig.railroad-Expression"/>,
+<xref linkend="fig.railroad-Number"/>, and
+<xref linkend="fig.railroad-op"/>.</para>
 
 <example xml:id="ex.railroad-source">
 <title>Example railroad source</title>
 <literallayout class="monospaced"
->Expression ::= Number op Number | "(" Expression ")"
-Number ::= [0-9]+
-op ::= "+" | "-" | "×" | "÷"
-</literallayout>
+><xi:include parse="text" href="../../txt/expression.ebnf"/></literallayout>
 </example>
 
-<figure xml:id="fig.railroad-1">
+<figure xml:id="fig.railroad-Expression">
 <title>The Expression production</title>
-<mediaobject>
-<imageobject>
-<imagedata fileref="img/railroad-1.svg"/>
-</imageobject>
-</mediaobject>
+<!-- tag abuse, baby! -->
+<programlisting role="railroad" wordsize="Expression"
+                vendor="'#fig.railroad-'||$p:nonterminal"
+><xi:include parse="text" href="../../txt/expression.ebnf"/></programlisting>
 </figure>
 
-<figure xml:id="fig.railroad-2">
+<figure xml:id="fig.railroad-Number">
 <title>The Number production</title>
 <mediaobject>
 <imageobject>
@@ -117,7 +124,7 @@ op ::= "+" | "-" | "×" | "÷"
 </mediaobject>
 </figure>
 
-<figure xml:id="fig.railroad-3">
+<figure xml:id="fig.railroad-op">
 <title>The op production</title>
 <mediaobject>
 <imageobject>
