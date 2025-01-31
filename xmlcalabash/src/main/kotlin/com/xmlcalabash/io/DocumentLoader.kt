@@ -13,11 +13,7 @@ import com.xmlcalabash.util.MediaClassification
 import com.xmlcalabash.util.SaxonTreeBuilder
 import com.xmlcalabash.util.UriUtils
 import net.sf.saxon.om.NamespaceUri
-import net.sf.saxon.s9api.QName
-import net.sf.saxon.s9api.SaxonApiException
-import net.sf.saxon.s9api.XdmAtomicValue
-import net.sf.saxon.s9api.XdmMap
-import net.sf.saxon.s9api.XdmValue
+import net.sf.saxon.s9api.*
 import net.sf.saxon.value.BooleanValue
 import nu.validator.htmlparser.common.XmlViolationPolicy
 import nu.validator.htmlparser.dom.HtmlDocumentBuilder
@@ -196,11 +192,11 @@ class DocumentLoader(val context: XProcStepConfiguration,
         val htmlBuilder = HtmlDocumentBuilder(XmlViolationPolicy.ALTER_INFOSET)
         val html = htmlBuilder.parse(stream)
         val builder = context.processor.newDocumentBuilder()
+        builder.isLineNumbering = true
         if (uri != null) {
             builder.baseURI = uri
         }
         val xdm = builder.build(DOMSource(html))
-        builder.isLineNumbering = true
         return XProcDocument.ofXml(xdm, context, properties)
     }
 
