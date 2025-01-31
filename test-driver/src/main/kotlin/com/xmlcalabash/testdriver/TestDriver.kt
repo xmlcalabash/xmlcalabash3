@@ -153,24 +153,31 @@ class TestDriver(val testOptions: TestOptions, val exclusions: Map<String, Strin
             allTestCases.addAll(suite.tests)
             val repeat = 0
 
-            for (test in suite.tests) {
-                test.singleTest = testOptions.stopOnFirstFailed || testsToRun.size == 1
-                for (rep in 0..repeat) {
-                    if (test.testFile in skipTests) {
-                        suite.skip(test, skipTests[test.testFile]!!)
-                    } else {
-                        test.run()
+            try {
+                for (test in suite.tests) {
+                    test.singleTest = testOptions.stopOnFirstFailed || testsToRun.size == 1
+                    for (rep in 0..repeat) {
+                        if (test.testFile in skipTests) {
+                            suite.skip(test, skipTests[test.testFile]!!)
+                        } else {
+                            test.run()
+                        }
+                    }
+                    if (testOptions.stopOnFirstFailed) {
+                        var stop = false
+                        for (result in suite.testCases.values) {
+                            stop = stop || result.status == "fail"
+                        }
+                        if (stop) {
+                            break;
+                        }
                     }
                 }
-                if (testOptions.stopOnFirstFailed) {
-                    var stop = false
-                    for (result in suite.testCases.values) {
-                        stop = stop || result.status == "fail"
-                    }
-                    if (stop) {
-                        break;
-                    }
-                }
+            } catch (ex: Exception) {
+                // This should never happen. Added on 31 Jan 2025 trying to chase down a failure
+                // in the polyglot steps. Didn't work. Java crashes without throwing a stack trace.
+                ex.printStackTrace()
+                throw ex
             }
 
             for (test in suite.tests) {

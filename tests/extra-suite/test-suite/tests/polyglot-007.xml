@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<t:test expected="pass"
+<t:test expected="pass" features="polyglot"
         xmlns:t="http://xproc.org/ns/testsuite/3.0">
   <t:info>
     <t:title>polyglot-007</t:title>
