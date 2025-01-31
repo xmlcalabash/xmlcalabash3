@@ -35,7 +35,7 @@ class XProcSelectExpression private constructor(stepConfig: XProcStepConfigurati
             compiler.baseURI = uri
         }
 
-        for ((prefix, uri) in config.inscopeNamespaces) {
+        for ((prefix, uri) in stepConfig.inscopeNamespaces) {
             compiler.declareNamespace(prefix, uri.toString())
         }
         for (name in variableRefs) {
