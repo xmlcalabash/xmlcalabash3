@@ -54,6 +54,7 @@ val dep_jacksonDataformat = project.findProperty("jacksonDataformat").toString()
 val dep_plantuml = project.findProperty("plantUml").toString()
 val dep_jeuclid = project.findProperty("jeuclidCore").toString()
 val dep_ditaa = project.findProperty("ditaa").toString()
+val dep_rr = project.findProperty("rr").toString()
 
 dependencies {
   implementation("org.jetbrains.kotlin:kotlin-stdlib:2.0.21")
@@ -142,6 +143,7 @@ buildConfig {
                   "jsonSchemaValidator",
                   "pdfbox",
                   "plantUml",
+                  "rr",
                   "schxslt2",
                   "sinclude",
                   "slf4j",

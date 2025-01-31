@@ -40,6 +40,7 @@ dependencies {
   implementation(files("lib"))
   // WTF? Why is this necessary?
   implementation(files("build/classes/kotlin/main"))
+  implementation(project(":ext:railroad"))
 
   transformation ("net.sf.saxon:Saxon-HE:${saxonVersion}")
 }

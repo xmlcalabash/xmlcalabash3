@@ -15,4 +15,5 @@ include("xmlcalabash", "app", "test-driver",
         "ext:polyglot", "ext:xpath", "ext:wait-for-update",
         "ext:diagramming", "ext:collection-manager",
         "template:kotlin", "template:java",
+        "ext:railroad"
     )

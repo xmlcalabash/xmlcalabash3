@@ -11,26 +11,14 @@ import com.xmlcalabash.util.MediaClassification
 import com.xmlcalabash.util.S9Api
 import com.xmlcalabash.util.SaxonTreeBuilder
 import net.sf.saxon.om.NamespaceUri
-import net.sf.saxon.s9api.Axis
-import net.sf.saxon.s9api.QName
-import net.sf.saxon.s9api.SaxonApiException
-import net.sf.saxon.s9api.XdmArray
-import net.sf.saxon.s9api.XdmAtomicValue
-import net.sf.saxon.s9api.XdmFunctionItem
-import net.sf.saxon.s9api.XdmMap
-import net.sf.saxon.s9api.XdmNode
-import net.sf.saxon.s9api.XdmNodeKind
-import net.sf.saxon.s9api.XdmValue
+import net.sf.saxon.s9api.*
 import nu.validator.htmlparser.common.XmlViolationPolicy
 import nu.validator.htmlparser.dom.HtmlDocumentBuilder
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
-import java.lang.IllegalArgumentException
 import java.nio.charset.StandardCharsets
-import java.util.Base64
-import java.util.Properties
+import java.util.*
 import javax.xml.transform.dom.DOMSource
-import kotlin.collections.iterator
 
 class DocumentConverter(val stepConfig: XProcStepConfiguration,
                         val doc: XProcDocument,

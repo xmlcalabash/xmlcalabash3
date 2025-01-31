@@ -364,6 +364,11 @@ open class XProcError protected constructor(val code: QName, val variant: Int, e
         fun xcxResourceWithDuplicateUri(uri: URI) = xstep(4, uri)
         fun xcxResourceWithoutValue(uri: URI) = xstep(5, uri)
         fun xcxCannotModifyStableCollection(uri: String) = xstep(6, uri)
+        fun xcxOffsetOutOfRange(offset: Int) = xstep(7, offset)
+        fun xcxInvalidHexColor(color: String) = xstep(8, color)
+        fun xcxNoStyleDefinitions() = xstep(9)
+        fun xcxNonterminalNotFound(nonterminal: String) = xstep(10, nonterminal)
+        fun xcxInvalidWidth(width: Int) = xstep(11, width)
 
         fun xiNoSuchOutputPort(port: String)= internal(1, port)
         fun xiImpossibleNodeType(type: XdmNodeKind) = internal(2, type)

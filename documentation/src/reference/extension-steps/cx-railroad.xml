@@ -1,0 +1,143 @@
+<refentry xmlns:p="http://www.w3.org/ns/xproc"
+          xmlns:e="http://www.w3.org/1999/XSL/Spec/ElementSyntax"
+          xmlns:xi="http://www.w3.org/2001/XInclude"
+          xmlns:xlink="http://www.w3.org/1999/xlink"
+          xmlns:cx="http://xmlcalabash.com/ns/extensions"
+          xmlns:cxerr="http://xmlcalabash.com/ns/error"
+          xmlns="http://docbook.org/ns/docbook"
+          xml:id="cx-railroad">
+<?db filename="cx-railroad"?>
+   <refnamediv>
+      <refname>cx:railroad</refname>
+      <refpurpose>Draws railroad diagrams</refpurpose>
+   </refnamediv>
+   <refsynopsisdiv>
+
+<refsection role="introduction">
+<title>Introduction</title>
+<para>The <tag>cx:railroad</tag> step generates railroad diagrams with
+<personname>Gunther Rademacher</personname>’s 
+<link xlink:href="https://www.bottlecaps.de/railroad/ui">Railroad Diagram Generator</link>.</para>
+</refsection>
+
+<refsection role="step-declaration">
+<title>Step declaration</title>
+     <xi:include href="../../../../ext/railroad/src/main/resources/com/xmlcalabash/ext/railroad.xpl"
+                 xpointer="xpath(/*/*[@type='cx:railroad'])"/>
+</refsection>
+
+<refsection role="errors">
+<title>Errors</title>
+<para>Errors from the entry body are summarized here.</para>
+</refsection>
+</refsynopsisdiv>
+
+<refsection>
+<title>Description</title>
+
+<para>Railroad diagrams are a way to visually represent grammars. See
+<xref linkend="ex.railroad.diagrams"/>.</para>
+
+<para>The Railroad Daigram Generator produces a single XHTML page containing all
+of the diagrams; this appears on the <port>html</port> port. The
+<tag>cx:railroad</tag> step breaks them down into a sequence of individual SVG diagrams;
+these appear on the <port>result</port> port.</para>
+
+<para>The <option>nonterminal</option> option allows you to select a single SVG
+diagram from a grammar. <error code="cxerr:XC0010">It is a <glossterm>dynamic
+error</glossterm> if the specified nonterminal does not appear in the
+grammar.</error> It is also possible to filter the diagrams with their document
+properties, see <xref linkend="railroad.properties"/>.</para>
+
+<para>The other step options correspond directly to the options on the generator.</para>
+
+<para>The color must be one of the standard Java AWT color names (black, blue,
+cyan, darkGray, gray, green, lightGray, magenta, orange, pink, red, white, or
+yellow) or an RGB color of the form “<literal>#RRGGBB</literal>”.
+<error code="cxerr:XC0008">It
+is a <glossterm>dynamic error</glossterm> if the color value is not one of the named
+colors or a valid hex RGB color specification.</error>
+The <option>color-offset</option> is a direction in the hue-saturation-lightness
+color space used to make the element colors distinct.
+<error code="cxerr:XC0007">It
+is a <glossterm>dynamic error</glossterm> if the color offset is not a value
+between 0 and 359.</error></para>
+
+<para><error code="cxerr:XC0011">It
+is a <glossterm>dynamic error</glossterm> if the width is less than or equal to 0.</error>
+</para>
+
+<para>XML Calabash is built with version <?version DEPENDENCY_rr?> of the railroad
+diagram generator.</para>
+</refsection>
+
+<refsection xml:id="railroad.properties">
+<title>Document properties</title>
+
+<para>For each diagram, additional metadata is provided in the document properties:
+The name of the production, its EBNF summary, and the list of other productions that
+reference it.</para>
+
+<para><xref linkend="ex.number.properties"/> shows an example of the document properties.</para>
+</refsection>
+
+<refsection xml:id="ex.railroad.diagrams">
+<title>Example</title>
+
+<para>A simple grammar like the one shown in
+<xref linkend="ex.railroad-source"/> has three productions. They can be
+rendered as shown in <xref linkend="fig.railroad-1"/>,
+<xref linkend="fig.railroad-2"/>, and
+<xref linkend="fig.railroad-3"/>.</para>
+
+<example xml:id="ex.railroad-source">
+<title>Example railroad source</title>
+<literallayout class="monospaced"
+>Expression ::= Number op Number | "(" Expression ")"
+Number ::= [0-9]+
+op ::= "+" | "-" | "×" | "÷"
+</literallayout>
+</example>
+
+<figure xml:id="fig.railroad-1">
+<title>The Expression production</title>
+<mediaobject>
+<imageobject>
+<imagedata fileref="img/railroad-1.svg"/>
+</imageobject>
+</mediaobject>
+</figure>
+
+<figure xml:id="fig.railroad-2">
+<title>The Number production</title>
+<mediaobject>
+<imageobject>
+<imagedata fileref="img/railroad-2.svg"/>
+</imageobject>
+</mediaobject>
+</figure>
+
+<figure xml:id="fig.railroad-3">
+<title>The op production</title>
+<mediaobject>
+<imageobject>
+<imagedata fileref="img/railroad-3.svg"/>
+</imageobject>
+</mediaobject>
+</figure>
+
+<example xml:id="ex.number.properties">
+<title>Document properties for the Number diagram</title>
+<literallayout class="monospaced"><![CDATA[{
+  "cx:referenced-by": [ "Expression" ],
+  "cx:nonterminal": "Number",
+  "content-type": "image/svg+xml",
+  "base-uri": "file://…/railroad-002.xpl",
+  "cx:ebnf": <div xmlns="http://www.w3.org/1999/xhtml" class="ebnf"><code>…</code>…</div>
+}]]></literallayout>
+</example>
+</refsection>
+
+</refentry>
+
+

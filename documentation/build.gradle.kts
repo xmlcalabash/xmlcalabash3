@@ -87,6 +87,7 @@ dependencies {
   documentation(project(":paged-media:fop", "runtimeElements"))
   documentation(project(":ext:unique-id", "runtimeElements"))
   documentation(project(":ext:metadata-extractor", "runtimeElements"))
+  documentation(project(":ext:railroad", "runtimeElements"))
 
   deltaxml(fileTree("dir" to layout.projectDirectory.dir("lib"),
                     "include" to "*.jar"))
@@ -181,6 +182,8 @@ val xincludeReference = tasks.register<SaxonXsltTask>("xincludeReference") {
                   "../ext/unique-id/src/main/resources/com/xmlcalabash/ext/unique-id.xpl"))
   inputs.file(layout.projectDirectory.file(
                   "../ext/metadata-extractor/src/main/resources/com/xmlcalabash/ext/metadata-extractor.xpl"))
+  inputs.file(layout.projectDirectory.file(
+                  "../ext/railroad/src/main/resources/com/xmlcalabash/ext/railroad.xpl"))
 
   input(layout.projectDirectory.file("src/reference/reference.xml"))
   stylesheet(layout.projectDirectory.file("src/xsl/xinclude.xsl"))
