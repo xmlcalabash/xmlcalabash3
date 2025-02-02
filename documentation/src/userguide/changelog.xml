@@ -13,6 +13,91 @@ See the commits and pull requests on
 finer detail.</para>
 
 <revhistory>
+<revision xml:id="r300-alpha18">
+<revnumber>3.0.0-alpha18</revnumber>
+<date>2025-02-02</date>
+<revdescription>
+<itemizedlist>
+<listitem><para>Upgraded to version 6.0.12 of the XML Resolver. This isn’t
+completely backwards compatible with earlier releases, so attempting to use an
+earlier version might not work.</para>
+</listitem>
+<listitem><para>Fixed <ghissue number="32"/>.
+The <function>p:lookup-uri</function> function now queries the catalog
+resolver.</para>
+</listitem>
+<listitem><para>Fixed <ghissue number="163"/>.
+Added a <literal linkend="dbg-next">next</literal> command to the debugger.</para>
+</listitem>
+<listitem><para>Fixed <ghissue number="215"/>.
+Make sure that options passed to a subpipeline are reset if the step appears in a loop.
+</para>
+</listitem>
+<listitem><para>Fixed <ghissue number="217"/>.
+Correctly handle sequences of documents on the <tag>p:xslt</tag> <port>secondary</port>
+output port.</para>
+</listitem>
+<listitem><para>Fixed <ghissue number="218"/>.
+Another XPath parsing bug. 🙁 Something more comprehensive is required.</para>
+</listitem>
+<listitem><para>Fixed <ghissue number="219"/>.
+When a <tag class="attribute">content-type</tag> is specified on
+<tag>p:document</tag>, it’s an override.</para>
+</listitem>
+<listitem><para>Fixed <ghissue number="220"/>.
+Improved the error message used to report an unbound variable reference in
+an expression.</para>
+</listitem>
+<listitem><para>Fixed <ghissue number="232"/>.
+Resolve the Saxon configuration file URI against the base URI of the
+configuration element.</para>
+</listitem>
+<listitem><para>Updates related to recent specification changes:</para>
+  <itemizedlist>
+  <listitem><para>Added a <tag>p:encode</tag> step.
+  </para></listitem>
+  <listitem><para>Adjusted the semantics of <tag>p:cast-content-type</tag> so that
+  a <tag>c:data</tag> document is always decoded.
+  </para></listitem>
+  <listitem><para>Added an <option>attributes</option> option to <tag>p:pack</tag>,
+  <tag>p:wrap</tag>, and <tag>p:wrap-sequence</tag>.
+  </para></listitem>
+  <listitem><para>Improved the semantics of text value templates in XML content.
+  It’s now possible to add attributes to elements with a template.
+  </para></listitem>
+  </itemizedlist>
+</listitem>
+<listitem><para>Added a <tag>cx:collection-manager</tag> step.</para>
+</listitem>
+<listitem><para>Added diagramming steps (<tag>p:ditaa</tag>, <tag>p:mathml-to-svg</tag>,
+and <tag>p:plantuml</tag>). These are published separately.</para>
+</listitem>
+<listitem><para>Added a <tag>cx:railroad</tag> step, published separately.</para>
+</listitem>
+<listitem><para>Improved error messages in serveral places. Improved the documentation
+of errors in reference pages.</para>
+</listitem>
+<listitem><para>Ignore serialization properties when they are explicitly set
+to the empty sequence.</para>
+</listitem>
+<listitem><para>Added support in <tag>p:cast-content-type</tag> for casting to and from
+<code>text/x-java-properties</code>.
+to the empty sequence.</para>
+</listitem>
+<listitem><para>Fixed a bug in <tag>p:viewport</tag> where the base URI of documents
+in the viewport was incorrect.</para>
+</listitem>
+<listitem><para>Allow other configuration elements in the configuration file. This provides
+a mechanism for steps to have their own configuration.</para>
+</listitem>
+<listitem><para>Improved the checking for invalid URIs.</para></listitem>
+<listitem><para>Fixed a couple of bugs in the pipeline graph output. (Sometimes the
+output from a compound step wasn’t correctly connected to its input.)</para>
+</listitem>
+</itemizedlist>
+</revdescription>
+</revision>
+
 <revision xml:id="r300-alpha17">
 <revnumber>3.0.0-alpha17</revnumber>
 <date>2025-01-19</date>
