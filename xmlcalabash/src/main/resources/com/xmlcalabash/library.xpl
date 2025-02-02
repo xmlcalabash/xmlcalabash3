@@ -173,6 +173,14 @@
       <p:option name="exclude-filter" as="xs:string*"/>
       <p:option name="override-content-types" as="array(array(xs:string))?"/>
    </p:declare-step>
+
+<p:declare-step type="p:encode">
+  <p:input port="source"/>
+  <p:output port="result" content-types="application/xml"/>
+  <p:option name="encoding" as="xs:string" select="'base64'"/>
+  <p:option name="serialization" as="map(xs:QName,item()*)?"/>
+</p:declare-step>
+
    <p:declare-step type="p:error" xml:id="error">
       <p:input port="source" sequence="true" content-types="text xml"/>
       <p:output port="result" sequence="true" content-types="any"/>
@@ -383,6 +391,7 @@
       <p:input port="alternate" sequence="true" content-types="text xml html"/>
       <p:output port="result" sequence="true" content-types="application/xml"/>
       <p:option name="wrapper" required="true" as="xs:QName"/>
+      <p:option name="attributes" as="map(xs:QName, xs:anyAtomicType)?"/>
    </p:declare-step>
    <p:declare-step type="p:rename" xml:id="rename">
       <p:input port="source" content-types="xml html"/>
@@ -676,6 +685,7 @@
                 as="xs:string"
                 e:type="XSLTSelectionPattern"/>
       <p:option name="group-adjacent" as="xs:string?" e:type="XPathExpression"/>
+      <p:option name="attributes" as="map(xs:QName, xs:anyAtomicType)?"/>
    </p:declare-step>
    <p:declare-step type="p:wrap-sequence" xml:id="wrap-sequence"
                   >
@@ -683,6 +693,7 @@
       <p:output port="result" sequence="true" content-types="application/xml"/>
       <p:option name="wrapper" required="true" as="xs:QName"/>
       <p:option name="group-adjacent" as="xs:string?" e:type="XPathExpression"/>
+      <p:option name="attributes" as="map(xs:QName, xs:anyAtomicType)?"/>
    </p:declare-step>
    <p:declare-step type="p:www-form-urldecode" xml:id="www-form-urldecode">
       <p:output port="result" content-types="application/json"/>

@@ -20,8 +20,8 @@ class StandardLibrary private constructor(builder: PipelineBuilder, private val 
             val localConfig = builder.stepConfig.with(mapOf(
                 "p" to NsP.namespace,
                 "cx" to NsCx.namespace,
-                "xs" to NsXs.namespace,
-                "xml" to NsXml.namespace
+                "xml" to NsXml.namespace,
+                "xs" to NsXs.namespace
             )).with(Location(URI("https://xmlcalabash.com/library/library.xpl")))
             val standardLibrary = StandardLibrary(builder, localConfig)
             val library = standardLibrary.create()
@@ -57,6 +57,7 @@ class StandardLibrary private constructor(builder: PipelineBuilder, private val 
         pCssFormatter()
         pDelete()
         pDirectoryList()
+        pEncode()
         pError()
         pFileCopy()
         pFileCreateTempfile()
@@ -496,6 +497,24 @@ class StandardLibrary private constructor(builder: PipelineBuilder, private val 
         option.asType = stepConfig.parseSequenceType("xs:string*")
         option = decl.option(QName("override-content-types"))
         option.asType = stepConfig.parseSequenceType("array(array(xs:string))?")
+
+        return decl
+    }
+
+    private fun pEncode(): DeclareStepInstruction {
+        val decl = library.declareStep()
+        decl._type = stepConfig.parseQName("p:encode")
+
+        val input = decl.input("source", primary=true, sequence=false)
+
+        val output = decl.output("result", primary=true, sequence=false)
+        output.contentTypes = MediaType.parseList("application/xml")
+
+        var option = decl.option(QName("encoding"))
+        option.select = XProcExpression.select(stepConfig, "'base64'")
+        option.asType = stepConfig.parseSequenceType("xs:string")
+        option = decl.option(QName("serialization"))
+        option.asType = stepConfig.parseSequenceType("map(xs:QName,item()*)?")
 
         return decl
     }
@@ -1035,9 +1054,11 @@ class StandardLibrary private constructor(builder: PipelineBuilder, private val 
         val output = decl.output("result", primary=true, sequence=true)
         output.contentTypes = MediaType.parseList("application/xml")
 
-        val option = decl.option(QName("wrapper"))
+        var option = decl.option(QName("wrapper"))
         option.asType = stepConfig.parseSequenceType("xs:QName")
         option.required = true
+        option = decl.option(QName("attributes"))
+        option.asType = stepConfig.parseSequenceType("map(xs:QName, xs:anyAtomicType)?")
 
         return decl
     }
@@ -1646,6 +1667,8 @@ class StandardLibrary private constructor(builder: PipelineBuilder, private val 
         option = decl.option(QName("group-adjacent"))
         option.asType = stepConfig.parseSequenceType("xs:string?")
         option.specialType = stepConfig.parseSpecialType("XPathExpression")
+        option = decl.option(QName("attributes"))
+        option.asType = stepConfig.parseSequenceType("map(xs:QName, xs:anyAtomicType)?")
 
         return decl
     }
@@ -1666,6 +1689,8 @@ class StandardLibrary private constructor(builder: PipelineBuilder, private val 
         option = decl.option(QName("group-adjacent"))
         option.asType = stepConfig.parseSequenceType("xs:string?")
         option.specialType = stepConfig.parseSpecialType("XPathExpression")
+        option = decl.option(QName("attributes"))
+        option.asType = stepConfig.parseSequenceType("map(xs:QName, xs:anyAtomicType)?")
 
         return decl
     }
@@ -1791,3 +1816,4 @@ class StandardLibrary private constructor(builder: PipelineBuilder, private val 
         return decl
     }
 }
+

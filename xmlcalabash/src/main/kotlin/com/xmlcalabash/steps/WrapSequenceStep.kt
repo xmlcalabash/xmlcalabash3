@@ -3,28 +3,41 @@ package com.xmlcalabash.steps
 import com.xmlcalabash.documents.DocumentContext
 import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.namespace.Ns
-import com.xmlcalabash.namespace.NsCx
+import com.xmlcalabash.namespace.NsXml
 import com.xmlcalabash.util.SaxonTreeBuilder
-import net.sf.saxon.om.EmptyAttributeMap
+import net.sf.saxon.om.AttributeMap
 import net.sf.saxon.om.Item
-import net.sf.saxon.s9api.XdmEmptySequence
-import net.sf.saxon.s9api.XdmItem
-import net.sf.saxon.s9api.XdmValue
+import net.sf.saxon.s9api.*
 import net.sf.saxon.tree.iter.ManualIterator
+import java.net.URI
 
 open class WrapSequenceStep(): AbstractAtomicStep() {
     private val documents = mutableListOf<XProcDocument>()
-    private var wrapperName = NsCx.unusedValue
+    private lateinit var wrapperName: QName
+    private lateinit var attributeMap: AttributeMap
     private var groupAdjacent: String? = null
     private var groupAdjacentContext: DocumentContext? = null
-    var index = 0
+    private var baseUri: URI? = null
+    private var index = 0
 
     override fun run() {
         super.run()
 
+        baseUri = stepConfig.baseUri
         documents.addAll(queues["source"]!!)
         wrapperName = qnameBinding(Ns.wrapper)!!
         groupAdjacent = stringBinding(Ns.groupAdjacent)
+
+        val attributeSet = mutableMapOf<QName,String?>()
+        val attrMap = qnameMapBinding(Ns.attributes)
+        for ((key, value) in attrMap) {
+            forbidNamespaceAttribute(key)
+            attributeSet[key] = (value as XdmAtomicValue).underlyingValue.stringValue
+            if (key == NsXml.base) {
+                baseUri = URI(value.underlyingValue.stringValue)
+            }
+        }
+        attributeMap = stepConfig.attributeMap(attributeSet)
 
         if (groupAdjacent == null) {
             runSimple()
@@ -41,8 +54,8 @@ open class WrapSequenceStep(): AbstractAtomicStep() {
 
     private fun runSimple() {
         val builder = SaxonTreeBuilder(stepConfig)
-        builder.startDocument(stepConfig.baseUri)
-        builder.addStartElement(wrapperName, EmptyAttributeMap.getInstance())
+        builder.startDocument(baseUri)
+        builder.addStartElement(wrapperName, attributeMap)
         for (doc in documents) {
             if (doc.value is XdmItem) {
                 builder.addSubtree(doc.value)
@@ -85,8 +98,8 @@ open class WrapSequenceStep(): AbstractAtomicStep() {
                 lastValue = thisValue
                 inGroup = true
                 builder = SaxonTreeBuilder(stepConfig)
-                builder.startDocument(stepConfig.environment.uniqueUri(stepConfig.baseUri.toString()))
-                builder.addStartElement(wrapperName)
+                builder.startDocument(stepConfig.environment.uniqueUri(baseUri.toString()))
+                builder.addStartElement(wrapperName, attributeMap)
                 builder.addSubtree(doc.value)
             }
         }

@@ -31,6 +31,7 @@ class StandardStepProvider: AtomicStepManager, AtomicStepProvider {
         NsP.cssFormatter        to { _: StepParameters? -> CssFormatterStep() },
         NsP.delete              to { _: StepParameters? -> DeleteStep() },
         NsP.directoryList       to { _: StepParameters? -> DirectoryListStep() },
+        NsP.encode              to { _: StepParameters? -> EncodeStep() },
         NsP.error               to { _: StepParameters? -> ErrorStep() },
         NsP.fileCopy            to { _: StepParameters? -> FileCopyStep() },
         NsP.fileCreateTempfile  to { _: StepParameters? -> CreateTempfileStep() },
