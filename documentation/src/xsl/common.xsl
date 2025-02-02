@@ -88,6 +88,13 @@
   </span>
 </xsl:template>
 
+<xsl:template match="db:ghissue">
+  <a href="https://github.com/xmlcalabash/xmlcalabash3/issues/{@number}">
+    <xsl:text>issue #</xsl:text>
+    <xsl:value-of select="@number"/>
+  </a>
+</xsl:template>
+
 <xsl:template match="processing-instruction('version')">
   <xsl:variable name="ver"
                 select="if (normalize-space(.) = '')
