@@ -25,6 +25,7 @@ object Ns {
     val byteOrderMark = QName("byte-order-mark")
     val bzip2 = QName("bzip2")
     val caseOrder = QName("case-order")
+    val charset = QName("charset")
     val code = QName("code")
     val collation = QName("collation")
     val collection = QName("collection")

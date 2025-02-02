@@ -209,6 +209,8 @@ open class XProcError protected constructor(val code: QName, val variant: Int, e
         fun xdInvalidContentType(value: String) = dynamic(79, value)
         fun xdUrifyNonhierarchicalBase(filepath: String, basedir: String) = dynamic(80, filepath, basedir)
 
+        fun xdTvtCannotSerializeAttributes(name: String) = dynamic(84, name)
+
         fun xcInvalidContentType(contentType: String) = step(1, contentType)
         fun xcHttpBadAuth(message: String) = step(3, message)
         fun xcXsltParameterNot20Compatible(name: QName, type: String) = step(7, name, type)
@@ -240,9 +242,10 @@ open class XProcError protected constructor(val code: QName, val variant: Int, e
         fun xcVersionNotAvailable(version: String) = step(38, version)
         fun xcInvalidUri(uri: URI) = step(Pair(50,1), uri)
         fun xcCannotCopy(source: URI, target: URI) = step(Pair(50,2), source, target)
+        fun xcInvalidEncoding(encoding: String) = step(52, encoding)
+        fun xcNotSchemaValidNVDL(xvrl: XProcDocument) = step(53, xvrl)
         fun xcNotSchemaValidSchematron(report: XProcDocument) = step(Pair(54, 1), report)
         fun xcNotSchemaValidSchematron(report: XProcDocument, uri: URI) = step(Pair(54, 2), report, uri)
-        fun xcNotSchemaValidNVDL(xvrl: XProcDocument) = step(53, xvrl)
         fun xcXsltNoTemplate(template: QName) = step(56, template)
         fun xcAllAndRelative() = step(58)
         fun xcCannotAddNamespaces(attName: QName) = step(Pair(59, 1), attName)
@@ -251,6 +254,7 @@ open class XProcError protected constructor(val code: QName, val variant: Int, e
         fun xcOsExecBadSeparator(sep: String) = step(63, sep)
         fun xcOsExecFailed(rc: Int) = step(64, rc)
         fun xcCannotSetContentType() = step(69)
+        fun xcInvalidCharset(charset: String) = step(71, charset)
         fun xcNotBase64(message: String) = step(72, message)
         fun xcContentTypeRequired() = step(73)
         fun xcDifferentContentTypes(contentType: MediaType, dataContentType: MediaType) = step(74, contentType, dataContentType)
