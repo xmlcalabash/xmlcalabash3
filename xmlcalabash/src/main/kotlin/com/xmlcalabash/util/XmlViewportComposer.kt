@@ -7,12 +7,15 @@ import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.namespace.Ns
 import com.xmlcalabash.namespace.NsCx
+import com.xmlcalabash.namespace.NsXml
 import com.xmlcalabash.runtime.ProcessMatch
 import com.xmlcalabash.runtime.ProcessMatchingNodes
 import net.sf.saxon.om.AttributeMap
 import net.sf.saxon.s9api.QName
 import net.sf.saxon.s9api.XdmNode
+import net.sf.saxon.s9api.XdmNodeKind
 import net.sf.saxon.s9api.XdmValue
+import java.net.URI
 
 class XmlViewportComposer(val stepConfig: XProcStepConfiguration, val match: String, val bindings: Map<QName,XdmValue>) {
     var itemIndex = 0

@@ -1,5 +1,3 @@
-nw-tvt-007 because there’s more work to be done
-
 ab-p-archive-067 because multiple archives are supported for create
 
 ab-import-functions-008 because https://saxonica.plan.io/issues/6603

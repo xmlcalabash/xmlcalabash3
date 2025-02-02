@@ -1,5 +1,6 @@
 package com.xmlcalabash.io
 
+import com.xmlcalabash.documents.DocumentProperties
 import com.xmlcalabash.documents.XProcBinaryDocument
 import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.exceptions.XProcError
@@ -16,6 +17,7 @@ import nu.validator.htmlparser.common.XmlViolationPolicy
 import nu.validator.htmlparser.dom.HtmlDocumentBuilder
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
+import java.nio.charset.Charset
 import java.nio.charset.StandardCharsets
 import java.util.*
 import javax.xml.transform.dom.DOMSource
@@ -73,8 +75,17 @@ class DocumentConverter(val stepConfig: XProcStepConfiguration,
     }
 
     private fun fromMarkup(): XProcDocument {
+        val element = S9Api.documentElement(doc.value as XdmNode)
+        if (element.nodeName == NsC.data) {
+            return decoded(element)
+        }
+
         when (outType) {
-            MediaClassification.XML, MediaClassification.XHTML, MediaClassification.HTML -> {
+            MediaClassification.XML -> {
+                return doc.with(contentType)
+            }
+
+            MediaClassification.XHTML, MediaClassification.HTML -> {
                 return doc.with(contentType)
             }
 
@@ -137,22 +148,7 @@ class DocumentConverter(val stepConfig: XProcStepConfiguration,
             MediaClassification.BINARY -> {
                 val node = S9Api.documentElement(doc.value as XdmNode)
                 if (node.nodeName == NsC.data) {
-                    val dataContentTypeAttr = node.getAttributeValue(Ns.contentType)
-                        ?: throw stepConfig.exception(XProcError.xcContentTypeRequired())
-                    val dataContentType = MediaType.parse(dataContentTypeAttr)
-                    if (contentType != dataContentType) {
-                        throw stepConfig.exception(XProcError.xcDifferentContentTypes(contentType, dataContentType))
-                    }
-
-                    val bytes = try {
-                        Base64.getDecoder().decode(node.stringValue)
-                    } catch (ex: IllegalArgumentException) {
-                        throw stepConfig.exception(XProcError.xcNotBase64(ex.message ?: "Base64 decoding error"))
-                    }
-
-                    val properties = doc.properties
-                    properties.remove(Ns.serialization)
-                    return XProcDocument.ofBinary(bytes, doc.context, contentType, properties).with(contentType, true)
+                    return decoded(node)
                 } else {
                     throw stepConfig.exception(
                         XProcError.xiNotImplemented
@@ -459,5 +455,44 @@ class DocumentConverter(val stepConfig: XProcStepConfiguration,
                 )
             }
         }
+    }
+
+    private fun decoded(node: XdmNode): XProcDocument {
+        val dataContentTypeAttr = node.getAttributeValue(Ns.contentType)
+            ?: throw stepConfig.exception(XProcError.xcContentTypeRequired())
+
+        val dataContentType = MediaType.parse(dataContentTypeAttr)
+        if (contentType != dataContentType) {
+            throw stepConfig.exception(XProcError.xcDifferentContentTypes(contentType, dataContentType))
+        }
+
+        val encoding = node.getAttributeValue(Ns.encoding) ?: "base64"
+        if (encoding != "base64") {
+            throw stepConfig.exception(XProcError.xcInvalidEncoding(encoding))
+        }
+
+        val bytes = try {
+            Base64.getDecoder().decode(node.stringValue)
+        } catch (ex: IllegalArgumentException) {
+            throw stepConfig.exception(XProcError.xcNotBase64(ex.message ?: "Base64 decoding error"))
+        }
+
+        val properties = DocumentProperties(doc.properties)
+        properties.remove(Ns.serialization)
+
+        if (contentType.classification() == MediaClassification.BINARY) {
+            return XProcDocument.ofBinary(bytes, doc.context, contentType, properties).with(contentType, true)
+        }
+
+        val charset = node.getAttributeValue(Ns.charset) ?: "utf-8"
+        val string = try {
+            bytes.toString(Charset.forName(charset))
+        } catch (ex: IllegalArgumentException) {
+            throw stepConfig.exception(XProcError.xcInvalidCharset(charset), ex)
+        }
+
+        val loader = DocumentLoader(stepConfig, null, properties)
+        val bais = ByteArrayInputStream(string.toByteArray())
+        return loader.load(null, bais, contentType)
     }
 }

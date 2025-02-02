@@ -1,11 +1,12 @@
 package com.xmlcalabash.runtime
 
-import com.xmlcalabash.runtime.XProcStepConfiguration
 import com.xmlcalabash.util.SaxonTreeBuilder
-import net.sf.saxon.om.*
+import net.sf.saxon.om.AttributeMap
+import net.sf.saxon.om.EmptyAttributeMap
+import net.sf.saxon.om.NameOfNode
+import net.sf.saxon.om.NamespaceUri
 import net.sf.saxon.s9api.*
 import net.sf.saxon.serialize.SerializationProperties
-import java.lang.UnsupportedOperationException
 import java.net.URI
 import javax.xml.xpath.XPathException
 
@@ -35,7 +36,7 @@ class ProcessMatch(val stepConfig: XProcStepConfiguration,
         receiver = destination.getReceiver(pipe, SerializationProperties())
 
         receiver.setPipelineConfiguration(pipe)
-        receiver.setSystemId(doc.baseURI!!.toASCIIString())
+        receiver.setSystemId(doc.baseURI!!.toString())
         receiver.open()
 
         // If we start a match at an element, fake a document wrapper

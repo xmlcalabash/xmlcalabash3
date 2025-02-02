@@ -5,13 +5,12 @@ import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.namespace.Ns
 import com.xmlcalabash.namespace.NsCx
+import com.xmlcalabash.namespace.NsXml
 import com.xmlcalabash.runtime.ProcessMatch
 import com.xmlcalabash.runtime.ProcessMatchingNodes
 import net.sf.saxon.om.AttributeMap
-import net.sf.saxon.s9api.Axis
-import net.sf.saxon.s9api.XdmItem
-import net.sf.saxon.s9api.XdmNode
-import net.sf.saxon.s9api.XdmNodeKind
+import net.sf.saxon.s9api.*
+import java.net.URI
 import java.util.*
 
 class WrapStep(): AbstractAtomicStep(), ProcessMatchingNodes {
@@ -23,6 +22,8 @@ class WrapStep(): AbstractAtomicStep(), ProcessMatchingNodes {
     private var wrapper = NsCx.unusedValue
     private var groupAdjacent: String? = null
     private var groupAdjacentContext: DocumentContext? = null
+    lateinit var attributeMap: AttributeMap
+    var baseUri: URI? = null
 
     override fun run() {
         super.run()
@@ -34,6 +35,17 @@ class WrapStep(): AbstractAtomicStep(), ProcessMatchingNodes {
         if (groupAdjacent != null) {
             groupAdjacentContext = options[Ns.groupAdjacent]!!.context
         }
+
+        val attributeSet = mutableMapOf<QName,String?>()
+        val attrMap = qnameMapBinding(Ns.attributes)
+        for ((key, value) in attrMap) {
+            forbidNamespaceAttribute(key)
+            attributeSet[key] = (value as XdmAtomicValue).underlyingValue.stringValue
+            if (key == NsXml.base) {
+                baseUri = URI(value.underlyingValue.stringValue)
+            }
+        }
+        attributeMap = stepConfig.attributeMap(attributeSet)
 
         inGroup.push(false)
 
@@ -48,7 +60,7 @@ class WrapStep(): AbstractAtomicStep(), ProcessMatchingNodes {
 
     override fun startDocument(node: XdmNode): Boolean {
         matcher.startDocument(node.baseURI)
-        matcher.addStartElement(wrapper)
+        matcher.addStartElement(wrapper, attributeMap, baseUri)
         matcher.addSubtree(node)
         matcher.addEndElement()
         matcher.endDocument()
@@ -61,7 +73,7 @@ class WrapStep(): AbstractAtomicStep(), ProcessMatchingNodes {
 
     override fun startElement(node: XdmNode, attributes: AttributeMap): Boolean {
         if (!inGroup.peek()) {
-            matcher.addStartElement(wrapper)
+            matcher.addStartElement(wrapper, attributeMap, baseUri)
         }
 
         inGroup.pop()
@@ -101,7 +113,7 @@ class WrapStep(): AbstractAtomicStep(), ProcessMatchingNodes {
 
     private fun process(node: XdmNode) {
         if (!inGroup.peek()) {
-            matcher.addStartElement(wrapper)
+            matcher.addStartElement(wrapper, attributeMap)
         }
 
         matcher.addSubtree(node)

@@ -32,6 +32,7 @@ object NsP {
     val documentation               = QName(namespace, "p:documentation")
     val empty                       = QName(namespace, "p:empty")
     val episode                     = QName(namespace, "p:episode")
+    val encode                      = QName(namespace, "p:encode")
     val error                       = QName(namespace, "p:error")
     val exec                        = QName(namespace, "p:exec")
     val expandText                  = QName(namespace, "p:expand-text")

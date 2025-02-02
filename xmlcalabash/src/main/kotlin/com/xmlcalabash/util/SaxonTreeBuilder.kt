@@ -69,7 +69,7 @@ open class SaxonTreeBuilder(val processor: Processor) {
         receiver.setPipelineConfiguration(pipe)
 
         if (baseURI != null) {
-            receiver.setSystemId(baseURI.toASCIIString())
+            receiver.setSystemId(baseURI.toString())
         }
         location = null
 
@@ -199,6 +199,10 @@ open class SaxonTreeBuilder(val processor: Processor) {
     }
 
     fun addStartElement(newName: QName, attrs: AttributeMap) {
+        addStartElement(newName, attrs, null)
+    }
+
+    fun addStartElement(newName: QName, attrs: AttributeMap, overrideBaseURI: URI?) {
         var nsmap = NamespaceMap.emptyMap()
         if (!newName.namespaceUri.isEmpty) {
             nsmap = nsmap.put(newName.prefix, newName.namespaceUri)
@@ -209,7 +213,9 @@ open class SaxonTreeBuilder(val processor: Processor) {
                 nsmap = nsmap.put(attr.nodeName.prefix, attr.nodeName.namespaceUri)
             }
         }
-        addStartElement(newName, attrs, nsmap)
+
+        val elemName = FingerprintedQName(newName.prefix, newName.namespaceUri, newName.localName)
+        addStartElement(elemName, attrs, Untyped.getInstance(), nsmap, overrideBaseURI)
     }
 
     fun addStartElement(newName: QName, attrs: AttributeMap, nsmap: NamespaceMap) {
@@ -227,8 +233,8 @@ open class SaxonTreeBuilder(val processor: Processor) {
 
     fun addStartElement(elemName: NodeName, attrs: AttributeMap, typeCode: SchemaType, nsmap: NamespaceMap, overrideBaseURI: URI?) {
         // Hack. See comment at top of file
-        if (overrideBaseURI != null && overrideBaseURI.toASCIIString() != "") {
-            receiver.setSystemId(overrideBaseURI.toASCIIString())
+        if (overrideBaseURI != null && overrideBaseURI.toString() != "") {
+            receiver.setSystemId(overrideBaseURI.toString())
         }
         addStartElement(elemName, attrs, typeCode, nsmap)
     }

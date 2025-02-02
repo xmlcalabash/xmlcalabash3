@@ -10,6 +10,8 @@ import com.xmlcalabash.namespace.NsP
 import com.xmlcalabash.runtime.LazyValue
 import com.xmlcalabash.runtime.XProcStepConfiguration
 import net.sf.saxon.s9api.*
+import net.sf.saxon.trans.UncheckedXPathException
+import net.sf.saxon.trans.XPathException
 import java.io.ByteArrayOutputStream
 import java.net.URI
 import java.nio.charset.StandardCharsets
@@ -134,6 +136,8 @@ class ValueTemplateFilterXml(val originalNode: XdmNode, val contentType: MediaTy
                 if (onlyChecking) {
                     attrMap[NsP.inlineExpandText] = expand.toString()
                 }
+
+                val nodes = mutableListOf<Pair<XdmValue?,String?>>()
                 node.axisIterator(Axis.ATTRIBUTE).forEach { attr ->
                     if (attr.nodeName != inlineAttribute && attr.nodeName != NsP.inlineExpandText) {
                         val value = if (expand) {
@@ -141,7 +145,7 @@ class ValueTemplateFilterXml(val originalNode: XdmNode, val contentType: MediaTy
                         } else {
                             attr.stringValue
                         }
-                        attrMap[attr.nodeName] = value
+                        nodes.add(Pair(attr, value))
                     }
                 }
 
@@ -166,8 +170,32 @@ class ValueTemplateFilterXml(val originalNode: XdmNode, val contentType: MediaTy
 
                 expandText.push(expand)
 
+                for (child in node.axisIterator(Axis.CHILD)) {
+                    nodes.addAll(filterValueTemplateNodes(config, child))
+                }
+
+                var done = nodes.isEmpty()
+                while (!done) {
+                    val childPair = nodes.first()
+                    if (childPair.first is XdmNode && (childPair.first as XdmNode).nodeKind == XdmNodeKind.ATTRIBUTE) {
+                        val name = (childPair.first as XdmNode).nodeName
+                        val value = childPair.second ?: (childPair.first as XdmNode).underlyingValue.stringValue
+                        attrMap[name] = value
+                        nodes.removeFirst()
+                        done = nodes.isEmpty()
+                    } else {
+                        done = true
+                    }
+                }
+
                 builder.addStartElement(node, config.attributeMap(attrMap))
-                node.axisIterator(Axis.CHILD).forEach { filterValueTemplates(config, builder, it) }
+                for (childPair in nodes) {
+                    if (childPair.first != null) {
+                        builder.addSubtree(childPair.first!!)
+                    } else {
+                        builder.addText(childPair.second!!)
+                    }
+                }
                 builder.addEndElement()
 
                 expandText.pop()
@@ -181,6 +209,30 @@ class ValueTemplateFilterXml(val originalNode: XdmNode, val contentType: MediaTy
             }
             else -> addSubtree(builder, node)
         }
+    }
+
+    private fun filterValueTemplateNodes(config: XProcStepConfiguration, node: XdmNode): List<Pair<XdmValue?,String?>> {
+        val nodes = mutableListOf<Pair<XdmValue?,String?>>()
+        when (node.nodeKind) {
+            XdmNodeKind.ELEMENT -> {
+                val builder = SaxonTreeBuilder(config)
+                builder.startDocument(node.baseURI)
+                filterValueTemplates(config, builder, node)
+                builder.endDocument()
+                val node = S9Api.documentElement(builder.result)
+                nodes.add(Pair(node, null))
+            }
+            XdmNodeKind.TEXT -> {
+                if (expandText.peek()) {
+                    nodes.addAll(considerValueTemplateNodes(config, node.parent, node.stringValue))
+                    considerValueTemplates(config, node.parent, node.stringValue)
+                } else {
+                    nodes.add(Pair(node, null))
+                }
+            }
+            else -> nodes.add(Pair(node, null))
+        }
+        return nodes
     }
 
     private fun removeInlineExpandText(config: XProcStepConfiguration, builder: SaxonTreeBuilder, node: XdmNode) {
@@ -223,8 +275,18 @@ class ValueTemplateFilterXml(val originalNode: XdmNode, val contentType: MediaTy
                 }
 
                 if (expr.canBeResolvedStatically()) {
-                    val value = expr.evaluate(config)
-                    sb.append(value.underlyingValue.stringValue)
+                    try {
+                        val value = expr.evaluate(config)
+                        sb.append(value.underlyingValue.stringValue)
+                    } catch (ex: Exception) {
+                        when (ex) {
+                            is XProcException -> throw ex
+                            is UncheckedXPathException -> {
+                                throw XProcError.xdInvalidAvtResult(text).exception(ex)
+                            }
+                        }
+                        throw XProcError.xdValueTemplateError(ex.message ?: "(no message)").exception(ex)
+                    }
                 } else {
                     if (onlyChecking) {
                         checkValueTemplate(expr, avt.value[index], sb)
@@ -244,20 +306,38 @@ class ValueTemplateFilterXml(val originalNode: XdmNode, val contentType: MediaTy
     }
 
     private fun considerValueTemplates(config: XProcStepConfiguration, builder: SaxonTreeBuilder, context: XdmNode, text: String) {
-        val avt = ValueTemplateParser.parse(config, text)
+        val nodes = considerValueTemplateNodes(config, context, text)
+        for (pair in nodes) {
+            if (pair.first != null) {
+                val value = pair.first!!
+                if (value is XdmNode || value is XdmAtomicValue) {
+                    addSubtree(builder, pair.first!!)
+                } else {
+                    throw XProcError.xdInvalidAvtResult(text).exception()
+                }
+            } else {
+                builder.addText(pair.second!!)
+            }
+        }
+    }
 
-        //val avtConfig = stepConfig.copy()
-        //avtConfig.updateWith(context)
+    private fun considerValueTemplateNodes(config: XProcStepConfiguration, context: XdmNode, text: String): List<Pair<XdmValue?,String?>> {
+        val nodes = mutableListOf<Pair<XdmValue?,String?>>()
+        val avt = ValueTemplateParser.parse(config, text)
 
         if (avt.value.size == 1) {
             // There are no value templates in here.
-            builder.addText(avt.value[0])
-            return
+            if (avt.value[0] != "") {
+                nodes.add(Pair(null, avt.value[0]))
+            }
+            return nodes
         }
 
         for (index in avt.value.indices) {
             if (index % 2 == 0) {
-                builder.addText(avt.value[index])
+                if (avt.value[index] != "") {
+                    nodes.add(Pair(null, avt.value[index]))
+                }
             } else {
                 val expr = XProcExpression.select(config, avt.value[index])
                 for ((name, value) in staticVariableBindings) {
@@ -267,7 +347,7 @@ class ValueTemplateFilterXml(val originalNode: XdmNode, val contentType: MediaTy
                 if (expr.canBeResolvedStatically()) {
                     try {
                         val value = expr.evaluate(config)
-                        addSubtree(builder, value)
+                        nodes.add(Pair(value, null))
                     } catch (ex: Exception) {
                         if (onlyChecking) {
                             val message = ex.message ?: ""
@@ -276,7 +356,7 @@ class ValueTemplateFilterXml(val originalNode: XdmNode, val contentType: MediaTy
                                 throw XProcError.xsXPathStaticError(message).exception(ex)
                             }
                             static = false
-                            builder.addText("{${avt.value[index]}}")
+                            nodes.add(Pair(null, "{${avt.value[index]}}"))
                         } else {
                             when (ex) {
                                 is XProcException -> throw ex
@@ -295,38 +375,46 @@ class ValueTemplateFilterXml(val originalNode: XdmNode, val contentType: MediaTy
                     }
                 } else {
                     if (onlyChecking) {
-                        builder.addText(checkValueTemplate(expr, avt.value[index]))
+                        nodes.add(Pair(null, checkValueTemplate(expr, avt.value[index])))
                     } else {
                         expr.contextItem = contextItem
                         for ((name, value) in variableBindings) {
                             expr.setBinding(name, value)
                         }
                         val value = expr.evaluate(config)
-                        addSubtree(builder, value)
+                        nodes.add(Pair(value, null))
                     }
                 }
             }
         }
+        return nodes
     }
 
     private fun addSubtree(builder: SaxonTreeBuilder, value: XdmValue) {
-        if (xmlMediaType) {
-            builder.addSubtree(value)
-        } else {
-            if (value is XdmNode && value.nodeKind == XdmNodeKind.ATTRIBUTE) {
-                builder.addText(value.underlyingNode.stringValue)
-                return
+        try {
+            if (xmlMediaType) {
+                builder.addSubtree(value)
+            } else {
+                val baos = ByteArrayOutputStream()
+                val serializer = originalNode.processor.newSerializer(baos)
+                serializer.setOutputProperty(Ns.byteOrderMark, "false")
+                serializer.setOutputProperty(Ns.method, "text")
+                serializer.setOutputProperty(Ns.encoding, "UTF-8")
+                serializer.setOutputProperty(Ns.omitXmlDeclaration, "true")
+                serializer.serializeXdmValue(value)
+                val str = baos.toString(StandardCharsets.UTF_8)
+                builder.addText(str)
             }
-
-            val baos = ByteArrayOutputStream()
-            val serializer = originalNode.processor.newSerializer(baos)
-            serializer.setOutputProperty(Ns.byteOrderMark, "false")
-            serializer.setOutputProperty(Ns.method, "text")
-            serializer.setOutputProperty(Ns.encoding, "UTF-8")
-            serializer.setOutputProperty(Ns.omitXmlDeclaration, "true")
-            serializer.serializeXdmValue(value)
-            val str = baos.toString(StandardCharsets.UTF_8)
-            builder.addText(str)
+        } catch (ex: Exception) {
+            if (ex is SaxonApiException || ex is XPathException) {
+                val message = ex.message ?: ""
+                if (message.contains("Cannot process free-standing attribute")) {
+                    val pos = message.indexOf('(')
+                    val name = message.substring(pos+1, message.length - 1)
+                    throw XProcError.xdTvtCannotSerializeAttributes(name).exception()
+                }
+            }
+            throw ex
         }
     }
 

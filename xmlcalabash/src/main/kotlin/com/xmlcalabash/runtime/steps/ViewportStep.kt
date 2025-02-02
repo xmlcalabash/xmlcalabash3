@@ -1,9 +1,11 @@
 package com.xmlcalabash.runtime.steps
 
+import com.xmlcalabash.documents.DocumentProperties
 import com.xmlcalabash.io.MediaType
 import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.namespace.Ns
+import com.xmlcalabash.namespace.NsXml
 import com.xmlcalabash.runtime.XProcStepConfiguration
 import com.xmlcalabash.runtime.model.CompoundStepModel
 import com.xmlcalabash.util.MediaClassification
@@ -89,11 +91,14 @@ open class ViewportStep(config: XProcStepConfiguration, compound: CompoundStepMo
                     firstTime = false
                 }
 
+                val currentProperties = DocumentProperties(document.properties)
+                currentProperties[Ns.baseUri] = item.node.baseURI
+
                 head.cacheInputs(cache)
                 if (S9Api.isTextDocument(item.node)) {
-                    head.input("current", XProcDocument.ofText(item.node, stepConfig, MediaType.TEXT, document.properties))
+                    head.input("current", XProcDocument.ofText(item.node, stepConfig, MediaType.TEXT, currentProperties))
                 } else {
-                    head.input("current", XProcDocument.ofXml(item.node, stepConfig, document.properties))
+                    head.input("current", XProcDocument.ofXml(item.node, stepConfig, currentProperties))
                 }
 
                 head.runStep()
