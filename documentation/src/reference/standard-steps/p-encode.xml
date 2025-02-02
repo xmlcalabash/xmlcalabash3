@@ -1,0 +1,41 @@
+<refentry xmlns="http://docbook.org/ns/docbook"
+          xmlns:p="http://www.w3.org/ns/xproc"
+          xml:id="p-encode">
+<?db filename="p-encode"?>
+   <refnamediv>
+      <refname>p:encode</refname>
+      <refpurpose>The standard p:encode step</refpurpose>
+   </refnamediv>
+   <refsynopsisdiv>
+
+<refsection role="introduction">
+<title>Introduction</title>
+<para>The <tag>p:encode</tag> step base64 encodes documents.</para>
+</refsection>
+
+<refsection role="step-declaration">
+<title>Step declaration</title>
+<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="../../../../xmlcalabash/src/main/resources/com/xmlcalabash/library.xpl" xpointer="xpath(/*/*[@type='p:encode'])"/>
+</refsection>
+
+<!--
+<refsection role="errors"><title>Errors</title><para>
+<error code="C0023">It
+is a <glossterm>dynamic error</glossterm> if the pattern matches
+anything other than document, element, text, processing instruction, and comment
+nodes.</error>
+</para>
+</refsection>
+
+<refsection role="implementation-features"><title>Implementation-defined and -dependent features</title>
+<para>
+</para>
+</refsection>
+-->
+</refsynopsisdiv>
+
+<refsection>
+  <title>Description</title>
+  <para role="external-refs"/>
+</refsection>
+</refentry>

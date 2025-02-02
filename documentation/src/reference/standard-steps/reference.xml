@@ -15,6 +15,7 @@
 <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="p-css-formatter.xml"/>
 <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="p-delete.xml"/>
 <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="p-directory-list.xml"/>
+<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="p-encode.xml"/>
 <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="p-error.xml"/>
 <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="p-file-copy.xml"/>
 <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="p-file-create-tempfile.xml"/>
@@ -66,8 +67,8 @@
 <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="p-validate-with-relax-ng.xml"/>
 <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="p-validate-with-schematron.xml"/>
 <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="p-validate-with-xml-schema.xml"/>
-<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="p-wrap-sequence.xml"/>
 <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="p-wrap.xml"/>
+<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="p-wrap-sequence.xml"/>
 <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="p-www-form-urldecode.xml"/>
 <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="p-www-form-urlencode.xml"/>
 <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="p-xinclude.xml"/>
