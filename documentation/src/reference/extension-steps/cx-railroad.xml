@@ -17,7 +17,7 @@
 <title>Introduction</title>
 <para>The <tag>cx:railroad</tag> step generates railroad diagrams with
 <personname>Gunther Rademacher</personname>’s 
-<link xlink:href="https://www.bottlecaps.de/railroad/ui">Railroad Diagram Generator</link>.</para>
+<link xlink:href="https://www.bottlecaps.de/rr/ui">Railroad Diagram Generator</link>.</para>
 </refsection>
 
 <refsection role="step-declaration">
