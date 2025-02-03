@@ -12,10 +12,9 @@ and the additional step libraries:
 [[https://spec.xproc.org/master/head/paged-media/][paged media steps]],
 [[https://spec.xproc.org/master/head/text/][text steps]],
 [[https://spec.xproc.org/master/head/validation/][validation steps]], and
-[[https://spec.xproc.org/master/head/ixml/][iXML steps]]. It also ships with implementations of
-[[https://docs.xmlcalabash.com/reference/current/cx-metadata-extractor.html][cx:metadata-extractor]], an extension step for reading metadata from image
-and other file types, and
-[[https://docs.xmlcalabash.com/reference/current/cx-unique-id.html][cx:unique-id]], an extension step that generates various flavors of unique identifier.
+[[https://spec.xproc.org/master/head/ixml/][iXML steps]]. It also ships with
+[a number](https://docs.xmlcalabash.com/reference/current/extension-steps.html)
+of extension steps.
 
 Instructions for installing and running the command line application are in the
 [[https://docs.xmlcalabash.com/userguide/current/][User Guide]]. The [[https://docs.xmlcalabash.com/reference/current/][Reference Guide]] describes all of the steps and other details.
@@ -38,10 +37,13 @@ known to be broken.
 In order to use XML Calabash, you Java 11 or later. Everything else is
 in the distribution.
 
-1. Download the [[https://github.com/xmlcalabash/xmlcalabash3/releases][latest release]], 3.0.0-alpha1 today.
+1. Download the [[https://github.com/xmlcalabash/xmlcalabash3/releases][latest release]]. You need ~xmlcalabash-3.0.0-alphaXX.zip~ where “XX”
+   is the release number. The other zip files on the release page are extension steps
+   with additional third party dependencies. You have to download them too, if you want
+   to use those steps.
 2. Unzip it somewhere on your local file system.
-3. Run ~java -jar xmlcalabash-app-3.0.0-alpha1 help~ to see a quick list of the options.
-4. Run ~java -jar xmlcalabash-app-3.0.0-alpha1 helloWorld.xpl~ to run the sample pipeline.
+3. Run ~java -jar xmlcalabash-app-3.0.0-alphaXX.jar help~ to see a quick list of the options.
+4. Run ~java -jar xmlcalabash-app-3.0.0-alphaXX.jar helloWorld.xpl~ to run the sample pipeline.
 
 There are more complete instructions in the [[https://docs.xmlcalabash.com/userguide/current/][User Guide]].
 
@@ -60,8 +62,9 @@ You can find the necessary jar files in the release archive. Dependencies
 :CUSTOM_ID: h-C3C1B934-F48D-4038-83ED-75274C6FA61B
 :END:
 
-The early testing releases aren’t distributed through Maven. That will come in
-the future.
+The early testing releases are distributed in a Maven snapshots repository:
+
++ https://oss.sonatype.org/content/repositories/snapshots/
 
 * Reporting issues
 :PROPERTIES:
