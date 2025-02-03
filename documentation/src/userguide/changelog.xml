@@ -69,8 +69,8 @@ configuration element.</para>
 </listitem>
 <listitem><para>Added a <tag>cx:collection-manager</tag> step.</para>
 </listitem>
-<listitem><para>Added diagramming steps (<tag>p:ditaa</tag>, <tag>p:mathml-to-svg</tag>,
-and <tag>p:plantuml</tag>). These are published separately.</para>
+<listitem><para>Added diagramming steps (<tag>cx:ditaa</tag>, <tag>cx:mathml-to-svg</tag>,
+and <tag>cx:plantuml</tag>). These are published separately.</para>
 </listitem>
 <listitem><para>Added a <tag>cx:railroad</tag> step, published separately.</para>
 </listitem>
