@@ -3,11 +3,9 @@ package com.xmlcalabash.ext.diagramming
 import com.xmlcalabash.documents.DocumentProperties
 import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.io.DocumentLoader
-import com.xmlcalabash.io.DocumentReader
 import com.xmlcalabash.io.DocumentWriter
 import com.xmlcalabash.io.MediaType
 import com.xmlcalabash.namespace.Ns
-import com.xmlcalabash.namespace.NsCx
 import com.xmlcalabash.steps.AbstractAtomicStep
 import net.sf.saxon.om.NamespaceUri
 import net.sf.saxon.s9api.QName
@@ -66,8 +64,9 @@ class MathMLtoSvgStep(): AbstractAtomicStep() {
             props.set(QName(NamespaceUri.NULL, "width"), "${dim.width}")
             props.set(QName(NamespaceUri.NULL, "height"), "${dim.height}")
 
+            val loader = DocumentLoader(stepConfig, null, props)
             val bais = ByteArrayInputStream(svgbaos.toByteArray())
-            val svg = DocumentReader(stepConfig, bais, MediaType.SVG).read().with(props)
+            val svg = loader.load(bais, MediaType.SVG)
             receiver.output("result", svg)
         } catch (ex: Exception) {
             throw stepConfig.exception(XProcError.xdStepFailed(ex.message ?: "???"), ex)

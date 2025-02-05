@@ -94,7 +94,7 @@ open class UncompressStep(): AbstractAtomicStep() {
 
         val loader = DocumentLoader(stepConfig, document.baseURI, document.properties, parameters)
         try {
-            val result = loader.load(document.baseURI, ByteArrayInputStream(baos.toByteArray()), outputContentType)
+            val result = loader.load(ByteArrayInputStream(baos.toByteArray()), outputContentType)
 
             val properties = DocumentProperties(document.properties)
             properties.remove(Ns.serialization)

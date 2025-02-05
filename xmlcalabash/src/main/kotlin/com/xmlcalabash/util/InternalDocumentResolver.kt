@@ -46,7 +46,7 @@ class InternalDocumentResolver(): DocumentResolver {
             val loader = DocumentLoader(context, uri)
             val stream = InternalDocumentResolver::class.java.getResourceAsStream(path)
                 ?: throw IOException("Failed to find ${path} as a resource")
-            val document = loader.load(uri, stream, MediaType.XML)
+            val document = loader.load(stream, MediaType.XML)
             stream.close()
             document_map[uri] = document
             return document

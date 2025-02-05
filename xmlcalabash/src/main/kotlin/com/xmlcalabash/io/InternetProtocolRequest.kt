@@ -34,6 +34,7 @@ import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.net.SocketTimeoutException
 import java.net.URI
+import java.nio.charset.Charset
 import java.nio.charset.StandardCharsets
 import java.time.Instant
 import java.time.format.DateTimeFormatter
@@ -258,8 +259,9 @@ class InternetProtocolRequest(val stepConfig: XProcStepConfiguration, val uri: U
         try {
             val stream = ByteArrayInputStream(httpResult.body)
             val docuri = URI(meta[Ns.baseUri]!!.underlyingValue.stringValue)
+            val charset = response.headerCharset
             val loader = DocumentLoader(stepConfig, docuri, meta, mapOf())
-            var doc = loader.load(docuri, stream, response.mediaType!!)
+            var doc = loader.load(stream, response.mediaType!!, charset)
 
             val serialization = properties[Ns.serialization]
             if (serialization is XdmMap) {
@@ -317,7 +319,7 @@ class InternetProtocolRequest(val stepConfig: XProcStepConfiguration, val uri: U
             }
 
             val loader = DocumentLoader(stepConfig, baseUri, meta, mapOf())
-            val doc = loader.load(baseUri, partStream, mcontentType)
+            val doc = loader.load(partStream, mcontentType)
             response.addResponse(doc)
         }
 

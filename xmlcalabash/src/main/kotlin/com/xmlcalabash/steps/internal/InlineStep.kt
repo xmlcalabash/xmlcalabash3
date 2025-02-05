@@ -3,12 +3,14 @@ package com.xmlcalabash.steps.internal
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.dataformat.toml.TomlFactory
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory
-import com.xmlcalabash.io.MediaType
 import com.xmlcalabash.documents.DocumentProperties
 import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.exceptions.XProcError
-import com.xmlcalabash.io.DocumentReader
+import com.xmlcalabash.exceptions.XProcException
+import com.xmlcalabash.io.DocumentLoader
+import com.xmlcalabash.io.MediaType
 import com.xmlcalabash.namespace.Ns
+import com.xmlcalabash.namespace.NsErr
 import com.xmlcalabash.runtime.parameters.InlineStepParameters
 import com.xmlcalabash.steps.AbstractAtomicStep
 import com.xmlcalabash.util.MediaClassification
@@ -18,7 +20,6 @@ import net.sf.saxon.s9api.*
 import java.io.ByteArrayInputStream
 import java.net.URI
 import java.net.URISyntaxException
-import java.nio.charset.Charset
 import java.nio.charset.StandardCharsets
 import java.util.*
 
@@ -82,7 +83,7 @@ open class InlineStep(val params: InlineStepParameters): AbstractAtomicStep() {
 
         if (params.encoding == null) {
             if (ctype.charset() != null) {
-                throw stepConfig.exception(XProcError.xdEncodingRequired(ctype.charset()!!))
+                throw stepConfig.exception(XProcError.xdEncodingRequired(ctype.charset()!!.name()))
             }
         } else {
             if (ctypeMarkup) {
@@ -143,12 +144,15 @@ open class InlineStep(val params: InlineStepParameters): AbstractAtomicStep() {
                 stepConfig.baseUri
             }
 
-            val charsetName = ctype.charset() ?: "UTF-8"
-            if (!Charset.isSupported(charsetName)) {
-                throw stepConfig.exception(XProcError.xdUnsupportedCharset(charsetName))
+            val charset = try {
+                ctype.charset() ?: StandardCharsets.UTF_8
+            } catch (ex: XProcException) {
+                if (ex.error.code == NsErr.xd(60)) {
+                    throw stepConfig.exception(ex.error.with(NsErr.xd(39)))
+                }
+                throw stepConfig.exception(ex.error)
             }
 
-            val charset = Charset.forName(ctype.charset() ?: "UTF-8")
             val builder = SaxonTreeBuilder(stepConfig.processor)
             builder.startDocument(baseURI)
             builder.addText(bytes.toString(charset))
@@ -161,8 +165,8 @@ open class InlineStep(val params: InlineStepParameters): AbstractAtomicStep() {
             props[Ns.baseUri] = stepConfig.baseUri
         }
 
-        val reader = DocumentReader(stepConfig, ByteArrayInputStream(bytes), ctype)
-        val result = reader.read().with(props)
+        val loader = DocumentLoader(stepConfig, props.baseURI, props)
+        val result = loader.load(ByteArrayInputStream(bytes), ctype)
         receiver.output("result", result)
     }
 
@@ -171,7 +175,7 @@ open class InlineStep(val params: InlineStepParameters): AbstractAtomicStep() {
     }
 
     private fun parseJson(bytes: ByteArray, contentType: MediaType?): XdmValue {
-        val charset = Charset.forName(contentType?.charset() ?: "UTF-8")
+        val charset = contentType?.charset() ?: StandardCharsets.UTF_8
         val text = bytes.toString(charset)
 
         try {
@@ -188,7 +192,7 @@ open class InlineStep(val params: InlineStepParameters): AbstractAtomicStep() {
     }
 
     private fun parseYaml(bytes: ByteArray, contentType: MediaType?): XdmValue {
-        val charset = Charset.forName(contentType?.charset() ?: "UTF-8")
+        val charset = contentType?.charset() ?: StandardCharsets.UTF_8
         val text = bytes.toString(charset)
 
         val yamlReader = ObjectMapper(YAMLFactory())
@@ -199,7 +203,7 @@ open class InlineStep(val params: InlineStepParameters): AbstractAtomicStep() {
     }
 
     private fun parseToml(bytes: ByteArray, contentType: MediaType?): XdmValue {
-        val charset = Charset.forName(contentType?.charset() ?: "UTF-8")
+        val charset = contentType?.charset() ?: StandardCharsets.UTF_8
         val text = bytes.toString(charset)
 
         val tomlReader = ObjectMapper(TomlFactory())

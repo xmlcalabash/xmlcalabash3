@@ -4,6 +4,7 @@ import com.xmlcalabash.config.CommonEnvironment
 import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.util.MediaClassification
 import net.sf.saxon.s9api.XdmAtomicValue
+import java.nio.charset.Charset
 import java.util.*
 import java.util.regex.Pattern
 import kotlin.collections.iterator
@@ -384,8 +385,17 @@ class MediaType private constructor(val mediaType: String, val mediaSubtype: Str
         return null
     }
 
-    fun charset(): String? {
-        return paramValue("charset")
+    fun charset(): Charset? {
+        val name = paramValue("charset")
+        if (name == null) {
+            return null
+        }
+
+        if (!Charset.isSupported(name)) {
+            throw XProcError.xdUnsupportedDocumentCharset(name).exception()
+        }
+
+        return Charset.forName(name)
     }
 
     fun assertValid(): MediaType {

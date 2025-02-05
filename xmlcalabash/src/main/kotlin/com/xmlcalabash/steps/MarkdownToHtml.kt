@@ -60,7 +60,7 @@ open class MarkdownToHtml(): AbstractAtomicStep() {
         val markup = "<body xmlns='http://www.w3.org/1999/xhtml'>" + renderer.render(html) + "</body>"
 
         val loader = DocumentLoader(stepConfig, document.baseURI, DocumentProperties(), mapOf())
-        val result = loader.load(document.baseURI, markup.byteInputStream(), MediaType.HTML)
+        val result = loader.load(markup.byteInputStream(), MediaType.HTML)
 
         receiver.output("result", result)
     }
