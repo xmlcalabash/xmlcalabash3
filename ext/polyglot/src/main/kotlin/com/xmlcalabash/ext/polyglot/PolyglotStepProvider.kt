@@ -3,13 +3,12 @@ package com.xmlcalabash.ext.polyglot
 import com.xmlcalabash.api.XProcStep
 import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.namespace.NsCx
-import com.xmlcalabash.runtime.XProcRuntime
 import com.xmlcalabash.runtime.parameters.StepParameters
 import com.xmlcalabash.spi.AtomicStepManager
 import com.xmlcalabash.spi.AtomicStepProvider
 import net.sf.saxon.s9api.QName
 
-class StepProvider: AtomicStepProvider, AtomicStepManager {
+class PolyglotStepProvider: AtomicStepProvider, AtomicStepManager {
     companion object {
         private val POLYGLOT = QName(NsCx.namespace, "polyglot")
         private val JAVASCRIPT = QName(NsCx.namespace, "cx:javascript")

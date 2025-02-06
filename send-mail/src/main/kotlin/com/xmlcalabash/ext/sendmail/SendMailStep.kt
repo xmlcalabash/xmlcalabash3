@@ -28,7 +28,7 @@ import javax.mail.internet.MimeBodyPart
 import javax.mail.internet.MimeMessage
 import javax.mail.internet.MimeMultipart
 
-class SendMail(): AbstractAtomicStep() {
+class SendMailStep(): AbstractAtomicStep() {
     companion object {
         val NS_EMAIL = NamespaceUri.of("URN:ietf:params:email-xml:")
         val NS_RFC822 = NamespaceUri.of("URN:ietf:params:rfc822:")
