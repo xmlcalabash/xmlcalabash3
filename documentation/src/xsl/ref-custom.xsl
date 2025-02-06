@@ -208,20 +208,7 @@
 
  }"/>
 
-<xsl:variable name="xprocref" select="('p:add-attribute', 'p:add-xml-base',
-  'p:archive', 'p:archive-manifest', 'p:cast-content-type', 'p:compare',
-  'p:compress', 'p:count', 'p:delete', 'p:directory-list', 'p:error',
-  'p:file-copy', 'p:file-create-tempfile', 'p:file-delete', 'p:file-info',
-  'p:file-mkdir', 'p:file-move', 'p:file-touch', 'p:filter', 'p:hash',
-  'p:http-request', 'p:identity', 'p:insert', 'p:json-join', 'p:json-merge',
-  'p:label-elements', 'p:load', 'p:make-absolute-uris', 'p:namespace-delete',
-  'p:namespace-rename', 'p:os-exec', 'p:os-info', 'p:pack', 'p:rename',
-  'p:replace', 'p:set-attributes', 'p:set-properties', 'p:sink',
-  'p:split-sequence', 'p:store', 'p:string-replace', 'p:text-count',
-  'p:text-head', 'p:text-join', 'p:text-replace', 'p:text-sort', 'p:text-tail',
-  'p:unarchive', 'p:uncompress', 'p:unwrap', 'p:uuid', 'p:wrap',
-  'p:wrap-sequence', 'p:www-form-urldecode', 'p:www-form-urlencode', 'p:xinclude',
-  'p:xquery', 'p:xslt')"/>
+<xsl:variable name="not-xprocref" select="()"/>
 
 <xsl:template match="db:para[@role='external-refs']">
   <xsl:if test="node()">
@@ -250,13 +237,13 @@
   <p>The <code>{$name}</code> step is a
   <a href="{$link}">standard XProc {$version} step</a>.
   <xsl:choose>
-    <xsl:when test="$name = $xprocref">
+    <xsl:when test="$name = $not-xprocref">
+      <xsl:message>Not on XProcRef.org? {$name}</xsl:message>
+    </xsl:when>
+    <xsl:otherwise>
       <xsl:text>It is also described on </xsl:text>
       <a href="https://xprocref.org/{$version}/{replace($name, ':', '.')}.html">XProcRef.org</a>
       <xsl:text>.</xsl:text>
-    </xsl:when>
-    <xsl:otherwise>
-      <xsl:message>Not on XProcRef.org? {$name}</xsl:message>
     </xsl:otherwise>
   </xsl:choose>
   </p>
