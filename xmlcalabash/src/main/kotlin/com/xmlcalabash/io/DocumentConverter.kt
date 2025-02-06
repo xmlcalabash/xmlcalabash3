@@ -339,7 +339,8 @@ class DocumentConverter(val stepConfig: XProcStepConfiguration,
             MediaClassification.YAML, MediaClassification.TOML -> {
                 val text = doc.value.underlyingValue.stringValue
                 val bais = ByteArrayInputStream(text.toByteArray(StandardCharsets.UTF_8))
-                return DocumentReader(stepConfig, bais, contentType).read()
+                val loader = DocumentLoader(stepConfig, doc.baseURI)
+                return loader.load(bais, contentType)
             }
 
             MediaClassification.TEXT -> {
@@ -493,6 +494,6 @@ class DocumentConverter(val stepConfig: XProcStepConfiguration,
 
         val loader = DocumentLoader(stepConfig, null, properties)
         val bais = ByteArrayInputStream(string.toByteArray())
-        return loader.load(null, bais, contentType)
+        return loader.load(bais, contentType)
     }
 }

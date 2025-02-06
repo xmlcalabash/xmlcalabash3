@@ -1,12 +1,13 @@
 package com.xmlcalabash.test
 
 import com.xmlcalabash.config.XmlCalabash
+import com.xmlcalabash.documents.DocumentProperties
 import com.xmlcalabash.io.MediaType
 import com.xmlcalabash.documents.XProcBinaryDocument
 import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.exceptions.XProcException
 import com.xmlcalabash.io.DocumentConverter
-import com.xmlcalabash.io.DocumentReader
+import com.xmlcalabash.io.DocumentLoader
 import com.xmlcalabash.io.DocumentWriter
 import com.xmlcalabash.namespace.*
 import com.xmlcalabash.runtime.XProcStepConfiguration
@@ -90,16 +91,16 @@ class MarshallTest {
     @Test
     fun readXml() {
         val uri = cwd.resolve("src/test/resources/marshall/input.xml")
-        val reader = DocumentReader(stepConfig, openStream(uri), MediaType.XML, uri)
-        val doc = reader.read()
+        val loader = DocumentLoader(stepConfig, uri)
+        val doc = loader.load(openStream(uri), MediaType.XML)
         Assertions.assertEquals(MediaType.XML, doc.contentType)
     }
 
     @Test
     fun writeXml() {
         val uri = cwd.resolve("src/test/resources/marshall/input.xml")
-        val reader = DocumentReader(stepConfig, openStream(uri), MediaType.XML, uri)
-        val doc = reader.read()
+        val loader = DocumentLoader(stepConfig, uri)
+        val doc = loader.load(openStream(uri), MediaType.XML)
 
         val temp = temporaryFile(".xml")
         val writer = DocumentWriter(doc, FileOutputStream(temp.toFile()))
@@ -112,8 +113,8 @@ class MarshallTest {
     @Test
     fun writeXmlOmitDecl() {
         val uri = cwd.resolve("src/test/resources/marshall/input.xml")
-        val reader = DocumentReader(stepConfig, openStream(uri), MediaType.XML, uri)
-        val doc = reader.read()
+        val loader = DocumentLoader(stepConfig, uri)
+        val doc = loader.load(openStream(uri), MediaType.XML)
 
         val temp = temporaryFile(".xml")
         val writer = DocumentWriter(doc, FileOutputStream(temp.toFile()))
@@ -128,8 +129,8 @@ class MarshallTest {
     @Test
     fun writeXmlEncoded() {
         val uri = cwd.resolve("src/test/resources/marshall/input.xml")
-        val reader = DocumentReader(stepConfig, openStream(uri), MediaType.XML, uri)
-        val doc = reader.read()
+        val loader = DocumentLoader(stepConfig, uri)
+        val doc = loader.load(openStream(uri), MediaType.XML)
 
         val temp = temporaryFile(".xml")
         val writer = DocumentWriter(doc, FileOutputStream(temp.toFile()))
@@ -145,9 +146,9 @@ class MarshallTest {
     @Test
     fun readBrokenXml() {
         val uri = cwd.resolve("src/test/resources/marshall/input-broken.xml")
-        val reader = DocumentReader(stepConfig, openStream(uri), MediaType.XML, uri)
+        val loader = DocumentLoader(stepConfig, uri)
         try {
-            val doc = reader.read()
+            val doc = loader.load(openStream(uri), MediaType.XML)
             fail()
         } catch (ex: XProcException) {
             Assertions.assertEquals(ex.error.code, NsErr.xd(49))
@@ -157,16 +158,16 @@ class MarshallTest {
     @Test
     fun readXHtml() {
         val uri = cwd.resolve("src/test/resources/marshall/input.xhtml")
-        val reader = DocumentReader(stepConfig, openStream(uri), MediaType.XHTML, uri)
-        val doc = reader.read()
+        val loader = DocumentLoader(stepConfig, uri)
+        val doc = loader.load(openStream(uri), MediaType.XHTML)
         Assertions.assertEquals(MediaType.XHTML, doc.contentType)
     }
 
     @Test
     fun writeXhtml() {
         val uri = cwd.resolve("src/test/resources/marshall/input.xhtml")
-        val reader = DocumentReader(stepConfig, openStream(uri), MediaType.XHTML, uri)
-        val doc = reader.read()
+        val loader = DocumentLoader(stepConfig, uri)
+        val doc = loader.load(openStream(uri), MediaType.XHTML)
 
         val temp = temporaryFile(".xhtml")
         val writer = DocumentWriter(doc, FileOutputStream(temp.toFile()))
@@ -181,9 +182,9 @@ class MarshallTest {
     @Test
     fun readBrokenXhtml() {
         val uri = cwd.resolve("src/test/resources/marshall/input-broken.xhtml")
-        val reader = DocumentReader(stepConfig, openStream(uri), MediaType.XHTML, uri)
+        val loader = DocumentLoader(stepConfig, uri)
         try {
-            val doc = reader.read()
+            val doc = loader.load(openStream(uri), MediaType.XHTML)
             fail()
         } catch (ex: XProcException) {
             Assertions.assertEquals(ex.error.code, NsErr.xd(49))
@@ -193,16 +194,16 @@ class MarshallTest {
     @Test
     fun readHtml() {
         val uri = cwd.resolve("src/test/resources/marshall/input.html")
-        val reader = DocumentReader(stepConfig, openStream(uri), MediaType.HTML, uri)
-        val doc = reader.read()
+        val loader = DocumentLoader(stepConfig, uri)
+        val doc = loader.load(openStream(uri), MediaType.HTML)
         Assertions.assertEquals(MediaType.HTML, doc.contentType)
     }
 
     @Test
     fun writeHtml() {
         val uri = cwd.resolve("src/test/resources/marshall/input.html")
-        val reader = DocumentReader(stepConfig, openStream(uri), MediaType.HTML, uri)
-        val doc = reader.read()
+        val loader = DocumentLoader(stepConfig, uri)
+        val doc = loader.load(openStream(uri), MediaType.HTML)
 
         val temp = temporaryFile(".html")
         val writer = DocumentWriter(doc, FileOutputStream(temp.toFile()))
@@ -217,8 +218,8 @@ class MarshallTest {
     @Test
     fun writeHtml5() {
         val uri = cwd.resolve("src/test/resources/marshall/input.html")
-        val reader = DocumentReader(stepConfig, openStream(uri), MediaType.HTML, uri)
-        val doc = reader.read()
+        val loader = DocumentLoader(stepConfig, uri)
+        val doc = loader.load(openStream(uri), MediaType.HTML)
 
         val temp = temporaryFile(".html")
         val writer = DocumentWriter(doc, FileOutputStream(temp.toFile()))
@@ -234,26 +235,25 @@ class MarshallTest {
     @Test
     fun readBrokenHtml() {
         val uri = cwd.resolve("src/test/resources/marshall/input-broken.html")
-        val reader = DocumentReader(stepConfig, openStream(uri), MediaType.HTML, uri)
-        val doc = reader.read()
+        val loader = DocumentLoader(stepConfig, uri)
+        val doc = loader.load(openStream(uri), MediaType.HTML)
         Assertions.assertEquals(MediaType.HTML, doc.contentType)
     }
 
     @Test
     fun readJsonMap() {
         val uri = cwd.resolve("src/test/resources/marshall/input-json-map.json")
-        val reader = DocumentReader(stepConfig, openStream(uri), MediaType.JSON, uri)
-        val doc = reader.read()
+        val loader = DocumentLoader(stepConfig, uri)
+        val doc = loader.load(openStream(uri), MediaType.JSON)
         Assertions.assertEquals(MediaType.JSON, doc.contentType)
     }
 
     @Test
     fun readJsonMapDupForbid() {
         val uri = cwd.resolve("src/test/resources/marshall/input-json-map-dup-keys.json")
-        val reader = DocumentReader(stepConfig, openStream(uri), MediaType.JSON, uri)
-        reader[QName("duplicates")] = "reject"
+        val loader = DocumentLoader(stepConfig, uri, DocumentProperties(), mapOf(QName("duplicates") to XdmAtomicValue("reject")))
         try {
-            val doc = reader.read()
+            val doc = loader.load(openStream(uri), MediaType.JSON)
             fail()
         } catch (ex: XProcException) {
             Assertions.assertEquals(ex.error.code, NsErr.xd(58))
@@ -263,32 +263,32 @@ class MarshallTest {
     @Test
     fun readJsonArray() {
         val uri = cwd.resolve("src/test/resources/marshall/input-json-array.json")
-        val reader = DocumentReader(stepConfig, openStream(uri), MediaType.JSON, uri)
-        val doc = reader.read()
+        val loader = DocumentLoader(stepConfig, uri)
+        val doc = loader.load(openStream(uri), MediaType.JSON)
         Assertions.assertEquals(MediaType.JSON, doc.contentType)
     }
 
     @Test
     fun readJsonNumber() {
         val uri = cwd.resolve("src/test/resources/marshall/input-json-number.json")
-        val reader = DocumentReader(stepConfig, openStream(uri), MediaType.JSON, uri)
-        val doc = reader.read()
+        val loader = DocumentLoader(stepConfig, uri)
+        val doc = loader.load(openStream(uri), MediaType.JSON)
         Assertions.assertEquals(MediaType.JSON, doc.contentType)
     }
 
     @Test
     fun readJsonString() {
         val uri = cwd.resolve("src/test/resources/marshall/input-json-string.json")
-        val reader = DocumentReader(stepConfig, openStream(uri), MediaType.JSON, uri)
-        val doc = reader.read()
+        val loader = DocumentLoader(stepConfig, uri)
+        val doc = loader.load(openStream(uri), MediaType.JSON)
         Assertions.assertEquals(MediaType.JSON, doc.contentType)
     }
 
     @Test
     fun writeJson() {
         val uri = cwd.resolve("src/test/resources/marshall/input-json-map.json")
-        val reader = DocumentReader(stepConfig, openStream(uri), MediaType.JSON, uri)
-        val doc = reader.read()
+        val loader = DocumentLoader(stepConfig, uri)
+        val doc = loader.load(openStream(uri), MediaType.JSON)
 
         val temp = temporaryFile(".json")
         val writer = DocumentWriter(doc, FileOutputStream(temp.toFile()))
@@ -303,8 +303,8 @@ class MarshallTest {
     @Test
     fun readYaml() {
         val uri = cwd.resolve("src/test/resources/marshall/input.yaml")
-        val reader = DocumentReader(stepConfig, openStream(uri), MediaType.YAML, uri)
-        val doc = reader.read()
+        val loader = DocumentLoader(stepConfig, uri)
+        val doc = loader.load(openStream(uri), MediaType.YAML)
         Assertions.assertEquals(MediaType.YAML, doc.contentType)
         Assertions.assertTrue(doc.value is XdmMap)
     }
@@ -312,8 +312,8 @@ class MarshallTest {
     @Test
     fun writeYaml() {
         val uri = cwd.resolve("src/test/resources/marshall/input-json-map.json")
-        val reader = DocumentReader(stepConfig, openStream(uri), MediaType.YAML, uri)
-        val doc = reader.read()
+        val loader = DocumentLoader(stepConfig, uri)
+        val doc = loader.load(openStream(uri), MediaType.YAML)
 
         val temp = temporaryFile(".yaml")
         val writer = DocumentWriter(doc, FileOutputStream(temp.toFile()))
@@ -328,8 +328,8 @@ class MarshallTest {
     @Test
     fun writeYamlOverrideMethod() {
         val uri = cwd.resolve("src/test/resources/marshall/input-json-map.json")
-        val reader = DocumentReader(stepConfig, openStream(uri), MediaType.JSON, uri)
-        val doc = reader.read()
+        val loader = DocumentLoader(stepConfig, uri)
+        val doc = loader.load(openStream(uri), MediaType.JSON)
 
         val temp = temporaryFile(".yaml")
         val writer = DocumentWriter(doc, FileOutputStream(temp.toFile()))
@@ -345,8 +345,8 @@ class MarshallTest {
     @Test
     fun readToml() {
         val uri = cwd.resolve("src/test/resources/marshall/input.toml")
-        val reader = DocumentReader(stepConfig, openStream(uri), MediaType.TOML, uri)
-        val doc = reader.read()
+        val loader = DocumentLoader(stepConfig, uri)
+        val doc = loader.load(openStream(uri), MediaType.TOML)
         Assertions.assertEquals(MediaType.TOML, doc.contentType)
         Assertions.assertTrue(doc.value is XdmMap)
     }
@@ -354,8 +354,8 @@ class MarshallTest {
     @Test
     fun writeToml() {
         val uri = cwd.resolve("src/test/resources/marshall/input.toml")
-        val reader = DocumentReader(stepConfig, openStream(uri), MediaType.TOML, uri)
-        val doc = reader.read()
+        val loader = DocumentLoader(stepConfig, uri)
+        val doc = loader.load(openStream(uri), MediaType.TOML)
 
         val temp = temporaryFile(".toml")
         val writer = DocumentWriter(doc, FileOutputStream(temp.toFile()))
@@ -370,8 +370,8 @@ class MarshallTest {
     @Test
     fun writeTomlOverrideMethod() {
         val uri = cwd.resolve("src/test/resources/marshall/input-json-map.json")
-        val reader = DocumentReader(stepConfig, openStream(uri), MediaType.JSON, uri)
-        val doc = reader.read()
+        val loader = DocumentLoader(stepConfig, uri)
+        val doc = loader.load(openStream(uri), MediaType.JSON)
 
         val temp = temporaryFile(".toml")
         val writer = DocumentWriter(doc, FileOutputStream(temp.toFile()))
@@ -388,8 +388,8 @@ class MarshallTest {
     fun readText() {
         val uri = cwd.resolve("src/test/resources/marshall/input.txt")
         val mediaType = MediaType.parse("text/arbitrary")
-        val reader = DocumentReader(stepConfig, openStream(uri), mediaType, uri)
-        val doc = reader.read()
+        val loader = DocumentLoader(stepConfig, uri)
+        val doc = loader.load(openStream(uri), mediaType)
 
         Assertions.assertEquals(mediaType, doc.contentType)
         Assertions.assertTrue(doc.value.toString().contains("emergency"))
@@ -399,8 +399,8 @@ class MarshallTest {
     fun writeText() {
         val uri = cwd.resolve("src/test/resources/marshall/input.txt")
         val mediaType = MediaType.parse("text/arbitrary")
-        val reader = DocumentReader(stepConfig, openStream(uri), mediaType, uri)
-        val doc = reader.read()
+        val loader = DocumentLoader(stepConfig, uri)
+        val doc = loader.load(openStream(uri), mediaType)
 
         val temp = temporaryFile(".txt")
         val writer = DocumentWriter(doc, FileOutputStream(temp.toFile()))
@@ -415,8 +415,8 @@ class MarshallTest {
     @Test
     fun readBinary() {
         val uri = cwd.resolve("src/test/resources/marshall/input.jpg")
-        val reader = DocumentReader(stepConfig, openStream(uri), MediaType.JPEG, uri)
-        val doc = reader.read()
+        val loader = DocumentLoader(stepConfig, uri)
+        val doc = loader.load(openStream(uri), MediaType.JPEG)
 
         Assertions.assertEquals(MediaType.JPEG, doc.contentType)
         Assertions.assertTrue(doc is XProcBinaryDocument)
@@ -425,8 +425,8 @@ class MarshallTest {
     @Test
     fun writeBinary() {
         val uri = cwd.resolve("src/test/resources/marshall/input.zip")
-        val reader = DocumentReader(stepConfig, openStream(uri), MediaType.ZIP, uri)
-        val doc = reader.read()
+        val loader = DocumentLoader(stepConfig, uri)
+        val doc = loader.load(openStream(uri), MediaType.ZIP)
 
         val temp = temporaryFile(".bin")
         val writer = DocumentWriter(doc, FileOutputStream(temp.toFile()))
@@ -451,8 +451,8 @@ class MarshallTest {
     @Test
     fun convertXmltoXml() {
         val uri = cwd.resolve("src/test/resources/marshall/input.xml")
-        val reader = DocumentReader(stepConfig, openStream(uri), MediaType.XML, uri)
-        val doc = reader.read()
+        val loader = DocumentLoader(stepConfig, uri)
+        val doc = loader.load(openStream(uri), MediaType.XML)
 
         val props = propertyMap(mapOf(
             "method" to "xml",
@@ -473,8 +473,8 @@ class MarshallTest {
     @Test
     fun convertXmltoHtml() {
         val uri = cwd.resolve("src/test/resources/marshall/input.xml")
-        val reader = DocumentReader(stepConfig, openStream(uri), MediaType.XML, uri)
-        val doc = reader.read()
+        val loader = DocumentLoader(stepConfig, uri)
+        val doc = loader.load(openStream(uri), MediaType.XML)
 
         val props = propertyMap(mapOf(
             "method" to "xml",
@@ -495,8 +495,8 @@ class MarshallTest {
     @Test
     fun convertFnJsonXmltoJson() {
         val stream = ByteArrayInputStream("{\"test\": 17}".toByteArray(StandardCharsets.UTF_8))
-        val reader = DocumentReader(stepConfig, stream, MediaType.JSON)
-        val originalJson = reader.read()
+        val loader = DocumentLoader(stepConfig, null)
+        val originalJson = loader.load(stream, MediaType.JSON)
 
         val xmlConverter = DocumentConverter(stepConfig, originalJson, MediaType.XML)
         val xmlDoc = xmlConverter.convert()
@@ -519,8 +519,8 @@ class MarshallTest {
                 "<c:param name='other' namespace='http://example.com/' value='Some string value'/>" +
                 "</c:param-set>"
         val stream = ByteArrayInputStream(xml.toByteArray(StandardCharsets.UTF_8))
-        val reader = DocumentReader(stepConfig, stream, MediaType.XML)
-        val xmlDoc = reader.read()
+        val loader = DocumentLoader(stepConfig, null)
+        val xmlDoc = loader.load(stream, MediaType.XML)
 
         val converter = DocumentConverter(stepConfig, xmlDoc, MediaType.JSON)
         val jsonDoc = converter.convert()
@@ -535,8 +535,8 @@ class MarshallTest {
     fun convertOtherXmltoJson() {
         val xml = "<test><this/></test>"
         val stream = ByteArrayInputStream(xml.toByteArray(StandardCharsets.UTF_8))
-        val reader = DocumentReader(stepConfig, stream, MediaType.XML)
-        val xmlDoc = reader.read()
+        val loader = DocumentLoader(stepConfig, null)
+        val xmlDoc = loader.load(stream, MediaType.XML)
 
         val converter = DocumentConverter(stepConfig, xmlDoc, MediaType.JSON)
         try {
@@ -551,8 +551,8 @@ class MarshallTest {
     @Test
     fun convertXmlToText() {
         val uri = cwd.resolve("src/test/resources/marshall/input.xml")
-        val reader = DocumentReader(stepConfig, openStream(uri), MediaType.XML, uri)
-        val doc = reader.read()
+        val loader = DocumentLoader(stepConfig, uri)
+        val doc = loader.load(openStream(uri), MediaType.XML)
 
         val converter = DocumentConverter(stepConfig, doc, MediaType.TEXT)
         converter[Ns.encoding] = "iso-8859-1"
@@ -567,8 +567,8 @@ class MarshallTest {
     @Test
     fun convertXmlToBinary() {
         val uri = cwd.resolve("src/test/resources/marshall/input.xml")
-        val reader = DocumentReader(stepConfig, openStream(uri), MediaType.XML, uri)
-        val doc = reader.read()
+        val loader = DocumentLoader(stepConfig, uri)
+        val doc = loader.load(openStream(uri), MediaType.XML)
 
         val converter = DocumentConverter(stepConfig, doc, MediaType.JPEG)
         try {
@@ -583,8 +583,8 @@ class MarshallTest {
     @Test
     fun convertDataXmlToBinary() {
         val uri = cwd.resolve("src/test/resources/marshall/input-base64.xml")
-        val reader = DocumentReader(stepConfig, openStream(uri), MediaType.XML, uri)
-        val doc = reader.read()
+        val loader = DocumentLoader(stepConfig, uri)
+        val doc = loader.load(openStream(uri), MediaType.XML)
 
         val converter = DocumentConverter(stepConfig, doc, MediaType.ZIP)
         val binDoc = converter.convert() as XProcBinaryDocument
@@ -597,8 +597,8 @@ class MarshallTest {
     @Test
     fun convertJsonToXml() {
         val uri = cwd.resolve("src/test/resources/marshall/input-json-map.json")
-        val reader = DocumentReader(stepConfig, openStream(uri), MediaType.JSON, uri)
-        val doc = reader.read()
+        val loader = DocumentLoader(stepConfig, uri)
+        val doc = loader.load(openStream(uri), MediaType.JSON)
 
         val converter = DocumentConverter(stepConfig, doc, MediaType.XML)
         converter[Ns.indent] = true
@@ -615,8 +615,8 @@ class MarshallTest {
     @Test
     fun convertJsonToHtml() {
         val uri = cwd.resolve("src/test/resources/marshall/input-json-map.json")
-        val reader = DocumentReader(stepConfig, openStream(uri), MediaType.JSON, uri)
-        val doc = reader.read()
+        val loader = DocumentLoader(stepConfig, uri)
+        val doc = loader.load(openStream(uri), MediaType.JSON)
 
         val converter = DocumentConverter(stepConfig, doc, MediaType.HTML)
         try {
@@ -631,8 +631,8 @@ class MarshallTest {
     @Test
     fun convertJsonToYaml() {
         val uri = cwd.resolve("src/test/resources/marshall/input-json-map.json")
-        val reader = DocumentReader(stepConfig, openStream(uri), MediaType.JSON, uri)
-        val doc = reader.read()
+        val loader = DocumentLoader(stepConfig, uri)
+        val doc = loader.load(openStream(uri), MediaType.JSON)
 
         val converted = DocumentConverter(stepConfig, doc, MediaType.YAML).convert()
         Assertions.assertEquals(MediaType.YAML, converted.contentType)
@@ -642,7 +642,8 @@ class MarshallTest {
     @Test
     fun convertJsonToText() {
         val uri = cwd.resolve("src/test/resources/marshall/input-json-map.json")
-        val doc = DocumentReader(stepConfig, openStream(uri), MediaType.JSON, uri).read()
+        val loader = DocumentLoader(stepConfig, uri)
+        val doc = loader.load(openStream(uri), MediaType.JSON)
 
         val converted = DocumentConverter(stepConfig, doc, MediaType.TEXT).convert()
         val text = converted.value.underlyingValue.stringValue
@@ -654,7 +655,8 @@ class MarshallTest {
     @Test
     fun convertYamlToText() {
         val uri = cwd.resolve("src/test/resources/marshall/input.yaml")
-        val doc = DocumentReader(stepConfig, openStream(uri), MediaType.YAML, uri).read()
+        val loader = DocumentLoader(stepConfig, uri)
+        val doc = loader.load(openStream(uri), MediaType.YAML)
 
         val converted = DocumentConverter(stepConfig, doc, MediaType.TEXT).convert()
         val text = converted.value.underlyingValue.stringValue
@@ -666,7 +668,8 @@ class MarshallTest {
     @Test
     fun convertTomlToText() {
         val uri = cwd.resolve("src/test/resources/marshall/input.toml")
-        val doc = DocumentReader(stepConfig, openStream(uri), MediaType.TOML, uri).read()
+        val loader = DocumentLoader(stepConfig, uri)
+        val doc = loader.load(openStream(uri), MediaType.TOML)
 
         val converted = DocumentConverter(stepConfig, doc, MediaType.TEXT).convert()
         val text = converted.value.underlyingValue.stringValue
@@ -677,7 +680,8 @@ class MarshallTest {
     @Test
     fun convertJsonToBinary() {
         val uri = cwd.resolve("src/test/resources/marshall/input-json-map.json")
-        val doc = DocumentReader(stepConfig, openStream(uri), MediaType.JSON, uri).read()
+        val loader = DocumentLoader(stepConfig, uri)
+        val doc = loader.load(openStream(uri), MediaType.JSON)
 
         val converter = DocumentConverter(stepConfig, doc, MediaType.JPEG)
         try {
@@ -692,7 +696,8 @@ class MarshallTest {
     @Test
     fun convertTextToXml() {
         val uri = cwd.resolve("src/test/resources/marshall/input.xml")
-        val doc = DocumentReader(stepConfig, openStream(uri), MediaType.TEXT, uri).read()
+        val loader = DocumentLoader(stepConfig, uri)
+        val doc = loader.load(openStream(uri), MediaType.TEXT)
 
         val props = propertyMap(mapOf(
             "method" to "xml",
@@ -713,7 +718,8 @@ class MarshallTest {
     @Test
     fun convertTextToHtml() {
         val uri = cwd.resolve("src/test/resources/marshall/input-broken.html")
-        val doc = DocumentReader(stepConfig, openStream(uri), MediaType.TEXT, uri).read()
+        val loader = DocumentLoader(stepConfig, uri)
+        val doc = loader.load(openStream(uri), MediaType.TEXT)
 
         val props = propertyMap(mapOf(
             "method" to "xml",
@@ -733,7 +739,8 @@ class MarshallTest {
     @Test
     fun convertTextToJson() {
         val uri = cwd.resolve("src/test/resources/marshall/input-json-array.json")
-        val doc = DocumentReader(stepConfig, openStream(uri), MediaType.TEXT, uri).read()
+        val loader = DocumentLoader(stepConfig, uri)
+        val doc = loader.load(openStream(uri), MediaType.TEXT)
 
         val props = propertyMap(mapOf(
             "method" to "xml",
@@ -751,7 +758,8 @@ class MarshallTest {
     @Test
     fun convertTextToYaml() {
         val uri = cwd.resolve("src/test/resources/marshall/input.yaml")
-        val doc = DocumentReader(stepConfig, openStream(uri), MediaType.TEXT, uri).read()
+        val loader = DocumentLoader(stepConfig, uri)
+        val doc = loader.load(openStream(uri), MediaType.TEXT)
 
         val props = propertyMap(mapOf(
             "method" to "xml",
@@ -769,7 +777,8 @@ class MarshallTest {
     @Test
     fun convertTextToToml() {
         val uri = cwd.resolve("src/test/resources/marshall/input.toml")
-        val doc = DocumentReader(stepConfig, openStream(uri), MediaType.TEXT, uri).read()
+        val loader = DocumentLoader(stepConfig, uri)
+        val doc = loader.load(openStream(uri), MediaType.TEXT)
 
         val props = propertyMap(mapOf(
             "method" to "xml",
@@ -787,7 +796,8 @@ class MarshallTest {
     @Test
     fun convertTextToText() {
         val uri = cwd.resolve("src/test/resources/marshall/input.toml")
-        val doc = DocumentReader(stepConfig, openStream(uri), MediaType.TEXT, uri).read()
+        val loader = DocumentLoader(stepConfig, uri)
+        val doc = loader.load(openStream(uri), MediaType.TEXT)
 
         val props = propertyMap(mapOf(
             "method" to "xml",
@@ -805,7 +815,8 @@ class MarshallTest {
     @Test
     fun convertTextToBinary() {
         val uri = cwd.resolve("src/test/resources/marshall/input.txt")
-        val doc = DocumentReader(stepConfig, openStream(uri), MediaType.TEXT, uri).read()
+        val loader = DocumentLoader(stepConfig, uri)
+        val doc = loader.load(openStream(uri), MediaType.TEXT)
 
         val converter = DocumentConverter(stepConfig, doc, MediaType.JPEG)
         try {

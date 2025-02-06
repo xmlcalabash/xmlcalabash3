@@ -6,6 +6,7 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLFactory
 import com.xmlcalabash.documents.DocumentProperties
 import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.exceptions.XProcError
+import com.xmlcalabash.exceptions.XProcException
 import com.xmlcalabash.namespace.Ns
 import com.xmlcalabash.namespace.NsCx
 import com.xmlcalabash.runtime.XProcStepConfiguration
@@ -22,12 +23,14 @@ import org.xml.sax.InputSource
 import org.xml.sax.SAXParseException
 import java.io.*
 import java.net.URI
+import java.nio.ByteBuffer
 import java.nio.charset.Charset
 import java.nio.charset.StandardCharsets
 import java.time.ZoneOffset
 import java.util.*
 import javax.xml.transform.dom.DOMSource
 import javax.xml.transform.sax.SAXSource
+import kotlin.Byte
 
 class DocumentLoader(val context: XProcStepConfiguration,
                      val href: URI?,
@@ -117,11 +120,16 @@ class DocumentLoader(val context: XProcStepConfiguration,
         return load(absURI, stream, mediaType)
     }
 
-    fun load(uri: URI?, stream: InputStream, mediaType: MediaType): XProcDocument {
+    fun load(stream: InputStream, mediaType: MediaType, charset: Charset? = null): XProcDocument {
+        return load(href, stream, mediaType, charset)
+    }
+
+    private fun load(uri: URI?, stream: InputStream, overrideMediaType: MediaType, charset: Charset? = null): XProcDocument {
+        mediaType = overrideMediaType
         properties.setAll(documentProperties)
         properties[Ns.contentType] = mediaType
-        if (uri != null && properties.baseURI == null) {
-            properties[Ns.baseUri] = uri
+        if (href != null && properties.baseURI == null) {
+            properties[Ns.baseUri] = href
         }
 
         val classification = mediaType.classification()
@@ -135,7 +143,7 @@ class DocumentLoader(val context: XProcStepConfiguration,
             }
             MediaClassification.HTML -> return loadHtml(uri, stream)
             MediaClassification.JSON -> return loadJson(stream)
-            MediaClassification.TEXT -> return loadText(stream)
+            MediaClassification.TEXT -> return loadText(stream, charset)
             // I'm not sure what to do with CSV. Maybe wait for XPath 4?
             // MediaType.CSV -> return loadCsv(stream)
             MediaClassification.YAML -> return loadYaml(stream)
@@ -206,7 +214,7 @@ class DocumentLoader(val context: XProcStepConfiguration,
         compiler.declareVariable(QName("opt"))
         val selector = compiler.compile("parse-json(\$a, \$opt)").load()
         selector.resourceResolver = context.environment.documentManager
-        val inputjson = loadTextData(stream)
+        val inputjson = loadTextData(stream, StandardCharsets.UTF_8)
         selector.setVariable(QName("a"), XdmAtomicValue(inputjson))
 
         // Our parameters map has QName keys, but the options map has string keys
@@ -263,10 +271,10 @@ class DocumentLoader(val context: XProcStepConfiguration,
         throw RuntimeException("Bang")
     }
 
-    private fun loadText(stream: InputStream): XProcDocument {
+    private fun loadText(stream: InputStream, charset: Charset?): XProcDocument {
         val builder = SaxonTreeBuilder(context.processor)
         builder.startDocument(context.baseUri)
-        builder.addText(loadTextData(stream))
+        builder.addText(loadTextData(stream, charset))
         builder.endDocument()
         return XProcDocument.ofXml(builder.result, context, properties)
     }
@@ -282,19 +290,41 @@ class DocumentLoader(val context: XProcStepConfiguration,
         return XProcDocument.ofBinary(baos.toByteArray(), context, properties)
     }
 
-    private fun loadTextData(stream: InputStream): String {
-        val charsetName = mediaType.charset() ?: "UTF-8"
-        if (!Charset.isSupported(charsetName)) {
-            throw context.exception(XProcError.xdUnsupportedDocumentCharset(charsetName))
-        }
-        val charset = Charset.forName(charsetName)
-        val reader = InputStreamReader(stream, charset)
+    private fun loadTextData(stream: InputStream, inputCharset: Charset?): String {
+        val FF = (-1).toByte()
+        val FE = (-2).toByte()
+
+        val suppliedCharset = inputCharset ?: mediaType.charset()
+        val bytes = stream.readAllBytes()
+
+        val charset = suppliedCharset
+            ?: if (bytes.size < 2) {
+                StandardCharsets.UTF_8
+            } else {
+                if (bytes[0] == FF && bytes[1] == FE) {
+                    StandardCharsets.UTF_16LE
+                } else if (bytes[0] == FE && bytes[1] == FF) {
+                    StandardCharsets.UTF_16BE
+                } else {
+                    StandardCharsets.UTF_8
+                }
+            }
+
+        val chars = charset.decode(ByteBuffer.wrap(bytes))
+
         val sb = StringBuilder()
-        val buf = CharArray(4096)
-        var len = reader.read(buf)
-        while (len >= 0) {
-            sb.appendRange(buf, 0, len)
-            len = reader.read(buf)
+        when (charset) {
+            StandardCharsets.UTF_8, StandardCharsets.UTF_16,
+            StandardCharsets.UTF_16LE, StandardCharsets.UTF_16BE, -> {
+                if (chars.length > 0 && chars[0] == '\uFEFF') {
+                    sb.append(chars, 1, chars.remaining())
+                } else {
+                    sb.append(chars)
+                }
+            }
+            else -> {
+                sb.append(chars)
+            }
         }
         return sb.toString()
     }

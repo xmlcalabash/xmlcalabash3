@@ -81,7 +81,7 @@ open class UnarchiveStep(): AbstractArchiveStep() {
             val contentType = contentType(entry.name)
 
             val loader = DocumentLoader(stepConfig, baseUri, DocumentProperties(), mapOf())
-            val loadedDoc = loader.load(baseUri, entry.inputStream!!, contentType)
+            val loadedDoc = loader.load(entry.inputStream!!, contentType)
             val doc = loadedDoc.with(loadedDoc.value, baseUri).with(contentType)
 
             receiver.output("result", doc)

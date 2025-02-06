@@ -6,6 +6,15 @@ import net.sf.saxon.s9api.XdmMap
 import org.apache.hc.client5.http.cookie.BasicCookieStore
 import org.apache.hc.client5.http.cookie.CookieStore
 import java.net.URI
+import java.nio.charset.Charset
+
+/**
+ * The response from an internet protocol request.
+ *
+ * Note: the `mediaType` is the ultimate content type that the request wants. This may override
+ * what the server actually responded. The `headerContentType` and `headerCharset` identify what
+ * the server said.
+ */
 
 class InternetProtocolResponse(val responseUri: URI, val statusCode: Int) {
     var report: XdmMap? = null
@@ -23,6 +32,25 @@ class InternetProtocolResponse(val responseUri: URI, val statusCode: Int) {
             }
         }
 
+    val headerContentType: MediaType?
+        get() {
+            val value = headers["content-type"]
+            if (value == null) {
+                return null
+            }
+
+            return MediaType.parse(value.underlyingValue.stringValue).discardParameters(listOf("charset"))
+        }
+
+    val headerCharset: Charset?
+        get() {
+            val value = headers["content-type"]
+            if (value == null) {
+                return null
+            }
+            val ctype = MediaType.parse(value.underlyingValue.stringValue)
+            return ctype.charset()
+        }
 
     var headers: Map<String, XdmAtomicValue>
         get() = _headers

@@ -243,7 +243,7 @@ class XmlCalabashCli private constructor() {
                 val port = explicitStdin ?: implicitStdin!!
                 val ctype = inputManifold[port]?.contentTypes?.firstOrNull() ?: MediaType.XML
                 val loader = DocumentLoader(pipeline.config, CommandLine.STDIO_URI)
-                loader.load(CommandLine.STDIO_URI, System.`in`, ctype)
+                loader.load(System.`in`, ctype)
             } else {
                 null
             }

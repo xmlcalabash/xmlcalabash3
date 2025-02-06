@@ -131,12 +131,12 @@ class OsExec(): AbstractAtomicStep() {
 
         if (rc == 0) {
             val outputLoader = DocumentLoader(stepConfig, null, DocumentProperties(), mapOf())
-            val output = outputLoader.load(null, ByteArrayInputStream(stdout.toByteArray()), resultContentType)
+            val output = outputLoader.load(ByteArrayInputStream(stdout.toByteArray()), resultContentType)
             receiver.output("result", output)
         }
 
         val errorLoader = DocumentLoader(stepConfig, null, DocumentProperties(), mapOf())
-        val error = errorLoader.load(null, ByteArrayInputStream(stderr.toByteArray()), errorContentType)
+        val error = errorLoader.load(ByteArrayInputStream(stderr.toByteArray()), errorContentType)
         receiver.output("error", error)
 
         val sbuilder = SaxonTreeBuilder(stepConfig)

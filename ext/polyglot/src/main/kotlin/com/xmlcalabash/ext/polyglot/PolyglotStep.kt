@@ -106,7 +106,7 @@ class PolyglotStep(val stepLanguage: String): AbstractAtomicStep() {
                 val properties = DocumentProperties()
                 properties[Ns.contentType] = resultContentType
                 val loader = DocumentLoader(stepConfig, null, properties, emptyMap())
-                val doc = loader.load(null, ByteArrayInputStream(outputStream.toByteArray()), resultContentType)
+                val doc = loader.load(ByteArrayInputStream(outputStream.toByteArray()), resultContentType)
                 receiver.output("result", doc)
             } else {
                 val value = jsvalue.execute()

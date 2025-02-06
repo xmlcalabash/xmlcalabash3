@@ -46,7 +46,7 @@ class DocumentResolverProvider:  DocumentResolverProvider, DocumentResolver {
             val loader = DocumentLoader(context, MAGIC_URI)
             val stream = DocumentResolverProvider::class.java.getResourceAsStream(RESOURCE_PATH)
                 ?: throw IOException("Failed to find ${RESOURCE_PATH} as a resource")
-            library = loader.load(MAGIC_URI, stream, MediaType.XML)
+            library = loader.load(stream, MediaType.XML)
             return library
         }
     }
