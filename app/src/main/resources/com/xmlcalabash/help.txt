@@ -6,20 +6,19 @@ Where command is:
   version              To display information about the version and configuration
   run                  To run a pipeline
 
-Where options are:
+And some of the frequently used options are:
 
   --help                To display this summary
   --input:port=uri      To read input port “port” from “uri”
   --output:port=file    To write output port “port” to “file”
   --configuration:file  To read configuration from “file”
-  --graph:file          To write the graph description to “file”
-  --description:file    To write the pipeline description to “file”
-  --debug               To enable additional debugging output
+  --graphs:directory    Write SVG pipeline descriptions to directory
   --pipe                To enable piped input on stdin and output on stdout
+  --debug               To enable additional debugging output
+  --debugger            Start the interactive debugger
   --verbosity:value     To set the general level of verbosity to “value”
-                        Values are: trace, debug, info, warn, error
+                        Values are: trace, debug, progress, info, warn, error
   --explain             Provide more detailed explanatory messages for errors
-
 
 The pipeline identified by the URI “pipeline.xpl” will be run.
 
@@ -28,3 +27,6 @@ specified value will be used to initialize the option. (The value
 is created as an untyped atomic value.)
 
 The ports and options specified must exist on the pipeline.
+
+For a more complete explanation, see the User Guide:
+https://docs.xmlcalabash.com/userguide/current/
