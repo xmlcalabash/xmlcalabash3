@@ -242,7 +242,7 @@ class DocumentLoader(val context: XProcStepConfiguration,
             }
 
             if ((ex.message ?: "").startsWith("Invalid JSON")) {
-                throw context.exception(XProcError.xdNotWellFormedJson(), ex)
+                throw context.exception(XProcError.xdNotWellFormedJson(inputjson), ex)
             }
 
             throw ex

@@ -332,7 +332,7 @@ class DocumentConverter(val stepConfig: XProcStepConfiguration,
                     val json = runFunction("parse-json", listOf(doc.value, params))
                     return doc.with(json).with(contentType, true)
                 } catch (ex: SaxonApiException) {
-                    throw stepConfig.exception(XProcError.xdNotWellFormedJson())
+                    throw stepConfig.exception(XProcError.xdNotWellFormedJson(doc.value.underlyingValue.stringValue))
                 }
             }
 

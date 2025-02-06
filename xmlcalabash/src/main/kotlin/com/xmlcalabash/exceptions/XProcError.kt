@@ -187,7 +187,7 @@ open class XProcError protected constructor(val code: QName, val variant: Int, e
         fun xdEncodingWithXmlOrHtml(encoding: String) = dynamic(54, encoding)
         fun xdEncodingRequired(charset: String) = dynamic(55, charset)
         fun xdMarkupForbiddenWithEncoding(encoding: String) = dynamic(56, encoding)
-        fun xdNotWellFormedJson() = dynamic(57)
+        fun xdNotWellFormedJson(json: String) = dynamic(57, json)
         fun xdDuplicateKey(key: String) = dynamic(58, key)
         fun xdInvalidParameter(message: String) = dynamic(59, message)
         fun xdUnsupportedDocumentCharset(charset: String) = dynamic(60, charset)

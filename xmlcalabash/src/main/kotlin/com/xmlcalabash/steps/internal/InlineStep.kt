@@ -187,7 +187,7 @@ open class InlineStep(val params: InlineStepParameters): AbstractAtomicStep() {
             val result = selector.evaluate()
             return result
         } catch (ex: SaxonApiException) {
-            throw stepConfig.exception(XProcError.xdNotWellFormedJson(), ex)
+            throw stepConfig.exception(XProcError.xdNotWellFormedJson(text), ex)
         }
     }
 

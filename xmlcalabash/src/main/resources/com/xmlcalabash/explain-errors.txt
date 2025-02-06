@@ -165,7 +165,7 @@ It is a dynamic error if an encoding is specified and the content of the
 p:inline contains any XML markup.
 
 XD0057
-JSON not well formed.
+JSON not well formed: $1
 It is a dynamic error if the text document does not conform to the JSON grammar,
 unless the parameter liberal is true and the processor chooses to accept the
 deviation.
