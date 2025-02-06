@@ -1,4 +1,4 @@
-package com.xmlcalabash.ext.pipelinemessages
+package com.xmlcalabash.ext.cache
 
 import com.xmlcalabash.api.XProcStep
 import com.xmlcalabash.exceptions.XProcError
@@ -8,9 +8,10 @@ import com.xmlcalabash.spi.AtomicStepManager
 import com.xmlcalabash.spi.AtomicStepProvider
 import net.sf.saxon.s9api.QName
 
-class StepProvider: AtomicStepProvider, AtomicStepManager {
+class CacheStepProvider: AtomicStepProvider, AtomicStepManager {
     companion object {
-        private val STEP = QName(NsCx.namespace, "cx:pipeline-messages")
+        private val CACHE_ADD = QName(NsCx.namespace, "cx:cache-add")
+        private val CACHE_DELETE = QName(NsCx.namespace, "cx:cache-delete")
     }
 
     override fun create(): AtomicStepManager {
@@ -18,17 +19,19 @@ class StepProvider: AtomicStepProvider, AtomicStepManager {
     }
 
     override fun createStep(params: StepParameters): () -> XProcStep {
-        if (params.stepType == STEP) {
-            return { -> PipelineMessagesStep() }
+        if (params.stepType == CACHE_ADD) {
+            return { -> CacheAddStep() }
+        } else if (params.stepType == CACHE_DELETE) {
+            return { -> CacheDeleteStep() }
         }
         throw XProcError.xiImpossible("Attempted to create ${params.stepType} step").exception()
     }
 
     override fun stepAvailable(stepType: QName): Boolean {
-        return stepType == STEP
+        return stepType == CACHE_ADD || stepType == CACHE_DELETE
     }
 
     override fun stepTypes(): Set<QName> {
-        return setOf(STEP)
+        return setOf(CACHE_ADD, CACHE_DELETE)
     }
 }

@@ -1,4 +1,4 @@
-package com.xmlcalabash.ext.uniqueid
+package com.xmlcalabash.util
 
 import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.io.DocumentLoader
@@ -10,15 +10,11 @@ import com.xmlcalabash.spi.DocumentResolverProvider
 import java.io.IOException
 import java.net.URI
 
-class DocumentResolverProvider:  DocumentResolverProvider, DocumentResolver {
-    companion object {
-        val MAGIC_URI = URI("https://xmlcalabash.com/ext/library/unique-id.xpl")
-        val RESOURCE_PATH = "/com/xmlcalabash/ext/unique-id.xpl"
-        var library: XProcDocument? = null
-    }
+open class SimpleDocumentResolverProvider(val magicUri: URI, val resourcePath: String):  DocumentResolverProvider, DocumentResolver {
+    private var library: XProcDocument? = null
 
     override fun resolvableUris(): List<URI> {
-        return listOf(MAGIC_URI)
+        return listOf(magicUri)
     }
 
     override fun create(): DocumentResolver {
@@ -26,7 +22,7 @@ class DocumentResolverProvider:  DocumentResolverProvider, DocumentResolver {
     }
 
     override fun configure(manager: DocumentManager) {
-        manager.registerPrefix(MAGIC_URI.toString(), this)
+        manager.registerPrefix(magicUri.toString(), this)
     }
 
     override fun resolve(context: XProcStepConfiguration, uri: URI, current: XProcDocument?): XProcDocument? {
@@ -34,18 +30,18 @@ class DocumentResolverProvider:  DocumentResolverProvider, DocumentResolver {
             return current // WAT?
         }
 
-        if (uri != MAGIC_URI) {
+        if (uri != magicUri) {
             return null // WAT?
         }
 
-        synchronized(Companion) {
+        synchronized(this) {
             if (library != null) {
                 return library
             }
 
-            val loader = DocumentLoader(context, MAGIC_URI)
-            val stream = DocumentResolverProvider::class.java.getResourceAsStream(RESOURCE_PATH)
-                ?: throw IOException("Failed to find ${RESOURCE_PATH} as a resource")
+            val loader = DocumentLoader(context, magicUri)
+            val stream = this::class.java.getResourceAsStream(resourcePath)
+                ?: throw IOException("Failed to find ${resourcePath} as a resource")
             library = loader.load(stream, MediaType.XML)
             stream.close()
             return library
