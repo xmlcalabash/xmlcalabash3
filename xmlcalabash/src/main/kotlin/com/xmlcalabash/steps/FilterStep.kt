@@ -11,7 +11,7 @@ class FilterStep(): AbstractAtomicStep() {
 
         val document = queues["source"]!!.first()
 
-        val evaluator = ExpressionEvaluator(stepConfig.processor, stringBinding(Ns.select)!!)
+        val evaluator = ExpressionEvaluator(stepConfig, stringBinding(Ns.select)!!)
         evaluator.setNamespaces(stepConfig.inscopeNamespaces)
         // FIXME: should only evaluate the bindings that are actually referenced...
         evaluator.setContext(document.value as XdmItem)

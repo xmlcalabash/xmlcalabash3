@@ -1,12 +1,13 @@
 package com.xmlcalabash.runtime
 
 import net.sf.saxon.om.NamespaceUri
-import net.sf.saxon.s9api.Processor
 import net.sf.saxon.s9api.QName
 import net.sf.saxon.s9api.XdmItem
 import net.sf.saxon.s9api.XdmValue
 
-class ExpressionEvaluator(val processor: Processor, val select: String) {
+class ExpressionEvaluator(stepConfig: XProcStepConfiguration, val select: String) {
+    private val processor = stepConfig.processor
+    private val baseUri = stepConfig.baseUri
     private val namespaceBindings = mutableMapOf<String, NamespaceUri>()
     private val variableBindings = mutableMapOf<QName, XdmValue>()
     private var contextItem: XdmItem? = null
@@ -28,6 +29,7 @@ class ExpressionEvaluator(val processor: Processor, val select: String) {
     fun evaluate(): XdmValue {
         val compiler = processor.newXPathCompiler()
         compiler.isSchemaAware = processor.isSchemaAware
+        compiler.baseURI = baseUri
         for ((prefix, uri) in namespaceBindings) {
             compiler.declareNamespace(prefix, uri.toString())
         }

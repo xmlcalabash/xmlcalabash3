@@ -173,7 +173,7 @@ open class HttpRequestStep(): AbstractAtomicStep() {
         val report = response.report!!
 
         if (assert != "") {
-            val evaluator = ExpressionEvaluator(stepConfig.processor, assert)
+            val evaluator = ExpressionEvaluator(stepConfig, assert)
             evaluator.setNamespaces(stepConfig.inscopeNamespaces)
             evaluator.setContext(response.report!!)
             val result = evaluator.evaluate()

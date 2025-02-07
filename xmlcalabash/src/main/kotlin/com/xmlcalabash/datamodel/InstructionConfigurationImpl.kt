@@ -1,6 +1,5 @@
 package com.xmlcalabash.datamodel
 
-import com.xmlcalabash.runtime.XProcStepConfiguration
 import com.xmlcalabash.documents.DocumentProperties
 import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.exceptions.XProcError
@@ -8,6 +7,7 @@ import com.xmlcalabash.exceptions.XProcException
 import com.xmlcalabash.io.MediaType
 import com.xmlcalabash.namespace.NsP
 import com.xmlcalabash.namespace.NsXml
+import com.xmlcalabash.runtime.XProcStepConfiguration
 import com.xmlcalabash.runtime.XProcStepConfigurationImpl
 import net.sf.saxon.expr.parser.XPathParser
 import net.sf.saxon.om.NamespaceUri

@@ -287,7 +287,11 @@ class DefaultErrorExplanation(): ErrorExplanation {
         } else if (doc.contentType?.classification() == MediaClassification.TEXT) {
             message = doc.value.underlyingValue.stringValue
         } else if (doc.contentType?.classification() == MediaClassification.XML) {
-            val root = S9Api.documentElement(doc.value as XdmNode)
+            val root = if (S9Api.isTextDocument(doc.value as XdmNode)) {
+                doc.value as XdmNode
+            } else {
+                S9Api.documentElement(doc.value as XdmNode)
+            }
 
             if (root.nodeName in listOf(NsXvrl.reports, NsXvrl.report)) {
                 return showXvrl(doc)

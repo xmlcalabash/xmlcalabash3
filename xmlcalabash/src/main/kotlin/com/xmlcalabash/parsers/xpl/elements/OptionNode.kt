@@ -2,6 +2,8 @@ package com.xmlcalabash.parsers.xpl.elements
 
 import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.namespace.Ns
+import com.xmlcalabash.runtime.XProcStepConfigurationImpl
+import com.xmlcalabash.util.TypeUtils
 import net.sf.saxon.s9api.QName
 import net.sf.saxon.s9api.SequenceType
 import net.sf.saxon.s9api.XdmNode
@@ -36,7 +38,8 @@ class OptionNode(parent: AnyNode, node: XdmNode, val name: QName, val select: St
 
                 if (value != null && asType != null) {
                     if (!asType!!.matches(value)) {
-                        throw XProcError.xdBadType(value.toString(), asType!!.underlyingSequenceType.toString()).exception()
+                        val typeUtils = TypeUtils(stepConfig)
+                        typeUtils.xpathPromote(value, asType!!.itemType.typeName)
                     }
                 }
 
