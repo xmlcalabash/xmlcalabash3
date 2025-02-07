@@ -372,7 +372,7 @@ class InternetProtocolRequest(val stepConfig: XProcStepConfiguration, val uri: U
                         // Convert date time strings into proper xs:dateTime values
                         val ta = DateTimeFormatter.RFC_1123_DATE_TIME.parse(header.value)
                         val dt = Instant.from(ta).toString()
-                        val evaluator = ExpressionEvaluator(stepConfig.processor, "Q{http://www.w3.org/2001/XMLSchema}dateTime('\$dt')")
+                        val evaluator = ExpressionEvaluator(stepConfig, "Q{http://www.w3.org/2001/XMLSchema}dateTime('\$dt')")
                         evaluator.setNamespaces(stepConfig.inscopeNamespaces)
                         evaluator.setBindings(mapOf(QName("dt") to XdmAtomicValue(dt)))
                         value = evaluator.evaluate() as XdmAtomicValue

@@ -69,7 +69,7 @@ class UseWhenContext internal constructor(val builder: PipelineBuilder) {
                 is ConditionalStepException -> Unit
                 is SaxonApiException -> {
                     if (!conditionalOption(stepConfig, ex)) {
-                        throw XProcError.xsXPathStaticError(ex.message ?: "").exception(ex)
+                        throw stepConfig.exception(XProcError.xsXPathStaticError(ex.message ?: ""), ex)
                     }
                 }
                 else -> Unit // Just assume this will work better next time...
@@ -84,6 +84,7 @@ class UseWhenContext internal constructor(val builder: PipelineBuilder) {
         val processor = stepConfig.saxonConfig.processor
 
         val compiler = stepConfig.newXPathCompiler()
+        compiler.baseURI = stepConfig.baseUri
         for ((option, value) in staticOptions) {
             if (value != null) {
                 compiler.declareVariable(option.name)

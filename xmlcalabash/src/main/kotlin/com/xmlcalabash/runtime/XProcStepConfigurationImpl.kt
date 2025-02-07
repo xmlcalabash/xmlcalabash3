@@ -153,6 +153,7 @@ open class XProcStepConfigurationImpl internal constructor(
 
     override fun newXPathCompiler(): XPathCompiler {
         val compiler = processor.newXPathCompiler()
+        compiler.baseURI = baseUri
         compiler.isSchemaAware = processor.isSchemaAware
         for ((prefix, value) in inscopeNamespaces) {
             compiler.declareNamespace(prefix, value.toString())

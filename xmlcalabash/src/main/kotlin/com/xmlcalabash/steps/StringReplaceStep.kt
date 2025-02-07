@@ -85,7 +85,7 @@ open class StringReplaceStep(): AbstractAtomicStep(), ProcessMatchingNodes {
     }
 
     private fun evaluate(contextItem: XdmNode): String {
-        val evaluator = ExpressionEvaluator(stepConfig.processor, replace)
+        val evaluator = ExpressionEvaluator(stepConfig, replace)
         evaluator.setNamespaces(stepConfig.inscopeNamespaces)
         evaluator.setContext(contextItem)
         return evaluator.evaluate().underlyingValue.stringValue
