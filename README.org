@@ -34,8 +34,7 @@ known to be broken.
 :CUSTOM_ID: h-28FFCEFF-A256-4FB6-9E1A-47295373CE82
 :END:
 
-In order to use XML Calabash, you Java 11 or later. Everything else is
-in the distribution.
+XML Calabash requires Java 11 or later. Everything else is in the distribution.
 
 1. Download the [[https://github.com/xmlcalabash/xmlcalabash3/releases][latest release]]. You need ~xmlcalabash-3.0.0-alphaXX.zip~ where “XX”
    is the release number. The other zip files on the release page are extension steps
