@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<t:test expected="pass"
+        features="p-validate-with-schematron"
+        xmlns:t="http://xproc.org/ns/testsuite/3.0">
+  <t:info>
+    <t:title>validate-sch-001</t:title>
+    <t:revision-history>
+      <t:revision>
+        <t:date>2025-02-07</t:date>
+        <t:author>
+          <t:name>Norm Tovey-Walsh</t:name>
+        </t:author>
+        <t:description xmlns="http://www.w3.org/1999/xhtml">
+          <p>Initial commit.</p>
+        </t:description>
+      </t:revision>
+    </t:revision-history>
+  </t:info>
+  <t:description xmlns="http://www.w3.org/1999/xhtml">
+    <p>Copying a 3.0 test; checking that the digests roll up.</p>
+  </t:description>
+  <t:pipeline>
+    <p:declare-step name="pipeline"
+                    version="3.0"
+                    xmlns:p="http://www.w3.org/ns/xproc">
+      <p:output port="result" pipe="report"/>
+      <p:validate-with-schematron report-format="xvrl" assert-valid="false"
+                                  phase="full">
+        <p:with-input port="source"
+                      href="../documents/docbook-invalid.xml"/>
+        <p:with-input port="schema"
+                      href="../../../3.0-test-suite/test-suite/documents/docbook-phases.sch"/>
+      </p:validate-with-schematron>
+    </p:declare-step>
+  </t:pipeline>
+  <t:schematron>
+    <s:schema queryBinding="xslt2"
+              xmlns:s="http://purl.oclc.org/dsdl/schematron">
+      <s:ns prefix="xvrl" uri="http://www.xproc.org/ns/xvrl"/>
+      <s:pattern>
+        <s:rule context="/">
+          <s:assert test="xvrl:report">The root is wrong.</s:assert>
+          <s:assert test="xvrl:report/xvrl:digest/@error-count = '2'">The error count is wrong.</s:assert>
+        </s:rule>
+      </s:pattern>
+    </s:schema>
+  </t:schematron>
+</t:test>
