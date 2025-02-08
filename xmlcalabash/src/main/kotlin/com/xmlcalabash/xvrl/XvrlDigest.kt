@@ -76,6 +76,21 @@ class XvrlDigest internal constructor(stepConfig: XProcStepConfiguration): XvrlE
     var infoCodes = mutableSetOf<String>()
     var unspecifiedCodes = mutableSetOf<String>()
 
+    fun clear() {
+        _valid = "undetermined"
+        _worst = "unspecified"
+        fatalErrorCount = 0
+        errorCount = 0
+        warningCount = 0
+        infoCount = 0
+        unspecifiedCount = 0
+        fatalErrorCodes.clear()
+        errorCodes.clear()
+        warningCodes.clear()
+        infoCodes.clear()
+        unspecifiedCodes.clear()
+    }
+
     override fun serialize(builder: SaxonTreeBuilder) {
         val attr = mutableMapOf<QName, String>()
         attr.putAll(attributes)

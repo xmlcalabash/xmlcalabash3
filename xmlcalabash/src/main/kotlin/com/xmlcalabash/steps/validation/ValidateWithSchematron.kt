@@ -78,7 +78,7 @@ open class ValidateWithSchematron(): AbstractAtomicStep() {
             return report
         }
 
-        val xvrl = XvrlReports.fromSvrl(stepConfig, report)
+        val xvrl = XvrlReport.fromSvrl(stepConfig, report)
         xvrl.metadata.validator("SchXslt2", XmlCalabashBuildConfig.DEPENDENCIES["schxslt2"] ?: "unknown")
 
         if (stepConfig.baseUri != null && schema.baseURI != null
