@@ -15,6 +15,7 @@ import com.xmlcalabash.tracing.TraceListener
 import com.xmlcalabash.util.DefaultOutputReceiver
 import com.xmlcalabash.util.AssertionsLevel
 import com.xmlcalabash.util.AssertionsMonitor
+import com.xmlcalabash.util.TypeUtils
 import com.xmlcalabash.visualizers.Silent
 import net.sf.saxon.s9api.QName
 import java.io.FileOutputStream
@@ -96,7 +97,7 @@ class XProcPipeline internal constructor(runtime: XProcRuntime, pipeline: Compou
         try {
             config.checkType(name, value.value, option.asType, config.inscopeNamespaces, option.values)
         } catch (_: Exception) {
-            throw XProcError.xdBadType(value.value.toString(), option.asType.toString()).exception()
+            throw XProcError.xdBadType(value.value.toString(), TypeUtils.sequenceTypeToString(option.asType)).exception()
         }
 
         for (step in runnable.runnables.filterIsInstance<AtomicOptionStep>()) {

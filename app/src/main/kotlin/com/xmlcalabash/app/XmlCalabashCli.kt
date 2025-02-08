@@ -21,6 +21,7 @@ import com.xmlcalabash.namespace.NsFn
 import com.xmlcalabash.namespace.NsXs
 import com.xmlcalabash.runtime.api.RuntimeOption
 import com.xmlcalabash.runtime.api.RuntimePort
+import com.xmlcalabash.util.DefaultMessagePrinter
 import com.xmlcalabash.util.DefaultXmlCalabashConfiguration
 import com.xmlcalabash.util.FileUtils
 import com.xmlcalabash.util.UriUtils
@@ -67,7 +68,9 @@ class XmlCalabashCli private constructor() {
     private var sawStdout = false
 
     private fun run(args: Array<out String>) {
-        var errorExplanation: ErrorExplanation = DefaultErrorExplanation()
+        val messagePrinter = DefaultMessagePrinter(XmlCalabashConfiguration.DEFAULT_CONSOLE_ENCODING)
+        var errorExplanation: ErrorExplanation = DefaultErrorExplanation(messagePrinter)
+
         val inputManifold = mutableMapOf<String, RuntimePort>()
         val outputManifold = mutableMapOf<String, RuntimePort>()
         val optionManifold = mutableMapOf<QName, RuntimeOption>()
@@ -392,7 +395,7 @@ class XmlCalabashCli private constructor() {
             xmlCalabash.println("Error: help is not available.")
             return
         }
-        val reader = BufferedReader(InputStreamReader(stream))
+        val reader = BufferedReader(InputStreamReader(stream, Charsets.UTF_8))
         for (line in reader.lines()) {
             xmlCalabash.println(line)
         }
