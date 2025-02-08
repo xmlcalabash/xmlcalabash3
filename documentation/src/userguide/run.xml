@@ -74,8 +74,6 @@ given, the <command>run</command> command is assumed.</para>
   <sbr/>
   <arg rep="norepeat" linkend="cli-graphs">--graphs:<replaceable>graph-output-directory</replaceable></arg>
   <sbr/>
-  <arg rep="norepeat" linkend="cli-step">--step:<replaceable>step-name</replaceable></arg>
-  <sbr/>
   <arg rep="norepeat" linkend="cli-verbosity">--verbosity:<replaceable>verbosity</replaceable></arg>
   <arg rep="norepeat" linkend="cli-explain">--explain</arg>
   <arg rep="norepeat" linkend="cli-visualizer">--visualizer:<replaceable>name</replaceable></arg>
@@ -90,7 +88,8 @@ given, the <command>run</command> command is assumed.</para>
   <arg rep="norepeat" linkend="cli-debug">--debugger</arg>
   <arg rep="norepeat" linkend="cli-help">--help</arg>
   <sbr/>
-  <arg choice="plain" linkend="cli-pipeline"><replaceable>pipeline.xpl</replaceable></arg>
+  <arg rep="norepeat" linkend="cli-step">--step:<replaceable>step-name</replaceable></arg>
+  <arg linkend="cli-pipeline"><replaceable>pipeline.xpl</replaceable></arg>
   <arg rep="repeat" linkend="cli-option"><replaceable>option</replaceable>=<replaceable>value</replaceable></arg>
 </cmdsynopsis>
 
@@ -204,13 +203,34 @@ if you want to save the output or enable piped mode.</para>
 <listitem>
 <para>Binds the specified <replaceable>prefix</replaceable> to the <replaceable>uri</replaceable>.
 This has no effect on the pipeline; these bindings are only used when evaluating
+the <option linkend="cli-step">--step</option> option and in
 expressions used to define <phrase linkend="cli-option">options</phrase>.
 </para>
-<para>If no namespace bindings are provided, the default bindings are 
-<code>xs</code>, <code>fn</code>, <code>map</code>, <code>array</code>, and <code>math</code>
-to their traditional XML Schema and XPath URIs. The prefix
-<code>saxon</code> is also bound to the Saxon extension namespace,
-<literal>http://saxon.sf.net/</literal>.</para>
+
+<para>The default namespace bindings on the command line are:</para>
+
+<informaltable>
+<tgroup cols="2">
+<colspec colwidth="1*"/>
+<colspec colwidth="5*"/>
+<thead>
+  <row><entry>Prefix</entry><entry>Namespace URI</entry></row>
+</thead>
+<tbody>
+  <row><entry><literal>array</literal></entry><entry><uri>http://www.w3.org/2005/xpath-functions/array</uri></entry></row>
+  <row><entry><literal>cx</literal></entry><entry><uri>http://xmlcalabash.com/ns/extensions</uri></entry></row>
+  <row><entry><literal>fn</literal></entry><entry><uri>http://www.w3.org/2005/xpath-functions</uri></entry></row>
+  <row><entry><literal>map</literal></entry><entry><uri>http://www.w3.org/2005/xpath-functions/map</uri></entry></row>
+  <row><entry><literal>math</literal></entry><entry><uri>http://www.w3.org/2005/xpath-functions/math</uri></entry></row>
+  <row><entry><literal>p</literal></entry><entry><uri>http://www.w3.org/ns/xproc</uri></entry></row>
+  <row><entry><literal>saxon</literal></entry><entry><uri>http://saxon.sf.net/</uri></entry></row>
+  <row><entry><literal>xs</literal></entry><entry><uri>http://www.w3.org/2001/XMLSchema</uri></entry></row>
+</tbody>
+</tgroup>
+</informaltable>
+
+<para>The <option>--namespace</option> option can add to, or change, these bindings.</para>
+
 </listitem>
 </varlistentry>
 
@@ -240,14 +260,6 @@ pipeline and its corresponding graph. An HTML index in the
 to view, or if links don’t work correctly, a good first step is to try a different
 browser.</para>
 </note>
-</listitem>
-</varlistentry>
-
-<varlistentry xml:id="cli-step">
-  <term><option>--step:<replaceable>step-name</replaceable></option>, identifies a step</term>
-<listitem>
-<para>If the input pipeline document is a <tag>p:library</tag>, this option identifies a step
-within that library to run.</para>
 </listitem>
 </varlistentry>
 
@@ -418,6 +430,37 @@ See <xref linkend="debugging"/>.</para>
 <para>This is equivalent to issuing the <command linkend="run-help">help</command> command.
 It’s provided as an option for convenience.
 </para>
+</listitem>
+</varlistentry>
+
+<varlistentry xml:id="cli-step">
+  <term><option>--step:<replaceable>step</replaceable></option>, identifies a step</term>
+<listitem>
+<para>The <option>--step</option> option is a little bit overloaded. Its interpretation
+depends on whether or not <link linkend="cli-pipeline">a pipeline</link> is specified.
+</para>
+
+<para>If a pipeline is specified, it must identify a <tag>p:library</tag>. The value of the
+<option>--step</option> option is interpreted as the <emphasis>name</emphasis> of a step in
+that library. The named step will be run.</para>
+
+<para>For example:</para>
+
+<screen><prompt>$ </prompt><userinput>xmlcalabash --step:helloWorld --library:examples.xpl …</userinput></screen>
+
+<para>If no pipeline is specified, the value of the <option>--step</option>
+option is interpreted as the <emphasis>type</emphasis> of a step. The (atomic)
+step with the specified type will be run. All of the inputs, outputs, and options
+specified apply to that step.</para>
+
+<para>For example:</para>
+
+<screen><prompt>$ </prompt><userinput>xmlcalabash --step:p:xslt …</userinput></screen>
+
+<para>The <literal>p</literal> and <literal>cx</literal> namespaces are bound by default.
+The <option linkend="cli-namespace">--namespace</option> option can be
+used to change the namespace bindings.</para>
+
 </listitem>
 </varlistentry>
 

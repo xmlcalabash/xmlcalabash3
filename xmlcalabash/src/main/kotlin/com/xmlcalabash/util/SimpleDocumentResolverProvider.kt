@@ -17,6 +17,10 @@ open class SimpleDocumentResolverProvider(val magicUri: URI, val resourcePath: S
         return listOf(magicUri)
     }
 
+    override fun resolvableLibraryUris(): List<URI> {
+        return listOf(magicUri)
+    }
+
     override fun create(): DocumentResolver {
         return this
     }

@@ -78,6 +78,17 @@ class XplParser internal constructor(val builder: PipelineBuilder) {
         return pipelineForContainer(stepContainer, stepName)
     }
 
+    fun parseLibrary(uri: URI): LibraryInstruction {
+        val stepContainer = parseUri(uri);
+        if (errors.isNotEmpty()) {
+            throw errors.first()
+        }
+        if (stepContainer is LibraryInstruction) {
+            return stepContainer
+        }
+        throw XProcError.xiNotALibrary(uri).exception()
+    }
+
     private fun pipelineForContainer(stepContainer: StepContainerInterface, stepName: String?): DeclareStepInstruction {
         if (stepContainer is DeclareStepInstruction) {
             return stepContainer

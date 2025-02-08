@@ -481,6 +481,10 @@ class DeclareStepInstruction(parent: XProcInstruction?, stepConfig: InstructionC
         return input
     }
 
+    fun getOptions(): List<OptionInstruction> {
+        return children.filterIsInstance<OptionInstruction>()
+    }
+
     override fun option(name: QName): OptionInstruction {
         if (name.namespaceUri == NsP.namespace) {
             throw stepConfig.exception(XProcError.xsOptionInXProcNamespace(name))
