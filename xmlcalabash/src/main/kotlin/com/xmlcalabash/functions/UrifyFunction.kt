@@ -16,6 +16,14 @@ class UrifyFunction(private val config: SaxonConfiguration): ExtensionFunctionDe
         return StructuredQName("p", NsP.namespace, "urify")
     }
 
+    override fun getMinimumNumberOfArguments(): Int {
+        return 1
+    }
+
+    override fun getMaximumNumberOfArguments(): Int {
+        return 2
+    }
+
     override fun getArgumentTypes(): Array<SequenceType> {
         return arrayOf(SequenceType.SINGLE_ITEM, SequenceType.OPTIONAL_ITEM)
     }
