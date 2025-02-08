@@ -2,6 +2,7 @@ package com.xmlcalabash.datamodel
 
 import com.xmlcalabash.runtime.XProcStepConfiguration
 import com.xmlcalabash.exceptions.XProcError
+import com.xmlcalabash.util.TypeUtils
 import net.sf.saxon.s9api.QName
 import net.sf.saxon.s9api.SequenceType
 import net.sf.saxon.s9api.XdmAtomicValue
@@ -14,12 +15,12 @@ class StaticOptionDetails(val stepConfig: XProcStepConfiguration, val name: QNam
 
     internal fun override(value: XdmValue) {
         if (!asType.matches(value)) {
-            throw stepConfig.exception(XProcError.xsValueDoesNotSatisfyType(value.toString(), asType.toString()))
+            throw stepConfig.exception(XProcError.xsValueDoesNotSatisfyType(value.toString(), TypeUtils.sequenceTypeToString(asType)))
         }
 
         if (values.isNotEmpty()) {
             if (value !is XdmAtomicValue) {
-                throw stepConfig.exception(XProcError.xsValueDoesNotSatisfyType(value.toString(), asType.toString()))
+                throw stepConfig.exception(XProcError.xsValueDoesNotSatisfyType(value.toString(), TypeUtils.sequenceTypeToString(asType)))
             }
             if (!values.contains(value)) {
                 throw stepConfig.exception(XProcError.xsValueDoesNotSatisfyType(value.toString(), values.toString()))

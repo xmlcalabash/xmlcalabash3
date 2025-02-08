@@ -940,7 +940,7 @@ class CliDebugger(val runtime: XProcRuntime): Monitor {
     private fun init() {
         val invisibleXml = InvisibleXml()
         val stream = CliDebugger::class.java.getResourceAsStream("/com/xmlcalabash/debugger.ixml")
-        parser = invisibleXml.getParser(stream, "https://xmlcalabash.com/grammar/debugger.ixml")
+        parser = invisibleXml.getParser(stream, "https://xmlcalabash.com/grammar/debugger.ixml", "utf-8")
 
         for (graph in runtime.graphList) {
             for (model in graph.models) {

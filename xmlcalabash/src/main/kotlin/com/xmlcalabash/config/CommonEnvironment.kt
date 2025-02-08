@@ -71,7 +71,8 @@ class CommonEnvironment(private val xmlCalabash: XmlCalabash) {
     }
 
     private var _documentManager: DocumentManager = DocumentManager()
-    private var _errorExplanation: ErrorExplanation = DefaultErrorExplanation()
+    private var _messagePrinter: MessagePrinter = xmlCalabash.xmlCalabashConfig.messagePrinter
+    private var _errorExplanation: ErrorExplanation = DefaultErrorExplanation(_messagePrinter)
     private var _messageReporter: (() -> MessageReporter)? = null
     private var _mimeTypes = MimetypesFileTypeMap()
     private var _proxies = mutableMapOf<String, String>()
@@ -141,6 +142,7 @@ class CommonEnvironment(private val xmlCalabash: XmlCalabash) {
         set(value) {
             _errorExplanation = value
         }
+    val messagePrinter = _messagePrinter
     var messageReporter: () -> MessageReporter
         get() {
             if (_messageReporter == null) {

@@ -5,6 +5,7 @@ import com.xmlcalabash.datamodel.Location
 import com.xmlcalabash.documents.XProcBinaryDocument
 import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.io.DocumentWriter
+import com.xmlcalabash.io.MessagePrinter
 import com.xmlcalabash.namespace.Ns
 import com.xmlcalabash.namespace.NsCx
 import com.xmlcalabash.namespace.NsErr
@@ -21,7 +22,7 @@ import java.io.InputStreamReader
 import java.nio.charset.StandardCharsets
 import javax.xml.transform.sax.SAXSource
 
-class DefaultErrorExplanation(): ErrorExplanation {
+class DefaultErrorExplanation(val printer: MessagePrinter): ErrorExplanation {
     private var environment: CommonEnvironment? = null
 
     companion object {
@@ -99,7 +100,7 @@ class DefaultErrorExplanation(): ErrorExplanation {
     }
 
     override fun report(error: XProcError) {
-        System.err.println(message(error, true))
+        printer.println(message(error, true))
     }
 
     override fun explanation(error: XProcError): String {
@@ -108,7 +109,7 @@ class DefaultErrorExplanation(): ErrorExplanation {
     }
 
     override fun reportExplanation(error: XProcError) {
-        System.err.println(explanation(error))
+        printer.println(explanation(error))
     }
 
     private fun template(code: QName, variant: Int, count: Int): ErrorExplanationTemplate {

@@ -9,14 +9,18 @@ import com.xmlcalabash.util.DefaultMessagePrinter
 import com.xmlcalabash.util.Verbosity
 import com.xmlcalabash.visualizers.Silent
 import net.sf.saxon.Configuration
-import net.sf.saxon.om.NamespaceUri
 import net.sf.saxon.s9api.QName
 import java.io.File
 import java.net.URI
 
 abstract class XmlCalabashConfiguration {
     companion object {
-        val DEFAULT_CONSOLE_ENCODING = "utf-8"
+        val OS = System.getProperty("os.name") ?: "unknown"
+        val DEFAULT_CONSOLE_ENCODING = if (OS.startsWith("Windows")) {
+            "windows-1252"
+        } else {
+            "utf-8"
+        }
     }
 
     abstract fun saxonConfigurer(saxon: Configuration)

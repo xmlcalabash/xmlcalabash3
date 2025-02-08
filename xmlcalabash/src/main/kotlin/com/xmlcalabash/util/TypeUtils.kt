@@ -24,6 +24,12 @@ class TypeUtils(val stepConfig: XProcStepConfiguration) {
         private val parsedXsTypes = mutableMapOf<String, SequenceType>()
         private var vara = QName("a")
         private var varb = QName("b")
+
+        fun sequenceTypeToString(asType: SequenceType): String {
+            val baseType = asType.itemType.typeName
+            val occur = asType.occurrenceIndicator.toString()
+            return "${baseType}${occur}"
+        }
     }
 
     val inscopeNamespaces = stepConfig.inscopeNamespaces
