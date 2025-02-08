@@ -3,6 +3,12 @@ package com.xmlcalabash.app
 import com.xmlcalabash.api.Monitor
 import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.exceptions.XProcException
+import com.xmlcalabash.namespace.NsCx
+import com.xmlcalabash.namespace.NsFn
+import com.xmlcalabash.namespace.NsP
+import com.xmlcalabash.namespace.NsSaxon
+import com.xmlcalabash.namespace.NsXml
+import com.xmlcalabash.namespace.NsXs
 import com.xmlcalabash.util.AssertionsLevel
 import com.xmlcalabash.util.UriUtils
 import com.xmlcalabash.util.Verbosity
@@ -198,7 +204,7 @@ class CommandLine private constructor(val args: Array<out String>) {
         ArgumentDescription("--namespace", listOf("-ns"), ArgumentType.STRING) { it -> parseNamespace(it) },
         ArgumentDescription("--init", listOf(), ArgumentType.STRING) { it -> _initializers.add(it) },
         ArgumentDescription("--configuration", listOf("-c", "--config"), ArgumentType.EXISTING_FILE) { it -> _config = File(it) },
-        ArgumentDescription("--step", listOf(), ArgumentType.STRING) { it -> _step = it },
+        ArgumentDescription("--step", listOf("-s"), ArgumentType.STRING) { it -> _step = it },
         ArgumentDescription("--graphs", listOf(), ArgumentType.DIRECTORY) { it -> _pipelineGraphs = it },
         ArgumentDescription("--licensed", listOf(), ArgumentType.BOOLEAN, "true") { it -> _licensed = it == "true" },
         ArgumentDescription("--pipe", listOf(), ArgumentType.BOOLEAN, "true") { it -> _pipe = it == "true" },
@@ -340,6 +346,21 @@ class CommandLine private constructor(val args: Array<out String>) {
 
         if (_debug == true && (verbosity == null || verbosity!! > Verbosity.DEBUG)) {
             _verbosity = Verbosity.DEBUG
+        }
+
+        for ((prefix, namespace) in mapOf(
+            "cx" to NsCx.namespace,
+            "p" to NsP.namespace,
+            "xs" to NsXs.namespace,
+            "fn" to NsFn.namespace,
+            "map" to NsFn.mapNamespace,
+            "array" to NsFn.arrayNamespace,
+            "math" to NsFn.mathNamespace,
+            "saxon" to NsSaxon.namespace,
+            "xml" to NsXml.namespace)) {
+            if (!_namespaces.containsKey(prefix)) {
+                _namespaces[prefix] = namespace
+            }
         }
     }
 

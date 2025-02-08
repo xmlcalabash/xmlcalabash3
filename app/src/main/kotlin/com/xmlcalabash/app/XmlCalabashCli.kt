@@ -4,9 +4,13 @@ import com.xmlcalabash.XmlCalabashBuildConfig
 import com.xmlcalabash.config.ConfigurationLoader
 import com.xmlcalabash.config.XmlCalabash
 import com.xmlcalabash.config.XmlCalabashConfiguration
+import com.xmlcalabash.datamodel.DeclareStepInstruction
 import com.xmlcalabash.datamodel.InstructionConfiguration
+import com.xmlcalabash.datamodel.LibraryInstruction
 import com.xmlcalabash.io.MediaType
 import com.xmlcalabash.datamodel.PipelineBuilder
+import com.xmlcalabash.datamodel.XProcExpression
+import com.xmlcalabash.datamodel.XProcSelectExpression
 import com.xmlcalabash.documents.DocumentProperties
 import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.exceptions.DefaultErrorExplanation
@@ -16,11 +20,14 @@ import com.xmlcalabash.exceptions.XProcException
 import com.xmlcalabash.io.DocumentLoader
 import com.xmlcalabash.io.DocumentWriter
 import com.xmlcalabash.namespace.Ns
+import com.xmlcalabash.namespace.NsCx
 import com.xmlcalabash.namespace.NsErr
 import com.xmlcalabash.namespace.NsFn
+import com.xmlcalabash.namespace.NsP
 import com.xmlcalabash.namespace.NsXs
 import com.xmlcalabash.runtime.api.RuntimeOption
 import com.xmlcalabash.runtime.api.RuntimePort
+import com.xmlcalabash.spi.DocumentResolverServiceProvider
 import com.xmlcalabash.util.DefaultMessagePrinter
 import com.xmlcalabash.util.DefaultXmlCalabashConfiguration
 import com.xmlcalabash.util.FileUtils
@@ -42,10 +49,12 @@ import org.slf4j.MDC
 import java.io.BufferedReader
 import java.io.File
 import java.io.InputStreamReader
+import java.net.URI
 import java.text.SimpleDateFormat
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
+import javax.lang.model.type.DeclaredType
 import kotlin.system.exitProcess
 
 /**
@@ -138,7 +147,7 @@ class XmlCalabashCli private constructor() {
 
             xmlCalabash = XmlCalabash.newInstance(config)
 
-            if (commandLine.help || (commandLine.command == "run" && commandLine.pipeline == null)) {
+            if (commandLine.help || (commandLine.command == "run" && commandLine.pipeline == null && commandLine.step == null)) {
                 help()
                 return
             }
@@ -184,7 +193,13 @@ class XmlCalabashCli private constructor() {
 
             evaluateOptions(xprocParser.builder, commandLine)
 
-            val declstep = xprocParser.parse(commandLine.pipeline!!.toURI(), commandLine.step)
+            val declstep = if (commandLine.pipeline != null) {
+                xprocParser.parse(commandLine.pipeline!!.toURI(), commandLine.step)
+            } else {
+                val type = stepConfig.parseQName(commandLine.step!!, commandLine.namespaces)
+                constructWrapper(type)
+            }
+
             val runtime = declstep.runtime()
             val pipeline = runtime.executable()
 
@@ -456,5 +471,69 @@ class XmlCalabashCli private constructor() {
             return false
         }
         return false
+    }
+
+    private fun constructWrapper(xstep: QName): DeclareStepInstruction {
+        val stepDecl = findDeclaration(xstep)
+        val step = stepDecl.second
+
+        val builder = xmlCalabash.newPipelineBuilder(3.1)
+        val decl = builder.newDeclareStep()
+
+        if (stepDecl.first != null) {
+            decl.import(stepDecl.first!!)
+        }
+
+        for (input in step.inputs()) {
+            decl.input(input.port, input.primary == true, input.sequence == true)
+        }
+        for (output in step.outputs()) {
+            val decloutput = decl.output(output.port, output.primary == true, output.sequence == true)
+            decloutput.pipe = output.port
+
+        }
+        for (option in step.getOptions()) {
+            val decloption = decl.option(option.name)
+            decloption.values = option.values
+            decloption.asType = option.asType
+            decloption.required = option.required
+            decloption.select = option.select
+            decloption.specialType = option.specialType
+        }
+
+        val innerstep = decl.atomicStep(step.type!!)
+        for (input in step.inputs()) {
+            val wi = innerstep.withInput(input.port)
+            wi.pipe = input.port
+        }
+        for (option in step.getOptions()) {
+            val wo = innerstep.withOption(option.name)
+            wo.empty()
+            wo.select = XProcExpression.select(innerstep.stepConfig, "\$${option.name}")
+        }
+
+        return decl
+    }
+
+    private fun findDeclaration(type: QName): Pair<LibraryInstruction?, DeclareStepInstruction> {
+        val pstep = xmlCalabash.commonEnvironment.standardSteps[type]
+        if (pstep != null) {
+            return Pair(null, pstep)
+        }
+
+        for (provider in DocumentResolverServiceProvider.providers()) {
+            val resolver = provider.create()
+            for (uri in resolver.resolvableLibraryUris()) {
+                val xprocParser = xmlCalabash.newXProcParser()
+                val library = xprocParser.parseLibrary(uri)
+                for (decl in library.children.filterIsInstance<DeclareStepInstruction>()) {
+                    if (decl.type == type) {
+                        return Pair(library, decl)
+                    }
+                }
+            }
+        }
+
+        throw XProcError.xsMissingStepDeclaration(type).exception()
     }
 }

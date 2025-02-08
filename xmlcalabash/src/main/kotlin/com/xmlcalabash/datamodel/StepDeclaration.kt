@@ -273,7 +273,7 @@ abstract class StepDeclaration(parent: XProcInstruction?, stepConfig: Instructio
         return namedPort(outputs(), name)
     }
 
-    internal open fun withInput(port: String? = null): WithInputInstruction {
+    open fun withInput(port: String? = null): WithInputInstruction {
         val withInput = WithInputInstruction(this, stepConfig)
         if (port != null) {
             withInput._port = port
@@ -282,13 +282,13 @@ abstract class StepDeclaration(parent: XProcInstruction?, stepConfig: Instructio
         return withInput
     }
 
-    internal open fun withInput(): WithInputInstruction {
+    open fun withInput(): WithInputInstruction {
         val withInput = WithInputInstruction(this, stepConfig.copy())
         _children.add(withInput)
         return withInput
     }
 
-    internal fun withOutput(): WithOutputInstruction {
+    fun withOutput(): WithOutputInstruction {
         val withOutput = WithOutputInstruction(this, stepConfig.copy())
         _children.add(withOutput)
         return withOutput

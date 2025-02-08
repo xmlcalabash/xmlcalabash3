@@ -419,6 +419,7 @@ open class XProcError protected constructor(val code: QName, val variant: Int, e
         fun xiTooLateForStaticOptions(name: QName) = internal(213, name)
         fun xiCliDuplicateNamespace(prefix: String) = internal(214, prefix)
         fun xiMergeDuplicatesError(name: String) = internal(215, name)
+        fun xiNotALibrary(uri: URI) = internal(216, uri)
 
         fun xiXvrlInvalidValue(name: QName, value: String) = internal(300, name, value)
         fun xiXvrlIllegalMessageName(name: QName) = internal(301, name)

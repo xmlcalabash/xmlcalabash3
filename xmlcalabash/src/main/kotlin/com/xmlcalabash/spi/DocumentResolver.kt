@@ -7,6 +7,7 @@ import java.net.URI
 
 interface DocumentResolver {
     fun resolvableUris(): List<URI>
+    fun resolvableLibraryUris(): List<URI>
     fun configure(manager: DocumentManager)
     fun resolve(context: XProcStepConfiguration, uri: URI, current: XProcDocument?): XProcDocument?
 }

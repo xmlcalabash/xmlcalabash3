@@ -16,8 +16,11 @@ class NopDocumentResolverProvider: DocumentResolverProvider, DocumentResolver {
         return emptyList()
     }
 
+    override fun resolvableLibraryUris(): List<URI> {
+        return emptyList()
+    }
+
     override fun configure(manager: DocumentManager) {
-        // manager.registerPrefix("file:/Volumes/Documents/xsl/", this)
         // nop
     }
 

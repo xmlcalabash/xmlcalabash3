@@ -22,6 +22,10 @@ class InternalDocumentResolver(): DocumentResolver {
         return URI_MAP.keys.toList()
     }
 
+    override fun resolvableLibraryUris(): List<URI> {
+        return emptyList()
+    }
+
     override fun configure(manager: DocumentManager) {
         for ((uri, _) in URI_MAP) {
             manager.registerPrefix(uri.toString(), this)
