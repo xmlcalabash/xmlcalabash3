@@ -44,6 +44,7 @@ jobs:
       HAVE_WWW: ${{ secrets.WWW_REPOSITORY != '' }}
       CAN_PUBLISH: ${{ secrets.ACCESS_TOKEN != '' }}
       XMLCALABASH_TEST_WEASY: "true"
+      XMLCALABASH_TEST_CHROME: "false"
       XMLCALABASH_VER: ${{ needs.check_branch.outputs.version }}
       CIWORKFLOW: "yes"
       CI_SHA1: ${{ github.sha }}
@@ -141,6 +142,7 @@ jobs:
             ext/polyglot/build/distributions/polyglot-${{ env.CI_TAG }}.zip
             ext/diagramming/build/distributions/diagramming-${{ env.CI_TAG }}.zip
             ext/railroad/build/distributions/railroad-${{ env.CI_TAG }}.zip
+            ext/selenium/build/distributions/selenium-${{ env.CI_TAG }}.zip
 
       # N.B. This is **only** publishing the SNAPSHOT builds on the main branch
       - name: Publish to Sonatype
