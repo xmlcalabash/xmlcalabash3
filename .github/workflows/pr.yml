@@ -95,5 +95,5 @@ jobs:
 
       - name: Build and test XML Calabash
         run: |
-          ./gradlew --info test
-          ./gradlew --warning-mode all release
+          ./gradlew test test-driver:test-report
+          ./gradlew release
