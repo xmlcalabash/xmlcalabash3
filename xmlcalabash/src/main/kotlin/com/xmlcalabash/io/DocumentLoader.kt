@@ -294,7 +294,7 @@ class DocumentLoader(val context: XProcStepConfiguration,
         val FF = (-1).toByte()
         val FE = (-2).toByte()
 
-        val suppliedCharset = inputCharset ?: mediaType.charset()
+        val suppliedCharset =  mediaType.charset() ?: inputCharset
         val bytes = stream.readAllBytes()
 
         val charset = suppliedCharset
