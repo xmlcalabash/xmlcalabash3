@@ -1,0 +1,168 @@
+ixml version "1.1-nineml" .
+
+script = versionDecl, s, page, s, statement++RS, s .
+
+-versionDecl = -"script version ", version, s, -"." .
+@version = "0.2" .
+
+@page = -"page", RS, string, s, -"." .
+
+-statement = simpleStatement, s, -"." | block | perform .
+perform = compoundStatement, (RS, -"then", RS, compoundStatement)+, s, -"." .
+
+-compoundStatement = send
+                   | pause
+                   | key
+                   | scroll
+                   | move
+                   | release
+                   | drag
+                   | click .
+
+-simpleStatement = compoundStatement
+                 | message
+                 | output
+                 | set
+                 | window
+                 | cookie
+                 | navigate
+                 | refresh
+                 | reset
+                 | close
+                 | find
+                 | call
+                 | waitReady .
+
+-block = ifBlock | whileBlock | untilBlock | subroutine .
+
+find = -"find", RS, (all, RS)?, @varname, RS, (-"by", RS)?, findType, s, -"=", s, @string,
+       (RS, @wait)?, (RS, @pause)? .
+@findType>type = "name" | "selector" | "id" | "link-text" | "partial-link-text"
+               | "tag" | "class" | "xpath" .
+
+@all = "all" .
+
+set = -"set", RS, @varname, RS, (-"to", RS)?, setWindowType, RS, setWindowParam
+    | -"set", RS, @varname, RS, (-"to", RS)?, setPageType, RS, setPageParam
+    | -"set", RS, @varname, RS, (-"to", RS)?, setCookieType, RS, @string>cookie
+    | -"set", RS, @varname, RS, (-"to", RS)?, setCookieType, RS, @name>cookie
+    | -"set", RS, @varname, RS, (-"to", RS)?, setStringType, RS, @string>string
+    | -"set", RS, @varname, RS, (-"to", RS)?, setXPathType, RS, @string>xpath 
+    | -"set", RS, @varname, RS, (-"to", RS)?, setElementType, RS, @varname>from, RS, property .
+
+@setWindowType>type = "window" .
+@setWindowParam>param = "width" | "height" | "x" | "y" .
+
+@setPageType>type = "page" .
+@setPageParam>param = "url" | "title" .
+@setCookieType>type = "cookie" .
+@setStringType>type = "string" .
+@setXPathType>type = "xpath" .
+@setElementType>type = "element" .
+@property = -name .
+
+@duration = number
+          | "P", (digit+, "D")
+          | "P", (digit+, "D")?, "T", (digit+, "H")?, (digit+, "M")?, (number, "S")? .
+
+-integer = digit+ | -"+", digit+ | "-", digit+ .
+-number = digit+, (".", digit+)? .
+-digit = ["0"-"9"] .
+
+send = -"send", RS, @string, (RS, (-"to", RS)?, @varname)?
+     | -"send", RS, -"¶", ~["¶"]*, -"¶", RS, (-"to", RS)?, @varname
+     | -"send", RS, -"⁋", ~["⁋"]*, -"⁋", RS, (-"to", RS)?, @varname
+     | -"send", RS, -"§", ~["§"]*, -"§", RS, (-"to", RS)?, @varname
+     | -"send", RS, -ff, ~[#c]*, -ff, RS, (-"to", RS)?, @varname .
+
+click = clickType, (RS, @varname)?
+      | clickHold, (RS, @varname)? .
+@clickType>type = "click" | "doubleclick" .
+@clickHold>type = -"click", +"click-hold", RS, (-"and", RS)?, -"hold" .
+
+pause = -"pause", RS, duration .
+wait  = -"wait", RS, duration .
+waitReady>wait = -"wait", (RS, -"until")?, RS, -"ready" .
+
+ifBlock>if = -"if", RS, @string>test, RS, -"then", RS, statement++RS, s, -"endif" .
+whileBlock>while = -"while", RS, @string>test, RS, -"do", RS, statement++RS, s, -"done" .
+untilBlock>until = -"until", RS, @string>test, RS, -"do", RS, statement++RS, s, -"done" .
+
+message = -"message", RS, @string>select .
+
+output = -"output", RS, @string, RS, (-"to", RS)?, -"result"
+       | -"output", RS, @setXPathType, RS, @string, RS, (-"to", RS)?, -"result"
+       | -"output", RS, (@varname, RS)?, (-"to", RS)?, -"result"
+       | -"output", RS, -"¶", ~["¶"]*, -"¶", RS, (-"to", RS)?, -"result"
+       | -"output", RS, -"⁋", ~["⁋"]*, -"⁋", RS, (-"to", RS)?, -"result"
+       | -"output", RS, -"§", ~["§"]*, -"§", RS, (-"to", RS)?, -"result"
+       | -"output", RS, -ff, ~[#c]*, -ff, RS, (-"to", RS)?, -"result" .
+
+window = -"window", RS, feature
+       | -"window", RS, featureSize, RS, integer, s, "x", s, integer
+       | -"window", RS, featurePosition, RS, integer, s, ",", s, integer .
+@feature = "minimize" | "maximize" | "fullscreen" .
+@featureSize>feature = "size" .
+@featurePosition>feature = "position" .
+
+cookie = -"cookie", RS, @string>name, s, -"=", s, @string>value,
+          (RS, -"path", s, -"=", s, @string>path)?,
+          (RS, -"duration", s, -"=", s, @duration)?
+       | -"cookie", RS, @name, s, -"=", s, @string>value,
+          (RS, -"path", s, -"=", s, @string>path)?,
+          (RS, -"duration", s, -"=", s, @duration)? .
+
+scroll = -"scroll", RS, (-"to", RS)?, @varname>to
+       | -"scroll", RS, (-"by", RS)?, @integer>delta-x, s, -",", s, @integer>delta-y
+       | -"scroll", RS, -"from", RS, @varname>from, RS, (-"by", RS)?, @integer>delta-x, s, -",", s, @integer>delta-y .
+
+move = -"move", RS, (-"to", RS)?, @varname>to .
+release = -"release" .
+
+drag = -"drag", RS, (-"and", RS, -"drop", RS)?, @varname>from, RS, (-"to", RS)?, @varname>to .
+
+navigate = -"navigate", RS, direction 
+         | -"navigate", RS, -"to", RS, @string>to .
+@direction = "forward" | "back" | "backwards" .
+
+refresh = -"refresh" .
+reset = -"reset" .
+close = -"close" .
+
+key = -"key", RS, keydir, RS, keyname
+    | -"key", RS, keydir, RS, @string>char .
+@keydir>direction = "up" | "down" .
+
+@keyname>name = "ADD" | "ALT" | "ARROW_DOWN" | "ARROW_LEFT" | "ARROW_RIGHT" | "ARROW_UP"
+              | "BACK_SPACE" | "CANCEL" | "CLEAR" | "COMMAND" | "CONTROL" | "DECIMAL"
+              | "DELETE" | "DIVIDE" | "DOWN" | "END" | "ENTER" | "EQUALS" | "ESCAPE"
+              | "F1" | "F2" | "F3" | "F4" | "F5" | "F6" | "F7" | "F8" | "F9" | "F10" | "F11" | "F12"
+              | "HELP" | "HOME" | "INSERT"
+              | "LEFT" | "LEFT_ALT" | "LEFT_CONTROL" | "LEFT_SHIFT" | "META"
+              | "MULTIPLY" | "NULL" | "NUMPAD0" | "NUMPAD1" | "NUMPAD2" | "NUMPAD3"
+              | "NUMPAD4" | "NUMPAD5" | "NUMPAD6" | "NUMPAD7" | "NUMPAD8" | "NUMPAD9"
+              | "PAGE_DOWN" | "PAGE_UP" | "PAUSE" | "RETURN" | "RIGHT"
+              | "SEPARATOR" | "SHIFT" | "SPACE" | "SUBTRACT" | "TAB" | "UP" .
+
+subroutine = (-"sub" | -"subroutine"), RS, @name, #20*, lf, s, statement**RS, s, -"end" .
+
+call = (-"call" | -"gosub"), RS, @name .
+
+name = namestart, namefollower*.
+-namestart = ["_"; L] .
+-namefollower = namestart | ["-.·‿⁀"; Nd; Mn] .
+varname>name = -"$", name .
+
+string = -'"', dchar+, -'"' | -"'", schar+, -"'" | -'“', qchar+, -'”' .
+-dchar = ~['"'; #a; #d] | '"', -'"' .
+-schar = ~["'"; #a; #d] | "'", -"'".
+-qchar = ~["“”"; #a; #d] .
+
+-s = (whitespace; comment)* .
+-RS = (whitespace; comment)+ .
+-whitespace = -[Zs]; tab; lf; cr .
+-tab = -#9 .
+-lf = -#a .
+-cr = -#d .
+-ff = -#c .
+-comment = -"#", -~[#a]*, -#a .

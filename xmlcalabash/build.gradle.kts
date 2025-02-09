@@ -55,6 +55,7 @@ val dep_plantuml = project.findProperty("plantUml").toString()
 val dep_jeuclid = project.findProperty("jeuclidCore").toString()
 val dep_ditaa = project.findProperty("ditaa").toString()
 val dep_rr = project.findProperty("rr").toString()
+val dep_nineml = project.findProperty("nineml").toString()
 
 dependencies {
   implementation("org.jetbrains.kotlin:kotlin-stdlib:2.0.21")
@@ -94,8 +95,8 @@ dependencies {
 
   implementation("org.apache.httpcomponents.client5:httpclient5:${dep_httpClient}")
 
-  implementation("org.nineml:coffeegrinder:3.2.7")
-  implementation("org.nineml:coffeefilter:3.2.7")
+  implementation("org.nineml:coffeegrinder:${dep_nineml}")
+  implementation("org.nineml:coffeefilter:${dep_nineml}")
 
   implementation("org.jline:jline-terminal:3.28.0")
   implementation("org.jline:jline-terminal-jni:3.28.0")
@@ -141,6 +142,7 @@ buildConfig {
                   "jeuclidCore",
                   "jing",
                   "jsonSchemaValidator",
+                  "nineml",
                   "pdfbox",
                   "plantUml",
                   "rr",

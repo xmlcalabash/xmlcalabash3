@@ -1,0 +1,92 @@
+#+title: Selenium
+#+date: <2025-01-28 Tue>
+#+author: Norman Tovey-Walsh
+#+startup: showall
+
++ [ ] key down "X" 
++ [ ] click (no varname)
+
+* Extra stuff
+:PROPERTIES:
+:CUSTOM_ID: h-FAE0D971-B5E9-45D5-99F1-1408EE4E1806
+:END:
+
++ [X] Sequences of actions executed with perform()
++ [X] Lists…
++ [ ] http requests?
+
+* Get info
+:PROPERTIES:
+:CUSTOM_ID: h-485B8BEA-BF6D-4456-B51C-B8B1F813C55D
+:END:
+
++ [X] page.title
++ [X] page.url
++ [X] window.x
++ [X] window.y
++ [X] window.width
++ [X] window.height
++ [X] element.gettext
+
+* Cookies
+:PROPERTIES:
+:CUSTOM_ID: h-843EB87B-FCCC-436A-BAA1-58ACEB18DA59
+:END:
+
++ [ ] cookie name = value
++ [ ] get-cookie(name)
+
+* Finding elements
+:PROPERTIES:
+:CUSTOM_ID: h-591A775A-7A29-4192-A8F9-5FE72A05FCF3
+:END:
+
++ [X] element name = find-name("name")
++ [X] element name = find-selector("name")
++ [X] element name = find-id("id")
++ [X] element name = find-link-text("text")
++ [X] element name = find-partial-link-text("text")
++ [X] element name = find-tag-name("name")
++ [X] element name = find-class-name("name")
++ [X] element name = find-xpath("path")
++ [X] all elements name = …
+
+* Interaction
+:PROPERTIES:
+:CUSTOM_ID: h-A40A74A9-3976-4BFC-BAEA-B270E63CC61F
+:END:
+
++ [X] click element (button, radio button, checkbox, …)
++ [X] doubleclick element
++ [X] contextclick element
++ [X] clickandhold element
++ [X] clickrelease element
++ [ ] select element by visible text "text"
++ [ ] select element by value "text"
++ [ ] select element by index <number>
++ [ ] drag [to] element
++ [ ] drag and drop source to target
++ [X] text element "text"
++ [X] text element § … §
++ [X] key down <key>
++ [X] key up <key>
++ [X] wait <duration>
++ [X] wait reload name
++ [X] close
++ [X] window maximize | minimize | <integer> x <integer> | fullscreen
++ [X] window position <number> x <number>
++ [X] navigate backward
++ [X] navigate forward
++ [X] refresh
++ [X] reset
++ [ ] move [to] element
++ [ ] move [by] <integer> x <integer>
++ [ ] move [by] offset <integer> x <integer>
++ [ ] scroll [to] element
++ [ ] scroll [by] <integer> x <integer>
++ [ ] scroll from element [by] <integer> x <integer>
+
+
+
+
+
