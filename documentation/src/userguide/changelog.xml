@@ -13,6 +13,61 @@ See the commits and pull requests on
 finer detail.</para>
 
 <revhistory>
+<revision xml:id="r300-alpha19">
+<revnumber>3.0.0-alpha19</revnumber>
+<date>2025-02-09</date>
+<revdescription>
+<itemizedlist>
+<listitem><para>Fixed <ghissue number="266"/>.
+The default encoding on Windows is now
+<link xlink:href="https://en.wikipedia.org/wiki/Windows-1252">Windows 1252</link>.
+(It was previously documented that way, but not implemented that way.)</para>
+</listitem>
+<listitem><para>Fixed <ghissue number="265"/>.
+The <function>p:urify</function> function can be called with a single argument.</para>
+</listitem>
+<listitem><para>Fixed <ghissue number="264"/>.
+The static base URI was not being set correctly in expressions. Also updated the
+error message that arises if an expression fails to include location information.</para>
+</listitem>
+<listitem><para>Fixed <ghissue number="257"/>.
+The <tag>p:validate-with-schematron</tag> step now returns a <tag>xvrl:report</tag>
+(not a report<emphasis>s</emphasis>). The bug that caused digest roll-ups to be incorrect
+has been fixed.</para>
+</listitem>
+<listitem><para>Fixed <ghissue number="256"/>.
+That sentence in the README now has a verb.</para>
+</listitem>
+<listitem><para>Fixed <ghissue number="255"/>. The help text has been updated to
+reflect current usage. Making the help text comprehensive seemed too verbose; the
+common options are summarized with a link to the documentation for more detail.
+</para>
+</listitem>
+<listitem><para>Fixed <ghissue number="253"/>.
+Updated the “quick start” section of the README for clarity.</para>
+</listitem>
+<listitem><para>Fixed <ghissue number="250"/>. Fixed a link accidentally broken
+by a global search-and-replace and a few other documentation issues.</para>
+</listitem>
+<listitem><para>Fixed <ghissue number="236"/>.
+The <option>--step</option> option can be used to run any atomic step.</para>
+</listitem>
+
+<listitem><para>The error message associated with “not well formed JSON” now
+includes the JSON that’s being rejected. Did a bit of nearby tidying of error
+messages.</para>
+</listitem>
+<listitem><para>Updated byte order mark handling in text and JSON documents to
+reflect recent specification changes. (Generally, byte order marks are not part
+of the text.)</para>
+</listitem>
+<listitem><para>Tinkered with the GitHub actions: the PR builds now include the
+test report; the build environment includes Firefox and Chrome.</para>
+</listitem>
+</itemizedlist>
+</revdescription>
+</revision>
+
 <revision xml:id="r300-alpha18">
 <revnumber>3.0.0-alpha18</revnumber>
 <date>2025-02-02</date>
