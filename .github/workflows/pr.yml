@@ -41,6 +41,7 @@ jobs:
     env:
       HAVE_LIBRARIES: ${{ secrets.LIBURI != '' }}
       XMLCALABASH_TEST_WEASY: "true"
+      XMLCALABASH_TEST_CHROME: "false"
       CIWORKFLOW: "yes"
       CI_SHA1: ${{ github.sha }}
       CI_BUILD_NUM: ${{ github.run_number }}

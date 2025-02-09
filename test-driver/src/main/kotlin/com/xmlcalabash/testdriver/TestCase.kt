@@ -52,7 +52,11 @@ class TestCase(val suite: TestSuite, val testFile: File) {
         val WRITABLE = QName("writable")
         val HIDDEN = QName("hidden")
 
-        val UNSUPPORTED_FEATURES = listOf("xslt-1", "xquery_1_0")
+        val UNSUPPORTED_FEATURES = if (System.getenv("XMLCALABASH_TEST_CHROME") == "false") {
+            listOf("xslt-1", "xquery_1_0", "selenium-chrome")
+        } else {
+            listOf("xslt-1", "xquery_1_0")
+        }
     }
 
     val config = suite.xmlCalabash
@@ -232,6 +236,10 @@ class TestCase(val suite: TestSuite, val testFile: File) {
                     stream.println("[${index}]: ")
                     result[index].serialize(stream, mapOf(Ns.indent to XdmAtomicValue(true)))
                     stream.println("----------------")
+
+                    println("[${index}]: ")
+                    result[index].serialize(System.out, mapOf(Ns.indent to XdmAtomicValue(true)))
+                    println("----------------")
                 }
 
                 for (node in errors) {
@@ -662,14 +670,6 @@ class TestCase(val suite: TestSuite, val testFile: File) {
         }
         builder.endDocument()
         return rootElement(builder.result)
-    }
-
-    private fun pipelineSvg(desc: XdmNode, filename: String) {
-        toSvg(desc, filename, "/com/xmlcalabash/pipeline2dot.xsl")
-    }
-
-    private fun graphSvg(desc: XdmNode, filename: String) {
-        toSvg(desc, filename, "/com/xmlcalabash/graph2dot.xsl")
     }
 
     private fun toSvg(desc: XdmNode, filename: String, stylesheet: String) {
