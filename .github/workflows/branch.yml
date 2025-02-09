@@ -63,6 +63,21 @@ jobs:
           java-version: '21'
           distribution: 'graalvm-community'
 
+      - name: Setup Chrome
+        uses: browser-actions/setup-chrome@latest
+        with:
+          install-chromedriver: true
+          install-dependencies: true
+
+      - name: Check chrome version
+        run: chrome --version
+
+      - name: Setup Firefox
+        uses: browser-actions/setup-firefox@latest
+
+      - name: Check firefox version
+        run: firefox --version
+
       - name: Checkout sources
         uses: actions/checkout@v4
 
