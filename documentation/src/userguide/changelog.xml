@@ -13,6 +13,14 @@ See the commits and pull requests on
 finer detail.</para>
 
 <revhistory>
+<revision xml:id="r300-alpha20">
+<revnumber>3.0.0-alpha20</revnumber>
+<date>2025-02-10</date>
+<revdescription>
+<para>The 3.0.0-alpha19 release failed because of an error in build automation.
+This is functionally the same release.</para>
+</revdescription>
+</revision>
 <revision xml:id="r300-alpha19">
 <revnumber>3.0.0-alpha19</revnumber>
 <date>2025-02-09</date>
