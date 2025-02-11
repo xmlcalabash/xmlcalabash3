@@ -8,6 +8,8 @@ import com.xmlcalabash.namespace.Ns
 import com.xmlcalabash.namespace.NsC
 import com.xmlcalabash.namespace.NsFn
 import com.xmlcalabash.runtime.XProcStepConfiguration
+import com.xmlcalabash.spi.ContentTypeConverter
+import com.xmlcalabash.spi.ContentTypeConverterServiceProvider
 import com.xmlcalabash.util.MediaClassification
 import com.xmlcalabash.util.S9Api
 import com.xmlcalabash.util.SaxonTreeBuilder
@@ -26,9 +28,12 @@ class DocumentConverter(val stepConfig: XProcStepConfiguration,
                         val doc: XProcDocument,
                         val contentType: MediaType,
                         externalSerialization: Map<QName, XdmValue> = emptyMap()): Marshaller(stepConfig) {
+    companion object {
+        private var converters: List<ContentTypeConverter>? = null
+    }
     private val outType = contentType.classification()
     private val _params = mutableMapOf<QName, XdmValue>()
-    lateinit private var inType: MediaClassification
+    private lateinit var inType: MediaClassification
     val serializationParameters: Map<QName, XdmValue>
         get() = _params
 
@@ -54,6 +59,22 @@ class DocumentConverter(val stepConfig: XProcStepConfiguration,
     }
 
     fun convert(): XProcDocument {
+        if (converters == null) {
+            val list = mutableListOf<ContentTypeConverter>()
+            for (provider in ContentTypeConverterServiceProvider.providers()) {
+                list.add(provider.create())
+            }
+            converters = list
+        }
+
+        for (converter in converters!!) {
+            for (conversion in converter.conversions()) {
+                if (conversion.first == doc.contentType && conversion.second == contentType) {
+                    return converter.convert(stepConfig, doc, contentType, serializationParameters)
+                }
+            }
+        }
+
         inType = doc.contentType?.classification() ?: MediaClassification.BINARY
         when (inType) {
             MediaClassification.XML, MediaClassification.XHTML, MediaClassification.HTML -> {
