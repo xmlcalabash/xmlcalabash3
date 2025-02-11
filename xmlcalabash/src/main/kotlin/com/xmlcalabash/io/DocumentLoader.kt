@@ -6,10 +6,12 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLFactory
 import com.xmlcalabash.documents.DocumentProperties
 import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.exceptions.XProcError
-import com.xmlcalabash.exceptions.XProcException
 import com.xmlcalabash.namespace.Ns
 import com.xmlcalabash.namespace.NsCx
 import com.xmlcalabash.runtime.XProcStepConfiguration
+import com.xmlcalabash.spi.ContentTypeConverter
+import com.xmlcalabash.spi.ContentTypeLoader
+import com.xmlcalabash.spi.ContentTypeLoaderServiceProvider
 import com.xmlcalabash.util.MediaClassification
 import com.xmlcalabash.util.SaxonTreeBuilder
 import com.xmlcalabash.util.UriUtils
@@ -30,7 +32,6 @@ import java.time.ZoneOffset
 import java.util.*
 import javax.xml.transform.dom.DOMSource
 import javax.xml.transform.sax.SAXSource
-import kotlin.Byte
 
 class DocumentLoader(val context: XProcStepConfiguration,
                      val href: URI?,
@@ -43,6 +44,7 @@ class DocumentLoader(val context: XProcStepConfiguration,
         val cx_is_hidden = QName(NsCx.namespace, "cx:is-hidden")
         val cx_last_modified = QName(NsCx.namespace, "cx:last-modified")
         val cx_size = QName(NsCx.namespace, "cx:size")
+        private var contentTypeLoaders: List<ContentTypeLoader>? = null
     }
 
     var mediaType = MediaType.XML
@@ -125,6 +127,20 @@ class DocumentLoader(val context: XProcStepConfiguration,
     }
 
     private fun load(uri: URI?, stream: InputStream, overrideMediaType: MediaType, charset: Charset? = null): XProcDocument {
+        if (contentTypeLoaders == null) {
+            val list = mutableListOf<ContentTypeLoader>()
+            for (provider in ContentTypeLoaderServiceProvider.providers()) {
+                list.add(provider.create())
+            }
+            contentTypeLoaders = list
+        }
+
+        for (loader in contentTypeLoaders!!) {
+            if (overrideMediaType in loader.contentTypes()) {
+                return loader.load(uri, stream, overrideMediaType, charset)
+            }
+        }
+
         mediaType = overrideMediaType
         properties.setAll(documentProperties)
         properties[Ns.contentType] = mediaType
