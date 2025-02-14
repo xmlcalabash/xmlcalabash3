@@ -68,10 +68,8 @@ class DocumentConverter(val stepConfig: XProcStepConfiguration,
         }
 
         for (converter in converters!!) {
-            for (conversion in converter.conversions()) {
-                if (conversion.first == doc.contentType && conversion.second == contentType) {
-                    return converter.convert(stepConfig, doc, contentType, serializationParameters)
-                }
+            if (doc.contentType != null && converter.canConvert(doc.contentType!!, contentType)) {
+                return converter.convert(stepConfig, doc, contentType, serializationParameters)
             }
         }
 

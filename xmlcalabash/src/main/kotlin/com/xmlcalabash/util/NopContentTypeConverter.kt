@@ -8,8 +8,8 @@ import net.sf.saxon.s9api.QName
 import net.sf.saxon.s9api.XdmValue
 
 class NopContentTypeConverter(): ContentTypeConverter {
-    override fun conversions(): List<Pair<MediaType, MediaType>> {
-        return emptyList()
+    override fun canConvert(from: MediaType, to: MediaType): Boolean {
+        return false
     }
 
     override fun convert(
