@@ -7,6 +7,6 @@ import net.sf.saxon.s9api.QName
 import net.sf.saxon.s9api.XdmValue
 
 interface ContentTypeConverter {
-    fun conversions(): List<Pair<MediaType, MediaType>>
+    fun canConvert(from: MediaType, to: MediaType): Boolean
     fun convert(stepConfig: XProcStepConfiguration, doc: XProcDocument, convertTo: MediaType, serialization: Map<QName, XdmValue>): XProcDocument
 }
