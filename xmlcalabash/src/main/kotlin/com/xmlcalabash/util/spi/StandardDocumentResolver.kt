@@ -1,4 +1,4 @@
-package com.xmlcalabash.util
+package com.xmlcalabash.util.spi
 
 import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.io.DocumentManager
@@ -7,7 +7,7 @@ import com.xmlcalabash.spi.DocumentResolver
 import com.xmlcalabash.spi.DocumentResolverProvider
 import java.net.URI
 
-class NopDocumentResolverProvider: DocumentResolverProvider, DocumentResolver {
+class StandardDocumentResolver: DocumentResolverProvider, DocumentResolver {
     override fun create(): DocumentResolver {
         return this
     }

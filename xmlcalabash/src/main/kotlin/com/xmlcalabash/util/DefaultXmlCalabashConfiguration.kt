@@ -18,12 +18,4 @@ class DefaultXmlCalabashConfiguration(): XmlCalabashConfiguration() {
         }
         pagedMediaManagers = managers
     }
-
-    override fun saxonConfigurer(saxon: Configuration) {
-        // nop
-    }
-
-    override fun xmlCalabashConfigurer(xmlCalabash: XmlCalabash) {
-        // nop
-    }
 }

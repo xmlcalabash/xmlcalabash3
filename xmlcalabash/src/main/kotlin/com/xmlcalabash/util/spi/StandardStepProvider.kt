@@ -1,21 +1,102 @@
-package com.xmlcalabash.util
+package com.xmlcalabash.util.spi
 
 import com.xmlcalabash.api.XProcStep
-import com.xmlcalabash.config.SaxonConfiguration
 import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.namespace.NsCx
 import com.xmlcalabash.namespace.NsP
-import com.xmlcalabash.runtime.parameters.*
+import com.xmlcalabash.runtime.parameters.DocumentStepParameters
+import com.xmlcalabash.runtime.parameters.EmptyStepParameters
+import com.xmlcalabash.runtime.parameters.ExpressionStepParameters
+import com.xmlcalabash.runtime.parameters.InlineStepParameters
+import com.xmlcalabash.runtime.parameters.OptionStepParameters
+import com.xmlcalabash.runtime.parameters.SelectStepParameters
+import com.xmlcalabash.runtime.parameters.StepParameters
+import com.xmlcalabash.runtime.parameters.UnimplementedStepParameters
 import com.xmlcalabash.spi.AtomicStepManager
 import com.xmlcalabash.spi.AtomicStepProvider
-import com.xmlcalabash.steps.*
+import com.xmlcalabash.steps.AddAttributeStep
+import com.xmlcalabash.steps.AddXmlBaseStep
+import com.xmlcalabash.steps.ArchiveManifestStep
+import com.xmlcalabash.steps.ArchiveStep
+import com.xmlcalabash.steps.CastContentTypeStep
+import com.xmlcalabash.steps.CompareStep
+import com.xmlcalabash.steps.CompressStep
+import com.xmlcalabash.steps.CountStep
+import com.xmlcalabash.steps.CssFormatterStep
+import com.xmlcalabash.steps.DeleteStep
+import com.xmlcalabash.steps.EncodeStep
+import com.xmlcalabash.steps.ErrorStep
+import com.xmlcalabash.steps.FilterStep
+import com.xmlcalabash.steps.HashStep
+import com.xmlcalabash.steps.HttpRequestStep
+import com.xmlcalabash.steps.IdentityStep
+import com.xmlcalabash.steps.InsertStep
+import com.xmlcalabash.steps.InvisibleXmlStep
+import com.xmlcalabash.steps.JsonJoinStep
+import com.xmlcalabash.steps.JsonMergeStep
+import com.xmlcalabash.steps.LabelElementsStep
+import com.xmlcalabash.steps.LoadStep
+import com.xmlcalabash.steps.MakeAbsoluteUrisStep
+import com.xmlcalabash.steps.MarkdownToHtml
+import com.xmlcalabash.steps.NamespaceDeleteStep
+import com.xmlcalabash.steps.NamespaceRenameStep
+import com.xmlcalabash.steps.PackStep
+import com.xmlcalabash.steps.RenameStep
+import com.xmlcalabash.steps.ReplaceStep
+import com.xmlcalabash.steps.SetAttributesStep
+import com.xmlcalabash.steps.SetPropertiesStep
+import com.xmlcalabash.steps.SinkStep
+import com.xmlcalabash.steps.SleepStep
+import com.xmlcalabash.steps.SplitSequenceStep
+import com.xmlcalabash.steps.StoreStep
+import com.xmlcalabash.steps.StringReplaceStep
+import com.xmlcalabash.steps.TextCountStep
+import com.xmlcalabash.steps.TextHeadStep
+import com.xmlcalabash.steps.TextJoinStep
+import com.xmlcalabash.steps.TextReplaceStep
+import com.xmlcalabash.steps.TextSortStep
+import com.xmlcalabash.steps.TextTailStep
+import com.xmlcalabash.steps.UnarchiveStep
+import com.xmlcalabash.steps.UncompressStep
+import com.xmlcalabash.steps.UnwrapStep
+import com.xmlcalabash.steps.UuidStep
+import com.xmlcalabash.steps.WrapSequenceStep
+import com.xmlcalabash.steps.WrapStep
+import com.xmlcalabash.steps.WwwFormUrlDecodeStep
+import com.xmlcalabash.steps.WwwFormUrlEncodeStep
+import com.xmlcalabash.steps.XIncludeStep
+import com.xmlcalabash.steps.XQueryStep
+import com.xmlcalabash.steps.XslFormatterStep
+import com.xmlcalabash.steps.XsltStep
 import com.xmlcalabash.steps.extension.CacheDocument
 import com.xmlcalabash.steps.extension.UncacheDocument
-import com.xmlcalabash.steps.file.*
-import com.xmlcalabash.steps.internal.*
+import com.xmlcalabash.steps.file.CreateTempfileStep
+import com.xmlcalabash.steps.file.DirectoryListStep
+import com.xmlcalabash.steps.file.FileCopyStep
+import com.xmlcalabash.steps.file.FileDeleteStep
+import com.xmlcalabash.steps.file.FileInfoStep
+import com.xmlcalabash.steps.file.FileMkdirStep
+import com.xmlcalabash.steps.file.FileMoveStep
+import com.xmlcalabash.steps.file.FileTouchStep
+import com.xmlcalabash.steps.internal.DocumentStep
+import com.xmlcalabash.steps.internal.EmptyStep
+import com.xmlcalabash.steps.internal.ExpressionStep
+import com.xmlcalabash.steps.internal.GuardStep
+import com.xmlcalabash.steps.internal.InlineStep
+import com.xmlcalabash.steps.internal.JoinerStep
+import com.xmlcalabash.steps.internal.NullStep
+import com.xmlcalabash.steps.internal.OptionExpressionStep
+import com.xmlcalabash.steps.internal.SelectStep
+import com.xmlcalabash.steps.internal.SplitterStep
+import com.xmlcalabash.steps.internal.UnimplementedStep
 import com.xmlcalabash.steps.os.OsExec
 import com.xmlcalabash.steps.os.OsInfo
-import com.xmlcalabash.steps.validation.*
+import com.xmlcalabash.steps.validation.ValidateWithDTD
+import com.xmlcalabash.steps.validation.ValidateWithJsonSchema
+import com.xmlcalabash.steps.validation.ValidateWithNVDL
+import com.xmlcalabash.steps.validation.ValidateWithRelaxNG
+import com.xmlcalabash.steps.validation.ValidateWithSchematron
+import com.xmlcalabash.steps.validation.ValidateWithXmlSchema
 import net.sf.saxon.s9api.QName
 
 class StandardStepProvider: AtomicStepManager, AtomicStepProvider {
@@ -123,7 +204,7 @@ class StandardStepProvider: AtomicStepManager, AtomicStepProvider {
 
     override fun createStep(params: StepParameters): () -> XProcStep {
         val constructor = implMap[params.stepType]
-            ?: throw XProcError.xiNotImplemented("createStep for ${params.stepType}").exception()
+            ?: throw XProcError.Companion.xiNotImplemented("createStep for ${params.stepType}").exception()
         return { -> constructor(params) }
     }
 }

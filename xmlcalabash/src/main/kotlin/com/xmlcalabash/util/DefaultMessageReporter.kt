@@ -2,6 +2,7 @@ package com.xmlcalabash.util
 
 import com.xmlcalabash.api.MessageReporter
 import com.xmlcalabash.io.MessagePrinter
+import com.xmlcalabash.util.NopMessageReporter
 import net.sf.saxon.s9api.QName
 
 class DefaultMessageReporter(val printer: MessagePrinter, nextReporter: MessageReporter? = null): NopMessageReporter(nextReporter) {

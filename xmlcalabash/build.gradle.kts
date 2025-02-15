@@ -55,6 +55,7 @@ val dep_plantuml = project.findProperty("plantUml").toString()
 val dep_jeuclid = project.findProperty("jeuclidCore").toString()
 val dep_ditaa = project.findProperty("ditaa").toString()
 val dep_rr = project.findProperty("rr").toString()
+val dep_activation = project.findProperty("activation").toString()
 
 dependencies {
   implementation("org.jetbrains.kotlin:kotlin-stdlib:2.0.21")
@@ -71,7 +72,7 @@ dependencies {
   implementation("org.brotli:dec:${dep_brotliDec}")
   implementation("org.tukaani:xz:${dep_tukaaniXz}")
 
-  implementation("javax.activation:activation:1.1.1") // For mimetype mapping
+  implementation("javax.activation:activation:${dep_activation}") // For mimetype mapping
   implementation("com.nwalsh:sinclude:${dep_sinclude}") {
     exclude(group="net.sf.saxon", module="Saxon-HE")
   }
@@ -127,7 +128,8 @@ buildConfig {
   val sb = StringBuilder()
   sb.append("mapOf(\n")
   sb.append("  \"saxon\" to \"${project.findProperty("saxonVersion").toString()}\",\n")
-  arrayOf<String>("brotliDec",
+  arrayOf<String>("activation",
+                  "brotliDec",
                   "commonsCodec",
                   "commonsCompress",
                   "ditaa",

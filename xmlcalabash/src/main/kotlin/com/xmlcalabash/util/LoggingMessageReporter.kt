@@ -1,6 +1,7 @@
 package com.xmlcalabash.util
 
 import com.xmlcalabash.api.MessageReporter
+import com.xmlcalabash.util.NopMessageReporter
 import net.sf.saxon.s9api.QName
 import org.apache.logging.log4j.kotlin.logger
 

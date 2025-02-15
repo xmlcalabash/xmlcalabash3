@@ -1,4 +1,4 @@
-package com.xmlcalabash.util
+package com.xmlcalabash.util.spi
 
 import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.io.MediaType
@@ -7,7 +7,7 @@ import com.xmlcalabash.spi.ContentTypeConverter
 import net.sf.saxon.s9api.QName
 import net.sf.saxon.s9api.XdmValue
 
-class NopContentTypeConverter(): ContentTypeConverter {
+class StandardContentTypeConverter(): ContentTypeConverter {
     override fun canConvert(from: MediaType, to: MediaType): Boolean {
         return false
     }

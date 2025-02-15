@@ -2,6 +2,7 @@ package com.xmlcalabash.tracing
 
 import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.io.DocumentWriter
+import com.xmlcalabash.io.MediaType
 import com.xmlcalabash.namespace.Ns
 import com.xmlcalabash.runtime.XProcStepConfiguration
 import com.xmlcalabash.runtime.steps.AbstractStep
@@ -17,12 +18,29 @@ import java.nio.file.Path
 class DetailTraceListener(val path: Path): StandardTraceListener() {
     val savedDocuments = mutableMapOf<Long, String>()
 
+    private val extensionMap = mutableMapOf<MediaType, String>()
+
     override fun sendDocument(from: Pair<AbstractStep, String>, to: Pair<Consumer, String>, document: XProcDocument): XProcDocument {
         super.sendDocument(from, to, document)
 
+        synchronized(extensionMap) {
+            if (extensionMap.isEmpty()) {
+                for ((ext, ctype) in document.context.xmlCalabash.commonEnvironment.defaultContentTypes) {
+                    extensionMap[MediaType.parse(ctype)] = ext
+                }
+                // Hack. There are duplicates in the defaultContentTypes map...
+                extensionMap[MediaType.XML] = "xml"
+                extensionMap[MediaType.TEXT] = "txt"
+                extensionMap[MediaType.GZIP] = "gz"
+                extensionMap[MediaType.XQUERY] = "xqy"
+                extensionMap[MediaType.XSLT] = "xsl"
+                extensionMap[MediaType.JPEG] = "jpg"
+            }
+        }
+
         if (document.id !in savedDocuments) {
             val prefix = "${from.first.id}."
-            val suffix = document.contentType?.extension() ?: ".bin"
+            val suffix = extensionMap[document.contentType] ?: ".bin"
             val tempFile = Files.createTempFile(path, prefix, suffix).toFile()
             savedDocuments[document.id] = tempFile.absolutePath
 

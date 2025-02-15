@@ -124,7 +124,6 @@ resources, XML Calabash defines a pragmatically more useful default.</para>
 <row><entry>cpio</entry><entry>application/x-cpio</entry></row>
 <row><entry>css</entry><entry>text/plain</entry></row>
 <row><entry>eps</entry><entry>image/eps</entry></row>
-<row><entry>epub</entry><entry>application/epub+zip</entry></row>
 <row><entry>fo</entry><entry>application/xml</entry></row>
 <row><entry>gif</entry><entry>image/gif</entry></row>
 <row><entry>gz</entry><entry>application/gzip</entry></row>
@@ -155,12 +154,14 @@ resources, XML Calabash defines a pragmatically more useful default.</para>
 </tgroup>
 </table>
 
-<para>If these defaults are problematic, use one of the existing configuration mechanisms
-to define the mapping you prefer.</para>
+<para>Extensions to XML Calabash may also update this table. For example, the
+<tag>cx:epubcheck</tag> step adds a mapping for the extension
+“<filename class="extension">epub</filename>”. If the defaults are problematic, you can
+override them with one of the existing configuration mechanisms.</para>
 
 <para>Also, if you have a different convention, perhaps using the extension
 “<literal>.schematron</literal>” for Schematron files or “<literal>.xs</literal>” for
-XML Schema documents, you will have to provide that mapping yourself. You will also
+XML Schema documents, you can provide that mapping as well. You will also
 want to provide mappings for other extensions you use.</para>
 
 </section>

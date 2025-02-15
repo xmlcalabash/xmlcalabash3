@@ -1,1 +1,1 @@
-com.xmlcalabash.util.NopDocumentResolverProvider
+com.xmlcalabash.util.spi.StandardDocumentResolver

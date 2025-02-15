@@ -7,8 +7,8 @@ import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.namespace.Ns
 import com.xmlcalabash.namespace.NsCx
 import com.xmlcalabash.spi.PagedMediaManager
-import com.xmlcalabash.util.NopPagedMediaProvider
 import com.xmlcalabash.util.UriUtils
+import com.xmlcalabash.util.spi.StandardPagedMediaProvider
 import net.sf.saxon.s9api.QName
 import java.io.ByteArrayOutputStream
 import java.net.URI
@@ -46,7 +46,7 @@ open class CssFormatterStep(): AbstractAtomicStep() {
         }
         formatters.addAll(stepConfig.xmlCalabash.xmlCalabashConfig.pagedMediaCssProcessors)
         if (formatters.isEmpty()) {
-            formatters.add(NopPagedMediaProvider.genericCssFormatter)
+            formatters.add(StandardPagedMediaProvider.genericCssFormatter)
         }
 
         for (formatter in formatters) {

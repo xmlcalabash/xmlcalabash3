@@ -1,26 +1,26 @@
 package com.xmlcalabash.spi
 
-import java.util.ServiceLoader
+import java.util.*
 
-class AtomicStepServiceProvider {
+class ConfigurerServiceProvider {
     companion object {
-        private val DEFAULT_PROVIDER = "com.xmlcalabash.util.spi.StandardStepProvider"
+        private val DEFAULT_PROVIDER = "com.xmlcalabash.util.spi.StandardConfigurer"
 
-        fun providers(): List<AtomicStepProvider> {
-            val services = mutableListOf<AtomicStepProvider>()
-            val loader = ServiceLoader.load(AtomicStepProvider::class.java)
+        fun providers(): List<ConfigurerProvider> {
+            val services = mutableListOf<ConfigurerProvider>()
+            val loader = ServiceLoader.load(ConfigurerProvider::class.java)
             for (provider in loader.iterator()) {
                 services.add(provider)
             }
             return services
         }
 
-        fun provider(): AtomicStepProvider {
+        fun provider(): ConfigurerProvider {
             return provider(DEFAULT_PROVIDER)
         }
 
-        fun provider(providerName: String): AtomicStepProvider {
-            val loader = ServiceLoader.load(AtomicStepProvider::class.java)
+        fun provider(providerName: String): ConfigurerProvider {
+            val loader = ServiceLoader.load(ConfigurerProvider::class.java)
             for (provider in loader.iterator()) {
                 if (provider::class.java.name == providerName) {
                     return provider
