@@ -128,11 +128,11 @@ class DocumentInstruction private constructor(parent: XProcInstruction): Connect
         val output = docStep.primaryOutput()!!
         output._sequence = false
         output._contentTypes.clear()
-        if (docStep.contentType == null) {
-            output._contentTypes.add(MediaType.ANY)
-        } else {
-            output._contentTypes.add(docStep.contentType!!)
-        }
+
+        // Don't limit what p:document can output; the content-type is about what it's
+        // reading. That's usually, but not necessarily, the same as what it outputs.
+        // (See the RdfLoader)
+        output._contentTypes.add(MediaType.ANY)
 
         newSteps.add(docStep)
         return newSteps

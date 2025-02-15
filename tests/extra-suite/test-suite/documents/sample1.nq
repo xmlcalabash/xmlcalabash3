@@ -1,0 +1,26 @@
+_:B94ae07267c8e3c98886cab4883da1595 <http://xmlns.com/foaf/0.1/name> "Norman Walsh" .
+_:B94ae07267c8e3c98886cab4883da1595 <http://xmlns.com/foaf/0.1/homepage> <https://nwalsh.com/> .
+_:B94ae07267c8e3c98886cab4883da1595 <http://xmlns.com/foaf/0.1/weblog> <https://so.nwalsh.com/> .
+_:Bbd33373016dd022b2f2bdf1f9fe7ac1e <http://xmlns.com/foaf/0.1/name> "Achim Berndzen" .
+_:Be24eef7b1839b67eaf3330831bee529d <http://xmlns.com/foaf/0.1/name> "Gerrit Imsieke" .
+_:B09d6ddcf8fcacaf516dd3e5934dcf476 <http://xmlns.com/foaf/0.1/name> "Erik Siegel" .
+<https://xproc.org/> <http://purl.org/dc/terms/title> "XProc" .
+<https://xproc.org/> <http://purl.org/dc/terms/type> <http://purl.org/dc/dcmitype/Collection> .
+<https://spec.xproc.org/3.0/xproc/> <http://purl.org/dc/terms/title> "XProc 3.0: An XML Pipeline Language" .
+<https://spec.xproc.org/3.0/xproc/> <http://purl.org/dc/terms/date> "2022-09-12"^^<http://www.w3.org/2001/XMLSchema#date> .
+<https://spec.xproc.org/3.0/xproc/> <http://purl.org/dc/terms/type> <http://purl.org/dc/dcmitype/Text> .
+<https://spec.xproc.org/3.0/xproc/> <http://purl.org/dc/terms/hasVersion> "3.0" .
+<https://spec.xproc.org/3.0/xproc/> <http://purl.org/dc/terms/isPartOf> <https://xproc.org/> .
+<https://spec.xproc.org/3.0/xproc/> <http://purl.org/dc/terms/contributor> _:B94ae07267c8e3c98886cab4883da1595 .
+<https://spec.xproc.org/3.0/xproc/> <http://purl.org/dc/terms/contributor> _:Bbd33373016dd022b2f2bdf1f9fe7ac1e .
+<https://spec.xproc.org/3.0/xproc/> <http://purl.org/dc/terms/contributor> _:Be24eef7b1839b67eaf3330831bee529d .
+<https://spec.xproc.org/3.0/xproc/> <http://purl.org/dc/terms/contributor> _:B09d6ddcf8fcacaf516dd3e5934dcf476 .
+<https://spec.xproc.org/3.0/steps/> <http://purl.org/dc/terms/title> "XProc 3.0: Standard Step Library" .
+<https://spec.xproc.org/3.0/steps/> <http://purl.org/dc/terms/date> "2022-09-12"^^<http://www.w3.org/2001/XMLSchema#date> .
+<https://spec.xproc.org/3.0/steps/> <http://purl.org/dc/terms/type> <http://purl.org/dc/dcmitype/Text> .
+<https://spec.xproc.org/3.0/steps/> <http://purl.org/dc/terms/hasVersion> "3.0" .
+<https://spec.xproc.org/3.0/steps/> <http://purl.org/dc/terms/isPartOf> <https://xproc.org/> .
+<https://spec.xproc.org/3.0/steps/> <http://purl.org/dc/terms/contributor> _:B94ae07267c8e3c98886cab4883da1595 .
+<https://spec.xproc.org/3.0/steps/> <http://purl.org/dc/terms/contributor> _:Bbd33373016dd022b2f2bdf1f9fe7ac1e .
+<https://spec.xproc.org/3.0/steps/> <http://purl.org/dc/terms/contributor> _:Be24eef7b1839b67eaf3330831bee529d .
+<https://spec.xproc.org/3.0/steps/> <http://purl.org/dc/terms/contributor> _:B09d6ddcf8fcacaf516dd3e5934dcf476 .

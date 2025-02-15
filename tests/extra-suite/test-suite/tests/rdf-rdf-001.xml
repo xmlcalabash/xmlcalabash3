@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<t:test expected="pass"
+        xmlns:t="http://xproc.org/ns/testsuite/3.0">
+  <t:info>
+    <t:title>rdf-rdf-001</t:title>
+    <t:revision-history>
+      <t:revision>
+        <t:date>2025-02-15</t:date>
+        <t:author>
+          <t:name>Norm Tovey-Walsh</t:name>
+        </t:author>
+        <t:description xmlns="http://www.w3.org/1999/xhtml">
+          <p>Created test.</p>
+        </t:description>
+      </t:revision>
+    </t:revision-history>
+  </t:info>
+  <t:description xmlns="http://www.w3.org/1999/xhtml">
+    <p>Tests that .rdf loads as application/rdf+xml, XML, and RDF.</p>
+  </t:description>
+  <t:pipeline>
+<p:declare-step xmlns:p="http://www.w3.org/ns/xproc"
+                xmlns:cx="http://xmlcalabash.com/ns/extensions"
+                name="main" version="3.0" expand-text="false">
+  <p:import href="https://xmlcalabash.com/ext/library/rdf.xpl"/>
+  <p:output port="result"/>
+
+  <p:load name="load" href="../documents/sample1.rdf"/>
+
+  <p:identity>
+    <p:with-input xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+                  select="exists(/rdf:RDF)"/>
+  </p:identity>
+  <p:cast-content-type content-type="text/plain"/>
+  <p:wrap-sequence name="first" wrapper="type"/>
+
+  <p:identity>
+    <p:with-input select="p:document-properties(.)" pipe="@load"/>
+  </p:identity>
+  <p:cast-content-type name="second" content-type="application/xml"/>
+
+  <p:cast-content-type name="third" content-type="application/rdf+xml">
+    <p:with-input pipe="@load"/>
+  </p:cast-content-type>
+
+  <p:wrap-sequence wrapper="wrapper">
+    <p:with-input pipe="@first @second @third"/>
+  </p:wrap-sequence>
+</p:declare-step>
+  </t:pipeline>
+  <t:schematron>
+    <s:schema queryBinding="xslt2"
+              xmlns:s="http://purl.oclc.org/dsdl/schematron">
+      <s:ns prefix="rdf" uri="http://www.w3.org/1999/02/22-rdf-syntax-ns#"/>
+      <s:ns prefix="fn" uri="http://www.w3.org/2005/xpath-functions"/>
+      <s:pattern>
+        <s:rule context="/">
+          <s:assert test="wrapper">The root is not wrapper.</s:assert>
+          <s:assert test="wrapper/type">The type is missing.</s:assert>
+          <s:assert test="wrapper/type = 'true'">The type isn’t true.</s:assert>
+          <s:assert test="wrapper/fn:map">The properties map is missing.</s:assert>
+          <s:assert test="wrapper/rdf:RDF">The result isn’t RDF.</s:assert>
+        </s:rule>
+      </s:pattern>
+      <s:pattern>
+        <s:rule context="/wrapper/fn:map">
+          <s:assert test="fn:string[@key='content-type'] = 'application/rdf+xml'"
+                    >The result content-type is incorrect.</s:assert>
+        </s:rule>
+      </s:pattern>
+    </s:schema>
+  </t:schematron>
+</t:test>

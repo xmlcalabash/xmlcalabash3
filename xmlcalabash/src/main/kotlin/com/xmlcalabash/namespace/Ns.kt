@@ -41,6 +41,7 @@ object Ns {
     val crc = QName("crc")
     val cwd = QName("cwd")
     val date = QName("date")
+    val datatype = QName("datatype")
     val dtdValidate = QName("dtd-validate")
     val debug = QName("debug")
     val deepEqual = QName("deep-equal")

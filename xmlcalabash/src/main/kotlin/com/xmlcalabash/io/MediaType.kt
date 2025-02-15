@@ -1,13 +1,11 @@
 package com.xmlcalabash.io
 
-import com.xmlcalabash.config.CommonEnvironment
 import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.util.MediaClassification
 import net.sf.saxon.s9api.XdmAtomicValue
 import java.nio.charset.Charset
 import java.util.*
 import java.util.regex.Pattern
-import kotlin.collections.iterator
 
 class MediaType private constructor(val mediaType: String, val mediaSubtype: String,
                                     val suffix: String? = null, val inclusive: Boolean = true,
@@ -40,6 +38,20 @@ class MediaType private constructor(val mediaType: String, val mediaSubtype: Str
         val CPIO = MediaType("application", "x-cpio")
         val SEVENZ = MediaType("application", "x-7z-compressed")
         val JAVA_PROPERTIES = MediaType("text", "x-java-properties")
+
+        val JSONLD = MediaType("application", "ld", "json")
+        val N3 = MediaType("text", "n3")
+        val NQUADS = MediaType("application", "n-quads")
+        val NTRIPLES = MediaType("application", "n-triples")
+        val RDFJSON = MediaType("application", "rdf", "json")
+        val RDFTHRIFT = MediaType("application", "rdf", "thrift")
+        val RDFXML = MediaType("application", "rdf", "xml")
+        val SPARQL = MediaType("application", "sparql-query")
+        val SPARQL_RESULTS_XML = MediaType("application", "sparql-results", "xml")
+        val SPARQL_RESULTS_JSON = MediaType("application", "sparql-results", "json")
+        val TRIG = MediaType("application", "trig")
+        val TRIX = MediaType("application", "trix", "xml")
+        val TURTLE = MediaType("text", "turtle")
 
         val XML_OR_HTML = listOf<MediaType>(
             MediaType("application", "xml"),
@@ -75,6 +87,10 @@ class MediaType private constructor(val mediaType: String, val mediaSubtype: Str
             MediaType("application", "relax-ng-compact-syntax"),
             MediaType("application", "xquery"),
             MediaType("application", "javascript"),
+            MediaType("application", "trig"),
+            MediaType("application", "n-triples"),
+            MediaType("application", "n-quads"),
+            MediaType("application", "sparql-query"),
             MediaType("text", "html", inclusive = false),
             MediaType("text", "xml", inclusive = false),
             MediaType("text", "yaml", inclusive = false)
@@ -391,7 +407,11 @@ class MediaType private constructor(val mediaType: String, val mediaSubtype: Str
     override fun equals(other: Any?): Boolean {
         return when (other) {
             is MediaType -> {
-                return mediaType == other.mediaType && mediaSubtype == other.mediaSubtype
+                if (mediaType != other.mediaType || mediaSubtype != other.mediaSubtype) {
+                    return false
+                }
+
+                return suffix == other.suffix
             }
             else -> false
         }

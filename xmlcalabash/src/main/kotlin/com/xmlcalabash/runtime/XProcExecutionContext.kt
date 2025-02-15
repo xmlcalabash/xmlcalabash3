@@ -1,10 +1,14 @@
 package com.xmlcalabash.runtime
 
+import com.xmlcalabash.documents.XProcBinaryDocument
 import com.xmlcalabash.documents.XProcDocument
+import com.xmlcalabash.namespace.NsCx
 import net.sf.saxon.om.GroundedValue
 import net.sf.saxon.s9api.QName
+import net.sf.saxon.s9api.XdmAtomicValue
 import net.sf.saxon.s9api.XdmMap
 import net.sf.saxon.s9api.XdmNode
+import net.sf.saxon.s9api.XdmValue
 
 open class XProcExecutionContext(val stepConfig: XProcStepConfiguration) {
     var iterationPosition = 1L

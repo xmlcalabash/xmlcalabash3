@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<t:test expected="pass"
+        xmlns:t="http://xproc.org/ns/testsuite/3.0">
+  <t:info>
+    <t:title>rdf-trix-002</t:title>
+    <t:revision-history>
+      <t:revision>
+        <t:date>2025-02-15</t:date>
+        <t:author>
+          <t:name>Norm Tovey-Walsh</t:name>
+        </t:author>
+        <t:description xmlns="http://www.w3.org/1999/xhtml">
+          <p>Created test.</p>
+        </t:description>
+      </t:revision>
+    </t:revision-history>
+  </t:info>
+  <t:description xmlns="http://www.w3.org/1999/xhtml">
+    <p>Tests that application/trix+xml works in p:inline, p:document, and p:load.</p>
+  </t:description>
+  <t:pipeline>
+<p:declare-step xmlns:p="http://www.w3.org/ns/xproc"
+                xmlns:cx="http://xmlcalabash.com/ns/extensions"
+                name="main" version="3.0" expand-text="false">
+  <p:import href="https://xmlcalabash.com/ext/library/rdf.xpl"/>
+  <p:output port="result"/>
+
+  <p:identity>
+    <p:with-input>
+      <p:inline content-type="application/trix+xml">
+<trix xmlns="http://www.w3.org/2004/03/trix/trix-1/">
+  <graph>
+    <triple>
+      <id>21ba10919040c0ec1907a125d091b3bd</id>
+      <uri>http://xmlns.com/foaf/0.1/name</uri>
+      <plainLiteral>Norman Walsh</plainLiteral>
+    </triple>
+    <triple>
+      <id>21ba10919040c0ec1907a125d091b3bd</id>
+      <uri>http://xmlns.com/foaf/0.1/homepage</uri>
+      <uri>https://nwalsh.com/</uri>
+    </triple>
+    <triple>
+      <id>21ba10919040c0ec1907a125d091b3bd</id>
+      <uri>http://xmlns.com/foaf/0.1/weblog</uri>
+      <uri>https://so.nwalsh.com/</uri>
+    </triple>
+    <triple>
+      <id>0e99590127e90d49557b6e72e418f54b</id>
+      <uri>http://xmlns.com/foaf/0.1/name</uri>
+      <plainLiteral>Achim Berndzen</plainLiteral>
+    </triple>
+    <triple>
+      <id>af124ebc00d1c11a0956fda6da02ee8c</id>
+      <uri>http://xmlns.com/foaf/0.1/name</uri>
+      <plainLiteral>Gerrit Imsieke</plainLiteral>
+    </triple>
+    <triple>
+      <id>e63e5c7e0739342332938e5c281db347</id>
+      <uri>http://xmlns.com/foaf/0.1/name</uri>
+      <plainLiteral>Erik Siegel</plainLiteral>
+    </triple>
+    <triple>
+      <uri>https://xproc.org/</uri>
+      <uri>http://purl.org/dc/terms/title</uri>
+      <plainLiteral>XProc</plainLiteral>
+    </triple>
+    <triple>
+      <uri>https://xproc.org/</uri>
+      <uri>http://purl.org/dc/terms/type</uri>
+      <uri>http://purl.org/dc/dcmitype/Collection</uri>
+    </triple>
+    <triple>
+      <uri>https://spec.xproc.org/3.0/xproc/</uri>
+      <uri>http://purl.org/dc/terms/title</uri>
+      <plainLiteral>XProc 3.0: An XML Pipeline Language</plainLiteral>
+    </triple>
+    <triple>
+      <uri>https://spec.xproc.org/3.0/xproc/</uri>
+      <uri>http://purl.org/dc/terms/date</uri>
+      <typedLiteral datatype="http://www.w3.org/2001/XMLSchema#date">2022-09-12</typedLiteral>
+    </triple>
+    <triple>
+      <uri>https://spec.xproc.org/3.0/xproc/</uri>
+      <uri>http://purl.org/dc/terms/type</uri>
+      <uri>http://purl.org/dc/dcmitype/Text</uri>
+    </triple>
+    <triple>
+      <uri>https://spec.xproc.org/3.0/xproc/</uri>
+      <uri>http://purl.org/dc/terms/hasVersion</uri>
+      <plainLiteral>3.0</plainLiteral>
+    </triple>
+    <triple>
+      <uri>https://spec.xproc.org/3.0/xproc/</uri>
+      <uri>http://purl.org/dc/terms/isPartOf</uri>
+      <uri>https://xproc.org/</uri>
+    </triple>
+    <triple>
+      <uri>https://spec.xproc.org/3.0/xproc/</uri>
+      <uri>http://purl.org/dc/terms/contributor</uri>
+      <id>21ba10919040c0ec1907a125d091b3bd</id>
+    </triple>
+    <triple>
+      <uri>https://spec.xproc.org/3.0/xproc/</uri>
+      <uri>http://purl.org/dc/terms/contributor</uri>
+      <id>0e99590127e90d49557b6e72e418f54b</id>
+    </triple>
+    <triple>
+      <uri>https://spec.xproc.org/3.0/xproc/</uri>
+      <uri>http://purl.org/dc/terms/contributor</uri>
+      <id>af124ebc00d1c11a0956fda6da02ee8c</id>
+    </triple>
+    <triple>
+      <uri>https://spec.xproc.org/3.0/xproc/</uri>
+      <uri>http://purl.org/dc/terms/contributor</uri>
+      <id>e63e5c7e0739342332938e5c281db347</id>
+    </triple>
+    <triple>
+      <uri>https://spec.xproc.org/3.0/steps/</uri>
+      <uri>http://purl.org/dc/terms/title</uri>
+      <plainLiteral>XProc 3.0: Standard Step Library</plainLiteral>
+    </triple>
+    <triple>
+      <uri>https://spec.xproc.org/3.0/steps/</uri>
+      <uri>http://purl.org/dc/terms/date</uri>
+      <typedLiteral datatype="http://www.w3.org/2001/XMLSchema#date">2022-09-12</typedLiteral>
+    </triple>
+    <triple>
+      <uri>https://spec.xproc.org/3.0/steps/</uri>
+      <uri>http://purl.org/dc/terms/type</uri>
+      <uri>http://purl.org/dc/dcmitype/Text</uri>
+    </triple>
+    <triple>
+      <uri>https://spec.xproc.org/3.0/steps/</uri>
+      <uri>http://purl.org/dc/terms/hasVersion</uri>
+      <plainLiteral>3.0</plainLiteral>
+    </triple>
+    <triple>
+      <uri>https://spec.xproc.org/3.0/steps/</uri>
+      <uri>http://purl.org/dc/terms/isPartOf</uri>
+      <uri>https://xproc.org/</uri>
+    </triple>
+    <triple>
+      <uri>https://spec.xproc.org/3.0/steps/</uri>
+      <uri>http://purl.org/dc/terms/contributor</uri>
+      <id>21ba10919040c0ec1907a125d091b3bd</id>
+    </triple>
+    <triple>
+      <uri>https://spec.xproc.org/3.0/steps/</uri>
+      <uri>http://purl.org/dc/terms/contributor</uri>
+      <id>0e99590127e90d49557b6e72e418f54b</id>
+    </triple>
+    <triple>
+      <uri>https://spec.xproc.org/3.0/steps/</uri>
+      <uri>http://purl.org/dc/terms/contributor</uri>
+      <id>af124ebc00d1c11a0956fda6da02ee8c</id>
+    </triple>
+    <triple>
+      <uri>https://spec.xproc.org/3.0/steps/</uri>
+      <uri>http://purl.org/dc/terms/contributor</uri>
+      <id>e63e5c7e0739342332938e5c281db347</id>
+    </triple>
+  </graph>
+</trix>
+      </p:inline>
+    </p:with-input>
+  </p:identity>
+  <p:cast-content-type name="first" content-type="application/rdf+xml"/>
+
+  <p:identity>
+    <p:with-input>
+      <p:document content-type="application/trix+xml" href="../documents/sample1.trix"/>
+    </p:with-input>
+  </p:identity>
+  <p:cast-content-type name="second" content-type="application/rdf+xml"/>
+
+  <p:load content-type="application/trix+xml" href="../documents/sample1.trix"/>
+  <p:cast-content-type name="third" content-type="application/rdf+xml"/>
+
+  <p:wrap-sequence wrapper="wrapper">
+    <p:with-input pipe="@first @second @third"/>
+  </p:wrap-sequence>
+</p:declare-step>
+  </t:pipeline>
+  <t:schematron>
+    <s:schema queryBinding="xslt2"
+              xmlns:s="http://purl.oclc.org/dsdl/schematron">
+      <s:ns prefix="rdf" uri="http://www.w3.org/1999/02/22-rdf-syntax-ns#"/>
+      <s:pattern>
+        <s:rule context="/">
+          <s:assert test="wrapper">The root is wrong.</s:assert>
+          <s:assert test="count(wrapper/rdf:RDF) = 3">RDF output is incorrect.</s:assert>
+        </s:rule>
+      </s:pattern>
+    </s:schema>
+  </t:schematron>
+</t:test>

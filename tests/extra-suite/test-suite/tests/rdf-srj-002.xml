@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<t:test expected="pass"
+        xmlns:t="http://xproc.org/ns/testsuite/3.0">
+  <t:info>
+    <t:title>rdf-srj-002</t:title>
+    <t:revision-history>
+      <t:revision>
+        <t:date>2025-02-15</t:date>
+        <t:author>
+          <t:name>Norm Tovey-Walsh</t:name>
+        </t:author>
+        <t:description xmlns="http://www.w3.org/1999/xhtml">
+          <p>Created test.</p>
+        </t:description>
+      </t:revision>
+    </t:revision-history>
+  </t:info>
+  <t:description xmlns="http://www.w3.org/1999/xhtml">
+    <p>Tests that cx:sparql can produce application/sparql-results+json.</p>
+  </t:description>
+  <t:pipeline>
+<p:declare-step xmlns:p="http://www.w3.org/ns/xproc"
+                xmlns:cx="http://xmlcalabash.com/ns/extensions"
+                name="main" version="3.0" expand-text="false">
+  <p:import href="https://xmlcalabash.com/ext/library/rdf.xpl"/>
+  <p:output port="result"/>
+
+  <cx:sparql content-type="application/sparql-results+json">
+    <p:with-input port="source" href="../documents/address-book.rdf"/>
+    <p:with-input port="query" href="../documents/query2.rq"/>
+  </cx:sparql>
+
+  <p:cast-content-type content-type="application/xml"/>
+</p:declare-step>
+  </t:pipeline>
+  <t:schematron>
+    <s:schema queryBinding="xslt2"
+              xmlns:s="http://purl.oclc.org/dsdl/schematron">
+      <s:ns prefix="fn" uri="http://www.w3.org/2005/xpath-functions"/>
+      <s:pattern>
+        <s:rule context="/">
+          <s:assert test="fn:map">The root is not a map.</s:assert>
+          <s:assert test="fn:map/fn:map[@key='head']">There is no head</s:assert>
+          <s:assert test="fn:map/fn:map[@key='results']">There are no results</s:assert>
+        </s:rule>
+      </s:pattern>
+      <s:pattern>
+        <s:rule context="fn:map/fn:map[@key='head']">
+          <s:assert test="fn:array">The head isn’t an array</s:assert>
+          <s:assert test="count(fn:array/fn:string) = 3">Wrong number of columns</s:assert>
+          <s:assert test="fn:array/fn:string = 'category'">No category.</s:assert>
+          <s:assert test="fn:array/fn:string = 'name'">No name.</s:assert>
+          <s:assert test="fn:array/fn:string = 'locality'">No locality.</s:assert>
+        </s:rule>
+      </s:pattern>
+      <s:pattern>
+        <s:rule context="fn:map/fn:map[@key='results']">
+          <s:assert test="fn:array">The results isn’t an array</s:assert>
+          <s:assert test="count(fn:array/fn:map) = 13">Wrong number of columns</s:assert>
+          <s:assert test="fn:array/fn:map/fn:map/fn:string = 'Patina'"
+                    >One of the expected results is missing.</s:assert>
+        </s:rule>
+      </s:pattern>
+    </s:schema>
+  </t:schematron>
+</t:test>

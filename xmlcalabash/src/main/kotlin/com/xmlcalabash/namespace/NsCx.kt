@@ -8,7 +8,6 @@ object NsCx {
     val errorNamespace: NamespaceUri = NamespaceUri.of("http://xmlcalabash.com/ns/error")
 
     val anonymous = QName(namespace, "cx:anonymous")
-    val anonymousType = QName(namespace, "cx:anonymous-type")
     val antiItem = QName(namespace, "cx:anti-item")
     val assertions = QName(namespace, "cx:assertions")
     val atomicStep = QName(namespace, "cx:atomic-step")

@@ -1,0 +1,53 @@
+<?xml version="1.0"?>
+<rdf:RDF
+    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+    xmlns:j.0="http://purl.org/dc/terms/"
+    xmlns:j.1="http://xmlns.com/foaf/0.1/">
+  <rdf:Description rdf:about="https://spec.xproc.org/3.0/xproc/">
+    <j.0:title>XProc 3.0: An XML Pipeline Language</j.0:title>
+    <j.0:date rdf:datatype="http://www.w3.org/2001/XMLSchema#date"
+    >2022-09-12</j.0:date>
+    <j.0:type rdf:resource="http://purl.org/dc/dcmitype/Text"/>
+    <j.0:hasVersion>3.0</j.0:hasVersion>
+    <j.0:isPartOf>
+      <rdf:Description rdf:about="https://xproc.org/">
+        <j.0:title>XProc</j.0:title>
+        <j.0:type rdf:resource="http://purl.org/dc/dcmitype/Collection"/>
+      </rdf:Description>
+    </j.0:isPartOf>
+    <j.0:contributor>
+      <rdf:Description rdf:nodeID="A0">
+        <j.1:name>Norman Walsh</j.1:name>
+        <j.1:homepage rdf:resource="https://nwalsh.com/"/>
+        <j.1:weblog rdf:resource="https://so.nwalsh.com/"/>
+      </rdf:Description>
+    </j.0:contributor>
+    <j.0:contributor>
+      <rdf:Description rdf:nodeID="A1">
+        <j.1:name>Achim Berndzen</j.1:name>
+      </rdf:Description>
+    </j.0:contributor>
+    <j.0:contributor>
+      <rdf:Description rdf:nodeID="A2">
+        <j.1:name>Gerrit Imsieke</j.1:name>
+      </rdf:Description>
+    </j.0:contributor>
+    <j.0:contributor>
+      <rdf:Description rdf:nodeID="A3">
+        <j.1:name>Erik Siegel</j.1:name>
+      </rdf:Description>
+    </j.0:contributor>
+  </rdf:Description>
+  <rdf:Description rdf:about="https://spec.xproc.org/3.0/steps/">
+    <j.0:title>XProc 3.0: Standard Step Library</j.0:title>
+    <j.0:date rdf:datatype="http://www.w3.org/2001/XMLSchema#date"
+    >2022-09-12</j.0:date>
+    <j.0:type rdf:resource="http://purl.org/dc/dcmitype/Text"/>
+    <j.0:hasVersion>3.0</j.0:hasVersion>
+    <j.0:isPartOf rdf:resource="https://xproc.org/"/>
+    <j.0:contributor rdf:nodeID="A0"/>
+    <j.0:contributor rdf:nodeID="A1"/>
+    <j.0:contributor rdf:nodeID="A2"/>
+    <j.0:contributor rdf:nodeID="A3"/>
+  </rdf:Description>
+</rdf:RDF>

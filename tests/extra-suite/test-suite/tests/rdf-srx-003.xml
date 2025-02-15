@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<t:test expected="pass"
+        xmlns:t="http://xproc.org/ns/testsuite/3.0">
+  <t:info>
+    <t:title>rdf-srx-003</t:title>
+    <t:revision-history>
+      <t:revision>
+        <t:date>2025-02-15</t:date>
+        <t:author>
+          <t:name>Norm Tovey-Walsh</t:name>
+        </t:author>
+        <t:description xmlns="http://www.w3.org/1999/xhtml">
+          <p>Created test.</p>
+        </t:description>
+      </t:revision>
+    </t:revision-history>
+  </t:info>
+  <t:description xmlns="http://www.w3.org/1999/xhtml">
+    <p>Tests application/sparql-results+xml can be cast to text/plain.</p>
+  </t:description>
+  <t:pipeline>
+<p:declare-step xmlns:p="http://www.w3.org/ns/xproc"
+                xmlns:cx="http://xmlcalabash.com/ns/extensions"
+                name="main" version="3.0" expand-text="false">
+  <p:import href="https://xmlcalabash.com/ext/library/rdf.xpl"/>
+  <p:output port="result"/>
+
+  <cx:sparql content-type="application/sparql-results+xml">
+    <p:with-input port="source" href="../documents/address-book.rdf"/>
+    <p:with-input port="query" href="../documents/query2.rq"/>
+  </cx:sparql>
+
+  <p:cast-content-type content-type="text/plain"/>
+
+  <p:wrap-sequence wrapper="text"/>
+</p:declare-step>
+  </t:pipeline>
+  <t:schematron>
+    <s:schema queryBinding="xslt2"
+              xmlns:s="http://purl.oclc.org/dsdl/schematron">
+      <s:pattern>
+        <s:rule context="/">
+          <s:assert test="text">The root is not text.</s:assert>
+          <s:assert test="contains(text, 'Patina')"
+                    >One of the expected results is missing.</s:assert>
+          <s:assert test="count(tokenize(text, '&#10;')) = 18"
+                    >Wrong number of results: <s:value-of select="count(tokenize(text, '&#10;'))"/>.</s:assert>
+        </s:rule>
+      </s:pattern>
+    </s:schema>
+  </t:schematron>
+</t:test>

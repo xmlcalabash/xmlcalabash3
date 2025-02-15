@@ -1,0 +1,47 @@
+@base <https://spec.xproc.org/3.0/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix dc: <http://purl.org/dc/terms/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+
+_:walsh
+  foaf:name "Norman Walsh";
+  foaf:homepage <https://nwalsh.com/>;
+  foaf:weblog <https://so.nwalsh.com/> .
+
+_:berndzen
+  foaf:name "Achim Berndzen" .
+
+_:imsieke
+  foaf:name "Gerrit Imsieke" .
+
+_:siegel
+  foaf:name "Erik Siegel" .
+
+<https://xproc.org/>
+  dc:title "XProc";
+  dc:type <http://purl.org/dc/dcmitype/Collection> .
+
+<xproc/>
+  dc:title "XProc 3.0: An XML Pipeline Language";
+  dc:date "2022-09-12"^^xsd:date;
+  dc:type <http://purl.org/dc/dcmitype/Text>;
+  dc:hasVersion "3.0";
+  dc:isPartOf <https://xproc.org/>;
+  dc:contributor _:walsh;
+  dc:contributor _:berndzen;
+  dc:contributor _:imsieke;
+  dc:contributor _:siegel .
+
+<steps/>
+  dc:title "XProc 3.0: Standard Step Library";
+  dc:date "2022-09-12"^^xsd:date;
+  dc:type <http://purl.org/dc/dcmitype/Text>;
+  dc:hasVersion "3.0";
+  dc:isPartOf <https://xproc.org/>;
+  dc:contributor _:walsh;
+  dc:contributor _:berndzen;
+  dc:contributor _:imsieke;
+  dc:contributor _:siegel .
+

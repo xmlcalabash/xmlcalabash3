@@ -1,0 +1,16 @@
+<part xmlns="http://docbook.org/ns/docbook"
+      xmlns:xi="http://www.w3.org/2001/XInclude"
+      xmlns:xlink="http://www.w3.org/1999/xlink"
+      xml:id="rdf-extension-steps" version="5.2">
+<info>
+  <title>RDF extension steps</title>
+</info>
+
+<xi:include href="general.xml"/>
+<xi:include href="cx-rdf-merge.xml"/>
+<xi:include href="cx-rdf-graph.xml"/>
+<xi:include href="cx-rdfa.xml"/>
+<xi:include href="cx-sparql.xml"/>
+
+</part>
+

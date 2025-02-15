@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sparql xmlns="http://www.w3.org/2005/sparql-results#">
+   <head>
+      <variable name="document"/>
+      <variable name="title"/>
+   </head>
+   <results>
+      <result>
+         <binding name="document">
+            <uri>https://spec.xproc.org/3.0/steps/</uri>
+         </binding>
+         <binding name="title">
+            <literal datatype="http://www.w3.org/2001/XMLSchema#string">XProc 3.0: Standard Step Library</literal>
+         </binding>
+      </result>
+      <result>
+         <binding name="document">
+            <uri>https://spec.xproc.org/3.0/xproc/</uri>
+         </binding>
+         <binding name="title">
+            <literal datatype="http://www.w3.org/2001/XMLSchema#string">XProc 3.0: An XML Pipeline Language</literal>
+         </binding>
+      </result>
+      <result>
+         <binding name="document">
+            <uri>https://xproc.org/</uri>
+         </binding>
+         <binding name="title">
+            <literal datatype="http://www.w3.org/2001/XMLSchema#string">XProc</literal>
+         </binding>
+      </result>
+   </results>
+</sparql>

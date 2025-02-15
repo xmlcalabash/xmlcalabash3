@@ -88,6 +88,7 @@ dependencies {
   documentation(project(":ext:unique-id", "runtimeElements"))
   documentation(project(":ext:metadata-extractor", "runtimeElements"))
   documentation(project(":ext:railroad", "runtimeElements"))
+  documentation(project(":ext:rdf", "runtimeElements"))
 
   deltaxml(fileTree("dir" to layout.projectDirectory.dir("lib"),
                     "include" to "*.jar"))
@@ -514,6 +515,8 @@ val exampleConfig = mapOf<String,Map<String,String>>(
     "delete-001.xpl" to mapOf("input" to "default-input.xml", "diff" to "default-input.xml"),
     "delete-002.xpl" to mapOf("input" to "default-input.xml", "diff" to "default-input.xml"),
     "messages.xpl" to mapOf("input" to "default-input.xml"),
+    "rdfa.xpl" to mapOf("input" to "../html/rdfa.html"),
+    "sparql.xpl" to mapOf("input" to "../rdf/address-book.rdf")
 )
 
 for ((example,options) in exampleConfig) {

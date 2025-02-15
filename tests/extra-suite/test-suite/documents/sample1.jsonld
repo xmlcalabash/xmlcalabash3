@@ -1,0 +1,91 @@
+{
+    "@graph": [
+        {
+            "@id": "_:b0",
+            "http://xmlns.com/foaf/0.1/name": "Norman Walsh",
+            "http://xmlns.com/foaf/0.1/homepage": {
+                "@id": "https://nwalsh.com/"
+            },
+            "http://xmlns.com/foaf/0.1/weblog": {
+                "@id": "https://so.nwalsh.com/"
+            }
+        },
+        {
+            "@id": "_:b1",
+            "http://xmlns.com/foaf/0.1/name": "Achim Berndzen"
+        },
+        {
+            "@id": "_:b2",
+            "http://xmlns.com/foaf/0.1/name": "Gerrit Imsieke"
+        },
+        {
+            "@id": "_:b3",
+            "http://xmlns.com/foaf/0.1/name": "Erik Siegel"
+        },
+        {
+            "@id": "https://xproc.org/",
+            "http://purl.org/dc/terms/title": "XProc",
+            "http://purl.org/dc/terms/type": {
+                "@id": "http://purl.org/dc/dcmitype/Collection"
+            }
+        },
+        {
+            "@id": "https://spec.xproc.org/3.0/xproc/",
+            "http://purl.org/dc/terms/title": "XProc 3.0: An XML Pipeline Language",
+            "http://purl.org/dc/terms/date": {
+                "@value": "2022-09-12",
+                "@type": "http://www.w3.org/2001/XMLSchema#date"
+            },
+            "http://purl.org/dc/terms/type": {
+                "@id": "http://purl.org/dc/dcmitype/Text"
+            },
+            "http://purl.org/dc/terms/hasVersion": "3.0",
+            "http://purl.org/dc/terms/isPartOf": {
+                "@id": "https://xproc.org/"
+            },
+            "http://purl.org/dc/terms/contributor": [
+                {
+                    "@id": "_:b0"
+                },
+                {
+                    "@id": "_:b1"
+                },
+                {
+                    "@id": "_:b2"
+                },
+                {
+                    "@id": "_:b3"
+                }
+            ]
+        },
+        {
+            "@id": "https://spec.xproc.org/3.0/steps/",
+            "http://purl.org/dc/terms/title": "XProc 3.0: Standard Step Library",
+            "http://purl.org/dc/terms/date": {
+                "@value": "2022-09-12",
+                "@type": "http://www.w3.org/2001/XMLSchema#date"
+            },
+            "http://purl.org/dc/terms/type": {
+                "@id": "http://purl.org/dc/dcmitype/Text"
+            },
+            "http://purl.org/dc/terms/hasVersion": "3.0",
+            "http://purl.org/dc/terms/isPartOf": {
+                "@id": "https://xproc.org/"
+            },
+            "http://purl.org/dc/terms/contributor": [
+                {
+                    "@id": "_:b0"
+                },
+                {
+                    "@id": "_:b1"
+                },
+                {
+                    "@id": "_:b2"
+                },
+                {
+                    "@id": "_:b3"
+                }
+            ]
+        }
+    ]
+}

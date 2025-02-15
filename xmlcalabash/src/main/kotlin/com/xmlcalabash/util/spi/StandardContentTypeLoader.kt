@@ -2,6 +2,7 @@ package com.xmlcalabash.util.spi
 
 import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.io.MediaType
+import com.xmlcalabash.runtime.XProcStepConfiguration
 import com.xmlcalabash.spi.ContentTypeLoader
 import java.io.InputStream
 import java.net.URI
@@ -12,7 +13,7 @@ class StandardContentTypeLoader(): ContentTypeLoader {
         return emptyList()
     }
 
-    override fun load(uri: URI?, stream: InputStream, contentType: MediaType, charset: Charset?): XProcDocument {
+    override fun load(context: XProcStepConfiguration, uri: URI?, stream: InputStream, contentType: MediaType, charset: Charset?): XProcDocument {
         throw IllegalArgumentException("The StandardContentTypeLoader doesn't support any content types")
     }
 }

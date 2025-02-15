@@ -1,0 +1,82 @@
+<refentry xmlns:p="http://www.w3.org/ns/xproc"
+          xmlns:e="http://www.w3.org/1999/XSL/Spec/ElementSyntax"
+          xmlns:xi="http://www.w3.org/2001/XInclude"
+          xmlns:xlink="http://www.w3.org/1999/xlink"
+          xmlns="http://docbook.org/ns/docbook"
+          xml:id="cx-sparql">
+<?db filename="cx-sparql"?>
+   <refnamediv>
+      <refname>cx:sparql</refname>
+      <refpurpose>Performs SPARQL queries on RDF datasets</refpurpose>
+   </refnamediv>
+   <refsynopsisdiv>
+     <xi:include href="../../../../ext/rdf/src/main/resources/com/xmlcalabash/ext/rdf.xpl"
+                 xpointer="xpath(/*/*[@type='cx:sparql'])"/>
+   </refsynopsisdiv>
+
+<refsection>
+<title>Installation</title>
+<para>The <tag>cx:sparql</tag> step is not included in the standard XML Calabash release.
+You must
+<link xlink:href="https://github.com/xmlcalabash/xmlcalabash3/releases">obtain it separately</link>
+and install it on your classpath before you can use this step.
+(More detailed instructions, T.B.D.)</para>
+</refsection>
+
+<refsection>
+<title>Description</title>
+
+<para>The <tag>cx:sparql</tag> step performs SPARQL queries. The content type of the
+result depends on the <option>content-type</option> option:
+<literal>application/sparql-results+xml</literal> for XML (this is the default if
+no type is specified), 
+<literal>application/sparql-results+json</literal> for JSON, or
+<literal>application/rdf+thrift</literal> for a binary dataset.</para>
+
+</refsection>
+
+<refsection>
+<title>Examples</title>
+
+<para>Consider an RDF address book containing hotels and restaurants. 
+A typical entry might look like this:</para>
+
+<programlisting language="xml"><![CDATA[<rdf:Description rdf:about="https://so.nwalsh.com/knows/where/adlards">
+   <rdf:type rdf:resource="http://nwalsh.com/rdf/contacts#Contact"/>
+   <rdf:type rdf:resource="http://nwalsh.com/rdf/contacts#Place"/>
+   <rdf:type rdf:resource="http://xmlns.com/foaf/0.1/Organization"/>
+   <foaf:name>Adlard’s</foaf:name>
+   <c:associatedName>Adlard’s</c:associatedName>
+   <c:category>Places</c:category>
+   <p:category>Restaurants</p:category>
+   <v:workAdr rdf:parseType="Resource">
+      <rdf:type rdf:resource="http://nwalsh.com/rdf/vCard#Address"/>
+      <v:street-address>79 Upper St. Giles Street</v:street-address>
+      <v:locality>Norwich</v:locality>
+      <v:region>Norfolk</v:region>
+      <v:postal-code>NR2 1AB</v:postal-code>
+      <v:country-name>GB</v:country-name>
+   </v:workAdr>
+   <foaf:homepage rdf:resource="http://www.adlards.co.uk/"/>
+</rdf:Description>]]></programlisting>
+
+<para>(Sadly, now closed.)</para>
+
+<para>We might query the address book using SPARQL:</para>
+
+<programlisting language="sparql"
+><xi:include href="../../examples/rdf/query.rq" parse="text"/></programlisting>
+
+<para>With a pipeline like this one:</para>
+
+<programlisting language="xml"
+><xi:include href="../../examples/xpl/sparql.xpl" parse="text"/></programlisting>
+
+<para>The <tag>cx:sparql</tag> step can produce XML or JSON results, but for a quick
+peek, often the simplest thing to do is cast it to text. This produces:</para>
+
+<!-- N.B. the result isn't really XML! -->
+<screen><xi:include href="../../../build/examples/results/sparql.xml" parse="text"/></screen>
+
+</refsection>
+</refentry>
