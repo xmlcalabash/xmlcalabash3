@@ -23,9 +23,6 @@ abstract class XmlCalabashConfiguration {
         }
     }
 
-    abstract fun saxonConfigurer(saxon: Configuration)
-    abstract fun xmlCalabashConfigurer(xmlCalabash: XmlCalabash)
-
     var verbosity = Verbosity.INFO
     var visualizer: Monitor = Silent(emptyMap())
     var messageBufferSize = 32

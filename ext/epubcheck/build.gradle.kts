@@ -13,10 +13,12 @@ configurations.forEach {
 }
 
 val dep_epubcheck = project.findProperty("epubcheck").toString()
+val dep_activation = project.findProperty("activation").toString()
 
 dependencies {
   implementation(project(":xmlcalabash"))
   implementation("org.w3c:epubcheck:${dep_epubcheck}")
+  implementation("javax.activation:activation:${dep_activation}") // For mimetype mapping
 
   xmlcalabash(project(":xmlcalabash"))
 }

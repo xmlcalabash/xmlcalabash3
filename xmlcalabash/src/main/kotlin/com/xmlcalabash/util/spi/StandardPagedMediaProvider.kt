@@ -1,14 +1,13 @@
-package com.xmlcalabash.util
+package com.xmlcalabash.util.spi
 
 import com.xmlcalabash.api.CssProcessor
 import com.xmlcalabash.api.FoProcessor
 import com.xmlcalabash.spi.PagedMediaManager
 import com.xmlcalabash.spi.PagedMediaProvider
 import net.sf.saxon.s9api.QName
-import java.lang.RuntimeException
 import java.net.URI
 
-class NopPagedMediaProvider: PagedMediaProvider, PagedMediaManager {
+class StandardPagedMediaProvider: PagedMediaProvider, PagedMediaManager {
     companion object {
         val genericXslFormatter = URI("https://xmlcalabash.com/paged-media/xsl-formatter")
         val genericCssFormatter = URI("https://xmlcalabash.com/paged-media/css-formatter")

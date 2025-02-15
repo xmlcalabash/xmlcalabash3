@@ -10,6 +10,8 @@ import com.xmlcalabash.util.DefaultXmlCalabashConfiguration
 import com.xmlcalabash.parsers.xpl.XplParser
 import com.xmlcalabash.runtime.XProcExecutionContext
 import com.xmlcalabash.runtime.XProcStepConfiguration
+import com.xmlcalabash.spi.Configurer
+import com.xmlcalabash.spi.ConfigurerServiceProvider
 import com.xmlcalabash.util.BufferingMessageReporter
 import com.xmlcalabash.util.DefaultMessageReporter
 import com.xmlcalabash.util.LoggingMessageReporter
@@ -27,6 +29,10 @@ class XmlCalabash private constructor(val xmlCalabashConfig: XmlCalabashConfigur
     val commonEnvironment: CommonEnvironment
         get() = _commonEnvironment
 
+    private val _configurers = mutableListOf<Configurer>()
+    internal val configurers: List<Configurer>
+        get() = _configurers
+
     companion object {
         fun newInstance(): XmlCalabash {
             return newInstance(DefaultXmlCalabashConfiguration())
@@ -43,13 +49,20 @@ class XmlCalabash private constructor(val xmlCalabashConfig: XmlCalabashConfigur
             val environment = PipelineCompilerContext(xmlCalabash)
             val saxonConfig = SaxonConfiguration.newInstance(environment)
             xmlCalabash._saxonConfig = saxonConfig
-            config.xmlCalabashConfigurer(xmlCalabash)
 
             val library = StandardLibrary.getInstance(environment, saxonConfig)
             for (decl in library.children.filterIsInstance<DeclareStepInstruction>()) {
                 if (decl.type != null && decl.visibility != Visibility.PRIVATE) {
                     environment.commonEnvironment._standardSteps[decl.type!!] = decl
                 }
+            }
+
+            for (provider in ConfigurerServiceProvider.providers()) {
+                val configurer = provider.create()
+                xmlCalabash._configurers.add(configurer)
+                configurer.configure(xmlCalabash)
+                configurer.configureSaxon(saxonConfig.configuration)
+                xmlCalabash.commonEnvironment.configure(configurer)
             }
 
             return xmlCalabash

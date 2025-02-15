@@ -68,7 +68,10 @@ class SaxonConfiguration private constructor(
                 init.initialize(newConfiguration)
             }
 
-            xmlCalabash.xmlCalabashConfig.saxonConfigurer(newConfiguration)
+            for (configurer in xmlCalabash.configurers) {
+                configurer.configureSaxon(newConfiguration)
+            }
+
             return newConfiguration
         }
     }

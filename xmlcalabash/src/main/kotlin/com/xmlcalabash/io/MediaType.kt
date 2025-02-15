@@ -41,8 +41,6 @@ class MediaType private constructor(val mediaType: String, val mediaSubtype: Str
         val SEVENZ = MediaType("application", "x-7z-compressed")
         val JAVA_PROPERTIES = MediaType("text", "x-java-properties")
 
-        private val extensionMap = HashMap<MediaType, String>()
-
         val XML_OR_HTML = listOf<MediaType>(
             MediaType("application", "xml"),
             MediaType("text", "xml"),
@@ -333,29 +331,6 @@ class MediaType private constructor(val mediaType: String, val mediaSubtype: Str
             }
         }
         return MediaClassification.BINARY
-    }
-
-    fun extension(): String {
-        synchronized(extensionMap) {
-            if (extensionMap.isEmpty()) {
-                for ((ext, ctype) in CommonEnvironment.defaultContentTypes) {
-                    extensionMap[parse(ctype)] = ext
-                }
-            }
-            // Hack. There are duplicates in the defaultContentTypes map...
-            extensionMap[XML] = "xml"
-            extensionMap[TEXT] = "txt"
-            extensionMap[GZIP] = "gz"
-            extensionMap[XQUERY] = "xqy"
-            extensionMap[XSLT] = "xsl"
-            extensionMap[JPEG] = "jpg"
-        }
-        for ((mtype, ext) in extensionMap) {
-            if (mtype.matches(this)) {
-                return ".${ext}"
-            }
-        }
-        return ".bin"
     }
 
     fun allowed(types: List<MediaType>): Boolean {

@@ -7,8 +7,8 @@ import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.namespace.Ns
 import com.xmlcalabash.namespace.NsCx
 import com.xmlcalabash.spi.PagedMediaManager
-import com.xmlcalabash.util.NopPagedMediaProvider
 import com.xmlcalabash.util.UriUtils
+import com.xmlcalabash.util.spi.StandardPagedMediaProvider
 import net.sf.saxon.s9api.QName
 import java.io.ByteArrayOutputStream
 import java.net.URI
@@ -43,7 +43,7 @@ open class XslFormatterStep(): AbstractAtomicStep() {
         }
         formatters.addAll(stepConfig.xmlCalabash.xmlCalabashConfig.pagedMediaXslProcessors)
         if (formatters.isEmpty()) {
-            formatters.add(NopPagedMediaProvider.genericXslFormatter)
+            formatters.add(StandardPagedMediaProvider.genericXslFormatter)
         }
 
         for (formatter in formatters) {

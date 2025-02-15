@@ -4,7 +4,7 @@ import java.util.ServiceLoader
 
 class PagedMediaServiceProvider {
     companion object {
-        private val DEFAULT_PROVIDER = "com.xmlcalabash.spi.NopPagedMediaProvider"
+        private val DEFAULT_PROVIDER = "com.xmlcalabash.util.spi.StandardPagedMediaProvider"
 
         fun providers(): List<PagedMediaProvider> {
             val services = mutableListOf<PagedMediaProvider>()

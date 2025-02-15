@@ -4,7 +4,7 @@ import java.util.ServiceLoader
 
 class ContentTypeLoaderServiceProvider {
     companion object {
-        private val DEFAULT_PROVIDER = "com.xmlcalabash.util.NopContentTypeLoader"
+        private val DEFAULT_PROVIDER = "com.xmlcalabash.util.spi.StandardContentTypeLoader"
 
         fun providers(): List<ContentTypeLoaderProvider> {
             val services = mutableListOf<ContentTypeLoaderProvider>()

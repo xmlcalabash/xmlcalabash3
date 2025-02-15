@@ -16,6 +16,7 @@ import com.xmlcalabash.spi.DocumentResolverServiceProvider
 import com.xmlcalabash.util.DefaultMessageReporter
 import com.xmlcalabash.api.MessageReporter
 import com.xmlcalabash.io.MessagePrinter
+import com.xmlcalabash.spi.Configurer
 import com.xmlcalabash.util.DefaultMessagePrinter
 import com.xmlcalabash.util.InternalDocumentResolver
 import net.sf.saxon.lib.Initializer
@@ -27,7 +28,7 @@ import javax.activation.MimetypesFileTypeMap
 class CommonEnvironment(private val xmlCalabash: XmlCalabash) {
     companion object {
         // N.B. This is used in reverse in MediaType.extension()
-        val defaultContentTypes = mapOf(
+        private val standardDefaultContentTypes = mapOf(
             "7z" to "application/x-7z-compressed",
             "a" to "application/x-archive",
             "arj" to "application/x-arj",
@@ -36,7 +37,6 @@ class CommonEnvironment(private val xmlCalabash: XmlCalabash) {
             "cpio" to "application/x-cpio",
             "css" to "text/plain",
             "csv" to "text/csv",
-            "epub" to "application/epub+zip",
             "eps" to "image/eps",
             "fo" to "application/xml",
             "gif" to "image/gif",
@@ -74,14 +74,18 @@ class CommonEnvironment(private val xmlCalabash: XmlCalabash) {
     private var _messagePrinter: MessagePrinter = xmlCalabash.xmlCalabashConfig.messagePrinter
     private var _errorExplanation: ErrorExplanation = DefaultErrorExplanation(_messagePrinter)
     private var _messageReporter: (() -> MessageReporter)? = null
-    private var _mimeTypes = MimetypesFileTypeMap()
     private var _proxies = mutableMapOf<String, String>()
     private val _additionalInitializers = mutableListOf<Initializer>()
     internal val _standardSteps = mutableMapOf<QName, DeclareStepInstruction>()
+    private val _defaultContentTypes = mutableMapOf<String, String>()
 
     private val uniqueUris = mutableMapOf<String, Int>()
     private val stepManagers = mutableListOf<AtomicStepManager>()
     private val knownAtomicSteps = mutableSetOf<QName>()
+
+    val mimeTypes = MimetypesFileTypeMap()
+
+    val defaultContentTypes: Map<String, String> = _defaultContentTypes
 
     init {
         errorExplanation.setEnvironment(this)
@@ -91,13 +95,14 @@ class CommonEnvironment(private val xmlCalabash: XmlCalabash) {
         }
 
         for ((contentType, extensions) in xmlCalabash.xmlCalabashConfig.mimetypes) {
-            _mimeTypes.addMimeTypes("${contentType} ${extensions}")
+            mimeTypes.addMimeTypes("${contentType} ${extensions}")
         }
 
+        _defaultContentTypes.putAll(standardDefaultContentTypes)
         for ((ext, contentType) in defaultContentTypes) {
-            if (_mimeTypes.getContentType("test.${ext}") == "application/octet-stream") {
+            if (mimeTypes.getContentType("test.${ext}") == "application/octet-stream") {
                 logger.trace { "Assigning default content type to '.${ext}' files: ${contentType}" }
-                _mimeTypes.addMimeTypes("${contentType} ${ext}")
+                mimeTypes.addMimeTypes("${contentType} ${ext}")
             }
         }
 
@@ -135,8 +140,6 @@ class CommonEnvironment(private val xmlCalabash: XmlCalabash) {
                 provider.create().configure(_documentManager)
             }
         }
-    val mimeTypes: MimetypesFileTypeMap
-        get() = _mimeTypes
     var errorExplanation: ErrorExplanation
         get() = _errorExplanation
         set(value) {
@@ -160,6 +163,10 @@ class CommonEnvironment(private val xmlCalabash: XmlCalabash) {
 
     val additionalInitializers: List<Initializer>
         get() = _additionalInitializers
+
+    fun configure(configurer: Configurer) {
+        configurer.configureContentTypes(_defaultContentTypes, mimeTypes)
+    }
 
     fun addInitializer(initializer: Initializer) {
         _additionalInitializers.add(initializer)

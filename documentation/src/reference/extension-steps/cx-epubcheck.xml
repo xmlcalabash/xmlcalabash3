@@ -37,6 +37,14 @@ cause the step to fail.</para>
 <para>Regardless of whether or not any warnings or errors are reported, the original
 EPUB file is passed from the <port>source</port> port to the <port>result</port> port
 without change.</para>
+</refsection>
+
+<refsection>
+<title>Configuration changes</title>
+
+<para>The <tag>cx:epubcheck</tag> step adds a new default MIME type mapping for
+the extension “<filename class="extension">epub</filename>” to the MIME type
+“<literal>application/epub+zip</literal>”.</para>
 
 </refsection>
 

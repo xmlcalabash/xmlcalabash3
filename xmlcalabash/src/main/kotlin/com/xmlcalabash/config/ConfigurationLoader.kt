@@ -7,9 +7,9 @@ import com.xmlcalabash.spi.PagedMediaManager
 import com.xmlcalabash.spi.PagedMediaServiceProvider
 import com.xmlcalabash.util.DefaultMessagePrinter
 import com.xmlcalabash.util.DefaultXmlCalabashConfiguration
-import com.xmlcalabash.util.NopPagedMediaProvider
 import com.xmlcalabash.util.S9Api
 import com.xmlcalabash.util.Verbosity
+import com.xmlcalabash.util.spi.StandardPagedMediaProvider
 import com.xmlcalabash.visualizers.Detail
 import com.xmlcalabash.visualizers.Plain
 import com.xmlcalabash.visualizers.Silent
@@ -357,7 +357,7 @@ class ConfigurationLoader private constructor(private val config: XmlCalabashCon
             processors.add(cssFormatter)
             config.pagedMediaCssProcessors = processors
 
-            if (cssFormatter == NopPagedMediaProvider.genericCssFormatter) {
+            if (cssFormatter == StandardPagedMediaProvider.genericCssFormatter) {
                 if (properties.isNotEmpty()) {
                     throw XProcError.xiForbiddenConfigurationAttributes(cssFormatter).exception()
                 }
@@ -377,7 +377,7 @@ class ConfigurationLoader private constructor(private val config: XmlCalabashCon
             processors.add(xslFormatter)
             config.pagedMediaXslProcessors = processors
 
-            if (xslFormatter == NopPagedMediaProvider.genericXslFormatter) {
+            if (xslFormatter == StandardPagedMediaProvider.genericXslFormatter) {
                 if (properties.isNotEmpty()) {
                     throw XProcError.xiForbiddenConfigurationAttributes(xslFormatter).exception()
                 }
