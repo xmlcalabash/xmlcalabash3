@@ -1,0 +1,34 @@
+<refentry xmlns:p="http://www.w3.org/ns/xproc"
+          xmlns:e="http://www.w3.org/1999/XSL/Spec/ElementSyntax"
+          xmlns:xi="http://www.w3.org/2001/XInclude"
+          xmlns:xlink="http://www.w3.org/1999/xlink"
+          xmlns="http://docbook.org/ns/docbook"
+          xml:id="cx-rdf-merge">
+<?db filename="cx-rdf-merge"?>
+   <refnamediv>
+      <refname>cx:rdf-merge</refname>
+      <refpurpose>Combines RDF datasets</refpurpose>
+   </refnamediv>
+   <refsynopsisdiv>
+     <xi:include href="../../../../ext/rdf/src/main/resources/com/xmlcalabash/ext/rdf.xpl"
+                 xpointer="xpath(/*/*[@type='cx:rdf-merge'])"/>
+   </refsynopsisdiv>
+
+<refsection>
+<title>Installation</title>
+<para>The <tag>cx:rdf-merge</tag> step is not included in the standard XML Calabash release.
+You must
+<link xlink:href="https://github.com/xmlcalabash/xmlcalabash3/releases">obtain it separately</link>
+and install it on your classpath before you can use this step.
+(More detailed instructions, T.B.D.)</para>
+</refsection>
+
+<refsection>
+<title>Description</title>
+
+<para>The <tag>cx:rdf-merge</tag> step combines several RDF datasets into a
+single dataset.</para>
+
+</refsection>
+
+</refentry>

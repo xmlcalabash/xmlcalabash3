@@ -117,7 +117,6 @@ open class InlineStep(val params: InlineStepParameters): AbstractAtomicStep() {
             props.remove(Ns.baseUri)
         }
 
-
         if (markup) {
             if (ctc == MediaClassification.TEXT) {
                 receiver.output("result", XProcDocument.ofText(xml.stringValue, stepConfig, ctype, props))
@@ -135,34 +134,21 @@ open class InlineStep(val params: InlineStepParameters): AbstractAtomicStep() {
             return
         }
 
+        if (!props.has(Ns.baseUri) && stepConfig.baseUri != null) {
+            props[Ns.baseUri] = stepConfig.baseUri
+        }
+
         val bytes = decode(xml.stringValue, params.encoding)
 
         if (ctc == MediaClassification.TEXT) {
-            val baseURI = if (props.has(Ns.baseUri)) {
-                props.getUri(Ns.baseUri)
-            } else {
-                stepConfig.baseUri
-            }
-
-            val charset = try {
-                ctype.charset() ?: StandardCharsets.UTF_8
+            try {
+                ctype.charset()
             } catch (ex: XProcException) {
                 if (ex.error.code == NsErr.xd(60)) {
                     throw stepConfig.exception(ex.error.with(NsErr.xd(39)))
                 }
                 throw stepConfig.exception(ex.error)
             }
-
-            val builder = SaxonTreeBuilder(stepConfig.processor)
-            builder.startDocument(baseURI)
-            builder.addText(bytes.toString(charset))
-            builder.endDocument()
-            receiver.output("result", XProcDocument(builder.result, stepConfig, props))
-            return
-        }
-
-        if (!props.has(Ns.baseUri) && stepConfig.baseUri != null) {
-            props[Ns.baseUri] = stepConfig.baseUri
         }
 
         val loader = DocumentLoader(stepConfig, props.baseURI, props)

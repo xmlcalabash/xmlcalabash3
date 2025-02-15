@@ -159,7 +159,10 @@ abstract class AbstractStep(val stepConfig: XProcStepConfiguration, step: StepMo
 
             when (ex) {
                 is XProcException -> {
-                    ex.error.updateAt(type, name).updateAt(location)
+                    ex.error.updateAt(type, name)
+                    if (ex.error.location == Location.NULL) {
+                        ex.error.updateAt(location)
+                    }
                     throw ex
                 }
                 else -> {

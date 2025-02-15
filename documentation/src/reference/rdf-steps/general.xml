@@ -1,0 +1,75 @@
+<preface xmlns:xi="http://www.w3.org/2001/XInclude"
+         xmlns:xlink="http://www.w3.org/1999/xlink"
+         xmlns="http://docbook.org/ns/docbook"
+         xml:id="cx-rdf-general-notes">
+<?db filename="rdf-general-notes"?>
+<info>
+  <title>General Notes about RDF Support</title>
+</info>
+
+<para>RDF support is built on top of the
+<link xlink:href="https://jena.apache.org/">Apache Jena</link> libraries.</para>
+
+<para>Jena supports <emphasis>many</emphasis> formats for reading, writing, and storing RDF
+data. These are exposed in XML Calabash with additional content types.
+When the RDF extensions are enabled, the following additional MIME type mappings
+are enabled by default:</para>
+
+<table xml:id="mimedef-rdf">
+<title>Additional MIME type mappings</title>
+<tgroup cols="3">
+<colspec colwidth="5em"/>
+<colspec/>
+<colspec colwidth="7em"/>
+<thead>
+<row>
+  <entry>Extension</entry><entry>Default MIME type</entry><entry>Representation</entry>
+</row>
+</thead>
+<tbody>
+<row><entry>jsonld</entry><entry>application/ld+json</entry><entry>JSON</entry></row>
+<row><entry>n3</entry><entry>text/n3</entry><entry>binary</entry></row>
+<row><entry>nq</entry><entry>application/n-quads</entry><entry>binary</entry></row>
+<row><entry>nt</entry><entry>application/n-triples</entry><entry>binary</entry></row>
+<row><entry>rdf</entry><entry>application/rdf+xml</entry><entry>XML</entry></row>
+<row><entry>rj</entry><entry>application/rdf+json</entry><entry>JSON</entry></row>
+<row><entry>rq</entry><entry>application/sparql-query</entry><entry>text</entry></row>
+<row><entry>srj</entry><entry>application/sparql-results+json</entry><entry>JSON</entry></row>
+<row><entry>srx</entry><entry>application/sparql-results+xml</entry><entry>XML</entry></row>
+<row><entry>thrift</entry><entry>application/rdf+thrift</entry><entry>binary</entry></row>
+<row><entry>trig</entry><entry>application/trig</entry><entry>binary</entry></row>
+<row><entry>trix</entry><entry>application/trix+xml</entry><entry>XML</entry></row>
+<row><entry>ttl</entry><entry>text/turtle</entry><entry>binary</entry></row>
+</tbody>
+</tgroup>
+</table>
+
+<para>These additional content types effect the behavior of
+<tag>p:load</tag>, <tag>p:document</tag>, and <tag>p:cast-content-type</tag>.
+</para>
+
+<section xml:id="rdf-load">
+<title>Loading RDF</title>
+
+<para>When RDF is enabled, <tag>p:load</tag> and <tag>p:document</tag> can read
+any of the RDF content types. When the underlying content types are XML or JSON, that’s
+what is passed through the pipeline. For all other content types, including the text ones,
+what is passed through the pipeline is a binary representation of the graph, an
+<literal>application/rdf+thrift</literal> document.</para>
+
+<para>The <literal>application/rdf+thrift</literal> format is an efficient
+representation suitable for queries.</para>
+</section>
+
+<section xml:id="rdf-cast">
+<title>Casting RDF media types</title>
+
+<para>When RDF is enabled, the <tag>p:cast-content-type</tag> step will cast
+between any of the RDF content types.</para>
+
+<para>It will also cast from the SPARQL result formats to <literal>text/plain</literal>.
+</para>
+
+</section>
+
+</preface>

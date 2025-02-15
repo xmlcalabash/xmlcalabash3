@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<t:test expected="pass"
+        xmlns:t="http://xproc.org/ns/testsuite/3.0">
+  <t:info>
+    <t:title>rdf-thrift-002</t:title>
+    <t:revision-history>
+      <t:revision>
+        <t:date>2025-02-15</t:date>
+        <t:author>
+          <t:name>Norm Tovey-Walsh</t:name>
+        </t:author>
+        <t:description xmlns="http://www.w3.org/1999/xhtml">
+          <p>Created test.</p>
+        </t:description>
+      </t:revision>
+    </t:revision-history>
+  </t:info>
+  <t:description xmlns="http://www.w3.org/1999/xhtml">
+    <p>Tests that application/rdf+thrift works in p:inline, p:document, and p:load.</p>
+  </t:description>
+  <t:pipeline>
+<p:declare-step xmlns:p="http://www.w3.org/ns/xproc"
+                xmlns:cx="http://xmlcalabash.com/ns/extensions"
+                name="main" version="3.0" expand-text="false">
+  <p:import href="https://xmlcalabash.com/ext/library/rdf.xpl"/>
+  <p:output port="result"/>
+
+  <p:identity>
+    <p:with-input>
+      <p:inline encoding="base64"
+                content-type="application/rdf+thrift">
+LBwcGCFodHRwczovL3NwZWMueHByb2Mub3JnLzMuMC9zdGVwcy8AABwcGCRodHRwOi8vcHVy
+bC5vcmcvZGMvdGVybXMvY29udHJpYnV0b3IAABwsGCBmY2M4MjIwMmFhZGZiY2Y2OWU3ZTM5
+ZGM0Y2YzODgxYwAAAAAsHBwYIWh0dHBzOi8vc3BlYy54cHJvYy5vcmcvMy4wL3N0ZXBzLwAA
+HBwYJGh0dHA6Ly9wdXJsLm9yZy9kYy90ZXJtcy9jb250cmlidXRvcgAAHCwYIDZkYTljMzU3
+ODhjNDc5YjNlZDEyY2RjN2E2ZGM2OTdjAAAAACwcHBghaHR0cHM6Ly9zcGVjLnhwcm9jLm9y
+Zy8zLjAvc3RlcHMvAAAcHBgkaHR0cDovL3B1cmwub3JnL2RjL3Rlcm1zL2NvbnRyaWJ1dG9y
+AAAcLBggYTFmNmIzZDk3MWE2NGUxZDMyN2JmOWM3Y2M5NWU2MzAAAAAALBwcGCFodHRwczov
+L3NwZWMueHByb2Mub3JnLzMuMC9zdGVwcy8AABwcGCRodHRwOi8vcHVybC5vcmcvZGMvdGVy
+bXMvY29udHJpYnV0b3IAABwsGCAyZTM4OTI1NThjYWU2ZWZjM2E0N2UxNGZjYzU0ZDU5MQAA
+AAAsHBwYIWh0dHBzOi8vc3BlYy54cHJvYy5vcmcvMy4wL3N0ZXBzLwAAHBwYIWh0dHA6Ly9w
+dXJsLm9yZy9kYy90ZXJtcy9pc1BhcnRPZgAAHBwYEmh0dHBzOi8veHByb2Mub3JnLwAAAAAs
+HBwYIWh0dHBzOi8vc3BlYy54cHJvYy5vcmcvMy4wL3N0ZXBzLwAAHBwYI2h0dHA6Ly9wdXJs
+Lm9yZy9kYy90ZXJtcy9oYXNWZXJzaW9uAAAcPBgDMy4wAAAAACwcHBghaHR0cHM6Ly9zcGVj
+Lnhwcm9jLm9yZy8zLjAvc3RlcHMvAAAcHBgdaHR0cDovL3B1cmwub3JnL2RjL3Rlcm1zL3R5
+cGUAABwcGCBodHRwOi8vcHVybC5vcmcvZGMvZGNtaXR5cGUvVGV4dAAAAAAsHBwYIWh0dHBz
+Oi8vc3BlYy54cHJvYy5vcmcvMy4wL3N0ZXBzLwAAHBwYHWh0dHA6Ly9wdXJsLm9yZy9kYy90
+ZXJtcy9kYXRlAAAcPBgKMjAyMi0wOS0xMiglaHR0cDovL3d3dy53My5vcmcvMjAwMS9YTUxT
+Y2hlbWEjZGF0ZQAAAAAsHBwYIWh0dHBzOi8vc3BlYy54cHJvYy5vcmcvMy4wL3N0ZXBzLwAA
+HBwYHmh0dHA6Ly9wdXJsLm9yZy9kYy90ZXJtcy90aXRsZQAAHDwYIFhQcm9jIDMuMDogU3Rh
+bmRhcmQgU3RlcCBMaWJyYXJ5AAAAACwcHBghaHR0cHM6Ly9zcGVjLnhwcm9jLm9yZy8zLjAv
+eHByb2MvAAAcHBgkaHR0cDovL3B1cmwub3JnL2RjL3Rlcm1zL2NvbnRyaWJ1dG9yAAAcLBgg
+ZmNjODIyMDJhYWRmYmNmNjllN2UzOWRjNGNmMzg4MWMAAAAALBwcGCFodHRwczovL3NwZWMu
+eHByb2Mub3JnLzMuMC94cHJvYy8AABwcGCRodHRwOi8vcHVybC5vcmcvZGMvdGVybXMvY29u
+dHJpYnV0b3IAABwsGCA2ZGE5YzM1Nzg4YzQ3OWIzZWQxMmNkYzdhNmRjNjk3YwAAAAAsHBwY
+IWh0dHBzOi8vc3BlYy54cHJvYy5vcmcvMy4wL3hwcm9jLwAAHBwYJGh0dHA6Ly9wdXJsLm9y
+Zy9kYy90ZXJtcy9jb250cmlidXRvcgAAHCwYIGExZjZiM2Q5NzFhNjRlMWQzMjdiZjljN2Nj
+OTVlNjMwAAAAACwcHBghaHR0cHM6Ly9zcGVjLnhwcm9jLm9yZy8zLjAveHByb2MvAAAcHBgk
+aHR0cDovL3B1cmwub3JnL2RjL3Rlcm1zL2NvbnRyaWJ1dG9yAAAcLBggMmUzODkyNTU4Y2Fl
+NmVmYzNhNDdlMTRmY2M1NGQ1OTEAAAAALBwcGCFodHRwczovL3NwZWMueHByb2Mub3JnLzMu
+MC94cHJvYy8AABwcGCFodHRwOi8vcHVybC5vcmcvZGMvdGVybXMvaXNQYXJ0T2YAABwcGBJo
+dHRwczovL3hwcm9jLm9yZy8AAAAALBwcGCFodHRwczovL3NwZWMueHByb2Mub3JnLzMuMC94
+cHJvYy8AABwcGCNodHRwOi8vcHVybC5vcmcvZGMvdGVybXMvaGFzVmVyc2lvbgAAHDwYAzMu
+MAAAAAAsHBwYIWh0dHBzOi8vc3BlYy54cHJvYy5vcmcvMy4wL3hwcm9jLwAAHBwYHWh0dHA6
+Ly9wdXJsLm9yZy9kYy90ZXJtcy90eXBlAAAcHBggaHR0cDovL3B1cmwub3JnL2RjL2RjbWl0
+eXBlL1RleHQAAAAALBwcGCFodHRwczovL3NwZWMueHByb2Mub3JnLzMuMC94cHJvYy8AABwc
+GB1odHRwOi8vcHVybC5vcmcvZGMvdGVybXMvZGF0ZQAAHDwYCjIwMjItMDktMTIoJWh0dHA6
+Ly93d3cudzMub3JnLzIwMDEvWE1MU2NoZW1hI2RhdGUAAAAALBwcGCFodHRwczovL3NwZWMu
+eHByb2Mub3JnLzMuMC94cHJvYy8AABwcGB5odHRwOi8vcHVybC5vcmcvZGMvdGVybXMvdGl0
+bGUAABw8GCNYUHJvYyAzLjA6IEFuIFhNTCBQaXBlbGluZSBMYW5ndWFnZQAAAAAsHBwYEmh0
+dHBzOi8veHByb2Mub3JnLwAAHBwYHWh0dHA6Ly9wdXJsLm9yZy9kYy90ZXJtcy90eXBlAAAc
+HBgmaHR0cDovL3B1cmwub3JnL2RjL2RjbWl0eXBlL0NvbGxlY3Rpb24AAAAALBwcGBJodHRw
+czovL3hwcm9jLm9yZy8AABwcGB5odHRwOi8vcHVybC5vcmcvZGMvdGVybXMvdGl0bGUAABw8
+GAVYUHJvYwAAAAAsHCwYIGZjYzgyMjAyYWFkZmJjZjY5ZTdlMzlkYzRjZjM4ODFjAAAcHBge
+aHR0cDovL3htbG5zLmNvbS9mb2FmLzAuMS9uYW1lAAAcPBgLRXJpayBTaWVnZWwAAAAALBws
+GCA2ZGE5YzM1Nzg4YzQ3OWIzZWQxMmNkYzdhNmRjNjk3YwAAHBwYHmh0dHA6Ly94bWxucy5j
+b20vZm9hZi8wLjEvbmFtZQAAHDwYDkdlcnJpdCBJbXNpZWtlAAAAACwcLBggYTFmNmIzZDk3
+MWE2NGUxZDMyN2JmOWM3Y2M5NWU2MzAAABwcGB5odHRwOi8veG1sbnMuY29tL2ZvYWYvMC4x
+L25hbWUAABw8GA5BY2hpbSBCZXJuZHplbgAAAAAsHCwYIDJlMzg5MjU1OGNhZTZlZmMzYTQ3
+ZTE0ZmNjNTRkNTkxAAAcHBggaHR0cDovL3htbG5zLmNvbS9mb2FmLzAuMS93ZWJsb2cAABwc
+GBZodHRwczovL3NvLm53YWxzaC5jb20vAAAAACwcLBggMmUzODkyNTU4Y2FlNmVmYzNhNDdl
+MTRmY2M1NGQ1OTEAABwcGCJodHRwOi8veG1sbnMuY29tL2ZvYWYvMC4xL2hvbWVwYWdlAAAc
+HBgTaHR0cHM6Ly9ud2Fsc2guY29tLwAAAAAsHCwYIDJlMzg5MjU1OGNhZTZlZmMzYTQ3ZTE0
+ZmNjNTRkNTkxAAAcHBgeaHR0cDovL3htbG5zLmNvbS9mb2FmLzAuMS9uYW1lAAAcPBgMTm9y
+bWFuIFdhbHNoAAAAAA==
+      </p:inline>
+    </p:with-input>
+  </p:identity>
+  <p:cast-content-type name="first" content-type="application/rdf+xml"/>
+
+  <p:identity>
+    <p:with-input>
+      <p:document content-type="application/rdf+thrift" href="../documents/sample1.thrift"/>
+    </p:with-input>
+  </p:identity>
+  <p:cast-content-type name="second" content-type="application/rdf+xml"/>
+
+  <p:load content-type="application/rdf+thrift" href="../documents/sample1.thrift"/>
+  <p:cast-content-type name="third" content-type="application/rdf+xml"/>
+
+  <p:wrap-sequence wrapper="wrapper">
+    <p:with-input pipe="@first @second @third"/>
+  </p:wrap-sequence>
+</p:declare-step>
+  </t:pipeline>
+  <t:schematron>
+    <s:schema queryBinding="xslt2"
+              xmlns:s="http://purl.oclc.org/dsdl/schematron">
+      <s:ns prefix="rdf" uri="http://www.w3.org/1999/02/22-rdf-syntax-ns#"/>
+      <s:pattern>
+        <s:rule context="/">
+          <s:assert test="wrapper">The root is wrong.</s:assert>
+          <s:assert test="count(wrapper/rdf:RDF) = 3">RDF output is incorrect.</s:assert>
+        </s:rule>
+      </s:pattern>
+    </s:schema>
+  </t:schematron>
+</t:test>

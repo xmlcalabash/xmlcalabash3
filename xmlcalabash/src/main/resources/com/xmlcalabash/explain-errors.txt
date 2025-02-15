@@ -1400,6 +1400,15 @@ cxerr:XC0011
 Invalid width: $1
 The width must be greater than 0.
 
+cxerr:XC0012
+Invalid content type: $1
+The cx:sparql step can only return application/sparql-results+xml (the default),
+application/sparql-results+json, or application/rdf+thrift results.
+
+cxerr:XC0013
+Unrecognized RDF content type: $1
+Only recognized content types can be parsed as RDF.
+
 cxerr:XI0001
 Pipeline has no “$1” output port.
 Cannot save the output from a port that doesn’t exist.

@@ -373,6 +373,8 @@ open class XProcError protected constructor(val code: QName, val variant: Int, e
         fun xcxNoStyleDefinitions() = xstep(9)
         fun xcxNonterminalNotFound(nonterminal: String) = xstep(10, nonterminal)
         fun xcxInvalidWidth(width: Int) = xstep(11, width)
+        fun xcxUnsupportedContentType(contentType: MediaType) = xstep(12, contentType)
+        fun xcxUnrecognizedRdfContentType(contentType: MediaType) = xstep(13, contentType)
 
         fun xiNoSuchOutputPort(port: String)= internal(1, port)
         fun xiImpossibleNodeType(type: XdmNodeKind) = internal(2, type)

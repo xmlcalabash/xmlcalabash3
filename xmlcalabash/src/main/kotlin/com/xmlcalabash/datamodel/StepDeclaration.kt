@@ -26,7 +26,8 @@ abstract class StepDeclaration(parent: XProcInstruction?, stepConfig: Instructio
             stepConfig.stepName = value
         }
 
-    val location = stepConfig.location
+    val location: Location
+        get() = stepConfig.location
 
     internal var timeout = Duration.ZERO
     internal var depends = mutableSetOf<String>()

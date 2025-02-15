@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<t:test expected="pass"
+        xmlns:t="http://xproc.org/ns/testsuite/3.0">
+  <t:info>
+    <t:title>rdf-srx-002</t:title>
+    <t:revision-history>
+      <t:revision>
+        <t:date>2025-02-15</t:date>
+        <t:author>
+          <t:name>Norm Tovey-Walsh</t:name>
+        </t:author>
+        <t:description xmlns="http://www.w3.org/1999/xhtml">
+          <p>Created test.</p>
+        </t:description>
+      </t:revision>
+    </t:revision-history>
+  </t:info>
+  <t:description xmlns="http://www.w3.org/1999/xhtml">
+    <p>Tests that cx:sparql can produce application/sparql-results+xml.</p>
+  </t:description>
+  <t:pipeline>
+<p:declare-step xmlns:p="http://www.w3.org/ns/xproc"
+                xmlns:cx="http://xmlcalabash.com/ns/extensions"
+                name="main" version="3.0" expand-text="false">
+  <p:import href="https://xmlcalabash.com/ext/library/rdf.xpl"/>
+  <p:output port="result"/>
+
+  <cx:sparql content-type="application/sparql-results+xml">
+    <p:with-input port="source" href="../documents/address-book.rdf"/>
+    <p:with-input port="query" href="../documents/query2.rq"/>
+  </cx:sparql>
+
+</p:declare-step>
+  </t:pipeline>
+  <t:schematron>
+    <s:schema queryBinding="xslt2"
+              xmlns:s="http://purl.oclc.org/dsdl/schematron">
+      <s:ns prefix="r" uri="http://www.w3.org/2005/sparql-results#"/>
+      <s:pattern>
+        <s:rule context="/">
+          <s:assert test="r:sparql">The root is not r:sparql.</s:assert>
+          <s:assert test="r:sparql/r:head">There is no r:head</s:assert>
+          <s:assert test="r:sparql/r:results">There is no r:results</s:assert>
+        </s:rule>
+      </s:pattern>
+      <s:pattern>
+        <s:rule context="/r:sparql/r:head">
+          <s:assert test="count(r:variable) = 3">Wrong number of columns</s:assert>
+          <s:assert test="r:variable[@name = 'category']">No category.</s:assert>
+          <s:assert test="r:variable[@name = 'name']">No name.</s:assert>
+          <s:assert test="r:variable[@name = 'locality']">No locality.</s:assert>
+        </s:rule>
+      </s:pattern>
+      <s:pattern>
+        <s:rule context="/r:sparql/r:results">
+          <s:assert test="count(r:result) = 13"
+                    >Wrong number of results: <s:value-of select="count(r:result)"/></s:assert>
+          <s:assert test="r:result/r:binding[@name='name']/r:literal = 'Patina'"
+                    >One of the expected results is missing.</s:assert>
+        </s:rule>
+      </s:pattern>
+    </s:schema>
+  </t:schematron>
+</t:test>

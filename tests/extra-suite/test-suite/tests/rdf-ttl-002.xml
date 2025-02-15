@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<t:test expected="pass"
+        xmlns:t="http://xproc.org/ns/testsuite/3.0">
+  <t:info>
+    <t:title>rdf-ttl-002</t:title>
+    <t:revision-history>
+      <t:revision>
+        <t:date>2025-02-15</t:date>
+        <t:author>
+          <t:name>Norm Tovey-Walsh</t:name>
+        </t:author>
+        <t:description xmlns="http://www.w3.org/1999/xhtml">
+          <p>Created test.</p>
+        </t:description>
+      </t:revision>
+    </t:revision-history>
+  </t:info>
+  <t:description xmlns="http://www.w3.org/1999/xhtml">
+    <p>Tests that text/turtle works in p:inline, p:document, and p:load.</p>
+  </t:description>
+  <t:pipeline>
+<p:declare-step xmlns:p="http://www.w3.org/ns/xproc"
+                xmlns:cx="http://xmlcalabash.com/ns/extensions"
+                name="main" version="3.0">
+  <p:import href="https://xmlcalabash.com/ext/library/rdf.xpl"/>
+  <p:output port="result"/>
+
+  <p:identity>
+    <p:with-input>
+      <p:inline content-type="text/turtle"><![CDATA[
+@base <https://spec.xproc.org/3.0/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix dc: <http://purl.org/dc/terms/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+
+_:walsh
+  foaf:name "Norman Walsh";
+  foaf:homepage <https://nwalsh.com/>;
+  foaf:weblog <https://so.nwalsh.com/> .
+
+_:berndzen
+  foaf:name "Achim Berndzen" .
+
+_:imsieke
+  foaf:name "Gerrit Imsieke" .
+
+_:siegel
+  foaf:name "Erik Siegel" .
+
+<https://xproc.org/>
+  dc:title "XProc";
+  dc:type <http://purl.org/dc/dcmitype/Collection> .
+
+<xproc/>
+  dc:title "XProc 3.0: An XML Pipeline Language";
+  dc:date "2022-09-12"^^xsd:date;
+  dc:type <http://purl.org/dc/dcmitype/Text>;
+  dc:hasVersion "3.0";
+  dc:isPartOf <https://xproc.org/>;
+  dc:contributor _:walsh;
+  dc:contributor _:berndzen;
+  dc:contributor _:imsieke;
+  dc:contributor _:siegel .
+
+<steps/>
+  dc:title "XProc 3.0: Standard Step Library";
+  dc:date "2022-09-12"^^xsd:date;
+  dc:type <http://purl.org/dc/dcmitype/Text>;
+  dc:hasVersion "3.0";
+  dc:isPartOf <https://xproc.org/>;
+  dc:contributor _:walsh;
+  dc:contributor _:berndzen;
+  dc:contributor _:imsieke;
+  dc:contributor _:siegel .
+      ]]></p:inline>
+    </p:with-input>
+  </p:identity>
+  <p:cast-content-type name="first" content-type="application/rdf+xml"/>
+
+  <p:identity>
+    <p:with-input>
+      <p:document content-type="text/turtle" href="../documents/sample1.ttl"/>
+    </p:with-input>
+  </p:identity>
+  <p:cast-content-type name="second" content-type="application/rdf+xml"/>
+
+  <p:load content-type="text/turtle" href="../documents/sample1.ttl"/>
+  <p:cast-content-type name="third" content-type="application/rdf+xml"/>
+
+  <p:wrap-sequence wrapper="wrapper">
+    <p:with-input pipe="@first @second @third"/>
+  </p:wrap-sequence>
+</p:declare-step>
+  </t:pipeline>
+  <t:schematron>
+    <s:schema queryBinding="xslt2"
+              xmlns:s="http://purl.oclc.org/dsdl/schematron">
+      <s:ns prefix="rdf" uri="http://www.w3.org/1999/02/22-rdf-syntax-ns#"/>
+      <s:pattern>
+        <s:rule context="/">
+          <s:assert test="wrapper">The root is wrong.</s:assert>
+          <s:assert test="count(wrapper/rdf:RDF) = 3">RDF output is incorrect.</s:assert>
+        </s:rule>
+      </s:pattern>
+    </s:schema>
+  </t:schematron>
+</t:test>

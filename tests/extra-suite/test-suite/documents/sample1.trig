@@ -1,0 +1,48 @@
+_:b0    <http://xmlns.com/foaf/0.1/homepage>
+                <https://nwalsh.com/>;
+        <http://xmlns.com/foaf/0.1/name>
+                "Norman Walsh";
+        <http://xmlns.com/foaf/0.1/weblog>
+                <https://so.nwalsh.com/> .
+
+_:b1    <http://xmlns.com/foaf/0.1/name>
+                "Achim Berndzen" .
+
+_:b2    <http://xmlns.com/foaf/0.1/name>
+                "Gerrit Imsieke" .
+
+_:b3    <http://xmlns.com/foaf/0.1/name>
+                "Erik Siegel" .
+
+<https://xproc.org/>  <http://purl.org/dc/terms/title>
+                "XProc";
+        <http://purl.org/dc/terms/type>
+                <http://purl.org/dc/dcmitype/Collection> .
+
+<https://spec.xproc.org/3.0/xproc/>
+        <http://purl.org/dc/terms/contributor>
+                _:b0 , _:b1 , _:b2 , _:b3;
+        <http://purl.org/dc/terms/date>
+                "2022-09-12"^^<http://www.w3.org/2001/XMLSchema#date>;
+        <http://purl.org/dc/terms/hasVersion>
+                "3.0";
+        <http://purl.org/dc/terms/isPartOf>
+                <https://xproc.org/>;
+        <http://purl.org/dc/terms/title>
+                "XProc 3.0: An XML Pipeline Language";
+        <http://purl.org/dc/terms/type>
+                <http://purl.org/dc/dcmitype/Text> .
+
+<https://spec.xproc.org/3.0/steps/>
+        <http://purl.org/dc/terms/contributor>
+                _:b0 , _:b1 , _:b2 , _:b3;
+        <http://purl.org/dc/terms/date>
+                "2022-09-12"^^<http://www.w3.org/2001/XMLSchema#date>;
+        <http://purl.org/dc/terms/hasVersion>
+                "3.0";
+        <http://purl.org/dc/terms/isPartOf>
+                <https://xproc.org/>;
+        <http://purl.org/dc/terms/title>
+                "XProc 3.0: Standard Step Library";
+        <http://purl.org/dc/terms/type>
+                <http://purl.org/dc/dcmitype/Text> .

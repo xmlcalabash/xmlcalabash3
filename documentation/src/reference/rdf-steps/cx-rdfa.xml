@@ -1,0 +1,67 @@
+<refentry xmlns:p="http://www.w3.org/ns/xproc"
+          xmlns:e="http://www.w3.org/1999/XSL/Spec/ElementSyntax"
+          xmlns:xi="http://www.w3.org/2001/XInclude"
+          xmlns:xlink="http://www.w3.org/1999/xlink"
+          xmlns="http://docbook.org/ns/docbook"
+          xml:id="cx-rdfa">
+<?db filename="cx-rdfa"?>
+   <refnamediv>
+      <refname>cx:rdfa</refname>
+      <refpurpose>Extracts RDFa from documents</refpurpose>
+   </refnamediv>
+   <refsynopsisdiv>
+     <xi:include href="../../../../ext/rdf/src/main/resources/com/xmlcalabash/ext/rdf.xpl"
+                 xpointer="xpath(/*/*[@type='cx:rdfa'])"/>
+   </refsynopsisdiv>
+
+<refsection>
+<title>Installation</title>
+<para>The <tag>cx:rdfa</tag> step is not included in the standard XML Calabash release.
+You must
+<link xlink:href="https://github.com/xmlcalabash/xmlcalabash3/releases">obtain it separately</link>
+and install it on your classpath before you can use this step.
+(More detailed instructions, T.B.D.)</para>
+</refsection>
+
+<refsection>
+<title>Description</title>
+
+<para>The <tag>cx:rdfa</tag> step uses the 
+<link xlink:href="https://github.com/semarglproject/semargl">Semargl</link> libraries
+to extract triples from documents marked up with RDFa.</para>
+
+<para>The output from the RDFa step is always <literal>application/rdf+thrift</literal>,
+a binary format suitable for further RDF processing. To view or save results, it will
+often be necessary to cast the results to some other RDF content type.</para>
+
+</refsection>
+
+<refsection>
+<title>Limitations</title>
+<para>The Semargl library does not provide any access to the in-scope namespace
+bindings. Consequently, it’s impossible to tell what datatypes are being used.
+The <tag>cx:rdfa</tag> step assumes that they are XML Schema data types,
+irrespective of their prefix.</para>
+</refsection>
+
+<refsection>
+<title>Examples</title>
+
+<para>Given a web page like this one:</para>
+
+<programlisting language="xml"
+><xi:include href="../../examples/html/rdfa.html" parse="text"/></programlisting>
+
+<para>This pipeline:</para>
+
+<programlisting language="xml"
+><xi:include href="../../examples/xpl/rdfa.xpl" parse="text"/></programlisting>
+
+<para>Produces Turtle output like this:</para>
+
+<!-- N.B. the result isn't really XML! -->
+<programlisting language="text"
+><xi:include href="../../../build/examples/results/rdfa.xml" parse="text"/></programlisting>
+
+</refsection>
+</refentry>

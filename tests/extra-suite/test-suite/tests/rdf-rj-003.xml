@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<t:test expected="pass"
+        xmlns:t="http://xproc.org/ns/testsuite/3.0">
+  <t:info>
+    <t:title>rdf-rj-003</t:title>
+    <t:revision-history>
+      <t:revision>
+        <t:date>2025-02-15</t:date>
+        <t:author>
+          <t:name>Norm Tovey-Walsh</t:name>
+        </t:author>
+        <t:description xmlns="http://www.w3.org/1999/xhtml">
+          <p>Created test.</p>
+        </t:description>
+      </t:revision>
+    </t:revision-history>
+  </t:info>
+  <t:description xmlns="http://www.w3.org/1999/xhtml">
+    <p>Tests application/rdf+json can be queried.</p>
+  </t:description>
+  <t:pipeline>
+<p:declare-step xmlns:p="http://www.w3.org/ns/xproc"
+                xmlns:cx="http://xmlcalabash.com/ns/extensions"
+                name="main" version="3.0" expand-text="false">
+  <p:import href="https://xmlcalabash.com/ext/library/rdf.xpl"/>
+  <p:output port="result"/>
+
+  <p:load content-type="application/rdf+json" href="../documents/sample1.rj"/>
+
+  <cx:sparql>
+    <p:with-input port="query">
+      <p:document content-type="application/sparql-query"
+                  href="../documents/query1.rq"/>
+    </p:with-input>
+  </cx:sparql>
+</p:declare-step>
+  </t:pipeline>
+  <t:schematron src="../documents/query1.sch"/>
+</t:test>

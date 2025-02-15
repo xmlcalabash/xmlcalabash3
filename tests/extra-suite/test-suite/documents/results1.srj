@@ -1,0 +1,25 @@
+{
+  "head": { "vars":[ "document", "title" ] },
+  "results": { "bindings":[
+      {
+        "title": {
+          "datatype": "http:\/\/www.w3.org\/2001\/XMLSchema#string",
+          "value": "XProc 3.0: Standard Step Library",
+          "type": "literal"
+        },
+        "document": { "value":"https:\/\/spec.xproc.org\/3.0\/steps\/", "type":"uri" }
+      },
+      {
+        "title": {
+          "datatype": "http:\/\/www.w3.org\/2001\/XMLSchema#string",
+          "value": "XProc 3.0: An XML Pipeline Language",
+          "type": "literal"
+        },
+        "document": { "value":"https:\/\/spec.xproc.org\/3.0\/xproc\/", "type":"uri" }
+      },
+      {
+        "title": { "datatype":"http:\/\/www.w3.org\/2001\/XMLSchema#string", "value":"XProc", "type":"literal" },
+        "document": { "value":"https:\/\/xproc.org\/", "type":"uri" }
+      }
+    ] }
+}

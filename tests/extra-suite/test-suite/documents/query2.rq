@@ -1,0 +1,15 @@
+PREFIX c: <http://nwalsh.com/rdf/contacts#>
+PREFIX v: <http://nwalsh.com/rdf/vCard#>
+PREFIX p: <http://nwalsh.com/rdf/pim#>
+
+SELECT ?category ?name ?locality
+WHERE 
+{
+  ?x c:associatedName ?name .
+  ?x p:category ?category .
+  ?x p:category "Restaurants" .
+  ?x v:workAdr ?addr .
+  ?addr v:country-name "US" .
+  ?addr v:region "CA" .
+  ?addr v:locality ?locality .
+}

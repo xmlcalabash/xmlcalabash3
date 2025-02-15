@@ -200,12 +200,11 @@ class InlineInstruction(parent: XProcInstruction, xmlDocument: XdmNode): Connect
         inlineStep.elaborateAtomicStep()
 
         val output = inlineStep.primaryOutput()!!
+
+        // Don't limit what p:inline can output; the content-type is about what it's
+        // reading. That's usually, but not necessarily, the same as what it outputs.
+        // (See the RdfLoader)
         output._contentTypes.clear()
-        if (inlineStep.contentType == null) {
-            output._contentTypes.addAll(MediaType.XML_OR_HTML)
-        } else {
-            output._contentTypes.addAll(listOf(inlineStep.contentType!!))
-        }
 
         newSteps.add(inlineStep)
         return newSteps

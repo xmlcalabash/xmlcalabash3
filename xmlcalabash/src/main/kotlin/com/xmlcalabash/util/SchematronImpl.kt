@@ -49,8 +49,12 @@ class SchematronImpl(val stepConfig: XProcStepConfiguration) {
         val schema = S9Api.adjustBaseUri(xschema, schemaXml.baseURI)
         val schemaAware = stepConfig.processor.isSchemaAware
 
-        val transpilerExec = loadExecutable()
-        val transpiler = transpilerExec.load()
+        lateinit var transpiler: XsltTransformer
+        synchronized(Companion) {
+            val transpilerExec = loadExecutable()
+            transpiler = transpilerExec.load()
+        }
+
         if (phase != null) {
             transpiler.setParameter(_phase, XdmAtomicValue(phase))
         }

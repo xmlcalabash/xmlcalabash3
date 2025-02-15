@@ -142,6 +142,7 @@ jobs:
             ext/polyglot/build/distributions/polyglot-${{ env.CI_TAG }}.zip
             ext/diagramming/build/distributions/diagramming-${{ env.CI_TAG }}.zip
             ext/railroad/build/distributions/railroad-${{ env.CI_TAG }}.zip
+            ext/rdf/build/distributions/rdf-${{ env.CI_TAG }}.zip
 
       # N.B. This is **only** publishing the SNAPSHOT builds on the main branch
       - name: Publish to Sonatype

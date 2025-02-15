@@ -45,6 +45,45 @@ class DocumentLoader(val context: XProcStepConfiguration,
         val cx_last_modified = QName(NsCx.namespace, "cx:last-modified")
         val cx_size = QName(NsCx.namespace, "cx:size")
         private var contentTypeLoaders: List<ContentTypeLoader>? = null
+
+        private val FF = (-1).toByte()
+        private val FE = (-2).toByte()
+
+        fun readTextStream(stream: InputStream, suppliedCharset: Charset?): String {
+            val bytes = stream.readAllBytes()
+
+            val charset = suppliedCharset
+                ?: if (bytes.size < 2) {
+                    StandardCharsets.UTF_8
+                } else {
+                    if (bytes[0] == FF && bytes[1] == FE) {
+                        StandardCharsets.UTF_16LE
+                    } else if (bytes[0] == FE && bytes[1] == FF) {
+                        StandardCharsets.UTF_16BE
+                    } else {
+                        StandardCharsets.UTF_8
+                    }
+                }
+
+            val chars = charset.decode(ByteBuffer.wrap(bytes))
+
+            val sb = StringBuilder()
+            when (charset) {
+                StandardCharsets.UTF_8, StandardCharsets.UTF_16,
+                StandardCharsets.UTF_16LE, StandardCharsets.UTF_16BE, -> {
+                    if (chars.length > 0 && chars[0] == '\uFEFF') {
+                        sb.append(chars, 1, chars.remaining())
+                    } else {
+                        sb.append(chars)
+                    }
+                }
+                else -> {
+                    sb.append(chars)
+                }
+            }
+
+            return sb.toString()
+        }
     }
 
     var mediaType = MediaType.XML
@@ -137,7 +176,7 @@ class DocumentLoader(val context: XProcStepConfiguration,
 
         for (loader in contentTypeLoaders!!) {
             if (overrideMediaType in loader.contentTypes()) {
-                return loader.load(uri, stream, overrideMediaType, charset)
+                return loader.load(context, uri, stream, overrideMediaType, mediaType.charset() ?: charset)
             }
         }
 
@@ -307,42 +346,8 @@ class DocumentLoader(val context: XProcStepConfiguration,
     }
 
     private fun loadTextData(stream: InputStream, inputCharset: Charset?): String {
-        val FF = (-1).toByte()
-        val FE = (-2).toByte()
-
         val suppliedCharset =  mediaType.charset() ?: inputCharset
-        val bytes = stream.readAllBytes()
-
-        val charset = suppliedCharset
-            ?: if (bytes.size < 2) {
-                StandardCharsets.UTF_8
-            } else {
-                if (bytes[0] == FF && bytes[1] == FE) {
-                    StandardCharsets.UTF_16LE
-                } else if (bytes[0] == FE && bytes[1] == FF) {
-                    StandardCharsets.UTF_16BE
-                } else {
-                    StandardCharsets.UTF_8
-                }
-            }
-
-        val chars = charset.decode(ByteBuffer.wrap(bytes))
-
-        val sb = StringBuilder()
-        when (charset) {
-            StandardCharsets.UTF_8, StandardCharsets.UTF_16,
-            StandardCharsets.UTF_16LE, StandardCharsets.UTF_16BE, -> {
-                if (chars.length > 0 && chars[0] == '\uFEFF') {
-                    sb.append(chars, 1, chars.remaining())
-                } else {
-                    sb.append(chars)
-                }
-            }
-            else -> {
-                sb.append(chars)
-            }
-        }
-        return sb.toString()
+        return readTextStream(stream, suppliedCharset)
     }
 
     private class LoaderErrorHandler(): ErrorHandler {

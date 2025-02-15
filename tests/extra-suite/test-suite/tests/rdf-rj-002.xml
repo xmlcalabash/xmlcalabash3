@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<t:test expected="pass"
+        xmlns:t="http://xproc.org/ns/testsuite/3.0">
+  <t:info>
+    <t:title>rdf-rj-002</t:title>
+    <t:revision-history>
+      <t:revision>
+        <t:date>2025-02-15</t:date>
+        <t:author>
+          <t:name>Norm Tovey-Walsh</t:name>
+        </t:author>
+        <t:description xmlns="http://www.w3.org/1999/xhtml">
+          <p>Created test.</p>
+        </t:description>
+      </t:revision>
+    </t:revision-history>
+  </t:info>
+  <t:description xmlns="http://www.w3.org/1999/xhtml">
+    <p>Tests that application/rdf+json works in p:inline, p:document, and p:load.</p>
+  </t:description>
+  <t:pipeline>
+<p:declare-step xmlns:p="http://www.w3.org/ns/xproc"
+                xmlns:cx="http://xmlcalabash.com/ns/extensions"
+                name="main" version="3.0" expand-text="false">
+  <p:import href="https://xmlcalabash.com/ext/library/rdf.xpl"/>
+  <p:output port="result"/>
+
+  <p:identity>
+    <p:with-input>
+      <p:inline content-type="application/rdf+json"><![CDATA[
+{ 
+  "_:29fd80932a5e292218c3913ed4b42250" : { 
+    "http://xmlns.com/foaf/0.1/name" : [ { 
+      "type" : "literal" ,
+      "value" : "Achim Berndzen"
+    }
+     ]
+  }
+   ,
+  "_:2321bd71b106b0d7b10de40281dc1ace" : { 
+    "http://xmlns.com/foaf/0.1/name" : [ { 
+      "type" : "literal" ,
+      "value" : "Erik Siegel"
+    }
+     ]
+  }
+   ,
+  "https://spec.xproc.org/3.0/xproc/" : { 
+    "http://purl.org/dc/terms/hasVersion" : [ { 
+      "type" : "literal" ,
+      "value" : "3.0"
+    }
+     ] ,
+    "http://purl.org/dc/terms/type" : [ { 
+      "type" : "uri" ,
+      "value" : "http://purl.org/dc/dcmitype/Text"
+    }
+     ] ,
+    "http://purl.org/dc/terms/title" : [ { 
+      "type" : "literal" ,
+      "value" : "XProc 3.0: An XML Pipeline Language"
+    }
+     ] ,
+    "http://purl.org/dc/terms/date" : [ { 
+      "type" : "literal" ,
+      "value" : "2022-09-12" ,
+      "datatype" : "http://www.w3.org/2001/XMLSchema#date"
+    }
+     ] ,
+    "http://purl.org/dc/terms/contributor" : [ { 
+      "type" : "bnode" ,
+      "value" : "_:29fd80932a5e292218c3913ed4b42250"
+    }
+    , { 
+      "type" : "bnode" ,
+      "value" : "_:2321bd71b106b0d7b10de40281dc1ace"
+    }
+    , { 
+      "type" : "bnode" ,
+      "value" : "_:fe73da079b38916946ea7b2523057c62"
+    }
+    , { 
+      "type" : "bnode" ,
+      "value" : "_:5f0291538bffea83cf14491bc8c524a7"
+    }
+     ] ,
+    "http://purl.org/dc/terms/isPartOf" : [ { 
+      "type" : "uri" ,
+      "value" : "https://xproc.org/"
+    }
+     ]
+  }
+   ,
+  "_:fe73da079b38916946ea7b2523057c62" : { 
+    "http://xmlns.com/foaf/0.1/homepage" : [ { 
+      "type" : "uri" ,
+      "value" : "https://nwalsh.com/"
+    }
+     ] ,
+    "http://xmlns.com/foaf/0.1/name" : [ { 
+      "type" : "literal" ,
+      "value" : "Norman Walsh"
+    }
+     ] ,
+    "http://xmlns.com/foaf/0.1/weblog" : [ { 
+      "type" : "uri" ,
+      "value" : "https://so.nwalsh.com/"
+    }
+     ]
+  }
+   ,
+  "_:5f0291538bffea83cf14491bc8c524a7" : { 
+    "http://xmlns.com/foaf/0.1/name" : [ { 
+      "type" : "literal" ,
+      "value" : "Gerrit Imsieke"
+    }
+     ]
+  }
+   ,
+  "https://xproc.org/" : { 
+    "http://purl.org/dc/terms/type" : [ { 
+      "type" : "uri" ,
+      "value" : "http://purl.org/dc/dcmitype/Collection"
+    }
+     ] ,
+    "http://purl.org/dc/terms/title" : [ { 
+      "type" : "literal" ,
+      "value" : "XProc"
+    }
+     ]
+  }
+   ,
+  "https://spec.xproc.org/3.0/steps/" : { 
+    "http://purl.org/dc/terms/hasVersion" : [ { 
+      "type" : "literal" ,
+      "value" : "3.0"
+    }
+     ] ,
+    "http://purl.org/dc/terms/type" : [ { 
+      "type" : "uri" ,
+      "value" : "http://purl.org/dc/dcmitype/Text"
+    }
+     ] ,
+    "http://purl.org/dc/terms/title" : [ { 
+      "type" : "literal" ,
+      "value" : "XProc 3.0: Standard Step Library"
+    }
+     ] ,
+    "http://purl.org/dc/terms/date" : [ { 
+      "type" : "literal" ,
+      "value" : "2022-09-12" ,
+      "datatype" : "http://www.w3.org/2001/XMLSchema#date"
+    }
+     ] ,
+    "http://purl.org/dc/terms/contributor" : [ { 
+      "type" : "bnode" ,
+      "value" : "_:29fd80932a5e292218c3913ed4b42250"
+    }
+    , { 
+      "type" : "bnode" ,
+      "value" : "_:2321bd71b106b0d7b10de40281dc1ace"
+    }
+    , { 
+      "type" : "bnode" ,
+      "value" : "_:fe73da079b38916946ea7b2523057c62"
+    }
+    , { 
+      "type" : "bnode" ,
+      "value" : "_:5f0291538bffea83cf14491bc8c524a7"
+    }
+     ] ,
+    "http://purl.org/dc/terms/isPartOf" : [ { 
+      "type" : "uri" ,
+      "value" : "https://xproc.org/"
+    }
+     ]
+  }
+}
+      ]]></p:inline>
+    </p:with-input>
+  </p:identity>
+  <p:cast-content-type name="first" content-type="application/rdf+xml"/>
+
+  <p:identity>
+    <p:with-input>
+      <p:document content-type="application/rdf+json" href="../documents/sample1.rj"/>
+    </p:with-input>
+  </p:identity>
+  <p:cast-content-type name="second" content-type="application/rdf+xml"/>
+
+  <p:load content-type="application/rdf+json" href="../documents/sample1.rj"/>
+  <p:cast-content-type name="third" content-type="application/rdf+xml"/>
+
+  <p:wrap-sequence wrapper="wrapper">
+    <p:with-input pipe="@first @second @third"/>
+  </p:wrap-sequence>
+</p:declare-step>
+  </t:pipeline>
+  <t:schematron>
+    <s:schema queryBinding="xslt2"
+              xmlns:s="http://purl.oclc.org/dsdl/schematron">
+      <s:ns prefix="rdf" uri="http://www.w3.org/1999/02/22-rdf-syntax-ns#"/>
+      <s:pattern>
+        <s:rule context="/">
+          <s:assert test="wrapper">The root is wrong.</s:assert>
+          <s:assert test="count(wrapper/rdf:RDF) = 3">RDF output is incorrect.</s:assert>
+        </s:rule>
+      </s:pattern>
+    </s:schema>
+  </t:schematron>
+</t:test>

@@ -30,6 +30,7 @@
 
 <xi:include href="standard-steps/reference.xml"/>
 <xi:include href="extension-steps/reference.xml"/>
+<xi:include href="rdf-steps/reference.xml"/>
 
 <xi:include href="functions.xml"/>
 <xi:include href="glossary.xml"/>

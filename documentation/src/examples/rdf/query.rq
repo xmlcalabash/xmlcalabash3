@@ -1,0 +1,17 @@
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX c: <http://nwalsh.com/rdf/contacts#>
+PREFIX v: <http://nwalsh.com/rdf/vCard#>
+PREFIX p: <http://nwalsh.com/rdf/pim#>
+
+SELECT ?category ?name ?region ?locality
+WHERE 
+{
+  ?x c:associatedName ?name .
+  ?x p:category ?category .
+  ?x p:category "Restaurants" .
+  ?x v:workAdr ?addr .
+  ?addr v:country-name "GB" .
+  ?addr v:region ?region .
+  ?addr v:locality ?locality .
+}
