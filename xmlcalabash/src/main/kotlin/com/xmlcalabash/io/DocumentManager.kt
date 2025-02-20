@@ -6,14 +6,18 @@ import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.runtime.XProcStepConfiguration
 import com.xmlcalabash.spi.DocumentResolver
+import net.sf.saxon.Configuration
 import net.sf.saxon.lib.ModuleURIResolver
 import net.sf.saxon.lib.ResourceResolver
+import net.sf.saxon.lib.SchemaURIResolver
 import net.sf.saxon.s9api.QName
 import net.sf.saxon.s9api.XdmValue
 import org.apache.logging.log4j.kotlin.logger
 import org.xml.sax.EntityResolver
 import org.xml.sax.InputSource
 import org.xml.sax.ext.EntityResolver2
+import org.xmlresolver.Resolver
+import org.xmlresolver.ResolverConstants
 import org.xmlresolver.ResourceRequestImpl
 import org.xmlresolver.XMLResolver
 import org.xmlresolver.XMLResolverConfiguration
@@ -203,7 +207,7 @@ class DocumentManager(): EntityResolver, EntityResolver2, ResourceResolver, Modu
         val request = ResourceRequestImpl(resolverConfiguration, saxonRequest.nature, saxonRequest.purpose)
         request.uri = saxonRequest.uri
         request.baseURI = saxonRequest.baseUri
-        request.encoding = saxonRequest.entityName
+        request.entityName = saxonRequest.entityName
         request.publicId = saxonRequest.publicId
 
         val resp = resolver.resolve(request)
@@ -230,6 +234,16 @@ class DocumentManager(): EntityResolver, EntityResolver2, ResourceResolver, Modu
 
         val inputSource = inputFromCache(href)
         if (inputSource == null) {
+            val request = ResourceRequestImpl(resolverConfiguration, ResolverConstants.SCHEMA_NATURE, ResolverConstants.VALIDATION_PURPOSE)
+            request.uri = moduleURI
+            request.baseURI = baseURI
+
+            val resp = resolver.resolve(request)
+            if (resp.inputStream != null) {
+                val source = StreamSource(resp.inputStream, href.toString())
+                return arrayOf(source)
+            }
+
             return null
         }
 
