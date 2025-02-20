@@ -168,9 +168,9 @@ abstract class AbstractStep(val stepConfig: XProcStepConfiguration, step: StepMo
                 else -> {
                     val msg = ex.message ?: ""
                     if (msg.contains("cannot be cast")) {
-                        throw stepConfig.exception(XProcError.xdBadType(msg).updateAt(type,name))
+                        throw stepConfig.exception(XProcError.xdBadType(msg).updateAt(type,name), ex)
                     }
-                    throw stepConfig.exception(XProcError.xdStepFailed(msg).updateAt(type, name))
+                    throw stepConfig.exception(XProcError.xdStepFailed(msg).updateAt(type, name), ex)
                 }
             }
         }
