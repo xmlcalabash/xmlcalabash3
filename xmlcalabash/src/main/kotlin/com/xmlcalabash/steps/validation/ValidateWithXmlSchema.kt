@@ -12,13 +12,17 @@ import com.xmlcalabash.runtime.parameters.RuntimeStepParameters
 import com.xmlcalabash.steps.AbstractAtomicStep
 import com.xmlcalabash.util.S9Api
 import com.xmlcalabash.util.SaxonErrorReporter
+import net.sf.saxon.Configuration
 import net.sf.saxon.Controller
+import net.sf.saxon.lib.SchemaURIResolver
 import net.sf.saxon.om.NamespaceUri
 import net.sf.saxon.s9api.*
 import net.sf.saxon.serialize.SerializationProperties
 import net.sf.saxon.type.ValidationException
 import java.net.URI
+import javax.xml.transform.Source
 import javax.xml.transform.sax.SAXSource
+import javax.xml.transform.stream.StreamSource
 
 open class ValidateWithXmlSchema(): AbstractAtomicStep() {
     companion object {
@@ -48,7 +52,10 @@ open class ValidateWithXmlSchema(): AbstractAtomicStep() {
         if (manager == null) {
             throw RuntimeException("Schema manager not found, XSD validation requires Saxon EE")
         }
+
         manager.errorReporter = errorReporter
+        manager.schemaURIResolver = XsdResolver()
+
         validateWithSaxon(manager)
     }
 
@@ -227,4 +234,14 @@ open class ValidateWithXmlSchema(): AbstractAtomicStep() {
     }
 
     override fun toString(): String = "p:validate-with-xml-schema"
+
+    inner class XsdResolver(): SchemaURIResolver {
+        override fun setConfiguration(config: Configuration?) {
+            // I don't care???
+        }
+
+        override fun resolve(moduleURI: String?, baseURI: String?, locations: Array<out String>?): Array<StreamSource>? {
+            return stepConfig.environment.documentManager.resolve(moduleURI, baseURI, locations)
+        }
+    }
 }
