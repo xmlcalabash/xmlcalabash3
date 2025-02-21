@@ -376,6 +376,15 @@ open class XProcError protected constructor(val code: QName, val variant: Int, e
         fun xcxUnsupportedContentType(contentType: MediaType) = xstep(12, contentType)
         fun xcxUnrecognizedRdfContentType(contentType: MediaType) = xstep(13, contentType)
 
+        fun xcxXmlUnitComparisonFailed(xvrl:XProcDocument) = xstep(14, xvrl)
+        fun xcxXmlUnitBadAttributeList(bad: String) = xstep(15)
+        fun xcxXmlUnitAttributesSelector() = xstep(16)
+        fun xcxXmlUnitElementSelectorAndClass() = xstep(17)
+        fun xcxXmlUnitNotAnElementSelector(klass: String) = xstep(18, klass)
+        fun xcxXmlUnitUnexpectedElementSelector(name: String) = xstep(19, name)
+        fun xcxXmlUnitElementSelectorAndNodeMatcher() = xstep(20)
+        fun xcxXmlUnitNotANodeMatcher(klass: String) = xstep(21, klass)
+
         fun xiNoSuchOutputPort(port: String)= internal(1, port)
         fun xiImpossibleNodeType(type: XdmNodeKind) = internal(2, type)
         fun xiThreadInterrupted() = internal(3)

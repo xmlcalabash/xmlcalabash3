@@ -1,0 +1,85 @@
+<refentry xmlns:p="http://www.w3.org/ns/xproc"
+          xmlns:e="http://www.w3.org/1999/XSL/Spec/ElementSyntax"
+          xmlns:xi="http://www.w3.org/2001/XInclude"
+          xmlns:xlink="http://www.w3.org/1999/xlink"
+          xmlns:cx="http://xmlcalabash.com/ns/extensions"
+          xmlns:cxerr="http://xmlcalabash.com/ns/error"
+          xmlns="http://docbook.org/ns/docbook"
+          xml:id="cx-xmlunit">
+<?db filename="cx-xmlunit"?>
+   <refnamediv>
+      <refname>cx:xmlunit</refname>
+      <refpurpose>Performs comparisons with xmlunit</refpurpose>
+   </refnamediv>
+   <refsynopsisdiv>
+
+<refsection role="introduction">
+<title>Introduction</title>
+<para>The <tag>cx:xmlunit</tag> step compares two XML (or HTML) documents with
+<link xlink:href="https://www.xmlunit.org/">XMLUnit</link>.</para>
+</refsection>
+
+<refsection role="step-declaration">
+<title>Step declaration</title>
+     <xi:include href="../../../../ext/xmlunit/src/main/resources/com/xmlcalabash/ext/xmlunit.xpl"
+                 xpointer="xpath(/*/*[@type='cx:xmlunit'])"/>
+</refsection>
+
+<refsection role="errors">
+<title>Errors</title>
+<para>Errors from the entry body are summarized here.</para>
+</refsection>
+</refsynopsisdiv>
+
+<refsection>
+<title>Description</title>
+
+<para>The <tag>cx:xmlunit</tag> step compares two XML (or HTML) documents for similarity or
+identity with XMLUnit version <?version DEPENDENCY_xmlunit?>. XMLUnit is very flexible, the
+<tag>cx:xmlunit</tag> step attempts to support many of the options, but there are some
+gaps.</para>
+
+<para>After the comparison, the source document appears (unchanged) on the
+<port>result</port> port. A report of the differences appears on the
+<port>report</port> port. For every difference, there are two <tag>xvrl:detection</tag>
+elements, one for the source document and one for the alternate.
+<error code="cxerr:XC0014">It
+is a <glossterm>dynamic error</glossterm> if the documents are different
+and the <option>fail-if-not-equal</option> option is true.</error></para>
+
+<para><error code="cxerr:XC0015">It
+is a <glossterm>dynamic error</glossterm> if the <option>attributes-list</option>
+option is not a list of QNames.</error>
+<error code="cxerr:XC0016">It
+is a <glossterm>dynamic error</glossterm> if the <option>attributes-list</option>
+option is not empty and the <option>element-selector</option> option is not
+“<literal>by-name-and-attributes</literal>”.</error></para>
+
+<para>In an effort to make the step more flexible, the
+<option>element-selector-class</option> can be used to provide the name
+of a class that implements the XMLUnit <interfacename>ElementSelector</interfacename> interface.
+If specified, that class will be instantiated (with a zero-argument constructor) and used
+to select elements. 
+<error code="cxerr:XC0017">It
+is a <glossterm>dynamic error</glossterm> if the <option>element-selector</option>
+and <option>element-selector-class</option> options are both provided.</error>
+<error code="cxerr:XC0018">It
+is a <glossterm>dynamic error</glossterm> if the <option>element-selector-class</option>
+cannot be instantiated.</error> You must provide the class on the class path.</para>
+
+<para>The <option>node-matcher-class</option> provides the name of a class that
+implements the <interfacename>NodeMatcher</interfacename> interface.
+If specified, that class will be instantiated (with a zero-argument constructor) and used
+to match nodes.
+<error code="cxerr:XC0020">It
+is a <glossterm>dynamic error</glossterm> if the <option>element-selector</option>
+and <option>node-matcher-class</option> options are both provided.</error>
+<error code="cxerr:XC0021">It
+is a <glossterm>dynamic error</glossterm> if the <option>node-matcher-class</option>
+cannot be instantiated.</error></para>
+
+</refsection>
+
+</refentry>
+
+

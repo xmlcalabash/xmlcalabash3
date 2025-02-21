@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<t:test expected="fail" code="cxerr:XC0014"
+        xmlns:cxerr="http://xmlcalabash.com/ns/error"
+        xmlns:t="http://xproc.org/ns/testsuite/3.0">
+  <t:info>
+    <t:title>xmlunit-002</t:title>
+    <t:revision-history>
+      <t:revision>
+        <t:date>2025-02-21</t:date>
+        <t:author>
+          <t:name>Norm Tovey-Walsh</t:name>
+        </t:author>
+        <t:description xmlns="http://www.w3.org/1999/xhtml">
+          <p>Created test.</p>
+        </t:description>
+      </t:revision>
+    </t:revision-history>
+  </t:info>
+  <t:description xmlns="http://www.w3.org/1999/xhtml">
+    <p>Tests that identity comparison fails.</p>
+  </t:description>
+  <t:pipeline>
+<p:declare-step xmlns:p="http://www.w3.org/ns/xproc"
+                xmlns:cx="http://xmlcalabash.com/ns/extensions"
+                name="main" version="3.0">
+  <p:import href="https://xmlcalabash.com/ext/library/xmlunit.xpl"/>
+  <p:output port="result" sequence="true"/>
+
+  <cx:xmlunit>
+    <p:with-input port="source">
+      <flowers>
+	<flower>Daisy</flower>
+	<flower>Roses</flower>
+	<flower>Crocus</flower>
+      </flowers>
+    </p:with-input>
+    <p:with-input port="alternate">
+      <flowers>
+	<flower>Roses</flower>
+	<flower>Daisy</flower>
+	<flower>Crocus</flower>
+      </flowers>
+    </p:with-input>
+  </cx:xmlunit>
+</p:declare-step>
+  </t:pipeline>
+</t:test>

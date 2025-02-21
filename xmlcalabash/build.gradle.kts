@@ -152,11 +152,12 @@ buildConfig {
                   "tukaaniXz",
                   "uuidCreator",
                   "xercesImpl",
-                  "xmlResolver"
+                  "xmlResolver",
+                  "xmlunit"
   ).forEach { dep ->
     sb.append("  \"").append(dep).append("\" to ")
     sb.append("\"").append(project.findProperty(dep).toString()).append("\"")
-    if (dep != "xmlResolver") {
+    if (dep != "xmlunit") {
       sb.append(",")
     }
     sb.append("\n")
