@@ -208,7 +208,7 @@ class Urify(filepath: String, basedir: String?) {
         } else if (windows && wfMatch != null) {
             val fpfile = wfMatch.groupValues[1]
             val fpdrive = wfMatch.groupValues[2]
-            val fppath = wfMatch.groupValues[3]
+            val fppath = wfMatch.groupValues[3].replace("\\", "/")
             _scheme = "file"
             _explicit = fpfile.lowercase().startsWith("file:")
             _driveLetter = fpdrive
