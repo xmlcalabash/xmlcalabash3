@@ -6,6 +6,7 @@
   <title>Extension steps</title>
 </info>
 
+<xi:include href="cx-asciidoctor.xml"/>
 <xi:include href="cx-cache-add.xml"/>
 <xi:include href="cx-cache-delete.xml"/>
 <xi:include href="cx-collection-manager.xml"/>

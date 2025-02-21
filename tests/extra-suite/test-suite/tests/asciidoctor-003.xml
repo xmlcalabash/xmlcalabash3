@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<t:test expected="pass"
+        xmlns:t="http://xproc.org/ns/testsuite/3.0">
+  <t:info>
+    <t:title>asciidoctor-003</t:title>
+    <t:revision-history>
+      <t:revision>
+        <t:date>2025-02-21</t:date>
+        <t:author>
+          <t:name>Norm Tovey-Walsh</t:name>
+        </t:author>
+        <t:description xmlns="http://www.w3.org/1999/xhtml">
+          <p>Created test.</p>
+        </t:description>
+      </t:revision>
+    </t:revision-history>
+  </t:info>
+  <t:description xmlns="http://www.w3.org/1999/xhtml">
+    <p>Tests that Asciidoctor creates a whole document.</p>
+  </t:description>
+  <t:pipeline>
+<p:declare-step xmlns:p="http://www.w3.org/ns/xproc"
+                xmlns:cx="http://xmlcalabash.com/ns/extensions"
+                name="main" version="3.0">
+  <p:import href="https://xmlcalabash.com/ext/library/asciidoctor.xpl"/>
+  <p:output port="result" sequence="true"/>
+
+  <cx:asciidoctor parameters="map{'standalone': true()}"
+                  attributes="map{'title': 'The Document Title'}">
+    <p:with-input>
+      <p:inline content-type="text/plain"><![CDATA[
+This is a paragraph.
+
+So is this.
+
+And this.
+      ]]></p:inline>
+    </p:with-input>
+  </cx:asciidoctor>
+</p:declare-step>
+  </t:pipeline>
+  <t:schematron>
+    <s:schema queryBinding="xslt2"
+              xmlns:s="http://purl.oclc.org/dsdl/schematron">
+      <s:ns prefix="db" uri="http://docbook.org/ns/docbook"/>
+      <s:pattern>
+        <s:rule context="/">
+          <s:assert test="db:article">The root is incorrect.</s:assert>
+          <s:assert test="db:article/db:info">There is no info.</s:assert>
+        </s:rule>
+        <s:rule context="/db:article/db:info">
+          <s:assert test="db:title='The Document Title'">The title is incorrect.</s:assert>
+        </s:rule>
+        <s:rule context="/db:article">
+          <s:assert test="count(db:simpara)=3">The number of paragraphs is incorrect.</s:assert>
+        </s:rule>
+      </s:pattern>
+    </s:schema>
+  </t:schematron>
+</t:test>

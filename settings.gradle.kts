@@ -14,6 +14,7 @@ include("xmlcalabash", "app", "test-driver",
         "ext:pipeline-messages", "ext:epubcheck",
         "ext:polyglot", "ext:xpath", "ext:wait-for-update",
         "ext:diagramming", "ext:collection-manager",
+        "ext:asciidoctor",
         "template:kotlin", "template:java",
         "ext:rdf", "ext:railroad", "ext:xmlunit"
     )

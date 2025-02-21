@@ -1,0 +1,353 @@
+<refentry xmlns:p="http://www.w3.org/ns/xproc"
+          xmlns:e="http://www.w3.org/1999/XSL/Spec/ElementSyntax"
+          xmlns:xi="http://www.w3.org/2001/XInclude"
+          xmlns:xlink="http://www.w3.org/1999/xlink"
+          xmlns:cx="http://xmlcalabash.com/ns/extensions"
+          xmlns:cxerr="http://xmlcalabash.com/ns/error"
+          xmlns="http://docbook.org/ns/docbook"
+          xml:id="cx-asciidoctor">
+<?db filename="cx-asciidoctor"?>
+   <refnamediv>
+      <refname>cx:asciidoctor</refname>
+      <refpurpose>Convert Asciidoctor documents</refpurpose>
+   </refnamediv>
+   <refsynopsisdiv>
+
+<refsection role="introduction">
+<title>Introduction</title>
+<para>The <tag>cx:asciidoctor</tag> step converts Asciidoctor documents to DocBook,
+HTML5, or PDF.</para>
+</refsection>
+
+<refsection role="step-declaration">
+<title>Step declaration</title>
+     <xi:include href="../../../../ext/asciidoctor/src/main/resources/com/xmlcalabash/ext/asciidoctor.xpl"
+                 xpointer="xpath(/*/*[@type='cx:asciidoctor'])"/>
+</refsection>
+
+<!--
+<refsection role="errors">
+<title>Errors</title>
+<para>Errors from the entry body are summarized here.</para>
+</refsection>
+-->
+</refsynopsisdiv>
+
+<refsection>
+<title>Description</title>
+
+<para><link xlink:href="https://asciidoctor.org/">Asciidoctor</link> is a
+sophisticated flavor of markdown, a text format that can be used to represent
+complex structures. One of its original goals was to capture DocBook in a
+markdown style.</para>
+
+<para>The Java API that XML Calabash uses,
+<link xlink:href="https://docs.asciidoctor.org/asciidoctorj/latest/">AsciidoctorJ</link>,
+offers both options and attributes. In fact, the attributes are part of the options API.
+It all seems a bit confused to me.</para>
+
+<para>For the step, I’ve implemented options in the <option>parameters</option> option and
+attributes in the <option>attributes</option> option.</para>
+
+<refsection>
+<title>Parameters</title>
+
+<para>The parameters listed below are supported. These are passed directly to the Asciidoctor
+API; please consult the API for more details.</para>
+
+<informaltable>
+<tgroup cols="3">
+<colspec colwidth="1*"/>
+<colspec colwidth="1*"/>
+<colspec colwidth="2*"/>
+<thead>
+<row>
+<entry>Parameter</entry><entry>Type</entry><entry>Notes</entry></row>
+</thead>
+<tbody>
+<row>
+<entry><literal>backend</literal></entry>
+<entry><literal>xs:string</literal></entry>
+<entry>Must be the same as the <option>backend</option> option, if both are specified.</entry>
+</row>
+<row>
+<entry><literal>doctype</literal></entry>
+<entry><literal>xs:string</literal></entry>
+<entry></entry>
+</row>
+<row>
+<entry><literal>standalone</literal></entry>
+<entry><literal>xs:boolean</literal></entry>
+<entry></entry>
+</row>
+<row>
+<entry><literal>template_dirs</literal></entry>
+<entry><literal>xs:string*</literal></entry>
+<entry>Must be directory names</entry>
+</row>
+<row>
+<entry><literal>template_engine</literal></entry>
+<entry><literal>xs:string</literal></entry>
+<entry></entry>
+</row>
+<row>
+<entry><literal>template_cache</literal></entry>
+<entry><literal>xs:boolean</literal></entry>
+<entry></entry>
+</row>
+<row>
+<entry><literal>safe</literal></entry>
+<entry>xs:string</entry>
+<entry>“<literal>unsafe</literal>”, “<literal>safe</literal>”, 
+“<literal>server</literal>”, or “<literal>secure</literal>”</entry>
+</row>
+<row>
+<entry><literal>sourcemap</literal></entry>
+<entry><literal>xs:boolean</literal></entry>
+<entry></entry>
+</row>
+<row>
+<entry><literal>eruby</literal></entry>
+<entry><literal>xs:string</literal></entry>
+<entry></entry>
+</row>
+<row>
+<entry><literal>compact</literal></entry>
+<entry><literal>xs:boolean</literal></entry>
+<entry></entry>
+</row>
+<row>
+<entry><literal>parse_header_only</literal></entry>
+<entry><literal>xs:boolean</literal></entry>
+<entry></entry>
+</row>
+</tbody>
+</tgroup>
+</informaltable>
+
+</refsection>
+
+<refsection>
+<title>Attributes</title>
+
+<para>The attributes listed below are supported. These are passed directly to the Asciidoctor
+API; please consult the API for more details.</para>
+
+<informaltable>
+<tgroup cols="3">
+<colspec colwidth="1*"/>
+<colspec colwidth="1*"/>
+<colspec colwidth="2*"/>
+<thead>
+<row>
+<entry>Parameter</entry><entry>Type</entry><entry>Notes</entry></row>
+</thead>
+<tbody>
+<row>
+<entry><literal>allow_uri_read</literal></entry>
+<entry><literal>xs:boolean</literal></entry>
+<entry></entry>
+</row>
+<row>
+<entry><literal>appendix_caption</literal></entry>
+<entry><literal>xs:string</literal></entry>
+<entry></entry>
+</row>
+<row>
+<entry><literal>attribute_missing</literal></entry>
+<entry><literal>xs:string</literal></entry>
+<entry></entry>
+</row>
+<row>
+<entry><literal>attribute_undefined</literal></entry>
+<entry><literal>xs:string</literal></entry>
+<entry></entry>
+</row>
+<row>
+<entry><literal>backend</literal></entry>
+<entry><literal>xs:string</literal></entry>
+<entry></entry>
+</row>
+<row>
+<entry><literal>compat_mode</literal></entry>
+<entry>xs:string</entry>
+<entry>“<literal>default</literal>” or “<literal>legacy</literal>”</entry>
+</row>
+<row>
+<entry><literal>data_uri</literal></entry>
+<entry><literal>xs:boolean</literal></entry>
+<entry></entry>
+</row>
+<row>
+<entry><literal>docdate</literal></entry>
+<entry><literal>xs:dateTime</literal></entry>
+<entry></entry>
+</row>
+<row>
+<entry><literal>doctime</literal></entry>
+<entry><literal>xs:dateTime</literal></entry>
+<entry></entry>
+</row>
+<row>
+<entry><literal>doctype</literal></entry>
+<entry><literal>xs:string</literal></entry>
+<entry></entry>
+</row>
+<row>
+<entry><literal>experimental</literal></entry>
+<entry><literal>xs:boolean</literal></entry>
+<entry></entry>
+</row>
+<row>
+<entry><literal>hardbreaks</literal></entry>
+<entry><literal>xs:boolean</literal></entry>
+<entry></entry>
+</row>
+<row>
+<entry><literal>hide_uri_scheme</literal></entry>
+<entry><literal>xs:boolean</literal></entry>
+<entry></entry>
+</row>
+<row>
+<entry><literal>iconfont_cdn</literal></entry>
+<entry><literal>xs:anyURI</literal></entry>
+<entry></entry>
+</row>
+<row>
+<entry><literal>iconfont_name</literal></entry>
+<entry><literal>xs:string</literal></entry>
+<entry></entry>
+</row>
+<row>
+<entry><literal>iconfont_remote</literal></entry>
+<entry><literal>xs:boolean</literal></entry>
+<entry></entry>
+</row>
+<row>
+<entry><literal>icons</literal></entry>
+<entry><literal>xs:string</literal></entry>
+<entry></entry>
+</row>
+<row>
+<entry><literal>icons_dir</literal></entry>
+<entry><literal>xs:string</literal></entry>
+<entry></entry>
+</row>
+<row>
+<entry><literal>ignore_undefined</literal></entry>
+<entry><literal>xs:boolean</literal></entry>
+<entry></entry>
+</row>
+<row>
+<entry><literal>imagesdir</literal></entry>
+<entry><literal>xs:string</literal></entry>
+<entry></entry>
+</row>
+<row>
+<entry><literal>link_attrs</literal></entry>
+<entry><literal>xs:boolean</literal></entry>
+<entry></entry>
+</row>
+<row>
+<entry><literal>link_css</literal></entry>
+<entry><literal>xs:boolean</literal></entry>
+<entry></entry>
+</row>
+<row>
+<entry><literal>localdate</literal></entry>
+<entry><literal>xs:dateTime</literal></entry>
+<entry></entry>
+</row>
+<row>
+<entry><literal>localtime</literal></entry>
+<entry><literal>xs:dateTime</literal></entry>
+<entry></entry>
+</row>
+<row>
+<entry><literal>math</literal></entry>
+<entry><literal>xs:string</literal></entry>
+<entry></entry>
+</row>
+<row>
+<entry><literal>max_include_depth</literal></entry>
+<entry><literal>xs:int</literal></entry>
+<entry></entry>
+</row>
+<row>
+<entry><literal>no_footer</literal></entry>
+<entry><literal>xs:boolean</literal></entry>
+<entry></entry>
+</row>
+<row>
+<entry><literal>section_numbers</literal></entry>
+<entry><literal>xs:boolean</literal></entry>
+<entry></entry>
+</row>
+<row>
+<entry><literal>sect_num_levels</literal></entry>
+<entry><literal>xs:int</literal></entry>
+<entry></entry>
+</row>
+<row>
+<entry><literal>set_anchors</literal></entry>
+<entry><literal>xs:boolean</literal></entry>
+<entry></entry>
+</row>
+<row>
+<entry><literal>show_title</literal></entry>
+<entry><literal>xs:boolean</literal></entry>
+<entry></entry>
+</row>
+<row>
+<entry><literal>skip_front_matter</literal></entry>
+<entry><literal>xs:boolean</literal></entry>
+<entry></entry>
+</row>
+<row>
+<entry><literal>source_highlighter</literal></entry>
+<entry><literal>xs:string</literal></entry>
+<entry></entry>
+</row>
+<row>
+<entry><literal>source_language</literal></entry>
+<entry><literal>xs:string</literal></entry>
+<entry></entry>
+</row>
+<row>
+<entry><literal>stylesheet_name</literal></entry>
+<entry><literal>xs:string</literal></entry>
+<entry></entry>
+</row>
+<row>
+<entry><literal>styles_dir</literal></entry>
+<entry><literal>xs:string</literal></entry>
+<entry></entry>
+</row>
+<row>
+<entry><literal>title</literal></entry>
+<entry><literal>xs:string</literal></entry>
+<entry></entry>
+</row>
+<row>
+<entry><literal>toc</literal></entry>
+<entry>xs:string</entry>
+<entry>“<literal>true</literal>”, “<literal>false</literal>”,
+“<literal>top</literal>”, “<literal>bottom</literal>”, “<literal>left</literal>”,
+“<literal>right</literal>”, “<literal>preamble</literal>”, or
+“<literal>macro</literal>”</entry>
+</row>
+<row>
+<entry><literal>untitled_label</literal></entry>
+<entry><literal>xs:string</literal></entry>
+<entry></entry>
+</row>
+</tbody>
+</tgroup>
+</informaltable>
+
+</refsection>
+
+</refsection>
+</refentry>
+
+
