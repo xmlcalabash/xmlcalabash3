@@ -42,6 +42,7 @@ dependencies {
   implementation(files("build/classes/kotlin/main"))
   implementation(project(":ext:railroad"))
   implementation(project(":ext:rdf"))
+  implementation(project(":ext:xmlunit"))
 
   transformation ("net.sf.saxon:Saxon-HE:${saxonVersion}")
 }

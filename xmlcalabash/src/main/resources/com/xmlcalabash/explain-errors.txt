@@ -1409,6 +1409,30 @@ cxerr:XC0013
 Unrecognized RDF content type: $1
 Only recognized content types can be parsed as RDF.
 
+cxerr:XC0014
+Comparison failed: XMLUnit found differences.
+
+cxerr:XC0015
+An attribute-list must be a list of QNames: “$1” not allowed.
+
+cxerr:XC0016
+Only element selector by-name-and-attributes has attribute-list.
+
+cxerr:XC0017
+The element-selector and element-selector-class options are mutually exclusive.
+
+cxerr:XC0018
+Failed to instantiate “$1” as an ElementSelector.
+
+cxerr:XC0019
+Unexpected element-selector: “$1”.
+
+cxerr:XC0020
+The element-selector and node-matcher-class options are mutually exclusive.
+
+cxerr:XC0021
+Failed to instantiate “$1” as a NodeMatcher.
+
 cxerr:XI0001
 Pipeline has no “$1” output port.
 Cannot save the output from a port that doesn’t exist.

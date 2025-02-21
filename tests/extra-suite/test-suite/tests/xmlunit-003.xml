@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<t:test expected="pass"
+        xmlns:cxerr="http://xmlcalabash.com/ns/error"
+        xmlns:t="http://xproc.org/ns/testsuite/3.0">
+  <t:info>
+    <t:title>xmlunit-003</t:title>
+    <t:revision-history>
+      <t:revision>
+        <t:date>2025-02-21</t:date>
+        <t:author>
+          <t:name>Norm Tovey-Walsh</t:name>
+        </t:author>
+        <t:description xmlns="http://www.w3.org/1999/xhtml">
+          <p>Created test.</p>
+        </t:description>
+      </t:revision>
+    </t:revision-history>
+  </t:info>
+  <t:description xmlns="http://www.w3.org/1999/xhtml">
+    <p>Tests that documents can be similar.</p>
+  </t:description>
+  <t:pipeline>
+<p:declare-step xmlns:p="http://www.w3.org/ns/xproc"
+                xmlns:cx="http://xmlcalabash.com/ns/extensions"
+                name="main" version="3.0">
+  <p:import href="https://xmlcalabash.com/ext/library/xmlunit.xpl"/>
+  <p:output port="result" sequence="true"/>
+
+  <cx:xmlunit check-for="similarity" element-selector="by-name-and-text">
+    <p:with-input port="source">
+      <flowers>
+	<flower>Daisy</flower>
+	<flower>Roses</flower>
+	<flower>Crocus</flower>
+      </flowers>
+    </p:with-input>
+    <p:with-input port="alternate">
+      <flowers>
+	<flower>Roses</flower>
+	<flower>Daisy</flower>
+	<flower>Crocus</flower>
+      </flowers>
+    </p:with-input>
+  </cx:xmlunit>
+</p:declare-step>
+  </t:pipeline>
+  <t:schematron>
+    <s:schema queryBinding="xslt2"
+              xmlns:s="http://purl.oclc.org/dsdl/schematron">
+      <s:pattern>
+        <s:rule context="/">
+          <s:assert test="flowers">The output is wrong.</s:assert>
+        </s:rule>
+      </s:pattern>
+    </s:schema>
+  </t:schematron>
+</t:test>
