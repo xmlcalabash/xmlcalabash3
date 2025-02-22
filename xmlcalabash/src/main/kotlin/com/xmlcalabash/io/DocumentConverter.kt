@@ -19,6 +19,7 @@ import nu.validator.htmlparser.common.XmlViolationPolicy
 import nu.validator.htmlparser.dom.HtmlDocumentBuilder
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
+import java.net.URI
 import java.nio.charset.Charset
 import java.nio.charset.StandardCharsets
 import java.util.*
@@ -324,7 +325,10 @@ class DocumentConverter(val stepConfig: XProcStepConfiguration,
                     val xml = runFunction("parse-xml", listOf(text))
                     return doc.with(xml).with(contentType, true)
                 } catch (ex: SaxonApiException) {
-                    throw stepConfig.exception(XProcError.xdNotWellFormed())
+                    if (doc.baseURI != null) {
+                        throw stepConfig.exception(XProcError.xdNotWellFormed(doc.baseURI!!), ex)
+                    }
+                    throw stepConfig.exception(XProcError.xdNotWellFormed(), ex)
                 }
             }
 

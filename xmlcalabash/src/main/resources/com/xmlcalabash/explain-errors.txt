@@ -136,8 +136,12 @@ Bad output content type “$2” on port “$1”.
 It is a dynamic error if a document arrives on an output port whose content type
 is not accepted by the output port specification.
 
-XD0049
+XD0049/1
 Document is not well formed.
+It is a dynamic error if the text value is not a well-formed XML document
+
+XD0049/2
+Document is not well formed: “$1”.
 It is a dynamic error if the text value is not a well-formed XML document
 
 XD0051

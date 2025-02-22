@@ -36,8 +36,16 @@ configurations.all {
   }
 }
 
+/*
+configurations.configureEach {
+  exclude("net.sf.saxon", "Saxon-HE")
+  exclude("com.saxonica", "Saxon-EE")
+}
+*/
+
 dependencies {
-  //implementation("net.sf.saxon:Saxon-HE:12.5")
+  //implementation("net.sf.saxon:Saxon-HE:${project.findProperty("saxonVersion")}")
+  //implementation("com.saxonica:Saxon-PE:${project.findProperty("saxonVersion")}")
   implementation("com.saxonica:Saxon-EE:${project.findProperty("saxonVersion")}")
   implementation("org.apache.logging.log4j:log4j-api-kotlin:1.4.0")
 
@@ -50,6 +58,14 @@ dependencies {
       }
     }
   }
+
+//  constraints {
+//    implementation("com.saxonica:Saxon-PE") {
+//      version {
+//        strictly ("${project.findProperty("saxonVersion")}")
+//      }
+//    }
+//  }
 
   constraints {
     implementation("com.saxonica:Saxon-EE") {
