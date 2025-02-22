@@ -193,6 +193,9 @@ class DocumentLoader(val context: XProcStepConfiguration,
                 try {
                     return loadXml(uri, stream)
                 } catch (ex: SaxonApiException) {
+                    if (href != null) {
+                        throw context.exception(XProcError.xdNotWellFormed(href), ex)
+                    }
                     throw context.exception(XProcError.xdNotWellFormed(), ex)
                 }
             }
@@ -242,6 +245,9 @@ class DocumentLoader(val context: XProcStepConfiguration,
             if (errorHandler.errorCount > 0) {
                 if (validating) {
                     throw context.exception(XProcError.xdNotDtdValid(errorHandler.message ?: "No message provided"))
+                }
+                if (href != null) {
+                    throw context.exception(XProcError.xdNotWellFormed(href))
                 }
                 throw context.exception(XProcError.xdNotWellFormed())
             }
