@@ -1,0 +1,45 @@
+<refentry xmlns:p="http://www.w3.org/ns/xproc"
+          xmlns:e="http://www.w3.org/1999/XSL/Spec/ElementSyntax"
+          xmlns:xi="http://www.w3.org/2001/XInclude"
+          xmlns:xlink="http://www.w3.org/1999/xlink"
+          xmlns:cx="http://xmlcalabash.com/ns/extensions"
+          xmlns:cxerr="http://xmlcalabash.com/ns/error"
+          xmlns="http://docbook.org/ns/docbook"
+          xml:id="cx-selenium">
+<?db filename="cx-selenium"?>
+<refnamediv>
+   <refname>cx:selenium</refname>
+   <refpurpose>Drive a web browser with Selenium</refpurpose>
+</refnamediv>
+<refsynopsisdiv>
+
+<refsection role="introduction">
+<title>Introduction</title>
+<para>The <tag>cx:selenium</tag> step uses
+<link xlink:href="https://www.selenium.dev/">Selenium</link> to automate a web
+browser. The step can drive the browser and extract all or part of rendered pages.</para>
+</refsection>
+
+<refsection role="step-declaration">
+<title>Step declaration</title>
+     <xi:include href="../../../../ext/selenium/src/main/resources/com/xmlcalabash/ext/selenium.xpl"
+                 xpointer="xpath(/*/*[@type='cx:selenium'])"/>
+</refsection>
+
+<refsection role="errors">
+<title>Errors</title>
+<para>Errors from the entry body are summarized here.</para>
+</refsection>
+</refsynopsisdiv>
+
+<refsection>
+<title>Description</title>
+
+<para>Selenium automates browsers.</para>
+
+<para>T.B.D.</para>
+
+</refsection>
+</refentry>
+
+

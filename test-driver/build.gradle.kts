@@ -45,6 +45,7 @@ dependencies {
   implementation(project(":ext:rdf"))
   implementation(project(":ext:xmlunit"))
   implementation(project(":ext:markup-blitz"))
+  implementation(project(":ext:selenium"))
 
   transformation ("net.sf.saxon:Saxon-HE:${saxonVersion}")
 }

@@ -1,0 +1,52 @@
+<t:test expected="pass" features="selenium"
+        xmlns:t="http://xproc.org/ns/testsuite/3.0">
+  <t:info>
+    <t:title>selenium-006</t:title>
+    <t:revision-history>
+      <t:revision>
+        <t:date>2025-02-09</t:date>
+        <t:author>
+          <t:name>Norm Tovey-Walsh</t:name>
+        </t:author>
+        <t:description xmlns="http://www.w3.org/1999/xhtml">
+          <p>Created test.</p>
+        </t:description>
+      </t:revision>
+    </t:revision-history>
+  </t:info>
+  <t:description xmlns="http://www.w3.org/1999/xhtml">
+    <p>Tests that Selenium can find an element by link-text.</p>
+  </t:description>
+  <t:pipeline>
+<p:declare-step xmlns:p="http://www.w3.org/ns/xproc"
+                xmlns:cx="http://xmlcalabash.com/ns/extensions"
+                name="main" version="3.0">
+  <p:import href="https://xmlcalabash.com/ext/library/selenium.xpl"/>
+  <p:output port="result" sequence="true"/>
+
+  <cx:selenium>
+    <p:with-option name="arguments" select="('--headless')"/>
+    <p:with-input>
+      <p:inline content-type="text/plain">script version 0.2 .
+page "http://localhost:8246/apps/find.html" .
+find $a by link-text = "some link text" .
+output $a to result.
+      </p:inline>
+    </p:with-input>
+  </cx:selenium>
+
+</p:declare-step>
+  </t:pipeline>
+  <t:schematron>
+    <s:schema queryBinding="xslt2"
+              xmlns:s="http://purl.oclc.org/dsdl/schematron">
+      <s:ns prefix="h" uri="http://www.w3.org/1999/xhtml"/>
+      <s:pattern>
+        <s:rule context="/">
+          <s:assert test="h:a">The result isn’t an a.</s:assert>
+          <s:assert test="h:a = 'some link text'">The wrong element was selected.</s:assert>
+        </s:rule>
+      </s:pattern>
+    </s:schema>
+  </t:schematron>
+</t:test>

@@ -1,0 +1,86 @@
+<t:test expected="pass" features="selenium"
+        xmlns:t="http://xproc.org/ns/testsuite/3.0">
+  <t:info>
+    <t:title>selenium-024</t:title>
+    <t:revision-history>
+      <t:revision>
+        <t:date>2025-02-09</t:date>
+        <t:author>
+          <t:name>Norm Tovey-Walsh</t:name>
+        </t:author>
+        <t:description xmlns="http://www.w3.org/1999/xhtml">
+          <p>Created test.</p>
+        </t:description>
+      </t:revision>
+    </t:revision-history>
+  </t:info>
+  <t:description xmlns="http://www.w3.org/1999/xhtml">
+    <p>Tests navigation</p>
+  </t:description>
+  <t:pipeline>
+<p:declare-step xmlns:p="http://www.w3.org/ns/xproc"
+                xmlns:cx="http://xmlcalabash.com/ns/extensions"
+                name="main" version="3.0">
+  <p:import href="https://xmlcalabash.com/ext/library/selenium.xpl"/>
+  <p:output port="result" sequence="true"/>
+
+  <cx:selenium>
+    <p:with-option name="arguments" select="('--headless')"/>
+    <p:with-input>
+      <p:inline content-type="text/plain">script version 0.2 .
+page "http://localhost:8246/apps/page1.html" .
+
+gosub print-title .
+
+find $second by link-text = "second page".
+click $second .
+pause PT0.25S .
+
+gosub print-title .
+
+navigate to "page3.html" .
+pause PT0.25S .
+
+gosub print-title .
+
+navigate back .
+pause PT0.25S .
+
+gosub print-title .
+
+navigate forward .
+pause PT0.25S .
+
+gosub print-title .
+
+sub print-title
+  set $title to page title .
+  output $title to result .
+end
+      </p:inline>
+    </p:with-input>
+  </cx:selenium>
+  <p:for-each>
+    <p:wrap-sequence wrapper='title'/>
+  </p:for-each>
+  <p:wrap-sequence wrapper="wrapper"/>
+</p:declare-step>
+  </t:pipeline>
+  <t:schematron>
+    <s:schema queryBinding="xslt2"
+              xmlns:s="http://purl.oclc.org/dsdl/schematron">
+      <s:ns prefix="h" uri="http://www.w3.org/1999/xhtml"/>
+      <s:pattern>
+        <s:rule context="/">
+          <s:assert test="wrapper">The result isn’t a wrapper.</s:assert>
+          <s:assert test="count(wrapper/title) = 5">The number of titles is wrong.</s:assert>
+          <s:assert test="wrapper/title[1] = 'Page 1'">The title is wrong</s:assert>
+          <s:assert test="wrapper/title[2] = 'Page 2'">The title is wrong</s:assert>
+          <s:assert test="wrapper/title[3] = 'Page 3'">The title is wrong</s:assert>
+          <s:assert test="wrapper/title[4] = 'Page 2'">The title is wrong</s:assert>
+          <s:assert test="wrapper/title[5] = 'Page 3'">The title is wrong</s:assert>
+        </s:rule>
+      </s:pattern>
+    </s:schema>
+  </t:schematron>
+</t:test>
