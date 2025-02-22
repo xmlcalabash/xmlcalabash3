@@ -44,6 +44,7 @@ dependencies {
   implementation(project(":ext:railroad"))
   implementation(project(":ext:rdf"))
   implementation(project(":ext:xmlunit"))
+  implementation(project(":ext:markup-blitz"))
 
   transformation ("net.sf.saxon:Saxon-HE:${saxonVersion}")
 }

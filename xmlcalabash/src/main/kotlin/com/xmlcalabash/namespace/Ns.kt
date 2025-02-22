@@ -185,4 +185,7 @@ object Ns {
     val zip = QName("zip")
     val valid = QName("valid")
     val sevenZ = QName("sevenZ")
+    val trace = QName("trace")
+    val timing = QName("timing")
+    val verbose = QName("verbose")
 }

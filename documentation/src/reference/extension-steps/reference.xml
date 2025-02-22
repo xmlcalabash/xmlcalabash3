@@ -13,6 +13,7 @@
 <xi:include href="cx-ditaa.xml"/>
 <xi:include href="cx-epubcheck.xml"/>
 <xi:include href="cx-javascript.xml"/>
+<xi:include href="cx-markup-blitz.xml"/>
 <xi:include href="cx-mathml-to-svg.xml"/>
 <xi:include href="cx-metadata-extractor.xml"/>
 <xi:include href="cx-pipeline-messages.xml"/>

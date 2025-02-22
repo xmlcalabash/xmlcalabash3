@@ -353,6 +353,7 @@ open class XProcError protected constructor(val code: QName, val variant: Int, e
         fun xcCannotUncompress() = step(Pair(202,2))
         fun xcHttpInvalidBoundary(boundary: String) = step(203, boundary)
         fun xcUnsupportedContentType(contentType: MediaType) = step(204, contentType)
+        fun xcInvisibleXmlParseFailed() = step(205)
         fun xcRunInputPrimaryMismatch(primary: String) = step(Pair(206, 1), primary)
         fun xcRunInputPrimaryMismatch(primary: String, runPrimary: String) = step(Pair(206, 2), primary, runPrimary)
         fun xcRunInputPrimaryUndeclared(runPrimary: String) = step(Pair(206, 3), runPrimary)

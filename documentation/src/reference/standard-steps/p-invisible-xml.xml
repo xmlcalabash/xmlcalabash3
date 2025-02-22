@@ -1,4 +1,7 @@
-<refentry xmlns="http://docbook.org/ns/docbook" xmlns:p="http://www.w3.org/ns/xproc" xml:id="p-invisible-xml">
+<refentry xmlns="http://docbook.org/ns/docbook"
+          xmlns:p="http://www.w3.org/ns/xproc"
+          xmlns:xlink="http://www.w3.org/1999/xlink"
+          xml:id="p-invisible-xml">
 <?db filename="p-ixml"?>
 <info>
   <bibliomisc role="version">3.1</bibliomisc>
@@ -42,5 +45,31 @@ if the source document cannot be parsed by the provided grammar.</error>
 <refsection>
   <title>Description</title>
   <para role="external-refs"/>
+
+  <para>The default Invisible XML implementation in XML Calabash is
+  <link xlink:href="https://nineml.org/">NineML</link>. It is also possible to use
+  <link xlink:href="https://github.com/GuntherRademacher/markup-blitz">Markup Blitz</link>.
+  In order to use Markup Blitz, you must put the Markup Blitz jar file
+  (<filename>markup-blitz-<?dep markupBlitz?>.jar</filename>) on your class path.
+  </para>
+
+<refsection>
+<title>Configuring the Invisible XML Processor</title>
+
+<para>You can specify the default processor by setting the Java system property
+“<literal>com.xmlcalabash.invisible-xml</literal>” to either
+“<literal>nineml</literal>” or “<literal>markup-blitz</literal>”. If the requested
+processor is not available, processing will fallback to the other. (If neither
+is available, the step will fail.)</para>
+
+<para>You can also specify the processor on a per-step basis by setting the
+extension attribute <tag>cx:processor</tag> to 
+“<literal>nineml</literal>” or “<literal>markup-blitz</literal>”.</para>
+
+<para>If the Markup Blitz extension step is available, you can also run
+<tag>cx:markup-blitz</tag> instead of <tag>p:invisible-xml</tag>.</para>
+
+</refsection>
+
 </refsection>
 </refentry>
