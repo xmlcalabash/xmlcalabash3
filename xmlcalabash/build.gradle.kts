@@ -58,13 +58,14 @@ val dep_uuidCreator = project.findProperty("uuidCreator").toString()
 val dep_xerces = project.findProperty("xercesImpl").toString()
 val dep_xmlResolver = project.findProperty("xmlResolver").toString()
 val dep_blitz = project.findProperty("markupBlitz").toString()
+val dep_nineml = project.findProperty("nineml").toString()
 
 dependencies {
   // Compile with Markup Blitz but only ship NineML
   // Is that the right answer?
   compileOnly("de.bottlecaps:markup-blitz:${dep_blitz}")
-  implementation("org.nineml:coffeegrinder:3.2.7")
-  implementation("org.nineml:coffeefilter:3.2.7")
+  implementation("org.nineml:coffeegrinder:${dep_nineml}")
+  implementation("org.nineml:coffeefilter:${dep_nineml}")
 
   implementation("org.jetbrains.kotlin:kotlin-stdlib:2.0.21")
   implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.1")
@@ -149,6 +150,7 @@ buildConfig {
                   "jing",
                   "jsonSchemaValidator",
                   "markupBlitz",
+                  "nineml",
                   "pdfbox",
                   "plantUml",
                   "rr",
