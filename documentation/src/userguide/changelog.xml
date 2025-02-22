@@ -13,6 +13,65 @@ See the commits and pull requests on
 finer detail.</para>
 
 <revhistory>
+<revision xml:id="r300-alpha21">
+<revnumber>3.0.0-alpha21</revnumber>
+<date>2025-02-22</date>
+<revdescription>
+<itemizedlist>
+<listitem><para>Fixed <ghissue number="286"/>.
+Added a <tag>cx:markup-blitz</tag> step and made it possible to use either
+NineML or Markup Blitz for the <tag>p:invisible-xml</tag> step.
+</para></listitem>
+<listitem><para>Fixed <ghissue number="285"/>. Make sure that catalog lookup
+is performed when XML Schema modules are loaded.
+</para></listitem>
+<listitem><para>Fixed <ghissue number="281"/>. Remarkably, the <function>p:urify</function>
+function didn’t correctly handle “\” in the file path. This may also resolve
+<ghissue number="282"/>.
+</para></listitem>
+<listitem><para>Improved the error message for <code>err:XD0049</code>; it now
+includes the URI of the document that caused the error, if the URI is available.
+</para></listitem>
+<listitem><para>Improved error messages generally by not losing the underlying
+exception and printing the underlying cause when an uncaught exception stops
+the pipeline. </para></listitem>
+<listitem><para>Added an initial implementation of the <tag>cx:asciidoctor</tag>
+step. This implements conversion from Asciidoctor to DocBook, HTML, or PDF.</para>
+</listitem>
+<listitem><para>Added an initial implementation of the <tag>cx:xmlunit</tag>
+step. This implements document comparisons with XMLUnit. It doesn’t support
+everything that XMLUnit can do, but it supports many of the options.
+</para></listitem>
+<listitem><para>Added an initial implementation of RDF-related steps:
+<tag>cx:rdf-merge</tag>, <tag>cx:rdf-graph</tag>, <tag>cx:rdfa</tag>, and
+<tag>cx:sparql</tag>. Added support for a wide range of RDF content types:
+<literal>application/ld+json</literal>, 
+<literal>application/n-quads</literal>, 
+<literal>application/n-triples</literal>, 
+<literal>application/rdf+json</literal>, 
+<literal>application/rdf+thrift</literal>, 
+<literal>application/rdf+xml</literal>, 
+<literal>application/sparql-query</literal>, 
+<literal>application/sparql-results+json</literal>, 
+<literal>application/sparql-results+xml</literal>, 
+<literal>application/trig</literal>, 
+<literal>text/n3</literal>, and
+<literal>text/turtle</literal>. (Supporting these content types means that
+the standard <tag>p:document</tag> instruction and the <tag>p:load</tag> and
+<tag>p:store</tag> steps support RDF documents natively.)
+</para></listitem>
+<listitem><para>Added a number of new service provider interfaces so that extension
+steps can interact with the processor configuration.
+</para></listitem>
+<listitem><para>Fixed a typo in the declaration of the
+<tag>cx:epubcheck</tag> step.
+</para></listitem>
+<listitem><para>Cleaned up some whitespace, unused imports, and did some general
+code tidying.</para>
+</listitem>
+</itemizedlist>
+</revdescription>
+</revision>
 <revision xml:id="r300-alpha20">
 <revnumber>3.0.0-alpha20</revnumber>
 <date>2025-02-10</date>
