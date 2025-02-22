@@ -5,16 +5,28 @@ plugins {
 
 rootProject.name = "xmlcalabash"
 
-include("xmlcalabash", "app", "test-driver",
-        "documentation",
-        "send-mail",
-        "paged-media:weasyprint", "paged-media:prince",
-        "paged-media:antenna-house", "paged-media:fop",
-        "ext:unique-id", "ext:metadata-extractor", "ext:cache",
-        "ext:pipeline-messages", "ext:epubcheck",
-        "ext:polyglot", "ext:xpath", "ext:wait-for-update",
-        "ext:diagramming", "ext:collection-manager",
-        "ext:asciidoctor",
-        "template:kotlin", "template:java",
-        "ext:rdf", "ext:railroad", "ext:xmlunit"
-    )
+include("xmlcalabash")
+include("app")
+include("test-driver")
+include("documentation")
+include("paged-media:antenna-house")
+include("paged-media:fop")
+include("paged-media:prince")
+include("paged-media:weasyprint")
+include("send-mail")
+include("template:java")
+include("template:kotlin")
+include("ext:asciidoctor")
+include("ext:cache")
+include("ext:collection-manager")
+include("ext:diagramming")
+include("ext:epubcheck")
+include("ext:metadata-extractor")
+include("ext:pipeline-messages")
+include("ext:polyglot")
+include("ext:railroad")
+include("ext:rdf")
+include("ext:unique-id")
+include("ext:wait-for-update")
+include("ext:xmlunit")
+include("ext:xpath")

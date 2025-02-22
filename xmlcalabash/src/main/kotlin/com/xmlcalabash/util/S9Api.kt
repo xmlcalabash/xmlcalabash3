@@ -236,7 +236,6 @@ class S9Api {
             return xdmToInputSource(stepConfig ,doc)
         }
 
-
         fun serializationPropertyMap(props: SerializationProperties): Map<QName, XdmValue> {
             val map = mutableMapOf<QName, XdmValue>()
             for ((key, value) in props.properties) {
