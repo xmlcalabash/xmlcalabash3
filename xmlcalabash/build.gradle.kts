@@ -30,19 +30,26 @@ configurations.forEach {
 }
 
 // If you add to this list, update BuildConfig as well!
+val dep_activation = project.findProperty("activation").toString()
 val dep_brotliDec = project.findProperty("brotliDec").toString()
 val dep_commonsCodec = project.findProperty("commonsCodec").toString()
 val dep_commonsCompress = project.findProperty("commonsCompress").toString()
+val dep_ditaa = project.findProperty("ditaa").toString()
 val dep_drewnoakesExtractor = project.findProperty("drewnoakesExtractor").toString()
 val dep_epubcheck = project.findProperty("epubcheck").toString()
 val dep_flexmarkAll = project.findProperty("flexmarkAll").toString()
 val dep_graalvmJS = project.findProperty("graalvmJS").toString()
 val dep_htmlparser = project.findProperty("htmlparser").toString()
 val dep_httpClient = project.findProperty("httpClient").toString()
+val dep_jacksonDataformat = project.findProperty("jacksonDataformat").toString()
 val dep_jaxbapi = project.findProperty("jaxbapi").toString()
+val dep_jeuclid = project.findProperty("jeuclidCore").toString()
 val dep_jing = project.findProperty("jing").toString()
 val dep_jsonSchemaValidator = project.findProperty("jsonSchemaValidator").toString()
+val dep_markupBlitz = project.findProperty("markupBlitz").toString()
 val dep_pdfbox = project.findProperty("pdfbox").toString()
+val dep_plantuml = project.findProperty("plantUml").toString()
+val dep_rr = project.findProperty("rr").toString()
 val dep_schxslt2 = project.findProperty("schxslt2").toString()
 val dep_sinclude = project.findProperty("sinclude").toString()
 val dep_slf4j = project.findProperty("slf4j").toString()
@@ -50,14 +57,15 @@ val dep_tukaaniXz = project.findProperty("tukaaniXz").toString()
 val dep_uuidCreator = project.findProperty("uuidCreator").toString()
 val dep_xerces = project.findProperty("xercesImpl").toString()
 val dep_xmlResolver = project.findProperty("xmlResolver").toString()
-val dep_jacksonDataformat = project.findProperty("jacksonDataformat").toString()
-val dep_plantuml = project.findProperty("plantUml").toString()
-val dep_jeuclid = project.findProperty("jeuclidCore").toString()
-val dep_ditaa = project.findProperty("ditaa").toString()
-val dep_rr = project.findProperty("rr").toString()
-val dep_activation = project.findProperty("activation").toString()
+val dep_blitz = project.findProperty("markupBlitz").toString()
 
 dependencies {
+  // Compile with Markup Blitz but only ship NineML
+  // Is that the right answer?
+  compileOnly("de.bottlecaps:markup-blitz:${dep_blitz}")
+  implementation("org.nineml:coffeegrinder:3.2.7")
+  implementation("org.nineml:coffeefilter:3.2.7")
+
   implementation("org.jetbrains.kotlin:kotlin-stdlib:2.0.21")
   implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.1")
   implementation("org.jetbrains.kotlin:kotlin-reflect:2.0.21")
@@ -94,9 +102,6 @@ dependencies {
   implementation("org.apache.logging.log4j:log4j-to-slf4j:2.23.1")
 
   implementation("org.apache.httpcomponents.client5:httpclient5:${dep_httpClient}")
-
-  implementation("org.nineml:coffeegrinder:3.2.7")
-  implementation("org.nineml:coffeefilter:3.2.7")
 
   implementation("org.jline:jline-terminal:3.28.0")
   implementation("org.jline:jline-terminal-jni:3.28.0")
@@ -143,6 +148,7 @@ buildConfig {
                   "jeuclidCore",
                   "jing",
                   "jsonSchemaValidator",
+                  "markupBlitz",
                   "pdfbox",
                   "plantUml",
                   "rr",
@@ -204,18 +210,6 @@ tasks.register("apidocs") {
     val stream = PrintStream(layout.buildDirectory.file("dokka/javadoc/details.json").get().asFile)
     stream.println("{\"version\": \"${xmlbuild.version.get()}\", \"pubdate\": \"${xmlbuild.buildTime.get()}\"}")
     stream.close()
-  }
-}
-
-/*
-tasks.withType<Test> {
-    this.classpath.forEach { println(it) }
-}
-*/
-
-tasks.register("helloWorld") {
-  doLast {
-    println("Hello, world.")
   }
 }
 

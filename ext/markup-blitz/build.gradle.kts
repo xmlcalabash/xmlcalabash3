@@ -12,11 +12,11 @@ configurations.forEach {
   it.exclude("net.sf.saxon.Saxon-HE")
 }
 
-val dep_rr = project.findProperty("rr").toString()
+val dep_blitz = project.findProperty("markupBlitz").toString()
 
 dependencies {
   implementation(project(":xmlcalabash"))
-  implementation("de.bottlecaps.rr:rr-lib:${dep_rr}")
+  implementation("de.bottlecaps:markup-blitz:${dep_blitz}")
 
   xmlcalabash(project(":xmlcalabash"))
 }
@@ -72,8 +72,8 @@ tasks.register("stage-release") {
       into(layout.buildDirectory.dir("stage"))
       include("README.md")
       filter { line ->
-        line.replace("Railroad diagram extension step",
-                     "Railroad diagram extension step version ${xmlbuild.version.get()}")
+        line.replace("Markup Blitz extension step",
+                     "Markup Blitz extension step version ${xmlbuild.version.get()}")
             .replace("<version>", xmlbuild.version.get())
       }
     }
@@ -107,9 +107,9 @@ publishing {
       pom {
         groupId = project.findProperty("xmlcalabashGroup").toString()
         version = project.findProperty("xmlcalabashVersion").toString()
-        name = "XML Calabash Railroad Diagramming Step"
+        name = "XML Calabash Markup Blitz Step"
         packaging = "jar"
-        description = "Railroad diagram step for XML Calabash 3.x"
+        description = "Markup Blitz step for XML Calabash 3.x"
         url = "https://github.com/xmlcalabash/xmlcalabash3"
 
         scm {

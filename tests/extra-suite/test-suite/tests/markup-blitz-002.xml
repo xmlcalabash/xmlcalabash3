@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<t:test expected="pass" features="p:ixml"
+        xmlns:cx="http://xmlcalabash.com/ns/extensions"
+        xmlns:t="http://xproc.org/ns/testsuite/3.0">
+   <t:info>
+      <t:title>markup-blitz-002</t:title>
+      <t:revision-history>
+         <t:revision>
+            <t:date>2025-02-22</t:date>
+            <t:author>
+               <t:name>Norm Tovey-Walsh</t:name>
+            </t:author>
+            <t:description xmlns="http://www.w3.org/1999/xhtml">
+              <p>Created test.</p>
+            </t:description>
+         </t:revision>
+      </t:revision-history>
+   </t:info>
+   <t:description xmlns="http://www.w3.org/1999/xhtml">
+      <p>Ported the standard ab-i-xml-002 test to use cx:markup-blitz.</p>
+   </t:description>
+   <t:pipeline>
+      <p:declare-step xmlns:p="http://www.w3.org/ns/xproc" version="3.0">
+         <p:import href="https://xmlcalabash.com/ext/library/markup-blitz.xpl"/>
+         <p:output port="result"/>
+
+         <cx:markup-blitz>
+            <p:with-input port="grammar">
+               <p:inline content-type="text/plain">
+                  date: s?, day, s, month, (s, year)? .
+                  -s: -" "+ .
+                  day: digit, digit? .
+                  -digit: "0"; "1"; "2"; "3"; "4"; "5"; "6"; "7"; "8"; "9".
+                  month: "January"; "February"; "March"; "April";
+                  "May"; "June"; "July"; "August";
+                  "September"; "October"; "November"; "December".
+                  year: (digit, digit)?, digit, digit .
+               </p:inline>
+            </p:with-input>
+            <p:with-input port="source">
+               <p:inline content-type="text/plain">31 December 2021</p:inline>
+            </p:with-input>
+         </cx:markup-blitz>
+      </p:declare-step>
+   </t:pipeline>
+   <t:schematron>
+      <s:schema queryBinding="xslt2"
+                xmlns:s="http://purl.oclc.org/dsdl/schematron"
+                xmlns="http://www.w3.org/1999/xhtml">
+         <s:pattern>
+            <s:rule context="/">
+               <s:assert test="date">The root element is not 'date'.</s:assert>
+               <s:assert test="date/day">The root element does not have a 'day' child.</s:assert>
+               <s:assert test="date/day/text()='31'">The value of 'day' is not '31'.</s:assert>
+               <s:assert test="date/month">The root element does not have a 'month' child.</s:assert>
+               <s:assert test="date/month/text()='December'">The value of 'month' is not 'December'.</s:assert>
+               <s:assert test="date/year">The root element does not have a 'year' child.</s:assert>
+               <s:assert test="date/year/text()='2021'">The value of 'year' is not '2021'.</s:assert>
+            </s:rule>
+         </s:pattern>
+      </s:schema>
+   </t:schematron>
+</t:test>

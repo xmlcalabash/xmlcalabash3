@@ -1306,7 +1306,7 @@ Unsupported content type: “$1”.
 It is a dynamic error if the requested content-type is not supported.
 
 XC0205
-Invalid grammar provided.
+Input cannot be parsed with grammar.
 It is a dynamic error if the source document cannot be parsed by the provided grammar.
 
 XC0206/1
