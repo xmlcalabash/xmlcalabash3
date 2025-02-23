@@ -36,10 +36,14 @@ HTML5, or PDF.</para>
 <refsection>
 <title>Description</title>
 
-<para><link xlink:href="https://asciidoctor.org/">Asciidoctor</link> is a
-sophisticated flavor of markdown, a text format that can be used to represent
-complex structures. One of its original goals was to capture DocBook in a
-markdown style.</para>
+<para><link xlink:href="https://asciidoctor.org/">Asciidoctor</link> is the
+modern toolchain for processing <link
+xlink:href="https://asciidoc.org/">Asciidoc</link> markup. Asciidoc is a
+sophisticated lightweight markup language that can be used to represent complex
+structures. One of its original goals was to capture DocBook in a markdown-like
+style. Asciidoc
+<link xlink:href="https://web.archive.org/web/20130203205849/asciidoc.org/CHANGELOG.html">predates</link>
+Markdown.</para>
 
 <para>The Java API that XML Calabash uses,
 <link xlink:href="https://docs.asciidoctor.org/asciidoctorj/latest/">AsciidoctorJ</link>,
