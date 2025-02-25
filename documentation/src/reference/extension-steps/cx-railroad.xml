@@ -60,6 +60,26 @@ the link <literal>#name</literal> into <literal>#pfx-name</literal>. Setting
 the <option>transform-links</option> option to the empty string removes the
 links entirely.</para>
 
+<para>There are many flavors of
+<link xlink:href="https://en.wikipedia.org/wiki/Extended_Backus%E2%80%93Naur_form">EBNF</link>,
+the Railroad Diagram Generator uses the
+<link xlink:href="https://www.w3.org/TR/xquery-31/#EBNFNotation">W3C EBNF</link> format.
+There’s a related step, <tag>cx:ebnf-convert</tag>, that can convert many different varieties
+of EBNF to the W3C format. As a convenience, the <option>notation</option> option can be
+used to indicate that some other variety is being used as input. The EBNF converter will
+be called automatically to perform the conversion before attempting to build the diagram.</para>
+
+<para>If no <option>notation</option> is specified, the step will attempt to determine the
+grammar format by inspection. If this fails, specify the format. If the <option>factoring</option> option is
+true, the conversion is performed with “full-left” factoring. If the <option>eliminate-recursion</option>
+option is true, “full” recursion elimination is used. If you need more control over the
+conversion, use the <tag>cx:ebnf-convert</tag> step beforehand and pass the results to
+<tag>cx:railroad</tag>.</para>
+
+<para><error code="cxerr:XC0022">It is a <glossterm>dynamic
+error</glossterm> if the grammar conversion fails.</error> 
+</para>
+
 <para>The other step options correspond directly to the options on the generator.</para>
 
 <para>The color must be one of the standard Java AWT color names (black, blue,

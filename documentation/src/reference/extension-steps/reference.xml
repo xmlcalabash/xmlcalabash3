@@ -11,6 +11,7 @@
 <xi:include href="cx-cache-delete.xml"/>
 <xi:include href="cx-collection-manager.xml"/>
 <xi:include href="cx-ditaa.xml"/>
+<xi:include href="cx-ebnf-convert.xml"/>
 <xi:include href="cx-epubcheck.xml"/>
 <xi:include href="cx-javascript.xml"/>
 <xi:include href="cx-markup-blitz.xml"/>
