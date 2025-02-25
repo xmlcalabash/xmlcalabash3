@@ -1,0 +1,102 @@
+<refentry xmlns:p="http://www.w3.org/ns/xproc"
+          xmlns:e="http://www.w3.org/1999/XSL/Spec/ElementSyntax"
+          xmlns:xi="http://www.w3.org/2001/XInclude"
+          xmlns:xlink="http://www.w3.org/1999/xlink"
+          xmlns:cx="http://xmlcalabash.com/ns/extensions"
+          xmlns:cxerr="http://xmlcalabash.com/ns/error"
+          xmlns="http://docbook.org/ns/docbook"
+          xml:id="cx-ebnf-convert">
+<?db filename="cx-ebnf-convert"?>
+   <refnamediv>
+      <refname>cx:ebnf-convert</refname>
+      <refpurpose>Converts other EBNF notations to W3C EBNF</refpurpose>
+   </refnamediv>
+   <refsynopsisdiv>
+
+<refsection role="introduction">
+<title>Introduction</title>
+<para>The <tag>cx:ebnf-convert</tag> step is a wrapper around
+<personname>Gunther Rademacher</personname>’s 
+<link xlink:href="https://www.bottlecaps.de/ebnf-convert/">grammar converter</link>.</para>
+</refsection>
+
+<refsection role="step-declaration">
+<title>Step declaration</title>
+     <xi:include href="../../../../ext/ebnf-convert/src/main/resources/com/xmlcalabash/ext/ebnf-convert.xpl"
+                 xpointer="xpath(/*/*[@type='cx:ebnf-convert'])"/>
+</refsection>
+
+<refsection role="errors">
+<title>Errors</title>
+<para>Errors from the entry body are summarized here.</para>
+</refsection>
+</refsynopsisdiv>
+
+<refsection>
+<title>Description</title>
+
+<para>There are wide variety of different
+<link xlink:href="https://en.wikipedia.org/wiki/Extended_Backus%E2%80%93Naur_form">EBNF</link>
+notations. This step converts many of them to the EBNF notation
+<link xlink:href="https://www.w3.org/TR/xquery-31/#EBNFNotation">defined by the W3C</link>.
+This notation is used in the XML specification, in the XPath and XQuery family of specifications,
+and, perhaps most significantly in this context,
+by the <tag>cx:railroad</tag> step to make railroad diagrams.</para>
+
+<para>The input notations are:</para>
+
+<itemizedlist>
+<listitem><para><literal>abnf</literal>,
+<link xlink:href="https://datatracker.ietf.org/doc/html/rfc5234">Augmented BNF for Syntax Specifications</link>.
+</para></listitem>
+<listitem><para><literal>antlr_3</literal>,
+<link xlink:href="https://www.antlr3.org/">ANTLR version 3</link>.
+</para></listitem>
+<listitem><para><literal>antlr_4</literal>,
+<link xlink:href="https://www.antlr.org/">ANTLR version 4</link>.
+</para></listitem>
+<listitem><para><literal>bison</literal>,
+<link xlink:href="https://www.gnu.org/software/bison/manual/html_node/Grammar-File.html">Bison</link>.
+</para></listitem>
+<listitem><para><literal>gold</literal>,
+<link xlink:href="http://goldparser.org/doc/index.htm">The GOLD Parser Builder</link>.
+</para></listitem>
+<listitem><para><literal>instaparse</literal>,
+<link xlink:href="https://github.com/Engelberg/instaparse/blob/master/src/instaparse/cfg.cljc">Instaparse</link>.
+</para></listitem>
+<listitem><para><literal>ixml</literal>,
+<link xlink:href="https://invisiblexml.org/1.0/">Invisible XML</link>.
+</para></listitem>
+<listitem><para><literal>javacc</literal>,
+<link xlink:href="https://javacc.github.io/javacc/documentation/grammar.html">JavaCC</link>.
+</para></listitem>
+<listitem><para><literal>jison</literal>,
+<link xlink:href="https://github.com/zaach/jison">Jison</link>.
+</para></listitem>
+<listitem><para><literal>pegjs</literal>,
+<link xlink:href="https://github.com/pegjs/pegjs/tree/master/docs/grammar">PEG.js</link>.
+</para></listitem>
+<listitem><para><literal>phythia</literal>, ???.
+</para></listitem>
+<listitem><para><literal>pss</literal>, ???.
+</para></listitem>
+<listitem><para><literal>rex_5_9</literal>, ???.
+</para></listitem>
+<listitem><para><literal>w3c</literal>,
+<link xlink:href="https://www.w3.org/TR/xquery-31/#EBNFNotation">W3C EBNF</link> (for notational completness).
+</para></listitem>
+<listitem><para><literal>xtext</literal>,
+<link xlink:href="https://eclipse.dev/Xtext/documentation/301_grammarlanguage.html">Xtext</link>.
+</para></listitem>
+</itemizedlist>
+
+<para><error code="cxerr:XC0022">It is a <glossterm>dynamic
+error</glossterm> if the grammar conversion fails.</error> 
+</para>
+
+<para>This conversion process is also available implicitly in the <tag>cx:railroad</tag> step.
+</para>
+
+</refsection>
+
+</refentry>

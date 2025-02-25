@@ -110,6 +110,7 @@ object Ns {
     val namespace = QName("namespace")
     val newName = QName("new-name")
     val normalizationForm = QName("normalization-form")
+    val notation = QName("notation")
     val number = QName("number")
     val omitXmlDeclaration = QName("omit-xml-declaration")
     val order = QName("order")

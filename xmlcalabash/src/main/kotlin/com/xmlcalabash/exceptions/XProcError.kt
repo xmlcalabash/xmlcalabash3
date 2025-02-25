@@ -387,6 +387,8 @@ open class XProcError protected constructor(val code: QName, val variant: Int, e
         fun xcxXmlUnitElementSelectorAndNodeMatcher() = xstep(20)
         fun xcxXmlUnitNotANodeMatcher(klass: String) = xstep(21, klass)
 
+        fun xcxGrammarConversionFailed(type: String) = xstep(22, type)
+
         fun xiNoSuchOutputPort(port: String)= internal(1, port)
         fun xiImpossibleNodeType(type: XdmNodeKind) = internal(2, type)
         fun xiThreadInterrupted() = internal(3)

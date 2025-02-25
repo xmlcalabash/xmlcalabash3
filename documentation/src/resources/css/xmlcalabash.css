@@ -131,10 +131,16 @@ code.literal {
     background-color: var(--secondary-color);
  }
 
+.pipeline-error code,
 p.element-syntax code {
     font-size: inherit;
     border: none;
     background-color: inherit;
+}
+
+.pipeline-error code {
+    padding: 0;
+    border-radius: none;
 }
 
 /* ============================================================ */

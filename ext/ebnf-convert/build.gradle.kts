@@ -12,12 +12,10 @@ configurations.forEach {
   it.exclude("net.sf.saxon.Saxon-HE")
 }
 
-val dep_rr = project.findProperty("rr").toString()
 val dep_ebnf = project.findProperty("ebnfConvert").toString()
 
 dependencies {
   implementation(project(":xmlcalabash"))
-  implementation("de.bottlecaps.rr:rr-lib:${dep_rr}")
   implementation("de.bottlecaps.ebnf-convert:ebnf-convert-lib:${dep_ebnf}")
 
   xmlcalabash(project(":xmlcalabash"))
@@ -74,8 +72,8 @@ tasks.register("stage-release") {
       into(layout.buildDirectory.dir("stage"))
       include("README.md")
       filter { line ->
-        line.replace("Railroad diagram extension step",
-                     "Railroad diagram extension step version ${xmlbuild.version.get()}")
+        line.replace("EBNF convert extension step",
+                     "EBNF convert extension step version ${xmlbuild.version.get()}")
             .replace("<version>", xmlbuild.version.get())
       }
     }
@@ -109,9 +107,9 @@ publishing {
       pom {
         groupId = project.findProperty("xmlcalabashGroup").toString()
         version = project.findProperty("xmlcalabashVersion").toString()
-        name = "XML Calabash Railroad Diagramming Step"
+        name = "XML Calabash EBNF Convert Step"
         packaging = "jar"
-        description = "Railroad diagram step for XML Calabash 3.x"
+        description = "EBNF convert step for XML Calabash 3.x"
         url = "https://github.com/xmlcalabash/xmlcalabash3"
 
         scm {

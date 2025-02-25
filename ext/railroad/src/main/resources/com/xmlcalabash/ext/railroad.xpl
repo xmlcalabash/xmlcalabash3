@@ -20,6 +20,9 @@
   <p:option name="factoring" as="xs:boolean" select="true()"/>
   <p:option name="inline-literals" as="xs:boolean" select="true()"/>
   <p:option name="keep-epsilon-nonterminals" as="xs:boolean" select="true()"/>
+  <p:option name="notation" as="xs:string?"
+            values="('abnf', 'antlr_3', 'antlr_4', 'bison', 'gold', 'instaparse', 'ixml',
+                     'javacc', 'jison', 'pegjs', 'phythia', 'pss', 'rex_5_9', 'w3c', 'xtext')"/>
 </p:declare-step>
 
 </p:library>

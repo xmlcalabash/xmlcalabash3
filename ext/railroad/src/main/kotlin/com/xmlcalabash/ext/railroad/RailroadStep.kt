@@ -13,13 +13,13 @@ import com.xmlcalabash.namespace.NsSvg
 import com.xmlcalabash.namespace.NsXlink
 import com.xmlcalabash.steps.AbstractAtomicStep
 import com.xmlcalabash.util.SaxonTreeBuilder
+import de.bottlecaps.convert.Convert
 import de.bottlecaps.railroad.RailroadGenerator
 import net.sf.saxon.s9api.Axis
 import net.sf.saxon.s9api.QName
 import net.sf.saxon.s9api.XdmArray
 import net.sf.saxon.s9api.XdmAtomicValue
 import net.sf.saxon.s9api.XdmDestination
-import net.sf.saxon.s9api.XdmEmptySequence
 import net.sf.saxon.s9api.XdmNode
 import net.sf.saxon.s9api.XdmNodeKind
 import net.sf.saxon.s9api.XdmValue
@@ -27,10 +27,6 @@ import org.xml.sax.InputSource
 import java.awt.Color
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
-import java.io.InputStream
-import java.net.URI
-import java.nio.charset.StandardCharsets
-import javax.swing.text.Document
 import javax.xml.transform.sax.SAXSource
 import kotlin.collections.iterator
 
@@ -60,7 +56,7 @@ class RailroadStep(): AbstractAtomicStep() {
         super.run()
 
         source = queues["source"]!!.first()
-        val ebnf = source.value.underlyingValue.stringValue
+        var ebnf = source.value.underlyingValue.stringValue
 
         stepConfig.debug { "EBNF:\n${ebnf}" }
 
@@ -76,6 +72,7 @@ class RailroadStep(): AbstractAtomicStep() {
         val factoring = booleanBinding(_factoring) ?: true
         val inlineLiterals = booleanBinding(_inlineLiterals) ?: true
         val keepEpsilons = booleanBinding(_keepEpsilonNonterminals) ?: true
+        val notation = stringBinding(Ns.notation)
 
         if (width <= 0) {
             throw stepConfig.exception(XProcError.xcxInvalidWidth(width))
@@ -83,6 +80,20 @@ class RailroadStep(): AbstractAtomicStep() {
 
         if (colorOffset < 0 || colorOffset > 359) {
             throw stepConfig.exception(XProcError.xcxOffsetOutOfRange(colorOffset))
+        }
+
+        if (notation != "w3c") {
+            try {
+                val factorStr = if (factoring) "full-left" else "none"
+                val recursionStr = if (recursion) "full" else "none"
+                val toXML = false
+                val verbose = false
+                val timestamp = false
+                val parserImplementation = Convert.ParserImplementation.JAVA
+                ebnf = Convert.convert(notation, ebnf, 0, toXML, recursionStr, factorStr, inlineLiterals, keepEpsilons, parserImplementation, !timestamp, verbose)
+            } catch (ex: Exception) {
+                throw stepConfig.exception(XProcError.xcxGrammarConversionFailed(notation ?: "unspecified"), ex)
+            }
         }
 
         try {
