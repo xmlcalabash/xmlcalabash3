@@ -138,15 +138,7 @@ jobs:
           body_path: documentation/build/changes.txt
           files: |
             app/build/distributions/xmlcalabash-${{ env.CI_TAG }}.zip
-            ext/asciidoctor/build/distributions/asciidoctor-${{ env.CI_TAG }}.zip
-            ext/diagramming/build/distributions/diagramming-${{ env.CI_TAG }}.zip
-            ext/epubcheck/build/distributions/epubcheck-${{ env.CI_TAG }}.zip
-            ext/markup-blitz/build/distributions/markup-blitz-${{ env.CI_TAG }}.zip
             ext/polyglot/build/distributions/polyglot-${{ env.CI_TAG }}.zip
-            ext/railroad/build/distributions/railroad-${{ env.CI_TAG }}.zip
-            ext/rdf/build/distributions/rdf-${{ env.CI_TAG }}.zip
-            ext/selenium/build/distributions/selenium-${{ env.CI_TAG }}.zip
-            ext/xmlunit/build/distributions/xmlunit-${{ env.CI_TAG }}.zip
 
       # N.B. This is **only** publishing the SNAPSHOT builds on the main branch
       - name: Publish to Sonatype
