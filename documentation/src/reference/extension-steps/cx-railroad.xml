@@ -165,6 +165,31 @@ rendered as shown in <xref linkend="fig.railroad-Expression"/>,
 </example>
 </refsection>
 
+<refsection>
+<title>Dependencies</title>
+<para>This step is included in the XML Calabash application.
+If you are getting XML Calabash from Maven, you will also need to include
+the extension dependency:</para>
+
+<itemizedlist spacing="compact">
+<listitem>
+<para><literal>com.xmlcalabash:railroad:<?version?></literal></para>
+</listitem>
+</itemizedlist>
+
+<para>The following third-party dependencies will also be included transitively:</para>
+
+<itemizedlist spacing="compact">
+<listitem>
+<para><literal>de.bottlecaps.rr:rr-lib:<?dep rr?></literal></para>
+</listitem>
+<listitem>
+<para><literal>de.bottlecaps.ebnf-convert:ebnf-convert-lib:<?dep ebnfConvert?></literal></para>
+</listitem>
+</itemizedlist>
+
+</refsection>
+
 </refentry>
 
 

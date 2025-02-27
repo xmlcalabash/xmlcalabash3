@@ -76,12 +76,6 @@ by the <tag>cx:railroad</tag> step to make railroad diagrams.</para>
 <listitem><para><literal>pegjs</literal>,
 <link xlink:href="https://github.com/pegjs/pegjs/tree/master/docs/grammar">PEG.js</link>.
 </para></listitem>
-<listitem><para><literal>phythia</literal>, ???.
-</para></listitem>
-<listitem><para><literal>pss</literal>, ???.
-</para></listitem>
-<listitem><para><literal>rex_5_9</literal>, ???.
-</para></listitem>
 <listitem><para><literal>w3c</literal>,
 <link xlink:href="https://www.w3.org/TR/xquery-31/#EBNFNotation">W3C EBNF</link> (for notational completness).
 </para></listitem>
@@ -90,12 +84,36 @@ by the <tag>cx:railroad</tag> step to make railroad diagrams.</para>
 </para></listitem>
 </itemizedlist>
 
+<para>The notations <literal>phythia</literal>, <literal>pss</literal>, and <literal>rex_5_9</literal>
+are legacy formats.</para>
+
 <para><error code="cxerr:XC0022">It is a <glossterm>dynamic
 error</glossterm> if the grammar conversion fails.</error> 
 </para>
 
 <para>This conversion process is also available implicitly in the <tag>cx:railroad</tag> step.
 </para>
+</refsection>
+
+<refsection>
+<title>Dependencies</title>
+<para>This step is included in the XML Calabash application.
+If you are getting XML Calabash from Maven, you will also need to include
+the extension dependency:</para>
+
+<itemizedlist spacing="compact">
+<listitem>
+<para><literal>com.xmlcalabash:ebnf-convert:<?version?></literal></para>
+</listitem>
+</itemizedlist>
+
+<para>The following third-party dependencies will also be included transitively:</para>
+
+<itemizedlist spacing="compact">
+<listitem>
+<para><literal>de.bottlecaps.ebnf-convert:ebnf-convert-lib:<?dep ebnfConvert?></literal></para>
+</listitem>
+</itemizedlist>
 
 </refsection>
 

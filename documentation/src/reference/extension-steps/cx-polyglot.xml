@@ -118,4 +118,30 @@ will be the text that appears on standard output interpreted according to the
 </refsection>
 </refsection>
 </refsection>
+
+<refsection>
+<title>Dependencies</title>
+<para>To use the polyglot steps, you must use GraalVM 21.0.2 or a compatible
+release. You will also need to include the extension dependency:</para>
+
+<itemizedlist spacing="compact">
+<listitem>
+<para><literal>com.xmlcalabash:polyglot:<?version?></literal></para>
+</listitem>
+</itemizedlist>
+
+<para>The following third-party dependencies will also be included transitively:</para>
+
+<itemizedlist spacing="compact">
+<listitem>
+<para><literal>org.graalvm.polyglot:polyglot:<?dep graalvmJS?></literal></para>
+</listitem>
+<listitem>
+<para><literal>org.graalvm.polyglot:polyglot:js:<?dep graalvmJS?></literal></para>
+</listitem>
+<listitem>
+<para><literal>org.graalvm.polyglot:polyglot:python:<?dep graalvmJS?></literal></para>
+</listitem>
+</itemizedlist>
+</refsection>
 </refentry>

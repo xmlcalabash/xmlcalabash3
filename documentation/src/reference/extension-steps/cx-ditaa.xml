@@ -59,6 +59,8 @@ show in <xref linkend="fig.ditaa"/>.</para>
 </figure>
 </refsection>
 
+<xi:include href="diagramming-depends.xml"/>
+
 </refentry>
 
 

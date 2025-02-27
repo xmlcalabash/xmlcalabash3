@@ -69,7 +69,41 @@ between any of the RDF content types.</para>
 
 <para>It will also cast from the SPARQL result formats to <literal>text/plain</literal>.
 </para>
-
 </section>
 
+<section>
+<title>Dependencies</title>
+<para>These steps are included in the XML Calabash application.
+If you are getting XML Calabash from Maven, you will also need to include
+the extension dependency:</para>
+
+<itemizedlist spacing="compact">
+<listitem>
+<para><literal>com.xmlcalabash:rdf:<?version?></literal></para>
+</listitem>
+</itemizedlist>
+
+<para>The following third-party dependencies will also be included transitively:</para>
+
+<itemizedlist spacing="compact">
+<listitem>
+<para><literal>org.apache.jena:jena:<?dep jena?></literal></para>
+</listitem>
+<listitem>
+<para><literal>org.apache.jena:jena-arq:<?dep jena?></literal></para>
+</listitem>
+<listitem>
+<para><literal>org.apache.jena:jena-core:<?dep jena?></literal></para>
+</listitem>
+<listitem>
+<para><literal>org.apache.jena:jena-iri:<?dep jena?></literal></para>
+</listitem>
+<listitem>
+<para><literal>org.semarglproject:semargl-core:<?dep semargl?></literal></para>
+</listitem>
+<listitem>
+<para><literal>org.semarglproject:semargl-rdfa:<?dep semargl?></literal></para>
+</listitem>
+</itemizedlist>
+</section>
 </preface>

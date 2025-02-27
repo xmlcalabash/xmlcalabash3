@@ -56,6 +56,8 @@ render the equation directly, as (possibly) shown in <xref linkend="fig.mathml"/
 <xi:include href="../../examples/xml/det-a.xml"/>
 </informalequation>
 </figure>
-
 </refsection>
+
+<xi:include href="diagramming-depends.xml"/>
+
 </refentry>
