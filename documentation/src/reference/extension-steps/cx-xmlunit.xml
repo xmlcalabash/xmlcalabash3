@@ -77,9 +77,28 @@ and <option>node-matcher-class</option> options are both provided.</error>
 <error code="cxerr:XC0021">It
 is a <glossterm>dynamic error</glossterm> if the <option>node-matcher-class</option>
 cannot be instantiated.</error></para>
-
 </refsection>
 
+<refsection>
+<title>Dependencies</title>
+<para>This step is included in the XML Calabash application.
+If you are getting XML Calabash from Maven, you will also need to include
+the extension dependency:</para>
+
+<itemizedlist spacing="compact">
+<listitem>
+<para><literal>com.xmlcalabash:xmlunit:<?version?></literal></para>
+</listitem>
+</itemizedlist>
+
+<para>The following third-party dependencies will also be included transitively:</para>
+
+<itemizedlist spacing="compact">
+<listitem>
+<para><literal>org.xmlunit:xmlunit-core:<?dep xmlunit?></literal></para>
+</listitem>
+</itemizedlist>
+</refsection>
 </refentry>
 
 

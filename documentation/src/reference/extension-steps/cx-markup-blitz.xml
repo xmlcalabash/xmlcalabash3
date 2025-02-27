@@ -37,8 +37,29 @@ the specified Invisible XML grammar.</para>
 <para>This step is the same as the <tag>p:invisible-xml</tag> step, but it always uses
 the Markup Blitz processor. It is also possible to configure XML Calabash to use 
 Markup Blitz for the <tag>p:invisible-xml</tag> step.</para>
-
 </refsection>
+
+<refsection>
+<title>Dependencies</title>
+<para>This step is included in the XML Calabash application.
+If you are getting XML Calabash from Maven, you will also need to include
+the extension dependency:</para>
+
+<itemizedlist spacing="compact">
+<listitem>
+<para><literal>com.xmlcalabash:markup-blitz:<?version?></literal></para>
+</listitem>
+</itemizedlist>
+
+<para>The following third-party dependencies will also be included transitively:</para>
+
+<itemizedlist spacing="compact">
+<listitem>
+<para><literal>de.bottlecaps:markup-blitz:<?dep markupBlitz?></literal></para>
+</listitem>
+</itemizedlist>
+</refsection>
+
 </refentry>
 
 

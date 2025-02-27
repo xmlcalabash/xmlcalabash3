@@ -191,8 +191,10 @@ for highlighting.)</para>
 </imageobject>
 </mediaobject>
 </figure>
-
 </refsection>
+
+<xi:include href="diagramming-depends.xml"/>
+
 </refentry>
 
 

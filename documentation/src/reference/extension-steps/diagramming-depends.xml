@@ -1,0 +1,30 @@
+<refsection xmlns="http://docbook.org/ns/docbook"
+            xmlns:xi="http://www.w3.org/2001/XInclude"
+            xmlns:xlink="http://www.w3.org/1999/xlink"
+            version="5.2">
+<title>Dependencies</title>
+<para>This step is included in the XML Calabash application.
+If you are getting XML Calabash from Maven, you will also need to include
+the extension dependency:</para>
+
+<itemizedlist spacing="compact">
+<listitem>
+<para><literal>com.xmlcalabash:diagramming:<?version?></literal></para>
+</listitem>
+</itemizedlist>
+
+<para>The following third-party dependencies will also be included transitively:</para>
+
+<itemizedlist spacing="compact">
+<listitem>
+<para><literal>net.sourceforge.plantuml:plantuml:<?dep plantUml?></literal></para>
+</listitem>
+<listitem>
+<para><literal>de.rototor.jeuclid:jeuclid-core:<?dep jeuclidCore?></literal></para>
+</listitem>
+<listitem>
+<para><literal>ditaa<?dep ditaa?>.jar</literal>, included in the XML Calabash
+extension because it’s not available through Maven.</para>
+</listitem>
+</itemizedlist>
+</refsection>

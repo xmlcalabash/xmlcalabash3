@@ -1,4 +1,5 @@
 @startuml
+skinparam backgroundColor #FFFFF8
 
 class BaseClass
 

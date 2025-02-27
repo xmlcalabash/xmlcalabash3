@@ -1,4 +1,6 @@
 @startebnf
+skinparam backgroundColor #FFFFF8
+
 grammar = { rule };
 rule = lhs , "=" (* definition *) , rhs , ";" (* termination *);
 lhs = identifier ;

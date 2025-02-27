@@ -1,4 +1,6 @@
 @startjson
+skinparam backgroundColor #FFFFF8
+
 #highlight "lastName"
 #highlight "address" / "city"
 #highlight "phoneNumbers" / "0" / "number"
