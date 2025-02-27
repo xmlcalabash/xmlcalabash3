@@ -89,7 +89,16 @@ class XmlViewportComposer(val stepConfig: XProcStepConfiguration, val match: Str
 
         override fun startElement(node: XdmNode, attributes: AttributeMap): Boolean {
             val builder = SaxonTreeBuilder(stepConfig)
-            builder.startDocument(node.baseURI)
+
+            // Special case for a document element with a relative base URI. Make sure that the base
+            // URI that will get computed for the document element will be correct.
+            val baseUri = if (node.getAttributeValue(NsXml.base) != null && !URI(node.getAttributeValue(NsXml.base)).isAbsolute) {
+                node.parent.baseURI
+            } else {
+                node.baseURI
+            }
+
+            builder.startDocument(baseUri)
             builder.addSubtree(node)
             builder.endDocument()
             viewportItems.add(XmlViewportItem(stepConfig, builder.result))

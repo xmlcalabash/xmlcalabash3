@@ -41,7 +41,7 @@ class ProcessMatch(val stepConfig: XProcStepConfiguration,
 
         // If we start a match at an element, fake a document wrapper
         if (doc.nodeKind != XdmNodeKind.DOCUMENT) {
-            startDocument(doc.baseURI)
+            startDocument(doc.parent.baseURI)
         }
 
         traverse(doc)
