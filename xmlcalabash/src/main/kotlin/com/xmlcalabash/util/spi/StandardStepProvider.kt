@@ -38,6 +38,7 @@ import com.xmlcalabash.steps.LabelElementsStep
 import com.xmlcalabash.steps.LoadStep
 import com.xmlcalabash.steps.MakeAbsoluteUrisStep
 import com.xmlcalabash.steps.MarkdownToHtml
+import com.xmlcalabash.steps.MessageStep
 import com.xmlcalabash.steps.NamespaceDeleteStep
 import com.xmlcalabash.steps.NamespaceRenameStep
 import com.xmlcalabash.steps.PackStep
@@ -134,6 +135,7 @@ class StandardStepProvider: AtomicStepManager, AtomicStepProvider {
         NsP.load                to { _: StepParameters? -> LoadStep() },
         NsP.makeAbsoluteUris    to { _: StepParameters? -> MakeAbsoluteUrisStep() },
         NsP.markdownToHtml      to { _: StepParameters? -> MarkdownToHtml() },
+        NsP.message             to { _: StepParameters? -> MessageStep() },
         NsP.namespaceDelete     to { _: StepParameters? -> NamespaceDeleteStep() },
         NsP.namespaceRename     to { _: StepParameters? -> NamespaceRenameStep() },
         NsP.osExec              to { _: StepParameters? -> OsExec() },
