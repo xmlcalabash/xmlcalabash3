@@ -1012,7 +1012,7 @@ class XplParser internal constructor(val builder: PipelineBuilder) {
                     else -> {
                         if ((atomic.instructionType.namespaceUri == NsP.namespace && name == Ns.message)
                             || (atomic.instructionType.namespaceUri != NsP.namespace && name == NsP.message)) {
-                            atomic.withOption(name, XProcExpression.avt(atomic.stepConfig, value))
+                            atomic.message(XProcExpression.avt(atomic.stepConfig, value))
                         } else {
                             if (name.namespaceUri != NamespaceUri.NULL) {
                                 atomic.setExtensionAttribute(name, value)

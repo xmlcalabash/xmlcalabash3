@@ -1,5 +1,6 @@
 package com.xmlcalabash.runtime.steps
 
+import com.xmlcalabash.datamodel.DeclareStepInstruction
 import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.namespace.Ns
@@ -134,11 +135,18 @@ class CompoundStepHead(config: XProcStepConfiguration, val parent: CompoundStep,
     }
 
     override fun prepare() {
-        for ((name, details) in staticOptions) {
-            if ((parent.type.namespaceUri == NsP.namespace && name == Ns.message)
-                || (parent.type.namespaceUri != NsP.namespace && name == NsP.message)) {
-                message = details.staticValue.evaluate(stepConfig)
-            }
+        val ns = if (parent is PipelineStep && parent.stepType != null) {
+            parent.stepType!!.namespaceUri
+        } else {
+            parent.type.namespaceUri
+        }
+        val matchingName = if (ns == NsP.namespace) {
+            Ns.message
+        } else {
+            NsP.message
+        }
+        if (matchingName in staticOptions) {
+            message = staticOptions[matchingName]!!.staticValue.evaluate(stepConfig)
         }
     }
 

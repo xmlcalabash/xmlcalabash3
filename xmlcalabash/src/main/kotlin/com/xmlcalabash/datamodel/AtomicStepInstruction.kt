@@ -160,9 +160,18 @@ open class AtomicStepInstruction(parent: XProcInstruction, instructionType: QNam
         return withOption(name, null)
     }
 
+    open fun withOption(name: QName, value: String): WithOptionInstruction {
+        return withOption(name, XProcExpression.constant(stepConfig, XdmAtomicValue(value)))
+    }
+
     open fun withOption(name: QName, expr: XProcExpression?): WithOptionInstruction {
         if (children.filterIsInstance<WithOptionInstruction>().any { it.name == name }) {
             throw stepConfig.exception(XProcError.xsDuplicateWithOption(name))
+        }
+
+        if ((instructionType.namespaceUri == NsP.namespace && name == Ns.message)
+            || (instructionType.namespaceUri != NsP.namespace && name == NsP.message)) {
+            throw stepConfig.exception(XProcError.xsNoSuchOption(name))
         }
 
         val withOption = WithOptionInstruction(this, name, stepConfig.copy())
@@ -171,7 +180,20 @@ open class AtomicStepInstruction(parent: XProcInstruction, instructionType: QNam
         return withOption
     }
 
-    open fun withOption(name: QName, value: String): WithOptionInstruction {
-        return withOption(name, XProcExpression.constant(stepConfig, XdmAtomicValue(value)))
+    open fun message(message: XProcAvtExpression) {
+        var name = if (instructionType.namespaceUri == NsP.namespace) {
+            Ns.message
+        } else {
+            NsP.message
+        }
+
+        if (children.filterIsInstance<WithOptionInstruction>().any { it.name == name }) {
+            throw stepConfig.exception(XProcError.xsDuplicateWithOption(name))
+        }
+
+        val option = WithOptionInstruction(this, name, stepConfig.copy())
+        option.select = message
+        option.asType = SequenceType.ANY
+        _children.add(option)
     }
 }
