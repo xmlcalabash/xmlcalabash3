@@ -79,6 +79,7 @@ class StandardLibrary private constructor(builder: PipelineBuilder, private val 
         pLoad()
         pMakeAbsoluteUris()
         pMarkdownToHtml()
+        pMessage()
         pNamespaceDelete()
         pNamespaceRename()
         pOsExec()
@@ -956,6 +957,23 @@ class StandardLibrary private constructor(builder: PipelineBuilder, private val 
         return decl
     }
 
+    private fun pMessage(): DeclareStepInstruction {
+        val decl = library.declareStep()
+        decl._type = stepConfig.parseQName("p:message")
+
+        val input = decl.input("source", primary=true, sequence=true)
+
+        val output = decl.output("result", primary=true, sequence=true)
+
+        var option = decl.option(QName("test"))
+        option.select = XProcExpression.select(stepConfig, "true()")
+        option.asType = stepConfig.parseSequenceType("xs:boolean")
+        option = decl.option(QName("select"))
+        option.asType = stepConfig.parseSequenceType("xs:string")
+
+        return decl
+    }
+
     private fun pNamespaceDelete(): DeclareStepInstruction {
         val decl = library.declareStep()
         decl._type = stepConfig.parseQName("p:namespace-delete")
@@ -1816,4 +1834,3 @@ class StandardLibrary private constructor(builder: PipelineBuilder, private val 
         return decl
     }
 }
-

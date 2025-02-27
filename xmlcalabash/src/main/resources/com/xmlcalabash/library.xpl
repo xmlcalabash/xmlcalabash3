@@ -352,6 +352,14 @@
       <p:output port="result" primary="true" content-types="html"/>
       <p:option name="parameters" as="map(xs:QName, item()*)?"/>
    </p:declare-step>
+
+<p:declare-step type="p:message">
+  <p:input port="source" sequence="true"/>
+  <p:output port="result" sequence="true"/>
+  <p:option name="test" as="xs:boolean" select="true()"/>
+  <p:option name="select" as="xs:string"/>
+</p:declare-step>
+
    <p:declare-step type="p:namespace-delete" xml:id="namespace-delete">
       <p:input port="source" content-types="xml html"/>
       <p:output port="result" content-types="xml html"/>
