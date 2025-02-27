@@ -183,13 +183,21 @@ class S9Api {
                             throw XProcError.xdInvalidSelection(value.nodeName).exception()
                         }
 
+                        // Special case for a document element with a relative base URI. Make sure that the base
+                        // URI that will get computed for the document element will be correct.
+                        val baseUri = if (value.getAttributeValue(NsXml.base) != null && !URI(value.getAttributeValue(NsXml.base)).isAbsolute) {
+                            value.parent.baseURI
+                        } else {
+                            value.baseURI
+                        }
+
                         val props = DocumentProperties()
-                        if (value.baseURI != null) {
-                            props[Ns.baseUri] = value.baseURI
+                        if (baseUri != null) {
+                            props[Ns.baseUri] = baseUri
                         }
 
                         val builder = SaxonTreeBuilder(stepConfig.processor)
-                        builder.startDocument(value.baseURI)
+                        builder.startDocument(baseUri)
                         builder.addSubtree(value)
                         builder.endDocument()
 
