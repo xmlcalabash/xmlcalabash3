@@ -10,6 +10,8 @@
                 exclude-result-prefixes="#all"
                 version="3.0">
 
+<xsl:output method="text"/>
+
 <xsl:variable name="nl" select="'&#10;'"/>
 
 <xsl:template match="dot:digraph">
@@ -39,32 +41,21 @@
   <xsl:value-of select="@xml:id"/>
   <xsl:text>" {{&#10;</xsl:text>
   <xsl:apply-templates select="." mode="properties"/>
+  <xsl:apply-templates/>
+  <xsl:text>}}&#10;</xsl:text>
+</xsl:template>
+
+<xsl:template match="dot:subgraph" mode="properties">
+  <xsl:if test="not(@label)">
+    <xsl:text>label = ""{$nl}</xsl:text>
+  </xsl:if>
+
   <xsl:for-each select="@*">
     <xsl:value-of select="local-name(.)"/>
     <xsl:text> = "</xsl:text>
     <xsl:value-of select="."/>
     <xsl:text>";&#10;</xsl:text>
   </xsl:for-each>
-
-  <xsl:apply-templates/>
-  <xsl:text>}}&#10;</xsl:text>
-</xsl:template>
-
-<xsl:template match="dot:subgraph" mode="properties">
-  <xsl:if test="@peripheries">
-    <xsl:text>peripheries = {@peripheries}{$nl}</xsl:text>
-  </xsl:if>
-  <xsl:choose>
-    <xsl:when test="@label">
-      <xsl:text>label = "{@label}"{$nl}</xsl:text>
-      <xsl:if test="@labeljust">
-        <xsl:text>labeljust={@labeljust}{$nl}</xsl:text>
-      </xsl:if>
-    </xsl:when>
-    <xsl:otherwise>
-      <xsl:text>label = ""{$nl}</xsl:text>
-    </xsl:otherwise>
-  </xsl:choose>
 </xsl:template>
 
 <xsl:template match="dot:input|dot:output">
