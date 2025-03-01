@@ -66,22 +66,29 @@
 
 <xsl:template match="ns:compound-step" name="compound-step">
   <dot:subgraph xml:id="cluster_{generate-id(.)}" labeljust="c">
-    <xsl:attribute name="label">
-      <xsl:sequence select="@type"/>
-      <xsl:if test="not(starts-with(@name, '!'))">
-        <xsl:sequence select="' / ' || @name"/>
-      </xsl:if>
-    </xsl:attribute>
+    <xsl:variable name="step-name" as="xs:string?"
+                  select="if (not(starts-with(@name, '!')))
+                          then string(@name)
+                          else ()"/>
+
+    <xsl:attribute name="label"
+                   select="@type
+                           || (if (@type and $step-name) then ' / ' else ())
+                           || $step-name"/>
 
     <xsl:if test="ns:with-input|ns:input">
       <dot:subgraph xml:id="cluster_{generate-id(.)}_head" peripheries="0" shape="diamond">
         <xsl:call-template name="compound-head"/>
       </dot:subgraph>
     </xsl:if>
+
     <xsl:apply-templates select="ns:atomic-step|ns:compound-step"/>
-    <dot:subgraph xml:id="cluster_{generate-id(.)}_foot" peripheries="0" shape="diamond">
-      <xsl:call-template name="compound-foot"/>
-    </dot:subgraph>
+
+    <xsl:if test="ns:output">
+      <dot:subgraph xml:id="cluster_{generate-id(.)}_foot" peripheries="0" shape="diamond">
+        <xsl:call-template name="compound-foot"/>
+      </dot:subgraph>
+    </xsl:if>
   </dot:subgraph>
 </xsl:template>
 
