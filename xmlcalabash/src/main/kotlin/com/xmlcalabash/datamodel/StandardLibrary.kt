@@ -969,7 +969,8 @@ class StandardLibrary private constructor(builder: PipelineBuilder, private val 
         option.select = XProcExpression.select(stepConfig, "true()")
         option.asType = stepConfig.parseSequenceType("xs:boolean")
         option = decl.option(QName("select"))
-        option.asType = stepConfig.parseSequenceType("xs:string")
+        option.asType = stepConfig.parseSequenceType("item()*")
+        option.required = true
 
         return decl
     }

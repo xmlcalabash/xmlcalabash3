@@ -8,8 +8,10 @@ open class MessageStep(): AbstractAtomicStep() {
 
         val test = booleanBinding(Ns.test)!!
         if (test) {
-            val message = stringBinding(Ns.select)!!
-            stepConfig.info { message }
+            val value = options[Ns.select]!!.value
+            for (item in value.iterator()) {
+                stepConfig.info { item.toString() }
+            }
         }
 
         for (doc in queues["source"]!!) {
