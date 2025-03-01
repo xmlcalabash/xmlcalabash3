@@ -17,7 +17,7 @@
 <title>Introduction</title>
 <para>The <tag>cx:selenium</tag> step uses
 <link xlink:href="https://www.selenium.dev/">Selenium</link> to automate a web
-browser. The step can drive the browser and extract all or part of rendered pages.</para>
+browser. The step can drive a web browser and extract all or part of rendered pages.</para>
 </refsection>
 
 <refsection role="step-declaration">
@@ -35,11 +35,850 @@ browser. The step can drive the browser and extract all or part of rendered page
 <refsection>
 <title>Description</title>
 
-<para>Selenium automates browsers.</para>
+<para>Selenium automates browsers. Steps like <tag>p:http-request</tag> can
+interact with the web, making selected, individual requests. The
+<tag>cx:selenium</tag> step fires up an actual web browser and interacts with
+it. In practice, what this means is that JavaScript is executed and the result
+is available to the step.</para>
 
-<para>T.B.D.</para>
+<para>Selenium is widely used for testing web applications. There are lots of programming APIs
+that can drive it. What the <tag>cx:selenium</tag> step does is expose that
+functionality through a small scripting language.</para>
+
+<para>The goal here is to make a language that’s easy to use for common sorts of
+tasks, not one that can do <emphasis>everything</emphasis> that Selenium can do.
+It’s also been invented in a somewhat ad hoc manner by someone with relatively
+little Selenium programming experience. Suggestions for improvements are welcome.</para>
+
+<refsection>
+<title>Whitelisting</title>
+
+<para>The <tag>cx:selenium</tag> step is running an actual web browser. In
+principle, if you can do something with a web browser, you can do it with this
+step: login to your bank, order pizza, etc. Care is advised.</para>
+
+<para>It is possible to whitelist the URIs that <tag>cx:selenium</tag> will
+load. Add a <tag>selenium</tag> element to your configuration:</para>
+
+<programlisting language="xml"><![CDATA[<x:selenium xmlns:x="https://xmlcalabash.com/ext/ns/selenium"
+            whitelist="http://localhost.*
+                       https://testdata.xmlcalabash.com/.*"/>]]></programlisting>
+
+<para>The <tag class="attribute">whitelist</tag> attribute is a space-separated
+list of regular expressions. If the page URI matches one of those regular expressions,
+the step will run.
+<error code="cxerr:XC0023">It is a <glossterm>dynamic
+error</glossterm> if page URI does not match at least one of the whitelist expressions.</error>
+</para>
 
 </refsection>
+
+<refsection>
+<title>The scripting language</title>
+
+<para>A <tag>cx:selenium</tag> script begins with a version declaration,
+identifies the page to open in the browser, and has one or more statements.</para>
+
+<figure xml:id="fig.scripting.railroad">
+<title>Overall structure of a cx:selenium script</title>
+<programlisting role="railroad">
+script ::= "script version 0.2" "." "page" string "." statement+
+</programlisting>
+</figure>
+
+<para>The scripting language is described in part with
+“<link xlink:href="https://en.wikipedia.org/wiki/Syntax_diagram">railroad diagrams</link>”.
+They indicate how a script is constructed from various constructs. In the
+diagrams, an oval containing bold text represents something you literally type.
+Words in rectangles are references to other parts of the grammar and what’s
+expected there is some example of that construct. Generally speaking, whitespace is
+expected between the ovals and boxes, except that whitespace around punctuation
+is often optional.</para>
+
+<para>The summary in <xref linkend="fig.scripting.railroad"/> indicates that a
+script begins with the literal text “<literal>script version 0.2</literal>”
+followed by (optional) whitespace, the literal text “<literal>.</literal>”,
+whitespace, the literal text “<literal>page</literal>”, whitespace, any
+<emphasis linkend="fig.string.railroad">string</emphasis>, the literal text
+“<literal>.</literal>”, and one or more <emphasis
+linkend="fig.statement.railroad">statements</emphasis>. For example:</para>
+
+<screen>script version 0.2. page "http://example.com/" .
+output "Hello, world." .
+</screen>
+
+<para>Currently, the only version supported is “0.2”.</para>
+
+<refsection>
+<title>Statement</title>
+
+<para>There are four blocks and about 20 different kinds of statements.</para>
+
+<figure xml:id="fig.statement.railroad">
+<title>A statement</title>
+<programlisting role="railroad">
+statement ::= (simpleStatement ".") | block | perform
+</programlisting>
+</figure>
+
+<para>A “simple” statement stands alone. A subset of the simple statements, the
+“compound” statements, can be joined together and performed at once. (This is an
+analog for the Selenium concept of building a sequence of actions and then
+performing them.)</para>
+
+<figure xml:id="fig.simpleStatement.railroad">
+<title>A simple statement</title>
+<programlisting role="railroad">
+simpleStatement ::= compoundStatement
+                  | call
+                  | close
+                  | cookie
+                  | find
+                  | message
+                  | navigate
+                  | output
+                  | refresh
+                  | reset
+                  | set
+                  | waitReady
+                  | window
+</programlisting>
+</figure>
+
+<figure xml:id="fig.compoundStatement.railroad">
+<title>A compound statement</title>
+<programlisting role="railroad">
+compoundStatement ::= click
+                    | drag
+                    | key
+                    | move
+                    | pause
+                    | release
+                    | scroll
+                    | send
+</programlisting>
+</figure>
+
+<figure xml:id="fig.perform.railroad">
+<title>A perform statement</title>
+<programlisting role="railroad">
+perform ::= compoundStatement ("then" compoundStatement)+ "."
+</programlisting>
+</figure>
+</refsection>
+
+<refsection xml:id="fig.block.railroad">
+<title>Blocks</title>
+<para>There are four kinds of blocks: three conditionals (if, while, until) and
+subroutines.
+</para>
+</refsection>
+
+<refsection xml:id="selenium-conditional-blocks">
+<title>Conditional blocks</title>
+
+<figure xml:id="fig.if.railroad">
+<title>An if block</title>
+<programlisting role="railroad">
+if ::= "if" expression "then" statement+ "endif"
+</programlisting>
+</figure>
+
+<para>The statements in an “if” block are evaluated if (and only if) the
+effective boolean value of the test expression is true. An <phrase
+xml:id="fig.expression.railroad">expression</phrase> is a quoted string
+containing an XPath expression.</para>
+
+<figure xml:id="fig.while.railroad">
+<title>A while block</title>
+<programlisting role="railroad">
+while ::= "while" expression "do" statement+ "done"
+</programlisting>
+</figure>
+
+<para>The statements in a “while” block are evaluated repeatedly as long as the effective
+boolean value of the test expression is true. If the test expression is initially false,
+the statements in the block are not executed at all.</para>
+
+<figure xml:id="fig.until.railroad">
+<title>An until block</title>
+<programlisting role="railroad">
+until ::= "until" expression "do" statement+ "done"
+</programlisting>
+</figure>
+
+<para>The statements in an “until” block are evaluated repeatedly as long as the effective
+boolean value of the test expression is true. The statements are always evaluated at least
+once, the expression is tested at the end of each loop.</para>
+</refsection>
+
+<refsection xml:id="selenium-subroutine">
+<title>Subroutines</title>
+
+<figure xml:id="fig.subroutine.railroad">
+<title>An subroutine</title>
+<programlisting role="railroad">
+subroutine = (-"sub" | -"subroutine"), @name, #a, statement*, -"end" .
+</programlisting>
+</figure>
+
+<para>Subroutines are a way to group statements that you can evaluate with the
+<literal>call</literal> statement. Subroutines are collected before script evaluation begins,
+so they can appear anywhere a statement can occur, even if that’s after <literal>call</literal>
+statements that refers to them. All subroutine names must be unique.
+</para>
+
+<para>The name and the first statement must be separated by at least one
+newline.</para>
+</refsection>
+
+<refsection xml:id="selenium-find">
+<title>find statement</title>
+
+<para>A find statement locates an element on the page and stores its (HTML) content
+in a variable. With the <literal>all</literal> keyword, it finds all of the elements that
+match the locator. If <literal>wait</literal> is added, the processor will wait as long
+as the specified duration for the locator to find at least one match. A <literal>pause</literal>
+specifies the duration to wait between each attempt; the default is 0.25s.</para>
+
+<para>In Selenium, it’s an error if the locator doesn’t match anything. In the
+<tag>cx:selenium</tag> step, it’s not an error, the variable will simply hold
+the empty sequence. If, however, a further attempt is made to perform a Selenium
+action with the variable (click on it or send text to it, for example), an error
+will occur. You can avoid this by first testing if the variable is empty.</para>
+
+<figure xml:id="fig.find.railroad">
+<title>The find statement</title>
+<programlisting role="railroad 700">
+find ::= "find" "all"? varname "by"? 
+         ("name" | "selector" | "id" | "link-text" | "partial-link-text"
+          | "tag" | "class" | "xpath") "=" string
+          ("wait" duration)? ("pause" duration)?
+</programlisting>
+</figure>
+
+<para>The token that follows “by” identifies the kind of match to be performed and
+consequently the form that the following string must have:</para>
+
+<informaltable>
+<tgroup cols="3">
+<colspec colwidth="1*"/>
+<colspec colwidth="2*"/>
+<colspec colwidth="1*"/>
+<thead>
+<row>
+  <entry>Token</entry>
+  <entry>Find by …</entry>
+  <entry>Example string</entry>
+</row>
+</thead>
+<tbody>
+<row>
+  <entry><literal>name</literal></entry>
+  <entry>Name attribute</entry>
+  <entry>button-name</entry>
+</row>
+<row>
+  <entry><literal>selector</literal></entry>
+  <entry>CSS selector</entry>
+  <entry>.someClass</entry>
+</row>
+<row>
+  <entry><literal>id</literal></entry>
+  <entry>ID</entry>
+  <entry>someId</entry>
+</row>
+<row>
+  <entry><literal>link-text</literal></entry>
+  <entry>Exact text of a link</entry>
+  <entry>click here</entry>
+</row>
+<row>
+  <entry><literal>partial-link-text</literal></entry>
+  <entry>Partial text of a link</entry>
+  <entry>click</entry>
+</row>
+<row>
+  <entry><literal>tag</literal></entry>
+  <entry>Element name</entry>
+  <entry>form</entry>
+</row>
+<row>
+  <entry><literal>class</literal></entry>
+  <entry>Class name</entry>
+  <entry>someClass</entry>
+</row>
+<row>
+  <entry><literal>xpath</literal></entry>
+  <entry>XPath (1.0) expression</entry>
+  <entry>/html/body/h1[2]</entry>
+</row>
+</tbody>
+</tgroup>
+</informaltable>
+
+<para>There is one, global scope for variable names and they are mutable. Whether they are
+set with <link linkend="selenium-find">find</link> or
+<link linkend="selenium-set">set</link>, whether they are set in the main body of the script
+or in a <link linkend="selenium-subroutine">subroutine</link>, they always have the 
+last value set.</para>
+
+</refsection>
+
+<refsection xml:id="selenium-set">
+<title>set statement</title>
+
+<para>A set statement sets a variable to some value. This can be some property of
+the window or page, a cookie, a string, the result of evaluating an XPath expression,
+or to the property of some element on the page.</para>
+
+<figure xml:id="fig.set.railroad">
+<title>The set statement</title>
+<programlisting role="railroad">
+set ::= "set" varname "to"?
+   (   ("window" ("width" | "height" | "x" | "y"))
+     | ("page" ("url" | "title"))
+     | ("cookie" (string | name))
+     | ("string" string)
+     | ("xpath" expression)
+     | ("element" varname property)
+   )
+</programlisting>
+</figure>
+
+<para>Where <phrase xml:id="fig.property.railroad">property</phrase> is a synonym
+for <phrase linkend="fig.name.railroad">name</phrase>.
+The token that follows “to” identifies the kind of query to be performed.</para>
+
+<variablelist>
+<varlistentry>
+<term><literal>window</literal></term>
+<listitem><para>The size or location of the browser window.
+</para>
+<screen>set $width to window width.</screen>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term><literal>page</literal></term>
+<listitem><para>The URL or title of the page.
+</para>
+<screen>set $title to window title.</screen>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term><literal>cookie</literal></term>
+<listitem><para>The value of the cookie named. If the cookie name doesn’t
+conform to the constraints of a <phrase linkend="fig.name.railroad">name</phrase>,
+put the name in a quoted string.
+</para>
+<screen>set $login to cookie login-id.</screen>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term><literal>string</literal></term>
+<listitem><para>The string provided.
+</para>
+<screen>set $hello to string "Hello, world.".</screen>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term><literal>xpath</literal></term>
+<listitem><para>The result of evaluating the XPath expression. Unlike the XPath
+expression in a <phrase linkend="selenium-find">find</phrase> statement, which is
+evaluated by Selenium and must be an XPath 1.0 expression, this expression is evaluated by
+the step and is an XPth 3.0 expression.
+</para>
+<screen>set $narrow to xpath "$width lt 600".</screen>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term><literal>element</literal></term>
+<listitem><para>Some property of the element in <varname>$varname</varname>.
+For example, if you used a <phrase linkend="selenium-find">find</phrase> statement to locate
+an <tag>input</tag> element on the page (<literal>$input</literal>), you could
+use a set statement to obtain its value:</para>
+<screen>set $value to element $input value .</screen>
+<para>This differs from <literal>find element …</literal> which returns the actual element.
+</para>
+</listitem>
+</varlistentry>
+</variablelist>
+
+<para>There is one, global scope for variable names and they are mutable. Whether they are
+set with <link linkend="selenium-find">find</link> or
+<link linkend="selenium-set">set</link>, whether they are set in the main body of the script
+or in a <link linkend="selenium-subroutine">subroutine</link>, they always have the 
+last value set.</para>
+</refsection>
+
+<refsection>
+<title>send statement</title>
+
+<para>The send statement sends text to the input on the page identified by
+<varname>$varname</varname>. Strings cannot contain newlines, so if you want to
+send a longer fragment, delimit it with 
+“¶”, “⁋”, “§”, or formfeed characters.</para>
+
+<figure xml:id="fig.send.railroad">
+<title>The send statement</title>
+<programlisting role="railroad">
+send = -"send", @string, ((-"to")?, @varname)?
+     | -"send", -"¶", ~["¶"]*, -"¶", (-"to")?, @varname
+     | -"send", -"⁋", ~["⁋"]*, -"⁋", (-"to")?, @varname
+     | -"send", -"§", ~["§"]*, -"§", (-"to")?, @varname
+     | -"send", -#c, ~[#c]*, -#c, (-"to")?, @varname .
+</programlisting>
+</figure>
+</refsection>
+
+<refsection>
+<title>click statement</title>
+<para>The click statement simulates clicking on the element identified
+by <varname>$varname</varname>.</para>
+
+<figure xml:id="fig.click.railroad">
+<title>The click statement</title>
+<programlisting role="railroad">
+click ::=  (("click" | "doubleclick") | ("click" "and" "hold")) varname?
+</programlisting>          
+</figure>
+</refsection>
+
+<refsection>
+<title>wait statement</title>
+
+<para>There are two forms of the wait statement, “wait until ready” and
+“wait for a duration” in the <link linkend="selenium-find">find</link> statement.</para>
+
+<para>The “wait until ready” statement waits until the page is ready. That is, it
+waits until the page indicates that <code>document.readyState</code> is
+“complete”.</para>
+
+<figure xml:id="fig.waitReady.railroad">
+<title>The wait until ready statement</title>
+<programlisting role="railroad">
+wait ::= "wait" "until"? "ready"
+</programlisting>          
+</figure>
+
+<para>The “wait for a duration” statement waits for a specified duration.</para>
+
+<figure xml:id="fig.wait.railroad">
+<title>The wait statement</title>
+<programlisting role="railroad">
+wait ::= "wait" duration
+</programlisting>          
+</figure>
+</refsection>
+
+<refsection>
+<title>pause statement</title>
+
+<para>The pause statement waits for a specified duration.</para>
+
+<figure xml:id="fig.pause.railroad">
+<title>The pause statement</title>
+<programlisting role="railroad">
+pause = -"pause", duration .
+</programlisting>          
+</figure>
+</refsection>
+
+<refsection>
+<title>message statement</title>
+<para>The message statement computes the value of the expression
+and sends it to the message handler at the “info” level.</para>
+
+<figure xml:id="fig.message.railroad">
+<title>The message statement</title>
+<programlisting role="railroad">
+message ::= "message" expression
+</programlisting>          
+</figure>
+</refsection>
+
+<refsection>
+<title>output statement</title>
+<para>The output statement sends output from the step. The element on the page
+identified by <varname>$varname</varname>, arbitrary text, or the result of
+evaluating an expression can be sent to the <port>result</port> port.</para>
+<figure xml:id="fig.output.railroad">
+<title>The output statement</title>
+<programlisting role="railroad">
+output = -"output", @string, (-"to")?, -"result"
+       | -"output", "xpath", @string, (-"to")?, -"result"
+       | -"output", (@varname)?, (-"to")?, -"result"
+       | -"output", -"¶", ~["¶"]*, -"¶", (-"to")?, -"result"
+       | -"output", -"⁋", ~["⁋"]*, -"⁋", (-"to")?, -"result"
+       | -"output", -"§", ~["§"]*, -"§", (-"to")?, -"result"
+       | -"output", -#c, ~[#c]*, -#c, (-"to")?, -"result" .
+</programlisting>          
+</figure>
+
+<para>Each output statement creates a new document on the <port>result</port> port.</para>
+</refsection>
+
+<refsection>
+<title>window statement</title>
+<para>The window statement updates aspects of the browser window.</para>
+<figure xml:id="fig.window.railroad">
+<title>The window statement</title>
+<programlisting role="railroad">
+window ::= "window" ("minimize" | "maximize" | "fullscreen"
+                    | ("size" integer "x" integer)
+                    | ("position" integer "," integer))
+</programlisting>          
+</figure>
+</refsection>
+
+<refsection>
+<title>cookie statement</title>
+<para>The cookie statement sets a cookie. If the name of the cookie satisfies
+the constraints of a <phrase linkend="fig.name.railroad">name</phrase>, then
+you can just use the name. For arbitrary names, use a string.</para>
+<figure xml:id="fig.cookie.railroad">
+<title>The cookie statement</title>
+<programlisting role="railroad">
+cookie ::= "cookie" (name | string) "=" string ("path" "=" string)? ("duration" duration)?
+</programlisting>          
+</figure>
+</refsection>
+
+<refsection>
+<title>scroll statement</title>
+<para>The scroll statement attempts to scroll the browser window. This statement
+seems to be somewhat inconsistently implemented by browsers. Firefox, for example, won’t
+scroll to an element not already visible in the viewport.</para>
+<para>To support scrolling arbitrarily, the <tag>cx:selenium</tag> step implements
+“scroll to $varname” by evaluating the JavaScript expression
+<code>varname.scrollIntoView(true)</code>.</para>
+
+<figure xml:id="fig.scroll.railroad">
+<title>The scroll statement</title>
+<programlisting role="railroad">
+scroll ::= "scroll" (("to" varname) | ("by" integer "," integer)
+                     | ("from" varname "by"? integer "," integer))
+</programlisting>          
+</figure>
+</refsection>
+
+<refsection>
+<title>move statement</title>
+<para>The move command moves to the element identified by <varname>$varname</varname>.</para>
+<figure xml:id="fig.move.railroad">
+<title>The move statement</title>
+<programlisting role="railroad">
+move ::= "move" "to"? varname
+</programlisting>          
+</figure>
+</refsection>
+
+<refsection>
+<title>release statement</title>
+<para>The release statement releases the mouse after a “click and hold”
+statement.</para>
+<figure xml:id="fig.release.railroad">
+<title>The move statement</title>
+<programlisting role="railroad">
+release ::= "release"
+</programlisting>          
+</figure>
+</refsection>
+
+<refsection>
+<title>drag statement</title>
+<para>The drag statement drags one element to another.</para>
+<figure xml:id="fig.drag.railroad">
+<title>The drag statement</title>
+<programlisting role="railroad">
+drag ::= "drag" ("and" "drop")? varname "to"? varname
+</programlisting>          
+</figure>
+</refsection>
+
+<refsection>
+<title>navigate statement</title>
+<para>The navigate statement changes the page in the browser.</para>
+
+<figure xml:id="fig.navigate.railroad">
+<title>The navigate statement</title>
+<programlisting role="railroad">
+navigate ::= "navigate" ("forward" | ("back" | "backwards") | ("to" string))
+</programlisting>          
+</figure>
+</refsection>
+
+<refsection>
+<title>refresh statement</title>
+<para>The refresh statement refreshes the page.</para>
+
+<figure xml:id="fig.refresh.railroad">
+<title>The refresh statement</title>
+<programlisting role="railroad">
+refresh ::= "refresh"
+</programlisting>          
+</figure>
+</refsection>
+
+<refsection>
+<title>reset statement</title>
+<para>The reset statement resets Selenium.</para>
+
+<figure xml:id="fig.reset.railroad">
+<title>The reset statement</title>
+<programlisting role="railroad">
+reset ::= "reset"
+</programlisting>          
+</figure>
+</refsection>
+
+<refsection>
+<title>close statement</title>
+<para>The close statement closes the browser.</para>
+
+<figure xml:id="fig.close.railroad">
+<title>The close statement</title>
+<programlisting role="railroad">
+close ::= "close"
+</programlisting>          
+</figure>
+
+<para>This ends the script.</para>
+
+</refsection>
+
+<refsection>
+<title>key statement</title>
+<para>The key statement presses or releases a key.</para>
+<figure xml:id="fig.key.railroad">
+<title>The key statement</title>
+<programlisting role="railroad">
+key ::= "key" ("up" | "down") (keyname | char)
+</programlisting>          
+</figure>
+
+<para>Where a keyname is one of the names in <xref linkend="fig.keyname.railroad"/>
+and a <phrase xml:id="fig.char.railroad">char</phrase> is any string containing a
+single character.</para>
+
+<figure xml:id="fig.keyname.railroad">
+<title>The key names</title>
+<programlisting role="railroad">
+keyname ::= "ADD" | "ALT" | "ARROW_DOWN" | "ARROW_LEFT" | "ARROW_RIGHT" | "ARROW_UP"
+              | "BACK_SPACE" | "CANCEL" | "CLEAR" | "COMMAND" | "CONTROL" | "DECIMAL"
+              | "DELETE" | "DIVIDE" | "DOWN" | "END" | "ENTER" | "EQUALS" | "ESCAPE"
+              | "F1" | "F2" | "F3" | "F4" | "F5" | "F6" | "F7" | "F8" | "F9" | "F10" | "F11" | "F12"
+              | "HELP" | "HOME" | "INSERT"
+              | "LEFT" | "LEFT_ALT" | "LEFT_CONTROL" | "LEFT_SHIFT" | "META"
+              | "MULTIPLY" | "NULL" | "NUMPAD0" | "NUMPAD1" | "NUMPAD2" | "NUMPAD3"
+              | "NUMPAD4" | "NUMPAD5" | "NUMPAD6" | "NUMPAD7" | "NUMPAD8" | "NUMPAD9"
+              | "PAGE_DOWN" | "PAGE_UP" | "PAUSE" | "RETURN" | "RIGHT"
+              | "SEPARATOR" | "SHIFT" | "SPACE" | "SUBTRACT" | "TAB" | "UP"
+</programlisting>          
+</figure>
+</refsection>
+
+<refsection>
+<title>call statement</title>
+<para>The call statement calls a defined subroutine.</para>
+
+<figure xml:id="fig.call.railroad">
+<title>The call statement</title>
+<programlisting role="railroad">
+call ::= ("call" | "gosub") name
+</programlisting>          
+</figure>
+</refsection>
+
+<refsection>
+<title>Names</title>
+
+<para>A name is a letter or an underscore followed by a letters, numbers, and variety of
+punctuation characters.</para>
+
+<figure xml:id="fig.name.railroad">
+<title>Names</title>
+<programlisting role="railroad">
+name = namestart, namefollower*.
+</programlisting>          
+</figure>
+
+<figure xml:id="fig.namestart.railroad">
+<title>Name start characters</title>
+<programlisting role="railroad">
+namestart = "_" | UnicodeL .
+</programlisting>          
+</figure>
+
+<para>Where “<literal xml:id="fig.UnicodeL.railroad">UnicodeL</literal>” is any
+Unicode character in the “L” category (letters).</para>
+
+<figure xml:id="fig.namefollower.railroad">
+<title>Name following characters</title>
+<programlisting role="railroad">
+namefollower = namestart | ["-.·‿⁀"] | UnicodeNd | UnicodeMn .
+</programlisting>          
+</figure>
+
+<para>Where “<literal xml:id="fig.UnicodeNd.railroad">UnicodeNd</literal>” is any
+Unicode character in the “Nd” category (decimal numbers) and
+“<literal xml:id="fig.UnicodeMn.railroad">UnicodeNd</literal>” is any
+Unicode character in the “Mn” category (nonspacing marks).</para>
+</refsection>
+
+<refsection>
+<title>Variable names</title>
+
+<para>Like XPath, variable names begin with a <literal>$</literal>.</para>
+
+<figure xml:id="fig.varname.railroad">
+<title>Variable names</title>
+<programlisting role="railroad">
+varname ::= '$' name
+</programlisting>          
+</figure>
+</refsection>
+
+<refsection>
+<title>Strings</title>
+
+<para>Strings begin and end with quote delimiters and must not break across
+lines.</para>
+
+<figure xml:id="fig.string.railroad">
+<title>Strings</title>
+<programlisting role="railroad">
+string ::= ('"' [^#xa "] '"')
+         | ("'" [^#xa '] "'")
+         | ("“" [^#xa “”] "”")
+</programlisting>          
+</figure>
+</refsection>
+
+<refsection>
+<title>Durations</title>
+
+<para>A duration is a number of milliseconds or an <code>xs:dayTimeDuration</code>.</para>
+
+<figure xml:id="fig.duration.railroad">
+<title>Durations</title>
+<programlisting role="railroad">
+@duration = number
+          | "P", (integer, "D")
+          | "P", (integer, "D")?, "T", (integer, "H")?, (integer, "M")?, (number, "S")? .
+</programlisting>          
+</figure>
+</refsection>
+
+<refsection>
+<title>Integers and numbers</title>
+
+<para>Positive or negative integers or decimal numbers.</para>
+
+<figure xml:id="fig.integer.railroad">
+<title>Integers</title>
+<programlisting role="railroad">
+-integer = ["0"-"9"]+ | -"+", ["0"-"9"]+ | "-", ["0"-"9"]+ .
+</programlisting>          
+</figure>
+
+<para>Note that negative integers are forbidden
+in some contexts (for example, window sizes).</para>
+
+<figure xml:id="fig.number.railroad">
+<title>Numbers</title>
+<programlisting role="railroad">
+number = ["0"-"9"]+ (".", ["0"-"9"]+)? .
+</programlisting>          
+</figure>
+
+<para>There are no use cases for negative decimal numbers, so signs are not allowed.</para>
+
+</refsection>
+</refsection>
+</refsection>
+
+<refsection>
+<title>Example</title>
+
+<para>The following pipeline uses the <tag>cx:selenium</tag> step to load the
+“<link xlink:href="https://testdata.xmlcalabash.com/cities/">cities</link>” example page.
+This page displays a table cities in the United Kingdom with the country they’re in and
+their latitude and longitude. A “more” button loads more cities.</para>
+
+<para>The Selenium script clicks the “more” button until the city of Appleton is
+in the table, then it returns the latitude and longitude in two text documents.</para>
+
+<programlisting language="xml"><![CDATA[<p:declare-step xmlns:p="http://www.w3.org/ns/xproc"
+                xmlns:cx="http://xmlcalabash.com/ns/extensions"
+                name="main" version="3.0">
+  <p:import href="https://xmlcalabash.com/ext/library/selenium.xpl"/>
+
+  <p:output port="result" serialization="map{'method':text}" sequence="true"/>
+
+  <cx:selenium xmlns:h="http://www.w3.org/1999/xhtml">
+    <p:with-option name="arguments" select="('--headless')"/>
+    <p:with-input>
+      <p:inline content-type="text/plain">
+script version 0.2 .
+page "https://testdata.xmlcalabash.com/cities/" .
+
+# Wait until the table has been populated
+until "not(empty($row))" do
+  find $row by selector = "table tbody tr" .
+  pause PT0.25S .
+done
+
+# Search for Appleton, hit more until we find it
+find $city by xpath = "//td[. = 'Appleton']".
+while "empty($city)" do
+  call clickNext .
+  find $city by xpath = "//td[. = 'Appleton']".
+done
+
+find $row by xpath "//tr[td[. = 'Appleton']]" .
+
+output xpath "normalize-space($row/*:td[3])" to result .
+output xpath "normalize-space($row/h:td[4])" to result .
+
+close .
+
+subroutine clickNext
+  find $button by selector = "button" .
+  scroll to $button .
+  click $button .
+  pause PT0.25S .
+end  
+      </p:inline>
+    </p:with-input>
+  </cx:selenium>
+</p:declare-step>]]></programlisting>
+
+<para>It’s not written in an especially efficient way. It’s written to demonstrate
+a variety of statements and features.</para>
+
+</refsection>
+<refsection>
+<title>Dependencies</title>
+<para>This step is included in the XML Calabash application.
+If you are getting XML Calabash from Maven, you will also need to include
+the extension dependency:</para>
+
+<itemizedlist spacing="compact">
+<listitem>
+<para><literal>com.xmlcalabash:selenium:<?version?></literal></para>
+</listitem>
+</itemizedlist>
+
+<para>The following third-party dependencies will also be included transitively:</para>
+
+<itemizedlist spacing="compact">
+<listitem>
+<para><literal>org.seleniumhq.selenium:selenium-java:<?dep selenium?></literal></para>
+</listitem>
+</itemizedlist>
+</refsection>
+
 </refentry>
 
 

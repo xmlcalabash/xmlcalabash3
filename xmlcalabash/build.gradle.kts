@@ -160,6 +160,7 @@ buildConfig {
                   "rr",
                   "schxslt2",
                   "semargl",
+                  "selenium",
                   "sinclude",
                   "slf4j",
                   "tukaaniXz",
