@@ -388,6 +388,8 @@ open class XProcError protected constructor(val code: QName, val variant: Int, e
         fun xcxXmlUnitNotANodeMatcher(klass: String) = xstep(21, klass)
 
         fun xcxGrammarConversionFailed(type: String) = xstep(22, type)
+        fun xcxSeleniumNotWhitelisted(uri: String) = xstep(23, uri)
+        fun xcxSeleniumInvalidScript(message: String) = xstep(24, message)
 
         fun xiNoSuchOutputPort(port: String)= internal(1, port)
         fun xiImpossibleNodeType(type: XdmNodeKind) = internal(2, type)

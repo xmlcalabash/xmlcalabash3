@@ -15,7 +15,7 @@
                              then xs:integer(tokenize(/*/@role, ' ')[last()])
                              else 992"/>
       <p:with-option name="nonterminal" select="/*/@wordsize"/>
-      <p:with-option name="transform-links" select="string(/*/@vendor)"/>
+      <p:with-option name="transform-links" select="&quot;'#fig.'||$p:nonterminal||'.railroad'&quot;"/>
       <p:with-input select="/*/text()"/>
     </cx:railroad>
 

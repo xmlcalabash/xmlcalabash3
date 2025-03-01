@@ -2,7 +2,7 @@ ixml version "1.1-nineml" .
 
 script = versionDecl, s, page, s, statement++RS, s .
 
--versionDecl = -"script version ", version, s, -"." .
+-versionDecl = s, -"script version ", version, s, -"." .
 @version = "0.2" .
 
 @page = -"page", RS, string, s, -"." .
@@ -35,7 +35,7 @@ perform = compoundStatement, (RS, -"then", RS, compoundStatement)+, s, -"." .
 
 -block = ifBlock | whileBlock | untilBlock | subroutine .
 
-find = -"find", RS, (all, RS)?, @varname, RS, (-"by", RS)?, findType, s, -"=", s, @string,
+find = -"find", RS, (all, RS)?, @varname, RS, (-"by", RS)?, findType, ((s, -"=", s) | RS), @string,
        (RS, @wait)?, (RS, @pause)? .
 @findType>type = "name" | "selector" | "id" | "link-text" | "partial-link-text"
                | "tag" | "class" | "xpath" .

@@ -16,6 +16,7 @@ import net.sf.saxon.s9api.*
 import net.sf.saxon.value.BooleanValue
 import net.sf.saxon.value.StringValue
 import org.nineml.coffeefilter.InvisibleXml
+import org.nineml.coffeefilter.InvisibleXmlFailureDocument
 import org.nineml.coffeefilter.InvisibleXmlParser
 import org.nineml.coffeefilter.ParserOptions
 import org.nineml.coffeefilter.trees.SimpleTreeBuilder
@@ -38,8 +39,6 @@ import org.openqa.selenium.interactions.WheelInput
 import org.openqa.selenium.remote.RemoteWebDriver
 import org.openqa.selenium.safari.SafariDriver
 import org.openqa.selenium.safari.SafariOptions
-import org.openqa.selenium.support.ui.ExpectedConditions
-import org.openqa.selenium.support.ui.WebDriverWait
 import org.xml.sax.InputSource
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
@@ -63,6 +62,7 @@ class SeleniumStep(): AbstractAtomicStep() {
         val _capabilities = QName(NamespaceUri.NULL, "capabilities")
         val _char = QName(NamespaceUri.NULL, "char")
         val _click = QName(NamespaceUri.NULL, "click")
+        val _close = QName(NamespaceUri.NULL, "close")
         val _cookie = QName(NamespaceUri.NULL, "cookie")
         val _deltaX = QName(NamespaceUri.NULL, "delta-x")
         val _deltaY = QName(NamespaceUri.NULL, "delta-y")
@@ -266,6 +266,7 @@ class SeleniumStep(): AbstractAtomicStep() {
                 _until -> interpretUntil(statement)
                 _if -> interpretIf(statement)
                 _call -> interpretCall(statement)
+                _close -> return
                 _subroutine -> Unit // already loaded
                 else -> throw stepConfig.exception(XProcError.xdStepFailed("Unexpected statement: ${statement.nodeName}"))
             }
@@ -347,11 +348,16 @@ class SeleniumStep(): AbstractAtomicStep() {
                         throw stepConfig.exception(XProcError.xdStepFailed("Unexpected find type: ${type}"))
                     }
                 }
-                val node = nodeFor(element.getDomProperty("outerHTML")!!)
+                val domSerialization = element.getDomProperty("outerHTML")!!
+                val node = nodeFor(domSerialization)
                 findResults[name] = FindResult(node, element)
                 return
             } catch (_: NoSuchElementException) {
-                stepConfig.debug { "Did not find \$${name}; pausing ${pause} for up to ${wait}."}
+                if (wait != null) {
+                    stepConfig.debug { "Did not find \$${name}; pausing ${pause} for up to ${wait}."}
+                } else {
+                    stepConfig.debug { "Did not find \$${name}"}
+                }
                 val interval = Duration.between(start, Instant.now())
                 if (wait == null || interval > wait) {
                     findResults[name] = FindResult()
@@ -623,7 +629,7 @@ class SeleniumStep(): AbstractAtomicStep() {
             }
         } else {
             val nodes = mutableListOf<XdmValue>()
-            val doc = if (name == null) {
+            if (name == null) {
                 nodes.add(nodeFor(driver.pageSource!!))
             } else {
                 val result = findResults[name]
@@ -637,7 +643,12 @@ class SeleniumStep(): AbstractAtomicStep() {
 
         builder.endDocument()
         val result = builder.result
-        receiver.output("result", XProcDocument.ofXml(result, stepConfig))
+
+        if (S9Api.isTextDocument(result)) {
+            receiver.output("result", XProcDocument.ofText(result, stepConfig))
+        } else {
+            receiver.output("result", XProcDocument.ofXml(result, stepConfig))
+        }
     }
 
     private fun interpretMessage(message: XdmNode) {
@@ -822,12 +833,32 @@ class SeleniumStep(): AbstractAtomicStep() {
     }
 
     private fun nodeFor(markup: String): XdmNode {
-        val wholeDocument = markup.startsWith("<html")
+        val endpos = if (markup.indexOf(" ") > 0) {
+            Math.min(markup.indexOf(">"), markup.indexOf(" "))
+        } else {
+            markup.indexOf(">")
+        }
+        val tagname = QName(NsHtml.namespace, markup.substring(1, endpos).lowercase())
+
+        val wholeDocument = tagname == NsHtml.html
 
         // If we're only going to parse a bit of the page, make sure we setup the
         // input so that the parser will work out the correct encoding.
         val stream = if (!wholeDocument) {
-            val preamble = "<html><head><meta charset='UTF-8'>${markup}"
+            // Try to special case tables...
+            var sb = StringBuilder()
+            sb.append("<html><head><meta charset='UTF-8'>")
+
+            when (tagname.localName) {
+                "thead", "tbody", "tfoot" -> sb.append("<table>")
+                "tr" -> sb.append("<table><tbody>")
+                "th", "td" -> sb.append("<table><tbody><tr>")
+                else -> Unit
+            }
+
+            sb.append(markup)
+
+            var preamble = sb.toString()
             ByteArrayInputStream(preamble.toByteArray(StandardCharsets.UTF_8))
         } else {
             ByteArrayInputStream(markup.toByteArray(StandardCharsets.UTF_8))
@@ -839,53 +870,55 @@ class SeleniumStep(): AbstractAtomicStep() {
             return doc
         }
 
-        val endpos = if (markup.indexOf(" ") > 0) {
-            Math.min(markup.indexOf(">"), markup.indexOf(" "))
-        } else {
-            markup.indexOf(">")
-        }
-        val tagname = QName(NsHtml.namespace, markup.substring(1, endpos))
-
         // If the markup doesn't contain <html, assume that we're looking at a
         // part of the page. In this case, we want only the content of the body.
         // This is an absolute hack.
-        val html = S9Api.documentElement(doc)
-        for (child in html.axisIterator(Axis.CHILD)) {
-            if (child.nodeKind == XdmNodeKind.ELEMENT && child.nodeName == NsHtml.body) {
-                if (tagname == NsHtml.body) {
-                    return child
-                } else {
-                    for (gchild in child.axisIterator(Axis.CHILD)) {
-                        if (gchild.nodeKind == XdmNodeKind.ELEMENT && gchild.nodeName == tagname) {
-                            return gchild
-                        }
-                    }
+        val node = findNode(S9Api.documentElement(doc), tagname)
+        return node ?: doc
+    }
+
+    private fun findNode(node: XdmNode, name: QName): XdmNode? {
+        for (child in node.axisIterator(Axis.CHILD)) {
+            if (child.nodeKind != XdmNodeKind.ELEMENT) {
+                continue
+            }
+
+            if (child.nodeName == name) {
+                return child
+            } else {
+                val descendant = findNode(child, name)
+                if (descendant != null) {
+                    return descendant
                 }
             }
         }
 
-        // That didn't work. How odd.
-        return doc
+        return null
     }
 
     private fun parseSource(text: String): XdmNode {
         val doc = parser!!.parse(text)
-        if (!doc.succeeded()) {
-            throw stepConfig.exception(XProcError.xdStepFailed("Invalid selenium script"))
-        }
 
         val opts = ParserOptions()
         opts.assertValidXmlNames = false
         opts.assertValidXmlCharacters = false
-        val walker = doc.result.getArborist()
         val tree = SimpleTreeBuilder(opts)
-        walker.getTree(doc.getAdapter(tree))
+
+        if (!doc.succeeded()) {
+            val failure = doc as InvisibleXmlFailureDocument
+            failure.getTree(tree)
+            throw stepConfig.exception(XProcError.xcxSeleniumInvalidScript(tree.tree.asXML().toString()))
+        } else {
+            val walker = doc.result.getArborist()
+            walker.getTree(doc.getAdapter(tree))
+        }
 
         val builder = stepConfig.processor.newDocumentBuilder()
         val bytes = ByteArrayInputStream(tree.tree.asXML().toByteArray(StandardCharsets.UTF_8))
         val source = SAXSource(InputSource(bytes))
         val xdmDestination = XdmDestination()
         builder.parse(source, xdmDestination)
+
         return xdmDestination.xdmNode
     }
 
@@ -928,7 +961,7 @@ class SeleniumStep(): AbstractAtomicStep() {
             }
         }
 
-        throw stepConfig.exception(XProcError.xdStepFailed("URI not whitelisted: ${uri}"))
+        throw stepConfig.exception(XProcError.xcxSeleniumNotWhitelisted(uri))
     }
 
     override fun toString(): String = "cx:selenium"

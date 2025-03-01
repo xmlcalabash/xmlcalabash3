@@ -1440,6 +1440,12 @@ Failed to instantiate “$1” as a NodeMatcher.
 cxerr:XC0022
 Conversion from “$1” grammar to W3C EBNF failed.
 
+cxerr:XC0023
+URI is not in cx:selenium whitelist: “$1”
+
+cxerr:XC0024
+Script is invalid: $1
+
 cxerr:XI0001
 Pipeline has no “$1” output port.
 Cannot save the output from a port that doesn’t exist.
