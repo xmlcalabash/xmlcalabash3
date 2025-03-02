@@ -13,6 +13,41 @@ See the commits and pull requests on
 finer detail.</para>
 
 <revhistory>
+<revision xml:id="r300-alpha22">
+<revnumber>3.0.0-alpha22</revnumber>
+<date>2025-03-02</date>
+<revdescription>
+<itemizedlist>
+<listitem><para>Added support for the <tag>p:message</tag> step.
+</para></listitem>
+<listitem><para>Fixed <ghissue number="308"/> by forbidding the
+<tag class="attribute">[p:]message</tag> attribute from being specified with
+<tag>p:with-option</tag>. (It’s not an option.)
+</para></listitem>
+<listitem><para>Fixed <ghissue number="306"/> (and <ghissue number="252"/>).
+All of the extension steps (except for the polyglot steps) are now bundled into the
+distribution.
+</para></listitem>
+<listitem><para>Fixed <ghissue number="304"/>. Make sure that 
+<tag class="attribute">[p:]message</tag> attributes on user-defined steps are
+output when the steps are run.
+</para></listitem>
+<listitem><para>Fixed <ghissue number="302"/> by making IDs explicit so that
+GraphViz doesn’t output duplicates in the SVG. Cleaned up the graph output in a
+few small ways.
+</para></listitem>
+<listitem><para>Fixed <ghissue number="301"/>. Added <tag>cx:ebnf-convert</tag>,
+a wrapper around Gunther Rademacher’s EBNF converter, and updated
+<tag>cx:railroad</tag> to use it directly. This will make it easier to draw railroad
+diagrams of, for example, Invisible XML grammars.
+</para></listitem>
+<listitem><para>Fixed selection of elements with relative <tag
+class="attribute">xml:base</tag> attributes so that the resolved base URI is
+correct.
+</para></listitem>
+</itemizedlist>
+</revdescription>
+</revision>
 <revision xml:id="r300-alpha21">
 <revnumber>3.0.0-alpha21</revnumber>
 <date>2025-02-22</date>
