@@ -69,10 +69,10 @@ class XmlCalabashCli private constructor() {
         }
     }
 
-    lateinit private var xmlCalabash: XmlCalabash
-    lateinit private var commandLine: CommandLine
-    lateinit private var config: XmlCalabashConfiguration
-    lateinit private var stepConfig: InstructionConfiguration
+    private lateinit var xmlCalabash: XmlCalabash
+    private lateinit var commandLine: CommandLine
+    private lateinit var config: XmlCalabashConfiguration
+    private lateinit var stepConfig: InstructionConfiguration
     private var sawStdin = false
     private var sawStdout = false
 
@@ -158,23 +158,13 @@ class XmlCalabashCli private constructor() {
             }
 
             for (name in commandLine.initializers) {
-                try {
-                    val klass = Class.forName(name)
-                    val constructor = klass.getConstructor()
-                    val init = constructor.newInstance()
-                    if (init is Initializer) {
-                        init.initialize(xmlCalabash.saxonConfig.configuration)
-                        xmlCalabash.commonEnvironment.addInitializer(init)
-                    } else {
-                        throw XProcError.xiInitializerError("${name} is not a net.sf.saxon.lib.Initializer").exception()
-                    }
-                } catch (ex: Exception) {
-                    if (ex is XProcException) {
-                        throw ex
-                    } else {
-                        throw XProcError.xiInitializerError(ex.toString()).exception(ex)
-                    }
-                }
+                saxonInitializer(name)
+            }
+            // It feels like this configuration should go somewhere else...but since
+            // CoffeeSacks is now bundled, try to initialize it for the user...
+            val csi = "org.nineml.coffeesacks.RegisterCoffeeSacks"
+            if (csi !in commandLine.initializers) {
+                saxonInitializer(csi, ignoreErrors = true)
             }
 
             val moon = Moon.illumination()
@@ -314,6 +304,29 @@ class XmlCalabashCli private constructor() {
                 }
                 System.err.println(ex)
                 exitProcess(1)
+            }
+        }
+    }
+
+    private fun saxonInitializer(name: String, ignoreErrors: Boolean = false) {
+        try {
+            val klass = Class.forName(name)
+            val constructor = klass.getConstructor()
+            val init = constructor.newInstance()
+            if (init is Initializer) {
+                init.initialize(xmlCalabash.saxonConfig.configuration)
+                xmlCalabash.commonEnvironment.addInitializer(init)
+            } else {
+                throw XProcError.xiInitializerError("${name} is not a net.sf.saxon.lib.Initializer").exception()
+            }
+        } catch (ex: Exception) {
+            if (ex is XProcException) {
+                throw ex
+            } else {
+                if (!ignoreErrors) {
+                    throw XProcError.xiInitializerError(ex.toString()).exception(ex)
+                }
+                // Should we print a warning about this?
             }
         }
     }
