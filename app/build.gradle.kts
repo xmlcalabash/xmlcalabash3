@@ -32,6 +32,7 @@ val waitForUpdateRelease by configurations.dependencyScope("waitforUpdateRelease
 val collectionManagerRelease by configurations.dependencyScope("collectionManagerRelease")
 
 val dep_slf4j = project.findProperty("slf4j").toString()
+val dep_nineml = project.findProperty("nineml").toString()
 
 dependencies {
   xmlcalabashRelease(project(mapOf("path" to ":xmlcalabash",
@@ -85,6 +86,7 @@ dependencies {
   implementation(project(":ext:xmlunit"))
   implementation(project(":ext:xpath"))
 
+  implementation("org.nineml:coffeesacks:${dep_nineml}")
   implementation("org.slf4j:slf4j-api:${dep_slf4j}")
 }
 
