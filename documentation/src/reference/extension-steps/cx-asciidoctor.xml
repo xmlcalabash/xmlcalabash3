@@ -7,11 +7,11 @@
           xmlns="http://docbook.org/ns/docbook"
           xml:id="cx-asciidoctor">
 <?db filename="cx-asciidoctor"?>
-   <refnamediv>
-      <refname>cx:asciidoctor</refname>
-      <refpurpose>Convert Asciidoctor documents</refpurpose>
-   </refnamediv>
-   <refsynopsisdiv>
+<refnamediv>
+  <refname>cx:asciidoctor</refname>
+  <refpurpose>Convert Asciidoctor documents</refpurpose>
+</refnamediv>
+<refsynopsisdiv>
 
 <refsection role="introduction">
 <title>Introduction</title>
@@ -21,16 +21,11 @@ HTML5, or PDF.</para>
 
 <refsection role="step-declaration">
 <title>Step declaration</title>
-     <xi:include href="../../../../ext/asciidoctor/src/main/resources/com/xmlcalabash/ext/asciidoctor.xpl"
-                 xpointer="xpath(/*/*[@type='cx:asciidoctor'])"/>
+<xi:include href="../../../../ext/asciidoctor/src/main/resources/com/xmlcalabash/ext/asciidoctor.xpl"
+            xpointer="xpath(/*/*[@type='cx:asciidoctor'])"/>
+<?import asciidoctor.xpl?>
 </refsection>
 
-<!--
-<refsection role="errors">
-<title>Errors</title>
-<para>Errors from the entry body are summarized here.</para>
-</refsection>
--->
 </refsynopsisdiv>
 
 <refsection>

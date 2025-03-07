@@ -6,14 +6,25 @@
           xmlns="http://docbook.org/ns/docbook"
           xml:id="cx-xpath">
 <?db filename="cx-xpath"?>
-
 <refnamediv>
   <refname>cx:xpath</refname>
   <refpurpose>Evalute XPath expressions</refpurpose>
 </refnamediv>
+
 <refsynopsisdiv>
-  <xi:include href="../../../../ext/xpath/src/main/resources/com/xmlcalabash/ext/xpath.xpl"
-              xpointer="xpath(/*/*[@type='cx:xpath'])"/>
+<refsection role="introduction">
+<title>Introduction</title>
+<para>This step applies an XPath expression to the sequence of documents
+provided on the <port>source</port> port.
+</para>
+</refsection>
+
+<refsection role="step-declaration">
+<title>Step declaration</title>
+<xi:include href="../../../../ext/xpath/src/main/resources/com/xmlcalabash/ext/xpath.xpl"
+            xpointer="xpath(/*/*[@type='cx:xpath'])"/>
+<?import xpath.xpl?>
+</refsection>
 </refsynopsisdiv>
 
 <refsection>

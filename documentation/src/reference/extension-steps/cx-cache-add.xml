@@ -5,21 +5,32 @@
           xmlns="http://docbook.org/ns/docbook"
           xml:id="cx-cache-add">
 <?db filename="cx-cache-add"?>
-   <refnamediv>
-      <refname>cx:cache-add</refname>
-      <refpurpose>Adds documents to the runtime cache</refpurpose>
-   </refnamediv>
-   <refsynopsisdiv>
-     <xi:include href="../../../../ext/cache/src/main/resources/com/xmlcalabash/ext/cache.xpl"
-                 xpointer="xpath(/*/*[@type='cx:cache-add'])"/>
-   </refsynopsisdiv>
-   <refsection>
-      <title>Description</title>
+<refnamediv>
+  <refname>cx:cache-add</refname>
+  <refpurpose>Adds documents to the runtime cache</refpurpose>
+</refnamediv>
 
-<para>XML Calabash maintains a cache of documents. If a step attempts to load a
-URI, and that URI is present in the cache, the cached value will always be
-returned. Some steps use the cache implicitly (for example, the validate steps
-update it to hold schema documents).</para>
+<refsynopsisdiv>
+<refsection role="introduction">
+<title>Introduction</title>
+<para>XML Calabash maintains a cache of documents. This step adds a document to
+the cache.</para>
+</refsection>
+
+<refsection role="step-declaration">
+<title>Step declaration</title>
+<xi:include href="../../../../ext/cache/src/main/resources/com/xmlcalabash/ext/cache.xpl"
+            xpointer="xpath(/*/*[@type='cx:cache-add'])"/>
+<?import cache.xpl?>
+</refsection>
+</refsynopsisdiv>
+
+<refsection>
+<title>Description</title>
+
+<para>If a step attempts to load a URI, and that URI is present in the cache,
+the cached value will always be returned. Some steps use the cache implicitly
+(for example, the validate steps update it to hold schema documents).</para>
 
 <para>A pipeline can add a document to the cache explicitly with <tag>cx:cache-add</tag>.
 If the <option>href</option> option is provided, it is used as the URI for

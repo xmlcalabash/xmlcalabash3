@@ -22,8 +22,9 @@
 
 <refsection role="step-declaration">
 <title>Step declaration</title>
-     <xi:include href="../../../../ext/ebnf-convert/src/main/resources/com/xmlcalabash/ext/ebnf-convert.xpl"
-                 xpointer="xpath(/*/*[@type='cx:ebnf-convert'])"/>
+<xi:include href="../../../../ext/ebnf-convert/src/main/resources/com/xmlcalabash/ext/ebnf-convert.xpl"
+            xpointer="xpath(/*/*[@type='cx:ebnf-convert'])"/>
+<?import ebnf-convert.xpl?>
 </refsection>
 
 <refsection role="errors">

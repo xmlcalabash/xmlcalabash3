@@ -5,16 +5,29 @@
           xmlns="http://docbook.org/ns/docbook"
           xml:id="cx-cache-delete">
 <?db filename="cx-cache-delete"?>
-   <refnamediv>
-      <refname>cx:cache-delete</refname>
-      <refpurpose>Deletes documents from the runtime cache</refpurpose>
-   </refnamediv>
-   <refsynopsisdiv>
-     <xi:include href="../../../../ext/cache/src/main/resources/com/xmlcalabash/ext/cache.xpl"
-                 xpointer="xpath(/*/*[@type='cx:cache-delete'])"/>
-   </refsynopsisdiv>
-   <refsection>
-      <title>Description</title>
+<refnamediv>
+  <refname>cx:cache-delete</refname>
+  <refpurpose>Deletes documents from the runtime cache</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv>
+<refsection role="introduction">
+<title>Introduction</title>
+<para>XML Calabash maintains a cache of documents. This step removes a document from
+the cache.</para>
+
+</refsection>
+
+<refsection role="step-declaration">
+<title>Step declaration</title>
+<xi:include href="../../../../ext/cache/src/main/resources/com/xmlcalabash/ext/cache.xpl"
+            xpointer="xpath(/*/*[@type='cx:cache-delete'])"/>
+<?import cache.xpl?>
+</refsection>
+</refsynopsisdiv>
+
+<refsection>
+<title>Description</title>
 
 <para>XML Calabash maintains a cache of documents. If a step attempts to load a
 URI, and that URI is present in the cache, the cached value will always be

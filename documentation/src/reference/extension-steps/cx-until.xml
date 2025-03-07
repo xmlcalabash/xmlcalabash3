@@ -6,17 +6,29 @@
           xmlns="http://docbook.org/ns/docbook"
           xml:id="cx-until">
 <?db filename="cx-until"?>
-
 <refnamediv>
   <refname>cx:until</refname>
   <refpurpose>Loop until an expression is true</refpurpose>
 </refnamediv>
 
 <refsynopsisdiv>
-<para>An until step is specified by the <tag>cx:until</tag> element. It
+<refsection role="introduction">
+<title>Introduction</title>
+<para>This step
 is a <glossterm>compound step</glossterm> that processes single documents,
 applying its <glossterm>subpipeline</glossterm> until the
 <tag class="attribute">test</tag> expression is true.</para>
+</refsection>
+
+<refsection role="step-declaration">
+<title>Step declaration</title>
+
+<para>An until step is specified by the <tag>cx:until</tag> element.</para>
+
+<!--
+<rng-pattern schema="../../build/pipeline-messages.rng"
+             name="cx.message" format="table"/>
+-->
 
 <programlisting><![CDATA[<cx:until
   name? = NCName
@@ -25,6 +37,7 @@ applying its <glossterm>subpipeline</glossterm> until the
       p:output?),
      subpipeline)
 </cx:until>]]></programlisting>
+</refsection>
 </refsynopsisdiv>
 
 <refsection>

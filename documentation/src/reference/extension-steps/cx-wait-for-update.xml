@@ -10,15 +10,25 @@
   <refpurpose>Wait for a document to change</refpurpose>
 </refnamediv>
 <refsynopsisdiv>
-  <xi:include href="../../../../ext/wait-for-update/src/main/resources/com/xmlcalabash/ext/wait-for-update.xpl"
-              xpointer="xpath(/*/*[@type='cx:wait-for-update'])"/>
+<refsection role="introduction">
+<title>Introduction</title>
+<para>This step waits for the document identified by the
+<option>href</option> option to change.</para>
+</refsection>
+
+<refsection role="step-declaration">
+<title>Step declaration</title>
+<xi:include href="../../../../ext/wait-for-update/src/main/resources/com/xmlcalabash/ext/wait-for-update.xpl"
+            xpointer="xpath(/*/*[@type='cx:wait-for-update'])"/>
+<?import wait-for-update.xpl?>
+</refsection>
 </refsynopsisdiv>
 
 <refsection>
 <title>Description</title>
 
 <para>The <tag>cx:wait-for-update</tag> step waits for the document identified by the
-<option>href</option> option to change. The updated document appars on the
+<option>href</option> option to change. The updated document appears on the
 <port>result</port> port.</para>
 
 <para>Only <code>file:</code>, <code>http:</code>, and <code>https:</code> URIs

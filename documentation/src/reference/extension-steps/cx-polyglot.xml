@@ -6,14 +6,26 @@
           xmlns="http://docbook.org/ns/docbook"
           xml:id="cx-polyglot">
 <?db filename="cx-polyglot"?>
-
 <refnamediv>
   <refname>cx:polyglot</refname>
   <refpurpose>Evalute steps implemented in other programming languages</refpurpose>
 </refnamediv>
+
 <refsynopsisdiv>
-  <xi:include href="../../../../ext/polyglot/src/main/resources/com/xmlcalabash/ext/polyglot.xpl"
-              xpointer="xpath(/*/*[@type='cx:polyglot'])"/>
+<refsection role="introduction">
+<title>Introduction</title>
+<para>The <tag>cx:polyglot</tag> step leverages the
+<link xlink:href="https://www.graalvm.org/latest/reference-manual/polyglot-programming/">GraalVM
+Polyglot Programming</link> library to evaluate other programming languages as the
+implementations of steps.</para>
+</refsection>
+
+<refsection role="step-declaration">
+<title>Step declaration</title>
+<xi:include href="../../../../ext/polyglot/src/main/resources/com/xmlcalabash/ext/polyglot.xpl"
+            xpointer="xpath(/*/*[@type='cx:polyglot'])"/>
+<?import polyglot.xpl?>
+</refsection>
 
 <refsection role="errors">
 <title>Errors</title>
@@ -35,11 +47,6 @@ and install it on your classpath before you can use this step.
 
 <refsection>
 <title>Description</title>
-
-<para>The <tag>cx:polyglot</tag> step leverages the
-<link xlink:href="https://www.graalvm.org/latest/reference-manual/polyglot-programming/">GraalVM
-Polyglot Programming</link> library to evaluate other programming languages as the
-implementations of steps.</para>
 
 <para>The polyglot extension includes <tag>cx:javascript</tag> and <tag>cx:python</tag> for
 running JavaScript and Python scripts, respectively. Other languages are possible if

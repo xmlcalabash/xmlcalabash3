@@ -5,21 +5,32 @@
           xmlns="http://docbook.org/ns/docbook"
           xml:id="cx-epubcheck">
 <?db filename="cx-epubcheck"?>
-   <refnamediv>
-      <refname>cx:epubcheck</refname>
-      <refpurpose>Checks the conformance of EPUB files</refpurpose>
-   </refnamediv>
-   <refsynopsisdiv>
-     <xi:include href="../../../../ext/epubcheck/src/main/resources/com/xmlcalabash/ext/epubcheck.xpl"
-                 xpointer="xpath(/*/*[@type='cx:epubcheck'])"/>
-   </refsynopsisdiv>
+<refnamediv>
+  <refname>cx:epubcheck</refname>
+  <refpurpose>Checks the conformance of EPUB files</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv>
+<refsection role="introduction">
+<title>Introduction</title>
+<para>This step uses the
+<link xlink:href="https://www.w3.org/publishing/epubcheck/">W3C
+EPUBCheck</link> validator to check the conformance of EPUB files.
+</para>
+</refsection>
+
+<refsection role="step-declaration">
+<title>Step declaration</title>
+<xi:include href="../../../../ext/epubcheck/src/main/resources/com/xmlcalabash/ext/epubcheck.xpl"
+            xpointer="xpath(/*/*[@type='cx:epubcheck'])"/>
+<?import epubcheck.xpl?>
+</refsection>
+</refsynopsisdiv>
 
 <refsection>
 <title>Description</title>
 
-<para>The <tag>cx:epubcheck</tag> step uses the
-<link xlink:href="https://www.w3.org/publishing/epubcheck/">W3C
-EPUBCheck</link> validator to check the conformance of EPUB files. It
+<para>The <tag>cx:epubcheck</tag> validates the conformance of EPUB files and
 generates an XVRL report on the <port>report</port> port.</para>
 
 <para>If <option>assert-valid</option> is true, any errors reported by EPUBCheck will
