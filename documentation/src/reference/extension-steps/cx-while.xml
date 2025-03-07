@@ -6,17 +6,24 @@
           xmlns="http://docbook.org/ns/docbook"
           xml:id="cx-while">
 <?db filename="cx-while"?>
-
 <refnamediv>
   <refname>cx:while</refname>
   <refpurpose>Loop while an expression is true</refpurpose>
 </refnamediv>
 
 <refsynopsisdiv>
-<para>A while step is specified by the <tag>cx:while</tag> element. It
+<refsection role="introduction">
+<title>Introduction</title>
+<para>This step
 is a <glossterm>compound step</glossterm> that processes single documents,
 applying its <glossterm>subpipeline</glossterm> while the
 <tag class="attribute">test</tag> expression is true.</para>
+</refsection>
+
+<refsection role="step-declaration">
+<title>Step declaration</title>
+
+<para>A while step is specified by the <tag>cx:while</tag> element.</para>
 
 <programlisting><![CDATA[<cx:while
   name? = NCName
@@ -25,6 +32,7 @@ applying its <glossterm>subpipeline</glossterm> while the
       p:output?),
      subpipeline)
 </cx:while>]]></programlisting>
+</refsection>
 </refsynopsisdiv>
 
 <refsection>

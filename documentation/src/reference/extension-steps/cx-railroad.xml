@@ -24,6 +24,7 @@
 <title>Step declaration</title>
      <xi:include href="../../../../ext/railroad/src/main/resources/com/xmlcalabash/ext/railroad.xpl"
                  xpointer="xpath(/*/*[@type='cx:railroad'])"/>
+<?import railroad.xpl?>
 </refsection>
 
 <refsection role="errors">

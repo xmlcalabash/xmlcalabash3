@@ -22,8 +22,9 @@ browser. The step can drive a web browser and extract all or part of rendered pa
 
 <refsection role="step-declaration">
 <title>Step declaration</title>
-     <xi:include href="../../../../ext/selenium/src/main/resources/com/xmlcalabash/ext/selenium.xpl"
-                 xpointer="xpath(/*/*[@type='cx:selenium'])"/>
+<xi:include href="../../../../ext/selenium/src/main/resources/com/xmlcalabash/ext/selenium.xpl"
+            xpointer="xpath(/*/*[@type='cx:selenium'])"/>
+<?import selenium.xpl?>
 </refsection>
 
 <refsection role="errors">

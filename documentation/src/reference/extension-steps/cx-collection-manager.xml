@@ -24,6 +24,7 @@ collection.</para>
 <title>Step declaration</title>
 <xi:include href="../../../../ext/collection-manager/src/main/resources/com/xmlcalabash/ext/collection-manager.xpl"
             xpointer="xpath(/*/*[@type='cx:collection-manager'])"/>
+<?import collection-manager.xpl?>
 </refsection>
 
 <refsection role="errors">

@@ -5,14 +5,26 @@
           xmlns="http://docbook.org/ns/docbook"
           xml:id="cx-mathml-to-svg">
 <?db filename="cx-mathml-to-svg"?>
-   <refnamediv>
-      <refname>cx:mathml-to-svg</refname>
-      <refpurpose>Draws diagrams with mathml-to-svg</refpurpose>
-   </refnamediv>
-   <refsynopsisdiv>
-     <xi:include href="../../../../ext/diagramming/src/main/resources/com/xmlcalabash/ext/diagramming.xpl"
-                 xpointer="xpath(/*/*[@type='cx:mathml-to-svg'])"/>
-   </refsynopsisdiv>
+<refnamediv>
+   <refname>cx:mathml-to-svg</refname>
+   <refpurpose>Draws diagrams with mathml-to-svg</refpurpose>
+</refnamediv>
+<refsynopsisdiv>
+
+<refsection role="introduction">
+<title>Introduction</title>
+<para>This step uses
+<link xlink:href="http://jeuclid.sourceforge.net/">JEuclid</link> to convert
+MathML to SVG.</para>
+</refsection>
+
+<refsection role="step-declaration">
+<title>Step declaration</title>
+<xi:include href="../../../../ext/diagramming/src/main/resources/com/xmlcalabash/ext/diagramming.xpl"
+            xpointer="xpath(/*/*[@type='cx:mathml-to-svg'])"/>
+<?import diagramming.xpl?>
+</refsection>
+</refsynopsisdiv>
 
 <refsection>
 <title>Description</title>

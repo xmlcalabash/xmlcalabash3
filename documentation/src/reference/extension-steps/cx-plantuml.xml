@@ -4,14 +4,25 @@
           xmlns="http://docbook.org/ns/docbook"
           xml:id="cx-plantuml">
 <?db filename="cx-plantuml"?>
-   <refnamediv>
-      <refname>cx:plantuml</refname>
-      <refpurpose>Draws diagrams with PlantUML</refpurpose>
-   </refnamediv>
-   <refsynopsisdiv>
-     <xi:include href="../../../../ext/diagramming/src/main/resources/com/xmlcalabash/ext/diagramming.xpl"
-                 xpointer="xpath(/*/*[@type='cx:plantuml'])"/>
-   </refsynopsisdiv>
+<refnamediv>
+  <refname>cx:plantuml</refname>
+  <refpurpose>Draws diagrams with PlantUML</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv>
+<refsection role="introduction">
+<title>Introduction</title>
+<para>This step constructs diagrams with
+<link xlink:href="https://plantuml.com/">PlantUML</link>.</para>
+</refsection>
+
+<refsection role="step-declaration">
+<title>Step declaration</title>
+<xi:include href="../../../../ext/diagramming/src/main/resources/com/xmlcalabash/ext/diagramming.xpl"
+            xpointer="xpath(/*/*[@type='cx:plantuml'])"/>
+<?import diagramming.xpl?>
+</refsection>
+</refsynopsisdiv>
 
 <refsection>
 <title>Description</title>

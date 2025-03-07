@@ -10,18 +10,29 @@
   <refname>cx:python</refname>
   <refpurpose>Evaluate steps implemented in Python</refpurpose>
 </refnamediv>
+
 <refsynopsisdiv>
-  <xi:include href="../../../../ext/polyglot/src/main/resources/com/xmlcalabash/ext/polyglot.xpl"
-              xpointer="xpath(/*/*[@type='cx:python'])"/>
+<refsection role="introduction">
+<title>Introduction</title>
+<para>This step runs a Python program as the implementation of a
+step.</para>
+</refsection>
+
+<refsection role="step-declaration">
+<title>Step declaration</title>
+<xi:include href="../../../../ext/polyglot/src/main/resources/com/xmlcalabash/ext/polyglot.xpl"
+            xpointer="xpath(/*/*[@type='cx:python'])"/>
+<?import polyglot.xpl?>
+</refsection>
 </refsynopsisdiv>
 
 <refsection>
 <title>Installation</title>
-<para>The <tag>cx:polyglot</tag> step is not included in the standard XML Calabash release.
+<para>The <tag>cx:python</tag> step is not included in the standard XML Calabash release.
 You must
 <link xlink:href="https://github.com/xmlcalabash/xmlcalabash3/releases">obtain it separately</link>
 and install it on your classpath before you can use this step.
-(More detailed instructions, T.B.D.)</para>
+See <tag xlink:href="cx-polyglot.html">cx:polyglot</tag> for more details.</para>
 </refsection>
 
 <refsection>

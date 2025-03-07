@@ -11,8 +11,17 @@
 </refnamediv>
 
 <refsynopsisdiv>
-  <xi:include href="../../../../ext/unique-id/src/main/resources/com/xmlcalabash/ext/unique-id.xpl"
-              xpointer="xpath(/*/*[@type='cx:unique-id'])"/>
+<refsection role="introduction">
+<title>Introduction</title>
+<para>This step can generate UUID, ULID, and TypeID unique identifiers.</para>
+</refsection>
+
+<refsection role="step-declaration">
+<title>Step declaration</title>
+<xi:include href="../../../../ext/unique-id/src/main/resources/com/xmlcalabash/ext/unique-id.xpl"
+            xpointer="xpath(/*/*[@type='cx:unique-id'])"/>
+<?import unique-id.xpl?>
+</refsection>
 </refsynopsisdiv>
 
 <refsection>

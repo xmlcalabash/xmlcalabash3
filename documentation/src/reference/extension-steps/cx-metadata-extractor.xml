@@ -5,18 +5,30 @@
           xmlns="http://docbook.org/ns/docbook"
           xml:id="cx-metadata-extractor">
 <?db filename="cx-metadata-extractor"?>
-   <refnamediv>
-      <refname>cx:metadata-extractor</refname>
-      <refpurpose>Extracts metadata from images and other files</refpurpose>
-   </refnamediv>
-   <refsynopsisdiv>
-     <xi:include href="../../../../ext/metadata-extractor/src/main/resources/com/xmlcalabash/ext/metadata-extractor.xpl"
-                 xpointer="xpath(/*/*[@type='cx:metadata-extractor'])"/>
-   </refsynopsisdiv>
-   <refsection>
-      <title>Description</title>
+<refnamediv>
+  <refname>cx:metadata-extractor</refname>
+  <refpurpose>Extracts metadata from images and other files</refpurpose>
+</refnamediv>
 
-      <para>The <tag>cx:metadata-extractor</tag> step returns an XML description of
+<refsynopsisdiv>
+<refsection role="introduction">
+<title>Introduction</title>
+<para>This step returns an XML description of the metadata associated with a
+media file.</para>
+</refsection>
+
+<refsection role="step-declaration">
+<title>Step declaration</title>
+<xi:include href="../../../../ext/metadata-extractor/src/main/resources/com/xmlcalabash/ext/metadata-extractor.xpl"
+            xpointer="xpath(/*/*[@type='cx:metadata-extractor'])"/>
+<?import metadata-extractor.xpl?>
+</refsection>
+</refsynopsisdiv>
+
+<refsection>
+<title>Description</title>
+
+<para>The <tag>cx:metadata-extractor</tag> step returns an XML description of
 the metadata associated with an image. For example, the metadata associated with
 the image in
 <xref linkend="fig.amaryllis"/> is shown in

@@ -22,8 +22,9 @@ the specified Invisible XML grammar.</para>
 
 <refsection role="step-declaration">
 <title>Step declaration</title>
-     <xi:include href="../../../../ext/markup-blitz/src/main/resources/com/xmlcalabash/ext/markup-blitz.xpl"
-                 xpointer="xpath(/*/*[@type='cx:markup-blitz'])"/>
+<xi:include href="../../../../ext/markup-blitz/src/main/resources/com/xmlcalabash/ext/markup-blitz.xpl"
+            xpointer="xpath(/*/*[@type='cx:markup-blitz'])"/>
+<?import markup-blitz.xpl?>
 </refsection>
 </refsynopsisdiv>
 

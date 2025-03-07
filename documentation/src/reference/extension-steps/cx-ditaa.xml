@@ -5,21 +5,29 @@
           xmlns="http://docbook.org/ns/docbook"
           xml:id="cx-ditaa">
 <?db filename="cx-ditaa"?>
-   <refnamediv>
-      <refname>cx:ditaa</refname>
-      <refpurpose>Draws diagrams with ditaa</refpurpose>
-   </refnamediv>
-   <refsynopsisdiv>
-     <xi:include href="../../../../ext/diagramming/src/main/resources/com/xmlcalabash/ext/diagramming.xpl"
-                 xpointer="xpath(/*/*[@type='cx:ditaa'])"/>
-   </refsynopsisdiv>
+<refnamediv>
+   <refname>cx:ditaa</refname>
+   <refpurpose>Draws diagrams with ditaa</refpurpose>
+</refnamediv>
+<refsynopsisdiv>
 
-<refsection>
-<title>Description</title>
-
+<refsection role="introduction">
+<title>Introduction</title>
 <para>The <tag>cx:ditaa</tag> step constructs diagrams with
 <link xlink:href="https://ditaa.sourceforge.net/">ditaa</link>
 (DIagrams Through Ascii Art).</para>
+</refsection>
+
+<refsection role="step-declaration">
+<title>Step declaration</title>
+<xi:include href="../../../../ext/diagramming/src/main/resources/com/xmlcalabash/ext/diagramming.xpl"
+            xpointer="xpath(/*/*[@type='cx:ditaa'])"/>
+<?import diagramming.xpl?>
+</refsection>
+</refsynopsisdiv>
+
+<refsection>
+<title>Description</title>
 
 <para>The supported content types are the content types supported by the
 <classname>javax.imageio.ImageWriter</classname> class. At the time of this 

@@ -7,11 +7,11 @@
           xmlns="http://docbook.org/ns/docbook"
           xml:id="cx-xmlunit">
 <?db filename="cx-xmlunit"?>
-   <refnamediv>
-      <refname>cx:xmlunit</refname>
-      <refpurpose>Performs comparisons with xmlunit</refpurpose>
-   </refnamediv>
-   <refsynopsisdiv>
+<refnamediv>
+  <refname>cx:xmlunit</refname>
+  <refpurpose>Performs comparisons with xmlunit</refpurpose>
+</refnamediv>
+<refsynopsisdiv>
 
 <refsection role="introduction">
 <title>Introduction</title>
@@ -21,8 +21,9 @@
 
 <refsection role="step-declaration">
 <title>Step declaration</title>
-     <xi:include href="../../../../ext/xmlunit/src/main/resources/com/xmlcalabash/ext/xmlunit.xpl"
-                 xpointer="xpath(/*/*[@type='cx:xmlunit'])"/>
+<xi:include href="../../../../ext/xmlunit/src/main/resources/com/xmlcalabash/ext/xmlunit.xpl"
+            xpointer="xpath(/*/*[@type='cx:xmlunit'])"/>
+<?import xmlunit.xpl?>
 </refsection>
 
 <refsection role="errors">

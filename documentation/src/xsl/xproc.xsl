@@ -28,6 +28,21 @@
 
     <xsl:next-match/>
 
+    <xsl:variable name="import" select="../processing-instruction('import')/string()"/>
+    <xsl:if test="$import">
+      <div>This is an extension step; to use it, your pipeline must include its declaration.
+      For example, by including the extension library with an import at the top of your
+      pipeline:</div>
+
+      <xsl:variable name="pl" as="element()">
+        <screen xmlns="http://docbook.org/ns/docbook"
+                        language="xml"
+        >&lt;p:import href="https://xmlcalabash.com/ext/library/{$import}"/&gt;</screen>
+      </xsl:variable>
+      <xsl:apply-templates select="$pl"/>
+
+    </xsl:if>
+
     <details>
       <summary>Declaration</summary>
       <xsl:variable name="clean-decl">
