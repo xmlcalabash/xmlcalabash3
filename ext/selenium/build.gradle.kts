@@ -3,7 +3,8 @@ import com.xmlcalabash.build.XmlCalabashBuildExtension
 plugins {
   id("buildlogic.kotlin-library-conventions")
   id("com.xmlcalabash.build.xmlcalabash-build")
-  `maven-publish`
+  id("maven-publish")
+  id("signing")
 }
 
 val xmlcalabash by configurations.creating {}
@@ -112,7 +113,7 @@ publishing {
   }
 
   publications {
-    create<MavenPublication>("mavenXmlCalabash") {
+    create<MavenPublication>("mavenSelenium") {
       pom {
         groupId = project.findProperty("xmlcalabashGroup").toString()
         version = project.findProperty("xmlcalabashVersion").toString()
@@ -147,4 +148,8 @@ publishing {
       artifact(sourcesJar.get())
     }
   }
+}
+
+signing {
+  sign(publishing.publications["mavenSelenium"])
 }

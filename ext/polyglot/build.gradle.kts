@@ -5,7 +5,8 @@ plugins {
   id("buildlogic.kotlin-library-conventions")
   id("com.xmlcalabash.build.xmlcalabash-build")
   id("org.graalvm.buildtools.native") version "0.10.2"
-  `maven-publish`
+  id("maven-publish")
+  id("signing")
 }
 
 val xmlcalabash by configurations.creating {}
@@ -150,7 +151,7 @@ publishing {
   }
 
   publications {
-    create<MavenPublication>("mavenXmlCalabash") {
+    create<MavenPublication>("mavenPolyglot") {
       pom {
         groupId = project.findProperty("xmlcalabashGroup").toString()
         version = project.findProperty("xmlcalabashVersion").toString()
@@ -185,4 +186,8 @@ publishing {
       artifact(sourcesJar.get())
     }
   }
+}
+
+signing {
+  sign(publishing.publications["mavenPolyglot"])
 }
