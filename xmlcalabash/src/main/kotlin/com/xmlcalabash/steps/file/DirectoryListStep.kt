@@ -7,14 +7,15 @@ import com.xmlcalabash.namespace.Ns
 import com.xmlcalabash.namespace.NsC
 import com.xmlcalabash.namespace.NsP
 import com.xmlcalabash.util.SaxonTreeBuilder
+import com.xmlcalabash.util.Urify
 import java.io.File
 import java.nio.file.Files
 
 class DirectoryListStep(): FileStep(NsP.directoryList) {
-    var rootPath = ""
-    var detailed = false
-    var includeFilters = mutableListOf<String>()
-    var excludeFilters = mutableListOf<String>()
+    private lateinit var rootPath: String
+    private var detailed = false
+    private val includeFilters = mutableListOf<String>()
+    private val excludeFilters = mutableListOf<String>()
 
     override fun run() {
         super.run()
@@ -41,8 +42,8 @@ class DirectoryListStep(): FileStep(NsP.directoryList) {
             throw stepConfig.exception(XProcError.xcUnsupportedScheme(path.scheme))
         }
 
-        rootPath = path.path
-        val dir = File(rootPath)
+        rootPath = path.toString()
+        val dir = File(path.path)
         if (!dir.isDirectory) {
             throw stepConfig.exception(XProcError.xcNotADirectory(path.path))
         }
@@ -80,7 +81,9 @@ class DirectoryListStep(): FileStep(NsP.directoryList) {
             } else {
                 dir.absolutePath
             }
-            val matchString = path.substring(rootPath.length + 1)
+
+            val urifyPath = Urify.urify(path)
+            val matchString = urifyPath.substring(rootPath.length + 1)
 
             if (includeFilters.isNotEmpty()) {
                 include = false
