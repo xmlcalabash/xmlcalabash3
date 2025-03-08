@@ -18,7 +18,12 @@ open class WithInputInstruction(parent: XProcInstruction, stepConfig: Instructio
         // elaboration might add a connection
         val connected = children.isNotEmpty() || href != null || pipe != null
 
-        if (!connected && primary != false) {
+        var connectDrp = !connected && primary == true
+        if (!connectDrp && !connected && parent != null) {
+            connectDrp = parent!!.instructionType in listOf(NsP.forEach, NsP.viewport)
+        }
+
+        if (!connected && connectDrp) {
             if (stepConfig.drp != null) {
                 pipe()
             } else {
