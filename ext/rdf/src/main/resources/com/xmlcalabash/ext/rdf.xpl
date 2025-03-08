@@ -17,7 +17,7 @@
   </p:declare-step>
 
   <p:declare-step type="cx:sparql">
-    <p:input port="source"/>
+    <p:input port="source" primary="true"/>
     <p:input port="query" content-types="text"/>
     <p:output port="result"/>
     <p:option name="content-type" as="xs:string?"/>
