@@ -12,6 +12,7 @@ import com.xmlcalabash.runtime.parameters.RuntimeStepParameters
 import com.xmlcalabash.steps.AbstractAtomicStep
 import com.xmlcalabash.util.S9Api
 import com.xmlcalabash.util.SaxonErrorReporter
+import com.xmlcalabash.util.XsdResolver
 import net.sf.saxon.Configuration
 import net.sf.saxon.Controller
 import net.sf.saxon.lib.SchemaURIResolver
@@ -54,7 +55,7 @@ open class ValidateWithXmlSchema(): AbstractAtomicStep() {
         }
 
         manager.errorReporter = errorReporter
-        manager.schemaURIResolver = XsdResolver()
+        manager.schemaURIResolver = XsdResolver(stepConfig)
 
         validateWithSaxon(manager)
     }
@@ -234,14 +235,4 @@ open class ValidateWithXmlSchema(): AbstractAtomicStep() {
     }
 
     override fun toString(): String = "p:validate-with-xml-schema"
-
-    inner class XsdResolver(): SchemaURIResolver {
-        override fun setConfiguration(config: Configuration?) {
-            // I don't care???
-        }
-
-        override fun resolve(moduleURI: String?, baseURI: String?, locations: Array<out String>?): Array<StreamSource>? {
-            return stepConfig.environment.documentManager.resolve(moduleURI, baseURI, locations)
-        }
-    }
 }
