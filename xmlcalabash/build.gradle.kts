@@ -19,7 +19,8 @@ plugins {
   id("com.xmlcalabash.build.xmlcalabash-build")
   id("com.github.gmazzo.buildconfig") version "5.5.0"
   id("org.jetbrains.dokka") version "1.9.20"
-  `maven-publish`
+  id("maven-publish")
+  id("signing")
 }
 
 configurations.forEach {
@@ -273,5 +274,9 @@ publishing {
       artifact(sourcesJar.get())
     }
   }
+}
+
+signing {
+  sign(publishing.publications["mavenXmlCalabash"])
 }
 
