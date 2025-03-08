@@ -157,6 +157,12 @@ open class XsltStep(): AbstractAtomicStep() {
         val collectionFinder = config.collectionFinder
         val unparsedTextURIResolver = config.unparsedTextURIResolver
 
+        val manager = stepConfig.processor.getSchemaManager()
+        if (manager != null) {
+            manager.errorReporter = errorReporter
+            manager.schemaURIResolver = XsdResolver(stepConfig)
+        }
+
         val compiler = processor.newXsltCompiler()
         compiler.isSchemaAware = processor.isSchemaAware
         compiler.errorReporter = errorReporter
@@ -190,6 +196,10 @@ open class XsltStep(): AbstractAtomicStep() {
         }
 
         val transformer = exec.load30()
+
+        transformer.setSchemaValidationMode(ValidationMode.DEFAULT)
+        transformer.getUnderlyingController().setUnparsedTextURIResolver(unparsedTextURIResolver)
+
         transformer.resourceResolver = stepConfig.environment.documentManager
         transformer.setResultDocumentHandler(DocumentHandler())
         transformer.setStylesheetParameters(parameters)
@@ -293,9 +303,6 @@ open class XsltStep(): AbstractAtomicStep() {
                 }
             }
         }
-
-        transformer.setSchemaValidationMode(ValidationMode.DEFAULT)
-        transformer.getUnderlyingController().setUnparsedTextURIResolver(unparsedTextURIResolver)
 
         if (globalContextItem != null && globalContextItem!!.value != XdmEmptySequence.getInstance()) {
             transformer.setGlobalContextItem(globalContextItem!!.value as XdmItem)
