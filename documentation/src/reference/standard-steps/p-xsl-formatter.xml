@@ -194,10 +194,20 @@ The following configuration options are supported:</para>
 <para>For more information about the properties, consult the FOP API documentation.</para>
 
 <para>The following <option>content-type</option>s are supported:
-<literal>application/pdf</literal>, <literal>application/postscript</literal>,
-<literal>application/x-afp</literal>, <literal>application/rtf</literal>,
-and <literal>text/plain</literal>.</para>
-
+<literal>application/pdf</literal>,
+<literal>application/postscript</literal>,
+<literal>application/rtf</literal>,
+<literal>application/vnd.hp-PCL</literal>,
+<literal>application/x-afp</literal>,
+<literal>application/X-fop-areatree</literal>,
+<literal>image/png</literal>,
+<literal>image/svg+xml</literal><footnote><para>SVG output is not supported
+by the standard release of FOP, it’s a
+<link xlink:href="https://xmlgraphics.apache.org/fop/${dep_fop}/output.html#sandbox">sandbox</link>
+feature. To use it, follow the Apache FOP instructions for building an FOP release
+with the sandbox enabled and put that on your class path.</para></footnote>,
+<literal>image/text</literal>, and
+<literal>text/plain</literal>.</para>
 </refsection>
 
 </refsection>

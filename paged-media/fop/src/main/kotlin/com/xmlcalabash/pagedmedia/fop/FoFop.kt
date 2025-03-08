@@ -22,9 +22,18 @@ import javax.xml.transform.sax.SAXSource
 
 class FoFop(): FoProcessor {
     companion object {
-        private val supportedContentTypes = listOf(MediaType.PDF, MediaType.parse("application/postscript"),
-            MediaType.parse("application/x-afp"), MediaType.parse("application/rtf"),
-            MediaType.TEXT)
+        private val supportedContentTypes = listOf(
+            MediaType.PDF,
+            MediaType.PNG,
+            MediaType.TEXT,
+            MediaType.parse("application/X-fop-areatree"),
+            MediaType.parse("application/postscript"),
+            MediaType.parse("application/rtf"),
+            MediaType.parse("application/vnd.hp-PCL"),
+            MediaType.parse("application/x-afp"),
+            MediaType.parse("image/svg+xml"),
+            MediaType.parse("image/tiff")
+        )
 
         private val _UserConfig = QName("UserConfig")
         private val _StrictFOValidation = QName("StrictFOValidation")
