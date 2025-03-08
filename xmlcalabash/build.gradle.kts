@@ -145,6 +145,7 @@ buildConfig {
                   "ebnfConvert",
                   "epubcheck",
                   "flexmarkAll",
+                  "fop",
                   "graalvmJS",
                   "htmlparser",
                   "httpClient",

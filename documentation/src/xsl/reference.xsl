@@ -34,6 +34,7 @@
 
 <xsl:param name="dep_saxon" select="'UNCONFIGURED'"/>
 <xsl:param name="dep_brotliDec" select="'UNCONFIGURED'"/>
+<xsl:param name="dep_fop" select="'UNCONFIGURED'"/>
 <xsl:param name="dep_commonsCodec" select="'UNCONFIGURED'"/>
 <xsl:param name="dep_commonsCompress" select="'UNCONFIGURED'"/>
 <xsl:param name="dep_flexmarkAll" select="'UNCONFIGURED'"/>
