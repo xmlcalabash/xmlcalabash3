@@ -174,7 +174,7 @@ class TestCase(val suite: TestSuite, val testFile: File) {
                     if (graphviz == null) {
                         logger.warn { "Cannot create SVG descriptions, graphviz is not configured" }
                     } else {
-                        VisualizerOutput.svg(description, suite.options.outputGraph!!, graphviz!!.absolutePath)
+                        VisualizerOutput.svg(description, suite.options.outputGraph!!, config.xmlCalabashConfig)
                     }
                 }
             }

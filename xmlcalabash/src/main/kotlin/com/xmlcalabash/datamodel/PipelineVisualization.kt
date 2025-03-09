@@ -63,17 +63,12 @@ class PipelineVisualization private constructor(private val instruction: XProcIn
 
     private fun startElement(qname: QName, attr: Map<String,String?>) {
         var nsmap: NamespaceMap = NamespaceMap.emptyMap()
-        nsmap = nsmap.put("", ns)
+        nsmap = nsmap.put("g", ns)
         nsmap = nsmap.put("p", NsP.namespace)
         nsmap = nsmap.put("cx", NsCx.namespace)
         nsmap = nsmap.put("xs", NsXs.namespace)
 
-        val name = if (qname.namespaceUri == ns) {
-            qname
-        } else {
-            QName(ns, qname.localName)
-        }
-
+        val name = QName(ns, "g:${qname.localName}")
         builder.addStartElement(name, instruction.stepConfig.stringAttributeMap(attr), nsmap)
         root = false
     }

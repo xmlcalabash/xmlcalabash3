@@ -85,7 +85,15 @@
   <xsl:if test="@dot:*">
     <xsl:text> [</xsl:text>
     <xsl:for-each select="@dot:*">
-      <xsl:text>{local-name(.)}={string(.)};</xsl:text>
+      <xsl:text>{local-name(.)}=</xsl:text>
+      <xsl:choose>
+        <xsl:when test="string(.) castable as xs:double">
+          <xsl:text>{string(.)};</xsl:text>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:text>"{string(.)}";</xsl:text>
+        </xsl:otherwise>
+      </xsl:choose>
     </xsl:for-each>
     <xsl:text>]</xsl:text>
   </xsl:if>

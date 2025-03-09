@@ -41,6 +41,7 @@ abstract class XmlCalabashConfiguration {
     var inlineTrimWhitespace: Boolean = false
     var mpt: Double = 0.99999998
     var graphviz: File? = null
+    var graphStyle: URI? = null
     var serialization: Map<MediaType, Map<QName, String>> = emptyMap()
     var trace: File? = null
     var traceDocuments: File? = null

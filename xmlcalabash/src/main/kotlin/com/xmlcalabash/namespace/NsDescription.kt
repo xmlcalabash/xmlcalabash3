@@ -7,7 +7,6 @@ object NsDescription {
     val namespace: NamespaceUri = NamespaceUri.of("http://xmlcalabash.com/ns/description")
 
     val description = QName(namespace, "g:description")
-    val graphs = QName(namespace, "g:graphs")
     val graph = QName(namespace, "g:graph")
     val declareStep = QName(namespace, "g:declare-step")
     val compound = QName(namespace, "g:compound")

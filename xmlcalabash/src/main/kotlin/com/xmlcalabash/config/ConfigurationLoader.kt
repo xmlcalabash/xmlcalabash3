@@ -50,6 +50,7 @@ class ConfigurationLoader private constructor(private val config: XmlCalabashCon
         private val _count = QName("count")
         private val _cssFormatter = QName("css-formatter")
         private val _dot = QName("dot")
+        private val _style = QName("style")
         private val _extensions = QName("extensions")
         private val _host = QName("host")
         private val _licensed = QName("licensed")
@@ -278,7 +279,7 @@ class ConfigurationLoader private constructor(private val config: XmlCalabashCon
     }
 
     private fun parseGraphviz(node: XdmNode) {
-        checkAttributes(node, listOf(_dot))
+        checkAttributes(node, listOf(_dot), listOf(_style))
         val dot = File(node.getAttributeValue(_dot)!!)
         if (!dot.exists() || dot.isDirectory) {
             throw XProcError.xiCannotFindGraphviz(dot.absolutePath).exception()
@@ -287,6 +288,11 @@ class ConfigurationLoader private constructor(private val config: XmlCalabashCon
             throw XProcError.xiCannotExecuteGraphviz(dot.absolutePath).exception()
         }
         config.graphviz = dot
+
+        val style = node.getAttributeValue(_style)
+        if (style != null) {
+            config.graphStyle = node.baseURI.resolve(style)
+        }
     }
 
     private fun parseSaxonConfigurationProperty(node: XdmNode) {

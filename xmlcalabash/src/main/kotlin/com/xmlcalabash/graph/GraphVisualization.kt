@@ -3,9 +3,13 @@ package com.xmlcalabash.graph
 import com.xmlcalabash.datamodel.AtomicExpressionStepInstruction
 import com.xmlcalabash.datamodel.DeclareStepInstruction
 import com.xmlcalabash.datamodel.InstructionConfiguration
+import com.xmlcalabash.namespace.Ns
+import com.xmlcalabash.namespace.Ns.primary
 import com.xmlcalabash.namespace.NsCx
 import com.xmlcalabash.namespace.NsDescription
 import com.xmlcalabash.util.SaxonTreeBuilder
+import net.sf.saxon.om.NamespaceUri
+import net.sf.saxon.s9api.QName
 import net.sf.saxon.s9api.XdmNode
 
 class GraphVisualization private constructor(val graph: Graph) {
@@ -107,14 +111,14 @@ class GraphVisualization private constructor(val graph: Graph) {
             }
         }
 
-        for ((name, _) in root.inputs) {
-            val inode = InputNode(name)
+        for ((name, port) in root.inputs) {
+            val inode = InputNode(name, port.primary, port.sequence)
             addNode(inode)
             addEdge(Edge(Port(inode, ""), Port(modelMap[root]!!, name)))
         }
 
-        for ((name, _) in root.outputs) {
-            val onode = OutputNode(name)
+        for ((name, port) in root.outputs) {
+            val onode = OutputNode(name, port.primary, port.sequence)
             addNode(onode)
             addEdge(Edge(Port(modelMap[root]!!, name), Port(onode, "")))
         }
@@ -211,6 +215,12 @@ class GraphVisualization private constructor(val graph: Graph) {
             for ((name, input) in model.inputs) {
                 val attr = mutableMapOf<String, String>()
                 attr["port"] = name
+                if (input.primary) {
+                    attr["primary"] = "true"
+                }
+                if (input.sequence) {
+                    attr["sequence"] = "true"
+                }
                 if (input.weldedShut) {
                     attr["welded-shut"] = "true"
                 }
@@ -220,6 +230,12 @@ class GraphVisualization private constructor(val graph: Graph) {
             for ((name, output) in model.outputs) {
                 val attr = mutableMapOf<String, String>()
                 attr["port"] = name
+                if (output.primary) {
+                    attr["primary"] = "true"
+                }
+                if (output.sequence) {
+                    attr["sequence"] = "true"
+                }
                 if (output.weldedShut) {
                     attr["welded-shut"] = "true"
                 }
@@ -335,14 +351,22 @@ class GraphVisualization private constructor(val graph: Graph) {
         }
     }
 
-    inner class InputNode(val port: String): Node() {
+    inner class InputNode(val port: String, val primary: Boolean, val sequence: Boolean): Node() {
         override val id = "I_${port}"
         override fun addSinks() {
             // nop
         }
 
         override fun describe(builder: SaxonTreeBuilder) {
-            builder.addStartElement(NsDescription.input, stepConfig.stringAttributeMap(mapOf("port" to port)))
+            val amap = mutableMapOf<String, String?>()
+            amap["port"] = port
+            if (primary) {
+                amap["primary"] = "true"
+            }
+            if (sequence) {
+                amap["sequence"] = "true"
+            }
+            builder.addStartElement(NsDescription.input, stepConfig.stringAttributeMap(amap))
             builder.addEndElement()
         }
 
@@ -351,14 +375,22 @@ class GraphVisualization private constructor(val graph: Graph) {
         }
     }
 
-    inner class OutputNode(val port: String): Node() {
+    inner class OutputNode(val port: String, val primary: Boolean, val sequence: Boolean): Node() {
         override val id = "O_${port}"
         override fun addSinks() {
             // nop
         }
 
         override fun describe(builder: SaxonTreeBuilder) {
-            builder.addStartElement(NsDescription.output, stepConfig.stringAttributeMap(mapOf("port" to port)))
+            val amap = mutableMapOf<String, String?>()
+            amap["port"] = port
+            if (primary) {
+                amap["primary"] = "true"
+            }
+            if (sequence) {
+                amap["sequence"] = "true"
+            }
+            builder.addStartElement(NsDescription.output, stepConfig.stringAttributeMap(amap))
             builder.addEndElement()
         }
 
