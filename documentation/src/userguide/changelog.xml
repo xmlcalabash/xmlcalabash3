@@ -13,6 +13,45 @@ See the commits and pull requests on
 finer detail.</para>
 
 <revhistory>
+<revision xml:id="r300-alpha23">
+<revnumber>3.0.0-alpha23</revnumber>
+<date>2025-03-09</date>
+<revdescription>
+<itemizedlist>
+<listitem><para>Fixed <ghissue number="350"/> by making the <port>source</port> port
+on <tag>cx:sparql</tag> primary. (That was an oversight in the library that declares the step.)
+</para></listitem>
+<listitem><para>Fixed <ghissue number="327"/> by making sure that
+<tag>p:directory-list</tag> paths are normalized against the base URI correctly.
+</para></listitem>
+<listitem><para>Fixed <ghissue number="325"/> by making sure that secondary (non-primary)
+input ports are bound correctly.
+A secondary input <emphasis>is not</emphasis> bound to the default readable port if there’s no
+explicit connection for it. Instead, it’s bound to the input port’s default
+connection.</para></listitem>
+<listitem><para>Fixed <ghissue number="323"/> by documenting that using an extension
+step requires providing its declaration; added a the library URIs to all of the
+extension step reference pages.
+</para></listitem>
+<listitem><para>Fixed <ghissue number="319"/> by bundling CoffeeSacks with XML
+Calabash (this is the Saxon extension function for Invisible XML). The function is
+automatically registered.
+</para></listitem>
+<listitem><para>Added support for user-styling of the SVG pipeline and graph output.
+Documentation T.B.D. (See <ghissue number="336"/>.)
+</para></listitem>
+<listitem><para>Added (somewhat experimental) support for 
+<link linkend="implicit-validation">implicit XML Schema validation</link>
+of primary inputs.
+</para></listitem>
+<listitem><para>Updated Apache FOP support;
+XML Calabash is now using FOP 2.10. Added image/png, image/tiff, application/X-fop-areatrea,
+and application/vnd.hp-PCL as output formats. Allow image/svg+xml as an output
+format, but note that it requires a build of FOP with the sandbox enabled.
+</para></listitem>
+</itemizedlist>
+</revdescription>
+</revision>
 <revision xml:id="r300-alpha22">
 <revnumber>3.0.0-alpha22</revnumber>
 <date>2025-03-02</date>
