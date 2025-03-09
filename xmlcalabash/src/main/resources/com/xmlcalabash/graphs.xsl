@@ -196,6 +196,9 @@
             <xsl:if test="$ispan ne 1">
               <xsl:attribute name="colspan" select="$ispan"/>
             </xsl:if>
+            <xsl:for-each select="@dot:*">
+              <xsl:attribute name="{local-name(.)}" select="."/>
+            </xsl:for-each>
             <xsl:variable name="welded" select="@welded-shut = 'true'"/>
             <xsl:variable name="lines" select="tokenize(@port, '/')"/>
             <xsl:for-each select="$lines">
@@ -295,6 +298,7 @@
       <xsl:if test="$style ne 'solid'">
         <xsl:attribute name="dot:style" select="$style"/>
       </xsl:if>
+      <xsl:copy-of select="@dot:*"/>
     </dot:edge>
   </xsl:if>
 </xsl:template>

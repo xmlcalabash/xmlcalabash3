@@ -60,6 +60,7 @@ cc.inline =
 cc.graphviz =
     element cc:graphviz {
         attribute dot { text },
+        attribute style { text }?,
         empty
     }
 

@@ -2,6 +2,7 @@ package com.xmlcalabash.util
 
 import com.xmlcalabash.XmlCalabashBuildConfig
 import com.xmlcalabash.config.XmlCalabash
+import com.xmlcalabash.config.XmlCalabashConfiguration
 import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.io.DocumentWriter
@@ -32,13 +33,30 @@ class VisualizerOutput {
             writer.write()
         }
 
-        fun svg(node: XdmNode, outdir: String, graphviz: String, debug: Boolean = false) {
+        fun svg(node: XdmNode, outdir: String, xmlcalabashConfig: XmlCalabashConfiguration, debug: Boolean = false) {
+            val graphviz = xmlcalabashConfig.graphviz!!.absolutePath
+
+            var xsltCompiler = node.processor.newXsltCompiler()
+
+            var source = if (xmlcalabashConfig.graphStyle == null) {
+                node
+            } else {
+                val graphStyleSource = SAXSource(InputSource(xmlcalabashConfig.graphStyle!!.toString()))
+                xsltCompiler.isSchemaAware = node.processor.isSchemaAware
+                xsltCompiler.resourceResolver = VisualizerResourceResolver()
+                val xsltExec = xsltCompiler.compile(graphStyleSource)
+                var transformer = xsltExec.load30()
+                transformer.globalContextItem = node
+                val xmlResult = XdmDestination()
+                transformer.applyTemplates(node.asSource(), xmlResult)
+                xmlResult.xdmNode
+            }
+
             val stylesheet = "/com/xmlcalabash/graphviz.xsl"
             var styleStream = VisualizerOutput::class.java.getResourceAsStream(stylesheet)
             var styleSource = SAXSource(InputSource(styleStream))
             styleSource.systemId = "/com/xmlcalabash/graphviz"
-            var xsltCompiler = node.processor.newXsltCompiler()
-            xsltCompiler.isSchemaAware = node.processor.isSchemaAware
+            xsltCompiler.isSchemaAware = source.processor.isSchemaAware
             xsltCompiler.resourceResolver = VisualizerResourceResolver()
             var xsltExec = xsltCompiler.compile(styleSource)
 
@@ -50,10 +68,10 @@ class VisualizerOutput {
                 transformer.setStylesheetParameters(mapOf(Ns.debug to XdmAtomicValue("1")))
             }
 
-            transformer.globalContextItem = node
+            transformer.globalContextItem = source
             transformer.baseOutputURI = "${outputBaseURI}"
             val xmlResult = XdmDestination()
-            transformer.applyTemplates(node.asSource(), xmlResult)
+            transformer.applyTemplates(source.asSource(), xmlResult)
             val dotxml = xmlResult.xdmNode
             val dotFiles = dotxml.underlyingNode.stringValue.trim().split('\n')
 
@@ -81,7 +99,9 @@ class VisualizerOutput {
                     }
                     logger.warn { "Graph generation failed for $filename" }
                 }
-                dotFile.delete()
+                if (!debug) {
+                    dotFile.delete()
+                }
             }
         }
     }
