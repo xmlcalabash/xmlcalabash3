@@ -90,7 +90,7 @@
 
 <xsl:template match="db:ghissue">
   <a href="https://github.com/xmlcalabash/xmlcalabash3/issues/{@number}">
-    <xsl:text>issue #</xsl:text>
+    <xsl:text>issue #</xsl:text>
     <xsl:value-of select="@number"/>
   </a>
 </xsl:template>
