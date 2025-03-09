@@ -15,6 +15,7 @@ import net.sf.saxon.om.EmptyAttributeMap
 import net.sf.saxon.om.NamespaceMap
 import net.sf.saxon.s9api.QName
 import net.sf.saxon.s9api.XdmNode
+import java.net.URI
 import java.time.Instant
 import java.time.ZoneId
 
@@ -47,6 +48,13 @@ open class StandardTraceListener: TraceListener {
         }
     }
 
+    override fun getResource(duration: Long, uri: URI, href: URI?, resolved: Boolean, cached: Boolean) {
+        val detail = GetResourceDetail(System.currentTimeMillis(), duration, uri, href, resolved, cached)
+        synchronized(_trace) {
+            _trace.add(detail)
+        }
+    }
+
     override fun sendDocument(from: Pair<AbstractStep, String>, to: Pair<Consumer, String>, document: XProcDocument): XProcDocument {
         synchronized(_trace) {
             val fromDetail = Pair(from.first.id, from.second)
@@ -59,6 +67,9 @@ open class StandardTraceListener: TraceListener {
     override fun summary(config: XProcStepConfiguration): XdmNode {
         val _startTime = QName("start-time")
         val _durationMs = QName("duration-ms")
+        val _uri = QName("uri")
+        val _resolvedLocally = QName("resolved-locally")
+        val _cached = QName("cached")
 
         var nsMap = NamespaceMap.emptyMap()
         nsMap = nsMap.put("", NsTrace.namespace)
@@ -114,6 +125,30 @@ open class StandardTraceListener: TraceListener {
                     }
                     is DocumentDetail -> {
                         documentSummary(config, builder, detail)
+                    }
+                    is GetResourceDetail -> {
+                        val instant = Instant.ofEpochMilli(detail.startTime)
+                        val dt = instant.atZone(utc).toOffsetDateTime()
+                        val ms = detail.duration / 1_000_000
+                        val attributes = mutableMapOf<QName, String>(
+                            _startTime to "${dt}",
+                            _durationMs to "${ms}",
+                            _uri to "${detail.uri}"
+                        )
+                        if (detail.href != null) {
+                            attributes[Ns.href] = "${detail.href}"
+                        }
+                        if (detail.resolved) {
+                            attributes[_resolvedLocally] = "${detail.resolved}"
+                        }
+                        if (detail.cached) {
+                            attributes[_cached] = "${detail.cached}"
+                        }
+                        builder.addStartElement(NsTrace.resource, config.attributeMap(attributes))
+                        builder.addEndElement()
+                    }
+                    else -> {
+                        throw IllegalArgumentException("Unknown detail type ${detail::class.java}")
                     }
                 }
             }

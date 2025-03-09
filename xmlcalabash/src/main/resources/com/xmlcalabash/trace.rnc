@@ -11,7 +11,7 @@ t.trace =
 t.thread =
     element t:thread {
         attribute id { xsd:long },
-        (t.step | t.document)+
+        (t.step | t.document | t.resource)+
     }
 
 t.step =
@@ -21,7 +21,7 @@ t.step =
         attribute type { xsd:QName },
         attribute start-time { xsd:dateTime },
         attribute duration-ms { xsd:long },
-        (t.step | t.document)*
+        (t.step | t.document | t.resource)*
     }
 
 t.document =
@@ -29,6 +29,17 @@ t.document =
         attribute id { xsd:long },
         attribute content-type { text }?,
         (t.from, t.to, t.location?)
+    }
+
+t.resource =
+    element t:resource {
+        attribute start-time { xsd:dateTime },
+        attribute duration-ms { xsd:long },
+        attribute uri { xsd:anyURI },
+        attribute href { xsd:anyURI }?,
+        attribute resolved { xsd:boolean }?,
+        attribute cached { xsd:boolean }?,
+        empty
     }
 
 t.from =

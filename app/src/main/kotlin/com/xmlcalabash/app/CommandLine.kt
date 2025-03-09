@@ -16,6 +16,7 @@ import com.xmlcalabash.visualizers.Detail
 import com.xmlcalabash.visualizers.Plain
 import com.xmlcalabash.visualizers.Silent
 import net.sf.saxon.om.NamespaceUri
+import net.sf.saxon.s9api.ValidationMode
 import java.io.File
 import java.net.URI
 
@@ -73,6 +74,11 @@ class CommandLine private constructor(val args: Array<out String>) {
     private var _initializers = mutableListOf<String>()
     private var _pipeline: File? = null
     private var _step: String? = null
+    private val _xmlSchemas = mutableListOf<URI>()
+    private var _validationMode = ValidationMode.DEFAULT
+    private var _useLocationHints: Boolean? = null
+    private var _tryNamespaces: Boolean? = null
+    private val _xmlCatalogs = mutableListOf<URI>()
 
     /** The command. */
     val command: String
@@ -198,10 +204,35 @@ class CommandLine private constructor(val args: Array<out String>) {
     val step: String?
         get() = _step
 
+    /** The validation mode. */
+    val validationMode: ValidationMode
+        get() = _validationMode
+
+    /** Try namespace URIs for schemas? */
+    val tryNamespaces: Boolean?
+        get() = _tryNamespaces
+
+    /** Use location hints for schemas? */
+    val useLocationHints: Boolean?
+        get() = _useLocationHints
+
+    /** XML Schema documents. */
+    val xmlSchemas: List<URI>
+        get() = _xmlSchemas
+
+    /** Catalog files specified on the command line. */
+    val xmlCatalogs: List<URI>
+        get() = _xmlCatalogs
+
     private val arguments = listOf(
         ArgumentDescription("--input", listOf("-i"), ArgumentType.STRING) { it -> parseInput(it) },
         ArgumentDescription("--output", listOf("-o"), ArgumentType.STRING) { it -> parseOutput(it) },
         ArgumentDescription("--namespace", listOf("-ns"), ArgumentType.STRING) { it -> parseNamespace(it) },
+        ArgumentDescription("--xml-schema", listOf("--xsd"), ArgumentType.URI) { it -> parseXmlSchema(it) },
+        ArgumentDescription("--validation-mode", listOf("--val"), ArgumentType.STRING, "strict") { it -> parseValidationMode(it) },
+        ArgumentDescription("--use-location-hints", listOf("--hints"), ArgumentType.BOOLEAN, "true") { it -> _useLocationHints = it == "true" },
+        ArgumentDescription("--try-namespaces", listOf("--try-ns"), ArgumentType.BOOLEAN, "true") { it -> _tryNamespaces = it == "true" },
+        ArgumentDescription("--catalog", listOf(), ArgumentType.URI) { it -> parseCatalog(it) },
         ArgumentDescription("--init", listOf(), ArgumentType.STRING) { it -> _initializers.add(it) },
         ArgumentDescription("--configuration", listOf("-c", "--config"), ArgumentType.EXISTING_FILE) { it -> _config = File(it) },
         ArgumentDescription("--step", listOf("-s"), ArgumentType.STRING) { it -> _step = it },
@@ -413,6 +444,32 @@ class CommandLine private constructor(val args: Array<out String>) {
         }
 
         _namespaces[prefix] = NamespaceUri.of(uri)
+    }
+
+    private fun parseXmlSchema(arg: String) {
+        val uri = URI(arg)
+        if (uri.isAbsolute) {
+            _xmlSchemas.add(uri)
+        } else {
+            _xmlSchemas.add(UriUtils.cwdAsUri().resolve(uri))
+        }
+    }
+
+    private fun parseCatalog(arg: String) {
+        val uri = URI(arg)
+        if (uri.isAbsolute) {
+            _xmlCatalogs.add(uri)
+        } else {
+            _xmlCatalogs.add(UriUtils.cwdAsUri().resolve(uri))
+        }
+    }
+
+    private fun parseValidationMode(arg: String) {
+        when (arg) {
+            "strict" -> _validationMode = ValidationMode.STRICT
+            "lax" -> _validationMode = ValidationMode.LAX
+            else -> throw XProcError.xiCliInvalidValue("--validation-mode", arg).exception()
+        }
     }
 
     private fun parseOptionParam(arg: String) {

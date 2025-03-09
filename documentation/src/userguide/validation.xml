@@ -1,0 +1,120 @@
+<chapter xmlns="http://docbook.org/ns/docbook"
+         xmlns:xlink="http://www.w3.org/1999/xlink"
+         xmlns:xi='http://www.w3.org/2001/XInclude'
+         version="5.2" xml:id="implicit-validation">
+<info>
+  <?db filename="validation"?>
+  <title>Implicit validation</title>
+</info>
+
+<important>
+<para>This is an experimental feature. The design may change in subsequent releases.</para>
+</important>
+
+<para>The XProc validation steps (<tag>p:validate-with-nvdl</tag>,
+<tag>p:validate-with-relax-ng</tag>,
+<tag>p:validate-with-schematron</tag>,
+<tag>p:validate-with-xml-schema</tag>,
+<tag>p:validate-with-json-schema</tag>,
+and <tag>validate-with-dtd</tag>) provide flexible, robust options for
+validation. But in the XPath data model, XML Schema validation has a special
+significance because it can effect the types of elements and attributes in XML documents.</para>
+
+<para>If you are using Saxon EE, you can enable implicit validation of inputs.
+This is not as flexible as using the <tag>p:validate-with-xml-schema</tag> step, but
+it offers a level of convenience.</para>
+
+<note>
+<para>This is an implementation-defined extension. Pipelines that rely on
+implicit validation may not run, or may produce unexpected results, when another
+XProc processor is used.</para>
+</note>
+
+<para>When implicit validation is enabled, it applies to one or more steps. When
+implicit validation is in force for a step, all the XML documents that appear on
+the step’s primary input port will be XML Schema validated. The step will throw
+an exception if validation fails.</para>
+
+<para>Implicit validation doesn’t apply to non-primary input ports. If
+validation applied to all ports, then you’d have to have an XML Schema for XSLT
+stylesheets to use the <tag>p:xslt</tag> step, and a schema for any document
+fragments that you were inserting with <tag>p:insert</tag>, etc.</para>
+
+<para>You can validate non-primary inputs with an explicit validation step or by
+passing them through the primary input port of some other step, such as
+<tag>p:identity</tag>.</para>
+
+
+<para>There’s only one, global context for schemas and catalogs. You can’t
+load different schemas for the same namespace in different steps, nor can you
+have a catalog that applies to only some steps.</para>
+
+<section>
+<title>From the configuration file</title>
+
+<para>Setting the
+<tag class="attribute" linkend="cc.xml-calabash">cc:validation-mode</tag> in the
+configuration file applies implicit validation to all steps. The validation
+mode can be either strict or lax.</para>
+
+<para>If <tag class="attribute" linkend="cc.xml-calabash">cc:try-namespaces</tag> is
+true, implicit validation will attempt to locate a schema using the namespace URI.
+(If a schema is not already loaded.)</para>
+
+<para>If <tag class="attribute" linkend="cc.xml-calabash">cc:use-location-hints</tag> is
+true, implicit validation will attempt to locate a schema using schema location hints
+in the source document. (If a schema is not already loaded.)</para>
+
+<para>Additional schema documents can be loaded directly from the configuration
+file with <tag linkend="cc.xml-schema">cc:xml-schema</tag> elements.</para>
+
+<para>Additional catalogs, consulted when trying the namespace URI to locate a
+schema, can be added directly from the configuration file with
+<tag linkend="cc.catalog">cc:catalog</tag> elements.</para>
+
+</section>
+
+<section>
+<title>From the command line</title>
+
+<para>Options specified on the command line take precedence over any values
+specified in the configuration file.</para>
+
+<para>Using the
+<option linkend="cli-validation-mode">--validation-mode</option> option
+applies implicit validation to all steps. The validation
+mode can be either strict or lax.</para>
+
+<para>If <option linkend="cli-try-namespaces">--try-namespaces</option> is
+specified, implicit validation will attempt to locate a schema using the namespace URI.
+(If a schema is not already loaded.)</para>
+
+<para>If <option linkend="cli-use-location-hints">--use-location-hints</option> is
+specified, implicit validation will attempt to locate a schema using schema location hints
+in the source document. (If a schema is not already loaded.)</para>
+
+<para>Additional schema documents can be loaded from the command
+line with the <option linkend="cli-xml-schema">--xml-schema</option> option.</para>
+
+<para>Additional catalogs, consulted when trying the namespace URI to locate a
+schema, can be loaded from the command line with the
+<option linkend="cli-catalog">--catalog</option> option.</para>
+
+</section>
+
+<section>
+<title>From a pipeline</title>
+
+<para>Putting the <tag class="attribute">cx:validation-mode</tag> attribute on
+a step enables implicit validation for that step. Specified on <tag>p:declare-step</tag>,
+it applies to all instances of that step type.</para>
+
+<para>A pipeline can include <tag>cx:use-catalog</tag> and <tag>cx:import-schema</tag>
+directives in a <tag>p:pipeinfo</tag> to load additional catalogs or schemas.</para>
+
+<para>All of the catalogs and schemas declared in any step type that could be
+called are loaded before execution begins.</para>
+
+</section>
+
+</chapter>

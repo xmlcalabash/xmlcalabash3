@@ -7,6 +7,7 @@ import net.sf.saxon.s9api.QName
 object NsXs {
     val namespace: NamespaceUri = NamespaceUri.of("http://www.w3.org/2001/XMLSchema")
 
+    val schema = QName(namespace, "xs:schema")
     val ENTITY = QName(namespace, "xs:ENTITY")
     val ID = QName(namespace, "xs:ID")
     val IDREF = QName(namespace, "xs:IDREF")

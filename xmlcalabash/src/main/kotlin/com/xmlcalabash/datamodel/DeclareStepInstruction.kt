@@ -2,6 +2,7 @@ package com.xmlcalabash.datamodel
 
 import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.io.MediaType
+import com.xmlcalabash.namespace.NsCx
 import com.xmlcalabash.namespace.NsP
 import com.xmlcalabash.runtime.XProcPipeline
 import com.xmlcalabash.runtime.XProcRuntime
@@ -9,6 +10,7 @@ import com.xmlcalabash.util.AssertionsLevel
 import com.xmlcalabash.util.AssertionsMonitor
 import net.sf.saxon.om.NamespaceUri
 import net.sf.saxon.s9api.QName
+import net.sf.saxon.s9api.ValidationMode
 import net.sf.saxon.s9api.XdmNode
 import java.net.URI
 
@@ -263,6 +265,14 @@ class DeclareStepInstruction(parent: XProcInstruction?, stepConfig: InstructionC
                     throw stepConfig.exception(XProcError.xsUnsupportedVersion(version!!.toString()))
                 }
             }
+        }
+
+        stepConfig.validationMode = stepConfig.xmlCalabash.xmlCalabashConfig.validationMode
+        when (extensionAttributes[NsCx.validationMode]) {
+            null -> Unit
+            "strict" -> stepConfig.validationMode = ValidationMode.STRICT
+            "lax" -> stepConfig.validationMode = ValidationMode.LAX
+            else -> throw stepConfig.exception(XProcError.xiUnsupportedValidationMode(extensionAttributes[NsCx.validationMode]!!))
         }
 
         if (isAtomic) {

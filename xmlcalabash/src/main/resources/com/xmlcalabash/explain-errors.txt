@@ -1546,6 +1546,24 @@ XPath version not supported: “$1”
 cxerr:XI0047
 At most one document is allowed on the source port, found $1.
 
+cxerr:XI0048
+The schema document is not an XSD schema: “$1”.
+
+cxerr:XI0049
+The cc:xml-schema element cannot have both an href attribute and content.
+
+cxerr:XI0050
+Non-whitespace text nodes are forbidden in cc:xml-schema elements.
+
+cxerr:XI0051
+The p:document instruction does not support multipart messages.
+
+cxerr:XI0052
+Unsupported validation mode: “$1”.
+
+cxerr:XI0053
+The cc:catalog element must be empty.
+
 cxerr:XI0200
 Invalid option value “$2” for $1.
 

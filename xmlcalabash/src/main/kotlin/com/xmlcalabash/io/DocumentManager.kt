@@ -4,8 +4,10 @@ import com.xmlcalabash.documents.DocumentProperties
 import com.xmlcalabash.documents.XProcBinaryDocument
 import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.exceptions.XProcError
+import com.xmlcalabash.namespace.NsCx
 import com.xmlcalabash.runtime.XProcStepConfiguration
 import com.xmlcalabash.spi.DocumentResolver
+import com.xmlcalabash.tracing.TraceListener
 import net.sf.saxon.lib.ModuleURIResolver
 import net.sf.saxon.lib.ResourceResolver
 import net.sf.saxon.s9api.QName
@@ -89,7 +91,12 @@ class DocumentManager(): EntityResolver, EntityResolver2, ResourceResolver, Modu
         val cached = getCached(href)
         if (cached != null) {
             val resolved = tryResolvers(href, stepConfig, cached)
-            return resolved ?: cached
+            if (resolved != null) {
+                trace(stepConfig, href, null, resolved=true, cached=false)
+                return resolved
+            }
+            trace(stepConfig, href, null, resolved=false, cached=true)
+            return cached
         }
 
         val resp = resolver.lookupUri(href.toString())
@@ -100,11 +107,42 @@ class DocumentManager(): EntityResolver, EntityResolver2, ResourceResolver, Modu
         }
 
         val resolved = tryResolvers(loadURI, stepConfig)
-        if (resolved == null) {
-            val loader = DocumentLoader(stepConfig, loadURI, properties, parameters)
-            return loader.load()
+        if (resolved != null) {
+            trace(stepConfig, loadURI, href, resolved=true, cached=false)
+            return resolved
         }
-        return resolved
+
+        val originalUri = if (href == loadURI) {
+            null
+        } else {
+            href
+        }
+
+        val newProperties = DocumentProperties()
+        for ((key, value) in properties.asMap()) {
+            if (key.namespaceUri == NsCx.namespace) {
+                stepConfig.warn { "Attempt to set ${key} property ignored." }
+            } else {
+                newProperties[key] = value
+            }
+        }
+
+        val loader = DocumentLoader(stepConfig, loadURI, properties, parameters, originalUri)
+        return loader.load()
+    }
+
+    private fun trace(stepConfig: XProcStepConfiguration, uri: URI, href: URI?, resolved: Boolean, cached: Boolean) {
+        val traceHref = if (uri == href) {
+            null
+        } else {
+            href
+        }
+
+        for (monitor in stepConfig.environment.monitors) {
+            if (monitor is TraceListener) {
+                monitor.getResource(0, uri, traceHref, resolved, cached)
+            }
+        }
     }
 
     fun getCached(href: URI): XProcDocument? {

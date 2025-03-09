@@ -1,6 +1,5 @@
 package com.xmlcalabash.runtime.steps
 
-import com.xmlcalabash.datamodel.DeclareStepInstruction
 import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.namespace.Ns
@@ -9,16 +8,10 @@ import com.xmlcalabash.namespace.NsP
 import com.xmlcalabash.runtime.XProcStepConfiguration
 import com.xmlcalabash.runtime.model.HeadModel
 import com.xmlcalabash.runtime.parameters.RuntimeStepParameters
+import com.xmlcalabash.util.SaxonXsdValidator
 import com.xmlcalabash.util.Verbosity
-import net.sf.saxon.s9api.QName
-import net.sf.saxon.s9api.XdmFunctionItem
-import net.sf.saxon.s9api.XdmNode
-import net.sf.saxon.s9api.XdmNodeKind
-import net.sf.saxon.s9api.XdmValue
+import net.sf.saxon.s9api.*
 import java.time.Duration
-import kotlin.collections.component1
-import kotlin.collections.component2
-import kotlin.collections.iterator
 
 class CompoundStepHead(config: XProcStepConfiguration, val parent: CompoundStep, step: HeadModel): AbstractStep(config, step, NsCx.head, "${step.name}/head") {
     override val params = RuntimeStepParameters(NsCx.head, "!head",
@@ -32,6 +25,7 @@ class CompoundStepHead(config: XProcStepConfiguration, val parent: CompoundStep,
     internal val _options = mutableMapOf<QName, MutableList<XProcDocument>>()
     private val inputErrors = mutableListOf<XProcError>()
     override val stepTimeout: Duration = Duration.ZERO
+    private var validator: SaxonXsdValidator? = null
 
     val cache: Map<String, List<XProcDocument>>
         get() = _cache
@@ -222,7 +216,16 @@ class CompoundStepHead(config: XProcStepConfiguration, val parent: CompoundStep,
                 continue
             }
 
-            val documents = cache[port] ?: emptyList()
+            val documents = mutableListOf<XProcDocument>()
+            if (cache[port] != null) {
+                if (params.outputs[port]?.primary == true) {
+                    for (doc in cache[port]!!) {
+                        documents.add(validate(doc))
+                    }
+                } else {
+                    documents.addAll(cache[port]!!)
+                }
+            }
 
             val rpair = receiver[port]
             if (rpair == null) {
@@ -245,7 +248,6 @@ class CompoundStepHead(config: XProcStepConfiguration, val parent: CompoundStep,
                     for (monitor in stepConfig.environment.monitors) {
                         outdoc = monitor.sendDocument(Pair(this, port), Pair(targetStep, targetPort), outdoc)
                     }
-
                     targetStep.input(targetPort, outdoc)
                 }
             }
@@ -265,6 +267,23 @@ class CompoundStepHead(config: XProcStepConfiguration, val parent: CompoundStep,
         }
 
         _cache.clear()
+    }
+
+    private fun validate(document: XProcDocument): XProcDocument {
+        if (stepConfig.validationMode == ValidationMode.DEFAULT) {
+            return document
+        }
+
+        val curVal = document.properties[NsCx.validationMode]?.underlyingValue?.stringValue
+        if (curVal == "strict" || (curVal == "lax" && stepConfig.validationMode == ValidationMode.LAX)) {
+            return document
+        }
+
+        if (validator == null) {
+            validator = SaxonXsdValidator(stepConfig)
+        }
+
+        return validator!!.validate(document)
     }
 
     override fun reset() {

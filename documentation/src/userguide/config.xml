@@ -56,7 +56,7 @@ The command-line setting takes precedence.</para>
 linkend="cli-verbosity">on the command line</link>. The command-line setting takes precedence.</para>
 </listitem>
 </varlistentry>
-<varlistentry><term><tag class="attribute">piped-io</tag></term>
+<varlistentry><term><tag class="attribute">piped-io</tag> (boolean)</term>
 <listitem>
 <para>If <tag class="attribute">piped-io</tag> is <literal>true</literal>, XML Calabash
 will behave like a Unix pipeline. If there is no binding for the primary input port, it will
@@ -71,7 +71,7 @@ on the primary input port. It will be parsed as XML if the primary input port do
 specify any content types.</para>
 </listitem>
 </varlistentry>
-<varlistentry><term><tag class="attribute">console-output-encoding</tag></term>
+<varlistentry><term><tag class="attribute">console-output-encoding</tag> (string)</term>
 <listitem>
 <para>When XML Calabash writes to the console, it attempts to make sure that
 the output is consistent with the <tag class="attribute">console-output-encoding</tag>.
@@ -81,12 +81,60 @@ by default, on other platforms it is
 <link xlink:href="https://en.wikipedia.org/wiki/UTF-8">UTF-8</link> by default.</para>
 </listitem>
 </varlistentry>
+
+<varlistentry><term><tag class="attribute">validation-mode</tag> (“lax” or “strict”)</term>
+<listitem>
+<para>Specifies a validation mode for <link linkend="implicit-validation">implicit validation</link>.
+This can also be specified
+<link linkend="cli-validation-mode">on the command line</link>.
+The command-line setting takes precedence.</para>
+</listitem>
+</varlistentry>
+<varlistentry><term><tag class="attribute">use-location-hints</tag> (boolean)</term>
+<listitem>
+<para>If true, <link linkend="implicit-validation">implicit validation</link> will
+use location hints to locate schemas.
+This can also be specified
+<link linkend="cli-use-location-hints">on the command line</link>.
+The command-line setting takes precedence.</para>
+</listitem>
+</varlistentry>
+<varlistentry><term><tag class="attribute">try-namespaces</tag> (boolean)</term>
+<listitem>
+<para>If true, <link linkend="implicit-validation">implicit validation</link> will
+attempt to retrieve the schema using the namespace URI.
+This can also be specified
+<link linkend="cli-try-namespaces">on the command line</link>.
+The command-line setting takes precedence.</para>
+</listitem>
+</varlistentry>
 </variablelist>
 
 <para>For simplicity, the content model of <tag>cc:xml-calabash</tag> allows every element to
 occur an arbitrary number of times. Where an element defines a single, global setting, the last
 value in document order applies.</para>
 
+</section>
+
+<section xml:id="cc.catalog">
+<info>
+<?db filename="cc-catalog"?>
+<title>cc:catalog</title>
+</info>
+
+<para>Adds the specified catalog to the list of XML Catalogs used during resource
+resolution.</para>
+
+<rng-pattern schema="../../build/xml-calabash.rng"
+             name="cc.catalog"/>
+
+<variablelist>
+<varlistentry><term><tag class="attribute">href</tag> (URI)</term>
+<listitem>
+<para>Location of the catalog file.</para>
+</listitem>
+</varlistentry>
+</variablelist>
 </section>
 
 <section xml:id="cc.graphviz">
@@ -108,7 +156,6 @@ executable. Making SVG diagrams of pipelines or graphs requires Graphviz.</para>
 </listitem>
 </varlistentry>
 </variablelist>
-
 </section>
 
 <section xml:id="cc.inline">
@@ -497,7 +544,32 @@ the documents produced during execution are recorded. (Defaults to false.)</para
 </variablelist>
 
 <para>Irrelevant at the moment. XML Calabash is currently single-threaded.</para>
+</section>
 
+<section xml:id="cc.xml-schema">
+<info>
+<?db filename="cc-xml-schema"?>
+<title>cc:xml-schema</title>
+</info>
+
+<para>Adds the specified XML Schema to the global validation context.</para>
+
+<rng-pattern schema="../../build/xml-calabash.rng"
+             name="cc.xmlSchema"/>
+
+<variablelist>
+<varlistentry><term><tag class="attribute">href</tag> (URI)</term>
+<listitem>
+<para>Location of the schema file.</para>
+</listitem>
+</varlistentry>
+</variablelist>
+
+<para>Alternatively, the XML Schema document (or documents) can be children of
+the <tag>cc:xml-schema</tag> element. The RELAX NG grammar for configuration
+files will allow any element as a child of <tag>cc:xml-schema</tag>, but in practice
+only <tag>xsd:schema</tag> elements are allowed.
+</para>
 </section>
 
 <section xml:id="cc.any-name">

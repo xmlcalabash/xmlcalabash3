@@ -189,4 +189,8 @@ object Ns {
     val trace = QName("trace")
     val timing = QName("timing")
     val verbose = QName("verbose")
+    val validationMode = QName("validatation-mode")
+    val tryNamespaces = QName("try-namespaces")
+    val useLocationHints = QName("use-location-hints")
+    val targetNamespace = QName("targetNamespace") // N.B. targetNamespace not target-namespace
 }

@@ -88,6 +88,22 @@ type <tag>p:declare-step</tag>. That represents the invocation of their subpipel
 It may also include documents.</para>
 
 </section>
+
+<section xml:id="t.resource">
+<title>Resources</title>
+
+<rng-pattern schema="../../build/trace.rng"
+             name="t.resource"/>
+
+<para>The <tag>t:resource</tag> element records resources loaded by the pipeline.
+The <tag class="attribute">uri</tag> attribute is the resource loaded; if the
+<tag class="attribute">href</tag> attribute is present, that’s the originally 
+requested URI. If <tag class="attribute">resolved</tag> is true, the resource
+was resolved locally. If <tag class="attribute">cached</tag> is true, the resource
+was found in the cache.
+</para>
+</section>
+
 <section xml:id="t.document">
 <title>Documents</title>
 

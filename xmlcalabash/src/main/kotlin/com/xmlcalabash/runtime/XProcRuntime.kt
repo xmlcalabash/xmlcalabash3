@@ -3,11 +3,21 @@ package com.xmlcalabash.runtime
 import com.xmlcalabash.datamodel.*
 import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.graph.*
+import com.xmlcalabash.namespace.Ns
+import com.xmlcalabash.namespace.NsCx
 import com.xmlcalabash.namespace.NsDescription
+import com.xmlcalabash.namespace.NsXs
 import com.xmlcalabash.runtime.model.CompoundStepModel
+import com.xmlcalabash.util.S9Api
 import com.xmlcalabash.util.SaxonTreeBuilder
 import net.sf.saxon.Configuration
+import net.sf.saxon.s9api.Axis
+import net.sf.saxon.s9api.ValidationMode
+import net.sf.saxon.s9api.XdmDestination
 import net.sf.saxon.s9api.XdmNode
+import net.sf.saxon.s9api.XdmNodeKind
+import org.xml.sax.InputSource
+import javax.xml.transform.sax.SAXSource
 
 class XProcRuntime private constructor(internal val start: DeclareStepInstruction, internal val config: XProcStepConfiguration) {
     companion object {
@@ -21,6 +31,53 @@ class XProcRuntime private constructor(internal val start: DeclareStepInstructio
 
             val runtime = XProcRuntime(start, config)
             val usedSteps = runtime.findUsedSteps(start)
+
+            for (step in usedSteps) {
+                for (info in step.pipeinfo) {
+                    for (element in S9Api.documentElement(info).axisIterator(Axis.CHILD)) {
+                        if (element.nodeKind == XdmNodeKind.ELEMENT) {
+                            when (element.nodeName) {
+                                NsCx.useCatalog -> {
+                                    val href = element.getAttributeValue(Ns.href)
+                                    if (href == null) {
+                                        config.warn { "Ignoring ${element.nodeName}: missing href" }
+                                    } else {
+                                        val uri = element.baseURI.resolve(href).toString()
+                                        config.debug { "Adding catalog: ${uri}" }
+                                        config.environment.documentManager.resolverConfiguration.addCatalog(uri)
+                                    }
+                                }
+                                NsCx.importSchema -> {
+                                    val href = element.getAttributeValue(Ns.href)
+                                    if (href == null) {
+                                        config.warn { "Ignoring ${element.nodeName}: missing href" }
+                                    } else {
+                                        val builder = config.processor.newDocumentBuilder()
+                                        val destination = XdmDestination()
+                                        val uri = element.baseURI.resolve(href).toString()
+                                        val source = SAXSource(InputSource(uri))
+                                        builder.parse(source, destination)
+                                        val schema = S9Api.documentElement(destination.xdmNode)
+                                        if (schema.nodeName == NsXs.schema) {
+                                            config.debug { "Loading XML Schema: ${uri}" }
+                                            config.xmlCalabash.xmlCalabashConfig.xmlSchemaDocuments.add(schema)
+                                        } else {
+                                            config.warn { "Ignoring ${element.nodeName}: not a schema: ${uri}" }
+                                        }
+                                    }
+                                }
+                                else -> {
+                                    if (element.nodeName.namespaceUri == NsCx.namespace) {
+                                        config.warn { "Unexpected element in p:pipeinfo: ${element.nodeName}" }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+
             val pipelines = mutableMapOf<DeclareStepInstruction, SubpipelineModel>()
             for (decl in usedSteps) {
                 val model = Graph.build(decl, config.environment)
@@ -43,7 +100,7 @@ class XProcRuntime private constructor(internal val start: DeclareStepInstructio
         val impl = XProcStepConfigurationImpl(config.environment, instructionConfig.saxonConfig, instructionConfig.location)
         impl.putAllNamespaces(instructionConfig.inscopeNamespaces)
         impl.putAllStepTypes(instructionConfig.inscopeStepTypes)
-        impl.stepName = instructionConfig.stepName
+        impl.validationMode = instructionConfig.validationMode
         return impl
     }
 

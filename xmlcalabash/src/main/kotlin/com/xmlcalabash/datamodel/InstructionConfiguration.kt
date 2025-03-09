@@ -1,15 +1,11 @@
 package com.xmlcalabash.datamodel
 
-import com.xmlcalabash.runtime.XProcStepConfiguration
 import com.xmlcalabash.documents.DocumentProperties
 import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.io.MediaType
+import com.xmlcalabash.runtime.XProcStepConfiguration
 import net.sf.saxon.om.NamespaceUri
-import net.sf.saxon.s9api.QName
-import net.sf.saxon.s9api.SequenceType
-import net.sf.saxon.s9api.XdmAtomicValue
-import net.sf.saxon.s9api.XdmNode
-import net.sf.saxon.s9api.XdmValue
+import net.sf.saxon.s9api.*
 import java.net.URI
 
 interface InstructionConfiguration: XProcStepConfiguration {
@@ -34,7 +30,6 @@ interface InstructionConfiguration: XProcStepConfiguration {
 
     fun updateWith(node: XdmNode)
     fun updateWith(baseUri: URI)
-    //fun updateNamespaces(nsmap: Map<String, NamespaceUri>)
 
     fun fromUri(href: URI, properties: DocumentProperties, parameters: Map<QName, XdmValue>): XProcDocument
     fun fromString(xml: String, properties: DocumentProperties, parameters: Map<QName, XdmValue>): XProcDocument

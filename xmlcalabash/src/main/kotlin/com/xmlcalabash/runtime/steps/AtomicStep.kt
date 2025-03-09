@@ -1,8 +1,11 @@
 package com.xmlcalabash.runtime.steps
 
+import com.xmlcalabash.documents.DocumentProperties
+import com.xmlcalabash.documents.XProcBinaryDocument
 import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.namespace.Ns
+import com.xmlcalabash.namespace.NsCx
 import com.xmlcalabash.namespace.NsP
 import com.xmlcalabash.runtime.LazyValue
 import com.xmlcalabash.runtime.XProcStepConfiguration
@@ -10,6 +13,10 @@ import com.xmlcalabash.runtime.api.Receiver
 import com.xmlcalabash.runtime.model.AtomicBuiltinStepModel
 import com.xmlcalabash.runtime.parameters.RuntimeStepParameters
 import com.xmlcalabash.steps.AbstractAtomicStep
+import com.xmlcalabash.util.S9Api
+import com.xmlcalabash.util.SaxonXsdValidator
+import net.sf.saxon.s9api.ValidationMode
+import net.sf.saxon.s9api.XdmNode
 import net.sf.saxon.s9api.XdmValue
 
 open class AtomicStep(config: XProcStepConfiguration, atomic: AtomicBuiltinStepModel): AbstractStep(config, atomic), Receiver {
@@ -22,6 +29,7 @@ open class AtomicStep(config: XProcStepConfiguration, atomic: AtomicBuiltinStepM
     private var message: XdmValue? = null
     private val inputErrors = mutableListOf<XProcError>()
     override val stepTimeout = atomic.model.step.timeout
+    private var validator: SaxonXsdValidator? = null
 
     init {
         inputPorts.addAll(atomic.inputs.keys)
@@ -58,9 +66,23 @@ open class AtomicStep(config: XProcStepConfiguration, atomic: AtomicBuiltinStepM
                 } else {
                     implementation.option(name, LazyValue(doc, stepConfig))
                 }
-                return
+            } else {
+                if (stepConfig.validationMode != ValidationMode.DEFAULT && params.inputs[port]?.primary == true) {
+                    val curVal = doc.properties[NsCx.validationMode]?.underlyingValue?.stringValue
+                    val validatable = (doc.value is XdmNode) &&!S9Api.isTextDocument(doc.value as XdmNode)
+                    if (validatable && (curVal == null || (curVal == "lax" && stepConfig.validationMode != ValidationMode.STRICT))) {
+                        if (validator == null) {
+                            validator = SaxonXsdValidator(stepConfig)
+                        }
+                        implementation.input(port, validator!!.validate(doc))
+                    } else {
+                        // This one's already validated or can't be validated
+                        implementation.input(port, doc)
+                    }
+                } else {
+                    implementation.input(port, doc)
+                }
             }
-            implementation.input(port, doc)
         } else {
             inputErrors.add(error)
         }
@@ -82,7 +104,22 @@ open class AtomicStep(config: XProcStepConfiguration, atomic: AtomicBuiltinStepM
         val targetStep = rpair.first
         val targetPort = rpair.second
 
-        var outdoc = document
+        val vmode = try {
+            document.properties[NsCx.validationMode] != null
+        } catch (ex: Exception) {
+            // We may have caused an otherwise lazy expression to be evaluated raising an error
+            // Ignore the error. If the expression is actually used, it'll get raised again.
+            false
+        }
+
+        var outdoc = if (vmode && this.type !in listOf(NsP.identity, NsCx.splitter, NsCx.joiner)) {
+            val props = DocumentProperties(document.properties)
+            props.remove(NsCx.validationMode)
+            document.with(props)
+        } else {
+            document
+        }
+
         for (monitor in stepConfig.environment.monitors) {
             outdoc = monitor.sendDocument(Pair(this, port), Pair(targetStep, targetPort), outdoc)
         }
