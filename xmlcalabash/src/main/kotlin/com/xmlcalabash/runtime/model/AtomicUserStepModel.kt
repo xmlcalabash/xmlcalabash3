@@ -9,6 +9,7 @@ import com.xmlcalabash.runtime.api.RuntimePort
 import com.xmlcalabash.runtime.steps.AbstractStep
 import com.xmlcalabash.runtime.steps.CompoundStep
 import net.sf.saxon.s9api.QName
+import net.sf.saxon.s9api.ValidationMode
 
 class AtomicUserStepModel(runtime: XProcRuntime, model: AtomicModel, private val impl: CompoundStepModel): AtomicStepModel(runtime, model) {
     private var _type = type
@@ -52,6 +53,11 @@ class AtomicUserStepModel(runtime: XProcRuntime, model: AtomicModel, private val
             val instance = CompoundStep.newInstance(config, impl)
             instance.stepType = stepType
             instance.stepName = name
+
+            // Validation mode on an instance overrides the default...
+            if (stepConfig.validationMode != ValidationMode.DEFAULT) {
+                instance.head.stepConfig.validationMode = stepConfig.validationMode
+            }
 
             impl._inputs.clear()
             impl._inputs.putAll(saveCompoundInputs)

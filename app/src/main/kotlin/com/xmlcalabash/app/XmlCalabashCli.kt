@@ -4,13 +4,7 @@ import com.xmlcalabash.XmlCalabashBuildConfig
 import com.xmlcalabash.config.ConfigurationLoader
 import com.xmlcalabash.config.XmlCalabash
 import com.xmlcalabash.config.XmlCalabashConfiguration
-import com.xmlcalabash.datamodel.DeclareStepInstruction
-import com.xmlcalabash.datamodel.InstructionConfiguration
-import com.xmlcalabash.datamodel.LibraryInstruction
-import com.xmlcalabash.io.MediaType
-import com.xmlcalabash.datamodel.PipelineBuilder
-import com.xmlcalabash.datamodel.XProcExpression
-import com.xmlcalabash.datamodel.XProcSelectExpression
+import com.xmlcalabash.datamodel.*
 import com.xmlcalabash.documents.DocumentProperties
 import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.exceptions.DefaultErrorExplanation
@@ -19,42 +13,33 @@ import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.exceptions.XProcException
 import com.xmlcalabash.io.DocumentLoader
 import com.xmlcalabash.io.DocumentWriter
+import com.xmlcalabash.io.MediaType
 import com.xmlcalabash.namespace.Ns
-import com.xmlcalabash.namespace.NsCx
 import com.xmlcalabash.namespace.NsErr
 import com.xmlcalabash.namespace.NsFn
-import com.xmlcalabash.namespace.NsP
 import com.xmlcalabash.namespace.NsXs
 import com.xmlcalabash.runtime.api.RuntimeOption
 import com.xmlcalabash.runtime.api.RuntimePort
 import com.xmlcalabash.spi.DocumentResolverServiceProvider
-import com.xmlcalabash.util.DefaultMessagePrinter
-import com.xmlcalabash.util.DefaultXmlCalabashConfiguration
-import com.xmlcalabash.util.FileUtils
-import com.xmlcalabash.util.UriUtils
-import com.xmlcalabash.util.Verbosity
-import com.xmlcalabash.util.VisualizerOutput
+import com.xmlcalabash.util.*
 import com.xmlcalabash.visualizers.Detail
 import com.xmlcalabash.visualizers.Plain
 import com.xmlcalabash.visualizers.Silent
 import net.sf.saxon.Configuration
 import net.sf.saxon.lib.Initializer
 import net.sf.saxon.om.NamespaceUri
-import net.sf.saxon.s9api.ItemType
-import net.sf.saxon.s9api.QName
-import net.sf.saxon.s9api.XdmAtomicValue
-import net.sf.saxon.s9api.XdmValue
+import net.sf.saxon.s9api.*
 import org.apache.logging.log4j.kotlin.logger
 import org.slf4j.MDC
+import org.xml.sax.InputSource
 import java.io.BufferedReader
 import java.io.File
 import java.io.InputStreamReader
-import java.net.URI
 import java.text.SimpleDateFormat
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
-import javax.lang.model.type.DeclaredType
+import javax.xml.transform.sax.SAXSource
 import kotlin.system.exitProcess
 
 /**
@@ -157,6 +142,26 @@ class XmlCalabashCli private constructor() {
                 return
             }
 
+            // These won't be in the base configuration, but I think they'll be in all subsequent configurations
+            for (uri in commandLine.xmlSchemas) {
+                val builder = xmlCalabash.saxonConfig.processor.newDocumentBuilder()
+                val destination = XdmDestination()
+                val source = SAXSource(InputSource(uri.toString()))
+                builder.parse(source, destination)
+                val schema = S9Api.documentElement(destination.xdmNode)
+                if (schema.nodeName == NsXs.schema) {
+                    config.xmlSchemaDocuments.add(schema)
+                } else {
+                    throw XProcError.xiNotAnXmlSchema(schema.nodeName).exception()
+                }
+            }
+            if (commandLine.tryNamespaces != null) {
+                config.tryNamespaces = commandLine.tryNamespaces!!
+            }
+            if (commandLine.useLocationHints != null) {
+                config.useLocationHints = commandLine.useLocationHints!!
+            }
+
             for (name in commandLine.initializers) {
                 saxonInitializer(name)
             }
@@ -180,6 +185,14 @@ class XmlCalabashCli private constructor() {
             stepConfig = xprocParser.builder.stepConfig
             errorExplanation = stepConfig.environment.errorExplanation
             errorExplanation.setEnvironment(xmlCalabash.commonEnvironment)
+
+            for (uri in commandLine.xmlCatalogs) {
+                xmlCalabash.commonEnvironment.documentManager.resolverConfiguration.addCatalog(uri.toString())
+            }
+
+            for (uri in config.xmlCatalogs) {
+                xmlCalabash.commonEnvironment.documentManager.resolverConfiguration.addCatalog(uri.toString())
+            }
 
             evaluateOptions(xprocParser.builder, commandLine)
 

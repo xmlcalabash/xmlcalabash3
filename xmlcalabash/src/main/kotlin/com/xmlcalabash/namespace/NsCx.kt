@@ -109,4 +109,7 @@ object NsCx {
     val statusChangeTime = QName(namespace, "cx:status-change-time")
     val windowsAttributes = QName(namespace, "cx:windows-attributes")
     val hostOs = QName(namespace, "cx:host-os")
+    val validationMode = QName(namespace, "cx:validation-mode")
+    val useCatalog = QName(namespace, "cx:use-catalog")
+    val importSchema = QName(namespace, "cx:import-schema")
 }

@@ -9,6 +9,7 @@ import net.sf.saxon.lib.ExtensionFunctionDefinition
 import net.sf.saxon.lib.FeatureIndex
 import net.sf.saxon.s9api.Processor
 import net.sf.saxon.s9api.Xslt30Transformer
+import org.apache.logging.log4j.kotlin.logger
 import org.xml.sax.InputSource
 import java.io.File
 import java.net.URI
@@ -62,6 +63,8 @@ class SaxonConfiguration private constructor(
                 }
             }
 
+            loadConfigurationSchemas(xmlCalabash, newConfiguration)
+
             newConfiguration.processor = Processor(newConfiguration)
 
             for (init in xmlCalabash.commonEnvironment.additionalInitializers) {
@@ -74,6 +77,24 @@ class SaxonConfiguration private constructor(
 
             return newConfiguration
         }
+
+        private var warnedAlready = false
+        private fun loadConfigurationSchemas(xmlCalabash: XmlCalabash, configuration: Configuration) {
+            if (xmlCalabash.xmlCalabashConfig.xmlSchemaDocuments.isNotEmpty()) {
+                if (configuration.isLicensedFeature(Configuration.LicenseFeature.SCHEMA_VALIDATION)) {
+                    for (schema in xmlCalabash.xmlCalabashConfig.xmlSchemaDocuments) {
+                        configuration.addSchemaSource(schema.asSource())
+                    }
+                } else {
+                    if (!warnedAlready) {
+                        logger.warn { "Schema validation feature is not enabled, ignoring configured schemas " }
+                    }
+                    warnedAlready = true
+                }
+            }
+
+        }
+
     }
 
     val id = ++_id
@@ -139,6 +160,12 @@ class SaxonConfiguration private constructor(
         val newproc = Processor(configuration)
         configureProcessor(newproc)
         return newproc
+    }
+
+    fun clearSchemaCache() {
+        // Yes, but keep the ones that were loaded at configuration time...
+        configuration.clearSchemaCache()
+        loadConfigurationSchemas(xmlCalabash, configuration)
     }
 
     internal fun addFunctionLibrary(href: URI, flib: FunctionLibrary) {

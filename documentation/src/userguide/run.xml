@@ -85,7 +85,12 @@ given, the <command>run</command> command is assumed.</para>
   <sbr/>
   <arg rep="norepeat" linkend="cli-licensed">--licensed</arg>
   <arg rep="norepeat" linkend="cli-debug">--debug</arg>
-  <arg rep="norepeat" linkend="cli-debug">--debugger</arg>
+  <arg rep="norepeat" linkend="cli-debugger">--debugger</arg>
+  <arg rep="repeat" linkend="cli-catalog">--catalog:<replaceable>catalog-file-uri</replaceable></arg>
+  <arg rep="repeat" linkend="cli-xml-schema">--xml-schema:<replaceable>xml-schema-file-uri</replaceable></arg>
+  <arg rep="norepeat" linkend="cli-validation-mode">--validation-mode:<replaceable>mode</replaceable></arg>
+  <arg rep="norepeat" linkend="cli-try-namespaces">--try-namespaces</arg>
+  <arg rep="norepeat" linkend="cli-use-location-hints">--use-location-hints</arg>
   <arg rep="norepeat" linkend="cli-help">--help</arg>
   <sbr/>
   <arg rep="norepeat" linkend="cli-step">--step:<replaceable>step-name</replaceable></arg>
@@ -423,7 +428,42 @@ You can configure it in the usual ways.</para>
 See <xref linkend="debugging"/>.</para>
 </listitem>
 </varlistentry>
-
+<varlistentry xml:id="cli-catalog">
+  <term><option>--catalog:<replaceable>catalog-file-uri</replaceable></option></term>
+<listitem>
+<para>Adds the specified catalog to the list of XML Catalogs that are used 
+during resource resolution.</para>
+</listitem>
+</varlistentry>
+<varlistentry xml:id="cli-xml-schema">
+  <term><option>--xml-schema:<replaceable>xml-schema-file-uri</replaceable></option></term>
+<listitem>
+<para>Adds the specified XML Schema to the validation context. This schema will
+be available in both <link linkend="implicit-validation">implicit validation</link> and
+when the <tag>p:validate-with-xml-schema</tag> step is used.</para>
+</listitem>
+</varlistentry>
+<varlistentry xml:id="cli-validation-mode">
+  <term><option>--validation-mode:<replaceable>mode</replaceable></option></term>
+<listitem>
+<para>This option enables <link linkend="implicit-validation">implicit validation</link>.
+The mode must be either “lax” or “strict”.</para>
+</listitem>
+</varlistentry>
+<varlistentry xml:id="cli-try-namespaces">
+  <term><option>----try-namespaces</option></term>
+<listitem>
+<para>This option enables attempting to retrieve a schema using its namespace URI
+during <link linkend="implicit-validation">implicit validation</link>.</para>
+</listitem>
+</varlistentry>
+<varlistentry xml:id="cli-use-location-hints">
+  <term><option>--use-location-hints</option></term>
+<listitem>
+<para>This option enables attempting to retrieve a schema using location hints
+during <link linkend="implicit-validation">implicit validation</link>.</para>
+</listitem>
+</varlistentry>
 <varlistentry xml:id="cli-help">
   <term><option>--help</option></term>
 <listitem>

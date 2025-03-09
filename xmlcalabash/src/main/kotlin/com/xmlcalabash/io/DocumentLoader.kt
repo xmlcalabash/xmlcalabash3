@@ -9,9 +9,9 @@ import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.namespace.Ns
 import com.xmlcalabash.namespace.NsCx
 import com.xmlcalabash.runtime.XProcStepConfiguration
-import com.xmlcalabash.spi.ContentTypeConverter
 import com.xmlcalabash.spi.ContentTypeLoader
 import com.xmlcalabash.spi.ContentTypeLoaderServiceProvider
+import com.xmlcalabash.tracing.TraceListener
 import com.xmlcalabash.util.MediaClassification
 import com.xmlcalabash.util.SaxonTreeBuilder
 import com.xmlcalabash.util.UriUtils
@@ -33,10 +33,11 @@ import java.util.*
 import javax.xml.transform.dom.DOMSource
 import javax.xml.transform.sax.SAXSource
 
-class DocumentLoader(val context: XProcStepConfiguration,
+class DocumentLoader(val stepConfig: XProcStepConfiguration,
                      val href: URI?,
                      val documentProperties: DocumentProperties = DocumentProperties(),
-                     val parameters: Map<QName,XdmValue> = mapOf()) {
+                     val parameters: Map<QName,XdmValue> = mapOf(),
+                     val originalURI: URI? = null) {
     companion object {
         val cx_can_read = QName(NsCx.namespace, "cx:can-read")
         val cx_can_write = QName(NsCx.namespace, "cx:can-write")
@@ -92,14 +93,14 @@ class DocumentLoader(val context: XProcStepConfiguration,
 
     fun load(): XProcDocument {
         if (href == null) {
-            throw context.exception(XProcError.xiImpossible("Attempt to load document with no URI"))
+            throw stepConfig.exception(XProcError.xiImpossible("Attempt to load document with no URI"))
         }
 
         absURI = if (href.isAbsolute) {
             href
         } else {
-            if (context.baseUri != null) {
-                context.baseUri!!.resolve(href)
+            if (stepConfig.baseUri != null) {
+                stepConfig.baseUri!!.resolve(href)
             } else {
                 UriUtils.cwdAsUri().resolve(href)
             }
@@ -109,35 +110,57 @@ class DocumentLoader(val context: XProcStepConfiguration,
             try {
                 return loadFile()
             } catch (ex: IOException) {
-                throw context.exception(XProcError.xdDoesNotExist(absURI.path, ex.message ?: "???"), ex)
+                throw stepConfig.exception(XProcError.xdDoesNotExist(absURI.path, ex.message ?: "???"), ex)
             }
         }
 
         if (absURI.scheme == "http" || absURI.scheme == "https") {
-            val req = InternetProtocolRequest(context, absURI)
+            val start = System.nanoTime()
+            val req = InternetProtocolRequest(stepConfig, absURI)
             req.overrideContentType = documentProperties.contentType
             val resp = req.execute("GET")
 
             if (resp.statusCode >= 500) {
-                throw context.exception(XProcError.xdIsNotReadable(absURI.toString(), "HTTP response code: ${resp.statusCode}"))
+                throw stepConfig.exception(
+                    XProcError.xdIsNotReadable(
+                        absURI.toString(),
+                        "HTTP response code: ${resp.statusCode}"
+                    )
+                )
             }
             if (resp.statusCode >= 400) {
-                throw context.exception(XProcError.xdDoesNotExist(absURI.toString(), "HTTP response code: ${resp.statusCode}"))
+                throw stepConfig.exception(
+                    XProcError.xdDoesNotExist(
+                        absURI.toString(),
+                        "HTTP response code: ${resp.statusCode}"
+                    )
+                )
+            }
+            if (resp.response.size != 1) {
+                throw stepConfig.exception(XProcError.xiDocumentReturnedMultipart())
+            }
+            val end = System.nanoTime()
+
+            for (monitor in stepConfig.environment.monitors) {
+                if (monitor is TraceListener) {
+                    monitor.getResource(end - start, resp.responseUri, originalURI ?: absURI, false, false)
+                }
             }
 
             return resp.response.first()
         }
 
-        throw RuntimeException("Unsupported scheme")
+        throw stepConfig.exception(XProcError.xdIsNotReadable(href.toString(), "Unsupported scheme."))
     }
 
     private fun loadFile(): XProcDocument {
+        val start = System.nanoTime()
         val file = File(absURI.path)
 
         mediaType = if (documentProperties.has(Ns.contentType)) {
             MediaType.parse(documentProperties[Ns.contentType]!!.underlyingValue.stringValue)
         } else {
-            val fileMediaType = context.environment.mimeTypes.getContentType(absURI.toString())
+            val fileMediaType = stepConfig.environment.mimeTypes.getContentType(absURI.toString())
             MediaType.parse(fileMediaType)
         }
 
@@ -158,7 +181,16 @@ class DocumentLoader(val context: XProcStepConfiguration,
         properties[cx_last_modified] = XdmAtomicValue(lmDate.toInstant().atZone(ZoneOffset.UTC))
 
         val stream = FileInputStream(file)
-        return load(absURI, stream, mediaType)
+        val doc = load(absURI, stream, mediaType)
+        val end = System.nanoTime()
+
+        for (monitor in stepConfig.environment.monitors) {
+            if (monitor is TraceListener) {
+                monitor.getResource(end - start, absURI, originalURI, false, false)
+            }
+        }
+
+        return doc
     }
 
     fun load(stream: InputStream, mediaType: MediaType, charset: Charset? = null): XProcDocument {
@@ -176,7 +208,7 @@ class DocumentLoader(val context: XProcStepConfiguration,
 
         for (loader in contentTypeLoaders!!) {
             if (overrideMediaType in loader.contentTypes()) {
-                return loader.load(context, uri, stream, overrideMediaType, mediaType.charset() ?: charset)
+                return loader.load(stepConfig, uri, stream, overrideMediaType, mediaType.charset() ?: charset)
             }
         }
 
@@ -188,34 +220,36 @@ class DocumentLoader(val context: XProcStepConfiguration,
         }
 
         val classification = mediaType.classification()
-        when (classification) {
+        val doc = when (classification) {
             MediaClassification.XML, MediaClassification.XHTML -> {
                 try {
-                    return loadXml(uri, stream)
+                    loadXml(uri, stream)
                 } catch (ex: SaxonApiException) {
                     if (href != null) {
-                        throw context.exception(XProcError.xdNotWellFormed(href), ex)
+                        throw stepConfig.exception(XProcError.xdNotWellFormed(href), ex)
                     }
-                    throw context.exception(XProcError.xdNotWellFormed(), ex)
+                    throw stepConfig.exception(XProcError.xdNotWellFormed(), ex)
                 }
             }
-            MediaClassification.HTML -> return loadHtml(uri, stream)
-            MediaClassification.JSON -> return loadJson(stream)
-            MediaClassification.TEXT -> return loadText(stream, charset)
+            MediaClassification.HTML -> loadHtml(uri, stream)
+            MediaClassification.JSON -> loadJson(stream)
+            MediaClassification.TEXT -> loadText(stream, charset)
             // I'm not sure what to do with CSV. Maybe wait for XPath 4?
-            // MediaType.CSV -> return loadCsv(stream)
-            MediaClassification.YAML -> return loadYaml(stream)
-            MediaClassification.TOML -> return loadToml(stream)
-            else -> return loadBinary(stream)
+            // MediaType.CSV -> loadCsv(stream)
+            MediaClassification.YAML -> loadYaml(stream)
+            MediaClassification.TOML -> loadToml(stream)
+            else -> loadBinary(stream)
         }
+
+        return doc
     }
 
     private fun loadXml(uri: URI?, stream: InputStream): XProcDocument {
-        val saveParseOptions = context.saxonConfig.configuration.parseOptions
+        val saveParseOptions = stepConfig.saxonConfig.configuration.parseOptions
         val errorHandler = LoaderErrorHandler()
         val parseOptions = saveParseOptions.withErrorHandler(errorHandler)
-        context.saxonConfig.configuration.parseOptions = parseOptions
-        val builder = context.processor.newDocumentBuilder()
+        stepConfig.saxonConfig.configuration.parseOptions = parseOptions
+        val builder = stepConfig.processor.newDocumentBuilder()
         builder.isLineNumbering = true
 
         /* disable loading external subset
@@ -228,7 +262,7 @@ class DocumentLoader(val context: XProcStepConfiguration,
             if (value is BooleanValue) {
                 value.booleanValue
             } else {
-                context.parseBoolean(value.stringValue)
+                stepConfig.parseBoolean(value.stringValue)
             }
         } else {
             false
@@ -244,37 +278,37 @@ class DocumentLoader(val context: XProcStepConfiguration,
             val xdm = builder.build(SAXSource(source))
             if (errorHandler.errorCount > 0) {
                 if (validating) {
-                    throw context.exception(XProcError.xdNotDtdValid(errorHandler.message ?: "No message provided"))
+                    throw stepConfig.exception(XProcError.xdNotDtdValid(errorHandler.message ?: "No message provided"))
                 }
                 if (href != null) {
-                    throw context.exception(XProcError.xdNotWellFormed(href))
+                    throw stepConfig.exception(XProcError.xdNotWellFormed(href))
                 }
-                throw context.exception(XProcError.xdNotWellFormed())
+                throw stepConfig.exception(XProcError.xdNotWellFormed())
             }
-            return XProcDocument.ofXml(xdm, context, properties)
+            return XProcDocument.ofXml(xdm, stepConfig, properties)
         } finally {
-            context.saxonConfig.configuration.parseOptions = saveParseOptions
+            stepConfig.saxonConfig.configuration.parseOptions = saveParseOptions
         }
     }
 
     private fun loadHtml(uri: URI?, stream: InputStream): XProcDocument {
         val htmlBuilder = HtmlDocumentBuilder(XmlViolationPolicy.ALTER_INFOSET)
         val html = htmlBuilder.parse(stream)
-        val builder = context.processor.newDocumentBuilder()
+        val builder = stepConfig.processor.newDocumentBuilder()
         builder.isLineNumbering = true
         if (uri != null) {
             builder.baseURI = uri
         }
         val xdm = builder.build(DOMSource(html))
-        return XProcDocument.ofXml(xdm, context, properties)
+        return XProcDocument.ofXml(xdm, stepConfig, properties)
     }
 
     private fun loadJson(stream: InputStream): XProcDocument {
-        val compiler = context.newXPathCompiler()
+        val compiler = stepConfig.newXPathCompiler()
         compiler.declareVariable(QName("a"))
         compiler.declareVariable(QName("opt"))
         val selector = compiler.compile("parse-json(\$a, \$opt)").load()
-        selector.resourceResolver = context.environment.documentManager
+        selector.resourceResolver = stepConfig.environment.documentManager
         val inputjson = loadTextData(stream, StandardCharsets.UTF_8)
         selector.setVariable(QName("a"), XdmAtomicValue(inputjson))
 
@@ -289,21 +323,21 @@ class DocumentLoader(val context: XProcStepConfiguration,
 
         try {
             val json = selector.evaluate()
-            return XProcDocument(json, context, properties)
+            return XProcDocument(json, stepConfig, properties)
         } catch (ex: SaxonApiException) {
             if ((ex.message ?: "").startsWith("Invalid option")) {
-                throw context.exception(XProcError.xdInvalidParameter(ex.message!!), ex)
+                throw stepConfig.exception(XProcError.xdInvalidParameter(ex.message!!), ex)
             }
 
             val pos = (ex.message ?: "").indexOf("Duplicate key")
             if (pos >= 0) {
                 val epos = ex.message!!.indexOf("}")
                 val key = ex.message!!.substring(pos+21, epos+1)
-                throw context.exception(XProcError.xdDuplicateKey(key), ex)
+                throw stepConfig.exception(XProcError.xdDuplicateKey(key), ex)
             }
 
             if ((ex.message ?: "").startsWith("Invalid JSON")) {
-                throw context.exception(XProcError.xdNotWellFormedJson(inputjson), ex)
+                throw stepConfig.exception(XProcError.xdNotWellFormedJson(inputjson), ex)
             }
 
             throw ex
@@ -333,11 +367,11 @@ class DocumentLoader(val context: XProcStepConfiguration,
     }
 
     private fun loadText(stream: InputStream, charset: Charset?): XProcDocument {
-        val builder = SaxonTreeBuilder(context.processor)
-        builder.startDocument(context.baseUri)
+        val builder = SaxonTreeBuilder(stepConfig.processor)
+        builder.startDocument(stepConfig.baseUri)
         builder.addText(loadTextData(stream, charset))
         builder.endDocument()
-        return XProcDocument.ofXml(builder.result, context, properties)
+        return XProcDocument.ofXml(builder.result, stepConfig, properties)
     }
 
     private fun loadBinary(stream: InputStream): XProcDocument {
@@ -348,7 +382,7 @@ class DocumentLoader(val context: XProcStepConfiguration,
             baos.write(buf, 0, len)
             len = stream.read(buf)
         }
-        return XProcDocument.ofBinary(baos.toByteArray(), context, properties)
+        return XProcDocument.ofBinary(baos.toByteArray(), stepConfig, properties)
     }
 
     private fun loadTextData(stream: InputStream, inputCharset: Charset?): String {

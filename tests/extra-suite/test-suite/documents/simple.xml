@@ -1,0 +1,6 @@
+<simple xmlns="https://www.xmlcalabash.com/ns/simple"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="https://www.xmlcalabash.com/ns/simple simple.xsd">
+  <title>Document title</title>
+  <p>Some text.</p>
+</simple>

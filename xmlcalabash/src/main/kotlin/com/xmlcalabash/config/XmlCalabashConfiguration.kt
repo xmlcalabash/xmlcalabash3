@@ -8,8 +8,9 @@ import com.xmlcalabash.util.AssertionsLevel
 import com.xmlcalabash.util.DefaultMessagePrinter
 import com.xmlcalabash.util.Verbosity
 import com.xmlcalabash.visualizers.Silent
-import net.sf.saxon.Configuration
 import net.sf.saxon.s9api.QName
+import net.sf.saxon.s9api.ValidationMode
+import net.sf.saxon.s9api.XdmNode
 import java.io.File
 import java.net.URI
 
@@ -31,6 +32,11 @@ abstract class XmlCalabashConfiguration {
     var saxonConfigurationProperties: Map<String,String> = emptyMap()
     var uniqueInlineUris: Boolean = true
     var licensed: Boolean = true // If a licensed configuration can't be loaded, an unlicensed one will be...
+    val xmlSchemaDocuments = mutableListOf<XdmNode>()
+    var validationMode = ValidationMode.DEFAULT
+    var tryNamespaces = false
+    var useLocationHints = false
+    val xmlCatalogs = mutableListOf<URI>()
     var proxies: Map<String, String> = emptyMap()
     var inlineTrimWhitespace: Boolean = false
     var mpt: Double = 0.99999998

@@ -10,6 +10,7 @@ object NsTrace {
     val thread = QName(namespace, "thread")
     val step = QName(namespace, "step")
     val document = QName(namespace, "document")
+    val resource = QName(namespace, "resource")
     val from = QName(namespace, "from")
     val to = QName(namespace, "to")
     val location = QName(namespace, "location")

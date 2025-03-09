@@ -2,10 +2,14 @@ package com.xmlcalabash.datamodel
 
 import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.exceptions.XProcException
+import com.xmlcalabash.namespace.NsCx
+import com.xmlcalabash.namespace.NsP
+import com.xmlcalabash.runtime.XProcStepConfigurationImpl
 import com.xmlcalabash.util.AssertionsLevel
 import com.xmlcalabash.util.AssertionsMonitor
 import com.xmlcalabash.util.DurationUtils
 import net.sf.saxon.s9api.QName
+import net.sf.saxon.s9api.ValidationMode
 import java.time.Duration
 
 abstract class StepDeclaration(parent: XProcInstruction?, stepConfig: InstructionConfiguration, instructionType: QName): XProcInstruction(parent, stepConfig, instructionType) {
@@ -84,6 +88,14 @@ abstract class StepDeclaration(parent: XProcInstruction?, stepConfig: Instructio
 
         if (stepConfig.xmlCalabash.xmlCalabashConfig.assertions != AssertionsLevel.IGNORE) {
             AssertionsMonitor.parseStepAssertions(this)
+        }
+
+        stepConfig.validationMode = stepConfig.xmlCalabash.xmlCalabashConfig.validationMode
+        when (extensionAttributes[NsCx.validationMode]) {
+            null -> Unit
+            "strict" -> stepConfig.validationMode = ValidationMode.STRICT
+            "lax" -> stepConfig.validationMode = ValidationMode.LAX
+            else -> throw stepConfig.exception(XProcError.xiUnsupportedValidationMode(extensionAttributes[NsCx.validationMode]!!))
         }
     }
 

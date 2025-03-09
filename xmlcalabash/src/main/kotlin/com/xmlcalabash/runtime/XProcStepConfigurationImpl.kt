@@ -33,6 +33,8 @@ open class XProcStepConfigurationImpl internal constructor(
     override val processor: Processor
         get() = saxonConfig.processor
 
+    override var validationMode = ValidationMode.DEFAULT
+
     protected val _inscopeNamespaces = mutableMapOf<String, NamespaceUri>()
     protected val _inscopeStepTypes = mutableMapOf<QName, DeclareStepInstruction>()
 
@@ -104,6 +106,7 @@ open class XProcStepConfigurationImpl internal constructor(
         copy._inscopeNamespaces.putAll(_inscopeNamespaces)
         copy._inscopeStepTypes.putAll(_inscopeStepTypes)
         copy._stepName = _stepName
+        copy.validationMode = validationMode
         return copy
     }
 
@@ -112,6 +115,7 @@ open class XProcStepConfigurationImpl internal constructor(
         copy._inscopeNamespaces.putAll(_inscopeNamespaces)
         copy._inscopeStepTypes.putAll(_inscopeStepTypes)
         copy._stepName = _stepName
+        copy.validationMode = validationMode
         return copy
     }
 

@@ -12,6 +12,7 @@ import com.xmlcalabash.util.SaxonTreeBuilder
 import net.sf.saxon.s9api.QName
 import org.apache.logging.log4j.kotlin.logger
 import java.io.FileOutputStream
+import java.net.URI
 import java.nio.file.Files
 import java.nio.file.Path
 

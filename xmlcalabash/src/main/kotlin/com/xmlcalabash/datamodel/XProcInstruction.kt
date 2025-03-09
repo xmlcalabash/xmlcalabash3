@@ -61,14 +61,6 @@ abstract class XProcInstruction internal constructor(initialParent: XProcInstruc
     val inscopeNamespaces: Map<String, NamespaceUri>
         get() = stepConfig.inscopeNamespaces
 
-    /*
-    val inscopeStepNames: Map<String, StepDeclaration>
-        get() = stepConfig.inscopeStepNames
-
-    val inscopeStepTypes: Map<QName, DeclareStepInstruction>
-        get() = stepConfig.inscopeStepTypes
-     */
-
     val inscopeVariables: Map<QName, VariableBindingContainer>
         get() = stepConfig.inscopeVariables
 

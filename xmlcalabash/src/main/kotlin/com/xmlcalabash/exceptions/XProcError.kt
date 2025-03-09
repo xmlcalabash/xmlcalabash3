@@ -425,6 +425,12 @@ open class XProcError protected constructor(val code: QName, val variant: Int, e
         fun xiPipeinfoMustBePipeinfo(root: QName) = internal(Pair(45, 2), root)
         fun xiXPathVersionNotSupported(version: String) = internal(46, version)
         fun xiTooManySources(count: Int) = internal(47, count)
+        fun xiNotAnXmlSchema(name: QName) = internal(48, name)
+        fun xiXmlSchemaContentOrHref() = internal(49)
+        fun xiNonWhitespaceTextInSchema() = internal(50)
+        fun xiDocumentReturnedMultipart() = internal(51)
+        fun xiUnsupportedValidationMode(mode: String) = internal(52, mode)
+        fun xiConfigurationCatalogElementMustBeEmpty() = internal(53)
 
         fun xiCliInvalidValue(option: String, value: String) = internal(200, option, value)
         fun xiCliValueRequired(option: String) = internal(202, option)

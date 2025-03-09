@@ -15,6 +15,7 @@ import net.sf.saxon.s9api.*
 interface XProcStepConfiguration: DocumentContext {
     val environment: PipelineEnvironment
     val saxonConfig: SaxonConfiguration
+    var validationMode: ValidationMode
 
     val inscopeStepTypes: Map<QName, DeclareStepInstruction>
 

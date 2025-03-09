@@ -11,7 +11,11 @@ cc.xmlCalabash =
         attribute verbosity { "trace" | "debug" | "progress" | "info" | "warn" | "error" }?,
         attribute piped-io { xsd:boolean }?,
         attribute console-output-encoding { xsd:string }?,
-        (cc.graphviz
+        attribute try-namespaces { xsd:boolean }?,
+        attribute use-location-hints { xsd:boolean }?,
+        attribute validation-mode { "strict" | "lax" }?,
+        (cc.catalog
+        | cc.graphviz
         | cc.inline
         | cc.mimetype
         | cc.pagedMedia
@@ -23,6 +27,7 @@ cc.xmlCalabash =
         | cc.messageReporter
         | cc.visualizer
         | cc.threading
+        | cc.xmlSchema
         | any-other-name)*
     }
 
@@ -129,6 +134,18 @@ cc.visualizer =
     element cc:visualizer {
         attribute name { "silent" | "plain" | "detail" },
         attribute * - name { text }*,
+        empty
+    }
+
+cc.xmlSchema =
+    element cc:xml-schema {
+        attribute href { xsd:anyURI }?,
+        any-other-name*
+    }
+
+cc.catalog =
+    element cc:catalog {
+        attribute href { xsd:anyURI }?,
         empty
     }
 
