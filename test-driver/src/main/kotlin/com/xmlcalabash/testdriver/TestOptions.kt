@@ -4,7 +4,6 @@ class TestOptions() {
     var title: String? = null
     var requirePass = false
     var traceExecution = false
-    var outputDescription: String? = null
     var outputGraph: String? = null
     var testLogging = false
     var updateRegressions = false

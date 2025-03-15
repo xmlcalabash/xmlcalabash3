@@ -3,6 +3,7 @@ package com.xmlcalabash.datamodel
 import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.io.MediaType
 import com.xmlcalabash.namespace.Ns
+import com.xmlcalabash.namespace.NsCx
 import com.xmlcalabash.namespace.NsP
 import com.xmlcalabash.namespace.NsXs
 import com.xmlcalabash.util.MediaClassification
@@ -128,7 +129,7 @@ class InlineInstruction(parent: XProcInstruction, xmlDocument: XdmNode): Connect
                     is OptionInstruction -> binding.exprStep!!
                     else -> throw IllegalStateException("Invalid binding: ${binding}")
                 }
-                pipe.setReadablePort(vbuilder.primaryOutput()!!)
+                pipe.setReadablePort(vbuilder.primaryOutput()!!, false)
                 inlineStep._children.add(wi)
             }
         }
@@ -141,13 +142,13 @@ class InlineInstruction(parent: XProcInstruction, xmlDocument: XdmNode): Connect
             } else {
                 listOf(stepConfig.drp!!)
             }
-            val exprSteps = documentProperties.promoteToStep(parent, context, false)
+            val exprSteps = documentProperties.promoteToStep(parent, NsCx.anonymous, context, false)
             val expr = exprSteps.last()
 
             val wi = inlineStep.withInput()
             wi._port = "Q{}document-properties"
             val pipe = wi.pipe()
-            pipe.setReadablePort(expr.primaryOutput()!!)
+            pipe.setReadablePort(expr.primaryOutput()!!, false)
             newSteps.addAll(exprSteps)
         }
 
@@ -181,14 +182,14 @@ class InlineInstruction(parent: XProcInstruction, xmlDocument: XdmNode): Connect
                     when (child) {
                         is PipeInstruction -> {
                             val pipe = wi.pipe()
-                            pipe.setReadablePort(child.readablePort!!)
+                            pipe.setReadablePort(child.readablePort!!, false)
                         }
                         else -> {
                             val csteps = (child as ConnectionInstruction).promoteToStep(parent, step)
                             if (csteps.isNotEmpty()) {
                                 val last = csteps.last()
                                 val pipe = wi.pipe()
-                                pipe.setReadablePort(last.primaryOutput()!!)
+                                pipe.setReadablePort(last.primaryOutput()!!, false)
                             }
                             newSteps.addAll(csteps)
                         }

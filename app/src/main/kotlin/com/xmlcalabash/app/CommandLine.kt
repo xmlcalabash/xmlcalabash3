@@ -79,6 +79,7 @@ class CommandLine private constructor(val args: Array<out String>) {
     private var _useLocationHints: Boolean? = null
     private var _tryNamespaces: Boolean? = null
     private val _xmlCatalogs = mutableListOf<URI>()
+    private var _nogo = false
 
     /** The command. */
     val command: String
@@ -224,6 +225,10 @@ class CommandLine private constructor(val args: Array<out String>) {
     val xmlCatalogs: List<URI>
         get() = _xmlCatalogs
 
+    /** Compile and possibly graph the pipeline but don't actually run it. */
+    val nogo: Boolean
+        get() = _nogo
+
     private val arguments = listOf(
         ArgumentDescription("--input", listOf("-i"), ArgumentType.STRING) { it -> parseInput(it) },
         ArgumentDescription("--output", listOf("-o"), ArgumentType.STRING) { it -> parseOutput(it) },
@@ -244,6 +249,7 @@ class CommandLine private constructor(val args: Array<out String>) {
         ArgumentDescription("--explain", listOf(), ArgumentType.BOOLEAN, "true") { it -> _explainErrors = it == "true" },
         ArgumentDescription("--help", listOf(), ArgumentType.BOOLEAN, "true") { it -> _help = it == "true" },
         ArgumentDescription("--trace", listOf(), ArgumentType.FILE) { it -> _trace = File(it) },
+        ArgumentDescription("--nogo", listOf(), ArgumentType.BOOLEAN, "true") { it -> _nogo = it == "true" },
         ArgumentDescription("--trace-documents", listOf("--trace-docs"), ArgumentType.DIRECTORY) { it -> _traceDocuments = File(it) },
         ArgumentDescription("--verbosity", listOf("-V"),
             ArgumentType.STRING, "info", listOf("trace", "debug", "progress", "info", "warn", "error")) { it ->

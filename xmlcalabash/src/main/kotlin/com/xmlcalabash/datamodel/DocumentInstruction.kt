@@ -79,39 +79,39 @@ class DocumentInstruction private constructor(parent: XProcInstruction): Connect
             } else {
                 listOf(stepConfig.drp!!)
             }
-            val exprSteps = href.promoteToStep(parent, bindings, false)
+            val exprSteps = href.promoteToStep(parent, Ns.href, bindings, false)
             val expr = exprSteps.last()
 
             val wi = docStep.withInput()
             wi._port = "Q{}href"
             val pipe = wi.pipe()
-            pipe.setReadablePort(expr.primaryOutput()!!)
+            pipe.setReadablePort(expr.primaryOutput()!!, false)
             newSteps.addAll(exprSteps)
         }
 
         if (documentProperties.canBeResolvedStatically()) {
             docStep._staticOptions[Ns.documentProperties] = StaticOptionDetails(stepConfig, Ns.documentProperties, stepConfig.qnameMapType, emptyList(), documentProperties)
         } else {
-            val exprSteps = documentProperties.promoteToStep(parent, listOf(stepConfig.drp!!), false)
+            val exprSteps = documentProperties.promoteToStep(parent, Ns.documentProperties, listOf(stepConfig.drp!!), false)
             val expr = exprSteps.last()
 
             val wi = docStep.withInput()
             wi._port = "Q{}document-properties"
             val pipe = wi.pipe()
-            pipe.setReadablePort(expr.primaryOutput()!!)
+            pipe.setReadablePort(expr.primaryOutput()!!, false)
             newSteps.addAll(exprSteps)
         }
 
         if (parameters.canBeResolvedStatically()) {
             docStep._staticOptions[Ns.parameters] = StaticOptionDetails(stepConfig, Ns.parameters, stepConfig.qnameMapType, emptyList(), parameters)
         } else {
-            val exprSteps = parameters.promoteToStep(parent, listOf(stepConfig.drp!!), false)
+            val exprSteps = parameters.promoteToStep(parent, Ns.parameters, listOf(stepConfig.drp!!), false)
             val expr = exprSteps.last()
 
             val wi = docStep.withInput()
             wi._port = "Q{}parameters"
             val pipe = wi.pipe()
-            pipe.setReadablePort(expr.primaryOutput()!!)
+            pipe.setReadablePort(expr.primaryOutput()!!, false)
             newSteps.addAll(exprSteps)
         }
 

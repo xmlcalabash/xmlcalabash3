@@ -21,7 +21,7 @@ open class AtomicModel(graph: Graph, parent: Model, step: AtomicStepInstruction,
                             is PipeInstruction -> {
                                 val from = graph.instructionMap[conn.readablePort!!.parent]!!
                                 val to = graph.instructionMap[step]!!
-                                graph.addEdge(from, conn.port!!, to, child.port)
+                                graph.addEdge(from, conn.port!!, to, child.port, conn.implicit)
                             }
                             else -> {
                                 throw step.stepConfig.exception(XProcError.xiImpossible("Connection is not a pipe: ${conn}"))

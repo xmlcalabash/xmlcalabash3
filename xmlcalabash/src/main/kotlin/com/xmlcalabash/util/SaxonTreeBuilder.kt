@@ -162,7 +162,7 @@ open class SaxonTreeBuilder(val processor: Processor) {
         val baseURI = try {
             node.baseURI
         } catch (ex: IllegalStateException) {
-            throw RuntimeException("bang") // XProcError.xdInvalidUri(node.underlyingNode.baseURI).exception()
+            throw XProcError.xdInvalidUri(inode.baseURI).exception(ex)
         }
 
         addStartElement(NameOfNode.makeName(inode), attrs, inode.schemaType, filteredNamespaceMap(inode.allNamespaces), baseURI)

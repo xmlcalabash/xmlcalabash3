@@ -107,6 +107,7 @@ class XmlCalabashCli private constructor() {
             config.assertions = commandLine.assertions
             config.licensed = config.licensed && commandLine.licensed
 
+            config.debug = commandLine.debug == true
             config.debugger = commandLine.debugger
             when (commandLine.visualizer) {
                 null -> {
@@ -239,21 +240,19 @@ class XmlCalabashCli private constructor() {
             }
 
             if (commandLine.pipelineGraphs != null) {
+                val description = runtime.description()
+                val vis = VisualizerOutput(xmlCalabash, description, commandLine.pipelineGraphs!!)
                 if (config.graphviz == null) {
                     logger.warn { "Cannot create SVG, graphviz is not configured"}
+                    vis.xml()
                 } else {
-                    val description = runtime.description()
-                    if (commandLine.debug == true) {
-                        val stream = FileUtils.outputStream("${commandLine.pipelineGraphs!!}pipeline.xml")
-                        val writer = DocumentWriter(XProcDocument.ofXml(description, declstep.stepConfig), stream)
-                        writer.set(Ns.method, "xml")
-                        writer.set(Ns.indent, "true")
-                        writer.write()
-                        stream.close()
-                    }
-
-                    VisualizerOutput.svg(description, commandLine.pipelineGraphs!!, config, commandLine.debug == true)
+                    vis.svg()
                 }
+            }
+
+            if (commandLine.nogo) {
+                xmlCalabash.commonEnvironment.messageReporter().debug { "Execution suppressed with --nogo" }
+                exitProcess(0)
             }
 
             if (implicitStdin != null) {

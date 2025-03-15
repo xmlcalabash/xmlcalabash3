@@ -165,17 +165,14 @@ class TestCase(val suite: TestSuite, val testFile: File) {
 
             val pipeline = runtime.executable()
 
-            if (suite.options.outputDescription != null || suite.options.outputGraph != null) {
+            if (suite.options.outputGraph != null) {
                 val description = runtime.description()
-                if (suite.options.outputDescription != null) {
-                    VisualizerOutput.xml(suite.xmlCalabash, description, suite.options.outputDescription!!)
-                }
-                if (suite.options.outputGraph != null) {
-                    if (graphviz == null) {
-                        logger.warn { "Cannot create SVG descriptions, graphviz is not configured" }
-                    } else {
-                        VisualizerOutput.svg(description, suite.options.outputGraph!!, config.xmlCalabashConfig)
-                    }
+                val vis = VisualizerOutput(suite.xmlCalabash, description, suite.options.outputGraph!!)
+                vis.xml()
+                if (graphviz == null) {
+                    logger.warn { "Cannot create SVG descriptions, graphviz is not configured" }
+                } else {
+                    vis.svg()
                 }
             }
 

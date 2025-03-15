@@ -4,6 +4,7 @@ import com.xmlcalabash.runtime.XProcStepConfiguration
 import com.xmlcalabash.datamodel.XProcExpression.Companion.avt
 import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.exceptions.XProcError
+import com.xmlcalabash.namespace.NsCx
 import com.xmlcalabash.parsers.XPathExpressionDetails
 import com.xmlcalabash.parsers.xpath31.XPathExpressionParser
 import com.xmlcalabash.util.ValueTemplate
@@ -158,10 +159,10 @@ abstract class XProcExpression(val stepConfig: XProcStepConfiguration, val asTyp
         return staticValue
     }
 
-    internal fun promoteToStep(step: XProcInstruction, inputContext: List<PortBindingContainer>? = null, explicitBinding: Boolean): List<AtomicStepInstruction> {
+    internal fun promoteToStep(step: XProcInstruction, bindingName: QName, inputContext: List<PortBindingContainer>? = null, explicitBinding: Boolean): List<AtomicStepInstruction> {
         val newSteps = mutableListOf<AtomicStepInstruction>()
 
-        val exprStep = AtomicExpressionStepInstruction(step, this)
+        val exprStep = AtomicExpressionStepInstruction(step, bindingName, this)
         for (name in variableRefs) {
             val variable = step.inscopeVariables[name]!!
             if (variable.canBeResolvedStatically()) {
@@ -171,7 +172,7 @@ abstract class XProcExpression(val stepConfig: XProcStepConfiguration, val asTyp
                 wi._port = "Q{${name.namespaceUri}}${name.localName}"
                 wi.sequence = true
                 val pipe = wi.pipe()
-                pipe.setReadablePort(variable.exprStep!!.primaryOutput()!!)
+                pipe.setReadablePort(variable.exprStep!!.primaryOutput()!!, false)
             }
         }
 
@@ -180,11 +181,11 @@ abstract class XProcExpression(val stepConfig: XProcStepConfiguration, val asTyp
             wi.port = "source"
             if (inputContext == null) {
                 val pipe = wi.pipe()
-                pipe.setReadablePort(step.stepConfig.drp!!)
+                pipe.setReadablePort(step.stepConfig.drp!!, true)
             } else {
                 for (esource in inputContext) {
                     val pipe = wi.pipe()
-                    pipe.setReadablePort(esource)
+                    pipe.setReadablePort(esource, false)
                 }
             }
         }

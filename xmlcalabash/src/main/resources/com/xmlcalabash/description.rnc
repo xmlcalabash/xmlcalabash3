@@ -1,0 +1,126 @@
+default namespace = "http://xmlcalabash.com/ns/description"
+namespace g = "http://xmlcalabash.com/ns/description"
+
+start = g.description
+
+g.description =
+    element g:description {
+        (g.declare-step|g.graph)+
+    }
+
+g.declare-step =
+    element g:declare-step {
+        attribute name { text }?,
+        attribute type { xsd:QName }?,
+        attribute base-uri { xsd:anyURI }?,
+        attribute id { text },
+        attribute filename { text }?,
+        attribute version { text }?,
+        g.input*,
+        g.output*,
+        g.head,
+        g.step+,
+        g.foot,
+        g.edge*
+    }
+
+g.input =
+    element g:input {
+        g.port
+    }
+
+g.output =
+    element g:output {
+        g.port
+    }
+
+g.head =
+    element g:head {
+        g.inputs, g.outputs
+    }
+
+g.foot =
+    element g:foot {
+        g.inputs, g.outputs
+    }
+
+g.inputs =
+    element g:inputs {
+        g.port*
+    }
+
+g.outputs =
+    element g:outputs {
+        g.port*
+    }
+
+g.port =
+    element g:port {
+        attribute id { text },
+        attribute primary { xsd:boolean }?,
+        attribute sequence { xsd:boolean }?,
+        text
+    }
+
+g.step = g.atomic-step | g.compound-step | g.subpipeline
+
+g.atomic-step =
+    element g:atomic-step {
+        attribute id { text }?,
+        attribute name { text },
+        attribute type { xsd:QName },
+        attribute as { text }?,
+        attribute href { text }?,
+        attribute option-name { xsd:QName }?,
+        attribute variable-name { xsd:QName }?,
+        attribute expression { text }?,
+        attribute filename { text }?,
+        g.inputs,
+        g.outputs
+    }
+
+g.subpipeline =
+    element g:subpipeline {
+        attribute id { text },
+        attribute name { text },
+        attribute type { xsd:QName },
+        attribute ref { text },
+        g.inputs,
+        g.outputs
+    }
+
+g.compound-step =
+    element g:compound-step {
+        attribute id { text }?,
+        attribute name { text },
+        attribute type { xsd:QName },
+        g.head,
+        g.step+,
+        g.foot,
+        g.edge*
+    }
+
+g.edge =
+    element g:edge {
+        attribute from { text },
+        attribute to { text },
+        attribute from-step { text }?,
+        attribute from-port { text }?,
+        attribute to-step { text }?,
+        attribute to-port { text }?,
+        attribute implicit { xsd:boolean }?,
+        empty
+    }
+
+# ============================================================
+
+g.graph =
+    element g:graph {
+        attribute filename { text }?,
+        g.input*,
+        g.output*,
+        g.declare-step,
+        g.step*,
+        g.edge*
+    }
+

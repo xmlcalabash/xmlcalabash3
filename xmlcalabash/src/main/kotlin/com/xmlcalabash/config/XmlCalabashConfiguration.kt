@@ -45,6 +45,7 @@ abstract class XmlCalabashConfiguration {
     var serialization: Map<MediaType, Map<QName, String>> = emptyMap()
     var trace: File? = null
     var traceDocuments: File? = null
+    var debug = false
     var debugger = false
     var pipe = false
     var consoleEncoding = DEFAULT_CONSOLE_ENCODING

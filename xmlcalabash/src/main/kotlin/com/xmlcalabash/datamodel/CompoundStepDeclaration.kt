@@ -236,7 +236,7 @@ abstract class CompoundStepDeclaration(parent: XProcInstruction?, stepConfig: In
                     throw stepConfig.exception(XProcError.xsNoOutputConnection(output.port))
                 } else {
                     val pipe = output.pipe()
-                    pipe.setReadablePort(result)
+                    pipe.setReadablePort(result, true)
                 }
             }
             output.elaborateInstructions()
@@ -291,7 +291,7 @@ abstract class CompoundStepDeclaration(parent: XProcInstruction?, stepConfig: In
         wi.port = "source"
         wi.sequence = true
         val pipe = wi.pipe()
-        pipe.setReadablePort(wo)
+        pipe.setReadablePort(wo, true)
         sink.elaborateInstructions()
     }
 
@@ -329,7 +329,7 @@ abstract class CompoundStepDeclaration(parent: XProcInstruction?, stepConfig: In
                                 val steps = binding.promoteToStep(this as StepDeclaration, this)
                                 val readablePort = steps.last().primaryOutput()!!
                                 val pipe = PipeInstruction(this)
-                                pipe.setReadablePort(readablePort)
+                                pipe.setReadablePort(readablePort, false)
                                 newBindings.add(pipe)
                                 newChildren.addAll(steps)
                             }

@@ -108,7 +108,7 @@ abstract class VariableBindingContainer(
         if (select!!.contextRef && children.isEmpty() && stepConfig.drp != null) {
             if (specialType != SpecialType.XSLT_SELECTION_PATTERN) {
                 val readFrom = pipe()
-                readFrom.setReadablePort(stepConfig.drp!!)
+                readFrom.setReadablePort(stepConfig.drp!!, true)
             }
         }
 
@@ -149,7 +149,7 @@ abstract class VariableBindingContainer(
             return emptyList()
         }
 
-        exprStep = AtomicExpressionStepInstruction(step, select!!)
+        exprStep = AtomicExpressionStepInstruction(step, name, select!!)
         step.stepConfig.addVisibleStepName(exprStep!!)
 
         if (this is OptionInstruction) {
@@ -165,7 +165,7 @@ abstract class VariableBindingContainer(
                 val wi = exprStep!!.withInput()
                 wi._port = "Q{${name.namespaceUri}}${name.localName}"
                 val pipe = wi.pipe()
-                pipe.setReadablePort(variable.withOutput!!)
+                pipe.setReadablePort(variable.withOutput!!, false)
             }
         }
 
@@ -178,14 +178,14 @@ abstract class VariableBindingContainer(
                 when (child) {
                     is PipeInstruction -> {
                         val pipe = wi.pipe()
-                        pipe.setReadablePort(child.readablePort!!)
+                        pipe.setReadablePort(child.readablePort!!, false)
                     }
                     else -> {
                         val csteps = (child as ConnectionInstruction).promoteToStep(step as StepDeclaration, step)
                         if (csteps.isNotEmpty()) {
                             val last = csteps.last()
                             val pipe = wi.pipe()
-                            pipe.setReadablePort(last.primaryOutput()!!)
+                            pipe.setReadablePort(last.primaryOutput()!!, false)
                         }
                         steps.addAll(csteps)
                     }

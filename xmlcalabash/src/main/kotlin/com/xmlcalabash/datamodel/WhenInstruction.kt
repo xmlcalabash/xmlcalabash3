@@ -128,11 +128,11 @@ class WhenInstruction(parent: ChooseInstruction): CompoundStepDeclaration(parent
                 }
             }
 
-            newSteps.addAll(testExpression.promoteToStep(this, readFrom, explicitBinding))
+            newSteps.addAll(testExpression.promoteToStep(this, Ns.test, readFrom, explicitBinding))
             newChildren.addAll(newSteps)
         } else {
             val expr = XProcExpression.constant(stepConfig, testExpression.staticValue!!, stepConfig.parseXsSequenceType("xs:boolean"))
-            val exprStep = AtomicExpressionStepInstruction(this, expr)
+            val exprStep = AtomicExpressionStepInstruction(this, Ns.test, expr)
 
             exprStep.elaborateAtomicStep()
             newChildren.add(exprStep)
@@ -144,7 +144,7 @@ class WhenInstruction(parent: ChooseInstruction): CompoundStepDeclaration(parent
         val guard = GuardExpressionStepInstruction(this)
         val wi = guard.withInput()
         val pipe = wi.pipe()
-        pipe.setReadablePort(last.primaryOutput()!!)
+        pipe.setReadablePort(last.primaryOutput()!!, false)
 
         guard.elaborateAtomicStep()
 

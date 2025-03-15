@@ -69,7 +69,7 @@ abstract class StepDeclaration(parent: XProcInstruction?, stepConfig: Instructio
             depin.primary = false
 
             val pipe = depin.pipe()
-            pipe.setReadablePort(depout)
+            pipe.setReadablePort(depout, false)
         }
     }
 
@@ -122,7 +122,7 @@ abstract class StepDeclaration(parent: XProcInstruction?, stepConfig: Instructio
                         val steps = binding.promoteToStep(this.parent!! as StepDeclaration, this)
                         val readablePort = steps.last().primaryOutput()!!
                         val pipe = PipeInstruction(this)
-                        pipe.setReadablePort(readablePort)
+                        pipe.setReadablePort(readablePort, false)
                         newChildren.add(pipe)
                         result.addAll(steps)
                     }
@@ -136,7 +136,7 @@ abstract class StepDeclaration(parent: XProcInstruction?, stepConfig: Instructio
                     pipe.step = child.step
                     pipe.port = child.port
                     if (child.readablePort != null) {
-                        pipe.setReadablePort(child.readablePort!!)
+                        pipe.setReadablePort(child.readablePort!!, false)
                     }
                 }
 
@@ -144,7 +144,7 @@ abstract class StepDeclaration(parent: XProcInstruction?, stepConfig: Instructio
 
                 val readablePort = selectStep.primaryOutput()!!
                 val pipe = PipeInstruction(this)
-                pipe.setReadablePort(readablePort)
+                pipe.setReadablePort(readablePort, false)
                 newChildren.clear()
                 newChildren.add(pipe)
             }
@@ -160,7 +160,7 @@ abstract class StepDeclaration(parent: XProcInstruction?, stepConfig: Instructio
             if (option.canBeResolvedStatically()) {
                 _staticOptions[option.name] = builder.staticOptionsManager.get(option)
             } else {
-                val exprStep = AtomicExpressionStepInstruction(this, option.select!!)
+                val exprStep = AtomicExpressionStepInstruction(this, option.name, option.select!!)
                 exprStep.depends.addAll(depends)
                 stepConfig.addVisibleStepName(exprStep)
 
@@ -172,13 +172,13 @@ abstract class StepDeclaration(parent: XProcInstruction?, stepConfig: Instructio
                         when (binding) {
                             is PipeInstruction -> {
                                 val pipe = wi.pipe()
-                                pipe.setReadablePort(binding.readablePort!!)
+                                pipe.setReadablePort(binding.readablePort!!, false)
                             }
                             else -> {
                                 val steps = binding.promoteToStep(this.parent!! as StepDeclaration, this)
                                 val readablePort = steps.last().primaryOutput()!!
                                 val pipe = wi.pipe(this)
-                                pipe.setReadablePort(readablePort)
+                                pipe.setReadablePort(readablePort, false)
                                 result.addAll(steps)
                             }
                         }
@@ -193,7 +193,7 @@ abstract class StepDeclaration(parent: XProcInstruction?, stepConfig: Instructio
                 wi._port = "Q{${option.name.namespaceUri}}${option.name.localName}"
                 val readablePort = exprStep.primaryOutput()!!
                 val pipe = wi.pipe()
-                pipe.setReadablePort(readablePort)
+                pipe.setReadablePort(readablePort, false)
             }
         }
 
@@ -214,7 +214,7 @@ abstract class StepDeclaration(parent: XProcInstruction?, stepConfig: Instructio
                 wi.primary = false
                 wi.sequence = false
                 val pipe = wi.pipe()
-                pipe.setReadablePort(exprStep.primaryOutput()!!)
+                pipe.setReadablePort(exprStep.primaryOutput()!!, false)
             }
         }
     }
