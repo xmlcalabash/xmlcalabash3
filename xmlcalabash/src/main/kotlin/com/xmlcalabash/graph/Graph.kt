@@ -24,13 +24,6 @@ class Graph private constructor(val environment: PipelineEnvironment) {
 
     private var pipelineNode: PipelineModel? = null
     private var _graphXml: XdmNode? = null
-    val description: XdmNode?
-        get() {
-            if (_graphXml == null && pipelineNode != null) {
-                _graphXml =  GraphVisualization.build(this, pipelineNode!!)
-            }
-            return _graphXml
-        }
 
     fun modelName(base: String): String {
         return environment.uniqueName(base)
@@ -107,7 +100,7 @@ class Graph private constructor(val environment: PipelineEnvironment) {
                     sink.init()
                     sink.inputs["source"] = ModelPort(sink, "source", false, true, true, listOf())
                     (model.parent as CompoundModel)._children.add(sink)
-                    addEdge(model, port, sink, "source")
+                    addEdge(model, port, sink, "source", true)
                 }
             }
         }
@@ -181,18 +174,18 @@ class Graph private constructor(val environment: PipelineEnvironment) {
         return null
     }
 
-    internal fun addEdge(from: Model, outputPort: String, to: Model, inputPort: String) {
-        val edge = Edge(edgeNumber++, from, outputPort, to, inputPort)
+    internal fun addEdge(from: Model, outputPort: String, to: Model, inputPort: String, implicit: Boolean) {
+        val edge = Edge(edgeNumber++, from, outputPort, to, inputPort, implicit)
         edges.add(edge)
     }
 
-    internal fun addEdge(number: Long, from: Model, outputPort: String, to: Model, inputPort: String) {
-        val edge = Edge(number, from, outputPort, to, inputPort)
+    internal fun addEdge(number: Long, from: Model, outputPort: String, to: Model, inputPort: String, implicit: Boolean) {
+        val edge = Edge(number, from, outputPort, to, inputPort, implicit)
         edges.add(edge)
     }
 
     private fun replaceEdge(existing: Edge, from: Model, outputPort: String, to: Model, inputPort: String) {
-        val edge = Edge(existing.number, from, outputPort, to, inputPort)
+        val edge = Edge(existing.number, from, outputPort, to, inputPort, existing.implicit)
         edges.add(edge)
     }
 
@@ -337,11 +330,11 @@ class Graph private constructor(val environment: PipelineEnvironment) {
                     for ((resultNumber, edge) in currentEdges.withIndex()) {
                         val fromPort = "result${resultNumber + 1}"
                         splitter.outputs[fromPort] = ModelPort(splitter, fromPort, false, false, true, listOf())
-                        addEdge(edge.number, splitter, fromPort, edge.to, edge.inputPort)
+                        addEdge(edge.number, splitter, fromPort, edge.to, edge.inputPort, edge.implicit)
                     }
 
                     val from = currentEdges.first().from
-                    addEdge(from, currentEdges.first().outputPort, splitter, "source")
+                    addEdge(from, currentEdges.first().outputPort, splitter, "source", currentEdges.first().implicit)
                     for (edge in currentEdges) {
                         edges.remove(edge)
                     }
@@ -386,9 +379,9 @@ class Graph private constructor(val environment: PipelineEnvironment) {
                     for ((sourceNumber, edge) in currentEdges.withIndex()) {
                         val toPort = "result${sourceNumber + 1}"
                         joiner.inputs[toPort] = ModelPort(joiner, toPort, false, false, true, listOf())
-                        addEdge(edge.from,  edge.outputPort, joiner, toPort)
+                        addEdge(edge.from,  edge.outputPort, joiner, toPort, false)
                     }
-                    addEdge(joiner, "result", currentEdges.first().to, currentEdges.first().inputPort)
+                    addEdge(joiner, "result", currentEdges.first().to, currentEdges.first().inputPort, currentEdges.first().implicit)
                     for (edge in currentEdges) {
                         edges.remove(edge)
                     }

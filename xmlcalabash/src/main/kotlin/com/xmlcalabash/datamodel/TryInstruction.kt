@@ -180,7 +180,7 @@ class TryInstruction(parent: XProcInstruction): CompoundStepDeclaration(parent, 
                 val stepoutput = child.namedOutput(portName)
                 if (stepoutput != null) {
                     val pipe = output.pipe()
-                    pipe.setReadablePort(stepoutput)
+                    pipe.setReadablePort(stepoutput, true)
                 }
             }
 
@@ -200,7 +200,7 @@ class TryInstruction(parent: XProcInstruction): CompoundStepDeclaration(parent, 
         val wi = sink.withInput()
         wi.port = "source"
         val pipe = wi.pipe()
-        pipe.setReadablePort(wo)
+        pipe.setReadablePort(wo, true)
         sink.elaborateInstructions()
     }
 

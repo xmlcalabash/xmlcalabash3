@@ -23,8 +23,6 @@ class Main {
                     testOptions.traceExecution = true
                 } else if (arg.startsWith("--title:")) {
                     testOptions.title = arg.substring(8)
-                } else if (arg.startsWith("--description:")) {
-                    testOptions.outputDescription = arg.substring(14)
                 } else if (arg.startsWith("--graph:")) {
                     testOptions.outputGraph = arg.substring(8)
                 } else if (arg == "--update-regressions" || arg == "-U") {

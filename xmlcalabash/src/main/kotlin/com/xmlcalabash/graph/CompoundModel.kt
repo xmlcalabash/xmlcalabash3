@@ -74,7 +74,7 @@ open class CompoundModel internal constructor(graph: Graph, parent: Model?, step
                             is PipeInstruction -> {
                                 val from = graph.instructionMap[conn.readablePort!!.parent]!!
                                 val to = graph.instructionMap[step]!!
-                                graph.addEdge(from, conn.port!!, to, child.port)
+                                graph.addEdge(from, conn.port!!, to, child.port, conn.implicit)
                             }
                             else -> {
                                 throw XProcError.xiImpossible("Connection is not a pipe: ${conn}").exception()
@@ -92,7 +92,7 @@ open class CompoundModel internal constructor(graph: Graph, parent: Model?, step
                                 footPort.serialization = child.serialization.evaluate(child.stepConfig) as XdmMap
                                 foot.inputs[child.port] = footPort
 
-                                graph.addEdge(from, conn.port!!, foot, child.port)
+                                graph.addEdge(from, conn.port!!, foot, child.port, conn.implicit)
                             }
                             else -> {
                                 throw XProcError.xiImpossible("Connection is not a pipe: ${conn}").exception()
@@ -138,7 +138,7 @@ open class CompoundModel internal constructor(graph: Graph, parent: Model?, step
             val toEdges = graph.edges.filter { it.to == child }
             for (edge in toEdges) {
                 val iport = edge.inputPort
-                graph.addEdge(edge.from, edge.outputPort, submodel, iport)
+                graph.addEdge(edge.from, edge.outputPort, submodel, iport, edge.implicit)
                 graph.edges.remove(edge)
                 val mport = ModelPort(child.inputs[iport]!!)
                 submodel.inputs[iport] = ModelPort(submodel, iport, false, mport.primary, mport.sequence, mport.contentTypes)
@@ -149,7 +149,7 @@ open class CompoundModel internal constructor(graph: Graph, parent: Model?, step
             val fromEdges = graph.edges.filter { it.from == child }
             for (edge in fromEdges) {
                 val oport = edge.outputPort
-                graph.addEdge(submodel, oport, edge.to, edge.inputPort)
+                graph.addEdge(submodel, oport, edge.to, edge.inputPort, edge.implicit)
                 graph.edges.remove(edge)
                 val mport = ModelPort(child.outputs[oport]!!)
                 val outport = ModelPort(submodel, oport, false, mport.primary, mport.sequence, mport.contentTypes)

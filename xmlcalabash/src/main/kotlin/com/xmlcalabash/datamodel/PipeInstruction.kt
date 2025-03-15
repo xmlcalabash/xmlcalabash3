@@ -10,6 +10,10 @@ class PipeInstruction(parent: XProcInstruction): ConnectionInstruction(parent, N
     val readablePort: PortBindingContainer?
         get() = _readablePort
 
+    private var _implicit: Boolean? = null
+    val implicit: Boolean
+        get() = _implicit ?: false
+
     constructor(parent: XProcInstruction, step: String?, port: String?): this(parent) {
         this.step = step
         this.port = port
@@ -125,10 +129,11 @@ class PipeInstruction(parent: XProcInstruction): ConnectionInstruction(parent, N
         super.elaborateInstructions()
     }
 
-    fun setReadablePort(readable: PortBindingContainer) {
+    fun setReadablePort(readable: PortBindingContainer, implicit: Boolean) {
         _readablePort = readable
         step = (readable.parent!! as StepDeclaration).name
         port = readable.port
+        _implicit = implicit
     }
 
     override fun promoteToStep(parent: StepDeclaration, step: StepDeclaration): List<AtomicStepInstruction> {

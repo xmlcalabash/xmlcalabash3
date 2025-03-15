@@ -5,22 +5,20 @@ import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.graph.*
 import com.xmlcalabash.namespace.Ns
 import com.xmlcalabash.namespace.NsCx
-import com.xmlcalabash.namespace.NsDescription
 import com.xmlcalabash.namespace.NsXs
 import com.xmlcalabash.runtime.model.CompoundStepModel
 import com.xmlcalabash.util.S9Api
-import com.xmlcalabash.util.SaxonTreeBuilder
 import net.sf.saxon.Configuration
 import net.sf.saxon.s9api.Axis
-import net.sf.saxon.s9api.ValidationMode
 import net.sf.saxon.s9api.XdmDestination
-import net.sf.saxon.s9api.XdmNode
 import net.sf.saxon.s9api.XdmNodeKind
 import org.xml.sax.InputSource
 import javax.xml.transform.sax.SAXSource
 
 class XProcRuntime private constructor(internal val start: DeclareStepInstruction, internal val config: XProcStepConfiguration) {
     companion object {
+        val uniqueNames = mutableListOf<String>()
+
         internal fun newInstance(start: DeclareStepInstruction): XProcRuntime {
             val environment = PipelineContext(start.stepConfig.environment as PipelineCompilerContext)
             val config = XProcStepConfigurationImpl(environment, start.stepConfig.saxonConfig, start.location)
@@ -109,27 +107,46 @@ class XProcRuntime private constructor(internal val start: DeclareStepInstructio
         return XProcPipeline(this, pipelineStep, config)
     }
 
-    fun description(): XdmNode {
-        val builder = SaxonTreeBuilder(pipelineStep.stepConfig)
-        builder.startDocument(null)
-        builder.addStartElement(NsDescription.description)
+    private fun pipelineFilename(pipeline: DeclareStepInstruction): String {
+        val name = if (pipeline.name.startsWith("!")) {
+            (pipeline.type ?: pipeline.instructionType).toString().replace(":", "_")
+        } else {
+            pipeline.name
+        }
 
-        builder.addSubtree(PipelineVisualization.build(start))
+        var unique = name
+        var count = 1
+        while (uniqueNames.contains(unique)) {
+            count++
+            unique = "${name}_${count}"
+        }
+        uniqueNames.add(unique)
+        return unique
+    }
+
+    fun description(): XProcDescription {
+        val description = XProcDescription(pipelineStep.stepConfig)
+
+        // Work out what all the filenames will be so that the linking is obvious
+        val filenameMap = mutableMapOf<String, String>()
+        for ((decl, model) in pipelines) {
+            filenameMap[decl.id] = pipelineFilename(decl)
+        }
+
+        // Make sure the starting point is the first pipeline/graph
+        description.addPipeline(PipelineVisualization.build(start, filenameMap))
 
         val startmodel = pipelines[start]!!
-        val startxml = GraphVisualization.build(startmodel.graph, startmodel.model as PipelineModel)
-        builder.addSubtree(startxml)
+        description.addGraph(GraphVisualization.build(startmodel.graph, startmodel.model as PipelineModel, filenameMap))
 
         for ((decl, model) in pipelines) {
             if (decl !== start) {
-                builder.addSubtree(PipelineVisualization.build(decl))
-                builder.addSubtree(GraphVisualization.build(model.graph, model.model as PipelineModel))
+                description.addPipeline(PipelineVisualization.build(decl, filenameMap))
+                description.addGraph(GraphVisualization.build(model.graph, model.model as PipelineModel, filenameMap))
             }
         }
 
-        builder.addEndElement()
-        builder.endDocument()
-        return builder.result
+        return description
     }
 
     private fun initialize(start: DeclareStepInstruction, pipelines: Map<DeclareStepInstruction, SubpipelineModel>) {

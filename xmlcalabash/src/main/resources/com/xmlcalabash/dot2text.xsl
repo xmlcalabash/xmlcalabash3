@@ -1,16 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-                xmlns:xs="http://www.w3.org/2001/XMLSchema"
-                xmlns:p="http://www.w3.org/ns/xproc"
                 xmlns:cx="http://xmlcalabash.com/ns/extensions"
-                xmlns:f="http://xmlcalabash.com/ns/functions"
                 xmlns:dot="http://xmlcalabash.com/ns/dot"
+                xmlns:f="http://xmlcalabash.com/ns/functions"
+                xmlns:h="http://www.w3.org/1999/xhtml"
+                xmlns:p="http://www.w3.org/ns/xproc"
+                xmlns:xs="http://www.w3.org/2001/XMLSchema"
                 expand-text="yes"
                 default-mode="dot-to-text"
                 exclude-result-prefixes="#all"
                 version="3.0">
 
 <xsl:output method="text"/>
+<xsl:key name="port" match="*" use="@port"/>
 
 <xsl:variable name="nl" select="'&#10;'"/>
 
@@ -23,16 +25,16 @@
   <xsl:text>}}&#10;</xsl:text>
 </xsl:template>
 
-<xsl:template match="dot:subgraph[table]">
+<xsl:template match="dot:subgraph[h:table]">
   <xsl:text>subgraph </xsl:text>
   <xsl:value-of select="@xml:id"/>
   <xsl:text> {{&#10;</xsl:text>
   <xsl:apply-templates select="." mode="properties"/>
   <xsl:text>node [shape=plaintext]{$nl}</xsl:text>
   <xsl:text>{@xml:id} [shape={(@shape,'plaintext')[1]};label=&lt;{$nl}</xsl:text>
-  <xsl:value-of select="serialize(f:strip-ns(table), map{'method':'xml', 'indent':false()})"/>
+  <xsl:value-of select="serialize(f:strip-ns(h:table), map{'method':'xml', 'indent':false()})"/>
   <xsl:text>{$nl}&gt;];{$nl}</xsl:text>
-  <xsl:apply-templates select="* except table"/>
+  <xsl:apply-templates select="* except h:table"/>
   <xsl:text>}}&#10;</xsl:text>
 </xsl:template>
 
@@ -78,9 +80,11 @@
   <xsl:text>{$nl}</xsl:text>
 </xsl:template>
 
+
 <xsl:template match="dot:edge">
-  <xsl:text>{@from}{if (string(@output) != '') then ':' || @output else ''} -> </xsl:text>
-  <xsl:text>{@to}{if (string(@input) != '') then ':' || @input else ''}</xsl:text>
+  <xsl:apply-templates select="@from" mode="port"/>
+  <xsl:text> -&gt; </xsl:text>
+  <xsl:apply-templates select="@to" mode="port"/>
 
   <xsl:if test="@dot:*">
     <xsl:text> [</xsl:text>
@@ -101,6 +105,19 @@
   <xsl:text>{$nl}</xsl:text>
 </xsl:template>
 
+<xsl:template match="@to|@from" mode="port">
+  <xsl:variable name="port" select="key('port', .)"/>
+  <xsl:variable name="cluster" select="($port//ancestor::dot:subgraph)[last()]/@xml:id"/>
+  <xsl:choose>
+    <xsl:when test="empty($cluster)">
+      <xsl:text>{.}</xsl:text>
+    </xsl:when>
+    <xsl:otherwise>
+      <xsl:text>{$cluster}:{.}</xsl:text>
+    </xsl:otherwise>
+  </xsl:choose>
+</xsl:template>
+
 <xsl:template match="dot:*">
   <xsl:message select="'Unexpected: ' || node-name(.)"/>
 </xsl:template>
@@ -112,12 +129,27 @@
   <xsl:apply-templates select="$root" mode="strip-ns"/>
 </xsl:function>
 
-<xsl:mode name="strip-ns" on-no-match="shallow-copy"/>
-
 <xsl:template match="*" mode="strip-ns">
   <xsl:element name="{local-name(.)}">
-    <xsl:apply-templates select="@*,node()" mode="strip-ns"/>
+    <xsl:apply-templates select="@*" mode="strip-ns"/>
+    <xsl:apply-templates select="node()" mode="strip-ns"/>
   </xsl:element>
+</xsl:template>
+
+<xsl:template match="attribute()|text()" mode="strip-ns">
+  <xsl:copy/>
+</xsl:template>
+
+<xsl:template match="@dot:*" mode="strip-ns">
+  <xsl:attribute name="{local-name(.)}" select="string(.)"/>
+</xsl:template>
+
+<xsl:template match="text()[normalize-space(.) = '']" mode="strip-ns">
+  <!-- discard -->
+</xsl:template>
+
+<xsl:template match="text()[parent::h:table or parent::h:tr]" priority="100" mode="strip-ns">
+  <xsl:text>&#10;</xsl:text>
 </xsl:template>
 
 </xsl:stylesheet>

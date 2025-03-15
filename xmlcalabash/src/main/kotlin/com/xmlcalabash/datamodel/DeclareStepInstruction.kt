@@ -383,10 +383,6 @@ class DeclareStepInstruction(parent: XProcInstruction?, stepConfig: InstructionC
         }
     }
 
-    fun description(): XdmNode {
-        return PipelineVisualization.build(this)
-    }
-
     fun getInputs(): List<InputInstruction> {
         return children.filterIsInstance<InputInstruction>()
     }

@@ -66,7 +66,7 @@ open class ChooseInstruction(parent: XProcInstruction, tag: QName = NsP.choose):
                 hasContext = false
             } else {
                 val pipe = withInput.pipe()
-                pipe.setReadablePort(stepConfig.drp!!)
+                pipe.setReadablePort(stepConfig.drp!!, true)
             }
         }
         withInput.elaborateInstructions()
@@ -126,7 +126,7 @@ open class ChooseInstruction(parent: XProcInstruction, tag: QName = NsP.choose):
                 val wi = identity.withInput()
                 wi.port = "source"
                 val pipe = wi.pipe()
-                pipe.setReadablePort(stepConfig.drp!!)
+                pipe.setReadablePort(stepConfig.drp!!, true)
                 identity.elaborateAtomicStep()
                 otherwise.elaborateInstructions()
             }
@@ -156,7 +156,7 @@ open class ChooseInstruction(parent: XProcInstruction, tag: QName = NsP.choose):
                 val stepoutput = child.namedOutput(portName)
                 if (stepoutput != null) {
                     val pipe = output.pipe()
-                    pipe.setReadablePort(stepoutput)
+                    pipe.setReadablePort(stepoutput, true)
                 }
             }
 
