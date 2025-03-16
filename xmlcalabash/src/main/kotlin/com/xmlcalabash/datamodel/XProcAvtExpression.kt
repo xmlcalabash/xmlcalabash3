@@ -14,7 +14,10 @@ class XProcAvtExpression private constructor(stepConfig: XProcStepConfiguration,
     }
 
     override fun cast(asType: SequenceType, values: List<XdmAtomicValue>): XProcExpression {
-        return avt(stepConfig, avt, asType, values)
+        if (details.error == null) {
+            return avt(stepConfig, avt, asType, values)
+        }
+        return this
     }
 
     override fun xevaluate(config: XProcStepConfiguration): () -> XdmValue {

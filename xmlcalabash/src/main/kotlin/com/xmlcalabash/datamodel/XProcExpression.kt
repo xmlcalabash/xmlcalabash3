@@ -17,7 +17,8 @@ abstract class XProcExpression(val stepConfig: XProcStepConfiguration, val asTyp
             val expr = XProcSelectExpression.newInstance(stepConfig, select, asType, collection, values)
             expr._details = XPathExpressionParser(stepConfig).parse(select)
             if (expr.details.error != null) {
-                throw stepConfig.exception(XProcError.xsXPathStaticError(expr.details.error?.message ?: ""), expr.details.error!!)
+                stepConfig.warn { "Invalid select expression: ${select}: ${expr.details.error?.message ?: "(no explanation)"}" }
+                //throw stepConfig.exception(XProcError.xsXPathStaticError(expr.details.error?.message ?: ""), expr.details.error!!)
             }
             return expr
         }
@@ -34,7 +35,8 @@ abstract class XProcExpression(val stepConfig: XProcStepConfiguration, val asTyp
             val expr = XProcMatchExpression.newInstance(stepConfig, match)
             expr._details = XPathExpressionParser(stepConfig).parse(match)
             if (expr.details.error != null) {
-                throw stepConfig.exception(XProcError.xsXPathStaticError(expr.details.error?.message ?: ""), expr.details.error!!)
+                stepConfig.warn { "Invalid match expression: ${match}: ${expr.details.error?.message ?: "(no explanation)"}" }
+                //throw stepConfig.exception(XProcError.xsXPathStaticError(expr.details.error?.message ?: ""), expr.details.error!!)
             }
             return expr
         }
@@ -50,6 +52,10 @@ abstract class XProcExpression(val stepConfig: XProcStepConfiguration, val asTyp
             val functions = mutableSetOf<Pair<QName,Int>>()
             for (avtExpr in avt.expressions()) {
                 val details = parser.parse(avtExpr)
+                if (error == null && details.error != null) {
+                    val s = "Invalid value template expression: ${avtExpr}: ${details.error.message ?: "(no explanation)"}"
+                    stepConfig.warn { "Invalid value template expression: ${avtExpr}: ${details.error.message ?: "(no explanation)"}" }
+                }
                 error = error ?: details.error
                 context = context || details.contextRef
                 alwaysDynamic = alwaysDynamic || details.alwaysDynamic
