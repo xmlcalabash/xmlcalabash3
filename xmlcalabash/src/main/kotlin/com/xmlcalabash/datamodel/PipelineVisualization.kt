@@ -236,14 +236,14 @@ class PipelineVisualization private constructor(val instruction: XProcInstructio
                     if (fromPort == null) {
                         val depends = findCompoundDepends(child, node)
                         val from = compoundDepends[depends]!!
-                        compound.edges.add(Edge(compound.nsmap, from, to, compound.name, "!depends", child.step!!, child.port!!))
+                        compound.edges.add(Edge(from, to, compound.name, "!depends", child.step!!, child.port!!, child.implicit))
                     } else {
                         val from = readableMap[fromPort]!!
                         var step: XProcInstruction = child
                         while (step !is StepDeclaration) {
                             step = step.parent!!
                         }
-                        compound.edges.add(Edge(compound.nsmap, from, to, step.name, fromPort.port, child.step!!, child.port!!))
+                        compound.edges.add(Edge(from, to, step.name, fromPort.port, child.step!!, child.port!!, child.implicit))
                     }
                 }
                 else -> addPipes(compound, child)
@@ -333,7 +333,7 @@ class PipelineVisualization private constructor(val instruction: XProcInstructio
         return findCompoundDepends(pipe, node.parent!!)
     }
 
-    private inner class Edge(val nsmap: NamespaceMap, val from: Int, val to: Int, val fromStep: String, val fromPort: String, val toStep: String, val toPort: String)
+    private inner class Edge(val from: Int, val to: Int, val fromStep: String, val fromPort: String, val toStep: String, val toPort: String, val implicit: Boolean)
 
     private inner class NamedPort(val nsmap: NamespaceMap, val name: String, val primary: Boolean, val sequence: Boolean) {
         var weldedShut = false
@@ -457,7 +457,8 @@ class PipelineVisualization private constructor(val instruction: XProcInstructio
                     "from-step" to edge.fromStep,
                     "from-port" to edge.fromPort,
                     "to-step" to edge.toStep,
-                    "to-port" to edge.toPort
+                    "to-port" to edge.toPort,
+                    "implicit" to (if (edge.implicit) "true" else null),
                     )
                 builder.addStartElement(NsDescription.g("edge", gPrefix), instruction.stepConfig.stringAttributeMap(attr), nsmap)
                 builder.addEndElement()

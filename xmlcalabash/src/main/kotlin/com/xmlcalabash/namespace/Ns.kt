@@ -65,6 +65,7 @@ object Ns {
     val failOnError = QName("fail-on-error")
     val failOnTimeout = QName("fail-on-timeout")
     val failureThreshold = QName("failure-threshold")
+    val filename = QName("filename")
     val fixupXmlBase = QName("fixup-xml-base")
     val fixupXmlLang = QName("fixup-xml-lang")
     val flags = QName("flags")
