@@ -23,6 +23,11 @@ open class ExpressionStep(val params: ExpressionStepParameters): AbstractAtomicS
 
     override fun run() {
         super.run()
+
+        params.expression.details.error?.let {
+            throw throw stepConfig.exception(XProcError.xsXPathStaticError(params.expression.toString()), it)
+        }
+
         // Expression steps are unusual in that source may not exist
         contextItems.addAll(queues["source"] ?: emptyList())
 
