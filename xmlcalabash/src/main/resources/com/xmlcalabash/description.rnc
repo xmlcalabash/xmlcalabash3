@@ -19,7 +19,7 @@ g.declare-step =
         g.input*,
         g.output*,
         g.head,
-        g.step+,
+        (g.atomic-step | g.compound-step | g.subpipeline)+,
         g.foot,
         g.edge*
     }
@@ -62,8 +62,6 @@ g.port =
         text
     }
 
-g.step = g.atomic-step | g.compound-step | g.subpipeline
-
 g.atomic-step =
     element g:atomic-step {
         attribute id { text }?,
@@ -71,6 +69,7 @@ g.atomic-step =
         attribute type { xsd:QName },
         attribute as { text }?,
         attribute href { text }?,
+        attribute select { text }?,
         attribute option-name { xsd:QName }?,
         attribute variable-name { xsd:QName }?,
         attribute expression { text }?,
@@ -95,7 +94,7 @@ g.compound-step =
         attribute name { text },
         attribute type { xsd:QName },
         g.head,
-        g.step+,
+        (g.atomic-step | g.compound-step | g.subpipeline)+,
         g.foot,
         g.edge*
     }
@@ -120,7 +119,7 @@ g.graph =
         g.input*,
         g.output*,
         g.declare-step,
-        g.step*,
+        (g.atomic-step | g.compound-step | g.subpipeline)*,
         g.edge*
     }
 

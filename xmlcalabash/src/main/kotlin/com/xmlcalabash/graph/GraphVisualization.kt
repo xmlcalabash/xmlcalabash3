@@ -1,8 +1,10 @@
 package com.xmlcalabash.graph
 
+import com.xmlcalabash.datamodel.AtomicDocumentStepInstruction
 import com.xmlcalabash.datamodel.AtomicExpressionStepInstruction
 import com.xmlcalabash.datamodel.DeclareStepInstruction
 import com.xmlcalabash.datamodel.InstructionConfiguration
+import com.xmlcalabash.namespace.Ns
 import com.xmlcalabash.namespace.NsDescription
 import com.xmlcalabash.namespace.NsP
 import com.xmlcalabash.util.SaxonTreeBuilder
@@ -27,7 +29,6 @@ class GraphVisualization private constructor(val graph: Graph, private val filen
     private lateinit var stepConfig: InstructionConfiguration
     private lateinit var gPrefix: String
     private lateinit var builder: SaxonTreeBuilder
-    private val gnames = mutableMapOf<String, QName>()
     private var nextId = 1
 
     private val nodes = mutableListOf<Node>()
@@ -207,6 +208,9 @@ class GraphVisualization private constructor(val graph: Graph, private val filen
 
         init {
             nsmap = nsmap.put(gPrefix, NsDescription.namespace)
+            if (model.step.instructionType.prefix != "") {
+                nsmap = nsmap.put(model.step.instructionType.prefix, model.step.instructionType.namespaceUri)
+            }
             for ((prefix, uri) in model.step.inscopeNamespaces) {
                 nsmap = nsmap.put(prefix, uri)
             }
@@ -288,9 +292,20 @@ class GraphVisualization private constructor(val graph: Graph, private val filen
                 null
             }
 
+            val href = if (model.step is AtomicDocumentStepInstruction) {
+                try {
+                    model.step.staticOptions[Ns.href]?.staticValue.toString()
+                } catch (ex: Exception) {
+                    null
+                }
+            } else {
+                null
+            }
+
             startElement(NsDescription.g("atomic-step", gPrefix), mapOf(
                 "id" to id,
                 "type" to model.step.instructionType.toString(),
+                "href" to href,
                 "name" to model.step.name,
                 "filename" to filenameMap[model.step.declId],
                 "option-name" to optName,

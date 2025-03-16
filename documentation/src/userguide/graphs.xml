@@ -10,8 +10,6 @@
 <para>XML Calabash transforms a pipeline into a collection of graphs. It is the
 graphs that are evaluated at runtime.</para>
 
-<para>T.B.D. This chapter needs a lot of work. It needs to be written, really. 🙂</para>
-
 <para>To explore the difference between pipelines and graphs, consider
 the example pipeline in <xref linkend="debugger-xpl"/>.</para>
 
@@ -34,10 +32,15 @@ equivalent and more concise version is:</para>
 </figure>
 
 <para>The processor analyzes the pipeline (resolves <tag class="attribute">use-when</tag>
-attributes, default readable ports, etc.) and constructs a model like the
-one shown in <xref linkend="debugger-pipeline"/>.</para>
+attributes, default readable ports, etc.) and constructs two models, one for each pipeline, like the
+ones shown in <xref linkend="debugger-pipeline"/>.</para>
 
-<figure xml:id="debugger-pipeline">
+<para>You can generate the graphs for any pipeline with the
+<option linkend="cli-graphs">--graphs</option> command line option.</para>
+
+<formalgroup xml:id="debugger-pipeline">
+<title>The pipeline models</title>
+<figure>
 <title>The pipeline model</title>
 <mediaobject>
 <imageobject>
@@ -45,6 +48,15 @@ one shown in <xref linkend="debugger-pipeline"/>.</para>
 </imageobject>
 </mediaobject>
 </figure>
+<figure>
+<title>The ex:ident model</title>
+<mediaobject>
+<imageobject>
+<imagedata fileref="img/debugger-exident.svg"/>
+</imageobject>
+</mediaobject>
+</figure>
+</formalgroup>
 
 <para>The processor makes some changes in the pipeline. Some occurrences of <tag>p:document</tag>,
 <tag>p:inline</tag>, and even <tag>p:option</tag> and <tag>p:variable</tag>, are “promoted”
@@ -54,16 +66,297 @@ to steps. This would be burdonsome for authoring, but simplifies the implementat
 It’s the actual graph that gets executed. The graph for this pipeline is
 shown in <xref linkend="debugger-model"/>.</para>
 
-<figure xml:id="debugger-model">
-<title>The pipeline graph model</title>
+<formalgroup xml:id="debugger-model">
+<title>The graph models</title>
+<figure>
+<title>The pipeline graph</title>
 <mediaobject>
 <imageobject>
-<imagedata fileref="img/debugger-graph.svg"/>
+<imagedata fileref="img/debugger-graph-pipeline.svg"/>
 </imageobject>
 </mediaobject>
 </figure>
+<figure xml:id="exgraph-pipeline-styled">
+<title>The ex:ident graph</title>
+<mediaobject>
+<imageobject>
+<imagedata fileref="img/debugger-graph-exident.svg"/>
+</imageobject>
+</mediaobject>
+</figure>
+</formalgroup>
 
 <para>Compound steps are represented as separate graphs. They have also grown
 “head” and “foot” steps that manage the boundaries.</para>
 
+<section xml:id="graph-styling">
+<title>Styling the SVG</title>
+
+<para>The actual SVG diagrams are constructed in several steps. If you run with
+the
+<option linkend="cli-graphs">--graphs</option> and
+<option linkend="cli-debug">--debug</option> options,
+all of the intermediate files will be saved in the graph output directory.
+The starting point is the pipeline description itself, <filename>pipeline.xml</filename>.
+This document contains an XML description of the compiled pipelines and their graphs.
+The pipeline description vocabulary is described in <xref linkend="description-reference"/>.
+</para>
+
+<para>The graphs are ultimately constructed with Graphviz. The <filename>pipeline.xml</filename>
+document is styled, then converted to a “<filename class="extension">.dot</filename>” file
+and processed with Graphviz.</para>
+
+<para>A completely unstyled example will help to illustrate how and where styling can be applied,
+see <xref linkend="exgraph-pipeline-unstyled"/>; this is the same graph as
+<xref linkend="exgraph-pipeline-styled"/> but with no style applied.</para>
+
+<figure xml:id="exgraph-pipeline-unstyled">
+<title>The ex:ident graph unstyled</title>
+<mediaobject>
+<imageobject>
+<imagedata fileref="img/debugger-exident-unstyled.svg"/>
+</imageobject>
+</mediaobject>
+</figure>
+
+<para>In Graphviz terms, each step is
+<link xlink:href="https://graphviz.org/doc/info/shapes.html">a node</link>, those are the
+nested rectangles,
+inside each node is <link xlink:href="https://graphviz.org/doc/info/shapes.html#table">a table</link>,
+and <link xlink:href="https://graphviz.org/docs/edges/">edges</link> join them. In particular,
+the first and last row of each table contain the inputs and outputs for the step, the “ports” in
+Graphviz terminology.</para>
+
+<para>The XML for this graph is show in <xref linkend="exgraph-description"/>.</para>
+
+<figure xml:id="exgraph-description">
+<title>The description markup for the ex:ident graph</title>
+<programlisting language='xml'
+><xi:include href="../examples/xml/exgraph-description.xml" parse="text"/></programlisting>
+</figure>
+
+<para>Styling consists of adding attributes to this markup. (Styling
+<emphasis>can</emphasis> also change the structure of the graph, but that risks
+creating a graph that doesn’t accurately reflect the structure of the original
+pipeline which may be very misleading.) Attributes in the “dot” namespace
+(<uri>http://xmlcalabash.com/ns/dot</uri>) can be added to supply Graphviz
+attributes. Attributes in the “html” namespace can be added to supply the HTML
+styling attributes that Graphviz supports.</para>
+
+<para>Additional rows can be added to the graph by inserting <tag>g:detail</tag> elements
+between the inputs and outputs. Each <tag>g:detail</tag> element represents a row in the table
+and should contain one or more <tag>td</tag> elements.</para>
+
+<para>The only significant attributes on the <tag>g:edge</tag> elements are <tag
+class="attribute">from</tag> and <tag class="attribute">to</tag> which must
+point to id values on the port elements. The other edge attributes are provided
+as a convenience for deciding how they should be styled.</para>
+
+<para>An example of styled output appears in <xref linkend="exgraph-description-styled"/>.
+This is what the default styling applies.</para>
+
+<figure xml:id="exgraph-description-styled">
+<title>The description markup for the ex:ident graph after styling</title>
+<programlisting language='xml'
+><xi:include href="../examples/xml/exgraph-description-styled.xml" parse="text"/></programlisting>
+</figure>
+
+<section>
+<title>Default styling</title>
+
+<para>If you don’t <link linkend="cc.graphviz">specify a stylesheet</link>, the pipelines
+and graphs are styled with a default stylesheet. The default stylesheet:</para>
+
+<itemizedlist>
+<listitem><para>Labels each step with its type and name (if a name was provided).
+</para></listitem>
+<listitem><para>Puts pipeline inputs and outputs in “house” shapes with fewer borders.
+</para></listitem>
+<listitem><para>Gives the head and foot elements a paralellogram shape with fewer table borders.
+</para></listitem>
+<listitem><para>Labels variable and option atomic steps appropriately and adds the variable
+name as a detail. If a default expression is provided, that’s also added as a detail.
+</para></listitem>
+<listitem><para>Adds links between subpipelines and their graphs.
+</para></listitem>
+<listitem><para>Uses dashed lines for “depends” edges.
+</para></listitem>
+<listitem><para>Adds “⋮” as a label to edges where the output allows a sequence but the input does not.
+</para></listitem>
+</itemizedlist>
+
+<para>Despite the earlier admonition about changing the graph structure, the default
+style does make one structural change. Any output port that is unconnected is connected to a
+“sink” represented as a point.</para>
+
+</section>
+
+<section>
+<title>Custom styling</title>
+
+<para>Providing your own stylesheet allows you to achieve any custom styling
+that you’d like. If you want to extend the default stylesheet, you can import it with the
+URI <uri>https://xmlcalabash.com/xsl/graphstyle.xsl</uri>. (This is a “magic” URI; there’s
+no actual web access necessary.)</para>
+
+<para>The stylesheet in <xref linkend="custom-graph-style"/> colors primary inputs and
+outputs in pale blue and makes implicit connections gray rather than black.
+(The “implicitness” of connections is roughly analagous to when the connection was made
+automatically to the default readable port, but it should be taken with a grain of salt; 
+compiling a pipeline involves adding, removing, and changing connections for a number of reasons
+and it’s not always clear which ones are implicit and which one’s arent.)
+</para>
+
+<figure xml:id="custom-graph-style">
+<title>Custom pipeline and graph styling</title>
+<programlisting language='xml'
+><xi:include href="../examples/xsl/custom-graph-style.xsl" parse="text"/></programlisting>
+</figure>
+
+<para>The result of applying custom styling is shown in 
+<xref linkend="exgraph-pipeline-custom"/>.</para>
+
+<figure xml:id="exgraph-pipeline-custom">
+<title>The ex:ident graph with custom styling</title>
+<mediaobject>
+<imageobject>
+<imagedata fileref="img/debugger-exident-custom.svg"/>
+</imageobject>
+</mediaobject>
+</figure>
+
+</section>
+</section>
+
+<section xml:id="description-reference">
+<title>Description reference</title>
+
+<para>T.B.D.</para>
+
+<note>
+<para>The pipeline description and the graph description have been made as
+similar as possible so that they can be styled more easily. The description
+schema doesn’t attempt to be prescriptive; in practice some combinations of
+attributes don’t arise, even though they’d be allowed by the schema.</para>
+<para>For example, a <tag>cx:document</tag> atomic step may have an 
+<tag class="attribute">href</tag> attribute, but no other step type will, nor will
+a <tag>cx:document</tag> ever have an <tag class="attribute">expression</tag>.</para>
+</note>
+
+<section xml:id="g.description">
+<title>g:description</title>
+<rng-pattern schema="../../build/description.rng"
+             ns="https://xmlcalabash.com/ns/description"
+             name="g.description"/>
+</section>
+
+<section xml:id="g.declare-step">
+<title>g:declare-step</title>
+<rng-pattern schema="../../build/description.rng"
+             ns="https://xmlcalabash.com/ns/description"
+             name="g.declare-step"/>
+
+<para>If the <tag class="attribute">filename</tag> is present, it’s the base filename
+used for this pipeline.</para>
+
+</section>
+
+<section xml:id="g.input">
+<title>g:input</title>
+<rng-pattern schema="../../build/description.rng"
+             ns="https://xmlcalabash.com/ns/description"
+             name="g.input"/>
+</section>
+
+<section xml:id="g.output">
+<title>g:output</title>
+<rng-pattern schema="../../build/description.rng"
+             ns="https://xmlcalabash.com/ns/description"
+             name="g.output"/>
+</section>
+
+<section xml:id="g.head">
+<title>g:head</title>
+<rng-pattern schema="../../build/description.rng"
+             ns="https://xmlcalabash.com/ns/description"
+             name="g.head"/>
+</section>
+
+<section xml:id="g.foot">
+<title>g:foot</title>
+<rng-pattern schema="../../build/description.rng"
+             ns="https://xmlcalabash.com/ns/description"
+             name="g.foot"/>
+</section>
+
+<section xml:id="g.inputs">
+<title>g:inputs</title>
+<rng-pattern schema="../../build/description.rng"
+             ns="https://xmlcalabash.com/ns/description"
+             name="g.inputs"/>
+</section>
+
+<section xml:id="g.outputs">
+<title>g:outputs</title>
+<rng-pattern schema="../../build/description.rng"
+             ns="https://xmlcalabash.com/ns/description"
+             name="g.outputs"/>
+</section>
+
+<section xml:id="g.port">
+<title>g:port</title>
+<rng-pattern schema="../../build/description.rng"
+             ns="https://xmlcalabash.com/ns/description"
+             name="g.port"/>
+</section>
+
+<section xml:id="g.atomic-step">
+<title>g:atomic-step</title>
+<rng-pattern schema="../../build/description.rng"
+             ns="https://xmlcalabash.com/ns/description"
+             name="g.atomic-step"/>
+
+<para>If the <tag class="attribute">filename</tag> is present, this is a user-defined
+step and the filename identifies the declaration for this step.
+</para>
+
+</section>
+
+<section xml:id="g.subpipeline">
+<title>g:subpipeline</title>
+<rng-pattern schema="../../build/description.rng"
+             ns="https://xmlcalabash.com/ns/description"
+             name="g.subpipeline"/>
+
+<para>A subpipeline is an atomic step that “calls” a compound step.</para>
+
+</section>
+
+<section xml:id="g.compound-step">
+<title>g:compound-step</title>
+<rng-pattern schema="../../build/description.rng"
+             ns="https://xmlcalabash.com/ns/description"
+             name="g.compound-step"/>
+</section>
+
+<section xml:id="g.edge">
+<title>g:edge</title>
+<rng-pattern schema="../../build/description.rng"
+             ns="https://xmlcalabash.com/ns/description"
+             name="g.edge"/>
+</section>
+
+<section xml:id="g.graph">
+<title>g:graph</title>
+<rng-pattern schema="../../build/description.rng"
+             ns="https://xmlcalabash.com/ns/description"
+             name="g.graph"/>
+
+<para>If the <tag class="attribute">filename</tag> is present, it’s the base filename
+used for this graph.</para>
+
+</section>
+
+
+</section>
 </chapter>

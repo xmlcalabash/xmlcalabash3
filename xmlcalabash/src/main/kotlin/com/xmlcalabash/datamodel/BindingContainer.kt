@@ -71,7 +71,7 @@ open class BindingContainer(parent: XProcInstruction, stepConfig: InstructionCon
 
     open fun pipe(input: InputInstruction): PipeInstruction {
         val pipe = PipeInstruction(this)
-        pipe.setReadablePort(input, false)
+        pipe.setReadablePort(input, implicit = false)
         _children.add(pipe)
         return pipe
     }

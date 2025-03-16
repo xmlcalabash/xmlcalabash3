@@ -10,7 +10,6 @@ class XProcDescription(val stepConfig: XProcStepConfiguration) {
     private val _pipelines = mutableListOf<XdmNode>()
     private val _graphs = mutableListOf<XdmNode>()
     private val names = mutableListOf<String>()
-    private val uniqueNames = mutableSetOf<String>()
     private var xml: XdmNode? = null
 
     val pipelines: List<XdmNode>
@@ -39,16 +38,8 @@ class XProcDescription(val stepConfig: XProcStepConfiguration) {
 
     fun addPipeline(node: XdmNode) {
         val root = S9Api.documentElement(node)
-        val rawname= root.getAttributeValue(Ns.name) ?: "pipeline"
-        val name = if (rawname.startsWith("!")) {
-            val typeName = root.getAttributeValue(Ns.type) ?: "pipeline"
-            unique(typeName.replace(":", "_"))
-        } else {
-            unique(rawname)
-        }
-
         _pipelines.add(node)
-        names.add(name)
+        names.add(root.getAttributeValue(Ns.filename)!!)
     }
 
     fun addGraph(node: XdmNode) {
@@ -63,17 +54,6 @@ class XProcDescription(val stepConfig: XProcStepConfiguration) {
     fun replaceGraphs(newGraphs: List<XdmNode>) {
         _graphs.clear()
         _graphs.addAll(newGraphs)
-    }
-
-    private fun unique(name: String): String {
-        var unique = name
-        var count = 1
-        while (uniqueNames.contains(unique)) {
-            count++
-            unique = "${name}_${count}"
-        }
-        uniqueNames.add(unique)
-        return unique
     }
 
     fun xml(): XdmNode {

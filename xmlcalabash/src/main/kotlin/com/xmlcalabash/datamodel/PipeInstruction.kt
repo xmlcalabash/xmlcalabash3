@@ -40,6 +40,7 @@ class PipeInstruction(parent: XProcInstruction): ConnectionInstruction(parent, N
             if (stepConfig.drp == null) {
                 throw stepConfig.exception(XProcError.xsNoStepPortNotReadable())
             }
+            _implicit = true
             stepConfig.drp!!.parent as StepDeclaration
         } else {
             var decl = stepConfig.inscopeStepNames[step]
