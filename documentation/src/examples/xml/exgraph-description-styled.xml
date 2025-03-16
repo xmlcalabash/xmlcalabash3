@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<g:graph xmlns="http://www.w3.org/1999/xhtml"
+         xmlns:dot="http://xmlcalabash.com/ns/dot"
+         xmlns:ex="https://xmlcalabash.com/ns/examples"
+         xmlns:g="http://xmlcalabash.com/ns/description"
+         xmlns:h="http://www.w3.org/1999/xhtml"
+         xmlns:p="http://www.w3.org/ns/xproc"
+         xmlns:xs="http://www.w3.org/2001/XMLSchema"
+         filename="ex_ident">
+   <g:input h:border="0"
+            h:cellborder="1"
+            h:cellspacing="0"
+            dot:peripheries="0"
+            dot:shape="invhouse">
+      <g:port id="input_7" primary="true" sequence="true">source</g:port>
+   </g:input>
+   <g:input h:border="0"
+            h:cellborder="1"
+            h:cellspacing="0"
+            dot:peripheries="0"
+            dot:shape="house">
+      <g:port id="output_8" primary="true" sequence="true">result</g:port>
+   </g:input>
+   <g:declare-step id="declare-step_2"
+                   base-uri="file:/documentation/src/examples/xpl/debugger.xpl"
+                   name="!declare-step_2"
+                   type="ex:ident"
+                   dot:label="p:declare-step">
+      <g:head h:border="0"
+              h:cellborder="1"
+              h:cellspacing="0"
+              dot:peripheries="0"
+              dot:shape="parallelogram">
+         <g:inputs>
+            <g:port id="_3" primary="true" sequence="true">source</g:port>
+         </g:inputs>
+         <g:outputs>
+            <g:port id="_1" primary="true" sequence="true">source</g:port>
+         </g:outputs>
+      </g:head>
+      <g:atomic-step id="identity"
+                     name="!identity"
+                     type="p:identity"
+                     h:border="0"
+                     h:cellborder="1"
+                     h:cellspacing="0"
+                     dot:peripheries="0">
+         <g:inputs>
+            <g:port id="_5" primary="true" sequence="true">source</g:port>
+         </g:inputs>
+         <g:detail>
+            <td>p:identity</td>
+         </g:detail>
+         <g:outputs>
+            <g:port id="_6" primary="true" sequence="true">result</g:port>
+         </g:outputs>
+      </g:atomic-step>
+      <g:foot h:border="0"
+              h:cellborder="1"
+              h:cellspacing="0"
+              dot:peripheries="0"
+              dot:shape="parallelogram">
+         <g:inputs>
+            <g:port id="_2" primary="true" sequence="true">result</g:port>
+         </g:inputs>
+         <g:outputs>
+            <g:port id="_4" primary="true" sequence="true">result</g:port>
+         </g:outputs>
+      </g:foot>
+   </g:declare-step>
+   <g:edge from="input_7"
+           to="_3"
+           to-port="source"
+           to-step="declare-step_2"
+           dot:arrowhead="normal"/>
+   <g:edge from="_4"
+           from-port="result"
+           from-step="declare-step_2_foot"
+           to="output_8"
+           dot:arrowhead="normal"/>
+   <g:edge from="_6"
+           from-port="result"
+           from-step="identity"
+           implicit="true"
+           to="_2"
+           to-port="result"
+           to-step="declare-step_2_foot"
+           dot:arrowhead="normal"/>
+   <g:edge from="_1"
+           from-port="source"
+           from-step="declare-step_2_head"
+           to="_5"
+           to-port="source"
+           to-step="identity"
+           dot:arrowhead="normal"/>
+</g:graph>

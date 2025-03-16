@@ -42,8 +42,6 @@
                 select="if (starts-with(@name, '!'))
                         then @type || g:step-number(root(), @type, @id)
                         else @type || g:step-number(root(), @type, @id) || ' “' || @name || '”'"/>
-
-  <xsl:message select="string(@type), string(@name), string(@id), '::', $label"/>
   <xsl:copy>
     <xsl:apply-templates select="@*"/>
     <xsl:attribute name="dot:label" select="$label"/>
@@ -74,16 +72,6 @@
     <xsl:apply-templates select="@*,node()"/>
   </g:input>
 </xsl:template>
-
-<!-- Give primary ports a light-gray background -->
-<!--
-<xsl:template match="g:port[@primary='true']">
-  <xsl:copy>
-    <xsl:attribute name="h:bgcolor" select="'#dadada'"/>
-    <xsl:apply-templates select="@*,node()"/>
-  </xsl:copy>
-</xsl:template>
--->
 
 <xsl:template match="g:head|g:foot">
   <xsl:copy>
@@ -128,6 +116,7 @@
           </xsl:otherwise>
         </xsl:choose>
       </xsl:when>
+
       <xsl:otherwise>
         <g:detail>
           <td>
@@ -154,6 +143,11 @@
             <td>“{string(@name)}”</td>
           </xsl:if>
         </g:detail>
+        <xsl:if test="@href">
+          <g:detail>
+            <td>href="{string(@href)}"</td>
+          </g:detail>
+        </xsl:if>
       </xsl:otherwise>
     </xsl:choose>
     <xsl:apply-templates select="g:outputs"/>

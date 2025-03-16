@@ -259,7 +259,11 @@ linkend="graphs">corresponding graphs</link>, to the
 <replaceable>graph-output-directory</replaceable>. The descriptions are “boxes and arrows”
 diagrams of the connections between the steps. One SVG diagram is produced for each declared
 pipeline and its corresponding graph. An HTML index in the
-<replaceable>graph-output-directory</replaceable> makes them easy to browse.</para>
+<replaceable>graph-output-directory</replaceable> makes them easy to browse.
+See <xref linkend="graphs"/> for more details.</para>
+<para>The processor assumes that it “owns” the
+<replaceable>graph-output-directory</replaceable>; it will erase files and directories
+before creating the graph output.</para>
 <note>
 <para>Some browsers have better support for SVG than others. If the diagrams are difficult
 to view, or if links don’t work correctly, a good first step is to try a different

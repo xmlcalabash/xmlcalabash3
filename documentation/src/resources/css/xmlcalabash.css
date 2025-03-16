@@ -196,3 +196,32 @@ main {
 .footnote-body {
     font-size: 90%;
 }
+
+.sidebar pre code {
+    background-color: inherit;
+}
+
+.fgbody {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+}
+
+.fgbody .formalobject + .formalobject {
+    margin-top: 0;
+}
+
+.fgbody .figure {
+    background-color: white;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.fgbody .figure header {
+    background-color: white;
+}
+
+.fgbody .figure header .title {
+    background-color: white;
+}

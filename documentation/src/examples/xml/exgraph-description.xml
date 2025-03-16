@@ -1,0 +1,59 @@
+<g:declare-step xmlns:g="http://xmlcalabash.com/ns/description"
+                xmlns:cx="http://xmlcalabash.com/ns/extensions"
+                xmlns:ex="https://xmlcalabash.com/ns/examples"
+                xmlns:p="http://www.w3.org/ns/xproc"
+                xmlns:xs="http://www.w3.org/2001/XMLSchema"
+                name="!declare-step_2"
+                type="ex:ident"
+                base-uri="file:/documentation/src/examples/xpl/debugger.xpl"
+                id="IC477"
+                filename="ex_ident">
+  <g:input>
+    <g:port id="input_39" primary="true" sequence="true">source</g:port>
+  </g:input>
+  <g:output>
+    <g:port id="output_42" primary="true" sequence="true">result</g:port>
+  </g:output>
+
+  <g:head>
+    <g:inputs>
+      <g:port id="_39" primary="true" sequence="true">source</g:port>
+    </g:inputs>
+    <g:outputs>
+      <g:port id="_40" primary="true" sequence="true">source</g:port>
+    </g:outputs>
+  </g:head>
+
+  <g:atomic-step name="!identity" type="p:identity">
+    <g:inputs>
+      <g:port id="_44" primary="true" sequence="true">source</g:port>
+    </g:inputs>
+    <g:outputs>
+      <g:port id="_45" primary="true" sequence="true">result</g:port>
+    </g:outputs>
+  </g:atomic-step>
+
+  <g:foot>
+    <g:inputs>
+      <g:port id="_41" primary="true" sequence="true">result</g:port>
+    </g:inputs>
+    <g:outputs>
+      <g:port id="_42" primary="true" sequence="true">result</g:port>
+    </g:outputs>
+  </g:foot>
+
+  <g:edge from="_45"
+          to="_41"
+          from-step="!declare-step_2"
+          from-port="result"
+          to-step="!identity"
+          to-port="result"/>
+  <g:edge from="_40"
+          to="_44"
+          from-step="!identity"
+          from-port="source"
+          to-step="!declare-step_2"
+          to-port="source"/>
+  <g:edge from="input_39" to="_39"/>
+  <g:edge from="_42" to="output_42"/>
+</g:declare-step>

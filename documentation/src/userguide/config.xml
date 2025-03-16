@@ -155,6 +155,11 @@ executable. Making SVG diagrams of pipelines or graphs requires Graphviz.</para>
 <para>Location of the Graphviz “dot” executable.</para>
 </listitem>
 </varlistentry>
+<varlistentry><term><tag class="attribute">style</tag> (filename)</term>
+<listitem>
+<para>The XSL stylesheet that will be used to style pipeline and graph output.</para>
+</listitem>
+</varlistentry>
 </variablelist>
 </section>
 
