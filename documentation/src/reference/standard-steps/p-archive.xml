@@ -102,15 +102,18 @@
 Compress™ library version <?dep commonsCompress?>.</para>
 
 <informaltable pgwide="1">
-<tgroup cols="5">
-<colspec colnum="1" align="left" colwidth="6em"/>
+<tgroup cols="6">
+<colspec colnum="1" align="left"   colwidth="3em"/>
 <colspec colnum="2" align="center" colwidth="3em"/>
 <colspec colnum="3" align="center" colwidth="3em"/>
+<colspec colnum="4" align="left"   colwidth="3em"/>
+<colspec colnum="6" align="left"   colwidth="8em"/>
 <thead>
   <row>
     <entry>Archive format</entry>
     <entry>Read?</entry>
     <entry>Write?</entry>
+    <entry><literal>format</literal> option</entry>
     <entry>Content type</entry>
     <entry>Common file extensions</entry>
   </row>
@@ -120,6 +123,7 @@ Compress™ library version <?dep commonsCompress?>.</para>
     <entry>7z</entry>
     <entry>✔</entry>
     <entry>✔</entry>
+    <entry><literal>sevenZ</literal></entry>
     <entry><literal>application/x-7z-compressed</literal></entry>
     <entry><filename class="extension">.7z</filename></entry>
   </row>
@@ -127,6 +131,7 @@ Compress™ library version <?dep commonsCompress?>.</para>
     <entry>Ar</entry>
     <entry>✔</entry>
     <entry>✔</entry>
+    <entry><literal>ar</literal></entry>
     <entry><literal>application/x-archive</literal></entry>
     <entry><filename class="extension">.a</filename>,
        <filename class="extension">.lib</filename>,
@@ -136,6 +141,7 @@ Compress™ library version <?dep commonsCompress?>.</para>
     <entry>Arj</entry>
     <entry>✔</entry>
     <entry></entry>
+    <entry><literal>arj</literal></entry>
     <entry><literal>application/x-arj</literal></entry>
     <entry><filename class="extension">.arj</filename></entry>
   </row>
@@ -143,6 +149,7 @@ Compress™ library version <?dep commonsCompress?>.</para>
     <entry>Cpio</entry>
     <entry>✔</entry>
     <entry>✔</entry>
+    <entry><literal>cpio</literal></entry>
     <entry><literal>application/x-cpio</literal></entry>
     <entry><filename class="extension">.cpio</filename></entry>
   </row>
@@ -150,6 +157,7 @@ Compress™ library version <?dep commonsCompress?>.</para>
     <entry>Jar</entry>
     <entry>✔</entry>
     <entry>✔</entry>
+    <entry><literal>jar</literal></entry>
     <entry><literal>application/java-archive</literal></entry>
     <entry><filename class="extension">.jar</filename></entry>
   </row>
@@ -157,6 +165,7 @@ Compress™ library version <?dep commonsCompress?>.</para>
     <entry>Tar</entry>
     <entry>✔</entry>
     <entry>✔</entry>
+    <entry><literal>tar</literal></entry>
     <entry><literal>application/x-tar</literal></entry>
     <entry><filename class="extension">.tar</filename></entry>
   </row>
@@ -164,6 +173,7 @@ Compress™ library version <?dep commonsCompress?>.</para>
     <entry>Zip</entry>
     <entry>✔</entry>
     <entry>✔</entry>
+    <entry><literal>zip</literal></entry>
     <entry><literal>application/zip</literal></entry>
     <entry><filename class="extension">.zip</filename></entry>
   </row>
