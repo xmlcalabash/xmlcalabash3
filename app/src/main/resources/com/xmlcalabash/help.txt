@@ -8,17 +8,18 @@ Where command is:
 
 And some of the frequently used options are:
 
-  --help                To display this summary
-  --input:port=uri      To read input port “port” from “uri”
-  --output:port=file    To write output port “port” to “file”
-  --configuration:file  To read configuration from “file”
-  --graphs:directory    Write SVG pipeline descriptions to directory
-  --pipe                To enable piped input on stdin and output on stdout
-  --debug               To enable additional debugging output
-  --debugger            Start the interactive debugger
-  --verbosity:value     To set the general level of verbosity to “value”
-                        Values are: trace, debug, progress, info, warn, error
-  --explain             Provide more detailed explanatory messages for errors
+  --help                  To display this summary
+  --input:[type@]port=uri To read input port “port” from “uri”
+  --output:port=file      To write output port “port” to “file”
+  --configuration:file    To read configuration from “file”
+  --graphs:directory      Write SVG pipeline descriptions to directory
+  --pipe                  To enable piped input on stdin and output on stdout
+  --debug                 To enable additional debugging output
+  --debugger              Start the interactive debugger
+  --verbosity:value       To set the general level of verbosity to “value”
+                          Values are: trace, debug, progress, info, warn, error
+  --explain               Provide more detailed explanatory messages for errors
+  --nogo                  Compile the pipeline and make graphs, but don’t run
 
 The pipeline identified by the URI “pipeline.xpl” will be run.
 
