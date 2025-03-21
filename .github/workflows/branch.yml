@@ -144,14 +144,14 @@ jobs:
       - name: Publish to Sonatype
         if: ${{ env.HAVE_ACCESS_TOKEN == 'true' && env.HAVE_SONATYPE == 'true' && env.CI_BRANCH == 'main' && contains(env.XMLCALABASH_VER, 'SNAPSHOT') }}
         run: |
-          curl -s -o secret.gpg ${{ secrets.GPGKEYURI }}
+          curl -s -o /tmp/secret.gpg ${{ secrets.GPGKEYURI }}
           ./gradlew -PsonatypeUsername=${{ secrets.SONATYPEUSER }} \
                   -PsonatypePassword="${{ secrets.SONATYPEPASS }}" \
                   -Psigning.keyId="${{ secrets.SIGNKEY }}" \
                   -Psigning.password="${{ secrets.SIGNPSW }}" \
-                  -Psigning.secretKeyRingFile=./secret.gpg \
+                  -Psigning.secretKeyRingFile=/tmp/secret.gpg \
                   publish
-          rm -f secret.gpg
+          rm -f /tmp/secret.gpg
 
       - name: Checkout www
         if: ${{ env.HAVE_WWW == 'true' && env.HAVE_ACCESS_TOKEN == 'true' && env.CI_BRANCH == 'main' && !contains(env.XMLCALABASH_VER, 'SNAPSHOT') }}
