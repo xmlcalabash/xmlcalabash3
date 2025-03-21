@@ -65,10 +65,6 @@ class XmlCalabashCli private constructor() {
         val messagePrinter = DefaultMessagePrinter(XmlCalabashConfiguration.DEFAULT_CONSOLE_ENCODING)
         var errorExplanation: ErrorExplanation = DefaultErrorExplanation(messagePrinter)
 
-        val inputManifold = mutableMapOf<String, RuntimePort>()
-        val outputManifold = mutableMapOf<String, RuntimePort>()
-        val optionManifold = mutableMapOf<QName, RuntimeOption>()
-
         commandLine = CommandLine.parse(args)
         if (commandLine.errors.isNotEmpty()) {
             abort(errorExplanation, commandLine.errors)
@@ -209,8 +205,10 @@ class XmlCalabashCli private constructor() {
 
             var explicitStdin: String? = null
             for ((port, uris) in commandLine.inputs) {
-                if (CommandLine.STDIO_URI in uris) {
-                    explicitStdin = port
+                for (pair in uris) {
+                    if (pair.first == CommandLine.STDIO_URI) {
+                        explicitStdin = port
+                    }
                 }
             }
 
@@ -256,25 +254,39 @@ class XmlCalabashCli private constructor() {
             }
 
             if (implicitStdin != null) {
-                commandLine._inputs[implicitStdin] = mutableListOf(CommandLine.STDIO_URI)
+                var ctype = implicitContentType(pipeline.inputManifold[implicitStdin]?.contentTypes)
+                commandLine._inputs[implicitStdin] = mutableListOf(Pair(CommandLine.STDIO_URI, ctype))
             }
 
             val stdin = if (explicitStdin != null || implicitStdin != null) {
                 val port = explicitStdin ?: implicitStdin!!
-                val ctype = inputManifold[port]?.contentTypes?.firstOrNull() ?: MediaType.XML
+                var ctype = implicitContentType(pipeline.inputManifold[port]?.contentTypes)
+
+                val inputList = commandLine.inputs[port]
+                for (pair in inputList!!) {
+                    if (pair.first == CommandLine.STDIO_URI) {
+                        if (pair.second != MediaType.ANY) {
+                            ctype = pair.second
+                        }
+                        break
+                    }
+                }
                 val loader = DocumentLoader(pipeline.config, CommandLine.STDIO_URI)
                 loader.load(System.`in`, ctype)
             } else {
                 null
             }
 
-            inputManifold.putAll(pipeline.inputManifold)
             for ((port, uris) in commandLine.inputs) {
-                for (uri in uris) {
-                    if (uri == CommandLine.STDIO_URI) {
+                for (pair in uris) {
+                    if (pair.first == CommandLine.STDIO_URI) {
                         pipeline.input(port, stdin!!)
                     } else {
-                        val doc = stepConfig.environment.documentManager.load(uri, pipeline.config)
+                        val props = DocumentProperties()
+                        if (pair.second != MediaType.ANY) {
+                            props[Ns.contentType] = pair.second.toString()
+                        }
+                        val doc = stepConfig.environment.documentManager.load(pair.first, pipeline.config, props)
                         pipeline.input(port, doc)
                     }
                 }
@@ -284,9 +296,8 @@ class XmlCalabashCli private constructor() {
                 commandLine._outputs[implicitStdout] = OutputFilename(CommandLine.STDIO_NAME)
             }
 
-            outputManifold.putAll(pipeline.outputManifold)
             for ((port, output) in commandLine.outputs) {
-                if (!outputManifold.containsKey(port)) {
+                if (!pipeline.outputManifold.containsKey(port)) {
                     throw XProcError.xiNoSuchOutputPort(port).exception()
                 }
                 if (output.pattern == "-") {
@@ -297,7 +308,6 @@ class XmlCalabashCli private constructor() {
                 }
             }
 
-            optionManifold.putAll(pipeline.optionManifold)
             for ((name, value) in xprocParser.builder.staticOptionsManager.useWhenOptions) {
                 pipeline.option(name, XProcDocument.ofValue(value, stepConfig, MediaType.OCTET_STREAM, DocumentProperties()))
             }
@@ -318,6 +328,29 @@ class XmlCalabashCli private constructor() {
                 exitProcess(1)
             }
         }
+    }
+
+    private fun implicitContentType(types: List<MediaType>?): MediaType {
+        if (types == null) {
+            return MediaType.XML
+        }
+        for (type in types) {
+            if (type.inclusive) {
+                if (type.mediaType == "*" || type.mediaSubtype == "*") {
+                    when (type.suffix) {
+                        "xml" -> return MediaType.XML
+                        "json" -> return MediaType.JSON
+                    }
+                    if (type.mediaType == "text") {
+                        return MediaType.TEXT
+                    }
+                } else {
+                    return type
+                }
+            }
+        }
+
+        return MediaType.XML
     }
 
     private fun saxonInitializer(name: String, ignoreErrors: Boolean = false) {

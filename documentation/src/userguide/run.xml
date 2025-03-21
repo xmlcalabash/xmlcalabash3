@@ -66,7 +66,7 @@ given, the <command>run</command> command is assumed.</para>
   <arg rep="norepeat" linkend="cli-configuration">--configuration:<replaceable>configuration-file</replaceable></arg>
   <sbr/>
   <arg rep="norepeat" linkend="cli-pipe">--pipe</arg>
-  <arg rep="repeat" linkend="cli-input">--input:<replaceable>port</replaceable>=<replaceable>uri</replaceable></arg>
+  <arg rep="repeat" linkend="cli-input">--input:[<replaceable>type</replaceable>@]<replaceable>port</replaceable>=<replaceable>uri</replaceable></arg>
   <arg rep="repeat" linkend="cli-output">--output:<replaceable>port</replaceable>=<replaceable>filespec</replaceable></arg>
   <sbr/>
   <arg rep="repeat" linkend="cli-namespace">--namespace:<replaceable>prefix</replaceable>=<replaceable>uri</replaceable></arg>
@@ -130,18 +130,34 @@ the <option linkend="cc.xml-calabash">piped-io</option> configuration setting.</
 </varlistentry>
 
 <varlistentry xml:id="cli-input">
-  <term><option>--input:<replaceable>port</replaceable>=<replaceable>uri</replaceable></option>, identifies
+  <term><option>--input:[<replaceable>type</replaceable>@]<replaceable>port</replaceable>=<replaceable>uri</replaceable></option>, identifies
   an input</term>
 <listitem>
-<para>This option associates the resource identified by the <replaceable>uri</replaceable> with
-the input port named <replaceable>port</replaceable>. If the <option>--input</option> option
+<para>This option associates the resource identified by the
+<replaceable>uri</replaceable> with the input port named
+<replaceable>port</replaceable>. The pipeline must have an input port named
+<replaceable>port</replaceable>.</para>
+
+<para>If <replaceable>type</replaceable> is provided,
+it is the content type that will be used to parse the input; it must be a valid content type.
+If no content type is provided, the content type will be inferred from the URI, if possible.
+</para>
+
+<para>If the <option>--input</option> option
 is repeated for the same <replaceable>port</replaceable>, the resources become a sequence of
 documents on that port, in the order specified.</para>
-<para>The pipeline must have an input port named <replaceable>port</replaceable>.</para>
+
 <para>If the input <replaceable>uri</replaceable> provided is “<literal>-</literal>”, input
-will be read from standard input. When standard input is read, it will be parsed
-as the (first) content type listed on the named input port. It will be parsed
-as XML if the input port doesn’t specify any content types.</para>
+will be read from standard input. When standard input is read, if no <replaceable>type</replaceable>
+is provided, it will be parsed as the first usable content type listed on the
+named input port. It will be parsed as XML if the input port doesn’t specify any usable
+content types.</para>
+
+<note>
+<para>A content type is “usable” if it is not a negated type, if it doesn’t use wildcards for the
+type or subtype, or if it’s recognized as a “+xml” or “+json” content type.</para>
+</note>
+
 </listitem>
 </varlistentry>
 
