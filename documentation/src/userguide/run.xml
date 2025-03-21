@@ -86,8 +86,11 @@ given, the <command>run</command> command is assumed.</para>
   <arg rep="norepeat" linkend="cli-licensed">--licensed</arg>
   <arg rep="norepeat" linkend="cli-debug">--debug</arg>
   <arg rep="norepeat" linkend="cli-debugger">--debugger</arg>
+  <arg rep="norepeat" linkend="cli-nogo">--nogo</arg>
+  <sbr/>
   <arg rep="repeat" linkend="cli-catalog">--catalog:<replaceable>catalog-file-uri</replaceable></arg>
   <arg rep="repeat" linkend="cli-xml-schema">--xml-schema:<replaceable>xml-schema-file-uri</replaceable></arg>
+  <sbr/>
   <arg rep="norepeat" linkend="cli-validation-mode">--validation-mode:<replaceable>mode</replaceable></arg>
   <arg rep="norepeat" linkend="cli-try-namespaces">--try-namespaces</arg>
   <arg rep="norepeat" linkend="cli-use-location-hints">--use-location-hints</arg>
@@ -432,6 +435,15 @@ You can configure it in the usual ways.</para>
 See <xref linkend="debugging"/>.</para>
 </listitem>
 </varlistentry>
+
+<varlistentry xml:id="cli-nogo">
+  <term><option>--nogo</option></term>
+<listitem>
+<para>Compile the pipeline, and produce graphs if they’re requested, but don’t actually
+run the pipeline.</para>
+</listitem>
+</varlistentry>
+
 <varlistentry xml:id="cli-catalog">
   <term><option>--catalog:<replaceable>catalog-file-uri</replaceable></option></term>
 <listitem>
