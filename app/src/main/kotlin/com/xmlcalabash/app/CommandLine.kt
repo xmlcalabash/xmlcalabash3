@@ -3,6 +3,7 @@ package com.xmlcalabash.app
 import com.xmlcalabash.api.Monitor
 import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.exceptions.XProcException
+import com.xmlcalabash.io.MediaType
 import com.xmlcalabash.namespace.NsCx
 import com.xmlcalabash.namespace.NsFn
 import com.xmlcalabash.namespace.NsP
@@ -67,7 +68,7 @@ class CommandLine private constructor(val args: Array<out String>) {
     private var _trace: File? = null
     private var _traceDocuments: File? = null
     private var _errors = mutableListOf<XProcException>()
-    internal var _inputs = mutableMapOf<String, MutableList<URI>>()
+    internal var _inputs = mutableMapOf<String, MutableList<Pair<URI,MediaType>>>()
     internal var _outputs = mutableMapOf<String, OutputFilename>()
     private var _options = mutableMapOf<String,List<String>>()
     private var _namespaces = mutableMapOf<String, NamespaceUri>()
@@ -162,7 +163,7 @@ class CommandLine private constructor(val args: Array<out String>) {
     /** The pipeline inputs.
      * <p>The inputs are a map from input port name to a (list of) URI(s).</p>
      */
-    val inputs: Map<String,List<URI>>
+    val inputs: Map<String,List<Pair<URI,MediaType>>>
         get() = _inputs
 
     /** The pipeline outputs.
@@ -410,15 +411,23 @@ class CommandLine private constructor(val args: Array<out String>) {
     }
 
     private fun parseInput(arg: String) {
-        // -i:port=path
-        val (port, href) = split(arg, "input")
+        // -i:contentType@port=path
+        val (portspec, href) = split(arg, "input")
+        var port = portspec
+        var contentType = MediaType.ANY
+        if (portspec.contains("@")) {
+            val index = portspec.indexOf("@")
+            contentType = MediaType.parse(portspec.substring(0, index))
+            port = port.substring(index + 1).trim()
+        }
+
         if (!_inputs.containsKey(port)) {
             _inputs.put(port, mutableListOf())
         }
         if (href == STDIO_NAME) {
-            _inputs[port]!!.add(STDIO_URI)
+            _inputs[port]!!.add(Pair(STDIO_URI, contentType))
         } else {
-            _inputs[port]!!.add(UriUtils.cwdAsUri().resolve(href))
+            _inputs[port]!!.add(Pair(UriUtils.cwdAsUri().resolve(href), MediaType.ANY))
         }
     }
 
