@@ -60,7 +60,7 @@ ones shown in <xref linkend="debugger-pipeline"/>.</para>
 
 <para>The processor makes some changes in the pipeline. Some occurrences of <tag>p:document</tag>,
 <tag>p:inline</tag>, and even <tag>p:option</tag> and <tag>p:variable</tag>, are “promoted”
-to steps. This would be burdonsome for authoring, but simplifies the implementation.</para>
+to steps. This would be burdensome for authoring, but simplifies the implementation.</para>
 
 <para>The processor then analyzes the pipeline to construct a set of graphs.
 It’s the actual graph that gets executed. The graph for this pipeline is
@@ -201,10 +201,10 @@ no actual web access necessary.)</para>
 
 <para>The stylesheet in <xref linkend="custom-graph-style"/> colors primary inputs and
 outputs in pale blue and makes implicit connections gray rather than black.
-(The “implicitness” of connections is roughly analagous to when the connection was made
+(The “implicitness” of connections is roughly analogous to when the connection was made
 automatically to the default readable port, but it should be taken with a grain of salt; 
 compiling a pipeline involves adding, removing, and changing connections for a number of reasons
-and it’s not always clear which ones are implicit and which one’s arent.)
+and it’s not always clear which ones are implicit and which ones aren’t.)
 </para>
 
 <figure xml:id="custom-graph-style">
