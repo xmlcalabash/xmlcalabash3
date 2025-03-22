@@ -13,30 +13,33 @@
 
 <xsl:param name="debug" select="'0'"/>
 
-<xsl:template match="/g:graph">
+<xsl:template match="g:pipeline-container | g:graph-container">
   <dot:digraph name="pipeline">
-    <xsl:apply-templates select="g:input"/>
-    <dot:subgraph src="{node-name(.)}" xml:id="cluster_{generate-id(.)}" dot:style="invis">
-      <xsl:apply-templates select="@*"/>
-      <xsl:apply-templates select="* except (g:head|g:tail|g:input|g:output|g:edge)"/>
-    </dot:subgraph>
-    <xsl:apply-templates select="g:output"/>
-    <xsl:apply-templates select="//g:edge"/>
+    <xsl:copy-of select="@dot:*"/>
+    <xsl:apply-templates/>
   </dot:digraph>
 </xsl:template>
 
-<xsl:template match="/g:declare-step">
-  <dot:digraph name="pipeline">
-    <xsl:apply-templates select="g:input"/>
-    <dot:subgraph src="{node-name(.)}" xml:id="cluster_{generate-id(.)}" dot:style="solid">
-      <xsl:apply-templates select="@*"/>
-      <xsl:apply-templates select="g:head"/>
-      <xsl:apply-templates select="* except (g:head|g:tail|g:input|g:output|g:edge)"/>
-      <xsl:apply-templates select="g:tail"/>
-    </dot:subgraph>
-    <xsl:apply-templates select="g:output"/>
-    <xsl:apply-templates select="//g:edge"/>
-  </dot:digraph>
+<xsl:template match="g:graph">
+  <xsl:apply-templates select="g:input"/>
+  <dot:subgraph src="{node-name(.)}" xml:id="cluster_{generate-id(.)}">
+    <xsl:copy-of select="@dot:*"/>
+    <xsl:apply-templates select="* except (g:head|g:tail|g:input|g:output|g:edge)"/>
+  </dot:subgraph>
+  <xsl:apply-templates select="g:output"/>
+  <xsl:apply-templates select="//g:edge"/>
+</xsl:template>
+
+<xsl:template match="g:pipeline-container/g:declare-step">
+  <xsl:apply-templates select="g:input"/>
+  <dot:subgraph src="{node-name(.)}" xml:id="cluster_{generate-id(.)}" dot:style="solid">
+    <xsl:apply-templates select="@*"/>
+    <xsl:apply-templates select="g:head"/>
+    <xsl:apply-templates select="* except (g:head|g:tail|g:input|g:output|g:edge)"/>
+    <xsl:apply-templates select="g:tail"/>
+  </dot:subgraph>
+  <xsl:apply-templates select="g:output"/>
+  <xsl:apply-templates select="//g:edge"/>
 </xsl:template>
 
 <xsl:template match="g:atomic-step|g:subpipeline">
@@ -51,7 +54,7 @@
   </dot:subgraph>
 </xsl:template>
 
-<xsl:template match="g:compound-step|*/g:declare-step">
+<xsl:template match="g:compound-step|g:graph-container//g:declare-step">
   <dot:subgraph src="{node-name(.)}" xml:id="{g:cluster-id(.)}" dot:style="solid">
     <xsl:apply-templates select="@*"/>
     <xsl:apply-templates select="g:head"/>

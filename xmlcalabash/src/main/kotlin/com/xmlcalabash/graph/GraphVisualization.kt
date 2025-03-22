@@ -5,16 +5,21 @@ import com.xmlcalabash.datamodel.AtomicExpressionStepInstruction
 import com.xmlcalabash.datamodel.DeclareStepInstruction
 import com.xmlcalabash.datamodel.InstructionConfiguration
 import com.xmlcalabash.namespace.Ns
+import com.xmlcalabash.namespace.NsCx
 import com.xmlcalabash.namespace.NsDescription
+import com.xmlcalabash.namespace.NsHtml
 import com.xmlcalabash.namespace.NsP
+import com.xmlcalabash.namespace.NsXs
 import com.xmlcalabash.util.SaxonTreeBuilder
 import net.sf.saxon.om.EmptyAttributeMap
 import net.sf.saxon.om.NamespaceMap
+import net.sf.saxon.om.NamespaceUri
 import net.sf.saxon.s9api.QName
 import net.sf.saxon.s9api.XdmNode
 import kotlin.collections.component1
 import kotlin.collections.component2
 import kotlin.collections.iterator
+import kotlin.collections.set
 
 class GraphVisualization private constructor(val graph: Graph, private val filenameMap: Map<String,String>) {
     companion object {
@@ -34,15 +39,21 @@ class GraphVisualization private constructor(val graph: Graph, private val filen
     private val nodes = mutableListOf<Node>()
     private val modelMap = mutableMapOf<Model,Node>()
     private val portMap = mutableMapOf<ModelPort, ModelPortNode>()
+    val allNamespacePrefixes = mutableMapOf<String, NamespaceUri>()
 
     private fun describe(root: PipelineModel): XdmNode {
         stepConfig = root.step.stepConfig
+
+        var nsmap: NamespaceMap = NamespaceMap.emptyMap()
+        for ((prefix, uri) in allNamespacePrefixes) {
+            nsmap = nsmap.put(prefix, uri)
+        }
 
         builder = SaxonTreeBuilder(root.step.stepConfig)
         builder.startDocument(null)
         builder.addStartElement(NsDescription.g("graph", gPrefix),
             stepConfig.stringAttributeMap(mapOf("filename" to filenameMap[root.step.id])),
-            modelMap[root]!!.nsmap)
+            nsmap)
 
         for (node in nodes.filterIsInstance<InputNode>()) {
             node.describe()
@@ -107,12 +118,20 @@ class GraphVisualization private constructor(val graph: Graph, private val filen
     }
 
     private fun build(root: PipelineModel) {
-        val allNamespacePrefixes = mutableSetOf<String>()
+        allNamespacePrefixes["p"] = NsP.namespace
+        allNamespacePrefixes["cx"] = NsCx.namespace
+        allNamespacePrefixes["xs"] = NsXs.namespace
+        allNamespacePrefixes["h"] = NsHtml.namespace
+
         for (model in graph.models) {
-            allNamespacePrefixes.addAll(model.step.inscopeNamespaces.keys)
+            for ((prefix, uri) in model.step.inscopeNamespaces) {
+                if (prefix !in allNamespacePrefixes) {
+                    allNamespacePrefixes[prefix] = uri
+                }
+            }
         }
         var gp = "g"
-        while (allNamespacePrefixes.contains(gp)) {
+        while (gp in allNamespacePrefixes.keys) {
             gp = "${gp}_"
         }
         gPrefix = gp

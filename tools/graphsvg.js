@@ -6,7 +6,9 @@ if (scaleSpan) {
   const minus = spans[1];
   const plus = spans[2];
 
-  const svg = document.querySelector("svg > g");
+  const svgDiv = document.querySelector("div.svg");
+  const svg = svgDiv.querySelector("svg > g");
+  const polygon = svg.querySelector("polygon");
 
   let before = null;
   let after = null;
@@ -24,6 +26,13 @@ if (scaleSpan) {
   if (!attr) {
       console.log("No transform attribute on svg/g");
   } else {
+    // If the background color on the digraph has been changed,
+    // attempt to match the color in the div.
+    let bgcolor = polygon && polygon.getAttribute("fill");
+    if (svgDiv && bgcolor) {
+      svgDiv.style["background-color"] = bgcolor;
+    }
+
     let pos = attr.indexOf("scale(");
     if (pos < -1) {
       console.log("No scale() in transform attribute on svg/g");

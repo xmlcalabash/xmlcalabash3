@@ -14,6 +14,18 @@
 
 <xsl:mode on-no-match="shallow-copy"/>
 
+<xsl:template match="/g:declare-step">
+  <g:pipeline-container>
+    <xsl:next-match/>
+  </g:pipeline-container>
+</xsl:template>
+
+<xsl:template match="/g:graph">
+  <g:graph-container>
+    <xsl:next-match/>
+  </g:graph-container>
+</xsl:template>
+
 <xsl:template match="g:declare-step">
   <xsl:copy>
     <xsl:apply-templates select="@*"/>
@@ -34,6 +46,14 @@
         <g:edge from="{$id}" to="sink_{generate-id(.)}"/>
       </xsl:if>
     </xsl:for-each>
+  </xsl:copy>
+</xsl:template>
+
+<xsl:template match="g:graph">
+  <xsl:copy>
+    <xsl:apply-templates select="@*"/>
+    <xsl:attribute name="dot:style" select="'invis'"/>
+    <xsl:apply-templates/>
   </xsl:copy>
 </xsl:template>
 
@@ -94,25 +114,25 @@
       <xsl:when test="@type='cx:expression'">
         <xsl:choose>
           <xsl:when test="@variable-name">
-            <g:detail>variable</g:detail>
-            <g:detail>${string(@variable-name)}</g:detail>
+            <g:detail><td>variable</td></g:detail>
+            <g:detail><td>${string(@variable-name)}</td></g:detail>
           </xsl:when>
           <xsl:when test="@option-name">
-            <g:detail>option</g:detail>
-            <g:detail>${string(@option-name)}</g:detail>
+            <g:detail><td>option</td></g:detail>
+            <g:detail><td>${string(@option-name)}</td></g:detail>
           </xsl:when>
           <xsl:otherwise>
-            <g:detail>cx:expression</g:detail>
+            <g:detail><td>cx:expression</td></g:detail>
           </xsl:otherwise>
         </xsl:choose>
         
         <xsl:choose>
           <xsl:when test="not(@expression)"/>
           <xsl:when test="string-length(@expression) lt 20">
-            <g:detail><i>{string(@expression)} </i></g:detail>
+            <g:detail><td><i>{string(@expression)} </i></td></g:detail>
           </xsl:when>
           <xsl:otherwise>
-            <g:detail><i>{substring(@expression, 1, 20)}… </i></g:detail>
+            <g:detail><td><i>{substring(@expression, 1, 20)}… </i></td></g:detail>
           </xsl:otherwise>
         </xsl:choose>
       </xsl:when>
@@ -122,15 +142,15 @@
           <td>
             <xsl:choose>
               <xsl:when test="self::g:subpipeline">
-                <xsl:attribute name="dot:href" select="'#cluster_' || replace(@ref, '-', '_')"/>
-                <font dot:color="#0000FF">
+                <xsl:attribute name="href" select="'#cluster_' || replace(@ref, '-', '_')"/>
+                <font color="#0000FF">
                   <xsl:text>{@type}</xsl:text>
                   <xsl:sequence select="g:step-number(root(), @type, @ref)"/>
                 </font>
               </xsl:when>
               <xsl:when test="@filename">
-                <xsl:attribute name="dot:href" select="@filename || '.html'"/>
-                <font dot:color="#0000FF">
+                <xsl:attribute name="href" select="@filename || '.html'"/>
+                <font color="#0000FF">
                   <xsl:text>{@type}</xsl:text>
                 </font>
               </xsl:when>
