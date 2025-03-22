@@ -29,6 +29,10 @@
     </xsl:message>
   </xsl:if>
 
+  <!--
+  <xsl:message select="$rngpat"/>
+  -->
+
   <xsl:apply-templates select="$rngpat">
     <xsl:with-param name="schema" tunnel="yes"
                     select="$schema/rng:grammar"/>
@@ -38,6 +42,8 @@
                     select="@format"/>
     <xsl:with-param name="namespace" tunnel="yes"
                     select="@ns"/>
+    <xsl:with-param name="suppress-prefix" tunnel="yes"
+                    select="@suppress-prefix"/>
   </xsl:apply-templates>
 </xsl:template>
 
@@ -63,7 +69,20 @@
   -->
 
   <xsl:variable name="summary" as="element()*">
-    <ss:element-summary name="{$rngpat/rng:element/@name}">
+    <xsl:variable name="name" select="$rngpat/rng:element/@name/string()"/>
+
+    <xsl:variable name="namespace" as="xs:string?">
+      <xsl:if test="contains($name, ':')">
+        <xsl:variable name="prefix" select="substring-before($name, ':')"/>
+        <xsl:sequence select="$rngpat/rng:element/namespace::*[local-name(.) = $prefix]"/>
+      </xsl:if>
+    </xsl:variable>
+
+    <ss:element-summary name="{$name}">
+      <xsl:if test="$namespace">
+        <xsl:attribute name="namespace" select="$namespace"/>
+      </xsl:if>
+
       <xsl:if test="@xml:id">
 	<xsl:attribute name="xml:id" select="@xml:id"/>
       </xsl:if>
@@ -312,7 +331,23 @@
     <xsl:sequence select="* except rng:anyName"/>
   </xsl:variable>
 
-  <ss:attribute name="{{any-name}}" optional="{$repeat}">
+  <xsl:variable name="nsName" as="element()?">
+    <xsl:sequence select="rng:nsName"/>
+  </xsl:variable>
+
+  <xsl:variable name="prefix" as="xs:string?">
+    <xsl:choose>
+      <xsl:when test="$nsName/@ns = 'http://www.w3.org/1999/xhtml'">
+        <xsl:sequence select="'h:'"/>
+      </xsl:when>
+      <xsl:when test="$nsName/@ns = 'http://xmlcalabash.com/ns/dot'">
+        <xsl:sequence select="'dot:'"/>
+      </xsl:when>
+      <xsl:otherwise/>
+    </xsl:choose>
+  </xsl:variable>
+
+  <ss:attribute name="{$prefix}{{any-name}}" optional="{$repeat}">
     <xsl:attribute name="type">
       <xsl:choose>
 	<xsl:when test="$content/rng:data">
@@ -365,12 +400,12 @@
 	<xsl:when test="$content/rng:text or not($content/*)">
 	  <xsl:text>string</xsl:text>
 	</xsl:when>
-	<xsl:when test="rng:text or not(* except (db:purpose|rng:anyName))">
+	<xsl:when test="rng:text or $nsName or not(* except (db:purpose|rng:anyName))">
 	  <xsl:text>string</xsl:text>
 	</xsl:when>
 	<xsl:otherwise>
 	  <xsl:message>
-	    <xsl:text>Warning: unsupported content in attribute: </xsl:text>
+	    <xsl:text>Warning: unsupported content in attribute: name=</xsl:text>
 	    <xsl:value-of select="@name"/>
 	    <xsl:text> (</xsl:text>
 	    <xsl:value-of select="ancestor::rng:element/@name"/>
@@ -398,6 +433,7 @@
 
 <xsl:template match="ss:element-summary">
   <xsl:param name="namespace" as="xs:string?" tunnel="yes"/>
+  <xsl:param name="suppress-prefix" as="xs:string?" tunnel="yes"/>
 
   <p id="{if (@xml:id) then @xml:id else generate-id(.)}">
     <!-- this generates the prefix= attribute ...
@@ -415,16 +451,25 @@
 
       <xsl:choose>
 	<xsl:when test="@name != ''">
-	  <xsl:value-of select="@prefix"/>
-	  <xsl:text>:</xsl:text>
+          <xsl:if test="not($suppress-prefix = 'true')">
+	    <xsl:value-of select="@prefix"/>
+	    <xsl:text>:</xsl:text>
+          </xsl:if>
 	  <xsl:value-of select="if (contains(@name,':'))
 				then substring-after(@name,':')
 				else @name"/>
-          <xsl:if test="$namespace">
-            <xsl:text> xmlns:</xsl:text>
-            <xsl:value-of select="@prefix"/>
+          <xsl:if test="@namespace">
+            <xsl:choose>
+              <xsl:when test="$suppress-prefix = 'true'">
+                <xsl:text> xmlns</xsl:text>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:text> xmlns:</xsl:text>
+                <xsl:value-of select="@prefix"/>
+              </xsl:otherwise>
+            </xsl:choose>
             <xsl:text>="</xsl:text>
-            <xsl:value-of select="$namespace"/>
+            <xsl:value-of select="@namespace"/>
             <xsl:text>"</xsl:text>
           </xsl:if>
 	</xsl:when>
@@ -482,6 +527,32 @@
       </xsl:choose>
     </code>
   </p>
+</xsl:template>
+
+<!-- This is an awful, one-off hack because I'm on a train
+     and this was not the bug I wanted to be working on today. -->
+<xsl:template match="ss:attribute[starts-with(@name, 'h:')
+                                  and count(../ss:attribute[starts-with(@name, 'h:')]) gt 1]"
+              priority="10">
+  <xsl:if test="empty(preceding-sibling::ss:attribute[starts-with(@name, 'h:')])">
+    <br/>
+    <xsl:text>&#160;&#160;</xsl:text>
+    <xsl:text>h:*</xsl:text>
+    <xsl:text> = string</xsl:text>
+  </xsl:if>
+</xsl:template>
+
+<!-- This is an awful, one-off hack because I'm on a train
+     and this was not the bug I wanted to be working on today. -->
+<xsl:template match="ss:attribute[starts-with(@name, 'dot:')
+                                  and count(../ss:attribute[starts-with(@name, 'dot:')]) gt 1]"
+              priority="10">
+  <xsl:if test="empty(preceding-sibling::ss:attribute[starts-with(@name, 'dot:')])">
+    <br/>
+    <xsl:text>&#160;&#160;</xsl:text>
+    <xsl:text>dot:*</xsl:text>
+    <xsl:text> = string</xsl:text>
+  </xsl:if>
 </xsl:template>
 
 <xsl:template match="ss:attribute">
@@ -563,7 +634,12 @@
 <xsl:template match="ss:element">
   <xsl:param name="prefix" tunnel="yes"/>
 
-  <xsl:variable name="idpfx" select="$prefix || '.'"/>
+  <!-- This is an awful, one-off hack because I'm on a train
+       and this was not the bug I wanted to be working on today. -->
+  <xsl:variable name="idpfx"
+                select="if (@name = 'h:td')
+                        then 'h.'
+                        else $prefix || '.'"/>
 
   <xsl:variable name="basename" select="if (contains(@name,':'))
 			                then substring-after(@name,':')
@@ -586,7 +662,7 @@
     </xsl:when>
     <xsl:otherwise>
       <a href="#{$idpfx}{$basename}">
-	<xsl:value-of select="concat($prefix,':',$basename)"/>
+	<xsl:value-of select="@name"/>
       </a>
       <xsl:value-of select="@repeat"/>
     </xsl:otherwise>

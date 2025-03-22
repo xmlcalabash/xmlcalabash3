@@ -5,6 +5,7 @@ import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.io.DocumentWriter
 import com.xmlcalabash.namespace.Ns
+import com.xmlcalabash.namespace.NsDescription
 import com.xmlcalabash.runtime.XProcDescription
 import net.sf.saxon.lib.ResourceRequest
 import net.sf.saxon.lib.ResourceResolver
@@ -76,10 +77,6 @@ class VisualizerOutput(val xmlCalabash: XmlCalabash, val description: XProcDescr
     private fun do_svg() {
         cleanupOutputDirectory()
 
-        if (debug) {
-            writeNode("${outputDirectory}pipeline.xml", description.xml())
-        }
-
         // This has to be first because the description is mutable.
         // Slightly funny code smell, but I'm not going to fuss about
         // it in the visualizer output...
@@ -91,13 +88,28 @@ class VisualizerOutput(val xmlCalabash: XmlCalabash, val description: XProcDescr
     }
 
     private fun styleDescription() {
-        val graphStyle = if (xmlCalabash.xmlCalabashConfig.graphStyle != null) {
-            SAXSource(InputSource(xmlCalabash.xmlCalabashConfig.graphStyle!!.toString()))
-        } else {
-            var styleStream = VisualizerOutput::class.java.getResourceAsStream(defaultStyle)
-            SAXSource(InputSource(styleStream))
+        var styleStream = VisualizerOutput::class.java.getResourceAsStream(defaultStyle)
+        transformDescription(SAXSource(InputSource(styleStream)), ".xml")
+
+        if (debug) {
+            val builder = SaxonTreeBuilder(xmlCalabash.saxonConfig.processor)
+            builder.startDocument(null)
+            builder.addStartElement(NsDescription.g("description"))
+            for (pipeline in description.pipelines) {
+                builder.addSubtree(pipeline)
+            }
+            for (graph in description.graphs) {
+                builder.addSubtree(graph)
+            }
+            builder.addEndElement()
+            builder.endDocument()
+            writeNode("${outputDirectory}pipeline.xml", builder.result)
         }
-        transformDescription(graphStyle, ".xml")
+
+        if (xmlCalabash.xmlCalabashConfig.graphStyle != null) {
+            val source = SAXSource(InputSource(xmlCalabash.xmlCalabashConfig.graphStyle!!.toString()))
+            transformDescription(source, ".xml")
+        }
     }
 
     private fun dotDescription() {

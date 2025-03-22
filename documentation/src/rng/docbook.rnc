@@ -35,6 +35,7 @@ rng.pattern =
         attribute ns { text }?,
         attribute prefix { text }?,
         attribute format { "table" }?,
+        attribute suppress-prefix { "true" }?,
         empty
     }
 

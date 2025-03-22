@@ -5,6 +5,7 @@ import com.xmlcalabash.namespace.*
 import com.xmlcalabash.util.SaxonTreeBuilder
 import net.sf.saxon.om.EmptyAttributeMap
 import net.sf.saxon.om.NamespaceMap
+import net.sf.saxon.om.NamespaceUri
 import net.sf.saxon.s9api.QName
 import net.sf.saxon.s9api.XdmNode
 
@@ -25,10 +26,15 @@ class PipelineVisualization private constructor(val instruction: XProcInstructio
     private val writeableMap = mutableMapOf<PortBindingContainer,Int>()
     private val pipeToPort = mutableMapOf<PipeInstruction,PortBindingContainer>()
     private val compoundDepends = mutableMapOf<CompoundStepDeclaration, Int>()
-    private val allPrefixes = mutableSetOf<String>()
+    private val allPrefixes = mutableMapOf<String, NamespaceUri>()
     private var gPrefix = "g"
 
     private fun build(): XdmNode {
+        allPrefixes["p"] = NsP.namespace
+        allPrefixes["cx"] = NsCx.namespace
+        allPrefixes["xs"] = NsXs.namespace
+        allPrefixes["h"] = NsHtml.namespace
+
         buildPipeMap(instruction)
 
         while (allPrefixes.contains(gPrefix)) {
@@ -37,9 +43,12 @@ class PipelineVisualization private constructor(val instruction: XProcInstructio
 
         var nsmap: NamespaceMap = NamespaceMap.emptyMap()
         nsmap = nsmap.put(gPrefix, NsDescription.namespace)
-        nsmap = nsmap.put("p", NsP.namespace)
-        nsmap = nsmap.put("cx", NsCx.namespace)
-        nsmap = nsmap.put("xs", NsXs.namespace)
+        nsmap = nsmap.put("", NsHtml.namespace)
+
+        for ((prefix, uri) in allPrefixes) {
+            nsmap = nsmap.put(prefix, uri)
+        }
+
         describe(instruction, nsmap)
 
         val builder = SaxonTreeBuilder(instruction.stepConfig)
@@ -252,8 +261,10 @@ class PipelineVisualization private constructor(val instruction: XProcInstructio
     }
 
     private fun buildPipeMap(instruction: XProcInstruction) {
-        for ((prefix, _) in instruction.inscopeNamespaces) {
-            allPrefixes.add(prefix)
+        for ((prefix, uri) in instruction.inscopeNamespaces) {
+            if (prefix !in allPrefixes) {
+                allPrefixes[prefix] = uri
+            }
         }
         for (child in instruction.children) {
             if (child is PipeInstruction) {

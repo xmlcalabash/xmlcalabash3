@@ -21,6 +21,7 @@
   <xsl:text> {{&#10;</xsl:text>
   <xsl:text>compound=true{$nl}</xsl:text>
   <xsl:text>rankdir=TB{$nl}</xsl:text>
+  <xsl:apply-templates select="." mode="properties"/>
   <xsl:apply-templates/>
   <xsl:text>}}&#10;</xsl:text>
 </xsl:template>
@@ -45,6 +46,15 @@
   <xsl:apply-templates select="." mode="properties"/>
   <xsl:apply-templates/>
   <xsl:text>}}&#10;</xsl:text>
+</xsl:template>
+
+<xsl:template match="dot:digraph" mode="properties">
+  <xsl:for-each select="@dot:*">
+    <xsl:value-of select="local-name(.)"/>
+    <xsl:text> = "</xsl:text>
+    <xsl:value-of select="."/>
+    <xsl:text>";&#10;</xsl:text>
+  </xsl:for-each>
 </xsl:template>
 
 <xsl:template match="dot:subgraph" mode="properties">

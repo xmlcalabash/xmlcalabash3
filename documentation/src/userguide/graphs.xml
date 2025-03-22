@@ -63,7 +63,7 @@ ones shown in <xref linkend="debugger-pipeline"/>.</para>
 to steps. This would be burdensome for authoring, but simplifies the implementation.</para>
 
 <para>The processor then analyzes the pipeline to construct a set of graphs.
-It’s the actual graph that gets executed. The graph for this pipeline is
+It’s the actual graphs that gets executed. The graph for this pipeline is
 shown in <xref linkend="debugger-model"/>.</para>
 
 <formalgroup xml:id="debugger-model">
@@ -103,21 +103,10 @@ The pipeline description vocabulary is described in <xref linkend="description-r
 </para>
 
 <para>The graphs are ultimately constructed with Graphviz. The <filename>pipeline.xml</filename>
-document is styled, then converted to a “<filename class="extension">.dot</filename>” file
-and processed with Graphviz.</para>
+document is styled, then converted to a number of “<filename class="extension">.dot</filename>” files,
+each processed with Graphviz.</para>
 
-<para>A completely unstyled example will help to illustrate how and where styling can be applied,
-see <xref linkend="exgraph-pipeline-unstyled"/>; this is the same graph as
-<xref linkend="exgraph-pipeline-styled"/> but with no style applied.</para>
-
-<figure xml:id="exgraph-pipeline-unstyled">
-<title>The ex:ident graph unstyled</title>
-<mediaobject>
-<imageobject>
-<imagedata fileref="img/debugger-exident-unstyled.svg"/>
-</imageobject>
-</mediaobject>
-</figure>
+<para>The default styling produces results like the one’s you’ve already seen.</para>
 
 <para>In Graphviz terms, each step is
 <link xlink:href="https://graphviz.org/doc/info/shapes.html">a node</link>, those are the
@@ -127,39 +116,36 @@ and <link xlink:href="https://graphviz.org/docs/edges/">edges</link> join them. 
 the first and last row of each table contain the inputs and outputs for the step, the “ports” in
 Graphviz terminology.</para>
 
-<para>The XML for this graph is show in <xref linkend="exgraph-description"/>.</para>
+<para>The first 50 or so lines of a pipeline description is shown in <xref
+linkend="exgraph-description"/>.</para>
 
 <figure xml:id="exgraph-description">
 <title>The description markup for the ex:ident graph</title>
 <programlisting language='xml'
-><xi:include href="../examples/xml/exgraph-description.xml" parse="text"/></programlisting>
+><xi:include href="../examples/xml/exgraph-description.xml" parse="text"
+             fragid="line=1,50"/></programlisting>
 </figure>
 
-<para>Styling consists of adding attributes to this markup. (Styling
-<emphasis>can</emphasis> also change the structure of the graph, but that risks
-creating a graph that doesn’t accurately reflect the structure of the original
-pipeline which may be very misleading.) Attributes in the “dot” namespace
-(<uri>http://xmlcalabash.com/ns/dot</uri>) can be added to supply Graphviz
-attributes. Attributes in the “html” namespace can be added to supply the HTML
-styling attributes that Graphviz supports.</para>
 
-<para>Additional rows can be added to the graph by inserting <tag>g:detail</tag> elements
-between the inputs and outputs. Each <tag>g:detail</tag> element represents a row in the table
+<para>Default styling has adding attributes to this markup and “rows” in the
+atomic steps. Each <tag>g:detail</tag> element represents a row in the table
 and should contain one or more <tag>td</tag> elements.</para>
 
-<para>The only significant attributes on the <tag>g:edge</tag> elements are <tag
-class="attribute">from</tag> and <tag class="attribute">to</tag> which must
-point to id values on the port elements. The other edge attributes are provided
-as a convenience for deciding how they should be styled.</para>
+<caution>
+<para>Styling
+<emphasis>can</emphasis> also change the structure of the graph, but that risks
+creating a graph that doesn’t accurately reflect the structure of the original
+pipeline which may be very misleading.</para>
+</caution>
 
-<para>An example of styled output appears in <xref linkend="exgraph-description-styled"/>.
-This is what the default styling applies.</para>
-
-<figure xml:id="exgraph-description-styled">
-<title>The description markup for the ex:ident graph after styling</title>
-<programlisting language='xml'
-><xi:include href="../examples/xml/exgraph-description-styled.xml" parse="text"/></programlisting>
-</figure>
+<para>Attributes in the “dot” namespace
+(<uri>http://xmlcalabash.com/ns/dot</uri>) can be added to supply Graphviz
+attributes. Attributes in the “html” namespace can be added to supply the HTML
+styling attributes that Graphviz supports. You should use unqualified attribute names
+on the “HTML” table elements that appear in the output.
+The <link linkend="description-reference">pipeline description vocabulary</link> enumerates
+the HTML attributes that (the Graphviz documentation says that) Graphviz understands,
+but that’s documentary. The styled document is not validated.</para>
 
 <section>
 <title>Default styling</title>
@@ -195,9 +181,21 @@ style does make one structural change. Any output port that is unconnected is co
 <title>Custom styling</title>
 
 <para>Providing your own stylesheet allows you to achieve any custom styling
-that you’d like. If you want to extend the default stylesheet, you can import it with the
-URI <uri>https://xmlcalabash.com/xsl/graphstyle.xsl</uri>. (This is a “magic” URI; there’s
-no actual web access necessary.)</para>
+that you’d like. Your stylesheet is applied after the standard stylesheet. This gives
+you the opportunity to add or remove <tag>g:detail</tag> elements, or to change
+the styling of elements.</para>
+
+<para>Your stylesheet is applied to each pipeline and graph separately; this
+makes it much easier to manage links between elements. You’ll never accidentally match a
+name or ID from a different pipeline or graph. The same custom stylesheet is applied
+to both pipelines and graphs; you can distinguish between them by the root element
+which will be <tag>g:pipeline-container</tag> for pipelines and <tag>g:graph-container</tag>
+for graphs.</para>
+
+<para>Background colors applied to the container elements apply to the entire
+“canvas”; background colors on nested elements apply to smaller regions. Note
+that if the graph style of an element is “invis” (as it is on graph elements by
+default), the background color is ignored.</para>
 
 <para>The stylesheet in <xref linkend="custom-graph-style"/> colors primary inputs and
 outputs in pale blue and makes implicit connections gray rather than black.
@@ -231,17 +229,44 @@ and it’s not always clear which ones are implicit and which ones aren’t.)
 <section xml:id="description-reference">
 <title>Description reference</title>
 
-<para>T.B.D.</para>
+<para>The XML vocabulary used to describe and style pipelines and graphs
+is a bit ad hoc. It started out as an internal format without any serious
+documentation. The observation that the graphs are a useful teaching aid
+persuaded me to try to make it a little more user friendly.</para>
 
-<note>
 <para>The pipeline description and the graph description have been made as
 similar as possible so that they can be styled more easily. The description
 schema doesn’t attempt to be prescriptive; in practice some combinations of
-attributes don’t arise, even though they’d be allowed by the schema.</para>
-<para>For example, a <tag>cx:document</tag> atomic step may have an 
+attributes don’t arise, even though they’d be allowed by the schema.
+For example, a <tag>cx:document</tag> atomic step may have an 
 <tag class="attribute">href</tag> attribute, but no other step type will, nor will
 a <tag>cx:document</tag> ever have an <tag class="attribute">expression</tag>.</para>
-</note>
+
+<para>The format leans heavily on the features of Graphviz. Familiarity with the
+Graphviz “dot” model and the way that nodes can be formatted with HTML table
+markup will probably be an aid to comprehension.</para>
+
+<para>It’s perhaps a little easier to understand the vocabulary starting from
+the center and working out. Most of the interesting markup is in atomic steps.
+An atomic step has inputs and outputs, those become table cells in the first and
+last rows of the description, respectively. In between the inputs and outputs,
+additional rows can be inserted with <tag>g:detail</tag> elements that also
+contain table cells. The atomic step container becomes a table. The table is
+wrapped in a node.</para>
+
+<para>Compound steps have inputs and outputs and contain one or more atomic or
+compound steps.</para>
+
+<para>Edges connect inputs to outputs. Unbound output ports are connected to
+“sinks” that appear as simple dots in the graph, rather than boxes.</para>
+
+<tip>
+<para>In the descriptions that follow, “dot” and HTML attributes, when they’re
+allowed, are abbreviated “<literal>dot:*</literal>” and “<literal>h:*</literal>” to
+simplify the summary. The schema actually contains longer enumerations, mostly
+because of <link xlink:href="https://github.com/relaxng/jing-trang/issues/287">an
+apparent bug</link> in Trang.</para>
+</tip>
 
 <section xml:id="g.description">
 <title>g:description</title>
@@ -273,6 +298,13 @@ used for this pipeline.</para>
 <rng-pattern schema="../../build/description.rng"
              ns="https://xmlcalabash.com/ns/description"
              name="g.output"/>
+</section>
+
+<section xml:id="g.detail">
+<title>g:detail</title>
+<rng-pattern schema="../../build/description.rng"
+             ns="https://xmlcalabash.com/ns/description"
+             name="g.detail"/>
 </section>
 
 <section xml:id="g.head">
@@ -344,6 +376,28 @@ step and the filename identifies the declaration for this step.
 <rng-pattern schema="../../build/description.rng"
              ns="https://xmlcalabash.com/ns/description"
              name="g.edge"/>
+
+<para>The only significant attributes on the <tag>g:edge</tag> elements are <tag
+class="attribute">from</tag> and <tag class="attribute">to</tag> which must
+point to id values on port elements. The other edge attributes are provided
+as a convenience for deciding how they should be styled.</para>
+
+</section>
+
+<section xml:id="g.pipeline-container">
+<title>g:pipeline-container</title>
+<rng-pattern schema="../../build/description.rng"
+             ns="https://xmlcalabash.com/ns/description"
+             name="g.pipeline-container"/>
+
+</section>
+
+<section xml:id="g.graph-container">
+<title>g:graph-container</title>
+<rng-pattern schema="../../build/description.rng"
+             ns="https://xmlcalabash.com/ns/description"
+             name="g.graph-container"/>
+
 </section>
 
 <section xml:id="g.graph">
@@ -357,6 +411,110 @@ used for this graph.</para>
 
 </section>
 
+<section xml:id="h.td">
+<title>td</title>
+
+<note>
+<para>The HTML elements in this summary are explicitly in the HTML namespace.
+GraphViz doesn’t really understand XML; you must not specify the namespace declaration
+on these elements, nor may you use an explicit prefix.</para>
+<para>The attributes in the description are the attributes that the Graphviz documentation
+claims are supported.</para>
+</note>
+
+<rng-pattern schema="../../build/description.rng"
+             ns="https://xmlcalabash.com/ns/description"
+             suppress-prefix="true"
+             name="h.td"/>
+</section>
+
+<section xml:id="h.font">
+<title>font</title>
+<rng-pattern schema="../../build/description.rng"
+             ns="https://xmlcalabash.com/ns/description"
+             suppress-prefix="true"
+             name="h.font"/>
+</section>
+
+<section xml:id="h.br">
+<title>br</title>
+<rng-pattern schema="../../build/description.rng"
+             ns="https://xmlcalabash.com/ns/description"
+             suppress-prefix="true"
+             name="h.br"/>
+</section>
+
+<section xml:id="h.img">
+<title>img</title>
+<rng-pattern schema="../../build/description.rng"
+             ns="https://xmlcalabash.com/ns/description"
+             suppress-prefix="true"
+             name="h.img"/>
+</section>
+
+<section xml:id="h.i">
+<title>i</title>
+<rng-pattern schema="../../build/description.rng"
+             ns="https://xmlcalabash.com/ns/description"
+             suppress-prefix="true"
+             name="h.i"/>
+</section>
+
+<section xml:id="h.b">
+<title>b</title>
+<rng-pattern schema="../../build/description.rng"
+             ns="https://xmlcalabash.com/ns/description"
+             suppress-prefix="true"
+             name="h.b"/>
+</section>
+
+<section xml:id="h.o">
+<title>o</title>
+<rng-pattern schema="../../build/description.rng"
+             ns="https://xmlcalabash.com/ns/description"
+             suppress-prefix="true"
+             name="h.o"/>
+</section>
+
+<section xml:id="h.sub">
+<title>sub</title>
+<rng-pattern schema="../../build/description.rng"
+             ns="https://xmlcalabash.com/ns/description"
+             suppress-prefix="true"
+             name="h.sub"/>
+</section>
+
+<section xml:id="h.sup">
+<title>sup</title>
+<rng-pattern schema="../../build/description.rng"
+             ns="https://xmlcalabash.com/ns/description"
+             suppress-prefix="true"
+             name="h.sup"/>
+</section>
+
+<section xml:id="h.s">
+<title>s</title>
+<rng-pattern schema="../../build/description.rng"
+             ns="https://xmlcalabash.com/ns/description"
+             suppress-prefix="true"
+             name="h.s"/>
+</section>
+
+<section xml:id="h.hr">
+<title>hr</title>
+<rng-pattern schema="../../build/description.rng"
+             ns="https://xmlcalabash.com/ns/description"
+             suppress-prefix="true"
+             name="h.hr"/>
+</section>
+
+<section xml:id="h.vr">
+<title>vr</title>
+<rng-pattern schema="../../build/description.rng"
+             ns="https://xmlcalabash.com/ns/description"
+             suppress-prefix="true"
+             name="h.vr"/>
+</section>
 
 </section>
 </chapter>

@@ -1,15 +1,155 @@
 default namespace = "http://xmlcalabash.com/ns/description"
 namespace g = "http://xmlcalabash.com/ns/description"
+namespace dot = "http://xmlcalabash.com/ns/dot"
+namespace h = "http://www.w3.org/1999/xhtml"
+
+# This is a weird and awkward schema. I'd prefer to use dot:* and h:*
+# instead of enumerating all the attributes, but 
+# https://github.com/relaxng/jing-trang/issues/287
 
 start = g.description
 
+dotAttributes =
+    attribute dot:class { text }?,
+    attribute dot:color { text }?,
+    attribute dot:colorscheme { text }?,
+    attribute dot:comment { text }?,
+    attribute dot:distortion { text }?,
+    attribute dot:fillcolor { text }?,
+    attribute dot:fixedsize { text }?,
+    attribute dot:fontcolor { text }?,
+    attribute dot:fontname { text }?,
+    attribute dot:fontsize { text }?,
+    attribute dot:gradientangle { text }?,
+    attribute dot:group { text }?,
+    attribute dot:height { text }?,
+    attribute dot:href { text }?,
+    attribute dot:id { text }?,
+    attribute dot:image { text }?,
+    attribute dot:imagepos { text }?,
+    attribute dot:imagescale { text }?,
+    attribute dot:label { text }?,
+    attribute dot:labelloc { text }?,
+    attribute dot:layer { text }?,
+    attribute dot:margin { text }?,
+    attribute dot:nojustify { text }?,
+    attribute dot:ordering { text }?,
+    attribute dot:orientation { text }?,
+    attribute dot:penwidth { text }?,
+    attribute dot:peripheries { text }?,
+    attribute dot:regular { text }?,
+    attribute dot:samplepoints { text }?,
+    attribute dot:shape { text }?,
+    attribute dot:shapefile { text }?,
+    attribute dot:showboxes { text }?,
+    attribute dot:sides { text }?,
+    attribute dot:skew { text }?,
+    attribute dot:sortv { text }?,
+    attribute dot:style { text }?,
+    attribute dot:target { text }?,
+    attribute dot:tooltip { text }?,
+    attribute dot:URL { text }?,
+    attribute dot:width { text }?,
+    attribute dot:xlabel { text }?,
+    attribute dot:z { text }?
+
+dotEdgeAttributes =
+    attribute dot:arrowhead { text }?,
+    attribute dot:arrowsize { text }?,
+    attribute dot:arrowtail { text }?,
+    attribute dot:class { text }?,
+    attribute dot:color { text }?,
+    attribute dot:colorscheme { text }?,
+    attribute dot:comment { text }?,
+    attribute dot:constraint { text }?,
+    attribute dot:decorate { text }?,
+    attribute dot:dir { text }?,
+    attribute dot:edgehref { text }?,
+    attribute dot:edgetarget { text }?,
+    attribute dot:edgetooltip { text }?,
+    attribute dot:edgeURL { text }?,
+    attribute dot:fillcolor { text }?,
+    attribute dot:fontcolor { text }?,
+    attribute dot:fontname { text }?,
+    attribute dot:fontsize { text }?,
+    attribute dot:headclip { text }?,
+    attribute dot:headhref { text }?,
+    attribute dot:headlabel { text }?,
+    attribute dot:headport { text }?,
+    attribute dot:headtarget { text }?,
+    attribute dot:headtooltip { text }?,
+    attribute dot:headURL { text }?,
+    attribute dot:href { text }?,
+    attribute dot:id { text }?,
+    attribute dot:label { text }?,
+    attribute dot:labelangle { text }?,
+    attribute dot:labeldistance { text }?,
+    attribute dot:labelfloat { text }?,
+    attribute dot:labelfontcolor { text }?,
+    attribute dot:labelfontname { text }?,
+    attribute dot:labelfontsize { text }?,
+    attribute dot:labelhref { text }?,
+    attribute dot:labeltarget { text }?,
+    attribute dot:labeltooltip { text }?,
+    attribute dot:labelURL { text }?,
+    attribute dot:layer { text }?,
+    attribute dot:lhead { text }?,
+    attribute dot:ltail { text }?,
+    attribute dot:minlen { text }?,
+    attribute dot:nojustify { text }?,
+    attribute dot:penwidth { text }?,
+    attribute dot:samehead { text }?,
+    attribute dot:sametail { text }?,
+    attribute dot:showboxes { text }?,
+    attribute dot:style { text }?,
+    attribute dot:tailclip { text }?,
+    attribute dot:tailhref { text }?,
+    attribute dot:taillabel { text }?,
+    attribute dot:tailport { text }?,
+    attribute dot:tailtarget { text }?,
+    attribute dot:tailtooltip { text }?,
+    attribute dot:tailURL { text }?,
+    attribute dot:target { text }?,
+    attribute dot:tooltip { text }?,
+    attribute dot:URL { text }?,
+    attribute dot:weight { text }?,
+    attribute dot:xlabel { text }?
+
+htmlTableAttributes = 
+    attribute h:align { "center" | "left" | "right" | "text" }?,
+    attribute h:bgcolor { text }?,
+    attribute h:border { text }?,
+    attribute h:cellborder { text }?,
+    attribute h:cellpadding { text }?,
+    attribute h:cellspacing { text }?,
+    attribute h:color { text }?,
+    attribute h:columns { text }?,
+    attribute h:fixedsize { "false" | "true" }?,
+    attribute h:gradientangle { xsd:double }?,
+    attribute h:height { text }?,
+    attribute h:href { text }?,
+    attribute h:id { text }?,
+    attribute h:port { text }?,
+    attribute h:rows { text }?,
+    attribute h:sides { text }?,
+    attribute h:style { text }?,
+    attribute h:target { text }?,
+    attribute h:title { text }?,
+    attribute h:tooltip { text }?,
+    attribute h:valign { "middle" | "bottom" | "top" }?,
+    attribute h:width { text }?
+
+commonAttributes = dotAttributes & htmlTableAttributes
+
 g.description =
     element g:description {
-        (g.declare-step|g.graph)+
+        commonAttributes,
+        (g.pipeline-container|g.graph-container)+
     }
 
 g.declare-step =
     element g:declare-step {
+        commonAttributes,
         attribute name { text }?,
         attribute type { xsd:QName }?,
         attribute base-uri { xsd:anyURI }?,
@@ -26,36 +166,49 @@ g.declare-step =
 
 g.input =
     element g:input {
+        commonAttributes,
         g.port
     }
 
 g.output =
     element g:output {
+        commonAttributes,
         g.port
+    }
+
+g.detail =
+    element g:detail {
+        commonAttributes,
+        h.td+
     }
 
 g.head =
     element g:head {
+        commonAttributes,
         g.inputs, g.outputs
     }
 
 g.foot =
     element g:foot {
+        commonAttributes,
         g.inputs, g.outputs
     }
 
 g.inputs =
     element g:inputs {
+        commonAttributes,
         g.port*
     }
 
 g.outputs =
     element g:outputs {
+        commonAttributes,
         g.port*
     }
 
 g.port =
     element g:port {
+        commonAttributes,
         attribute id { text },
         attribute primary { xsd:boolean }?,
         attribute sequence { xsd:boolean }?,
@@ -64,32 +217,38 @@ g.port =
 
 g.atomic-step =
     element g:atomic-step {
+        commonAttributes,
         attribute id { text }?,
         attribute name { text },
         attribute type { xsd:QName },
         attribute as { text }?,
         attribute href { text }?,
+        attribute ref { text }?,
         attribute select { text }?,
         attribute option-name { xsd:QName }?,
         attribute variable-name { xsd:QName }?,
         attribute expression { text }?,
         attribute filename { text }?,
         g.inputs,
+        g.detail*,
         g.outputs
     }
 
 g.subpipeline =
     element g:subpipeline {
+        commonAttributes,
         attribute id { text },
         attribute name { text },
         attribute type { xsd:QName },
         attribute ref { text },
         g.inputs,
+        g.detail*,
         g.outputs
     }
 
 g.compound-step =
     element g:compound-step {
+        commonAttributes,
         attribute id { text }?,
         attribute name { text },
         attribute type { xsd:QName },
@@ -101,6 +260,7 @@ g.compound-step =
 
 g.edge =
     element g:edge {
+        dotEdgeAttributes,
         attribute from { text },
         attribute to { text },
         attribute from-step { text }?,
@@ -113,13 +273,121 @@ g.edge =
 
 # ============================================================
 
+g.pipeline-container =
+    element g:pipeline-container {
+        commonAttributes,
+        g.declare-step
+    }
+
+g.graph-container =
+    element g:graph-container {
+        commonAttributes,
+        g.graph
+    }
+
+# ============================================================
+
 g.graph =
     element g:graph {
+        commonAttributes,
         attribute filename { text }?,
         g.input*,
         g.output*,
         g.declare-step,
         (g.atomic-step | g.compound-step | g.subpipeline)*,
         g.edge*
+    }
+
+# ============================================================
+
+htmlInlines = (text | h.font | h.br | h.img | h.i | h.b | h.o
+               | h.sub | h.sup | h.s | h.hr | h.vr)*
+
+h.td =
+    element h:td {
+        attribute align { "center" | "left" | "right" | "text" }?,
+        attribute balign { "center" | "left" | "right" }?,
+        attribute valign { "middle" | "bottom" | "top" }?,
+        attribute bgcolor { text }?,
+        attribute border { text }?,
+        attribute cellpadding { text }?,
+        attribute cellspacing { text }?,
+        attribute color { text }?,
+        attribute colspan { xsd:integer }?,
+        attribute fixedsize { "false" | "true" }?,
+        attribute gradientangle { xsd:double }?,
+        attribute height { text }?,
+        attribute href { text }?,
+        attribute id { text }?,
+        attribute port { text }?,
+        attribute rowspan { text }?,
+        attribute sides { text }?,
+        attribute style { text }?,
+        attribute target { text }?,
+        attribute title { text }?,
+        attribute tooltip { text }?,
+        attribute width { text }?,
+        htmlInlines
+    }
+
+h.font =
+    element h:font {
+        attribute color { text }?,
+        attribute face { text }?,
+        attribute point-size { text }?,
+        htmlInlines
+    }
+
+h.br =
+    element h:br {
+        attribute balign { "center" | "left" | "right" }?,
+        empty
+    }
+
+h.img =
+    element h:img {
+        attribute scale { text }?,
+        attribute src { text },
+        empty 
+    }
+
+h.i =
+    element h:i {
+        htmlInlines
+      }
+
+h.b =
+    element h:b {
+        htmlInlines
+    }
+
+h.o =
+    element h:o {
+        htmlInlines
+    }
+
+h.sub =
+    element h:sub {
+        htmlInlines
+    }
+
+h.sup =
+    element h:sup {
+        htmlInlines
+    }
+
+h.s =
+    element h:s {
+        htmlInlines
+    }
+
+h.hr =
+    element h:hr {
+        htmlInlines
+    }
+
+h.vr =
+    element h:vr {
+        htmlInlines
     }
 

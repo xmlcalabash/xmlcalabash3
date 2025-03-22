@@ -1,59 +1,793 @@
-<g:declare-step xmlns:g="http://xmlcalabash.com/ns/description"
-                xmlns:cx="http://xmlcalabash.com/ns/extensions"
-                xmlns:ex="https://xmlcalabash.com/ns/examples"
-                xmlns:p="http://www.w3.org/ns/xproc"
-                xmlns:xs="http://www.w3.org/2001/XMLSchema"
-                name="!declare-step_2"
-                type="ex:ident"
-                base-uri="file:/documentation/src/examples/xpl/debugger.xpl"
-                id="IC477"
-                filename="ex_ident">
-  <g:input>
-    <g:port id="input_39" primary="true" sequence="true">source</g:port>
-  </g:input>
-  <g:output>
-    <g:port id="output_42" primary="true" sequence="true">result</g:port>
-  </g:output>
-
-  <g:head>
-    <g:inputs>
-      <g:port id="_39" primary="true" sequence="true">source</g:port>
-    </g:inputs>
-    <g:outputs>
-      <g:port id="_40" primary="true" sequence="true">source</g:port>
-    </g:outputs>
-  </g:head>
-
-  <g:atomic-step name="!identity" type="p:identity">
-    <g:inputs>
-      <g:port id="_44" primary="true" sequence="true">source</g:port>
-    </g:inputs>
-    <g:outputs>
-      <g:port id="_45" primary="true" sequence="true">result</g:port>
-    </g:outputs>
-  </g:atomic-step>
-
-  <g:foot>
-    <g:inputs>
-      <g:port id="_41" primary="true" sequence="true">result</g:port>
-    </g:inputs>
-    <g:outputs>
-      <g:port id="_42" primary="true" sequence="true">result</g:port>
-    </g:outputs>
-  </g:foot>
-
-  <g:edge from="_45"
-          to="_41"
-          from-step="!declare-step_2"
-          from-port="result"
-          to-step="!identity"
-          to-port="result"/>
-  <g:edge from="_40"
-          to="_44"
-          from-step="!identity"
-          from-port="source"
-          to-step="!declare-step_2"
-          to-port="source"/>
-  <g:edge from="input_39" to="_39"/>
-  <g:edge from="_42" to="output_42"/>
-</g:declare-step>
+<?xml version="1.0" encoding="UTF-8"?>
+<g:description xmlns:g="http://xmlcalabash.com/ns/description">
+   <g:pipeline-container xmlns="http://www.w3.org/1999/xhtml"
+                         xmlns:dot="http://xmlcalabash.com/ns/dot"
+                         xmlns:h="http://www.w3.org/1999/xhtml">
+      <g:declare-step xmlns:cx="http://xmlcalabash.com/ns/extensions"
+                      xmlns:ex="https://xmlcalabash.com/ns/examples"
+                      xmlns:p="http://www.w3.org/ns/xproc"
+                      xmlns:xs="http://www.w3.org/2001/XMLSchema"
+                      name="!declare-step"
+                      base-uri="file:/Volumes/Projects/xproc/xmlcalabash3/documentation/src/examples/xpl/debugger.xpl"
+                      id="IC475"
+                      filename="p_declare-step"
+                      version="3.0"
+                      dot:label="p:declare-step">
+         <g:input dot:peripheries="0"
+                  dot:shape="house"
+                  h:cellspacing="0"
+                  h:border="0"
+                  h:cellborder="1">
+            <g:port id="output_5" primary="true" sequence="true">result</g:port>
+         </g:input>
+         <g:head dot:shape="parallelogram"
+                 dot:peripheries="0"
+                 h:cellspacing="0"
+                 h:border="0"
+                 h:cellborder="1">
+            <g:inputs/>
+            <g:outputs/>
+         </g:head>
+         <g:atomic-step dot:peripheries="0"
+                        h:cellspacing="0"
+                        h:border="0"
+                        h:cellborder="1"
+                        name="!document"
+                        type="cx:document"
+                        href="../xml/default-input.xml">
+            <g:inputs/>
+            <g:detail>
+               <td>cx:document</td>
+            </g:detail>
+            <g:detail>
+               <td>href="../xml/default-input.xml"</td>
+            </g:detail>
+            <g:outputs>
+               <g:port id="_7" primary="true" sequence="false">result</g:port>
+            </g:outputs>
+         </g:atomic-step>
+         <g:atomic-step dot:peripheries="0"
+                        h:cellspacing="0"
+                        h:border="0"
+                        h:cellborder="1"
+                        name="!xinclude"
+                        type="p:xinclude">
+            <g:inputs>
+               <g:port id="_9" primary="true" sequence="false">source</g:port>
+            </g:inputs>
+            <g:detail>
+               <td>p:xinclude</td>
+            </g:detail>
+            <g:outputs>
+               <g:port id="_10" primary="true" sequence="false">result</g:port>
+            </g:outputs>
+         </g:atomic-step>
+         <g:atomic-step dot:peripheries="0"
+                        h:cellspacing="0"
+                        h:border="0"
+                        h:cellborder="1"
+                        name="ex1"
+                        type="ex:ident"
+                        filename="ex_ident">
+            <g:inputs>
+               <g:port id="_12" primary="true" sequence="true">source</g:port>
+            </g:inputs>
+            <g:detail>
+               <td href="ex_ident.html">
+                  <font color="#0000FF">ex:ident</font>
+               </td>
+               <td>“ex1”</td>
+            </g:detail>
+            <g:outputs>
+               <g:port id="_13" primary="true" sequence="true">result</g:port>
+            </g:outputs>
+         </g:atomic-step>
+         <g:atomic-step dot:peripheries="0"
+                        h:cellspacing="0"
+                        h:border="0"
+                        h:cellborder="1"
+                        name="!select_IC527"
+                        type="cx:select"
+                        select="/ex:doc/*">
+            <g:inputs>
+               <g:port id="_15" primary="true" sequence="true">source</g:port>
+            </g:inputs>
+            <g:detail>
+               <td>cx:select</td>
+            </g:detail>
+            <g:outputs>
+               <g:port id="_16" primary="true" sequence="true">result</g:port>
+            </g:outputs>
+         </g:atomic-step>
+         <g:compound-step name="!for-each" type="p:for-each" dot:label="p:for-each">
+            <g:head dot:shape="parallelogram"
+                    dot:peripheries="0"
+                    h:cellspacing="0"
+                    h:border="0"
+                    h:cellborder="1">
+               <g:inputs>
+                  <g:port id="_20" primary="false" sequence="true">!source</g:port>
+               </g:inputs>
+               <g:outputs>
+                  <g:port id="_21" primary="true" sequence="true">current</g:port>
+               </g:outputs>
+            </g:head>
+            <g:atomic-step dot:peripheries="0"
+                           h:cellspacing="0"
+                           h:border="0"
+                           h:cellborder="1"
+                           name="id1"
+                           type="p:identity">
+               <g:inputs>
+                  <g:port id="_25" primary="true" sequence="true">source</g:port>
+               </g:inputs>
+               <g:detail>
+                  <td>p:identity</td>
+                  <td>“id1”</td>
+               </g:detail>
+               <g:outputs>
+                  <g:port id="_26" primary="true" sequence="true">result</g:port>
+               </g:outputs>
+            </g:atomic-step>
+            <g:atomic-step dot:peripheries="0"
+                           h:cellspacing="0"
+                           h:border="0"
+                           h:cellborder="1"
+                           name="add"
+                           type="p:add-attribute">
+               <g:inputs>
+                  <g:port id="_28" primary="true" sequence="false">source</g:port>
+               </g:inputs>
+               <g:detail>
+                  <td>p:add-attribute</td>
+                  <td>“add”</td>
+               </g:detail>
+               <g:outputs>
+                  <g:port id="_29" primary="true" sequence="false">result</g:port>
+               </g:outputs>
+            </g:atomic-step>
+            <g:foot dot:shape="parallelogram"
+                    dot:peripheries="0"
+                    h:cellspacing="0"
+                    h:border="0"
+                    h:cellborder="1">
+               <g:inputs>
+                  <g:port id="_22" primary="true" sequence="true">!result</g:port>
+               </g:inputs>
+               <g:outputs>
+                  <g:port id="_23" primary="true" sequence="true">!result</g:port>
+               </g:outputs>
+            </g:foot>
+            <g:edge dot:arrowhead="normal"
+                    from="_29"
+                    to="_22"
+                    from-step="!for-each"
+                    from-port="result"
+                    to-step="add"
+                    to-port="result"
+                    implicit="true"/>
+            <g:edge dot:arrowhead="normal"
+                    from="_16"
+                    to="_20"
+                    from-step="!for-each"
+                    from-port="result"
+                    to-step="!select_IC527"
+                    to-port="result"/>
+            <g:edge dot:arrowhead="normal"
+                    from="_21"
+                    to="_25"
+                    from-step="id1"
+                    from-port="current"
+                    to-step="!for-each"
+                    to-port="current"
+                    implicit="true"/>
+            <g:edge dot:label="⋮"
+                    dot:arrowhead="normal"
+                    from="_26"
+                    to="_28"
+                    from-step="add"
+                    from-port="result"
+                    to-step="id1"
+                    to-port="result"
+                    implicit="true"/>
+         </g:compound-step>
+         <g:atomic-step dot:peripheries="0"
+                        h:cellspacing="0"
+                        h:border="0"
+                        h:cellborder="1"
+                        name="!wrap-sequence"
+                        type="p:wrap-sequence">
+            <g:inputs>
+               <g:port id="_31" primary="true" sequence="true">source</g:port>
+            </g:inputs>
+            <g:detail>
+               <td>p:wrap-sequence</td>
+            </g:detail>
+            <g:outputs>
+               <g:port id="_32" primary="true" sequence="true">result</g:port>
+            </g:outputs>
+         </g:atomic-step>
+         <g:atomic-step dot:peripheries="0"
+                        h:cellspacing="0"
+                        h:border="0"
+                        h:cellborder="1"
+                        name="id2"
+                        type="p:identity">
+            <g:inputs>
+               <g:port id="_34" primary="true" sequence="true">source</g:port>
+            </g:inputs>
+            <g:detail>
+               <td>p:identity</td>
+               <td>“id2”</td>
+            </g:detail>
+            <g:outputs>
+               <g:port id="_35" primary="true" sequence="true">result</g:port>
+            </g:outputs>
+         </g:atomic-step>
+         <g:foot dot:shape="parallelogram"
+                 dot:peripheries="0"
+                 h:cellspacing="0"
+                 h:border="0"
+                 h:cellborder="1">
+            <g:inputs>
+               <g:port id="_4" primary="true" sequence="true">result</g:port>
+            </g:inputs>
+            <g:outputs>
+               <g:port id="_5" primary="true" sequence="true">result</g:port>
+            </g:outputs>
+         </g:foot>
+         <g:edge dot:arrowhead="normal"
+                 from="_35"
+                 to="_4"
+                 from-step="!declare-step"
+                 from-port="result"
+                 to-step="id2"
+                 to-port="result"
+                 implicit="true"/>
+         <g:edge dot:arrowhead="normal"
+                 from="_7"
+                 to="_9"
+                 from-step="!xinclude"
+                 from-port="result"
+                 to-step="!document"
+                 to-port="result"/>
+         <g:edge dot:arrowhead="normal"
+                 from="_10"
+                 to="_12"
+                 from-step="ex1"
+                 from-port="result"
+                 to-step="!xinclude"
+                 to-port="result"
+                 implicit="true"/>
+         <g:edge dot:arrowhead="normal"
+                 from="_13"
+                 to="_15"
+                 from-step="!select_IC527"
+                 from-port="result"
+                 to-step="ex1"
+                 to-port="result"/>
+         <g:edge dot:arrowhead="normal"
+                 from="_23"
+                 to="_31"
+                 from-step="!wrap-sequence"
+                 from-port="!result"
+                 to-step="!for-each"
+                 to-port="!result"
+                 implicit="true"/>
+         <g:edge dot:arrowhead="normal"
+                 from="_32"
+                 to="_34"
+                 from-step="id2"
+                 from-port="result"
+                 to-step="!wrap-sequence"
+                 to-port="result"
+                 implicit="true"/>
+         <g:edge dot:arrowhead="normal" from="_5" to="output_5"/>
+      </g:declare-step>
+   </g:pipeline-container>
+   <g:pipeline-container xmlns="http://www.w3.org/1999/xhtml"
+                         xmlns:dot="http://xmlcalabash.com/ns/dot"
+                         xmlns:h="http://www.w3.org/1999/xhtml">
+      <g:declare-step xmlns:cx="http://xmlcalabash.com/ns/extensions"
+                      xmlns:ex="https://xmlcalabash.com/ns/examples"
+                      xmlns:p="http://www.w3.org/ns/xproc"
+                      xmlns:xs="http://www.w3.org/2001/XMLSchema"
+                      name="!declare-step_2"
+                      type="ex:ident"
+                      base-uri="file:/Volumes/Projects/xproc/xmlcalabash3/documentation/src/examples/xpl/debugger.xpl"
+                      id="IC477"
+                      filename="ex_ident"
+                      dot:label="p:declare-step">
+         <g:input dot:peripheries="0"
+                  dot:shape="invhouse"
+                  h:cellspacing="0"
+                  h:border="0"
+                  h:cellborder="1">
+            <g:port id="input_39" primary="true" sequence="true">source</g:port>
+         </g:input>
+         <g:input dot:peripheries="0"
+                  dot:shape="house"
+                  h:cellspacing="0"
+                  h:border="0"
+                  h:cellborder="1">
+            <g:port id="output_42" primary="true" sequence="true">result</g:port>
+         </g:input>
+         <g:head dot:shape="parallelogram"
+                 dot:peripheries="0"
+                 h:cellspacing="0"
+                 h:border="0"
+                 h:cellborder="1">
+            <g:inputs>
+               <g:port id="_39" primary="true" sequence="true">source</g:port>
+            </g:inputs>
+            <g:outputs>
+               <g:port id="_40" primary="true" sequence="true">source</g:port>
+            </g:outputs>
+         </g:head>
+         <g:atomic-step dot:peripheries="0"
+                        h:cellspacing="0"
+                        h:border="0"
+                        h:cellborder="1"
+                        name="!identity"
+                        type="p:identity">
+            <g:inputs>
+               <g:port id="_44" primary="true" sequence="true">source</g:port>
+            </g:inputs>
+            <g:detail>
+               <td>p:identity</td>
+            </g:detail>
+            <g:outputs>
+               <g:port id="_45" primary="true" sequence="true">result</g:port>
+            </g:outputs>
+         </g:atomic-step>
+         <g:foot dot:shape="parallelogram"
+                 dot:peripheries="0"
+                 h:cellspacing="0"
+                 h:border="0"
+                 h:cellborder="1">
+            <g:inputs>
+               <g:port id="_41" primary="true" sequence="true">result</g:port>
+            </g:inputs>
+            <g:outputs>
+               <g:port id="_42" primary="true" sequence="true">result</g:port>
+            </g:outputs>
+         </g:foot>
+         <g:edge dot:arrowhead="normal"
+                 from="_45"
+                 to="_41"
+                 from-step="!declare-step_2"
+                 from-port="result"
+                 to-step="!identity"
+                 to-port="result"
+                 implicit="true"/>
+         <g:edge dot:arrowhead="normal"
+                 from="_40"
+                 to="_44"
+                 from-step="!identity"
+                 from-port="source"
+                 to-step="!declare-step_2"
+                 to-port="source"
+                 implicit="true"/>
+         <g:edge dot:arrowhead="normal" from="input_39" to="_39"/>
+         <g:edge dot:arrowhead="normal" from="_42" to="output_42"/>
+      </g:declare-step>
+   </g:pipeline-container>
+   <g:graph-container xmlns="http://www.w3.org/1999/xhtml"
+                      xmlns:dot="http://xmlcalabash.com/ns/dot"
+                      xmlns:h="http://www.w3.org/1999/xhtml">
+      <g:graph xmlns:cx="http://xmlcalabash.com/ns/extensions"
+               xmlns:ex="https://xmlcalabash.com/ns/examples"
+               xmlns:p="http://www.w3.org/ns/xproc"
+               xmlns:xs="http://www.w3.org/2001/XMLSchema"
+               filename="p_declare-step"
+               dot:style="invis">
+         <g:input dot:peripheries="0"
+                  dot:shape="house"
+                  h:cellspacing="0"
+                  h:border="0"
+                  h:cellborder="1">
+            <g:port id="output_26" primary="true" sequence="true">result</g:port>
+         </g:input>
+         <g:declare-step base-uri="file:/Volumes/Projects/xproc/xmlcalabash3/documentation/src/examples/xpl/debugger.xpl"
+                         id="declare-step"
+                         name="!declare-step"
+                         dot:label="p:declare-step">
+            <g:head dot:shape="parallelogram"
+                    dot:peripheries="0"
+                    h:cellspacing="0"
+                    h:border="0"
+                    h:cellborder="1">
+               <g:inputs/>
+               <g:outputs/>
+            </g:head>
+            <g:atomic-step dot:peripheries="0"
+                           h:cellspacing="0"
+                           h:border="0"
+                           h:cellborder="1"
+                           id="document"
+                           type="cx:document"
+                           href="../xml/default-input.xml"
+                           name="!document">
+               <g:inputs/>
+               <g:detail>
+                  <td>cx:document</td>
+               </g:detail>
+               <g:detail>
+                  <td>href="../xml/default-input.xml"</td>
+               </g:detail>
+               <g:outputs>
+                  <g:port id="_3" primary="true" sequence="false">result</g:port>
+               </g:outputs>
+            </g:atomic-step>
+            <g:atomic-step dot:peripheries="0"
+                           h:cellspacing="0"
+                           h:border="0"
+                           h:cellborder="1"
+                           id="xinclude"
+                           type="p:xinclude"
+                           name="!xinclude">
+               <g:inputs>
+                  <g:port id="_4" primary="true" sequence="false">source</g:port>
+               </g:inputs>
+               <g:detail>
+                  <td>p:xinclude</td>
+               </g:detail>
+               <g:outputs>
+                  <g:port id="_5" primary="true" sequence="false">result</g:port>
+               </g:outputs>
+            </g:atomic-step>
+            <g:atomic-step dot:peripheries="0"
+                           h:cellspacing="0"
+                           h:border="0"
+                           h:cellborder="1"
+                           id="ex1"
+                           type="ex:ident"
+                           name="ex1"
+                           filename="ex_ident">
+               <g:inputs>
+                  <g:port id="_6" primary="true" sequence="true">source</g:port>
+               </g:inputs>
+               <g:detail>
+                  <td href="ex_ident.html">
+                     <font color="#0000FF">ex:ident</font>
+                  </td>
+                  <td>“ex1”</td>
+               </g:detail>
+               <g:outputs>
+                  <g:port id="_7" primary="true" sequence="true">result</g:port>
+               </g:outputs>
+            </g:atomic-step>
+            <g:atomic-step dot:peripheries="0"
+                           h:cellspacing="0"
+                           h:border="0"
+                           h:cellborder="1"
+                           id="select_IC527"
+                           type="cx:select"
+                           name="!select_IC527">
+               <g:inputs>
+                  <g:port id="_8" primary="true" sequence="true">source</g:port>
+               </g:inputs>
+               <g:detail>
+                  <td>cx:select</td>
+               </g:detail>
+               <g:outputs>
+                  <g:port id="_9" primary="true" sequence="true">result</g:port>
+               </g:outputs>
+            </g:atomic-step>
+            <g:atomic-step dot:peripheries="0"
+                           h:cellspacing="0"
+                           h:border="0"
+                           h:cellborder="1"
+                           id="wrap-sequence"
+                           type="p:wrap-sequence"
+                           name="!wrap-sequence">
+               <g:inputs>
+                  <g:port id="_22" primary="true" sequence="true">source</g:port>
+               </g:inputs>
+               <g:detail>
+                  <td>p:wrap-sequence</td>
+               </g:detail>
+               <g:outputs>
+                  <g:port id="_23" primary="true" sequence="true">result</g:port>
+               </g:outputs>
+            </g:atomic-step>
+            <g:atomic-step dot:peripheries="0"
+                           h:cellspacing="0"
+                           h:border="0"
+                           h:cellborder="1"
+                           id="id2"
+                           type="p:identity"
+                           name="id2">
+               <g:inputs>
+                  <g:port id="_24" primary="true" sequence="true">source</g:port>
+               </g:inputs>
+               <g:detail>
+                  <td>p:identity</td>
+                  <td>“id2”</td>
+               </g:detail>
+               <g:outputs>
+                  <g:port id="_25" primary="true" sequence="true">result</g:port>
+               </g:outputs>
+            </g:atomic-step>
+            <g:atomic-step dot:peripheries="0"
+                           h:cellspacing="0"
+                           h:border="0"
+                           h:cellborder="1"
+                           id="for-each_pipeline"
+                           ref="for-each"
+                           type="p:for-each"
+                           name="!for-each">
+               <g:inputs>
+                  <g:port id="_10" primary="false" sequence="true">!source</g:port>
+               </g:inputs>
+               <g:detail>
+                  <td href="#cluster_for_each">
+                     <font color="#0000FF">p:for-each</font>
+                  </td>
+               </g:detail>
+               <g:outputs>
+                  <g:port id="_11" primary="true" sequence="true">!result</g:port>
+               </g:outputs>
+            </g:atomic-step>
+            <g:foot dot:shape="parallelogram"
+                    dot:peripheries="0"
+                    h:cellspacing="0"
+                    h:border="0"
+                    h:cellborder="1">
+               <g:inputs>
+                  <g:port id="_1" primary="true" sequence="true">result</g:port>
+               </g:inputs>
+               <g:outputs>
+                  <g:port id="_2" primary="true" sequence="true">result</g:port>
+               </g:outputs>
+            </g:foot>
+         </g:declare-step>
+         <g:compound-step id="for-each"
+                          type="p:for-each"
+                          name="!for-each"
+                          dot:label="p:for-each">
+            <g:head dot:shape="parallelogram"
+                    dot:peripheries="0"
+                    h:cellspacing="0"
+                    h:border="0"
+                    h:cellborder="1">
+               <g:inputs>
+                  <g:port id="_16" primary="false" sequence="true">!source</g:port>
+               </g:inputs>
+               <g:outputs>
+                  <g:port id="_13" primary="true" sequence="true">current</g:port>
+               </g:outputs>
+            </g:head>
+            <g:atomic-step dot:peripheries="0"
+                           h:cellspacing="0"
+                           h:border="0"
+                           h:cellborder="1"
+                           id="id1"
+                           type="p:identity"
+                           name="id1">
+               <g:inputs>
+                  <g:port id="_18" primary="true" sequence="true">source</g:port>
+               </g:inputs>
+               <g:detail>
+                  <td>p:identity</td>
+                  <td>“id1”</td>
+               </g:detail>
+               <g:outputs>
+                  <g:port id="_19" primary="true" sequence="true">result</g:port>
+               </g:outputs>
+            </g:atomic-step>
+            <g:atomic-step dot:peripheries="0"
+                           h:cellspacing="0"
+                           h:border="0"
+                           h:cellborder="1"
+                           id="add"
+                           type="p:add-attribute"
+                           name="add">
+               <g:inputs>
+                  <g:port id="_20" primary="true" sequence="false">source</g:port>
+               </g:inputs>
+               <g:detail>
+                  <td>p:add-attribute</td>
+                  <td>“add”</td>
+               </g:detail>
+               <g:outputs>
+                  <g:port id="_21" primary="true" sequence="false">result</g:port>
+               </g:outputs>
+            </g:atomic-step>
+            <g:foot dot:shape="parallelogram"
+                    dot:peripheries="0"
+                    h:cellspacing="0"
+                    h:border="0"
+                    h:cellborder="1">
+               <g:inputs>
+                  <g:port id="_14" primary="true" sequence="true">!result</g:port>
+               </g:inputs>
+               <g:outputs>
+                  <g:port id="_17" primary="true" sequence="true">!result</g:port>
+               </g:outputs>
+            </g:foot>
+         </g:compound-step>
+         <g:edge dot:arrowhead="normal"
+                 from="_2"
+                 from-step="declare-step_foot"
+                 from-port="result"
+                 to="output_26"/>
+         <g:edge dot:arrowhead="normal"
+                 from="_3"
+                 to="_4"
+                 from-step="document"
+                 from-port="result"
+                 to-step="xinclude"
+                 to-port="source"/>
+         <g:edge dot:arrowhead="normal"
+                 from="_5"
+                 to="_6"
+                 from-step="xinclude"
+                 from-port="result"
+                 to-step="ex1"
+                 to-port="source"
+                 implicit="true"/>
+         <g:edge dot:arrowhead="normal"
+                 from="_7"
+                 to="_8"
+                 from-step="ex1"
+                 from-port="result"
+                 to-step="select_IC527"
+                 to-port="source"/>
+         <g:edge dot:label="⋮"
+                 dot:arrowhead="normal"
+                 from="_19"
+                 to="_20"
+                 from-step="id1"
+                 from-port="result"
+                 to-step="add"
+                 to-port="source"
+                 implicit="true"/>
+         <g:edge dot:arrowhead="normal"
+                 from="_21"
+                 to="_14"
+                 from-step="add"
+                 from-port="result"
+                 to-step="for-each_foot"
+                 to-port="!result"
+                 implicit="true"/>
+         <g:edge dot:arrowhead="normal"
+                 from="_23"
+                 to="_24"
+                 from-step="wrap-sequence"
+                 from-port="result"
+                 to-step="id2"
+                 to-port="source"
+                 implicit="true"/>
+         <g:edge dot:arrowhead="normal"
+                 from="_25"
+                 to="_1"
+                 from-step="id2"
+                 from-port="result"
+                 to-step="declare-step_foot"
+                 to-port="result"
+                 implicit="true"/>
+         <g:edge dot:arrowhead="normal"
+                 from="_13"
+                 to="_18"
+                 from-step="for-each_head"
+                 from-port="current"
+                 to-step="id1"
+                 to-port="source"
+                 implicit="true"/>
+         <g:edge dot:arrowhead="normal"
+                 from="_9"
+                 to="_10"
+                 from-step="select_IC527"
+                 from-port="result"
+                 to-step="for-each_pipeline"
+                 to-port="!source"/>
+         <g:edge dot:arrowhead="normal"
+                 from="_11"
+                 to="_22"
+                 from-step="for-each_pipeline"
+                 from-port="!result"
+                 to-step="wrap-sequence"
+                 to-port="source"
+                 implicit="true"/>
+      </g:graph>
+   </g:graph-container>
+   <g:graph-container xmlns="http://www.w3.org/1999/xhtml"
+                      xmlns:dot="http://xmlcalabash.com/ns/dot"
+                      xmlns:h="http://www.w3.org/1999/xhtml">
+      <g:graph xmlns:cx="http://xmlcalabash.com/ns/extensions"
+               xmlns:ex="https://xmlcalabash.com/ns/examples"
+               xmlns:p="http://www.w3.org/ns/xproc"
+               xmlns:xs="http://www.w3.org/2001/XMLSchema"
+               filename="ex_ident"
+               dot:style="invis">
+         <g:input dot:peripheries="0"
+                  dot:shape="invhouse"
+                  h:cellspacing="0"
+                  h:border="0"
+                  h:cellborder="1">
+            <g:port id="input_7" primary="true" sequence="true">source</g:port>
+         </g:input>
+         <g:input dot:peripheries="0"
+                  dot:shape="house"
+                  h:cellspacing="0"
+                  h:border="0"
+                  h:cellborder="1">
+            <g:port id="output_8" primary="true" sequence="true">result</g:port>
+         </g:input>
+         <g:declare-step base-uri="file:/Volumes/Projects/xproc/xmlcalabash3/documentation/src/examples/xpl/debugger.xpl"
+                         type="ex:ident"
+                         id="declare-step_2"
+                         name="!declare-step_2"
+                         dot:label="p:declare-step">
+            <g:head dot:shape="parallelogram"
+                    dot:peripheries="0"
+                    h:cellspacing="0"
+                    h:border="0"
+                    h:cellborder="1">
+               <g:inputs>
+                  <g:port id="_3" primary="true" sequence="true">source</g:port>
+               </g:inputs>
+               <g:outputs>
+                  <g:port id="_1" primary="true" sequence="true">source</g:port>
+               </g:outputs>
+            </g:head>
+            <g:atomic-step dot:peripheries="0"
+                           h:cellspacing="0"
+                           h:border="0"
+                           h:cellborder="1"
+                           id="identity"
+                           type="p:identity"
+                           name="!identity">
+               <g:inputs>
+                  <g:port id="_5" primary="true" sequence="true">source</g:port>
+               </g:inputs>
+               <g:detail>
+                  <td>p:identity</td>
+               </g:detail>
+               <g:outputs>
+                  <g:port id="_6" primary="true" sequence="true">result</g:port>
+               </g:outputs>
+            </g:atomic-step>
+            <g:foot dot:shape="parallelogram"
+                    dot:peripheries="0"
+                    h:cellspacing="0"
+                    h:border="0"
+                    h:cellborder="1">
+               <g:inputs>
+                  <g:port id="_2" primary="true" sequence="true">result</g:port>
+               </g:inputs>
+               <g:outputs>
+                  <g:port id="_4" primary="true" sequence="true">result</g:port>
+               </g:outputs>
+            </g:foot>
+         </g:declare-step>
+         <g:edge dot:arrowhead="normal"
+                 from="input_7"
+                 to="_3"
+                 to-step="declare-step_2"
+                 to-port="source"/>
+         <g:edge dot:arrowhead="normal"
+                 from="_4"
+                 from-step="declare-step_2_foot"
+                 from-port="result"
+                 to="output_8"/>
+         <g:edge dot:arrowhead="normal"
+                 from="_6"
+                 to="_2"
+                 from-step="identity"
+                 from-port="result"
+                 to-step="declare-step_2_foot"
+                 to-port="result"
+                 implicit="true"/>
+         <g:edge dot:arrowhead="normal"
+                 from="_1"
+                 to="_5"
+                 from-step="declare-step_2_head"
+                 from-port="source"
+                 to-step="identity"
+                 to-port="source"
+                 implicit="true"/>
+      </g:graph>
+   </g:graph-container>
+</g:description>
