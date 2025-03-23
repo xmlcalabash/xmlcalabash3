@@ -46,7 +46,7 @@ class Urify(filepath: String, basedir: String?) {
         private val windowsFilepathRE = "^(?i)(file:/*)?(?i)([a-z]):(.*)$".toRegex()
         private val fileAuthorityRE = "^(?i)(file://)([^/]+)(/.*)?$".toRegex()
         private val filepathRE = "^(?i)(file:)(.*)$".toRegex()
-        private val otherSchemeRE = "^(?i)([a-z]+):(.*)$".toRegex()
+        private val otherSchemeRE = "^(?i)([-a-z0-9+.]+):(.*)$".toRegex()
         private val authorityRE = "^//([^/]+)(/.*)?$".toRegex()
 
         fun urify(filestr: String): String {
