@@ -1,0 +1,8 @@
+<?xml encoding="UTF-8"?>
+
+<!ELEMENT ex:a EMPTY>
+<!ATTLIST ex:a
+  xmlns:ex CDATA #FIXED 'http://example.com/ns'>
+
+<!ENTITY % b SYSTEM "sub/b.dtd">
+%b;

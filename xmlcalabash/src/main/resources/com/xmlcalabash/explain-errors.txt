@@ -1452,6 +1452,42 @@ URI is not in cx:selenium whitelist: “$1”
 cxerr:XC0024
 Script is invalid: $1
 
+cxerr:XC0025
+At least one source is required.
+
+cxerr:XC0026
+Trang does not support XML Schema as an input format.
+
+cxerr:XC0027
+Invalid $1 option: “$2”.
+
+cxerr:XC0028
+Conflicting options: “$1” and “$2”.
+
+cxerr:XC0029
+If more than one input is provided, they must all have base URIs
+
+cxerr:XC0030
+Only file: URIs are supported by cx:trang
+
+cxerr:XC0031
+Unsupported input format: “$1”.
+
+cxerr:XC0032
+Unsupported output format: “$1”.
+
+cxerr:XC0033
+Failed to infer input format.
+
+cxerr:XC0034
+Failed to infer input format, unexpected XML vocabulary.
+
+cxerr:XC0035
+Unresolved from inputs: “$1”.
+
+cxerr:XC0036
+Input and output formats are the same: “$1”.
+
 cxerr:XI0001
 Pipeline has no “$1” output port.
 Cannot save the output from a port that doesn’t exist.

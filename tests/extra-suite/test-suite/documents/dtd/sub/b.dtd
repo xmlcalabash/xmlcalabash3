@@ -1,0 +1,5 @@
+<?xml encoding="UTF-8"?>
+
+<!ELEMENT ex:b EMPTY>
+<!ATTLIST ex:b
+  xmlns:ex CDATA #FIXED 'http://example.com/ns'>

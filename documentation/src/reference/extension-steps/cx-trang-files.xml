@@ -1,0 +1,64 @@
+<refentry xmlns:p="http://www.w3.org/ns/xproc"
+          xmlns:e="http://www.w3.org/1999/XSL/Spec/ElementSyntax"
+          xmlns:cxerr="http://xmlcalabash.com/ns/error"
+          xmlns:xi="http://www.w3.org/2001/XInclude"
+          xmlns:xlink="http://www.w3.org/1999/xlink"
+          xmlns="http://docbook.org/ns/docbook"
+          xml:id="cx-trang-files">
+<?db filename="cx-trang-files"?>
+<refnamediv>
+  <refname>cx:trang-files</refname>
+  <refpurpose>Convert between schema formats</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv>
+<refsection role="introduction">
+<title>Introduction</title>
+<para>This step converts between DTD, RELAX NG, and XML Schema grammar formats
+with <link xlink:href="https://relaxng.org/jclark/trang.html">Trang</link>.
+</para>
+</refsection>
+
+<refsection role="step-declaration">
+<title>Step declaration</title>
+<xi:include href="../../../../ext/trang/src/main/resources/com/xmlcalabash/ext/trang.xpl"
+            xpointer="xpath(/*/*[@type='cx:trang-files'])"/>
+<?import trang.xpl?>
+</refsection>
+
+<refsection role="errors">
+<title>Errors</title>
+<para>Errors from the entry body are summarized here.</para>
+</refsection>
+</refsynopsisdiv>
+
+<refsection>
+<title>Description</title>
+
+<para>Trang translates between DTD, RELAX NG, and XML Schema grammar formats on
+the file system. This is roughly the same as running <command>trang</command> on
+the command line.
+</para>
+
+<para>If a <option>source-format</option> option is not provided, the step will attempt to
+determine the format by looking at the <option>source-schema</option>.
+<error code="cxerr:XC0033">It is a <glossterm>dynamic error</glossterm> if the format
+cannot be determined from the schema URI.</error>
+<error code="cxerr:XC0031">It is a <glossterm>dynamic error</glossterm> if the input
+format is not supported.</error>
+</para>
+
+<para>If a <option>result-format</option> option is not provided, the step will attempt to
+determine the format by looking at the <option>result-schema</option>.
+<error code="cxerr:XC0032">It is a <glossterm>dynamic error</glossterm> if the result
+format is not supported.</error>
+</para>
+
+<para>See <tag>cx:trang</tag> for more details about the <option>namespaces</option>,
+<option>source-parameters</option>, and <option>result-parameters</option> options.</para>
+
+<para>The converted schema documents are stored on the file system. The result schema
+URI is provided on the <port>result</port> port in a <tag>c:result</tag> element.</para>
+
+</refsection>
+</refentry>

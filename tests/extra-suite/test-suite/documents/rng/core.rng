@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<grammar ns="http://example.com/ns" xmlns:ex="http://example.com/ns" xmlns="http://relaxng.org/ns/structure/1.0">
+  <define name="a">
+    <element name="ex:a">
+      <empty/>
+    </element>
+  </define>
+  <include href="sub/b.rng"/>
+</grammar>

@@ -11,6 +11,7 @@ import com.xmlcalabash.namespace.NsXmlns
 import com.xmlcalabash.runtime.*
 import com.xmlcalabash.runtime.api.Receiver
 import com.xmlcalabash.runtime.parameters.RuntimeStepParameters
+import com.xmlcalabash.util.Urify
 import net.sf.saxon.om.NamespaceMap
 import net.sf.saxon.om.NamespaceUri
 import net.sf.saxon.om.NodeInfo
@@ -170,6 +171,20 @@ abstract class AbstractAtomicStep(): XProcStep {
             return null
         }
         return opt.context.resolve(opt.value.underlyingValue.stringValue)
+/*
+        val uri = if (opt.context.baseUri == null) {
+            Urify.urify(opt.value.underlyingValue.stringValue)
+        } else {
+            Urify.urify(opt.value.underlyingValue.stringValue, opt.context.baseUri!!)
+        }
+
+        // Because *everywhere else*, the JVM will have used a single "/"
+        if (uri.startsWith("file:///")) {
+            return URI("file:/${uri.substring(8)}")
+        }
+
+        return URI(uri)
+ */
     }
 
     fun integerBinding(name: QName): Int? {

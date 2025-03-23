@@ -1,0 +1,213 @@
+<refentry xmlns:p="http://www.w3.org/ns/xproc"
+          xmlns:e="http://www.w3.org/1999/XSL/Spec/ElementSyntax"
+          xmlns:cxerr="http://xmlcalabash.com/ns/error"
+          xmlns:xi="http://www.w3.org/2001/XInclude"
+          xmlns:xlink="http://www.w3.org/1999/xlink"
+          xmlns="http://docbook.org/ns/docbook"
+          xml:id="cx-trang">
+<?db filename="cx-trang"?>
+<refnamediv>
+  <refname>cx:trang</refname>
+  <refpurpose>Convert between schema formats</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv>
+<refsection role="introduction">
+<title>Introduction</title>
+<para>This step converts between DTD, RELAX NG, and XML Schema grammar formats
+with <link xlink:href="https://relaxng.org/jclark/trang.html">Trang</link>.
+</para>
+</refsection>
+
+<refsection role="step-declaration">
+<title>Step declaration</title>
+<xi:include href="../../../../ext/trang/src/main/resources/com/xmlcalabash/ext/trang.xpl"
+            xpointer="xpath(/*/*[@type='cx:trang'])"/>
+<?import trang.xpl?>
+</refsection>
+
+<refsection role="errors">
+<title>Errors</title>
+<para>Errors from the entry body are summarized here.</para>
+</refsection>
+</refsynopsisdiv>
+
+<refsection>
+<title>Description</title>
+
+<para>Trang translates between DTD, RELAX NG, and XML Schema grammar formats. At
+least one schema must be provided on the <port>source</port> port. <error
+code="cxerr:XC0025">It is a <glossterm>dynamic error</glossterm> if no schemas
+are provided.</error></para>
+
+<para>The underlying Trang APIs are really designed to operate on files. Making
+them work with a sequence of dynamically provided schemas requires a little
+effort. For a single schema document, with no references to other schema
+documents, the conversion is straightforward. For a set of schema documents that contain
+cross-references (parameters entities in DTDs or RELAX NG include elements), it’s
+a bit more complicated.</para>
+
+<para>For a set of related schemas, you must provide all of the schemas on the
+<port>source</port> port, and they must all have base URIs and those URIs must
+use the file: URI scheme.
+<error code="cxerr:XC0029">It is a <glossterm>dynamic error</glossterm> if multiple
+schemas are provided and they do not all have base URIs.</error>
+<error code="cxerr:XC0030">It is a <glossterm>dynamic error</glossterm> if any schema
+document has a base URI that is not a file: URI.</error>
+If the
+cross-references use relative URIs, then they will be resolved against the base
+URI of the document in which they appear. Every resolved base URI must be the same
+as the base URI of one of the input schemas.
+<error code="cxerr:XC0035">It is a <glossterm>dynamic error</glossterm> if any reference
+is made to a schema document that has a URI not among the source schemas.</error>
+</para>
+
+<para>Alternatively, the <tag>cx:trang-files</tag> step operates directly on
+files on the filesystem. For some conversions this may be easier than
+constructing the correct set of source schema documents.</para>
+
+<para>If a <option>source-format</option> option is not provided, the step will attempt to
+determine the format by looking at the first input schema.
+<error code="cxerr:XC0033">It is a <glossterm>dynamic error</glossterm> if the format
+cannot be determined from the first schema.</error>
+<error code="cxerr:XC0026">It is a <glossterm>dynamic error</glossterm> if an XML Schema
+is provided on the <port>source</port> port.</error>
+<error code="cxerr:XC0034">It is a <glossterm>dynamic error</glossterm> if the document on
+the source port is an XML document and it is not a RELAX NG Schema.</error></para>
+
+<para><error code="cxerr:XC0036">It is a <glossterm>dynamic error</glossterm> if the source
+and result formats are the same.</error>
+</para>
+
+<para>The converted schema documents are provided on the <port>result</port> port.
+Each one will have a base URI that is resolved against the <option>output-base-uri</option>.
+</para>
+
+<para>Source and result parameters can be used to control the translations.
+<error code="cxerr:XC0027">It is a <glossterm>dynamic error</glossterm> if the value
+supplied for a parameter is not valid for that parameter.</error>
+</para>
+
+<refsection>
+<title>Source parameters</title>
+
+<para>The allowed source parameters vary depending on the source format.
+Consult the Trang documentation for more details.
+</para>
+
+<refsection>
+<title>DTD source parameters</title>
+
+<para>The <option>namespaces</option> option specifies namespace bindings for
+elements and attributes. They are prefix/URI pairs where the empty string
+represents the default namespace.</para>
+
+<para>The other source parameters are:</para>
+
+<variablelist>
+<varlistentry><term><literal>colon-replacement</literal></term>
+<listitem><para>Characters to use when replacing colons in DTD element and attribute names
+to produce the name of a RELAX NG pattern.
+</para></listitem>
+</varlistentry>
+<varlistentry><term><literal>element-define</literal></term>
+<listitem><para>A name pattern used to produce the name of a RELAX NG pattern
+from an element name.
+</para></listitem>
+</varlistentry>
+<varlistentry><term><literal>inline-attlist</literal></term>
+<listitem><para>If the inline-attlist parameter is true, the attribute declarations
+will be part of the element pattern. If it’s false, they will be in their own pattern.
+</para></listitem>
+</varlistentry>
+<varlistentry><term><literal>attlist-define</literal></term>
+<listitem><para>A name pattern used to produce the name of a RELAX NG pattern
+from an attribute name.
+</para></listitem>
+</varlistentry>
+<varlistentry><term><literal>any-name</literal></term>
+<listitem><para>Specifies the name of the definition generated for the content
+of elements declared in the DTD as having a content model of ANY.
+</para></listitem>
+</varlistentry>
+<varlistentry><term><literal>strict-any</literal></term>
+<listitem><para>If true, preserves the exact semantics of ANY content models by
+using an explicit choice of references to all declared elements. If it’s false,
+Trang uses a wildcard that allows any element.
+</para></listitem>
+</varlistentry>
+<varlistentry><term><literal>annotation-prefix</literal></term>
+<listitem><para>The prefix to use for RELAX NG DTD Compatibility annotations. The 
+default is “<literal>a</literal>”.</para>
+</listitem>
+</varlistentry>
+<varlistentry><term><literal>generate-start</literal></term>
+<listitem><para>If true, Trang will generate a start element.
+</para></listitem>
+</varlistentry>
+</variablelist>
+
+<para>The encoding parameter is not supported for DTDs.</para>
+
+</refsection>
+
+<refsection>
+<title>RELAX NG source parameters</title>
+
+<variablelist>
+<varlistentry><term><literal>encoding</literal></term>
+<listitem><para>The input encoding.</para>
+</listitem>
+</varlistentry>
+</variablelist>
+</refsection>
+</refsection>
+
+<refsection>
+<title>Result parameters</title>
+
+<para>Several parameters are common to all of the result formats.</para>
+
+<variablelist>
+<varlistentry><term><literal>encoding</literal></term>
+<listitem><para>The output encoding.
+</para></listitem>
+</varlistentry>
+<varlistentry><term><literal>indent</literal></term>
+<listitem><para>Indent by the specified number of spaces when nesting.
+</para></listitem>
+</varlistentry>
+<varlistentry><term><literal>lineLength</literal></term>
+<listitem><para>The maximum line length. Must be a value between 20 and 1024.
+(This parameter is “lineLength”, not “line-length”.)
+</para></listitem>
+</varlistentry>
+</variablelist>
+
+<refsection>
+<title>XML Schema result parameters</title>
+
+<para>Several additional result parameters are supported for XML Schema results.</para>
+
+<variablelist>
+<varlistentry><term><literal>disable-abstract-elements</literal></term>
+<listitem><para>If true, Trang won’t use abstract elements and substitution groups.
+</para></listitem>
+</varlistentry>
+<varlistentry><term><literal>any-process-contents</literal></term>
+<listitem><para>The <code>processContents</code> value for “<literal>any</literal>” elements.
+</para></listitem>
+</varlistentry>
+<varlistentry><term><literal>any-attribute-process-contents</literal></term>
+<listitem><para>The <code>processContents</code> value for “<literal>anyAttribute</literal>” elements.
+</para></listitem>
+</varlistentry>
+</variablelist>
+
+<para>Consult the Trang documentation for more details.</para>
+
+</refsection>
+</refsection>
+
+</refsection>
+</refentry>

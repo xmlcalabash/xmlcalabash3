@@ -37,6 +37,7 @@ class CommonEnvironment(private val xmlCalabash: XmlCalabash) {
             "cpio" to "application/x-cpio",
             "css" to "text/plain",
             "csv" to "text/csv",
+            "dtd" to "application/xml-dtd",
             "eps" to "image/eps",
             "fo" to "application/xml",
             "gif" to "image/gif",

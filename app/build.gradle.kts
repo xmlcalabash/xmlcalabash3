@@ -81,6 +81,7 @@ dependencies {
   implementation(project(":ext:railroad"))
   implementation(project(":ext:rdf"))
   implementation(project(":ext:selenium"))
+  implementation(project(":ext:trang"))
   implementation(project(":ext:unique-id"))
   implementation(project(":ext:wait-for-update"))
   implementation(project(":ext:xmlunit"))

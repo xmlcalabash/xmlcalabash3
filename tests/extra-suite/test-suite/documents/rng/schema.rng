@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<grammar ns="http://example.com/ns" xmlns:ex="http://example.com/ns" xmlns="http://relaxng.org/ns/structure/1.0">
+  <start>
+    <ref name="ex.first"/>
+  </start>
+  <define name="ex.first">
+    <element name="ex:first">
+      <ref name="a"/>
+      <ref name="b"/>
+    </element>
+  </define>
+  <include href="core.rng"/>
+</grammar>
