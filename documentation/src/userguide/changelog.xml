@@ -13,6 +13,33 @@ See the commits and pull requests on
 finer detail.</para>
 
 <revhistory>
+<revision xml:id="r300-alpha25">
+<revnumber>3.0.0-alpha25</revnumber>
+<date>2025-03-23</date>
+<revdescription>
+<itemizedlist>
+<listitem><para>Added <tag>cx:trang</tag> and <tag>cx:trang-files</tag> steps.
+</para></listitem>
+<listitem><para>Fixed <ghissue number="361"/>. The regular expression used to match
+the URI scheme was woefully inadequate.
+</para></listitem>
+<listitem><para>Fixed <ghissue number="352"/> by supporting an explicit syntax
+for specifying the content type of inputs specified on the command line. This is
+especially relevant when reading from standard input as the name gives no hints
+about the content type.
+</para></listitem>
+<listitem><para>Fixed <ghissue number="351"/>. This release includes a
+substantial revision to SVG diagrams of pipelines and graphs. This has no
+user-visible effects unless you’re interested in styling the SVG diagrams.
+</para></listitem>
+<listitem><para>Fixed <ghissue number="349"/> by documenting the <option>--nogo</option> option.
+</para></listitem>
+<listitem><para>Fixed <ghissue number="348"/> by documenting the
+<option>format</option> option values for <tag>p:archive</tag> and
+<tag>p:unarchive</tag>. </para></listitem>
+</itemizedlist>
+</revdescription>
+</revision>
 <revision xml:id="r300-alpha24">
 <revnumber>3.0.0-alpha24</revnumber>
 <date>2025-03-16</date>
