@@ -12,8 +12,15 @@ class MediaType private constructor(val mediaType: String, val mediaSubtype: Str
                                     val parameters: List<MediaTypeParameter> = listOf()) {
     companion object {
         val ANY = MediaType("*", "*")
+        val AR = MediaType("application", "x-archive")
+        val ARJ = MediaType("application", "x-arj")
+        val CPIO = MediaType("application", "x-cpio")
+        val CSV = MediaType("text", "csv")
+        val DTD = MediaType("application", "xml-dtd")
         val GZIP = MediaType("application", "gzip")
         val HTML = MediaType("text", "html")
+        val JAR = MediaType("application", "java-archive")
+        val JAVA_PROPERTIES = MediaType("text", "x-java-properties")
         val JPEG = MediaType("image", "jpeg")
         val JSON = MediaType("application", "json")
         val MULTIPART = MediaType("multipart", "*")
@@ -21,23 +28,18 @@ class MediaType private constructor(val mediaType: String, val mediaSubtype: Str
         val OCTET_STREAM = MediaType("application", "octet-stream")
         val PDF = MediaType("application", "pdf")
         val PNG = MediaType("image", "png")
+        val RNC =  MediaType("application", "relax-ng-compact-syntax")
+        val SEVENZ = MediaType("application", "x-7z-compressed")
+        val SVG = MediaType("image", "svg", "xml")
+        val TAR = MediaType("application", "x-tar")
         val TEXT = MediaType("text", "plain")
+        val TOML = MediaType("application", "toml")
         val XHTML = MediaType("application", "xhtml", "xml")
         val XML  = MediaType("application", "xml")
-        val SVG = MediaType("image", "svg", "xml")
         val XQUERY = MediaType("application", "xquery")
         val XSLT = MediaType("application", "xslt", "xml")
         val YAML = MediaType("application", "vnd.yaml")
-        val TOML = MediaType("application", "toml")
-        val CSV = MediaType("text", "csv")
         val ZIP = MediaType("application", "zip")
-        val JAR = MediaType("application", "java-archive")
-        val TAR = MediaType("application", "x-tar")
-        val AR = MediaType("application", "x-archive")
-        val ARJ = MediaType("application", "x-arj")
-        val CPIO = MediaType("application", "x-cpio")
-        val SEVENZ = MediaType("application", "x-7z-compressed")
-        val JAVA_PROPERTIES = MediaType("text", "x-java-properties")
 
         val JSONLD = MediaType("application", "ld", "json")
         val N3 = MediaType("text", "n3")
@@ -47,17 +49,11 @@ class MediaType private constructor(val mediaType: String, val mediaSubtype: Str
         val RDFTHRIFT = MediaType("application", "rdf", "thrift")
         val RDFXML = MediaType("application", "rdf", "xml")
         val SPARQL = MediaType("application", "sparql-query")
-        val SPARQL_RESULTS_XML = MediaType("application", "sparql-results", "xml")
         val SPARQL_RESULTS_JSON = MediaType("application", "sparql-results", "json")
+        val SPARQL_RESULTS_XML = MediaType("application", "sparql-results", "xml")
         val TRIG = MediaType("application", "trig")
         val TRIX = MediaType("application", "trix", "xml")
         val TURTLE = MediaType("text", "turtle")
-
-        val XML_OR_HTML = listOf<MediaType>(
-            MediaType("application", "xml"),
-            MediaType("text", "xml"),
-            MediaType("*", "*", "xml")
-        )
 
         val MATCH_XML = listOf<MediaType>(
             MediaType("application", "xml"),
@@ -84,7 +80,8 @@ class MediaType private constructor(val mediaType: String, val mediaSubtype: Str
 
         val MATCH_TEXT = listOf<MediaType>(
             MediaType("text", "*"),
-            MediaType("application", "relax-ng-compact-syntax"),
+            MediaType.RNC,
+            MediaType("application", "xml-dtd"),
             MediaType("application", "xquery"),
             MediaType("application", "javascript"),
             MediaType("application", "trig"),

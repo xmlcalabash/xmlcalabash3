@@ -69,7 +69,7 @@ load. Add a <tag>selenium</tag> element to your configuration:</para>
 list of regular expressions. If the page URI matches one of those regular expressions,
 the step will run.
 <error code="cxerr:XC0023">It is a <glossterm>dynamic
-error</glossterm> if page URI does not match at least one of the whitelist expressions.</error>
+error</glossterm> if the page URI does not match at least one of the whitelist expressions.</error>
 </para>
 
 </refsection>

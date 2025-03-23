@@ -392,6 +392,19 @@ open class XProcError protected constructor(val code: QName, val variant: Int, e
         fun xcxSeleniumNotWhitelisted(uri: String) = xstep(23, uri)
         fun xcxSeleniumInvalidScript(message: String) = xstep(24, message)
 
+        fun xcxTrangSourceRequired() = xstep(25)
+        fun xcxTrangNoXsdSource() = xstep(26)
+        fun xcxTrangInvalidOptionValue(option: String, value: String) = xstep(27, option, value)
+        // 28
+        fun xcxTrangBaseUriRequired() = xstep(29)
+        fun xcxTrangFileUriRequired() = xstep(30)
+        fun xcxTrangUnsupportedInputFormat(format: String) = xstep(31, format)
+        fun xcxTrangUnsupportedOutputFormat(format: String) = xstep(32, format)
+        fun xcxTrangCannotDetermineFormat() = xstep(33)
+        fun xcxTrangUnsupportedXmlFormat() = xstep(34)
+        fun xcxTrangUnresolvedInput(resolved: String) = xstep(35, resolved)
+        fun xcxTrangIdenticalFormats(format: String) = xstep(36, format)
+
         fun xiNoSuchOutputPort(port: String)= internal(1, port)
         fun xiImpossibleNodeType(type: XdmNodeKind) = internal(2, type)
         fun xiThreadInterrupted() = internal(3)

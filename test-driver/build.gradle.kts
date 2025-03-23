@@ -47,6 +47,7 @@ dependencies {
   implementation(project(":ext:markup-blitz"))
   implementation(project(":ext:selenium"))
   implementation(project(":ext:ebnf-convert"))
+  implementation(project(":ext:trang"))
 
   transformation ("net.sf.saxon:Saxon-HE:${saxonVersion}")
 }

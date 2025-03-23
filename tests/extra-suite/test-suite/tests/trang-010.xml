@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<t:test expected="pass"
+        xmlns:t="http://xproc.org/ns/testsuite/3.0">
+  <t:info>
+    <t:title>trang-010</t:title>
+    <t:revision-history>
+      <t:revision>
+        <t:date>2025-03-23</t:date>
+        <t:author>
+          <t:name>Norm Tovey-Walsh</t:name>
+        </t:author>
+        <t:description xmlns="http://www.w3.org/1999/xhtml">
+          <p>Created test.</p>
+        </t:description>
+      </t:revision>
+    </t:revision-history>
+  </t:info>
+  <t:description xmlns="http://www.w3.org/1999/xhtml">
+    <p>Tests RNC to XSD</p>
+  </t:description>
+  <t:pipeline>
+<p:declare-step xmlns:p="http://www.w3.org/ns/xproc"
+                xmlns:cx="http://xmlcalabash.com/ns/extensions"
+                name="main" version="3.0">
+  <p:import href="https://xmlcalabash.com/ext/library/trang.xpl"/>
+  <p:output port="result" sequence="true"/>
+
+  <cx:trang output-base-uri="http://example.com/schemas/" result-format="xsd">
+    <p:with-input expand-text="false">
+      <p:inline content-type="application/relax-ng-compact-syntax">
+doc = element doc { attlist.doc, p+ }
+attlist.doc &amp;= empty
+p = element p { attlist.p, text* }
+attlist.p &amp;= empty
+start = doc
+      </p:inline>
+    </p:with-input>
+  </cx:trang>
+</p:declare-step>
+  </t:pipeline>
+  <t:schematron>
+    <s:schema queryBinding="xslt2"
+              xmlns:s="http://purl.oclc.org/dsdl/schematron">
+      <s:ns prefix="rng" uri="http://relaxng.org/ns/structure/1.0"/>
+      <s:ns prefix="xs" uri="http://www.w3.org/2001/XMLSchema"/>
+      <s:pattern>
+        <s:rule context="/">
+          <s:assert test="xs:schema">The root is wrong.</s:assert>
+        </s:rule>
+      </s:pattern>
+    </s:schema>
+  </t:schematron>
+</t:test>

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<t:test expected="fail" code="cxerr:XC0036"
+        xmlns:cxerr="http://xmlcalabash.com/ns/error"
+        xmlns:t="http://xproc.org/ns/testsuite/3.0">
+  <t:info>
+    <t:title>trang-004</t:title>
+    <t:revision-history>
+      <t:revision>
+        <t:date>2025-03-23</t:date>
+        <t:author>
+          <t:name>Norm Tovey-Walsh</t:name>
+        </t:author>
+        <t:description xmlns="http://www.w3.org/1999/xhtml">
+          <p>Created test.</p>
+        </t:description>
+      </t:revision>
+    </t:revision-history>
+  </t:info>
+  <t:description xmlns="http://www.w3.org/1999/xhtml">
+    <p>Tests DTD to DTD</p>
+  </t:description>
+  <t:pipeline>
+<p:declare-step xmlns:p="http://www.w3.org/ns/xproc"
+                xmlns:cx="http://xmlcalabash.com/ns/extensions"
+                name="main" version="3.0">
+  <p:import href="https://xmlcalabash.com/ext/library/trang.xpl"/>
+  <p:output port="result" sequence="true"/>
+
+  <cx:trang output-base-uri="http://example.com/schemas/" result-format="dtd">
+    <p:with-input>
+      <p:inline content-type="application/xml-dtd"><![CDATA[
+<!ELEMENT doc (p+)>
+<!ELEMENT p (#PCDATA)*>
+      ]]></p:inline>
+    </p:with-input>
+  </cx:trang>
+</p:declare-step>
+  </t:pipeline>
+</t:test>

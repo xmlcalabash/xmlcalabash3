@@ -1,0 +1,8 @@
+<?xml encoding="UTF-8"?>
+
+<!ELEMENT ex:first (ex:a,ex:b)>
+<!ATTLIST ex:first
+  xmlns:ex CDATA #FIXED 'http://example.com/ns'>
+
+<!ENTITY % core SYSTEM "core.dtd">
+%core;

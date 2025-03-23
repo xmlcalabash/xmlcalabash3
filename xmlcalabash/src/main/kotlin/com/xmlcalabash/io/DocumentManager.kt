@@ -78,8 +78,12 @@ class DocumentManager(): EntityResolver, EntityResolver2, ResourceResolver, Modu
         return current
     }
 
-    fun lookup(href: URI): URI {
-        val req = resolver.getRequest("${href}")
+    fun lookup(href: URI, baseUri: URI? = null): URI {
+        val req = if (baseUri == null) {
+            resolver.getRequest("${href}")
+        } else {
+            resolver.getRequest("${href}", "${baseUri}")
+        }
         val resp = resolver.lookup(req)
         if (resp.resolvedURI != null) {
             return resp.resolvedURI
