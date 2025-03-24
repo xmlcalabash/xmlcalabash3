@@ -22,9 +22,9 @@ class PipelineVisualization private constructor(val instruction: XProcInstructio
 
     private var root: Compound? = null
     private var parent: Compound? = null
-    private val readableMap = mutableMapOf<PortBindingContainer,Int>()
-    private val writeableMap = mutableMapOf<PortBindingContainer,Int>()
-    private val pipeToPort = mutableMapOf<PipeInstruction,PortBindingContainer>()
+    private val readableMap = mutableMapOf<BindingContainer,Int>()
+    private val writeableMap = mutableMapOf<BindingContainer,Int>()
+    private val pipeToPort = mutableMapOf<PipeInstruction,BindingContainer>()
     private val compoundDepends = mutableMapOf<CompoundStepDeclaration, Int>()
     private val allPrefixes = mutableMapOf<String, NamespaceUri>()
     private var gPrefix = "g"
@@ -57,7 +57,7 @@ class PipelineVisualization private constructor(val instruction: XProcInstructio
         builder.endDocument()
         val xml = builder.result
 
-        val readFrom = mutableSetOf<PortBindingContainer>()
+        val readFrom = mutableSetOf<BindingContainer>()
         readFrom.addAll(readableMap.keys.filter { it !is OutputInstruction || it.parent !is DeclareStepInstruction })
         for ((_, readable) in pipeToPort) {
             readFrom.remove(readable)
@@ -154,6 +154,11 @@ class PipelineVisualization private constructor(val instruction: XProcInstructio
             readableMap[input] = iport.id
         }
 
+        for (input in step.children.filterIsInstance<WithOptionInstruction>()) {
+            val iport = head.addInput(input)
+            writeableMap[input] = iport.id
+        }
+
         for (output in step.children.filterIsInstance<OutputInstruction>()) {
             val iport = foot.addInput(output)
             writeableMap[output] = iport.id
@@ -229,6 +234,11 @@ class PipelineVisualization private constructor(val instruction: XProcInstructio
             writeableMap[input] = port.id
         }
 
+        for (input in step.children.filterIsInstance<WithOptionInstruction>()) {
+            val iport = atomic.addInput(input)
+            writeableMap[input] = iport.id
+        }
+
         for (output in step.children.filterIsInstance<WithOutputInstruction>()) {
             val port = atomic.addOutput(output)
             readableMap[output] = port.id
@@ -240,7 +250,7 @@ class PipelineVisualization private constructor(val instruction: XProcInstructio
             when (child) {
                 is CompoundStepDeclaration -> Unit
                 is PipeInstruction -> {
-                    val to = writeableMap[node as PortBindingContainer]!!
+                    val to = writeableMap[node as BindingContainer]!!
                     val fromPort = pipeToPort[child]
                     if (fromPort == null) {
                         val depends = findCompoundDepends(child, node)
@@ -252,7 +262,11 @@ class PipelineVisualization private constructor(val instruction: XProcInstructio
                         while (step !is StepDeclaration) {
                             step = step.parent!!
                         }
-                        compound.edges.add(Edge(from, to, step.name, fromPort.port, child.step!!, child.port!!, child.implicit))
+                        if (fromPort is PortBindingContainer) {
+                            compound.edges.add(Edge(from, to, step.name, fromPort.port, child.step!!, child.port!!, child.implicit))
+                        } else {
+                            compound.edges.add(Edge(from, to, step.name, "result", child.step!!, child.port!!, child.implicit))
+                        }
                     }
                 }
                 else -> addPipes(compound, child)
@@ -389,6 +403,13 @@ class PipelineVisualization private constructor(val instruction: XProcInstructio
         fun addInput(input: PortBindingContainer): NamedPort {
             val port = NamedPort(nsmap, input.port, input.primary == true, input.sequence == true)
             port.weldedShut = input.weldedShut
+            inputs.add(port)
+            return port
+        }
+
+        fun addInput(input: WithOptionInstruction): NamedPort {
+            val port = NamedPort(nsmap, "Q{${input.name.namespaceUri}}${input.name.localName}", true, true)
+            port.weldedShut = false
             inputs.add(port)
             return port
         }
