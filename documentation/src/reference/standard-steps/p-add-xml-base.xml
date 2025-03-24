@@ -60,7 +60,7 @@ base URIs.</para>
 <programlisting language="xml"><xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="../../../build/examples/results/add-xml-base-001.xml" parse="text"/></programlisting>
 
 <para>The
-<tag>p:add-base-uri</tag> step makes each element’s base URI explicit using
+<tag>p:add-xml-base</tag> step makes each element’s base URI explicit using
 <biblioref linkend="xml-base"/>. Consequently,
 the base URI of the second <tag>example</tag> has been recorded in
 an explicit <tag class="attribute">xml:base</tag> attribute.</para>

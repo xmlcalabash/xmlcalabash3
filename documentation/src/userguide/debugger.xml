@@ -627,7 +627,7 @@ by the model or <command>subpipeline</command> commands.)</para>
 command to inspect the values of the options. We could also use the <command>set</command>
 command to <emphasis>change them</emphasis>.</para>
 
-<para>Let’s set a breakpoint on the <tag>ex:ident</tag> step:</para>
+<para>Let’s set a breakpoint on the <code>ex:ident</code> step:</para>
 
 <screen><prompt>> </prompt><userinput>up</userinput>
 <prompt>> </prompt><userinput>stack</userinput>
@@ -644,7 +644,7 @@ id2            ... p:identity</computeroutput>
 <prompt>> </prompt><userinput>break on declare-step_2</userinput>
 <prompt>> </prompt></screen>
 
-<para>We need the id of the <tag>ex:ident</tag> step. To find it, we navigate up
+<para>We need the id of the <code>ex:ident</code> step. To find it, we navigate up
 to the stack frame for the compound step, then we look at its <command>subpipeline</command>.
 The step we’re interested is the one named “<literal>declare_step_2</literal>.
 Once we know its id, we can set a breakpoint on it.</para>

@@ -657,8 +657,8 @@ between the user guide and the reference.
 <para>Fixed
 <link xlink:href="https://github.com/xmlcalabash/xmlcalabash3/issues/130">issue #130</link>.
 There was a typo in the Relax NG grammar for the configuration file that caused
-<code>cc:mimetype</code> to appear twice when the second occurrence should have
-been <code>cc:paged-media</code>.
+<tag>cc:mimetype</tag> to appear twice when the second occurrence should have
+been <tag>cc:paged-media</tag>
 </para>
 </listitem>
 <listitem>

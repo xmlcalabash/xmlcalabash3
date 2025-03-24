@@ -42,6 +42,16 @@
                     select="@format"/>
     <xsl:with-param name="namespace" tunnel="yes"
                     select="@ns"/>
+    <xsl:with-param name="xml-id" tunnel="yes" as="xs:string?">
+      <xsl:choose>
+        <xsl:when test="@xml:id">
+          <xsl:sequence select="@xml:id"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:sequence select="@name"/>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:with-param>
     <xsl:with-param name="suppress-prefix" tunnel="yes"
                     select="@suppress-prefix"/>
   </xsl:apply-templates>
@@ -52,6 +62,7 @@
   <xsl:param name="prefix" as="xs:string" tunnel="yes"/>
   <xsl:param name="format" as="xs:string?" tunnel="yes"/>
   <xsl:param name="namespace" as="xs:string?" tunnel="yes"/>
+  <xsl:param name="xml-id" as="xs:string?" tunnel="yes"/>
 
   <xsl:variable name="rngpat" select="."/>
   <xsl:variable name="class" select="()"/>
@@ -82,9 +93,8 @@
       <xsl:if test="$namespace">
         <xsl:attribute name="namespace" select="$namespace"/>
       </xsl:if>
-
-      <xsl:if test="@xml:id">
-	<xsl:attribute name="xml:id" select="@xml:id"/>
+      <xsl:if test="$xml-id != ''">
+	<xsl:attribute name="xml:id" select="$xml-id"/>
       </xsl:if>
 
       <xsl:attribute name="prefix" select="$prefix"/>
