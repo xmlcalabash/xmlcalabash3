@@ -4,7 +4,7 @@ import com.xmlcalabash.io.MessagePrinter
 import java.io.PrintStream
 
 class DefaultMessagePrinter(override val encoding: String) : MessagePrinter {
-    private var _printStream: PrintStream = System.out
+    private var _printStream: PrintStream = System.err
     private val stream: PrintStream
         get() = _printStream
     private val mustSanitize = !encoding.lowercase().startsWith("utf")
