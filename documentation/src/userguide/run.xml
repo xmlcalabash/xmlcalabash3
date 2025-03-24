@@ -194,8 +194,13 @@ output port is bound to some other output, no output will be sent to standard ou
 
 <para>If piped mode is not enabled, and no port is explicitly bound to standard
 output, the pipeline will write the output from all otherwise unbound output
-ports to standard output. If standard output appears to be going to a terminal
-window:</para>
+ports to standard output. If exactly one port is being written to standard
+output, and if that port cannot produce a sequence, then the output is written
+directly to standard output.</para>
+
+<para>If more than one port may appear on standard output, or if a sequence of
+documents may appear, and if standard output appears to be going to a terminal
+window, “decoration” is added as an aid to comprehension:</para>
 
 <itemizedlist>
 <listitem>
@@ -216,8 +221,9 @@ one document is output).</para>
 
 <para>The method for determining whether output is going to a terminal or being
 redirected isn’t terribly sophisticated and may be wrong in some
-circumstances. It’s safer to use <option>--output</option> to write to a file
-if you want to save the output or enable piped mode.</para>
+circumstances. It’s safer to explicitly enable piped mode or
+use <option>--output</option> to write to a file
+if you want to save the output.</para>
 </listitem>
 </varlistentry>
 

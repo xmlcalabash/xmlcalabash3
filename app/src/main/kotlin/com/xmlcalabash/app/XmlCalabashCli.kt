@@ -312,7 +312,7 @@ class XmlCalabashCli private constructor() {
                 pipeline.option(name, XProcDocument.ofValue(value, stepConfig, MediaType.OCTET_STREAM, DocumentProperties()))
             }
 
-            pipeline.receiver = FileOutputReceiver(xmlCalabash, xmlCalabash.saxonConfig.processor, commandLine.outputs, explicitStdout ?: implicitStdout)
+            pipeline.receiver = FileOutputReceiver(xmlCalabash, xmlCalabash.saxonConfig.processor, pipeline.outputManifold, commandLine.outputs, explicitStdout ?: implicitStdout)
             pipeline.run()
         } catch (ex: Exception) {
             if (ex is XProcException) {
