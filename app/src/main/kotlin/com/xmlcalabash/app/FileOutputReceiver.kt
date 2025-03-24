@@ -3,6 +3,7 @@ package com.xmlcalabash.app
 import com.xmlcalabash.config.XmlCalabash
 import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.io.DocumentWriter
+import com.xmlcalabash.runtime.api.RuntimePort
 import com.xmlcalabash.util.DefaultOutputReceiver
 import net.sf.saxon.s9api.Processor
 import org.apache.logging.log4j.kotlin.logger
@@ -10,9 +11,10 @@ import java.io.FileOutputStream
 
 class FileOutputReceiver(xmlCalabash: XmlCalabash,
                          processor: Processor,
+                         outputManifold: Map<String,RuntimePort>,
                          val files: Map<String,OutputFilename>,
                          val stdout: String?
-): DefaultOutputReceiver(xmlCalabash, processor) {
+): DefaultOutputReceiver(xmlCalabash, processor, outputManifold, outputManifold.keys - files.keys) {
 
     private val wroteTo = mutableSetOf<String>()
 

@@ -6,15 +6,19 @@ import com.xmlcalabash.io.DocumentWriter
 import com.xmlcalabash.namespace.Ns
 import com.xmlcalabash.runtime.XProcStepConfiguration
 import com.xmlcalabash.runtime.api.Receiver
+import com.xmlcalabash.runtime.api.RuntimePort
 import net.sf.saxon.s9api.Processor
 import org.apache.logging.log4j.kotlin.logger
 
-open class DefaultOutputReceiver(val xmlCalabash: XmlCalabash, val processor: Processor): Receiver {
-    constructor(config: XProcStepConfiguration): this(config.xmlCalabash, config.processor)
+open class DefaultOutputReceiver(val xmlCalabash: XmlCalabash,
+                                 val processor: Processor,
+                                 val outputManifold: Map<String, RuntimePort>,
+                                 val ports: Set<String> = outputManifold.keys): Receiver {
+    constructor(config: XProcStepConfiguration, outputManifold: Map<String, RuntimePort>): this(config.xmlCalabash, config.processor, outputManifold)
 
     companion object {
         // This is a crude check, if you really care, use --output
-        private val writingToTerminal = System.console() != null
+        private val writingToTerminal = true // System.console() != null
         private var debugOutputShown = false // man, this is persnickty
     }
 
@@ -38,6 +42,9 @@ open class DefaultOutputReceiver(val xmlCalabash: XmlCalabash, val processor: Pr
         val contentType = document.contentType
         val writer = DocumentWriter(document, System.out)
 
+        val runtimePort = outputManifold[port]
+        val decorate = writingToTerminal && (runtimePort?.sequence == true || ports.size > 1)
+
         if (xmlCalabash.xmlCalabashConfig.pipe) {
             writer.write()
             return
@@ -49,11 +56,11 @@ open class DefaultOutputReceiver(val xmlCalabash: XmlCalabash, val processor: Pr
             "=== ${port} :: ${position} :: ${document.baseURI} ===".padEnd(72, '=')
         }
 
-        if (writingToTerminal) {
+        if (decorate) {
             println(header)
         }
 
-        if (writingToTerminal && contentType != null) {
+        if (decorate && contentType != null) {
             if (contentType.classification() in listOf(MediaClassification.XML, MediaClassification.XHTML, MediaClassification.HTML)) {
                 writer[Ns.encoding] = xmlCalabash.xmlCalabashConfig.consoleEncoding
                 if (xmlCalabash.xmlCalabashConfig.consoleEncoding.lowercase() == "utf-8") {
@@ -65,7 +72,7 @@ open class DefaultOutputReceiver(val xmlCalabash: XmlCalabash, val processor: Pr
 
         writer.write()
 
-        if (writingToTerminal) {
+        if (decorate) {
             println("".padEnd(header.length, '='))
         }
     }
