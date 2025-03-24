@@ -208,7 +208,7 @@
 
  }"/>
 
-<xsl:variable name="not-xprocref" select="()"/>
+<xsl:variable name="not-xprocref" select="('p:message')"/>
 
 <xsl:template match="db:para[@role='external-refs']">
   <xsl:if test="node()">
@@ -296,6 +296,70 @@
       <span class="newinver">{$version}</span>
     </xsl:if>
   </li>
+</xsl:template>
+
+<xsl:template match="db:tag">
+  <xsl:variable name="formatted" as="element()">
+    <xsl:next-match/>
+  </xsl:variable>
+
+  <xsl:variable name="tagname" select="normalize-space(string(.))"/>
+
+  <xsl:variable name="link-to" as="xs:string"
+                select="replace($tagname, ':', '-')"/>
+
+  <xsl:variable name="target" as="element()?"
+                select="id($link-to)"/>
+
+  <xsl:element name="{node-name($formatted)}"
+               namespace="{namespace-uri-from-QName(node-name($formatted))}">
+    <xsl:copy-of select="$formatted/@*"/>
+    <xsl:choose>
+      <xsl:when test="@class = 'attribute' or not(contains($tagname, ':')) or @namespace">
+        <xsl:sequence select="$formatted/node()"/>
+      </xsl:when>
+      <xsl:when test="exists($target) and $target = ancestor::*">
+        <xsl:sequence select="$formatted/node()"/>
+      </xsl:when>
+
+      <xsl:when test="$tagname = ('p:document', 'p:with-input')">
+        <a href="https://spec.xproc.org/master/head/xproc/#p.{substring-after($tagname, 'p:')}">
+          <xsl:sequence select="$formatted/node()"/>
+        </a>
+      </xsl:when>
+      <xsl:when test="$tagname = 'xsl:message'">
+        <a href="https://www.w3.org/TR/xslt-30/#element-message">
+          <xsl:sequence select="$formatted/node()"/>
+        </a>
+      </xsl:when>
+
+      <xsl:when test="starts-with($tagname, 'cc:')">
+        <a href="https://docs.xmlcalabash.com/userguide/current/configuration.html#{replace($tagname,':','.')}">
+          <xsl:sequence select="$formatted/node()"/>
+        </a>
+      </xsl:when>
+
+      <xsl:when test="starts-with($tagname, 'xvrl:')">
+        <a href="https://spec.xproc.org/master/head/xvrl/">
+          <xsl:sequence select="$formatted/node()"/>
+        </a>
+      </xsl:when>
+
+      <xsl:when test="starts-with($tagname, 'c:')">
+        <xsl:sequence select="$formatted/node()"/>
+      </xsl:when>
+
+      <xsl:when test="exists($target)">
+        <a href="#{$link-to}">
+          <xsl:sequence select="$formatted/node()"/>
+        </a>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:message select="'No target:', $tagname"/>
+        <xsl:sequence select="$formatted/node()"/>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:element>
 </xsl:template>
 
 <!-- ============================================================ -->

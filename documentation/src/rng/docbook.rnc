@@ -31,6 +31,7 @@ _any_xproc_syntax =
 rng.pattern =
     element rng-pattern {
         attribute schema { text }?,
+        attribute xml:id { xsd:NCName }?,
         attribute name { text },
         attribute ns { text }?,
         attribute prefix { text }?,

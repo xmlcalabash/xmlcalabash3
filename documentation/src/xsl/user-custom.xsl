@@ -85,4 +85,84 @@
   </header>
 </xsl:template>
 
+<xsl:template match="db:tag">
+  <xsl:variable name="formatted" as="element()">
+    <xsl:next-match/>
+  </xsl:variable>
+
+  <xsl:variable name="tagname" select="normalize-space(string(.))"/>
+
+  <xsl:variable name="link-to" as="xs:string"
+                select="if (exists(id(replace($tagname, ':', '.'))))
+                        then replace($tagname, ':', '.')
+                        else replace($tagname, ':', '-')"/>
+
+  <xsl:variable name="target" as="element()?"
+                select="id($link-to)"/>
+
+  <xsl:element name="{node-name($formatted)}"
+               namespace="{namespace-uri-from-QName(node-name($formatted))}">
+    <xsl:sequence select="$formatted/@*"/>
+    <xsl:choose>
+      <xsl:when test="@class = 'attribute' or not(contains($tagname, ':')) or @namespace">
+        <xsl:sequence select="$formatted/node()"/>
+      </xsl:when>
+      <xsl:when test="exists($target) and $target = ancestor::*">
+        <xsl:sequence select="$formatted/node()"/>
+      </xsl:when>
+
+      <xsl:when test="$tagname = ('p:atomic', 'p:catch', 'p:choose', 'p:declare-step', 
+                                  'p:document', 'p:documentation', 'p:empty', 'p:extension', 
+                                  'p:finally', 'p:for-each', 'p:group', 'p:if', 'p:import', 
+                                  'p:import-functions', 'p:inline', 'p:input', 'p:library', 
+                                  'p:option', 'p:otherwise', 'p:output', 'p:pipe', 'p:pipeinfo', 
+                                  'p:try', 'p:variable', 'p:viewport', 'p:when', 'p:with-input', 
+                                  'p:with-option')">
+        <a href="https://spec.xproc.org/master/head/xproc/#p.{substring-after($tagname, 'p:')}">
+          <xsl:sequence select="$formatted/node()"/>
+        </a>
+      </xsl:when>
+
+      <xsl:when test="$tagname = 'xsd:schema'">
+        <a href="https://www.w3.org/TR/xmlschema11-1/#Schemas">
+          <xsl:sequence select="$formatted/node()"/>
+        </a>
+      </xsl:when>
+
+      <xsl:when test="$tagname = 's:schema'">
+        <a href="https://schematron.com/">
+          <xsl:sequence select="$formatted/node()"/>
+        </a>
+      </xsl:when>
+
+      <xsl:when test="$tagname = 'xvrl:report'">
+        <a href="https://spec.xproc.org/master/head/xvrl/">
+          <xsl:sequence select="$formatted/node()"/>
+        </a>
+      </xsl:when>
+
+      <!-- Speculatively, the rest are steps. -->
+      <xsl:when test="starts-with($tagname, 'p:') or starts-with($tagname, 'cx:')">
+        <a href="https://docs.xmlcalabash.com/reference/current/{replace($tagname, ':', '-')}">
+          <xsl:sequence select="$formatted/node()"/>
+        </a>
+      </xsl:when>
+
+      <xsl:when test="starts-with($tagname, 'c:')">
+        <xsl:sequence select="$formatted/node()"/>
+      </xsl:when>
+
+      <xsl:when test="exists($target)">
+        <a href="#{$link-to}">
+          <xsl:sequence select="$formatted/node()"/>
+        </a>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:message select="'No target:', $tagname"/>
+        <xsl:sequence select="$formatted/node()"/>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:element>
+</xsl:template>
+
 </xsl:stylesheet>

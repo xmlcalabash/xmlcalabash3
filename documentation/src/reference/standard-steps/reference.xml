@@ -1,80 +1,83 @@
 <?xml version="1.0" encoding="utf-8"?>
-<part xmlns="http://docbook.org/ns/docbook" xml:id="standard-steps" version="5.2">
+<part xmlns="http://docbook.org/ns/docbook"
+      xmlns:xi="http://www.w3.org/2001/XInclude"
+      xml:id="standard-steps" version="5.2">
 <?db filename="standard-steps"?>
 <info>
   <title>Standard steps</title>
 </info>
 
-<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="p-add-attribute.xml"/>
-<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="p-add-xml-base.xml"/>
-<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="p-archive.xml"/>
-<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="p-archive-manifest.xml"/>
-<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="p-cast-content-type.xml"/>
-<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="p-compare.xml"/>
-<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="p-compress.xml"/>
-<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="p-count.xml"/>
-<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="p-css-formatter.xml"/>
-<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="p-delete.xml"/>
-<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="p-directory-list.xml"/>
-<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="p-encode.xml"/>
-<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="p-error.xml"/>
-<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="p-file-copy.xml"/>
-<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="p-file-create-tempfile.xml"/>
-<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="p-file-delete.xml"/>
-<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="p-file-info.xml"/>
-<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="p-file-mkdir.xml"/>
-<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="p-file-move.xml"/>
-<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="p-file-touch.xml"/>
-<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="p-filter.xml"/>
-<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="p-hash.xml"/>
-<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="p-http-request.xml"/>
-<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="p-identity.xml"/>
-<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="p-insert.xml"/>
-<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="p-invisible-xml.xml"/>
-<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="p-json-join.xml"/>
-<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="p-json-merge.xml"/>
-<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="p-label-elements.xml"/>
-<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="p-load.xml"/>
-<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="p-make-absolute-uris.xml"/>
-<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="p-markdown-to-html.xml"/>
-<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="p-namespace-delete.xml"/>
-<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="p-namespace-rename.xml"/>
-<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="p-os-exec.xml"/>
-<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="p-os-info.xml"/>
-<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="p-pack.xml"/>
-<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="p-rename.xml"/>
-<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="p-replace.xml"/>
-<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="p-send-mail.xml"/>
-<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="p-set-attributes.xml"/>
-<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="p-set-properties.xml"/>
-<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="p-sink.xml"/>
-<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="p-sleep.xml"/>
-<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="p-split-sequence.xml"/>
-<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="p-store.xml"/>
-<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="p-string-replace.xml"/>
-<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="p-text-count.xml"/>
-<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="p-text-head.xml"/>
-<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="p-text-join.xml"/>
-<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="p-text-replace.xml"/>
-<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="p-text-sort.xml"/>
-<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="p-text-tail.xml"/>
-<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="p-unarchive.xml"/>
-<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="p-uncompress.xml"/>
-<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="p-unwrap.xml"/>
-<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="p-uuid.xml"/>
-<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="p-validate-with-dtd.xml"/>
-<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="p-validate-with-json-schema.xml"/>
-<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="p-validate-with-nvdl.xml"/>
-<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="p-validate-with-relax-ng.xml"/>
-<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="p-validate-with-schematron.xml"/>
-<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="p-validate-with-xml-schema.xml"/>
-<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="p-wrap.xml"/>
-<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="p-wrap-sequence.xml"/>
-<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="p-www-form-urldecode.xml"/>
-<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="p-www-form-urlencode.xml"/>
-<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="p-xinclude.xml"/>
-<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="p-xquery.xml"/>
-<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="p-xsl-formatter.xml"/>
-<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="p-xslt.xml"/>
+<xi:include href="p-add-attribute.xml"/>
+<xi:include href="p-add-xml-base.xml"/>
+<xi:include href="p-archive.xml"/>
+<xi:include href="p-archive-manifest.xml"/>
+<xi:include href="p-cast-content-type.xml"/>
+<xi:include href="p-compare.xml"/>
+<xi:include href="p-compress.xml"/>
+<xi:include href="p-count.xml"/>
+<xi:include href="p-css-formatter.xml"/>
+<xi:include href="p-delete.xml"/>
+<xi:include href="p-directory-list.xml"/>
+<xi:include href="p-encode.xml"/>
+<xi:include href="p-error.xml"/>
+<xi:include href="p-file-copy.xml"/>
+<xi:include href="p-file-create-tempfile.xml"/>
+<xi:include href="p-file-delete.xml"/>
+<xi:include href="p-file-info.xml"/>
+<xi:include href="p-file-mkdir.xml"/>
+<xi:include href="p-file-move.xml"/>
+<xi:include href="p-file-touch.xml"/>
+<xi:include href="p-filter.xml"/>
+<xi:include href="p-hash.xml"/>
+<xi:include href="p-http-request.xml"/>
+<xi:include href="p-identity.xml"/>
+<xi:include href="p-insert.xml"/>
+<xi:include href="p-invisible-xml.xml"/>
+<xi:include href="p-json-join.xml"/>
+<xi:include href="p-json-merge.xml"/>
+<xi:include href="p-label-elements.xml"/>
+<xi:include href="p-load.xml"/>
+<xi:include href="p-make-absolute-uris.xml"/>
+<xi:include href="p-markdown-to-html.xml"/>
+<xi:include href="p-message.xml"/>
+<xi:include href="p-namespace-delete.xml"/>
+<xi:include href="p-namespace-rename.xml"/>
+<xi:include href="p-os-exec.xml"/>
+<xi:include href="p-os-info.xml"/>
+<xi:include href="p-pack.xml"/>
+<xi:include href="p-rename.xml"/>
+<xi:include href="p-replace.xml"/>
+<xi:include href="p-send-mail.xml"/>
+<xi:include href="p-set-attributes.xml"/>
+<xi:include href="p-set-properties.xml"/>
+<xi:include href="p-sink.xml"/>
+<xi:include href="p-sleep.xml"/>
+<xi:include href="p-split-sequence.xml"/>
+<xi:include href="p-store.xml"/>
+<xi:include href="p-string-replace.xml"/>
+<xi:include href="p-text-count.xml"/>
+<xi:include href="p-text-head.xml"/>
+<xi:include href="p-text-join.xml"/>
+<xi:include href="p-text-replace.xml"/>
+<xi:include href="p-text-sort.xml"/>
+<xi:include href="p-text-tail.xml"/>
+<xi:include href="p-unarchive.xml"/>
+<xi:include href="p-uncompress.xml"/>
+<xi:include href="p-unwrap.xml"/>
+<xi:include href="p-uuid.xml"/>
+<xi:include href="p-validate-with-dtd.xml"/>
+<xi:include href="p-validate-with-json-schema.xml"/>
+<xi:include href="p-validate-with-nvdl.xml"/>
+<xi:include href="p-validate-with-relax-ng.xml"/>
+<xi:include href="p-validate-with-schematron.xml"/>
+<xi:include href="p-validate-with-xml-schema.xml"/>
+<xi:include href="p-wrap.xml"/>
+<xi:include href="p-wrap-sequence.xml"/>
+<xi:include href="p-www-form-urldecode.xml"/>
+<xi:include href="p-www-form-urlencode.xml"/>
+<xi:include href="p-xinclude.xml"/>
+<xi:include href="p-xquery.xml"/>
+<xi:include href="p-xsl-formatter.xml"/>
+<xi:include href="p-xslt.xml"/>
 
 </part>

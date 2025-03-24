@@ -63,7 +63,7 @@ processor is not available, processing will fallback to the other. (If neither
 is available, the step will fail.)</para>
 
 <para>You can also specify the processor on a per-step basis by setting the
-extension attribute <tag>cx:processor</tag> to 
+extension attribute <tag class="attribute">cx:processor</tag> to 
 “<literal>nineml</literal>” or “<literal>markup-blitz</literal>”.</para>
 
 <para>If the Markup Blitz extension step is available, you can also run

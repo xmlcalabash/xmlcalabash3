@@ -6,25 +6,28 @@ start = cx.messages
 
 cx.messages =
     element cx:messages {
+        [ db:purpose
+              [ "The individual messages" ]
+        ]
         cx.message*
     }
 
 cx.message =
     element cx:message {
         [ db:purpose
-              [ "The logging level." ]
+              [ "The logging level" ]
         ]
         attribute level { "TRACE" | "DEBUG" | "INFO" | "WARN" | "ERROR" },
         [ db:purpose
-              [ "The message text." ]
+              [ "The message text" ]
         ]
         attribute message { text },
         [ db:purpose
-              [ "The message timestamp (local time)." ]
+              [ "The message timestamp (local time)" ]
         ]
         attribute date { xsd:dateTime },
         [ db:purpose
-              [ "Any additional attributes are allowed." ]
+              [ "Any additional attributes are allowed" ]
         ]
         attribute * { text }, 
         empty
