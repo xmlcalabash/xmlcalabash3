@@ -130,13 +130,13 @@ class VisualizerOutput(val xmlCalabash: XmlCalabash, val description: XProcDescr
         val styledGraphs = mutableListOf<XdmNode>()
 
         for (pipeline in description.pipelines) {
-            val result = transform(xsltExec, pipeline.asSource(),
+            val result = transform(xsltExec, pipeline,
                 if (store) "${outputDirectory}pipelines/${description.pipelineName(pipeline)}${ext}" else null)
             styledPipelines.add(result)
         }
 
         for (graph in description.graphs) {
-            val result = transform(xsltExec, graph.asSource(),
+            val result = transform(xsltExec, graph,
                 if (store) "${outputDirectory}graphs/${description.graphName(graph)}${ext}" else null)
             styledGraphs.add(result)
         }
@@ -153,14 +153,15 @@ class VisualizerOutput(val xmlCalabash: XmlCalabash, val description: XProcDescr
         xsltCompiler.isSchemaAware = description.stepConfig.processor.isSchemaAware
         xsltCompiler.resourceResolver = VisualizerResourceResolver()
         val xsltExec = xsltCompiler.compile(styleSource)
-        transform(xsltExec, description.xml().asSource(), "${outputDirectory}/index.html",
+        transform(xsltExec, description.xml(), "${outputDirectory}/index.html",
             mapOf(Ns.version to XdmAtomicValue(description.stepConfig.environment.productVersion)))
     }
 
-    private fun transform(xsltExec: XsltExecutable, source: Source, filename: String?, params: Map<QName, XdmAtomicValue> = emptyMap()): XdmNode {
+    private fun transform(xsltExec: XsltExecutable, source: XdmNode, filename: String?, params: Map<QName, XdmAtomicValue> = emptyMap()): XdmNode {
         val transformer = xsltExec.load30()
         transformer.setStylesheetParameters(params)
         val xmlResult = XdmDestination()
+        transformer.globalContextItem = source
         transformer.applyTemplates(source, xmlResult)
         val result = xmlResult.xdmNode
         filename?.let { writeNode(it, result) }
@@ -213,8 +214,10 @@ class VisualizerOutput(val xmlCalabash: XmlCalabash, val description: XProcDescr
         val xsltExec = xsltCompiler.compile(styleSource)
 
         val source = SAXSource(InputSource(svgFile.absolutePath))
+        val builder = description.stepConfig.processor.newDocumentBuilder()
+        val xml = builder.build(source)
 
-        transform(xsltExec, source, "${path}${basename}.html",
+        transform(xsltExec, xml, "${path}${basename}.html",
             mapOf(
                 Ns.version to XdmAtomicValue(description.stepConfig.environment.productVersion),
                 QName("basename") to XdmAtomicValue(basename),
