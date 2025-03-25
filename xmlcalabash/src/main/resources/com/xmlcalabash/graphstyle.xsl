@@ -8,6 +8,8 @@
                 exclude-result-prefixes="xs"
                 expand-text="yes"
                 version="3.0">
+<xsl:import href="https://xmlcalabash.com/xsl/static.xsl"/>
+
 <xsl:output method="xml" encoding="utf-8" indent="no"/>
 
 <xsl:key name="port" match="g:port" use="@id"/>
@@ -29,10 +31,7 @@
 <xsl:template match="g:declare-step">
   <xsl:copy>
     <xsl:apply-templates select="@*"/>
-    <xsl:attribute name="dot:label"
-                   select="if (starts-with(@name, '!'))
-                           then 'p:declare-step'
-                           else 'p:declare-step “' || @name || '”'"/>
+    <xsl:call-template name="container-style"/>
 
     <xsl:apply-templates select="node()"/>
     
@@ -58,13 +57,9 @@
 </xsl:template>
 
 <xsl:template match="g:compound-step">
-  <xsl:variable name="label"
-                select="if (starts-with(@name, '!'))
-                        then @type || g:step-number(root(), @type, @id)
-                        else @type || g:step-number(root(), @type, @id) || ' “' || @name || '”'"/>
   <xsl:copy>
     <xsl:apply-templates select="@*"/>
-    <xsl:attribute name="dot:label" select="$label"/>
+    <xsl:call-template name="container-style"/>
     <xsl:apply-templates select="node()"/>
     <xsl:call-template name="add-sinks"/>
   </xsl:copy>
@@ -95,7 +90,6 @@
 
 <xsl:template match="g:head|g:foot">
   <xsl:copy>
-    <xsl:attribute name="dot:shape" select="'parallelogram'"/>
     <xsl:attribute name="dot:peripheries" select="0"/>
     <xsl:attribute name="h:cellspacing" select="0"/>
     <xsl:attribute name="h:border" select="0"/>
@@ -105,7 +99,10 @@
 </xsl:template>
 
 <xsl:template match="g:atomic-step|g:subpipeline">
-  <g:atomic-step dot:peripheries="0" h:cellspacing="0" h:border="0" h:cellborder="1">
+  <g:atomic-step dot:peripheries="0"
+                 h:cellspacing="0"
+                 h:border="0"
+                 h:cellborder="1">
     <xsl:apply-templates select="@*"/>
 
     <xsl:apply-templates select="g:inputs"/>
@@ -115,24 +112,42 @@
         <xsl:choose>
           <xsl:when test="@variable-name">
             <g:detail><td>variable</td></g:detail>
-            <g:detail><td>${string(@variable-name)}</td></g:detail>
+            <g:detail><td bgcolor="{$light-orange}">${string(@variable-name)}</td></g:detail>
           </xsl:when>
           <xsl:when test="@option-name">
             <g:detail><td>option</td></g:detail>
-            <g:detail><td>${string(@option-name)}</td></g:detail>
+            <g:detail><td bgcolor="{$light-orange}">${string(@option-name)}</td></g:detail>
           </xsl:when>
           <xsl:otherwise>
             <g:detail><td>cx:expression</td></g:detail>
           </xsl:otherwise>
         </xsl:choose>
-        
+
+        <xsl:variable name="width" select="24"/>
         <xsl:choose>
           <xsl:when test="not(@expression)"/>
-          <xsl:when test="string-length(@expression) lt 20">
-            <g:detail><td><i>{string(@expression)} </i></td></g:detail>
+          <xsl:when test="string-length(@expression) lt $width">
+            <g:detail>
+              <td>
+                <font face="{$expression-font}"
+                      point-size="10"
+                      >{string(@expression)}</font>
+              </td>
+            </g:detail>
           </xsl:when>
           <xsl:otherwise>
-            <g:detail><td><i>{substring(@expression, 1, 20)}… </i></td></g:detail>
+            <xsl:variable name="first"
+                          select="substring(@expression, 1, $width idiv 2)"/>
+            <xsl:variable name="last"
+                          select="substring(@expression,
+                                     string-length(@expression) - ($width idiv 2))"/>
+            <g:detail>
+              <td>
+                <font face="{$expression-font}"
+                      point-size="10"
+                      >{$first} ⋯ {$last}</font>
+              </td>
+            </g:detail>
           </xsl:otherwise>
         </xsl:choose>
       </xsl:when>
@@ -140,6 +155,9 @@
       <xsl:otherwise>
         <g:detail>
           <td>
+            <xsl:if test="not(starts-with(@type, 'cx:'))">
+              <xsl:attribute name="bgcolor" select="$light-orange"/>
+            </xsl:if>
             <xsl:choose>
               <xsl:when test="self::g:subpipeline">
                 <xsl:attribute name="href" select="'#cluster_' || replace(@ref, '-', '_')"/>
@@ -210,6 +228,34 @@
     <xsl:sequence select="($style, $head, $tail)"/>
     <xsl:apply-templates select="@*, node()"/>
   </g:edge>
+</xsl:template>
+
+<!-- ============================================================ -->
+
+<xsl:template name="container-style">
+  <xsl:variable name="label" as="xs:string">
+    <xsl:choose>
+      <xsl:when test="self::g:declare-step">
+        <xsl:sequence
+            select="if (starts-with(@name, '!'))
+                    then 'p:declare-step'
+                    else 'p:declare-step “' || @name || '”'"/>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:sequence 
+            select="if (starts-with(@name, '!'))
+                    then @type || g:step-number(root(), @type, @id)
+                    else @type || g:step-number(root(), @type, @id)
+                               || ' “' || @name || '”'"/>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:variable>
+
+    <xsl:attribute name="dot:label" select="$label"/>
+    <xsl:attribute name="dot:fontname" select="$label-font"/>
+    <xsl:attribute name="dot:style" select="'rounded'"/>
+    <xsl:attribute name="dot:color" select="$sky-blue"/>
+    <xsl:attribute name="dot:penwidth" select="2"/>
 </xsl:template>
 
 <!-- ============================================================ -->
