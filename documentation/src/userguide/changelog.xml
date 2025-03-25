@@ -13,6 +13,39 @@ See the commits and pull requests on
 finer detail.</para>
 
 <revhistory>
+
+<revision xml:id="r300-alpha26">
+<revnumber>3.0.0-alpha26</revnumber>
+<date>2025-03-25</date>
+<revdescription>
+<itemizedlist>
+<listitem><para>Fixed <ghissue number="372"/>. The graph
+visualizer was completely unprepared for connections to option
+expressions.
+</para></listitem>
+<listitem><para>Fixed <ghissue number="370"/> by sending message output to
+standard error instead of standard output. This assures that message
+output and pipeline output don’t clash. Writing to standard error should
+probably have been the default from the beginning. </para></listitem>
+<listitem><para>Fixed <ghissue number="365"/>. Documentation
+improvements; step names are now links to the appropriate 
+reference page.
+</para></listitem>
+<listitem><para>(Re)fixed <ghissue number="361"/>. Make sure
+that the global context item is initialized (so that the custom
+stylesheet can define global variables).
+</para></listitem>
+<listitem><para>Fixed <ghissue number="360"/>.
+Attempted to improve the way writing pipeline output to standard output is handled.
+Pipeline output to standard output is “undecorated” if only
+one port is being output and it cannot produce a sequence.
+</para></listitem>
+<listitem><para>I made some aesthetic improvements, well, changes
+at least, to the SVG graph styling: curved borders, a few colors.
+</para></listitem>
+</itemizedlist>
+</revdescription>
+</revision>
 <revision xml:id="r300-alpha25">
 <revnumber>3.0.0-alpha25</revnumber>
 <date>2025-03-23</date>
