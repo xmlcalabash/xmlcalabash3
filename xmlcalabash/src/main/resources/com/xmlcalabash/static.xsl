@@ -3,6 +3,19 @@
                 exclude-result-prefixes="xs"
                 version="3.0">
 
+<xsl:variable name="black" select="'#000000'"/>
+<xsl:variable name="orange" select="'#e69f00'"/>
+<xsl:variable name="light-orange" select="'#edc571'"/>
+<xsl:variable name="sky-blue" select="'#56b4e9'"/>
+<xsl:variable name="green" select="'#009e73'"/>
+<xsl:variable name="yellow" select="'#f0e442'"/>
+<xsl:variable name="blue" select="'#0072b2'"/>
+<xsl:variable name="red" select="'#d55e00'"/>
+<xsl:variable name="purple" select="'#cc79a7'"/>
+
+<xsl:variable name="label-font" select="'sans-serif'"/>
+<xsl:variable name="expression-font" select="'monospace'"/>
+
 <xsl:variable name="logo" as="xs:string">
 R0lGODlhMAAxAPcAAP///wAAAP7+/v39/fz8/Pv7+/r6+vn5+fj4+Pf39/b29vX19fT09PPz8/Ly8vHx
 8fDw8O/v7+7u7u3t7ezs7Ovr6+rq6unp6ejo6Ofn5+bm5uXl5eTk5OPj4+Li4uHh4eDg4N/f397e3t3d
