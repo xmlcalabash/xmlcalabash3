@@ -13,6 +13,8 @@
 <xsl:output method="xml" encoding="utf-8" indent="no"/>
 
 <xsl:key name="port" match="g:port" use="@id"/>
+<xsl:key name="edge-from" match="g:edge" use="@from"/>
+<xsl:key name="edge-to" match="g:edge" use="@to"/>
 
 <xsl:mode on-no-match="shallow-copy"/>
 
@@ -190,6 +192,13 @@
     </xsl:choose>
     <xsl:apply-templates select="g:outputs"/>
   </g:atomic-step>
+</xsl:template>
+
+<xsl:template match="g:inputs">
+  <xsl:copy>
+    <xsl:sequence select="@*"/>
+    <xsl:apply-templates select="g:port[exists(key('edge-to', @id))]"/>
+  </xsl:copy>
 </xsl:template>
 
 <xsl:template match="g:atomic-step[@type='cx:sink']">
