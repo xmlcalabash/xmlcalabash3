@@ -1,18 +1,13 @@
 package com.xmlcalabash.xvrl
 
-import com.xmlcalabash.namespace.NsSvrl
-import com.xmlcalabash.namespace.NsXml
+import com.xmlcalabash.config.StepConfiguration
 import com.xmlcalabash.namespace.NsXvrl
-import com.xmlcalabash.runtime.XProcStepConfiguration
 import com.xmlcalabash.util.SaxonTreeBuilder
-import net.sf.saxon.om.NamespaceUri
-import net.sf.saxon.s9api.Axis
 import net.sf.saxon.s9api.QName
 import net.sf.saxon.s9api.XdmNode
-import net.sf.saxon.s9api.XdmNodeKind
 import java.net.URI
 
-class XvrlReports private constructor(stepConfig: XProcStepConfiguration): XvrlElement(stepConfig) {
+class XvrlReports private constructor(stepConfig: StepConfiguration): XvrlElement(stepConfig) {
     lateinit var _metadata: XvrlReportMetadata
     val metadata: XvrlReportMetadata
         get() = _metadata
@@ -27,14 +22,14 @@ class XvrlReports private constructor(stepConfig: XProcStepConfiguration): XvrlE
         val _location = QName("location")
         val _context = QName("context")
 
-        fun newInstance(stepConfig: XProcStepConfiguration, attr: Map<QName,String?> = emptyMap()): XvrlReports {
+        fun newInstance(stepConfig: StepConfiguration, attr: Map<QName,String?> = emptyMap()): XvrlReports {
             val reports = XvrlReports(stepConfig)
             reports.commonAttributes(attr)
             reports._metadata = XvrlReportMetadata.newInstance(stepConfig)
             return reports
         }
 
-        fun newInstance(stepConfig: XProcStepConfiguration, metadata: XvrlReportMetadata, attr: Map<QName,String?> = emptyMap()): XvrlReports {
+        fun newInstance(stepConfig: StepConfiguration, metadata: XvrlReportMetadata, attr: Map<QName,String?> = emptyMap()): XvrlReports {
             val reports = XvrlReports(stepConfig)
             reports.commonAttributes(attr)
             reports._metadata = metadata
@@ -85,7 +80,7 @@ class XvrlReports private constructor(stepConfig: XProcStepConfiguration): XvrlE
         val digest = XvrlDigest(stepConfig)
         digest.valid = "undetermined"
 
-        builder.addStartElement(NsXvrl.reports, stepConfig.attributeMap(attributes))
+        builder.addStartElement(NsXvrl.reports, stepConfig.typeUtils.attributeMap(attributes))
         metadata.serialize(builder)
         for (item in reports) {
             item.serialize(builder)

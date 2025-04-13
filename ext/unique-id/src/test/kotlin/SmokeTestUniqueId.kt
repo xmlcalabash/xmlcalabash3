@@ -1,6 +1,5 @@
-import com.xmlcalabash.config.XmlCalabash
+import com.xmlcalabash.XmlCalabash
 import com.xmlcalabash.util.BufferingReceiver
-import com.xmlcalabash.util.DefaultXmlCalabashConfiguration
 import org.junit.jupiter.api.Assertions.fail
 import org.junit.jupiter.api.Test
 import java.io.File
@@ -9,8 +8,7 @@ import kotlin.collections.first
 class SmokeTestUniqueId {
     @Test
     fun testUniqueId() {
-        val config = DefaultXmlCalabashConfiguration()
-        val calabash = XmlCalabash.newInstance(config)
+        val calabash = XmlCalabash.newInstance()
         val parser = calabash.newXProcParser()
         val decl = parser.parse(File("src/test/resources/pipe.xpl").toURI())
         val runtime = decl.runtime()

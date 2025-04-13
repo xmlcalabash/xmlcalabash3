@@ -1,11 +1,12 @@
 package com.xmlcalabash.runtime
 
+import com.xmlcalabash.config.StepConfiguration
 import net.sf.saxon.om.NamespaceUri
 import net.sf.saxon.s9api.QName
 import net.sf.saxon.s9api.XdmItem
 import net.sf.saxon.s9api.XdmValue
 
-class ExpressionEvaluator(stepConfig: XProcStepConfiguration, val select: String) {
+class ExpressionEvaluator(stepConfig: StepConfiguration, val select: String) {
     private val processor = stepConfig.processor
     private val baseUri = stepConfig.baseUri
     private val namespaceBindings = mutableMapOf<String, NamespaceUri>()

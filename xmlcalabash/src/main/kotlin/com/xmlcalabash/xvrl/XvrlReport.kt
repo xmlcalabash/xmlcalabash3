@@ -1,5 +1,6 @@
 package com.xmlcalabash.xvrl
 
+import com.xmlcalabash.config.StepConfiguration
 import com.xmlcalabash.namespace.NsSaxon
 import com.xmlcalabash.namespace.NsSvrl
 import com.xmlcalabash.namespace.NsXml
@@ -23,22 +24,22 @@ import net.sf.saxon.trans.XPathException
 import org.apache.logging.log4j.kotlin.logger
 import java.net.URI
 
-class XvrlReport private constructor(stepConfig: XProcStepConfiguration, val metadata: XvrlReportMetadata): XvrlElement(stepConfig) {
+class XvrlReport private constructor(stepConfig: StepConfiguration, val metadata: XvrlReportMetadata): XvrlElement(stepConfig) {
     companion object {
-        fun newInstance(stepConfig: XProcStepConfiguration, attr: Map<QName,String?> = emptyMap()): XvrlReport {
+        fun newInstance(stepConfig: StepConfiguration, attr: Map<QName,String?> = emptyMap()): XvrlReport {
             val metadata = XvrlReportMetadata.newInstance(stepConfig)
             val report = XvrlReport(stepConfig, metadata)
             report.commonAttributes(attr)
             return report
         }
 
-        fun newInstance(stepConfig: XProcStepConfiguration, metadata: XvrlReportMetadata, attr: Map<QName,String?> = emptyMap()): XvrlReport {
+        fun newInstance(stepConfig: StepConfiguration, metadata: XvrlReportMetadata, attr: Map<QName,String?> = emptyMap()): XvrlReport {
             val report = XvrlReport(stepConfig, metadata)
             report.commonAttributes(attr)
             return report
         }
 
-        fun fromSvrl(stepConfig: XProcStepConfiguration, svrl: XdmNode): XvrlReport {
+        fun fromSvrl(stepConfig: StepConfiguration, svrl: XdmNode): XvrlReport {
             val report = newInstance(stepConfig)
             report.fromSvrl(svrl)
             return report
@@ -113,7 +114,7 @@ class XvrlReport private constructor(stepConfig: XProcStepConfiguration, val met
     }
 
     override fun serialize(builder: SaxonTreeBuilder) {
-        builder.addStartElement(NsXvrl.report, stepConfig.attributeMap(attributes))
+        builder.addStartElement(NsXvrl.report, stepConfig.typeUtils.attributeMap(attributes))
         metadata.serialize(builder)
         digest.clear()
         var overall = "true"

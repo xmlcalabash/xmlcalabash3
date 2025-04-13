@@ -56,7 +56,7 @@ open class SetPropertiesStep(): AbstractAtomicStep() {
             val value = setProperties[Ns.serialization]
             if (value is XdmMap) {
                 try {
-                    setProperties[Ns.serialization] = stepConfig.forceQNameKeys(value.underlyingValue)
+                    setProperties[Ns.serialization] = stepConfig.typeUtils.forceQNameKeys(value.underlyingValue)
                 } catch (ex: Exception) {
                     throw stepConfig.exception(XProcError.xdInvalidSerialization(value.toString()))
                 }

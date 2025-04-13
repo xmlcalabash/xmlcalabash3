@@ -10,6 +10,6 @@ import com.xmlcalabash.runtime.steps.AtomicOptionStep
 class AtomicBuiltinOptionModel(runtime: XProcRuntime, model: AtomicModel): AtomicBuiltinStepModel(runtime, model) {
     override fun runnable(config: XProcStepConfiguration): () -> AbstractStep {
         val externalName = (model.step as AtomicExpressionStepInstruction).externalName!!
-        return { AtomicOptionStep(config.copy(stepConfig), this, externalName) }
+        return { AtomicOptionStep(config.copy(), this, externalName) }
     }
 }

@@ -1,5 +1,6 @@
 package com.xmlcalabash.util.spi
 
+import com.xmlcalabash.config.StepConfiguration
 import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.io.DocumentManager
 import com.xmlcalabash.runtime.XProcStepConfiguration
@@ -24,7 +25,7 @@ class StandardDocumentResolver: DocumentResolverProvider, DocumentResolver {
         // nop
     }
 
-    override fun resolve(context: XProcStepConfiguration, uri: URI, current: XProcDocument?): XProcDocument? {
+    override fun resolve(context: StepConfiguration, uri: URI, current: XProcDocument?): XProcDocument? {
         // This method will never be called, but still...
         return current
     }

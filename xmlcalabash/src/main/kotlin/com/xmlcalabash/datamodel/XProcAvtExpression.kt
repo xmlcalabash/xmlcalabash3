@@ -1,14 +1,14 @@
 package com.xmlcalabash.datamodel
 
-import com.xmlcalabash.runtime.XProcStepConfiguration
+import com.xmlcalabash.config.StepConfiguration
 import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.util.ValueTemplate
 import net.sf.saxon.s9api.*
 import net.sf.saxon.type.StringConverter.StringToUntypedAtomic
 
-class XProcAvtExpression private constructor(stepConfig: XProcStepConfiguration, val avt: ValueTemplate, asType: SequenceType, values: List<XdmAtomicValue>): XProcExpression(stepConfig, asType, false, values) {
+class XProcAvtExpression private constructor(stepConfig: StepConfiguration, val avt: ValueTemplate, asType: SequenceType, values: List<XdmAtomicValue>): XProcExpression(stepConfig, asType, false, values) {
     companion object {
-        fun newInstance(stepConfig: XProcStepConfiguration, avt: ValueTemplate, asType: SequenceType = SequenceType.ANY, values: List<XdmAtomicValue> = emptyList()): XProcAvtExpression {
+        fun newInstance(stepConfig: StepConfiguration, avt: ValueTemplate, asType: SequenceType = SequenceType.ANY, values: List<XdmAtomicValue> = emptyList()): XProcAvtExpression {
             return XProcAvtExpression(stepConfig, avt, asType, values)
         }
     }
@@ -20,11 +20,11 @@ class XProcAvtExpression private constructor(stepConfig: XProcStepConfiguration,
         return this
     }
 
-    override fun xevaluate(config: XProcStepConfiguration): () -> XdmValue {
+    override fun xevaluate(config: StepConfiguration): () -> XdmValue {
         return { evaluate(config) }
     }
 
-    override fun evaluate(config: XProcStepConfiguration): XdmValue {
+    override fun evaluate(config: StepConfiguration): XdmValue {
         val sb = StringBuilder()
 
         for (index in avt.value.indices) {
@@ -64,7 +64,7 @@ class XProcAvtExpression private constructor(stepConfig: XProcStepConfiguration,
         if (asType !== SequenceType.ANY || values.isNotEmpty()) {
             // This must be an attribute, so treat the value as untyped atomic to begin with
             val value = StringToUntypedAtomic().convert(XdmAtomicValue(sb.toString()).underlyingValue)
-            return config.checkType(null, XdmAtomicValue(value), asType, values)
+            return config.typeUtils.checkType(null, XdmAtomicValue(value), asType, values)
         }
 
         return XdmAtomicValue(sb.toString())

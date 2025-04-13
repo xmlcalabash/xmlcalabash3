@@ -69,7 +69,7 @@ class SparqlStep(): AbstractRdfStep() {
         builder.addStartElement(NsSparqlResults.head)
         for (variable in queryResults.resultVars) {
             builder.addStartElement(NsSparqlResults.variable,
-                stepConfig.attributeMap(mapOf(Ns.name to variable)))
+                stepConfig.typeUtils.attributeMap(mapOf(Ns.name to variable)))
             builder.addEndElement()
         }
         builder.addEndElement()
@@ -80,7 +80,7 @@ class SparqlStep(): AbstractRdfStep() {
 
             for (variable in soln.varNames()) {
                 builder.addStartElement(NsSparqlResults.binding,
-                    stepConfig.attributeMap(mapOf(Ns.name to variable)))
+                    stepConfig.typeUtils.attributeMap(mapOf(Ns.name to variable)))
 
                 val node = soln.get(variable)
                 if (node.isLiteral) {
@@ -95,7 +95,7 @@ class SparqlStep(): AbstractRdfStep() {
                         attr[NsXml.lang] = node.asLiteral().language
                     }
 
-                    builder.addStartElement(NsSparqlResults.literal, stepConfig.attributeMap(attr))
+                    builder.addStartElement(NsSparqlResults.literal, stepConfig.typeUtils.attributeMap(attr))
                     builder.addText(node.asLiteral().toString())
                     builder.addEndElement()
                 } else if (node.isResource) {

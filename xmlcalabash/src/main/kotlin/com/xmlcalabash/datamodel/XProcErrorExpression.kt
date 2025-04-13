@@ -1,13 +1,13 @@
 package com.xmlcalabash.datamodel
 
-import com.xmlcalabash.runtime.XProcStepConfiguration
+import com.xmlcalabash.config.StepConfiguration
 import net.sf.saxon.s9api.SequenceType
 import net.sf.saxon.s9api.XdmAtomicValue
 import net.sf.saxon.s9api.XdmValue
 
-class XProcErrorExpression private constructor(stepConfig: XProcStepConfiguration): XProcExpression(stepConfig, SequenceType.ANY, false, emptyList()) {
+class XProcErrorExpression private constructor(stepConfig: StepConfiguration): XProcExpression(stepConfig, SequenceType.ANY, false, emptyList()) {
     companion object {
-        fun newInstance(stepConfig: XProcStepConfiguration): XProcErrorExpression {
+        fun newInstance(stepConfig: StepConfiguration): XProcErrorExpression {
             return XProcErrorExpression(stepConfig)
         }
     }
@@ -16,11 +16,11 @@ class XProcErrorExpression private constructor(stepConfig: XProcStepConfiguratio
         return error(stepConfig)
     }
 
-    override fun xevaluate(config: XProcStepConfiguration): () -> XdmValue {
+    override fun xevaluate(config: StepConfiguration): () -> XdmValue {
         return { evaluate(config) }
     }
 
-    override fun evaluate(config: XProcStepConfiguration): XdmValue {
+    override fun evaluate(config: StepConfiguration): XdmValue {
         throw UnsupportedOperationException("Attempt to evaluate error expression")
     }
 

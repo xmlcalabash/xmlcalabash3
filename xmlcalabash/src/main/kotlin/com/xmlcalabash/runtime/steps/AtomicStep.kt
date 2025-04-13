@@ -23,6 +23,7 @@ open class AtomicStep(config: XProcStepConfiguration, atomic: AtomicBuiltinStepM
     final override val params = RuntimeStepParameters(atomic.type, atomic.name, atomic.location,
         atomic.inputs, atomic.outputs, atomic.options)
     val implementation = atomic.provider()
+    val contextDocuments = mutableSetOf<XProcDocument>()
     val inputPorts = mutableSetOf<String>()
     val initiallyOpenPorts = mutableSetOf<String>()
     val openPorts = mutableSetOf<String>()
@@ -59,7 +60,8 @@ open class AtomicStep(config: XProcStepConfiguration, atomic: AtomicBuiltinStepM
         val error = checkInputPort(port, doc, params.inputs[port])
         if (error == null) {
             if (port.startsWith("Q{")) {
-                val name = stepConfig.parseQName(port)
+                contextDocuments.add(doc)
+                val name = stepConfig.typeUtils.parseQName(port)
                 if ((type.namespaceUri == NsP.namespace && name == Ns.message)
                     || (type.namespaceUri != NsP.namespace && name == NsP.message)) {
                     message = doc.value
@@ -70,11 +72,13 @@ open class AtomicStep(config: XProcStepConfiguration, atomic: AtomicBuiltinStepM
                 if (stepConfig.validationMode != ValidationMode.DEFAULT && params.inputs[port]?.primary == true) {
                     val curVal = doc.properties[NsCx.validationMode]?.underlyingValue?.stringValue
                     val validatable = (doc.value is XdmNode) &&!S9Api.isTextDocument(doc.value as XdmNode)
-                    if (validatable && (curVal == null || (curVal == "lax" && stepConfig.validationMode != ValidationMode.STRICT))) {
+                    if (false && validatable && (curVal == null || (curVal == "lax" && stepConfig.validationMode != ValidationMode.STRICT))) {
                         if (validator == null) {
                             validator = SaxonXsdValidator(stepConfig)
                         }
-                        implementation.input(port, validator!!.validate(doc))
+                        val valid = validator!!.validate(doc)
+                        stepConfig.saxonConfig.addProperties(valid)
+                        implementation.input(port, valid)
                     } else {
                         // This one's already validated or can't be validated
                         implementation.input(port, doc)
@@ -179,9 +183,18 @@ open class AtomicStep(config: XProcStepConfiguration, atomic: AtomicBuiltinStepM
         }
 
         val stepConfig = (implementation as AbstractAtomicStep).stepConfig
-        stepConfig.environment.xmlCalabash.newExecutionContext(stepConfig)
+
+        val execContext = stepConfig.saxonConfig.newExecutionContext(stepConfig)
+        for (doc in contextDocuments) {
+            execContext.addProperties(doc)
+        }
+
         runImplementation()
-        stepConfig.environment.xmlCalabash.releaseExecutionContext()
+
+        for (doc in contextDocuments) {
+            execContext.removeProperties(doc)
+        }
+        stepConfig.saxonConfig.releaseExecutionContext()
 
         for ((_, rpair) in receiver) {
             rpair.first.close(rpair.second)
@@ -200,6 +213,7 @@ open class AtomicStep(config: XProcStepConfiguration, atomic: AtomicBuiltinStepM
     override fun reset() {
         super.reset()
         implementation.reset()
+        contextDocuments.clear()
         openPorts.clear()
         openPorts.addAll(initiallyOpenPorts)
         inputErrors.clear()

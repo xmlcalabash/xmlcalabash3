@@ -1,6 +1,6 @@
 package com.xmlcalabash.util
 
-import com.xmlcalabash.config.XmlCalabash
+import com.xmlcalabash.XmlCalabash
 import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.io.DocumentWriter
@@ -34,7 +34,7 @@ class VisualizerOutput(val xmlCalabash: XmlCalabash, val description: XProcDescr
     }
 
     private var cleanupPerformed = false
-    private val debug = xmlCalabash.xmlCalabashConfig.debug
+    private val debug = xmlCalabash.config.debug
 
     fun xml() {
         try {
@@ -92,7 +92,7 @@ class VisualizerOutput(val xmlCalabash: XmlCalabash, val description: XProcDescr
         transformDescription(SAXSource(InputSource(styleStream)), ".xml")
 
         if (debug) {
-            val builder = SaxonTreeBuilder(xmlCalabash.saxonConfig.processor)
+            val builder = SaxonTreeBuilder(xmlCalabash.config.saxonConfiguration.processor)
             builder.startDocument(null)
             builder.addStartElement(NsDescription.g("description"))
             for (pipeline in description.pipelines) {
@@ -106,8 +106,8 @@ class VisualizerOutput(val xmlCalabash: XmlCalabash, val description: XProcDescr
             writeNode("${outputDirectory}pipeline.xml", builder.result)
         }
 
-        if (xmlCalabash.xmlCalabashConfig.graphStyle != null) {
-            val source = SAXSource(InputSource(xmlCalabash.xmlCalabashConfig.graphStyle!!.toString()))
+        if (xmlCalabash.config.graphStyle != null) {
+            val source = SAXSource(InputSource(xmlCalabash.config.graphStyle!!.toString()))
             transformDescription(source, ".xml")
         }
     }
@@ -179,7 +179,7 @@ class VisualizerOutput(val xmlCalabash: XmlCalabash, val description: XProcDescr
 
     private fun graphviz(path: String, basename: String) {
         val rt = Runtime.getRuntime()
-        val graphviz = xmlCalabash.xmlCalabashConfig.graphviz!!.absolutePath
+        val graphviz = xmlCalabash.config.graphviz!!.absolutePath
 
         val dotFile = File("${path}${basename}.dot")
         val svgFile = File("${path}${basename}.svg")

@@ -9,6 +9,12 @@ class Location(private val uri: URI?, lineNo: Int?, colNo: Int?) {
         val NULL = Location(null, null, null)
     }
 
+    init {
+        if (lineNo == 13 && colNo == 84) {
+            println("HERE")
+        }
+    }
+
     val baseUri: URI? = uri
     var _lineNumber: Int = lineNo ?: -1
     val lineNumber: Int = _lineNumber

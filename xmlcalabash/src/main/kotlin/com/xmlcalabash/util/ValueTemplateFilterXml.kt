@@ -1,5 +1,6 @@
 package com.xmlcalabash.util
 
+import com.xmlcalabash.config.StepConfiguration
 import com.xmlcalabash.datamodel.XProcExpression
 import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.exceptions.XProcError
@@ -33,7 +34,7 @@ class ValueTemplateFilterXml(val originalNode: XdmNode, val contentType: MediaTy
 
     private var contextItem: Any? = null
 
-    override fun containsMarkup(config: XProcStepConfiguration): Boolean {
+    override fun containsMarkup(config: StepConfiguration): Boolean {
         val compiler = config.newXPathCompiler()
         val exec = compiler.compile("//*")
         val selector = exec.load()
@@ -62,7 +63,7 @@ class ValueTemplateFilterXml(val originalNode: XdmNode, val contentType: MediaTy
         return usesFunctions
     }
 
-    override fun expandStaticValueTemplates(config: XProcStepConfiguration, initialExpand: Boolean, staticBindings: Map<QName, XProcExpression>): XdmNode {
+    override fun expandStaticValueTemplates(config: StepConfiguration, initialExpand: Boolean, staticBindings: Map<QName, XProcExpression>): XdmNode {
         contextItem = null
         this.initialExpand = initialExpand
         expandText.clear()
@@ -92,11 +93,11 @@ class ValueTemplateFilterXml(val originalNode: XdmNode, val contentType: MediaTy
         return xmlNode
     }
 
-    override fun expandValueTemplates(config: XProcStepConfiguration, contextItem: XProcDocument?, bindings: Map<QName, LazyValue>): XdmNode {
+    override fun expandValueTemplates(config: StepConfiguration, contextItem: XProcDocument?, bindings: Map<QName, LazyValue>): XdmNode {
         return expandValueTemplatesAny(config, contextItem, bindings)
     }
 
-    private fun expandValueTemplatesAny(config: XProcStepConfiguration, contextItem: XProcDocument?, bindings: Map<QName, LazyValue>): XdmNode {
+    private fun expandValueTemplatesAny(config: StepConfiguration, contextItem: XProcDocument?, bindings: Map<QName, LazyValue>): XdmNode {
         this.contextItem = contextItem
 
         expandText.clear()
@@ -118,7 +119,7 @@ class ValueTemplateFilterXml(val originalNode: XdmNode, val contentType: MediaTy
         return builder.result
     }
 
-    private fun filterValueTemplates(config: XProcStepConfiguration, builder: SaxonTreeBuilder, node: XdmNode) {
+    private fun filterValueTemplates(config: StepConfiguration, builder: SaxonTreeBuilder, node: XdmNode) {
         when (node.nodeKind) {
             XdmNodeKind.DOCUMENT -> node.axisIterator(Axis.CHILD).forEach { filterValueTemplates(config, builder, it) }
             XdmNodeKind.ELEMENT -> {
@@ -188,7 +189,7 @@ class ValueTemplateFilterXml(val originalNode: XdmNode, val contentType: MediaTy
                     }
                 }
 
-                builder.addStartElement(node, config.attributeMap(attrMap))
+                builder.addStartElement(node, config.typeUtils.attributeMap(attrMap))
                 for (childPair in nodes) {
                     if (childPair.first != null) {
                         builder.addSubtree(childPair.first!!)
@@ -211,7 +212,7 @@ class ValueTemplateFilterXml(val originalNode: XdmNode, val contentType: MediaTy
         }
     }
 
-    private fun filterValueTemplateNodes(config: XProcStepConfiguration, node: XdmNode): List<Pair<XdmValue?,String?>> {
+    private fun filterValueTemplateNodes(config: StepConfiguration, node: XdmNode): List<Pair<XdmValue?,String?>> {
         val nodes = mutableListOf<Pair<XdmValue?,String?>>()
         when (node.nodeKind) {
             XdmNodeKind.ELEMENT -> {
@@ -235,7 +236,7 @@ class ValueTemplateFilterXml(val originalNode: XdmNode, val contentType: MediaTy
         return nodes
     }
 
-    private fun removeInlineExpandText(config: XProcStepConfiguration, builder: SaxonTreeBuilder, node: XdmNode) {
+    private fun removeInlineExpandText(config: StepConfiguration, builder: SaxonTreeBuilder, node: XdmNode) {
         when (node.nodeKind) {
             XdmNodeKind.DOCUMENT -> node.axisIterator(Axis.CHILD).forEach { removeInlineExpandText(config, builder, it) }
             XdmNodeKind.ELEMENT -> {
@@ -245,7 +246,7 @@ class ValueTemplateFilterXml(val originalNode: XdmNode, val contentType: MediaTy
                         attrMap[attr.nodeName] = attr.stringValue
                     }
                 }
-                builder.addStartElement(node, config.attributeMap(attrMap))
+                builder.addStartElement(node, config.typeUtils.attributeMap(attrMap))
                 node.axisIterator(Axis.CHILD).forEach { removeInlineExpandText(config, builder, it) }
                 builder.addEndElement()
             }
@@ -253,7 +254,7 @@ class ValueTemplateFilterXml(val originalNode: XdmNode, val contentType: MediaTy
         }
     }
 
-    private fun considerValueTemplates(config: XProcStepConfiguration, context: XdmNode, text: String): String {
+    private fun considerValueTemplates(config: StepConfiguration, context: XdmNode, text: String): String {
         val avt = ValueTemplateParser.parse(config, text)
 
         if (avt.value.size == 1) {
@@ -305,7 +306,7 @@ class ValueTemplateFilterXml(val originalNode: XdmNode, val contentType: MediaTy
         return sb.toString()
     }
 
-    private fun considerValueTemplates(config: XProcStepConfiguration, builder: SaxonTreeBuilder, context: XdmNode, text: String) {
+    private fun considerValueTemplates(config: StepConfiguration, builder: SaxonTreeBuilder, context: XdmNode, text: String) {
         val nodes = considerValueTemplateNodes(config, context, text)
         for (pair in nodes) {
             if (pair.first != null) {
@@ -321,7 +322,7 @@ class ValueTemplateFilterXml(val originalNode: XdmNode, val contentType: MediaTy
         }
     }
 
-    private fun considerValueTemplateNodes(config: XProcStepConfiguration, context: XdmNode, text: String): List<Pair<XdmValue?,String?>> {
+    private fun considerValueTemplateNodes(config: StepConfiguration, context: XdmNode, text: String): List<Pair<XdmValue?,String?>> {
         val nodes = mutableListOf<Pair<XdmValue?,String?>>()
         val avt = ValueTemplateParser.parse(config, text)
 

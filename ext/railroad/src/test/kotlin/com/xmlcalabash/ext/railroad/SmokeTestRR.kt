@@ -1,9 +1,8 @@
 package com.xmlcalabash.ext.rr
 
-import com.xmlcalabash.config.XmlCalabash
+import com.xmlcalabash.XmlCalabash
 import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.util.BufferingReceiver
-import com.xmlcalabash.util.DefaultXmlCalabashConfiguration
 import net.sf.saxon.s9api.QName
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.fail
@@ -13,8 +12,7 @@ import java.net.URI
 
 class SmokeTestRR {
     private fun runPipelineGetAllResults(pipeline: URI, href: String? = null): List<XProcDocument> {
-        val config = DefaultXmlCalabashConfiguration()
-        val calabash = XmlCalabash.newInstance(config)
+        val calabash = XmlCalabash.newInstance()
         val parser = calabash.newXProcParser()
         val decl = parser.parse(pipeline)
         val runtime = decl.runtime()
@@ -47,5 +45,4 @@ class SmokeTestRR {
         val xml = result.value.toString()
         Assertions.assertTrue(xml.startsWith("<svg"))
     }
-
 }

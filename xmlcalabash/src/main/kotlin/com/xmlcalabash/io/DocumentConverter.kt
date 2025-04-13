@@ -1,13 +1,14 @@
 package com.xmlcalabash.io
 
+import com.xmlcalabash.config.StepConfiguration
 import com.xmlcalabash.documents.DocumentProperties
 import com.xmlcalabash.documents.XProcBinaryDocument
 import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.exceptions.XProcError
+import com.xmlcalabash.util.TypeUtils
 import com.xmlcalabash.namespace.Ns
 import com.xmlcalabash.namespace.NsC
 import com.xmlcalabash.namespace.NsFn
-import com.xmlcalabash.runtime.XProcStepConfiguration
 import com.xmlcalabash.spi.ContentTypeConverter
 import com.xmlcalabash.spi.ContentTypeConverterServiceProvider
 import com.xmlcalabash.util.MediaClassification
@@ -19,13 +20,12 @@ import nu.validator.htmlparser.common.XmlViolationPolicy
 import nu.validator.htmlparser.dom.HtmlDocumentBuilder
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
-import java.net.URI
 import java.nio.charset.Charset
 import java.nio.charset.StandardCharsets
 import java.util.*
 import javax.xml.transform.dom.DOMSource
 
-class DocumentConverter(val stepConfig: XProcStepConfiguration,
+class DocumentConverter(val stepConfig: StepConfiguration,
                         val doc: XProcDocument,
                         val contentType: MediaType,
                         externalSerialization: Map<QName, XdmValue> = emptyMap()): Marshaller(stepConfig) {
@@ -40,7 +40,7 @@ class DocumentConverter(val stepConfig: XProcStepConfiguration,
 
     init {
         _params.putAll(externalSerialization)
-        _params.putAll(stepConfig.asMap(doc.properties.getSerialization()))
+        _params.putAll(stepConfig.typeUtils.asMap(doc.properties.getSerialization()))
     }
 
     operator fun get(name: QName): XdmValue? {
@@ -126,7 +126,8 @@ class DocumentConverter(val stepConfig: XProcStepConfiguration,
                                 val qname = if (ns == null) {
                                     QName(key, child)
                                 } else {
-                                    QName("", ns, docContext.parseNCName(key))
+                                    val tutil = TypeUtils(docContext)
+                                    QName("", ns, tutil.parseNCName(key))
                                 }
                                 map = map.put(XdmAtomicValue(qname), XdmAtomicValue(value))
                             }
@@ -351,7 +352,7 @@ class DocumentConverter(val stepConfig: XProcStepConfiguration,
 
             MediaClassification.JSON -> {
                 try {
-                    val params = stepConfig.asXdmMap(serializationParameters)
+                    val params = stepConfig.typeUtils.asXdmMap(serializationParameters)
                     val json = runFunction("parse-json", listOf(doc.value, params))
                     return doc.with(json).with(contentType, true)
                 } catch (ex: SaxonApiException) {
@@ -404,7 +405,7 @@ class DocumentConverter(val stepConfig: XProcStepConfiguration,
 
                 val builder = SaxonTreeBuilder(stepConfig)
                 builder.startDocument(doc.baseURI)
-                builder.addStartElement(_properties, stepConfig.attributeMap(mapOf(
+                builder.addStartElement(_properties, stepConfig.typeUtils.attributeMap(mapOf(
                     Ns.version to "1.0"
                 )))
                 if (comment.isNotBlank()) {
@@ -413,7 +414,7 @@ class DocumentConverter(val stepConfig: XProcStepConfiguration,
                     builder.addEndElement()
                 }
                 for (key in properties.stringPropertyNames()) {
-                    builder.addStartElement(_entry, stepConfig.attributeMap(mapOf(
+                    builder.addStartElement(_entry, stepConfig.typeUtils.attributeMap(mapOf(
                         Ns.key to key
                     )))
                     builder.addText(properties.getProperty(key))
@@ -461,7 +462,7 @@ class DocumentConverter(val stepConfig: XProcStepConfiguration,
                     Ns.contentType to "${doc.contentType ?: MediaType.OCTET_STREAM}",
                     Ns.encoding to "base64"
                 )
-                builder.addStartElement(NsC.data, stepConfig.attributeMap(amap))
+                builder.addStartElement(NsC.data, stepConfig.typeUtils.attributeMap(amap))
                 builder.addText(Base64.getEncoder().encodeToString((doc as XProcBinaryDocument).binaryValue))
                 builder.addEndElement()
                 builder.endDocument()

@@ -3,8 +3,11 @@ package com.xmlcalabash.steps.internal
 import com.xmlcalabash.datamodel.XProcAvtExpression
 import com.xmlcalabash.datamodel.XProcConstantExpression
 import com.xmlcalabash.datamodel.XProcSelectExpression
+import com.xmlcalabash.documents.DocumentProperties
+import com.xmlcalabash.documents.LazyDocumentValue
 import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.exceptions.XProcError
+import com.xmlcalabash.namespace.Ns
 import com.xmlcalabash.namespace.NsCx
 import com.xmlcalabash.namespace.NsFn
 import com.xmlcalabash.namespace.NsP
@@ -12,6 +15,9 @@ import com.xmlcalabash.runtime.parameters.ExpressionStepParameters
 import com.xmlcalabash.steps.AbstractAtomicStep
 import net.sf.saxon.expr.parser.RoleDiagnostic
 import net.sf.saxon.s9api.SaxonApiException
+import net.sf.saxon.s9api.XdmArray
+import net.sf.saxon.s9api.XdmMap
+import net.sf.saxon.s9api.XdmNode
 import net.sf.saxon.s9api.XdmValue
 import java.util.function.Supplier
 
@@ -61,7 +67,7 @@ open class ExpressionStep(val params: ExpressionStepParameters): AbstractAtomicS
         for ((name, option) in params.options) {
             if (name in options) {
                 val value = options[name]!!.value
-                stepConfig.checkType(name, value, option.asType, option.values)
+                stepConfig.typeUtils.checkType(name, value, option.asType, option.values)
                 stepConfig.debug { "  ${name} = ${value}" }
                 expression.setBinding(name, value)
             } else {
@@ -72,9 +78,9 @@ open class ExpressionStep(val params: ExpressionStepParameters): AbstractAtomicS
         }
 
         val eager = if (params.extensionAttr.containsKey(NsCx.eager)) {
-            stepConfig.parseBoolean(params.extensionAttr[NsCx.eager]!!)
+            stepConfig.typeUtils.parseBoolean(params.extensionAttr[NsCx.eager]!!)
         } else {
-            stepConfig.environment.commonEnvironment.eagerEvaluation
+            stepConfig.xmlCalabashConfig.eagerEvaluation
         }
 
         val canBeLazy = !eager
@@ -83,8 +89,27 @@ open class ExpressionStep(val params: ExpressionStepParameters): AbstractAtomicS
                 && !expression.functionRefs.contains(Pair(NsFn.collection,0))
                 && !expression.functionRefs.contains(Pair(NsFn.collection,1))
 
-        val lazy: () -> XdmValue = {
-            try { expression.evaluate(stepConfig)
+        val lazy: () -> LazyDocumentValue = {
+            try {
+                val value = expression.evaluate(stepConfig)
+                var properties: DocumentProperties = DocumentProperties()
+                when (value) {
+                    is XdmNode -> {
+                        properties[Ns.baseUri] = value.baseURI
+                        properties[Ns.contentType] = "application/xml"
+                    }
+                    is XdmMap, is XdmArray -> {
+                        properties[Ns.contentType] = "application/json"
+                    }
+                    else -> Unit
+                }
+                for (context in contextItems) {
+                    if (context.value.underlyingValue === value.underlyingValue) {
+                        properties = DocumentProperties(context.properties)
+                        break;
+                    }
+                }
+                LazyDocumentValue(value, properties)
             } catch (ex: SaxonApiException) {
                 if (ex.message != null && ex.message!!.contains("context item is absent")) {
                     if (contextItems.size > 1) {
@@ -102,7 +127,8 @@ open class ExpressionStep(val params: ExpressionStepParameters): AbstractAtomicS
             receiver.output("result", XProcDocument(lazy, stepConfig))
         } else {
             stepConfig.debug { "  expression=${lazy()}" }
-            receiver.output("result", XProcDocument(lazy(), stepConfig))
+            val lazyValue = lazy()
+            receiver.output("result", XProcDocument(lazyValue.value, stepConfig, lazyValue.properties))
         }
     }
 

@@ -85,7 +85,7 @@ abstract class FileStep(val stepType: QName): AbstractAtomicStep() {
     protected fun errorDocument(source: URI?, errorCode: QName, target: URI? = null): XdmNode {
         val builder = SaxonTreeBuilder(stepConfig)
         builder.startDocument(source)
-        builder.addStartElement(NsC.error, stepConfig.attributeMap(mapOf(Ns.code to "{${errorCode.namespaceUri}}${errorCode.localName}")))
+        builder.addStartElement(NsC.error, stepConfig.typeUtils.attributeMap(mapOf(Ns.code to "{${errorCode.namespaceUri}}${errorCode.localName}")))
         if (source == null) {
             builder.addText("I/O error")
         } else {
@@ -120,7 +120,7 @@ abstract class FileStep(val stepType: QName): AbstractAtomicStep() {
 
         val body = exception.message ?: "???"
 
-        builder.addStartElement(NsC.error, stepConfig.attributeMap(amap))
+        builder.addStartElement(NsC.error, stepConfig.typeUtils.attributeMap(amap))
         builder.addText(body)
         builder.addEndElement()
     }

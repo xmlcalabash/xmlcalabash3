@@ -3,11 +3,18 @@ package com.xmlcalabash.util
 import com.xmlcalabash.io.MessagePrinter
 import java.io.PrintStream
 
-class DefaultMessagePrinter(override val encoding: String) : MessagePrinter {
+class DefaultMessagePrinter(encoding: String) : MessagePrinter {
+    private var _encoding: String = encoding
     private var _printStream: PrintStream = System.err
     private val stream: PrintStream
         get() = _printStream
     private val mustSanitize = !encoding.lowercase().startsWith("utf")
+
+    override val encoding: String = _encoding
+
+    override fun setEncoding(encoding: String) {
+        _encoding = encoding
+    }
 
     override fun setPrintStream(stream: PrintStream) {
         _printStream = stream

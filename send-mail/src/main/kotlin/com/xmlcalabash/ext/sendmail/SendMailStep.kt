@@ -55,7 +55,7 @@ class SendMailStep(): AbstractAtomicStep() {
 
     override fun setup(stepConfig: XProcStepConfiguration, receiver: Receiver, stepParams: RuntimeStepParameters) {
         super.setup(stepConfig, receiver, stepParams)
-        sendmail = stepConfig.saxonConfig.xmlCalabash.xmlCalabashConfig.sendmail
+        sendmail = stepConfig.xmlCalabashConfig.sendmail
     }
 
     override fun run() {

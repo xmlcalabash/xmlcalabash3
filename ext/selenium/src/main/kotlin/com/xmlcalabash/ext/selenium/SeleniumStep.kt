@@ -173,7 +173,7 @@ class SeleniumStep(): AbstractAtomicStep() {
     override fun run() {
         super.run()
 
-        val config = stepConfig.xmlCalabash.xmlCalabashConfig.other[selenium] ?: emptyList()
+        val config = stepConfig.xmlCalabashConfig.other[selenium] ?: emptyList()
         for (wlist in config) {
             val list = wlist[_whitelist] ?: ""
             for (regex in list.split("\\s+".toRegex())) {

@@ -1,15 +1,15 @@
 package com.xmlcalabash.xvrl
 
+import com.xmlcalabash.config.StepConfiguration
 import com.xmlcalabash.namespace.Ns
 import com.xmlcalabash.namespace.NsXvrl
-import com.xmlcalabash.runtime.XProcStepConfiguration
 import com.xmlcalabash.util.SaxonTreeBuilder
 import net.sf.saxon.s9api.QName
 import net.sf.saxon.s9api.XdmNode
 
-class XvrlValidator private constructor(stepConfiguration: XProcStepConfiguration): XvrlContainer(stepConfiguration) {
+class XvrlValidator private constructor(stepConfiguration: StepConfiguration): XvrlContainer(stepConfiguration) {
     companion object {
-        fun newInstance(stepConfig: XProcStepConfiguration, name: String, version: String?, attr: Map<QName,String?> = emptyMap()): XvrlValidator {
+        fun newInstance(stepConfig: StepConfiguration, name: String, version: String?, attr: Map<QName,String?> = emptyMap()): XvrlValidator {
             val validator = XvrlValidator(stepConfig)
             validator.setAttributes(attr)
             validator.setAttribute(Ns.name, name)
@@ -17,7 +17,7 @@ class XvrlValidator private constructor(stepConfiguration: XProcStepConfiguratio
             return validator
         }
 
-        fun newInstance(stepConfig: XProcStepConfiguration, name: String, version: String?, node: XdmNode, attr: Map<QName,String?> = emptyMap()): XvrlValidator {
+        fun newInstance(stepConfig: StepConfiguration, name: String, version: String?, node: XdmNode, attr: Map<QName,String?> = emptyMap()): XvrlValidator {
             val validator = XvrlValidator(stepConfig)
             validator.withNode(node)
             validator.setAttributes(attr)
@@ -26,7 +26,7 @@ class XvrlValidator private constructor(stepConfiguration: XProcStepConfiguratio
             return validator
         }
 
-        fun newInstance(stepConfig: XProcStepConfiguration, name: String, version: String?, text: String, attr: Map<QName,String?> = emptyMap()): XvrlValidator {
+        fun newInstance(stepConfig: StepConfiguration, name: String, version: String?, text: String, attr: Map<QName,String?> = emptyMap()): XvrlValidator {
             val validator = XvrlValidator(stepConfig)
             validator.withText(text)
             validator.setAttributes(attr)
@@ -35,7 +35,7 @@ class XvrlValidator private constructor(stepConfiguration: XProcStepConfiguratio
             return validator
         }
 
-        fun newInstance(stepConfig: XProcStepConfiguration, name: String, version: String?, nodes: List<XdmNode>, attr: Map<QName,String?> = emptyMap()): XvrlValidator {
+        fun newInstance(stepConfig: StepConfiguration, name: String, version: String?, nodes: List<XdmNode>, attr: Map<QName,String?> = emptyMap()): XvrlValidator {
             val validator = XvrlValidator(stepConfig)
             validator.withNodes(nodes)
             validator.setAttributes(attr)
@@ -52,7 +52,7 @@ class XvrlValidator private constructor(stepConfiguration: XProcStepConfiguratio
         get() = attributes[Ns.version]
 
     override fun serialize(builder: SaxonTreeBuilder) {
-        builder.addStartElement(NsXvrl.validator, stepConfig.attributeMap(attributes))
+        builder.addStartElement(NsXvrl.validator, stepConfig.typeUtils.attributeMap(attributes))
         serializeContent(builder)
         builder.addEndElement()
     }

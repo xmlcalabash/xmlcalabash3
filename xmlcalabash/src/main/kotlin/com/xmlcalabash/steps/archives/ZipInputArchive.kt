@@ -1,18 +1,18 @@
 package com.xmlcalabash.steps.archives
 
-import com.xmlcalabash.io.MediaType
+import com.xmlcalabash.config.StepConfiguration
 import com.xmlcalabash.documents.XProcBinaryDocument
 import com.xmlcalabash.exceptions.XProcError
+import com.xmlcalabash.io.MediaType
 import com.xmlcalabash.namespace.Ns
 import com.xmlcalabash.namespace.NsCx
-import com.xmlcalabash.runtime.XProcStepConfiguration
 import net.sf.saxon.s9api.QName
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry
 import org.apache.commons.compress.archivers.zip.ZipFile
 import java.io.InputStream
 import java.util.zip.ZipEntry
 
-open class ZipInputArchive(stepConfig: XProcStepConfiguration, doc: XProcBinaryDocument): InputArchive(stepConfig, doc) {
+open class ZipInputArchive(stepConfig: StepConfiguration, doc: XProcBinaryDocument): InputArchive(stepConfig, doc) {
     override val archiveFormat = Ns.zip
     override val baseUri = doc.baseURI
     lateinit var archive: ZipFile

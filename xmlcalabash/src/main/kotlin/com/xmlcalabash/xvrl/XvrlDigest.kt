@@ -1,12 +1,12 @@
 package com.xmlcalabash.xvrl
 
+import com.xmlcalabash.config.StepConfiguration
 import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.namespace.NsXvrl
-import com.xmlcalabash.runtime.XProcStepConfiguration
 import com.xmlcalabash.util.SaxonTreeBuilder
 import net.sf.saxon.s9api.QName
 
-class XvrlDigest internal constructor(stepConfig: XProcStepConfiguration): XvrlElement(stepConfig) {
+class XvrlDigest internal constructor(stepConfig: StepConfiguration): XvrlElement(stepConfig) {
     companion object {
         val _fatalErrorCount = QName("fatal-error-count")
         val _errorCount = QName("error-count")
@@ -19,7 +19,7 @@ class XvrlDigest internal constructor(stepConfig: XProcStepConfiguration): XvrlE
         val _infoCodes = QName("info-codes")
         val _unspecifiedCodes = QName("unspecified-codes")
 
-        fun newInstance(stepConfig: XProcStepConfiguration, attr: Map<QName,String?> = emptyMap()): XvrlDigest {
+        fun newInstance(stepConfig: StepConfiguration, attr: Map<QName,String?> = emptyMap()): XvrlDigest {
             val digest = XvrlDigest(stepConfig)
             digest.setAttributes(attr)
             return digest
@@ -106,7 +106,7 @@ class XvrlDigest internal constructor(stepConfig: XProcStepConfiguration): XvrlE
         attr[_infoCodes] = infoCodes.joinToString(separator=" ")
         attr[_unspecifiedCodes] = unspecifiedCodes.joinToString(separator=" ")
         attr[QName("worst")] = worst
-        builder.addStartElement(NsXvrl.digest, stepConfig.attributeMap(attr))
+        builder.addStartElement(NsXvrl.digest, stepConfig.typeUtils.attributeMap(attr))
         builder.addEndElement()
     }
 }

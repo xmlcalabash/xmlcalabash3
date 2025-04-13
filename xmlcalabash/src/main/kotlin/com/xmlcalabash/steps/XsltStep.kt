@@ -403,7 +403,7 @@ open class XsltStep(): AbstractAtomicStep() {
                     if (items.isEmpty()) {
                         val props = DocumentProperties()
                         if (serprops.isNotEmpty()) {
-                            props[Ns.serialization] = stepConfig.asXdmMap(serprops)
+                            props[Ns.serialization] = stepConfig.typeUtils.asXdmMap(serprops)
                         }
                         receiver.output("secondary", XProcDocument.ofText(XdmEmptySequence.getInstance(), stepConfig, MediaType.XML, props))
                     } else {

@@ -1,6 +1,6 @@
 package com.xmlcalabash.datamodel
 
-import com.xmlcalabash.config.SaxonConfiguration
+import com.xmlcalabash.XmlCalabash
 import com.xmlcalabash.documents.DocumentProperties
 import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.exceptions.XProcError
@@ -8,50 +8,37 @@ import com.xmlcalabash.exceptions.XProcException
 import com.xmlcalabash.namespace.Ns
 import com.xmlcalabash.namespace.NsErr
 import com.xmlcalabash.namespace.NsP
-import com.xmlcalabash.runtime.PipelineContext
 import net.sf.saxon.s9api.QName
 import net.sf.saxon.s9api.XdmValue
 import java.net.URI
 
-class PipelineBuilder private constructor(val pipelineContext: PipelineEnvironment, val saxonConfig: SaxonConfiguration) {
+class PipelineBuilder private constructor(val stepConfig: InstructionConfiguration) {
     companion object {
-        fun newInstance(config: SaxonConfiguration): PipelineBuilder {
-            return newInstance(config, null)
+        fun newInstance(xmlCalabash: XmlCalabash): PipelineBuilder {
+            return newInstance(xmlCalabash, null)
         }
 
-        fun newInstance(config: SaxonConfiguration, version: Double?): PipelineBuilder {
-            val environment = PipelineCompilerContext(config.xmlCalabash)
-            val builder = PipelineBuilder(environment, config)
+        fun newInstance(xmlCalabash: XmlCalabash, version: Double?): PipelineBuilder {
+            val newConfig = xmlCalabash.saxonConfiguration.newConfiguration()
+            val context = DocumentContextImpl(newConfig)
+            val environment = CompileEnvironment("", xmlCalabash)
+            newConfig.environment = environment
+            val instructionConfig
+                = InstructionConfiguration(newConfig, context, environment).with("p", NsP.namespace)
+            val builder = PipelineBuilder(instructionConfig)
             builder.version = version
-            builder._stepConfig = InstructionConfigurationImpl.newInstance(builder)
-            builder._stepConfig.putNamespace("p", NsP.namespace)
-            return builder
-        }
-
-        internal fun newInstance(environment: PipelineCompilerContext, config: SaxonConfiguration): PipelineBuilder {
-            val builder = PipelineBuilder(environment, config)
-            builder.version = null
-            builder._stepConfig = InstructionConfigurationImpl.newInstance(builder)
-            builder._stepConfig.putNamespace("p", NsP.namespace)
+            val library = StandardLibrary.getInstance(builder)
+            environment.standardSteps.putAll(library.exportedSteps)
+            for ((_, decl) in library.exportedSteps) {
+                instructionConfig.addVisibleStepType(decl)
+            }
             return builder
         }
     }
 
-    var version: Double? = null
-
-    lateinit private var _stepConfig: InstructionConfiguration
-    val stepConfig: InstructionConfiguration
-        get() = _stepConfig
-
-    val staticOptionsManager = StaticOptionsManager()
-
-    /*
-    private val _options = mutableMapOf<QName, XdmValue>()
-    val options: Map<QName, XdmValue>
-        get() = _options
-     */
-
     private var started = false
+    var version: Double? = null
+    val staticOptionsManager = StaticOptionsManager()
 
     fun load(uri: URI): XProcDocument {
         // Irrespective of what the filename suggests, if we're trying to load a pipeline
@@ -69,6 +56,35 @@ class PipelineBuilder private constructor(val pipelineContext: PipelineEnvironme
         }
     }
 
+    fun newLibrary(): LibraryInstruction {
+        for ((optname, value) in staticOptionsManager.useWhenOptions) {
+            staticOptionsManager.compileTimeValue(optname, XProcExpression.constant(stepConfig, value))
+        }
+        val decl = LibraryInstruction(stepConfig.copy())
+        if (version != null) {
+            decl.version = version
+        }
+        decl.builder = this
+        return decl
+    }
+
+    fun newDeclareStep(): DeclareStepInstruction {
+        for ((optname, value) in staticOptionsManager.useWhenOptions) {
+            staticOptionsManager.compileTimeValue(optname, XProcExpression.constant(stepConfig, value))
+        }
+
+        for ((optname, value) in staticOptionsManager.useWhenOptions) {
+            stepConfig.addStaticBinding(optname, value)
+        }
+
+        val decl = DeclareStepInstruction(null, stepConfig.copyNew())
+        if (version != null) {
+            decl.version = version
+        }
+        decl.builder = this
+        return decl
+    }
+
     fun option(name: QName, value: XProcDocument) {
         option(name, value.value)
     }
@@ -84,34 +100,5 @@ class PipelineBuilder private constructor(val pipelineContext: PipelineEnvironme
         } else {
             staticOptionsManager.useWhenValue(name, curValue.append(value))
         }
-    }
-
-    fun newDeclareStep(): DeclareStepInstruction {
-        for ((optname, value) in staticOptionsManager.useWhenOptions) {
-            staticOptionsManager.compileTimeValue(optname, XProcExpression.constant(stepConfig, value))
-        }
-
-        for ((optname, value) in staticOptionsManager.useWhenOptions) {
-            stepConfig.addStaticBinding(optname, value)
-        }
-
-        val decl = DeclareStepInstruction(null, stepConfig.copy())
-        if (version != null) {
-            decl.version = version
-        }
-        decl.builder = this
-        return decl
-    }
-
-    fun newLibrary(): LibraryInstruction {
-        for ((optname, value) in staticOptionsManager.useWhenOptions) {
-            staticOptionsManager.compileTimeValue(optname, XProcExpression.constant(stepConfig, value))
-        }
-        val decl = LibraryInstruction(stepConfig.copy())
-        if (version != null) {
-            decl.version = version
-        }
-        decl.builder = this
-        return decl
     }
 }

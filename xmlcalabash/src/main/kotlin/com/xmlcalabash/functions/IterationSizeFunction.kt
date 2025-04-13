@@ -37,7 +37,7 @@ class IterationSizeFunction(private val config: SaxonConfiguration): ExtensionFu
         }
 
         override fun call(context: XPathContext?, arguments: Array<out Sequence>?): Sequence {
-            val dynamicContext = config.environment.getExecutionContext()
+            val dynamicContext = config.getExecutionContext()
             return Int64Value(dynamicContext.iterationSize)
         }
     }

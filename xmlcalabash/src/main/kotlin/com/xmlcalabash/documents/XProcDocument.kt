@@ -1,5 +1,6 @@
 package com.xmlcalabash.documents
 
+import com.xmlcalabash.datamodel.DocumentContext
 import com.xmlcalabash.io.MediaType
 import com.xmlcalabash.io.DocumentWriter
 import com.xmlcalabash.namespace.Ns
@@ -19,7 +20,7 @@ import java.net.URI
 
 open class XProcDocument internal constructor() {
     val id = ++_id
-    private var _valueFunction: () -> XdmValue = { -> XdmEmptySequence.getInstance() }
+    private var _valueFunction: () -> LazyDocumentValue = { -> LazyDocumentValue(XdmEmptySequence.getInstance(), DocumentProperties()) }
     protected var _value: XdmValue? = null
     protected lateinit var _context: DocumentContext
     protected val _properties = DocumentProperties()
@@ -38,21 +39,17 @@ open class XProcDocument internal constructor() {
         }
     }
 
-    constructor(valueFunction: () -> XdmValue, context: DocumentContext): this() {
+    constructor(valueFunction: () -> LazyDocumentValue, context: DocumentContext): this() {
         _valueFunction = valueFunction
         _context = context
-    }
-
-    constructor(valueFunction: () -> XdmValue, context: DocumentContext, initialProperties: DocumentProperties): this() {
-        _valueFunction = valueFunction
-        _context = context
-        initialProperties.setAll(initialProperties)
     }
 
     private fun evaluate(): XdmValue {
         synchronized(this) {
             if (_value == null) {
-                _value = _valueFunction()
+                val lazyResult = _valueFunction()
+                _value = lazyResult.value
+
                 adjustValue()
                 if (_properties.baseURI == null) {
                     if (_value is XdmNode) {
@@ -65,9 +62,12 @@ open class XProcDocument internal constructor() {
                         _properties[Ns.baseUri] = context.baseUri
                     }
                 }
+
                 if (_properties.contentType == null) {
                     _properties[Ns.contentType] = ValueUtils.contentClassification(_value!!)
                 }
+
+                _properties.setAll(lazyResult.properties)
             }
             return _value!!
         }

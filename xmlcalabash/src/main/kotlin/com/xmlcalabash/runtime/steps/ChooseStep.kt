@@ -22,7 +22,7 @@ open class ChooseStep(config: XProcStepConfiguration, compound: CompoundStepMode
         stepsToRun.clear()
         stepsToRun.addAll(runnables.filter { it !is ChooseWhenStep })
 
-        stepConfig.environment.newExecutionContext(stepConfig)
+        stepConfig.saxonConfig.newExecutionContext(stepConfig)
 
         head.cacheInputs(cache)
         for (doc in context) {
@@ -42,7 +42,7 @@ open class ChooseStep(config: XProcStepConfiguration, compound: CompoundStepMode
         }
 
         foot.runStep()
-        stepConfig.environment.releaseExecutionContext()
+        stepConfig.saxonConfig.releaseExecutionContext()
     }
 
     override fun reset() {

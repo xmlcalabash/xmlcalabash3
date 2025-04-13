@@ -1,11 +1,11 @@
 package com.xmlcalabash.io
 
+import com.xmlcalabash.config.StepConfiguration
 import com.xmlcalabash.documents.DocumentProperties
 import com.xmlcalabash.documents.XProcBinaryDocument
 import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.namespace.NsCx
-import com.xmlcalabash.runtime.XProcStepConfiguration
 import com.xmlcalabash.spi.DocumentResolver
 import com.xmlcalabash.tracing.TraceListener
 import net.sf.saxon.lib.ModuleURIResolver
@@ -66,7 +66,7 @@ class DocumentManager(): EntityResolver, EntityResolver2, ResourceResolver, Modu
         prefixMap.remove(prefix)
     }
 
-    private fun tryResolvers(href: URI, stepConfig: XProcStepConfiguration, loaded: XProcDocument? = null): XProcDocument? {
+    private fun tryResolvers(href: URI, stepConfig: StepConfiguration, loaded: XProcDocument? = null): XProcDocument? {
         var current = loaded
         // FIXME: use a binary search
         val uristr = href.toString()
@@ -91,7 +91,7 @@ class DocumentManager(): EntityResolver, EntityResolver2, ResourceResolver, Modu
         return href
     }
 
-    fun load(href: URI, stepConfig: XProcStepConfiguration, properties: DocumentProperties = DocumentProperties(), parameters: Map<QName, XdmValue> = mapOf()): XProcDocument {
+    fun load(href: URI, stepConfig: StepConfiguration, properties: DocumentProperties = DocumentProperties(), parameters: Map<QName, XdmValue> = mapOf()): XProcDocument {
         val cached = getCached(href)
         if (cached != null) {
             val resolved = tryResolvers(href, stepConfig, cached)
@@ -135,14 +135,14 @@ class DocumentManager(): EntityResolver, EntityResolver2, ResourceResolver, Modu
         return loader.load()
     }
 
-    private fun trace(stepConfig: XProcStepConfiguration, uri: URI, href: URI?, resolved: Boolean, cached: Boolean) {
+    private fun trace(stepConfig: StepConfiguration, uri: URI, href: URI?, resolved: Boolean, cached: Boolean) {
         val traceHref = if (uri == href) {
             null
         } else {
             href
         }
 
-        for (monitor in stepConfig.environment.monitors) {
+        for (monitor in stepConfig.monitors) {
             if (monitor is TraceListener) {
                 monitor.getResource(0, uri, traceHref, resolved, cached)
             }

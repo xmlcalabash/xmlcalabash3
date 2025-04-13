@@ -1,19 +1,17 @@
 package com.xmlcalabash.datamodel
 
-import com.xmlcalabash.runtime.XProcStepConfiguration
-import com.xmlcalabash.datamodel.XProcExpression.Companion.avt
+import com.xmlcalabash.config.StepConfiguration
 import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.exceptions.XProcError
-import com.xmlcalabash.namespace.NsCx
 import com.xmlcalabash.parsers.XPathExpressionDetails
 import com.xmlcalabash.parsers.xpath31.XPathExpressionParser
 import com.xmlcalabash.util.ValueTemplate
 import com.xmlcalabash.util.ValueTemplateParser
 import net.sf.saxon.s9api.*
 
-abstract class XProcExpression(val stepConfig: XProcStepConfiguration, val asType: SequenceType, val collection: Boolean, val values: List<XdmAtomicValue>) {
+abstract class XProcExpression(val stepConfig: StepConfiguration, val asType: SequenceType, val collection: Boolean, val values: List<XdmAtomicValue>) {
     companion object {
-        fun select(stepConfig: XProcStepConfiguration, select: String, asType: SequenceType = SequenceType.ANY, collection: Boolean = false, values: List<XdmAtomicValue> = emptyList()): XProcSelectExpression {
+        fun select(stepConfig: StepConfiguration, select: String, asType: SequenceType = SequenceType.ANY, collection: Boolean = false, values: List<XdmAtomicValue> = emptyList()): XProcSelectExpression {
             val expr = XProcSelectExpression.newInstance(stepConfig, select, asType, collection, values)
             expr._details = XPathExpressionParser(stepConfig).parse(select)
             if (expr.details.error != null) {
@@ -23,15 +21,15 @@ abstract class XProcExpression(val stepConfig: XProcStepConfiguration, val asTyp
             return expr
         }
 
-        fun avt(stepConfig: XProcStepConfiguration, avt: String, asType: SequenceType = SequenceType.ANY, values: List<XdmAtomicValue> = emptyList()): XProcAvtExpression {
+        fun avt(stepConfig: StepConfiguration, avt: String, asType: SequenceType = SequenceType.ANY, values: List<XdmAtomicValue> = emptyList()): XProcAvtExpression {
             return avt(stepConfig, ValueTemplateParser.parse(stepConfig, avt), asType, values)
         }
 
-        fun shortcut(stepConfig: XProcStepConfiguration, shortcut: String, asType: SequenceType = SequenceType.ANY, values: List<XdmAtomicValue> = emptyList()): XProcShortcutExpression {
+        fun shortcut(stepConfig: StepConfiguration, shortcut: String, asType: SequenceType = SequenceType.ANY, values: List<XdmAtomicValue> = emptyList()): XProcShortcutExpression {
             return XProcShortcutExpression.newInstance(stepConfig, shortcut, asType, values)
         }
 
-        fun match(stepConfig: XProcStepConfiguration, match: String): XProcMatchExpression {
+        fun match(stepConfig: StepConfiguration, match: String): XProcMatchExpression {
             val expr = XProcMatchExpression.newInstance(stepConfig, match)
             expr._details = XPathExpressionParser(stepConfig).parse(match)
             if (expr.details.error != null) {
@@ -41,7 +39,7 @@ abstract class XProcExpression(val stepConfig: XProcStepConfiguration, val asTyp
             return expr
         }
 
-        internal fun avt(stepConfig: XProcStepConfiguration, avt: ValueTemplate, asType: SequenceType = SequenceType.ANY, values: List<XdmAtomicValue> = emptyList()): XProcAvtExpression {
+        internal fun avt(stepConfig: StepConfiguration, avt: ValueTemplate, asType: SequenceType = SequenceType.ANY, values: List<XdmAtomicValue> = emptyList()): XProcAvtExpression {
             val expr = XProcAvtExpression.newInstance(stepConfig, avt, asType, values)
 
             val parser = XPathExpressionParser(stepConfig)
@@ -67,13 +65,13 @@ abstract class XProcExpression(val stepConfig: XProcStepConfiguration, val asTyp
             return expr
         }
 
-        fun constant(stepConfig: XProcStepConfiguration, value: XdmValue, asType: SequenceType = SequenceType.ANY, values: List<XdmAtomicValue> = emptyList()): XProcConstantExpression {
+        fun constant(stepConfig: StepConfiguration, value: XdmValue, asType: SequenceType = SequenceType.ANY, values: List<XdmAtomicValue> = emptyList()): XProcConstantExpression {
             val expr = XProcConstantExpression.newInstance(stepConfig, value, asType, values)
             expr._details = XPathExpressionDetails(error = null, variableRefs = emptySet(), functionRefs = emptySet(), contextRef = false, alwaysDynamic = false)
             return expr
         }
 
-        fun error(stepConfig: XProcStepConfiguration): XProcErrorExpression {
+        fun error(stepConfig: StepConfiguration): XProcErrorExpression {
             return XProcErrorExpression.newInstance(stepConfig)
         }
     }
@@ -131,8 +129,8 @@ abstract class XProcExpression(val stepConfig: XProcStepConfiguration, val asTyp
     val staticValue: XdmValue?
         get() = _staticValue
 
-    abstract fun xevaluate(config: XProcStepConfiguration): () -> XdmValue
-    abstract fun evaluate(config: XProcStepConfiguration): XdmValue
+    abstract fun xevaluate(config: StepConfiguration): () -> XdmValue
+    abstract fun evaluate(config: StepConfiguration): XdmValue
     abstract fun cast(asType: SequenceType, values: List<XdmAtomicValue> = emptyList()): XProcExpression
 
     internal open fun computeStaticValue(stepConfig: InstructionConfiguration): XdmValue? {
@@ -224,9 +222,9 @@ abstract class XProcExpression(val stepConfig: XProcStepConfiguration, val asTyp
         }
     }
 
-    protected fun setupExecutionContext(stepConfig: XProcStepConfiguration, selector: XPathSelector) {
+    protected fun setupExecutionContext(stepConfig: StepConfiguration, selector: XPathSelector) {
         // If this is being called during compilation, there won't be a thread-local one yet
-        val execContext = stepConfig.environment.xmlCalabash.newExecutionContext(stepConfig)
+        stepConfig.saxonConfig.newExecutionContext(stepConfig)
 
         for (name in variableRefs) {
             val value = if (name in variableBindings) {
@@ -251,22 +249,24 @@ abstract class XProcExpression(val stepConfig: XProcStepConfiguration, val asTyp
                 if (value is XdmItem) {
                     selector.contextItem = value
                 }
-                stepConfig.environment.xmlCalabash.addProperties(doc)
+                stepConfig.saxonConfig.addProperties(doc)
             }
         }
     }
 
     protected fun teardownExecutionContext() {
         if (contextItem is XProcDocument && (contextItem as XProcDocument).value is XdmItem) {
-            stepConfig.environment.xmlCalabash.removeProperties((contextItem as XProcDocument))
+            stepConfig.saxonConfig.removeProperties((contextItem as XProcDocument))
         }
 
+        /*
         for ((_, doc) in variableBindings) {
             if (doc is XProcDocument) {
-                stepConfig.environment.xmlCalabash.removeProperties(doc)
+                stepConfig.saxonConfig.removeProperties(doc)
             }
         }
+         */
 
-        stepConfig.environment.xmlCalabash.releaseExecutionContext()
+        stepConfig.saxonConfig.releaseExecutionContext()
     }
 }

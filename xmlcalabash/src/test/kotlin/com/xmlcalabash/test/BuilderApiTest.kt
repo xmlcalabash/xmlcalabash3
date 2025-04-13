@@ -1,6 +1,6 @@
 package com.xmlcalabash.test
 
-import com.xmlcalabash.config.XmlCalabash
+import com.xmlcalabash.XmlCalabashBuilder
 import com.xmlcalabash.datamodel.XProcExpression
 import com.xmlcalabash.exceptions.XProcException
 import com.xmlcalabash.namespace.*
@@ -18,7 +18,7 @@ import org.junit.jupiter.api.Test
 import java.io.ByteArrayOutputStream
 import java.net.URI
 
-class BuilderApiTest {
+class BuilderApiTest(): XmlCalabashTestClass() {
     private fun result(receiver: BufferingReceiver): String {
         val result = receiver.outputs["result"]?.removeFirstOrNull()
         Assertions.assertNotNull(result)
@@ -33,7 +33,7 @@ class BuilderApiTest {
 
     @Test
     fun simplePipeline() {
-        val calabash = XmlCalabash.newInstance()
+        val calabash = XmlCalabashBuilder().build()
         val builder = calabash.newPipelineBuilder()
 
         val declStep = builder.newDeclareStep()
@@ -46,7 +46,7 @@ class BuilderApiTest {
 
         val pipeline = declStep.getExecutable()
 
-        val doc = declStep.fromString("<doc/>")
+        val doc = fromString(declStep, "<doc/>")
 
         pipeline.input("source", doc)
 
@@ -60,14 +60,14 @@ class BuilderApiTest {
 
     @Test
     fun defaultInputPipeline() {
-        val calabash = XmlCalabash.newInstance()
+        val calabash = XmlCalabashBuilder().build()
         val builder = calabash.newPipelineBuilder()
 
         val declStep = builder.newDeclareStep()
         declStep.name = "main"
         declStep.version = 3.1
 
-        val defaultInput = declStep.fromString("<default-input/>")
+        val defaultInput = fromString(declStep, "<default-input/>")
 
         val input = declStep.input("source")
         input.inline(defaultInput)
@@ -86,7 +86,7 @@ class BuilderApiTest {
     }
 
     private fun staticOptionPipelineSetup(sopt: String?): XProcPipeline {
-        val calabash = XmlCalabash.newInstance()
+        val calabash = XmlCalabashBuilder().build()
         val builder = calabash.newPipelineBuilder()
         if (sopt != null) {
             builder.option(QName("sopt"), XdmAtomicValue("different"))
@@ -108,7 +108,7 @@ class BuilderApiTest {
         wrapSequence.withOption(QName("wrapper"), XProcExpression.select(wrapSequence.stepConfig, "\$sopt"))
 
         val wi = wrapSequence.withInput()
-        wi.inline(declStep.fromString("<test value='{\$sopt}'/>").value as XdmNode)
+        wi.inline(fromString(declStep, "<test value='{\$sopt}'/>").value as XdmNode)
 
         val pipeline = declStep.getExecutable()
         return pipeline
@@ -143,7 +143,7 @@ class BuilderApiTest {
 
     @Test
     fun noVersionPipeline() {
-        val calabash = XmlCalabash.newInstance()
+        val calabash = XmlCalabashBuilder().build()
         val builder = calabash.newPipelineBuilder()
 
         val declStep = builder.newDeclareStep()
@@ -162,7 +162,7 @@ class BuilderApiTest {
 
     @Test
     fun outOfOrderPipeline() {
-        val calabash = XmlCalabash.newInstance()
+        val calabash = XmlCalabashBuilder().build()
         val builder = calabash.newPipelineBuilder()
 
         val declStep = builder.newDeclareStep()
@@ -186,7 +186,7 @@ class BuilderApiTest {
 
         val pipeline = declStep.getExecutable()
 
-        val doc = declStep.fromString("<doc/>")
+        val doc = fromString(declStep, "<doc/>")
 
         pipeline.input("source", doc)
 
@@ -200,7 +200,7 @@ class BuilderApiTest {
 
     @Test
     fun nestedPipeline() {
-        val calabash = XmlCalabash.newInstance()
+        val calabash = XmlCalabashBuilder().build()
         val builder = calabash.newPipelineBuilder()
 
         val testns = NamespaceUri.of("http://example.com/test")
@@ -232,7 +232,7 @@ class BuilderApiTest {
         val expr = XProcExpression.avt(sc, "{'aname-' || year-from-date(current-date()) idiv 1000}")
         wrap.withOption(Ns.wrapper, expr)
 
-        val doc = testStep.fromString("<doc/>")
+        val doc = fromString(testStep, "<doc/>")
 
         val pipeline = declStep.getExecutable()
         pipeline.input("source", doc)
@@ -247,7 +247,7 @@ class BuilderApiTest {
 
     @Test
     fun importedPipeline() {
-        val calabash = XmlCalabash.newInstance()
+        val calabash = XmlCalabashBuilder().build()
         val builder = calabash.newPipelineBuilder()
 
         val testns = NamespaceUri.of("http://example.com/test")
@@ -285,7 +285,7 @@ class BuilderApiTest {
         val expr = XProcExpression.avt(sc, "{'aname-' || year-from-date(current-date()) idiv 1000}")
         wrap.withOption(Ns.wrapper, expr)
 
-        val doc = testStep.fromString("<doc/>")
+        val doc = fromString(testStep, "<doc/>")
 
         val pipeline = declStep.getExecutable()
         pipeline.input("source", doc)
@@ -300,7 +300,7 @@ class BuilderApiTest {
 
     @Test
     fun simpleLibrary() {
-        val calabash = XmlCalabash.newInstance()
+        val calabash = XmlCalabashBuilder().build()
         val builder = calabash.newPipelineBuilder()
 
         val testns = NamespaceUri.of("http://example.com/test")
@@ -308,7 +308,7 @@ class BuilderApiTest {
         val test_test2 = QName(testns, "test:test2")
 
         val library = builder.newLibrary()
-        library.stepConfig.putNamespace("test", testns)
+        library.stepConfig.updateWith("test", testns)
         library.version = 3.1
 
         val t1 = library.declareStep()
@@ -325,7 +325,7 @@ class BuilderApiTest {
         t2.output("result")
         t2.atomicStep(test_test1)
 
-        val doc = library.fromString("<doc/>")
+        val doc = fromString(library, "<doc/>")
 
         val pipeline = library.getExecutable("test2")
         pipeline.input("source", doc)
@@ -340,7 +340,7 @@ class BuilderApiTest {
 
     @Test
     fun importDeclareStep() {
-        val calabash = XmlCalabash.newInstance()
+        val calabash = XmlCalabashBuilder().build()
         val builder = calabash.newPipelineBuilder()
 
         val testns = NamespaceUri.of("http://example.com/test")
@@ -365,7 +365,7 @@ class BuilderApiTest {
 
         val pipeline = decl.getExecutable()
 
-        val doc = decl.fromString("<doc/>")
+        val doc = fromString(decl, "<doc/>")
         pipeline.input("source", doc)
 
         val receiver = BufferingReceiver()
@@ -378,7 +378,7 @@ class BuilderApiTest {
 
     @Test
     fun importLibrary() {
-        val calabash = XmlCalabash.newInstance()
+        val calabash = XmlCalabashBuilder().build()
         val builder = calabash.newPipelineBuilder()
 
         val testns = NamespaceUri.of("http://example.com/test")
@@ -407,7 +407,7 @@ class BuilderApiTest {
 
         val pipeline = decl.getExecutable()
 
-        val doc = decl.fromString("<doc/>")
+        val doc = fromString(decl, "<doc/>")
         pipeline.input("source", doc)
 
         val receiver = BufferingReceiver()
@@ -420,7 +420,7 @@ class BuilderApiTest {
 
     @Test
     fun importRecursiveLibrary() {
-        val calabash = XmlCalabash.newInstance()
+        val calabash = XmlCalabashBuilder().build()
         val builder = calabash.newPipelineBuilder()
 
         val testns = NamespaceUri.of("http://example.com/test")
@@ -448,7 +448,7 @@ class BuilderApiTest {
 
         val pipeline = decl.getExecutable()
 
-        val doc = decl.fromString("<doc/>")
+        val doc = fromString(decl, "<doc/>")
         pipeline.input("source", doc)
 
         val receiver = BufferingReceiver()
@@ -461,7 +461,7 @@ class BuilderApiTest {
 
     @Test
     fun importMutuallyRecursiveLibraries() {
-        val calabash = XmlCalabash.newInstance()
+        val calabash = XmlCalabashBuilder().build()
         val builder = calabash.newPipelineBuilder(3.1)
 
         val testns = NamespaceUri.of("http://example.com/test")
@@ -500,7 +500,7 @@ class BuilderApiTest {
 
         val pipeline = decl.getExecutable()
 
-        val doc = decl.fromString("<doc/>")
+        val doc = fromString(decl, "<doc/>")
         pipeline.input("source", doc)
 
         val receiver = BufferingReceiver()
@@ -513,7 +513,7 @@ class BuilderApiTest {
 
     @Test
     fun groupPipeline() {
-        val calabash = XmlCalabash.newInstance()
+        val calabash = XmlCalabashBuilder().build()
         val builder = calabash.newPipelineBuilder()
 
         val declStep = builder.newDeclareStep()
@@ -528,7 +528,7 @@ class BuilderApiTest {
 
         val pipeline = declStep.getExecutable()
 
-        val doc = declStep.fromString("<doc/>")
+        val doc = fromString(declStep, "<doc/>")
 
         pipeline.input("source", doc)
 
@@ -542,7 +542,7 @@ class BuilderApiTest {
 
     @Test
     fun forEachPipeline() {
-        val calabash = XmlCalabash.newInstance()
+        val calabash = XmlCalabashBuilder().build()
         val builder = calabash.newPipelineBuilder()
 
         val declStep = builder.newDeclareStep()
@@ -550,8 +550,8 @@ class BuilderApiTest {
         declStep.version = 3.1
         val input = declStep.input("source")
         input.sequence = true
-        input.inline(input.fromString("<doc>One</doc>"))
-        input.inline(input.fromString("<doc>Two</doc>"))
+        input.inline(fromString(input, "<doc>One</doc>"))
+        input.inline(fromString(input, "<doc>Two</doc>"))
 
         val output = declStep.output("result")
         output.sequence = true
@@ -576,14 +576,14 @@ class BuilderApiTest {
 
     @Test
     fun choosePipeline() {
-        val calabash = XmlCalabash.newInstance()
+        val calabash = XmlCalabashBuilder().build()
         val builder = calabash.newPipelineBuilder()
 
         val declStep = builder.newDeclareStep()
         declStep.name = "main"
         declStep.version = 3.1
         val input = declStep.input("source")
-        input.inline(input.fromString("<doc>7</doc>"))
+        input.inline(fromString(input, "<doc>7</doc>"))
 
         declStep.output("result")
 
@@ -592,22 +592,22 @@ class BuilderApiTest {
         when1.test = "string(.) = '4'"
         val id1 = when1.atomicStep(NsP.identity, "id1")
         val id1input = id1.withInput()
-        id1input.inline(id1.fromString("<doc>Success when 4</doc>"))
+        id1input.inline(fromString(id1, "<doc>Success when 4</doc>"))
 
         val when2 = choose.whenInstruction()
         when2.test = "string(.) = '7'"
         val id2 = when2.atomicStep(NsP.identity, "id2")
         val id2input = id2.withInput()
-        id2input.inline(id2.fromString("<doc>Success when 7</doc>"))
+        id2input.inline(fromString(id2, "<doc>Success when 7</doc>"))
 
         val otherwise = choose.otherwise()
         val id3 = otherwise.atomicStep(NsP.identity, "id3")
         val id3input = id3.withInput()
-        id3input.inline(id3.fromString("<doc>Success when not 4 or 7 (was {string(.)})</doc>"))
+        id3input.inline(fromString(id3, "<doc>Success when not 4 or 7 (was {string(.)})</doc>"))
 
         val pipeline = declStep.getExecutable()
 
-        val doc = declStep.fromString("<doc>4</doc>")
+        val doc = fromString(declStep, "<doc>4</doc>")
         pipeline.input("source", doc)
 
         val receiver = BufferingReceiver()
@@ -620,15 +620,15 @@ class BuilderApiTest {
 
     @Test
     fun ifTruePipeline() {
-        val calabash = XmlCalabash.newInstance()
+        val calabash = XmlCalabashBuilder().build()
         val builder = calabash.newPipelineBuilder()
 
         val declStep = builder.newDeclareStep()
-        declStep.stepConfig.putNamespace("xs", NsXs.namespace)
+        declStep.stepConfig.updateWith("xs", NsXs.namespace)
         declStep.name = "main"
         declStep.version = 3.1
         val input = declStep.input("source")
-        input.inline(input.fromString("<doc>6</doc>"))
+        input.inline(fromString(input, "<doc>6</doc>"))
 
         declStep.output("result")
 
@@ -640,7 +640,7 @@ class BuilderApiTest {
         ifStep.test = "xs:integer(.) mod 2 = 0"
         val ifid = ifStep.atomicStep(NsP.identity, "id-in-if")
         val ifinput = ifid.withInput()
-        ifinput.inline(declStep.fromString("<doc>Success if input was even.</doc>"))
+        ifinput.inline(fromString(declStep, "<doc>Success if input was even.</doc>"))
 
         val primin = declStep.atomicStep(NsP.identity, "primin")
         val priminput = primin.withInput()
@@ -648,7 +648,7 @@ class BuilderApiTest {
 
         val copy = declStep.atomicStep(NsP.identity, "copy")
         val copyinput = copy.withInput()
-        copyinput.inline(declStep.fromString("<doc>Testing with {string(.)}</doc>"))
+        copyinput.inline(fromString(declStep, "<doc>Testing with {string(.)}</doc>"))
 
         val wrapseq = declStep.atomicStep(NsP.wrapSequence, "wrapseq")
         wrapseq.withOption(Ns.wrapper, "wrapper")
@@ -660,7 +660,7 @@ class BuilderApiTest {
 
         val pipeline = declStep.getExecutable()
 
-        val doc = declStep.fromString("<doc>4</doc>")
+        val doc = fromString(declStep, "<doc>4</doc>")
         pipeline.input("source", doc)
 
         val receiver = BufferingReceiver()
@@ -676,15 +676,15 @@ class BuilderApiTest {
 
     @Test
     fun ifFalsePipeline() {
-        val calabash = XmlCalabash.newInstance()
+        val calabash = XmlCalabashBuilder().build()
         val builder = calabash.newPipelineBuilder()
 
         val declStep = builder.newDeclareStep()
-        declStep.stepConfig.putNamespace("xs", NsXs.namespace)
+        declStep.stepConfig.updateWith("xs", NsXs.namespace)
         declStep.name = "main"
         declStep.version = 3.1
         val input = declStep.input("source")
-        input.inline(input.fromString("<doc>7</doc>"))
+        input.inline(fromString(input, "<doc>7</doc>"))
 
         declStep.output("result")
 
@@ -701,11 +701,11 @@ class BuilderApiTest {
 
         val id_r2 = ifStep.atomicStep(NsP.identity, "r2")
         val id_r2_wi = id_r2.withInput()
-        id_r2_wi.inline(declStep.fromString("<doc>This is a secondary result.</doc>"))
+        id_r2_wi.inline(fromString(declStep, "<doc>This is a secondary result.</doc>"))
 
         val id = ifStep.atomicStep(NsP.identity)
         val id_wi = id.withInput()
-        id_wi.inline(declStep.fromString("<doc>Success if the input was even.</doc>"))
+        id_wi.inline(fromString(declStep, "<doc>Success if the input was even.</doc>"))
 
         val wrapseq = declStep.atomicStep(NsP.wrapSequence, "wrapseq")
         wrapseq.withOption(Ns.wrapper, "both")
@@ -718,7 +718,7 @@ class BuilderApiTest {
 
         val pipeline = declStep.getExecutable()
 
-        val doc = declStep.fromString("<doc>9</doc>")
+        val doc = fromString(declStep, "<doc>9</doc>")
         pipeline.input("source", doc)
 
         val receiver = BufferingReceiver()
@@ -730,19 +730,19 @@ class BuilderApiTest {
     }
 
     private fun tryCatchPipeline(even: Boolean) {
-        val calabash = XmlCalabash.newInstance()
+        val calabash = XmlCalabashBuilder().build()
         val builder = calabash.newPipelineBuilder()
 
         val declStep = builder.newDeclareStep()
-        declStep.stepConfig.putNamespace("xs", NsXs.namespace)
-        declStep.stepConfig.putNamespace("cxerr", NsCx.errorNamespace)
+        declStep.stepConfig.updateWith("xs", NsXs.namespace)
+        declStep.stepConfig.updateWith("cxerr", NsCx.errorNamespace)
         declStep.name = "main"
         declStep.version = 3.1
         val input = declStep.input("source")
         if (even) {
-            input.inline(input.fromString("<doc>6</doc>"))
+            input.inline(fromString(input, "<doc>6</doc>"))
         } else {
-            input.inline(input.fromString("<doc>7</doc>"))
+            input.inline(fromString(input, "<doc>7</doc>"))
         }
 
         declStep.output("result")
@@ -765,16 +765,16 @@ class BuilderApiTest {
         oddError.withOption(Ns.code, "cxerr:odd")
 
         val oddCatch = tryCatch.catch()
-        oddCatch.code = listOf(oddCatch.stepConfig.parseQName("cxerr:odd"))
+        oddCatch.code = listOf(oddCatch.stepConfig.typeUtils.parseQName("cxerr:odd"))
         val id1 = oddCatch.atomicStep(NsP.identity)
         val wi1 = id1.withInput()
-        wi1.inline(wi1.fromString("<doc>Successfully caught odd</doc>"))
+        wi1.inline(fromString(wi1, "<doc>Successfully caught odd</doc>"))
 
         val evenCatch = tryCatch.catch()
-        evenCatch.code = listOf(oddCatch.stepConfig.parseQName("cxerr:even"))
+        evenCatch.code = listOf(oddCatch.stepConfig.typeUtils.parseQName("cxerr:even"))
         val id2 = evenCatch.atomicStep(NsP.identity)
         val wi2 = id2.withInput()
-        wi2.inline(wi2.fromString("<doc>Successfully caught even</doc>"))
+        wi2.inline(fromString(wi2, "<doc>Successfully caught even</doc>"))
 
         val finally = tryCatch.finally()
         val foutput = finally.output("finally", false)
@@ -783,7 +783,7 @@ class BuilderApiTest {
 
         val id3 = finally.atomicStep(NsP.identity, "final")
         val wi3 = id3.withInput()
-        wi3.inline(wi3.fromString("<doc>Finally</doc>"))
+        wi3.inline(fromString(wi3, "<doc>Finally</doc>"))
 
         val wrapseq = declStep.atomicStep(NsP.wrapSequence, "wrapseq")
         wrapseq.withOption(Ns.wrapper, "both")
@@ -820,15 +820,15 @@ class BuilderApiTest {
 
     @Test
     fun viewportPipeline() {
-        val calabash = XmlCalabash.newInstance()
+        val calabash = XmlCalabashBuilder().build()
         val builder = calabash.newPipelineBuilder()
 
         val declStep = builder.newDeclareStep()
-        declStep.stepConfig.putNamespace("xs", NsXs.namespace)
+        declStep.stepConfig.updateWith("xs", NsXs.namespace)
         declStep.name = "main"
         declStep.version = 3.1
         val input = declStep.input("source")
-        input.inline(input.fromString("<doc><ch>One</ch><ch>Two</ch></doc>"))
+        input.inline(fromString(input, "<doc><ch>One</ch><ch>Two</ch></doc>"))
 
         declStep.output("result")
 

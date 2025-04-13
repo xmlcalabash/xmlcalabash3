@@ -1,14 +1,14 @@
 package com.xmlcalabash.xvrl
 
+import com.xmlcalabash.config.StepConfiguration
 import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.namespace.Ns
 import com.xmlcalabash.namespace.NsXvrl
-import com.xmlcalabash.runtime.XProcStepConfiguration
 import com.xmlcalabash.util.SaxonTreeBuilder
 import net.sf.saxon.s9api.QName
 import java.net.URI
 
-open class XvrlLocation protected constructor(stepConfig: XProcStepConfiguration): XvrlElement(stepConfig) {
+open class XvrlLocation protected constructor(stepConfig: StepConfiguration): XvrlElement(stepConfig) {
     companion object {
         private val _href = QName("href")
         private val _xpath = QName("xpath")
@@ -18,14 +18,14 @@ open class XvrlLocation protected constructor(stepConfig: XProcStepConfiguration
         private val _column = QName("column")
         private val _octetPosition = QName("octet-position")
 
-        fun newInstance(stepConfig: XProcStepConfiguration, href: URI?, attr: Map<QName,String?> = emptyMap()): XvrlLocation {
+        fun newInstance(stepConfig: StepConfiguration, href: URI?, attr: Map<QName,String?> = emptyMap()): XvrlLocation {
             val loc = XvrlLocation(stepConfig)
             loc.setAttributes(attr)
             href?.let { loc.setAttribute(_href, "${it}") }
             return loc
         }
 
-        fun newInstance(stepConfig: XProcStepConfiguration, href: URI?, line: Int, column: Int = 0, attr: Map<QName,String?> = emptyMap()): XvrlLocation {
+        fun newInstance(stepConfig: StepConfiguration, href: URI?, line: Int, column: Int = 0, attr: Map<QName,String?> = emptyMap()): XvrlLocation {
             val loc = XvrlLocation(stepConfig)
             loc.setAttributes(attr)
             href?.let { loc.setAttribute(_href, "${it}") }
@@ -38,7 +38,7 @@ open class XvrlLocation protected constructor(stepConfig: XProcStepConfiguration
             return loc
         }
 
-        fun newInstance(stepConfig: XProcStepConfiguration, href: URI?, offset: Int, attr: Map<QName,String?> = emptyMap()): XvrlLocation {
+        fun newInstance(stepConfig: StepConfiguration, href: URI?, offset: Int, attr: Map<QName,String?> = emptyMap()): XvrlLocation {
             val loc = XvrlLocation(stepConfig)
             loc.setAttributes(attr)
             href?.let { loc.setAttribute(_href, "${it}") }
@@ -159,7 +159,7 @@ open class XvrlLocation protected constructor(stepConfig: XProcStepConfiguration
     }
 
     override fun serialize(builder: SaxonTreeBuilder) {
-        builder.addStartElement(NsXvrl.location, stepConfig.attributeMap(attributes))
+        builder.addStartElement(NsXvrl.location, stepConfig.typeUtils.attributeMap(attributes))
         builder.addEndElement()
     }
 }

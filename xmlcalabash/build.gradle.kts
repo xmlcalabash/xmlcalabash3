@@ -109,9 +109,9 @@ dependencies {
   implementation("org.jline:jline-terminal-jni:3.28.0")
   implementation("org.jline:jline-reader:3.28.0")
 
-  implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:{$dep_jacksonDataformat}")
-  implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-toml:{$dep_jacksonDataformat}")
-  implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-csv:{$dep_jacksonDataformat}")
+  implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:${dep_jacksonDataformat}")
+  implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-toml:${dep_jacksonDataformat}")
+  implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-csv:${dep_jacksonDataformat}")
 
   implementation(files("lib/"))
 }

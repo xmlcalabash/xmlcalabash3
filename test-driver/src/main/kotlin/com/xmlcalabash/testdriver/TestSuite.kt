@@ -1,6 +1,6 @@
 package com.xmlcalabash.testdriver
 
-import com.xmlcalabash.config.XmlCalabash
+import com.xmlcalabash.XmlCalabash
 import com.xmlcalabash.exceptions.XProcError
 import net.sf.saxon.s9api.QName
 import net.sf.saxon.s9api.XdmNode
@@ -18,6 +18,7 @@ class TestSuite(val xmlCalabash: XmlCalabash, val options: TestOptions) {
         }
 
     fun loadTest(testFile: File): TestCase {
+        println("Load ${testFile.absolutePath}")
         val case = TestCase(this, testFile)
         case.load()
         if (!options.onlyExpectedToPass || case.expected == "pass") {

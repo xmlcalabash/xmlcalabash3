@@ -119,7 +119,7 @@ class AssertionsMonitor(): Monitor {
                 }
 
                 // Small hack to use qnames, these should just be string keys...
-                val map = stepConfig.asMap(stepConfig.forceQNameKeys(value))
+                val map = stepConfig.typeUtils.asMap(stepConfig.typeUtils.forceQNameKeys(value))
                 for ((name, values) in map) {
                     if (name.namespaceUri != NamespaceUri.NULL) {
                         step.stepConfig.warn { "The cx:assertions port names must be strings: ${assertions}" }

@@ -1,7 +1,7 @@
 package com.xmlcalabash.io
 
-import com.xmlcalabash.documents.DocumentContext
 import com.xmlcalabash.exceptions.XProcError
+import com.xmlcalabash.datamodel.DocumentContext
 import net.sf.saxon.s9api.QName
 import net.sf.saxon.s9api.XdmValue
 

@@ -1,5 +1,6 @@
 package com.xmlcalabash.xvrl
 
+import com.xmlcalabash.config.StepConfiguration
 import com.xmlcalabash.namespace.NsXvrl
 import com.xmlcalabash.runtime.XProcStepConfiguration
 import com.xmlcalabash.util.SaxonTreeBuilder
@@ -9,9 +10,9 @@ import net.sf.saxon.s9api.XdmNode
 import java.net.URI
 import java.time.ZonedDateTime
 
-class XvrlReportMetadata private constructor(stepConfiguration: XProcStepConfiguration): XvrlElement(stepConfiguration) {
+class XvrlReportMetadata private constructor(stepConfiguration: StepConfiguration): XvrlElement(stepConfiguration) {
     companion object {
-        fun newInstance(stepConfig: XProcStepConfiguration, attr: Map<QName,String?> = emptyMap()): XvrlReportMetadata {
+        fun newInstance(stepConfig: StepConfiguration, attr: Map<QName,String?> = emptyMap()): XvrlReportMetadata {
             val metadata = XvrlReportMetadata(stepConfig)
             metadata.commonAttributes(attr)
             return metadata
@@ -246,7 +247,7 @@ class XvrlReportMetadata private constructor(stepConfiguration: XProcStepConfigu
             return
         }
 
-        builder.addStartElement(NsXvrl.metadata, stepConfig.attributeMap(attributes))
+        builder.addStartElement(NsXvrl.metadata, stepConfig.typeUtils.attributeMap(attributes))
         timestamp?.serialize(builder)
         validator?.serialize(builder)
         creator?.serialize(builder)

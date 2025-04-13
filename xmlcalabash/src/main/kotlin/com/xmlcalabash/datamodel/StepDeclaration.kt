@@ -3,8 +3,6 @@ package com.xmlcalabash.datamodel
 import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.exceptions.XProcException
 import com.xmlcalabash.namespace.NsCx
-import com.xmlcalabash.namespace.NsP
-import com.xmlcalabash.runtime.XProcStepConfigurationImpl
 import com.xmlcalabash.util.AssertionsLevel
 import com.xmlcalabash.util.AssertionsMonitor
 import com.xmlcalabash.util.DurationUtils
@@ -19,7 +17,7 @@ abstract class StepDeclaration(parent: XProcInstruction?, stepConfig: Instructio
     var name: String
         get() {
             if (!nameAssigned) {
-                stepConfig.stepName = stepConfig.environment.uniqueName("!${instructionType.localName}")
+                stepConfig.stepName = stepConfig.uniqueName("!${instructionType.localName}")
                 nameAssigned = true
             }
             return stepConfig.stepName
@@ -86,11 +84,11 @@ abstract class StepDeclaration(parent: XProcInstruction?, stepConfig: Instructio
         super.elaborateInstructions()
         checkInputBindings()
 
-        if (stepConfig.xmlCalabash.xmlCalabashConfig.assertions != AssertionsLevel.IGNORE) {
+        if (stepConfig.xmlCalabashConfig.assertions != AssertionsLevel.IGNORE) {
             AssertionsMonitor.parseStepAssertions(this)
         }
 
-        stepConfig.validationMode = stepConfig.xmlCalabash.xmlCalabashConfig.validationMode
+        stepConfig.validationMode = stepConfig.xmlCalabashConfig.validationMode
         when (extensionAttributes[NsCx.validationMode]) {
             null -> Unit
             "strict" -> stepConfig.validationMode = ValidationMode.STRICT
@@ -168,7 +166,7 @@ abstract class StepDeclaration(parent: XProcInstruction?, stepConfig: Instructio
                     val wi = exprStep.withInput()
                     wi.port = "source"
                     for (child in option.children) {
-                       val binding = child as ConnectionInstruction
+                        val binding = child as ConnectionInstruction
                         when (binding) {
                             is PipeInstruction -> {
                                 val pipe = wi.pipe()
@@ -225,7 +223,7 @@ abstract class StepDeclaration(parent: XProcInstruction?, stepConfig: Instructio
         }
         for (depend in steplist.split("\\s+".toRegex())) {
             try {
-                depends.add(stepConfig.parseNCName(depend))
+                depends.add(stepConfig.typeUtils.parseNCName(depend))
             } catch (ex: XProcException) {
                 throw ex.error.asStatic().exception()
             }

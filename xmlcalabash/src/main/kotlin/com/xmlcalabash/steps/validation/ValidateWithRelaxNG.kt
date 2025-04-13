@@ -8,7 +8,6 @@ import com.thaiopensource.validate.auto.AutoSchemaReader
 import com.thaiopensource.validate.prop.rng.RngProperty
 import com.thaiopensource.validate.rng.CompactSchemaReader
 import com.xmlcalabash.XmlCalabashBuildConfig
-import com.xmlcalabash.config.XmlCalabashConfiguration
 import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.namespace.Ns

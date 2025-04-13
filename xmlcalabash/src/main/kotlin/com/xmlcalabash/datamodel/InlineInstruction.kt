@@ -53,14 +53,14 @@ class InlineInstruction(parent: XProcInstruction, xmlDocument: XdmNode): Connect
     override fun elaborateInstructions() {
         if (_documentProperties == null) {
             val stype = "map(Q{${NsXs.namespace}}QName, item()*)"
-            _documentProperties = XProcExpression.constant(parent!!.stepConfig, XdmMap(), parent!!.stepConfig.parseSequenceType(stype))
+            _documentProperties = XProcExpression.constant(parent!!.stepConfig, XdmMap(), parent!!.stepConfig.typeUtils.parseSequenceType(stype))
         }
 
         val isRunPipeline = false // = parent != null && parent!!.parent is RunBuilder
 
         // Force inlines to have unique URIs because document-uri(). Bleh.
         val uri = xml.baseURI?.toString() ?: ""
-        val inlineBaseUri = stepConfig.environment.uniqueUri(uri)
+        val inlineBaseUri = stepConfig.uniqueUri(uri)
 
         if (contentType == null) {
             _contentType = MediaType.XML

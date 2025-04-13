@@ -1,8 +1,9 @@
 package com.xmlcalabash.runtime
 
+import com.xmlcalabash.config.StepConfiguration
 import com.xmlcalabash.datamodel.XProcExpression
-import com.xmlcalabash.documents.DocumentContext
 import com.xmlcalabash.documents.XProcDocument
+import com.xmlcalabash.datamodel.DocumentContext
 import net.sf.saxon.s9api.XdmValue
 
 /**
@@ -13,20 +14,20 @@ import net.sf.saxon.s9api.XdmValue
  * runtime. Perhaps a better solution would be to resolve the conflict between
  * StepConfiguration and RuntimeStepConfiguration, but we'll do this kludge for now.
  */
-class LazyValue private constructor(val context: DocumentContext, config: XProcStepConfiguration) {
+class LazyValue private constructor(val context: DocumentContext, config: StepConfiguration) {
     private var expression: XProcExpression? = null
     private var constant: XProcDocument? = null
     private val resolvedConfig = config.copy()
 
     init {
-        resolvedConfig.putAllNamespaces(context.inscopeNamespaces)
+        resolvedConfig.updateWith(context.inscopeNamespaces)
     }
 
-    constructor(context: DocumentContext, expression: XProcExpression, config: XProcStepConfiguration): this(context, config) {
+    constructor(context: DocumentContext, expression: XProcExpression, config: StepConfiguration): this(context, config) {
         this.expression = expression
     }
 
-    constructor(doc: XProcDocument, config: XProcStepConfiguration): this(doc.context, config) {
+    constructor(doc: XProcDocument, config: StepConfiguration): this(doc.context, config) {
         this.constant = doc
     }
 

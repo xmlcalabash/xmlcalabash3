@@ -371,7 +371,7 @@ class PipelineVisualization private constructor(val instruction: XProcInstructio
                 "sequence" to "${sequence}",
                 "welded-shut" to (if (weldedShut) "true" else null)
             )
-            builder.addStartElement(NsDescription.g("port", gPrefix), instruction.stepConfig.stringAttributeMap(attr), nsmap)
+            builder.addStartElement(NsDescription.g("port", gPrefix), instruction.stepConfig.typeUtils.stringAttributeMap(attr), nsmap)
             builder.addText(name)
             builder.addEndElement()
         }
@@ -436,7 +436,7 @@ class PipelineVisualization private constructor(val instruction: XProcInstructio
 
             attr.putAll(attributes)
 
-            builder.addStartElement(gi, instruction.stepConfig.stringAttributeMap(attr), nsmap)
+            builder.addStartElement(gi, instruction.stepConfig.typeUtils.stringAttributeMap(attr), nsmap)
             builder.addStartElement(NsDescription.g("inputs", gPrefix), EmptyAttributeMap.getInstance(), nsmap)
             for (input in inputs) {
                 input.makeXml(builder)
@@ -470,13 +470,13 @@ class PipelineVisualization private constructor(val instruction: XProcInstructio
             attr.putAll(attributes)
 
             if (type == NsP.declareStep) {
-                builder.addStartElement(NsDescription.g("declare-step", gPrefix), instruction.stepConfig.stringAttributeMap(attr), nsmap)
+                builder.addStartElement(NsDescription.g("declare-step", gPrefix), instruction.stepConfig.typeUtils.stringAttributeMap(attr), nsmap)
                 val head = children.filterIsInstance<Head>().first()
                 io(builder, head.inputs, NsDescription.g("input", gPrefix))
                 val foot = children.filterIsInstance<Foot>().first()
                 io(builder, foot.outputs, NsDescription.g("output", gPrefix))
             } else {
-                builder.addStartElement(NsDescription.g("compound-step", gPrefix), instruction.stepConfig.stringAttributeMap(attr), nsmap)
+                builder.addStartElement(NsDescription.g("compound-step", gPrefix), instruction.stepConfig.typeUtils.stringAttributeMap(attr), nsmap)
             }
             for (child in children) {
                 child.makeXml(builder)
@@ -492,7 +492,7 @@ class PipelineVisualization private constructor(val instruction: XProcInstructio
                     "to-port" to edge.toPort,
                     "implicit" to (if (edge.implicit) "true" else null),
                     )
-                builder.addStartElement(NsDescription.g("edge", gPrefix), instruction.stepConfig.stringAttributeMap(attr), nsmap)
+                builder.addStartElement(NsDescription.g("edge", gPrefix), instruction.stepConfig.typeUtils.stringAttributeMap(attr), nsmap)
                 builder.addEndElement()
             }
 
@@ -503,7 +503,7 @@ class PipelineVisualization private constructor(val instruction: XProcInstructio
                         "from" to "input_${port.id}",
                         "to" to "_${port.id}"
                     )
-                    builder.addStartElement(NsDescription.g("edge", gPrefix), instruction.stepConfig.stringAttributeMap(edgeattr), nsmap)
+                    builder.addStartElement(NsDescription.g("edge", gPrefix), instruction.stepConfig.typeUtils.stringAttributeMap(edgeattr), nsmap)
                     builder.addEndElement()
                 }
 
@@ -513,7 +513,7 @@ class PipelineVisualization private constructor(val instruction: XProcInstructio
                         "from" to "_${port.id}",
                         "to" to "output_${port.id}"
                     )
-                    builder.addStartElement(NsDescription.g("edge", gPrefix), instruction.stepConfig.stringAttributeMap(edgeattr), nsmap)
+                    builder.addStartElement(NsDescription.g("edge", gPrefix), instruction.stepConfig.typeUtils.stringAttributeMap(edgeattr), nsmap)
                     builder.addEndElement()
                 }
             }
@@ -530,7 +530,7 @@ class PipelineVisualization private constructor(val instruction: XProcInstructio
                     "sequence" to "${port.sequence}"
                 )
                 builder.addStartElement(element, EmptyAttributeMap.getInstance(), nsmap)
-                builder.addStartElement(NsDescription.g("port", gPrefix), instruction.stepConfig.stringAttributeMap(attr), nsmap)
+                builder.addStartElement(NsDescription.g("port", gPrefix), instruction.stepConfig.typeUtils.stringAttributeMap(attr), nsmap)
                 builder.addText(port.name)
                 builder.addEndElement()
                 builder.addEndElement()

@@ -1,13 +1,13 @@
 package com.xmlcalabash.test
 
-import com.xmlcalabash.config.XmlCalabash
+import com.xmlcalabash.XmlCalabash
+import com.xmlcalabash.config.StepConfiguration
 import com.xmlcalabash.namespace.NsXml
 import com.xmlcalabash.namespace.NsXs
 import com.xmlcalabash.runtime.XProcStepConfiguration
 import com.xmlcalabash.util.SaxonTreeBuilder
 import com.xmlcalabash.util.SchematronImpl
 import com.xmlcalabash.xvrl.XvrlReport
-import com.xmlcalabash.xvrl.XvrlReports
 import net.sf.saxon.s9api.QName
 import net.sf.saxon.s9api.XdmDestination
 import net.sf.saxon.s9api.XdmNode
@@ -21,7 +21,7 @@ import java.net.URI
 
 @TestInstance(PER_CLASS)
 class XvrlReportTest {
-    lateinit var stepConfig: XProcStepConfiguration
+    lateinit var stepConfig: StepConfiguration
 
     @BeforeAll
     fun init() {
@@ -100,5 +100,4 @@ class XvrlReportTest {
         val node = reports.asXml()
         Assertions.assertNotNull(node)
     }
-
 }

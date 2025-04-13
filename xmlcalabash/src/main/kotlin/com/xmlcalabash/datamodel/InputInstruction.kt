@@ -21,7 +21,7 @@ class InputInstruction(parent: XProcInstruction): InputBindingInstruction(parent
             if (value == null) {
                 _select = null
             } else {
-                _select = value.cast(parent!!.stepConfig.parseSequenceType("item()*"))
+                _select = value.cast(parent!!.stepConfig.typeUtils.parseSequenceType("item()*"))
             }
             /*
             if (parent is DeclareStepInstruction) {

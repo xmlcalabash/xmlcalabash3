@@ -1,7 +1,5 @@
 package com.xmlcalabash.datamodel
 
-import com.xmlcalabash.documents.DocumentProperties
-import com.xmlcalabash.documents.XProcDocument
 import net.sf.saxon.om.NamespaceUri
 import net.sf.saxon.s9api.QName
 import net.sf.saxon.s9api.XdmNode
@@ -149,10 +147,6 @@ abstract class XProcInstruction internal constructor(initialParent: XProcInstruc
             p = p.parent
         }
         return null
-    }
-
-    fun fromString(xml: String, properties: DocumentProperties = DocumentProperties()): XProcDocument {
-        return stepConfig.fromString(xml, properties, emptyMap())
     }
 
     override fun toString(): String {

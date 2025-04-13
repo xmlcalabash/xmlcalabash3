@@ -18,7 +18,7 @@ open class DocumentStep(val params: DocumentStepParameters): AbstractAtomicStep(
         if (options.containsKey(Ns.documentProperties)) {
             val docProps = options[Ns.documentProperties]!!.value
             if (docProps is XdmMap) {
-                props.setAll(stepConfig.asMap(stepConfig.forceQNameKeys(docProps.underlyingValue as MapItem)))
+                props.setAll(stepConfig.typeUtils.asMap(stepConfig.typeUtils.forceQNameKeys(docProps.underlyingValue as MapItem)))
             }
         }
 
@@ -36,7 +36,7 @@ open class DocumentStep(val params: DocumentStepParameters): AbstractAtomicStep(
         if (options.containsKey(Ns.parameters)) {
             val docParams = options[Ns.parameters]!!.value
             if (docParams is XdmMap) {
-                params.putAll(stepConfig.asMap(stepConfig.forceQNameKeys(docParams.underlyingValue as MapItem)))
+                params.putAll(stepConfig.typeUtils.asMap(stepConfig.typeUtils.forceQNameKeys(docParams.underlyingValue as MapItem)))
             }
         }
 

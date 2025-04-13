@@ -26,26 +26,26 @@ open class AtomicBuiltinStepModel(runtime: XProcRuntime, val model: AtomicModel)
         provider = when (childStep.instructionType) {
             NsCx.empty -> {
                 params = EmptyStepParameters(name, location, inputs, outputs, options)
-                runtime.environment.commonEnvironment.stepProvider(params)
+                runtime.environment.stepProvider(params)
             }
 
             NsCx.inline -> {
                 val step = childStep as AtomicInlineStepInstruction
                 params = InlineStepParameters(name, location, inputs, outputs, options,
                     step.filter, step.contentType, step.encoding)
-                runtime.environment.commonEnvironment.stepProvider(params)
+                runtime.environment.stepProvider(params)
             }
 
             NsCx.document -> {
                 val step = childStep as AtomicDocumentStepInstruction
                 params = DocumentStepParameters(name, location, inputs, outputs, options, step.contentType)
-                runtime.environment.commonEnvironment.stepProvider(params)
+                runtime.environment.stepProvider(params)
             }
 
             NsCx.select -> {
                 val step = childStep as AtomicSelectStepInstruction
                 val param = SelectStepParameters(name, location, inputs, outputs, options, step.select)
-                runtime.environment.commonEnvironment.stepProvider(param)
+                runtime.environment.stepProvider(param)
             }
 
             NsCx.expression -> {
@@ -72,18 +72,18 @@ open class AtomicBuiltinStepModel(runtime: XProcRuntime, val model: AtomicModel)
                     ExpressionStepParameters(name, location, inputs, outputs, inscopeOptions, step)
                 }
 
-                runtime.environment.commonEnvironment.stepProvider(params)
+                runtime.environment.stepProvider(params)
             }
 
             else -> {
                 params = RuntimeStepParameters(childStep.instructionType, childStep.name, childStep.location,
                     inputs, outputs, options)
-                runtime.environment.commonEnvironment.stepProvider(params)
+                runtime.environment.stepProvider(params)
             }
         }
     }
 
     override fun runnable(config: XProcStepConfiguration): () -> AbstractStep {
-        return { AtomicStep(config.copy(stepConfig), this) }
+        return { AtomicStep(config.copy(), this) }
     }
 }

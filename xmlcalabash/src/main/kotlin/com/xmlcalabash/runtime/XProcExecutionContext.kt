@@ -1,16 +1,14 @@
 package com.xmlcalabash.runtime
 
-import com.xmlcalabash.documents.XProcBinaryDocument
+import com.xmlcalabash.config.StepConfiguration
 import com.xmlcalabash.documents.XProcDocument
-import com.xmlcalabash.namespace.NsCx
 import net.sf.saxon.om.GroundedValue
 import net.sf.saxon.s9api.QName
-import net.sf.saxon.s9api.XdmAtomicValue
 import net.sf.saxon.s9api.XdmMap
 import net.sf.saxon.s9api.XdmNode
 import net.sf.saxon.s9api.XdmValue
 
-open class XProcExecutionContext(val stepConfig: XProcStepConfiguration) {
+open class XProcExecutionContext(val stepConfig: StepConfiguration) {
     var iterationPosition = 1L
     var iterationSize = 1L
     private val properties = mutableMapOf<GroundedValue, MutableList<XdmMap>>()
@@ -19,6 +17,7 @@ open class XProcExecutionContext(val stepConfig: XProcStepConfiguration) {
         iterationPosition = context.iterationPosition
         iterationSize = context.iterationSize
         properties.putAll(context.properties)
+        //println("Cpy XProcExecutionContext: ${context.properties.size}")
     }
 
     open fun stepAvailable(name: QName): Boolean {
@@ -37,7 +36,8 @@ open class XProcExecutionContext(val stepConfig: XProcStepConfiguration) {
                 if (!properties.containsKey(item)) {
                     properties[item] = mutableListOf()
                 }
-                properties[item]!!.add(stepConfig.asXdmMap(doc.properties.asMap()))
+                //println("Add ${item} to ${this}; ${doc.properties.asMap().size}")
+                properties[item]!!.add(stepConfig.typeUtils.asXdmMap(doc.properties.asMap()))
             }
         }
     }

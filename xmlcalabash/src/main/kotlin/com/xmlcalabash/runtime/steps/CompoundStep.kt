@@ -16,7 +16,7 @@ import net.sf.saxon.s9api.QName
 abstract class CompoundStep(config: XProcStepConfiguration, compound: CompoundStepModel): AbstractStep(config, compound) {
     companion object {
         fun newInstance(config: XProcStepConfiguration, compound: CompoundStepModel): CompoundStep {
-            val newConfig = config.copy(compound.stepConfig)
+            val newConfig = compound.stepConfig.copy()
             when (compound.type) {
                 NsP.declareStep -> return PipelineStep(newConfig, compound)
                 NsP.group -> return GroupStep(newConfig, compound)

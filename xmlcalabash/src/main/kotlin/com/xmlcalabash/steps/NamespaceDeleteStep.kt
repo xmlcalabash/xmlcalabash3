@@ -62,7 +62,7 @@ open class NamespaceDeleteStep(): AbstractAtomicStep(), ProcessMatchingNodes {
             newMap[attrName] = attr.value
         }
 
-        matcher.addStartElement(nodeName, stepConfig.attributeMap(newMap))
+        matcher.addStartElement(nodeName, stepConfig.typeUtils.attributeMap(newMap))
         return true
     }
 

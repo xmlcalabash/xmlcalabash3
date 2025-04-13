@@ -1,5 +1,6 @@
 package com.xmlcalabash.runtime
 
+import com.xmlcalabash.config.StepConfiguration
 import com.xmlcalabash.util.SaxonTreeBuilder
 import net.sf.saxon.om.AttributeMap
 import net.sf.saxon.om.EmptyAttributeMap
@@ -10,7 +11,7 @@ import net.sf.saxon.serialize.SerializationProperties
 import java.net.URI
 import javax.xml.xpath.XPathException
 
-class ProcessMatch(val stepConfig: XProcStepConfiguration,
+class ProcessMatch(val stepConfig: StepConfiguration,
                    val nodeProcessor: ProcessMatchingNodes,
                    val inScopeNamespaces: Map<String,NamespaceUri>,
                    val bindings: Map<QName,XdmValue> = mapOf()): SaxonTreeBuilder(stepConfig) {

@@ -41,14 +41,14 @@ open class XslFormatterStep(): AbstractAtomicStep() {
                 formatters.add(URI.create("https://xmlcalabash.com/paged-media/xsl-formatter/${value}"))
             }
         }
-        formatters.addAll(stepConfig.xmlCalabash.xmlCalabashConfig.pagedMediaXslProcessors)
+        formatters.addAll(stepConfig.xmlCalabashConfig.pagedMediaXslProcessors)
         if (formatters.isEmpty()) {
             formatters.add(StandardPagedMediaProvider.genericXslFormatter)
         }
 
         for (formatter in formatters) {
             stepConfig.debug { "Searching for ${formatter} css-formatter" }
-            for (manager in stepConfig.xmlCalabash.xmlCalabashConfig.pagedMediaManagers) {
+            for (manager in stepConfig.xmlCalabashConfig.pagedMediaManagers) {
                 if (manager.formatterAvailable(formatter)) {
                     xslManager = manager
                     break

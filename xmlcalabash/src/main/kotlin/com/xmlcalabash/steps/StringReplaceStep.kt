@@ -51,7 +51,7 @@ open class StringReplaceStep(): AbstractAtomicStep(), ProcessMatchingNodes {
 
     override fun attributes(node: XdmNode, matchingAttributes: AttributeMap, nonMatchingAttributes: AttributeMap): AttributeMap? {
         val amap = mutableMapOf<QName, String?>()
-        amap.putAll(stepConfig.attributeMap(nonMatchingAttributes))
+        amap.putAll(stepConfig.typeUtils.attributeMap(nonMatchingAttributes))
 
         for (attr in matchingAttributes.asList()) {
             val qname = QName(attr.nodeName.prefix, attr.nodeName.namespaceUri.toString(), attr.nodeName.localPart)
@@ -65,7 +65,7 @@ open class StringReplaceStep(): AbstractAtomicStep(), ProcessMatchingNodes {
             amap[qname] = evaluate(attrNode)
         }
 
-        return stepConfig.attributeMap(amap)
+        return stepConfig.typeUtils.attributeMap(amap)
     }
 
     override fun endElement(node: XdmNode) {

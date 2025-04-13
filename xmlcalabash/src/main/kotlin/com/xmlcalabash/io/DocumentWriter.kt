@@ -8,6 +8,7 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator.Feature
 import com.xmlcalabash.documents.XProcBinaryDocument
 import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.exceptions.XProcError
+import com.xmlcalabash.util.TypeUtils
 import com.xmlcalabash.namespace.Ns
 import com.xmlcalabash.namespace.NsCx
 import com.xmlcalabash.util.MediaClassification
@@ -112,7 +113,8 @@ class DocumentWriter(val doc: XProcDocument,
             val sname = serMethod.underlyingValue as QNameValue
             QName(sname.prefix, sname.namespaceURI.toString(), sname.localName)
         } else {
-            docContext.parseQName(serMethod.underlyingValue.stringValue)
+            val typeUtils = TypeUtils(docContext)
+            typeUtils.parseQName(serMethod.underlyingValue.stringValue)
         }
 
         if (method == Ns.json || method == Ns.adaptive) {

@@ -1,6 +1,6 @@
 package com.xmlcalabash.app
 
-import com.xmlcalabash.config.XmlCalabash
+import com.xmlcalabash.XmlCalabash
 import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.io.DocumentWriter
 import com.xmlcalabash.runtime.api.RuntimePort

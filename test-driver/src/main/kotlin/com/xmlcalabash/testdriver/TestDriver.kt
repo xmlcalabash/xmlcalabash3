@@ -1,8 +1,8 @@
 package com.xmlcalabash.testdriver
 
-import com.xmlcalabash.config.XmlCalabash
+import com.xmlcalabash.XmlCalabash
+import com.xmlcalabash.XmlCalabashBuilder
 import com.xmlcalabash.util.BufferingMessageReporter
-import com.xmlcalabash.util.DefaultXmlCalabashConfiguration
 import com.xmlcalabash.util.NopMessageReporter
 import com.xmlcalabash.util.SaxonTreeBuilder
 import com.xmlcalabash.util.AssertionsLevel
@@ -108,44 +108,71 @@ class TestDriver(val testOptions: TestOptions, val exclusions: Map<String, Strin
             testsToRun.addAll(allTests)
         }
 
-        val licensedConfig = DefaultXmlCalabashConfiguration()
-        licensedConfig.licensed = true
-        licensedConfig.uniqueInlineUris = false
-        licensedConfig.assertions = AssertionsLevel.WARNING
+        // We need different XmlCalabash instances for the different configurations.
+        // licensed/unlicensed
+        // eager/notEager
+        val builder = XmlCalabashBuilder()
 
-        val unlicensedConfig = DefaultXmlCalabashConfiguration()
-        unlicensedConfig.licensed = false
-        unlicensedConfig.uniqueInlineUris = false
-        unlicensedConfig.assertions = AssertionsLevel.WARNING
+        val eagerLicensed = builder
+            .setLicensed(true)
+            .setEagerEvaluation(true)
+            .setUniqueInlineUris(false)
+            .setAssertions(AssertionsLevel.WARNING)
+            .setMessageReporter(BufferingMessageReporter(100, NopMessageReporter()))
+            .setGraphviz(File("/opt/homebrew/bin/dot")) // FIXME:
+            .build()
 
-        val xmlCalabash = XmlCalabash.newInstance(licensedConfig)
-        xmlCalabash.commonEnvironment.messageReporter = { BufferingMessageReporter(100, NopMessageReporter()) }
+        val lazyLicensed = builder
+            .setEagerEvaluation(false)
+            .setMessageReporter(BufferingMessageReporter(100, NopMessageReporter()))
+            .build()
 
-        val saxonConfig = xmlCalabash.saxonConfig
+        val eagerUnlicensed = builder
+            .setLicensed(false)
+            .setEagerEvaluation(true)
+            .setMessageReporter(BufferingMessageReporter(100, NopMessageReporter()))
+            .build()
+
+        val lazyUnlicensed = XmlCalabashBuilder()
+            .setLicensed(false)
+            .setEagerEvaluation(false)
+            .setMessageReporter(BufferingMessageReporter(100, NopMessageReporter()))
+            .build()
+
+        val saxonConfig = eagerLicensed.saxonConfiguration
         println("Running tests with ${saxonConfig.processor.saxonEdition} version ${saxonConfig.processor.saxonProductVersion}")
 
-        val unlicensedXmlCalabash = XmlCalabash.newInstance(unlicensedConfig)
-        xmlCalabash.commonEnvironment.messageReporter = { BufferingMessageReporter(100, NopMessageReporter()) }
-
-        val licensedSuite = TestSuite(xmlCalabash, testOptions)
-        val unlicensedSuite = TestSuite(unlicensedXmlCalabash, testOptions)
+        val eagerLicensedSuite = TestSuite(eagerLicensed, testOptions)
+        val eagerUnlicensedSuite = TestSuite(eagerUnlicensed, testOptions)
+        val lazyLicensedSuite = TestSuite(lazyLicensed, testOptions)
+        val lazyUnlicensedSuite = TestSuite(lazyUnlicensed, testOptions)
 
         for (testFile in testsToRun) {
-            val case = licensedSuite.loadTest(testFile)
+            var case = lazyLicensedSuite.loadTest(testFile)
             if (case.features.contains("no-psvi-support")) {
-                licensedSuite.removeTest(case)
-                unlicensedSuite.loadTest(testFile)
+                lazyLicensedSuite.removeTest(case)
+                if (case.features.contains("eager-eval")) {
+                    eagerUnlicensedSuite.loadTest(testFile)
+                } else {
+                    lazyUnlicensedSuite.loadTest(testFile)
+                }
+            } else {
+                if (case.features.contains("eager-eval")) {
+                    lazyLicensedSuite.removeTest(case)
+                    eagerLicensedSuite.loadTest(testFile)
+                }
             }
         }
 
         for ((testFile, _) in skipTests) {
-            licensedSuite.loadTest(testFile)
+            lazyLicensedSuite.loadTest(testFile)
         }
 
         val allSuites = mutableListOf<TestSuite>()
-        allSuites.add(licensedSuite)
-        if (unlicensedSuite.testCases.isNotEmpty()) {
-            allSuites.add(unlicensedSuite)
+        for (suite in listOf(lazyLicensedSuite, lazyUnlicensedSuite, eagerLicensedSuite, eagerUnlicensedSuite)) {
+            if (suite.testCases.isNotEmpty()) {
+                allSuites.add(suite)
+            }
         }
 
         val suiteStart = System.nanoTime()
@@ -199,7 +226,7 @@ class TestDriver(val testOptions: TestOptions, val exclusions: Map<String, Strin
 
         statusDir.mkdirs()
 
-        makeReport(xmlCalabash)
+        makeReport(lazyLicensedSuite.xmlCalabash)
 
         println("Test suite: ${pass} pass (${percent}%), ${fail} fail, ${notrun} not run (${total} total)")
         var max = 10
@@ -247,7 +274,9 @@ class TestDriver(val testOptions: TestOptions, val exclusions: Map<String, Strin
                                 println("== Regressions ==========================================================")
                                 firstRegression = false
                             }
-                            println("NEW  ${status} ${testCase.testFile}")
+                            if (status.status == "fail") {
+                                println("NEW  ${status} ${testCase.testFile}")
+                            }
                         } else if (prev == status.toString()) {
                             // no change
                         } else {
@@ -300,7 +329,7 @@ class TestDriver(val testOptions: TestOptions, val exclusions: Map<String, Strin
             return
         }
 
-        val saxonConfig = xmlCalabash.saxonConfig
+        val saxonConfig = xmlCalabash.saxonConfiguration
         val report = SaxonTreeBuilder(saxonConfig.processor)
         report.startDocument(null)
 
@@ -409,5 +438,4 @@ class TestDriver(val testOptions: TestOptions, val exclusions: Map<String, Strin
         report.addStartElement(NsReport.property, attributeMap(map))
         report.addEndElement()
     }
-
 }

@@ -4,7 +4,6 @@ import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.exceptions.XProcException
 import com.xmlcalabash.namespace.Ns
-import com.xmlcalabash.namespace.Ns.code
 import com.xmlcalabash.namespace.NsCx
 import com.xmlcalabash.namespace.NsP
 import com.xmlcalabash.runtime.XProcStepConfiguration
@@ -64,7 +63,7 @@ open class StandardTraceListener: TraceListener {
         return document
     }
 
-    override fun summary(config: XProcStepConfiguration): XdmNode {
+    override fun summary(stepConfig: XProcStepConfiguration): XdmNode {
         val _startTime = QName("start-time")
         val _durationMs = QName("duration-ms")
         val _uri = QName("uri")
@@ -76,14 +75,14 @@ open class StandardTraceListener: TraceListener {
         nsMap = nsMap.put("p", NsP.namespace)
         nsMap = nsMap.put("cx", NsCx.namespace)
 
-        val builder = SaxonTreeBuilder(config)
+        val builder = SaxonTreeBuilder(stepConfig)
         builder.startDocument(null)
         builder.addStartElement(NsTrace.trace, EmptyAttributeMap.getInstance(), nsMap)
 
         val utc = ZoneId.of("UTC")
 
         for (thread in threads) {
-            builder.addStartElement(NsTrace.thread, config.attributeMap(mapOf(Ns.id to "${thread}")), nsMap)
+            builder.addStartElement(NsTrace.thread, stepConfig.typeUtils.attributeMap(mapOf(Ns.id to "${thread}")), nsMap)
             val threadTrace = trace.filter { it.threadId == thread }
             for ((index, detail) in threadTrace.withIndex()) {
                 when (detail) {
@@ -118,13 +117,13 @@ open class StandardTraceListener: TraceListener {
                             attributes[Ns.error] = reason
                         }
 
-                        builder.addStartElement(NsTrace.step, config.attributeMap(attributes), localNsMap)
+                        builder.addStartElement(NsTrace.step, stepConfig.typeUtils.attributeMap(attributes), localNsMap)
                     }
                     is StepStopDetail -> {
                         builder.addEndElement()
                     }
                     is DocumentDetail -> {
-                        documentSummary(config, builder, detail)
+                        documentSummary(stepConfig, builder, detail)
                     }
                     is GetResourceDetail -> {
                         val instant = Instant.ofEpochMilli(detail.startTime)
@@ -144,7 +143,7 @@ open class StandardTraceListener: TraceListener {
                         if (detail.cached) {
                             attributes[_cached] = "${detail.cached}"
                         }
-                        builder.addStartElement(NsTrace.resource, config.attributeMap(attributes))
+                        builder.addStartElement(NsTrace.resource, stepConfig.typeUtils.attributeMap(attributes))
                         builder.addEndElement()
                     }
                     else -> {
@@ -167,13 +166,13 @@ open class StandardTraceListener: TraceListener {
         if (detail.contentType != null) {
             atts[Ns.contentType] = detail.contentType.toString()
         }
-        builder.addStartElement(NsTrace.document, config.attributeMap(atts))
+        builder.addStartElement(NsTrace.document, config.typeUtils.attributeMap(atts))
 
-        builder.addStartElement(NsTrace.from, config.attributeMap(mapOf(
+        builder.addStartElement(NsTrace.from, config.typeUtils.attributeMap(mapOf(
             Ns.id to detail.from.first,
             Ns.port to detail.from.second)))
         builder.addEndElement()
-        builder.addStartElement(NsTrace.to, config.attributeMap(mapOf(
+        builder.addStartElement(NsTrace.to, config.typeUtils.attributeMap(mapOf(
             Ns.id to detail.to.first,
             Ns.port to detail.to.second)))
         builder.addEndElement()

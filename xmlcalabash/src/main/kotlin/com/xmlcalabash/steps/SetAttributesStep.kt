@@ -46,11 +46,11 @@ class SetAttributesStep(): AbstractAtomicStep(), ProcessMatchingNodes {
 
     override fun startElement(node: XdmNode, attributes: AttributeMap): Boolean {
         val newAttr = mutableMapOf<QName, String?>()
-        newAttr.putAll(stepConfig.attributeMap(attributes))
+        newAttr.putAll(stepConfig.typeUtils.attributeMap(attributes))
         for ((name, value) in attributeSet) {
             newAttr[name] = value
         }
-        matcher.addStartElement(node, stepConfig.attributeMap(newAttr))
+        matcher.addStartElement(node, stepConfig.typeUtils.attributeMap(newAttr))
         return true
     }
 

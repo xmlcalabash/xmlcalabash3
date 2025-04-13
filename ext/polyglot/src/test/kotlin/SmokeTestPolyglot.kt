@@ -1,14 +1,12 @@
-import com.xmlcalabash.config.XmlCalabash
+import com.xmlcalabash.XmlCalabash
 import com.xmlcalabash.util.BufferingReceiver
-import com.xmlcalabash.util.DefaultXmlCalabashConfiguration
 import org.junit.jupiter.api.Assertions.fail
 import org.junit.jupiter.api.Test
 import java.io.File
 
 class SmokeTestPolyglot {
     private fun runPipeline(name: String) {
-        val config = DefaultXmlCalabashConfiguration()
-        val calabash = XmlCalabash.newInstance(config)
+        val calabash = XmlCalabash.newInstance()
         val parser = calabash.newXProcParser()
         val decl = parser.parse(File("src/test/resources/${name}.xpl").toURI())
         val runtime = decl.runtime()

@@ -149,7 +149,7 @@ class MetadataExtractorImpl(private val config: XProcStepConfiguration, private 
             amap[_units] = "pt"
         }
 
-        builder.addStartElement(NsC.result, config.attributeMap(amap), nsmap)
+        builder.addStartElement(NsC.result, config.typeUtils.attributeMap(amap), nsmap)
 
         try {
             if (meta != null) {
@@ -225,7 +225,7 @@ class MetadataExtractorImpl(private val config: XProcStepConfiguration, private 
                     _type to tag.tagTypeHex,
                     _name to tag.tagName
                 )
-                builder.addStartElement(cTag, config.attributeMap(attr))
+                builder.addStartElement(cTag, config.typeUtils.attributeMap(attr))
 
                 var value = tag.description
 
@@ -343,7 +343,7 @@ class MetadataExtractorImpl(private val config: XProcStepConfiguration, private 
             }
 
             if (width > 0) {
-                builder.addStartElement(cTag, config.attributeMap(mapOf(
+                builder.addStartElement(cTag, config.typeUtils.attributeMap(mapOf(
                     _dir to "Exif",
                     _type to "0x9000",
                     _name to "Exif Version"
@@ -351,7 +351,7 @@ class MetadataExtractorImpl(private val config: XProcStepConfiguration, private 
                 builder.addText("0")
                 builder.addEndElement()
 
-                builder.addStartElement(cTag, config.attributeMap(mapOf(
+                builder.addStartElement(cTag, config.typeUtils.attributeMap(mapOf(
                     _dir to "Jpeg",
                     _type to "0x0001",
                     _name to "Image Height"
@@ -359,7 +359,7 @@ class MetadataExtractorImpl(private val config: XProcStepConfiguration, private 
                 builder.addText("${height} pixels")
                 builder.addEndElement()
 
-                builder.addStartElement(cTag, config.attributeMap(mapOf(
+                builder.addStartElement(cTag, config.typeUtils.attributeMap(mapOf(
                     _dir to "Jpeg",
                     _type to "0x0003",
                     _name to "Image Width"

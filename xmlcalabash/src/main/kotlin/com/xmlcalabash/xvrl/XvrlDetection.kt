@@ -1,21 +1,21 @@
 package com.xmlcalabash.xvrl
 
+import com.xmlcalabash.config.StepConfiguration
 import com.xmlcalabash.datamodel.Location
 import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.namespace.Ns
 import com.xmlcalabash.namespace.NsSaxon
 import com.xmlcalabash.namespace.NsXvrl
-import com.xmlcalabash.runtime.XProcStepConfiguration
 import com.xmlcalabash.util.SaxonTreeBuilder
 import net.sf.saxon.s9api.QName
 import net.sf.saxon.s9api.XdmNode
 import java.net.URI
 
-class XvrlDetection private constructor(stepConfig: XProcStepConfiguration): XvrlElement(stepConfig) {
+class XvrlDetection private constructor(stepConfig: StepConfiguration): XvrlElement(stepConfig) {
     companion object {
         val _severity = QName("severity")
 
-        fun newInstance(stepConfig: XProcStepConfiguration, severity: String, code: String? = null, attr: Map<QName,String?> = emptyMap()): XvrlDetection {
+        fun newInstance(stepConfig: StepConfiguration, severity: String, code: String? = null, attr: Map<QName,String?> = emptyMap()): XvrlDetection {
             if (severity !in listOf("info", "warning", "error", "fatal-error", "unspecified")) {
                 throw stepConfig.exception(XProcError.xiXvrlInvalidSeverity(severity))
             }
@@ -232,7 +232,7 @@ class XvrlDetection private constructor(stepConfig: XProcStepConfiguration): Xvr
     // ============================================================
 
     override fun serialize(builder: SaxonTreeBuilder) {
-        builder.addStartElement(NsXvrl.detection, stepConfig.attributeMap(attributes))
+        builder.addStartElement(NsXvrl.detection, stepConfig.typeUtils.attributeMap(attributes))
         location?.serialize(builder)
         provenance?.serialize(builder)
         for (item in title) {

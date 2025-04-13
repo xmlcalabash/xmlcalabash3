@@ -1,5 +1,6 @@
 package com.xmlcalabash.documents
 
+import com.xmlcalabash.datamodel.DocumentContext
 import com.xmlcalabash.io.MediaType
 import com.xmlcalabash.namespace.Ns
 import com.xmlcalabash.util.SaxonTreeBuilder

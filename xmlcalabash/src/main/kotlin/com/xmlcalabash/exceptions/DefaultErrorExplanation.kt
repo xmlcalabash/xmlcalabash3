@@ -1,6 +1,5 @@
 package com.xmlcalabash.exceptions
 
-import com.xmlcalabash.config.CommonEnvironment
 import com.xmlcalabash.datamodel.Location
 import com.xmlcalabash.documents.XProcBinaryDocument
 import com.xmlcalabash.documents.XProcDocument
@@ -23,8 +22,6 @@ import java.nio.charset.StandardCharsets
 import javax.xml.transform.sax.SAXSource
 
 class DefaultErrorExplanation(val printer: MessagePrinter): ErrorExplanation {
-    private var environment: CommonEnvironment? = null
-
     companion object {
         private var loaded = false
         private val messages = mutableListOf<ErrorExplanationTemplate>()
@@ -51,10 +48,6 @@ class DefaultErrorExplanation(val printer: MessagePrinter): ErrorExplanation {
 
             loaded = true
         }
-    }
-
-    override fun setEnvironment(environment: CommonEnvironment) {
-        this.environment = environment
     }
 
     override fun message(error: XProcError, includeDetails: Boolean): String {
@@ -280,8 +273,6 @@ class DefaultErrorExplanation(val printer: MessagePrinter): ErrorExplanation {
     }
 
     private fun showDetail(doc: XProcDocument): String {
-        val sb = StringBuilder()
-
         var message: String? = null
         if (doc is XProcBinaryDocument) {
             message = "...binary message cannot be displayed..."
@@ -316,7 +307,7 @@ class DefaultErrorExplanation(val printer: MessagePrinter): ErrorExplanation {
             writer.set(Ns.omitXmlDeclaration, "true")
             writer.set(Ns.indent, "true")
             writer.write()
-            message = baos.toString(environment?.config?.consoleEncoding ?: "US-ASCII")
+            message = baos.toString(printer.encoding)
         }
 
         if (message == null) {
@@ -329,10 +320,6 @@ class DefaultErrorExplanation(val printer: MessagePrinter): ErrorExplanation {
     private fun showXvrl(doc: XProcDocument): String {
         val sb = StringBuilder()
         val node = doc.value as XdmNode
-
-        if (environment?.messageReporter != null) {
-            environment!!.messageReporter().debug { "${node}" }
-        }
 
         // This is a slightly odd context, we don't have access to a step configuration
         // so we can't call on the document manager to load the stylesheet. But we
@@ -354,7 +341,7 @@ class DefaultErrorExplanation(val printer: MessagePrinter): ErrorExplanation {
         val baos = ByteArrayOutputStream()
         val writer = DocumentWriter(XProcDocument.ofText(xmlResult.xdmNode, doc.context), baos)
         writer.set(Ns.method, "text")
-        writer.set(Ns.encoding, environment?.config?.consoleEncoding ?: "UTF-8")
+        writer.set(Ns.encoding, printer.encoding)
         writer.write()
         val text = baos.toString(StandardCharsets.UTF_8)
         return text

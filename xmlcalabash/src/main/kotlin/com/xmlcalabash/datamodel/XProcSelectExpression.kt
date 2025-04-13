@@ -1,6 +1,6 @@
 package com.xmlcalabash.datamodel
 
-import com.xmlcalabash.runtime.XProcStepConfiguration
+import com.xmlcalabash.config.StepConfiguration
 import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.exceptions.XProcException
 import com.xmlcalabash.namespace.NsErr
@@ -11,9 +11,9 @@ import net.sf.saxon.s9api.XdmAtomicValue
 import net.sf.saxon.s9api.XdmValue
 import net.sf.saxon.type.BuiltInAtomicType
 
-class XProcSelectExpression private constructor(stepConfig: XProcStepConfiguration, val select: String, asType: SequenceType, collection: Boolean, values: List<XdmAtomicValue>): XProcExpression(stepConfig, asType, collection, values) {
+class XProcSelectExpression private constructor(stepConfig: StepConfiguration, val select: String, asType: SequenceType, collection: Boolean, values: List<XdmAtomicValue>): XProcExpression(stepConfig, asType, collection, values) {
     companion object {
-        fun newInstance(stepConfig: XProcStepConfiguration, select: String, asType: SequenceType, collection: Boolean, values: List<XdmAtomicValue> = emptyList()): XProcSelectExpression {
+        fun newInstance(stepConfig: StepConfiguration, select: String, asType: SequenceType, collection: Boolean, values: List<XdmAtomicValue> = emptyList()): XProcSelectExpression {
             return XProcSelectExpression(stepConfig, select, asType, collection, values)
         }
     }
@@ -22,11 +22,11 @@ class XProcSelectExpression private constructor(stepConfig: XProcStepConfigurati
         return select(stepConfig, select, asType, collection, values)
     }
 
-    override fun xevaluate(config: XProcStepConfiguration): () -> XdmValue {
+    override fun xevaluate(config: StepConfiguration): () -> XdmValue {
         return { evaluate(config) }
     }
 
-    override fun evaluate(config: XProcStepConfiguration): XdmValue {
+    override fun evaluate(config: StepConfiguration): XdmValue {
         val compiler = config.newXPathCompiler()
 
         // Hack
@@ -84,7 +84,7 @@ class XProcSelectExpression private constructor(stepConfig: XProcStepConfigurati
 
         if (asType !== SequenceType.ANY || values.isNotEmpty()) {
             try {
-                return config.checkType(null, result, asType, values)
+                return config.typeUtils.checkType(null, result, asType, values)
             } catch (ex: XProcException) {
                 if (ex.error.code == NsErr.xd(36) && asType.underlyingSequenceType.primaryType == BuiltInAtomicType.QNAME) {
                     throw ex.error.with(NsErr.xd(61)).exception()

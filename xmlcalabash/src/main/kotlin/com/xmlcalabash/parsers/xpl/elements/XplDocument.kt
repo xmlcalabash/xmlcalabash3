@@ -68,7 +68,7 @@ class XplDocument(val builder: PipelineBuilder, val xml: XdmNode) {
                                 && node.getAttributeValue(Ns.static) != null
                                 && parseBoolean(node.getAttributeValue(Ns.static))) {
                                 try {
-                                    val name = tree.stepConfig.parseQName(node.getAttributeValue(Ns.name))
+                                    val name = tree.stepConfig.typeUtils.parseQName(node.getAttributeValue(Ns.name))
                                     var defaultValue = node.getAttributeValue(Ns.select) ?: "()"
                                     OptionNode(tree, node, name, defaultValue)
                                 } catch (ex: Exception) {
@@ -132,7 +132,7 @@ class XplDocument(val builder: PipelineBuilder, val xml: XdmNode) {
                     val impl = if (decl.useWhen == null) {
                         StepImplementation(false, { false })
                     } else {
-                        StepImplementation(true, { (decl.useWhen == true) && (!decl.isAtomic || decl.stepConfig.environment.commonEnvironment.atomicStepAvailable(decl.type!!)) })
+                        StepImplementation(true, { (decl.useWhen == true) && (!decl.isAtomic || decl.stepConfig.atomicStepAvailable(decl.type!!)) })
                     }
                     exportedStepTypes[decl.type!!] = impl
                 }
@@ -150,7 +150,7 @@ class XplDocument(val builder: PipelineBuilder, val xml: XdmNode) {
                         val impl = if (child.useWhen == null) {
                             StepImplementation(false, { false })
                         } else {
-                            StepImplementation(true, { (child.useWhen == true) && (!child.isAtomic || decl.stepConfig.environment.commonEnvironment.atomicStepAvailable(child.type!!)) })
+                            StepImplementation(true, { (child.useWhen == true) && (!child.isAtomic || decl.stepConfig.atomicStepAvailable(child.type!!)) })
                         }
                         exportedStepTypes[child.type!!] = impl
                     }

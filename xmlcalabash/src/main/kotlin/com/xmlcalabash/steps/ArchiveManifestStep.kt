@@ -94,13 +94,13 @@ open class ArchiveManifestStep(): AbstractArchiveStep() {
 
     private fun archiveManifest(builder: SaxonTreeBuilder, format: String, archive: InputArchive) {
         archive.open()
-        builder.addStartElement(NsC.archive, stepConfig.attributeMap(mapOf(Ns.format to format)))
+        builder.addStartElement(NsC.archive, stepConfig.typeUtils.attributeMap(mapOf(Ns.format to format)))
         for (entry in archive.entries) {
             val amap = mutableMapOf<QName, String>()
             amap.putAll(entry.properties)
             amap[Ns.href] = "${relativeTo.resolve(entry.name)}"
             amap[Ns.contentType] = "${contentType(entry.name)}"
-            builder.addStartElement(NsC.entry, stepConfig.attributeMap(amap))
+            builder.addStartElement(NsC.entry, stepConfig.typeUtils.attributeMap(amap))
             builder.addEndElement()
         }
         builder.addEndElement()

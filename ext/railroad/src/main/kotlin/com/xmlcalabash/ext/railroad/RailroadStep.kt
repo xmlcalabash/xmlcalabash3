@@ -307,7 +307,7 @@ class RailroadStep(): AbstractAtomicStep() {
                                 amap[attr.nodeName] = value
                             }
                         }
-                        builder.addStartElement(node, stepConfig.attributeMap(amap))
+                        builder.addStartElement(node, stepConfig.typeUtils.attributeMap(amap))
                         for (child in node.axisIterator(Axis.CHILD)) {
                             addSubtree(builder, child)
                         }

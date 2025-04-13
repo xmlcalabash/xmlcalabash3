@@ -9,6 +9,6 @@ class AtomicDocumentStepInstruction(parent: XProcInstruction): AtomicStepInstruc
     lateinit var parameters: XProcExpression
 
     init {
-        name = stepConfig.environment.uniqueName("!${instructionType.localName}")
+        name = stepConfig.uniqueName("!${instructionType.localName}")
     }
 }

@@ -47,7 +47,7 @@ class DocumentPropertyFunction(private val config: SaxonConfiguration): Extensio
         }
 
         override fun call(context: XPathContext?, arguments: Array<out Sequence>?): Sequence {
-            val dynamicContext = config.environment.getExecutionContext()
+            val dynamicContext = config.getExecutionContext()
 
             val item = arguments!![0].head()
             val propname = arguments[1].head()

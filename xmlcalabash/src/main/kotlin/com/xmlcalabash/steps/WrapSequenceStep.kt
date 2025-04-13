@@ -1,7 +1,7 @@
 package com.xmlcalabash.steps
 
-import com.xmlcalabash.documents.DocumentContext
 import com.xmlcalabash.documents.XProcDocument
+import com.xmlcalabash.datamodel.DocumentContext
 import com.xmlcalabash.namespace.Ns
 import com.xmlcalabash.namespace.NsXml
 import com.xmlcalabash.util.SaxonTreeBuilder
@@ -37,7 +37,7 @@ open class WrapSequenceStep(): AbstractAtomicStep() {
                 baseUri = URI(value.underlyingValue.stringValue)
             }
         }
-        attributeMap = stepConfig.attributeMap(attributeSet)
+        attributeMap = stepConfig.typeUtils.attributeMap(attributeSet)
 
         if (groupAdjacent == null) {
             runSimple()
@@ -81,7 +81,7 @@ open class WrapSequenceStep(): AbstractAtomicStep() {
             var equal = false
 
             if (lastValue != null) {
-                equal = stepConfig.xpathDeepEqual(lastValue, thisValue)
+                equal = stepConfig.typeUtils.xpathDeepEqual(lastValue, thisValue)
                 if (equal) {
                     builder!!.addSubtree(doc.value)
                 } else {

@@ -1,5 +1,6 @@
 package com.xmlcalabash.util
 
+import com.xmlcalabash.config.StepConfiguration
 import com.xmlcalabash.io.MediaType
 import com.xmlcalabash.documents.DocumentProperties
 import com.xmlcalabash.documents.XProcDocument
@@ -171,7 +172,7 @@ class S9Api {
             }
         }
 
-        fun makeDocuments(stepConfig: XProcStepConfiguration, result: XdmValue): List<XProcDocument> {
+        fun makeDocuments(stepConfig: StepConfiguration, result: XdmValue): List<XProcDocument> {
             val selections = mutableListOf<XProcDocument>()
             for (value in result.iterator()) {
                 when (value) {

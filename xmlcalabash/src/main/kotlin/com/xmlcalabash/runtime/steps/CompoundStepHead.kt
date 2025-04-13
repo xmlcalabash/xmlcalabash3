@@ -88,7 +88,7 @@ class CompoundStepHead(config: XProcStepConfiguration, val parent: CompoundStep,
     override fun input(port: String, doc: XProcDocument) {
         // N.B. inputs and outputs are swapped in the head
         if (port.startsWith("Q{")) {
-            val name = stepConfig.parseQName(port)
+            val name = stepConfig.typeUtils.parseQName(port)
 
             if ((type.namespaceUri == NsP.namespace && name == Ns.message)
                 || (type.namespaceUri != NsP.namespace && name == NsP.message)) {
@@ -220,7 +220,8 @@ class CompoundStepHead(config: XProcStepConfiguration, val parent: CompoundStep,
             if (cache[port] != null) {
                 if (params.outputs[port]?.primary == true) {
                     for (doc in cache[port]!!) {
-                        documents.add(validate(doc))
+                        //documents.add(validate(doc))
+                        documents.add(doc)
                     }
                 } else {
                     documents.addAll(cache[port]!!)
@@ -229,7 +230,7 @@ class CompoundStepHead(config: XProcStepConfiguration, val parent: CompoundStep,
 
             val rpair = receiver[port]
             if (rpair == null) {
-                if (stepConfig.xmlCalabash.xmlCalabashConfig.verbosity <= Verbosity.DEBUG) {
+                if (stepConfig.xmlCalabashConfig.verbosity <= Verbosity.DEBUG) {
                     // Ultimately, I don't think these ever matter, but for debugging purposes...
                     if (((type == NsP.choose || type == NsP.`if`) && port == "!context")
                         || ((type == NsP.catch || type == NsP.finally) && port == "error")

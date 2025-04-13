@@ -31,7 +31,7 @@ open class TryStep(config: XProcStepConfiguration, compound: CompoundStepModel):
             }
         }
 
-        stepConfig.environment.newExecutionContext(stepConfig)
+        stepConfig.saxonConfig.newExecutionContext(stepConfig)
         head.runStep()
 
         var errorDocument: XProcDocument? = null
@@ -80,7 +80,7 @@ open class TryStep(config: XProcStepConfiguration, compound: CompoundStepModel):
             }
         }
 
-        stepConfig.environment.releaseExecutionContext()
+        stepConfig.saxonConfig.releaseExecutionContext()
 
         if (throwException != null) {
             throw throwException
@@ -114,7 +114,7 @@ open class TryStep(config: XProcStepConfiguration, compound: CompoundStepModel):
 
         val builder = SaxonTreeBuilder(stepConfig)
         builder.startDocument(null)
-        builder.addStartElement(NsC.errors, step.stepConfig.stringAttributeMap(emptyMap()), nsmap)
+        builder.addStartElement(NsC.errors, step.stepConfig.typeUtils.stringAttributeMap(emptyMap()), nsmap)
 
         val attr = mutableMapOf<String, String?>()
 
@@ -131,7 +131,7 @@ open class TryStep(config: XProcStepConfiguration, compound: CompoundStepModel):
                 attr["column"] = error.location.columnNumber.toString()
             }
 
-            builder.addStartElement(NsC.error, step.stepConfig.stringAttributeMap(attr), nsmap)
+            builder.addStartElement(NsC.error, step.stepConfig.typeUtils.stringAttributeMap(attr), nsmap)
 
             if (error.inputLocation.baseUri != null || error.inputLocation.lineNumber > 0) {
                 attr.clear()
@@ -142,7 +142,7 @@ open class TryStep(config: XProcStepConfiguration, compound: CompoundStepModel):
                 if (error.inputLocation.columnNumber > 0) {
                     attr["column"] = error.inputLocation.columnNumber.toString()
                 }
-                builder.addStartElement(NsCx.inputLocation, step.stepConfig.stringAttributeMap(attr), nsmap)
+                builder.addStartElement(NsCx.inputLocation, step.stepConfig.typeUtils.stringAttributeMap(attr), nsmap)
                 builder.addEndElement()
             }
 
@@ -168,13 +168,13 @@ open class TryStep(config: XProcStepConfiguration, compound: CompoundStepModel):
             }
 
             if (error.stackTrace.isNotEmpty()) {
-                builder.addStartElement(NsCx.stackTrace, step.stepConfig.stringAttributeMap(emptyMap()), nsmap)
+                builder.addStartElement(NsCx.stackTrace, step.stepConfig.typeUtils.stringAttributeMap(emptyMap()), nsmap)
 
                 for (frame in error.stackTrace) {
                     attr.clear()
                     attr["type"] = frame.stepType.toString()
                     attr["name"] = frame.stepName
-                    builder.addStartElement(NsCx.stackFrame, step.stepConfig.stringAttributeMap(attr), nsmap)
+                    builder.addStartElement(NsCx.stackFrame, step.stepConfig.typeUtils.stringAttributeMap(attr), nsmap)
                     builder.addEndElement()
                 }
 
@@ -183,7 +183,7 @@ open class TryStep(config: XProcStepConfiguration, compound: CompoundStepModel):
 
             builder.addEndElement()
         } else {
-            builder.addStartElement(NsC.error, step.stepConfig.stringAttributeMap(attr), nsmap)
+            builder.addStartElement(NsC.error, step.stepConfig.typeUtils.stringAttributeMap(attr), nsmap)
             builder.addText(exception.message ?: "")
             builder.addEndElement()
         }

@@ -34,7 +34,7 @@ open class PackStep(): AbstractAtomicStep() {
         while (source.isNotEmpty() || alternate.isNotEmpty()) {
             val builder = SaxonTreeBuilder(stepConfig)
             builder.startDocument(baseUri)
-            builder.addStartElement(wrapperName, stepConfig.attributeMap(attributeSet))
+            builder.addStartElement(wrapperName, stepConfig.typeUtils.attributeMap(attributeSet))
             if (source.isNotEmpty()) {
                 builder.addSubtree(source.removeFirst().value)
             }

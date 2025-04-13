@@ -43,7 +43,7 @@ abstract class AbstractStep(val stepConfig: XProcStepConfiguration, step: StepMo
     val inputCount = mutableMapOf<String, Int>()
     val outputCount = mutableMapOf<String, Int>()
     val staticOptions = step.staticOptions.toMutableMap()
-    val verbosity = stepConfig.saxonConfig.xmlCalabash.xmlCalabashConfig.verbosity
+    val verbosity = stepConfig.xmlCalabashConfig.verbosity
 
     var aborted = false
     abstract val stepTimeout: Duration
@@ -195,7 +195,7 @@ abstract class AbstractStep(val stepConfig: XProcStepConfiguration, step: StepMo
                 val inlineStepParams = InlineStepParameters("!inline", binding.stepConfig.location,
                     mapOf("source" to source), mapOf("result" to result), emptyMap(), binding.valueTemplateFilter, binding.contentType, binding.encoding)
                 val inlineStep = InlineStep(inlineStepParams)
-                inlineStep.setup(binding.stepConfig, inlineReceiver, inlineStepParams)
+                inlineStep.setup(stepConfig.from(binding.stepConfig), inlineReceiver, inlineStepParams)
 
                 if (binding.documentProperties.canBeResolvedStatically()) {
                     inlineStep.option(Ns.documentProperties, LazyValue(binding.stepConfig, binding.documentProperties, stepConfig))
@@ -211,7 +211,7 @@ abstract class AbstractStep(val stepConfig: XProcStepConfiguration, step: StepMo
                 val documentStepParameters = DocumentStepParameters("!document", binding.stepConfig.location,
                     emptyMap(), emptyMap(), emptyMap(), binding.contentType)
                 val documentStep = DocumentStep(documentStepParameters)
-                documentStep.setup(binding.stepConfig, documentReceiver, documentStepParameters)
+                documentStep.setup(stepConfig.from(binding.stepConfig), documentReceiver, documentStepParameters)
 
                 if (binding.href.canBeResolvedStatically()) {
                     documentStep.option(Ns.href, LazyValue(binding.stepConfig, binding.href, stepConfig))

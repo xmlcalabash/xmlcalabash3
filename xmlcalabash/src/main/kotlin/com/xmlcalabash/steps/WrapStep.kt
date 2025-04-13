@@ -1,8 +1,8 @@
 package com.xmlcalabash.steps
 
-import com.xmlcalabash.documents.DocumentContext
 import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.exceptions.XProcError
+import com.xmlcalabash.datamodel.DocumentContext
 import com.xmlcalabash.namespace.Ns
 import com.xmlcalabash.namespace.NsCx
 import com.xmlcalabash.namespace.NsXml
@@ -45,7 +45,7 @@ class WrapStep(): AbstractAtomicStep(), ProcessMatchingNodes {
                 baseUri = URI(value.underlyingValue.stringValue)
             }
         }
-        attributeMap = stepConfig.attributeMap(attributeSet)
+        attributeMap = stepConfig.typeUtils.attributeMap(attributeSet)
 
         inGroup.push(false)
 
@@ -140,7 +140,7 @@ class WrapStep(): AbstractAtomicStep(), ProcessMatchingNodes {
 
             if (matcher.matches(chk)) {
                 val nextItem = computeGroup(chk)!!
-                return stepConfig.xpathDeepEqual(nodeValue, nextItem)
+                return stepConfig.typeUtils.xpathDeepEqual(nodeValue, nextItem)
             }
 
             if (!skipable) {

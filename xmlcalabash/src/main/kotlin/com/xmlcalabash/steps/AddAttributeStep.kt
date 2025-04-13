@@ -84,7 +84,7 @@ class AddAttributeStep(): AbstractAtomicStep(), ProcessMatchingNodes {
         }
 
         attrs[instanceAttName] = attValue
-        matcher.addStartElement(node, stepConfig.attributeMap(attrs))
+        matcher.addStartElement(node, stepConfig.typeUtils.attributeMap(attrs))
         return true
     }
 

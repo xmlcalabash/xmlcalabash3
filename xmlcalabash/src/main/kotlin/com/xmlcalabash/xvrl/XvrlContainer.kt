@@ -1,10 +1,10 @@
 package com.xmlcalabash.xvrl
 
-import com.xmlcalabash.runtime.XProcStepConfiguration
+import com.xmlcalabash.config.StepConfiguration
 import com.xmlcalabash.util.SaxonTreeBuilder
 import net.sf.saxon.s9api.XdmNode
 
-abstract class XvrlContainer(stepConfiguration: XProcStepConfiguration): XvrlElement(stepConfiguration) {
+abstract class XvrlContainer(stepConfiguration: StepConfiguration): XvrlElement(stepConfiguration) {
     private var _content: XdmNode? = null
 
     val content: XdmNode?

@@ -56,10 +56,10 @@ class OsInfo(): AbstractAtomicStep() {
 
         val builder = SaxonTreeBuilder(stepConfig)
         builder.startDocument(null)
-        builder.addStartElement(NsC.result, stepConfig.attributeMap(attr))
+        builder.addStartElement(NsC.result, stepConfig.typeUtils.attributeMap(attr))
 
         for ((name, value) in System.getenv()) {
-            builder.addStartElement(NsC.environment, stepConfig.attributeMap(mapOf(
+            builder.addStartElement(NsC.environment, stepConfig.typeUtils.attributeMap(mapOf(
                 Ns.name to name,
                 Ns.value to value
             )))

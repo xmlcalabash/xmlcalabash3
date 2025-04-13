@@ -1,6 +1,6 @@
 package com.xmlcalabash.util
 
-import com.xmlcalabash.config.XmlCalabash
+import com.xmlcalabash.XmlCalabash
 import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.io.DocumentWriter
 import com.xmlcalabash.namespace.Ns
@@ -45,7 +45,7 @@ open class DefaultOutputReceiver(val xmlCalabash: XmlCalabash,
         val runtimePort = outputManifold[port]
         val decorate = writingToTerminal && (runtimePort?.sequence == true || ports.size > 1)
 
-        if (xmlCalabash.xmlCalabashConfig.pipe) {
+        if (xmlCalabash.config.pipe) {
             writer.write()
             return
         }
@@ -62,8 +62,8 @@ open class DefaultOutputReceiver(val xmlCalabash: XmlCalabash,
 
         if (decorate && contentType != null) {
             if (contentType.classification() in listOf(MediaClassification.XML, MediaClassification.XHTML, MediaClassification.HTML)) {
-                writer[Ns.encoding] = xmlCalabash.xmlCalabashConfig.consoleEncoding
-                if (xmlCalabash.xmlCalabashConfig.consoleEncoding.lowercase() == "utf-8") {
+                writer[Ns.encoding] = xmlCalabash.config.consoleEncoding
+                if (xmlCalabash.config.consoleEncoding.lowercase() == "utf-8") {
                     writer[Ns.omitXmlDeclaration] = true
                 }
             }

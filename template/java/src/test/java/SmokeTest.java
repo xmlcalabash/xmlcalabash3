@@ -1,4 +1,4 @@
-import com.xmlcalabash.config.XmlCalabash;
+import com.xmlcalabash.XmlCalabash;
 import com.xmlcalabash.datamodel.DeclareStepInstruction;
 import com.xmlcalabash.documents.XProcDocument;
 import com.xmlcalabash.parsers.xpl.XplParser;
@@ -9,7 +9,6 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.fail;
 
 public class SmokeTest {
-
     @Test
     public void testPipeline() {
         XmlCalabash calabash = XmlCalabash.Companion.newInstance();

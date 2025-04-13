@@ -1,6 +1,6 @@
 package com.xmlcalabash.test
 
-import com.xmlcalabash.config.XmlCalabash
+import com.xmlcalabash.XmlCalabash
 import com.xmlcalabash.datamodel.InstructionConfiguration
 import com.xmlcalabash.namespace.NsFn
 import com.xmlcalabash.parsers.XPathExpressionDetails
@@ -297,5 +297,4 @@ class XPathParserTest {
         Assertions.assertTrue(details.functionRefs.isEmpty())
         Assertions.assertNull(details.error)
     }
-
 }

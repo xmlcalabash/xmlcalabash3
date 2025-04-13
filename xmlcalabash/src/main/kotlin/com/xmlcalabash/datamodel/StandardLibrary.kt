@@ -1,6 +1,5 @@
 package com.xmlcalabash.datamodel
 
-import com.xmlcalabash.config.SaxonConfiguration
 import com.xmlcalabash.io.MediaType
 import com.xmlcalabash.namespace.NsCx
 import com.xmlcalabash.namespace.NsP
@@ -15,14 +14,14 @@ import java.net.URI
 
 class StandardLibrary private constructor(builder: PipelineBuilder, private val stepConfig: InstructionConfiguration) {
     companion object {
-        fun getInstance(environment: PipelineCompilerContext, config: SaxonConfiguration): StandardLibraryInstruction {
-            val builder = PipelineBuilder.newInstance(environment, config)
-            val localConfig = builder.stepConfig.with(mapOf(
-                "p" to NsP.namespace,
-                "cx" to NsCx.namespace,
-                "xml" to NsXml.namespace,
-                "xs" to NsXs.namespace
-            )).with(Location(URI("https://xmlcalabash.com/library/library.xpl")))
+        internal fun getInstance(builder: PipelineBuilder): StandardLibraryInstruction {
+            val nodeContext = builder.stepConfig
+                .with("p", NsP.namespace)
+                .with("cx", NsCx.namespace)
+                .with("xml", NsXml.namespace)
+                .with("xs", NsXs.namespace)
+                .with(Location(URI("https://xmlcalabash.com/library/library.xpl")))
+            val localConfig = InstructionConfiguration(builder.stepConfig, nodeContext)
             val standardLibrary = StandardLibrary(builder, localConfig)
             val library = standardLibrary.create()
             library.findDeclarations()
@@ -123,8 +122,8 @@ class StandardLibrary private constructor(builder: PipelineBuilder, private val 
     }
 
     private fun cxCacheAddDocument(): DeclareStepInstruction {
-        val decl = library.declareStep()
-        decl._type = stepConfig.parseQName("cx:cache-add-document")
+        val decl = library.declareAtomicStep()
+        decl._type = stepConfig.typeUtils.parseQName("cx:cache-add-document")
 
         val input = decl.input("source", primary=true, sequence=true)
         input.contentTypes = MediaType.parseList("any")
@@ -136,8 +135,8 @@ class StandardLibrary private constructor(builder: PipelineBuilder, private val 
     }
 
     private fun cxCacheRemoveDocument(): DeclareStepInstruction {
-        val decl = library.declareStep()
-        decl._type = stepConfig.parseQName("cx:cache-remove-document")
+        val decl = library.declareAtomicStep()
+        decl._type = stepConfig.typeUtils.parseQName("cx:cache-remove-document")
 
         val input = decl.input("source", primary=true, sequence=true)
         input.contentTypes = MediaType.parseList("any")
@@ -149,8 +148,8 @@ class StandardLibrary private constructor(builder: PipelineBuilder, private val 
     }
 
     private fun cxDefaultInput(): DeclareStepInstruction {
-        val decl = library.declareStep()
-        decl._type = stepConfig.parseQName("cx:default-input")
+        val decl = library.declareAtomicStep()
+        decl._type = stepConfig.typeUtils.parseQName("cx:default-input")
 
         var input = decl.input("source", primary=true, sequence=true)
         input.contentTypes = MediaType.parseList("any")
@@ -164,8 +163,8 @@ class StandardLibrary private constructor(builder: PipelineBuilder, private val 
     }
 
     private fun cxDocument(): DeclareStepInstruction {
-        val decl = library.declareStep()
-        decl._type = stepConfig.parseQName("cx:document")
+        val decl = library.declareAtomicStep()
+        decl._type = stepConfig.typeUtils.parseQName("cx:document")
 
         val output = decl.output("result", primary=true, sequence=false)
         output.contentTypes = MediaType.parseList("any")
@@ -174,8 +173,8 @@ class StandardLibrary private constructor(builder: PipelineBuilder, private val 
     }
 
     private fun cxEmpty(): DeclareStepInstruction {
-        val decl = library.declareStep()
-        decl._type = stepConfig.parseQName("cx:empty")
+        val decl = library.declareAtomicStep()
+        decl._type = stepConfig.typeUtils.parseQName("cx:empty")
 
         val output = decl.output("result", primary=true, sequence=true)
         output.contentTypes = MediaType.parseList("any")
@@ -184,8 +183,8 @@ class StandardLibrary private constructor(builder: PipelineBuilder, private val 
     }
 
     private fun cxSink(): DeclareStepInstruction {
-        val decl = library.declareStep()
-        decl._type = stepConfig.parseQName("cx:sink")
+        val decl = library.declareAtomicStep()
+        decl._type = stepConfig.typeUtils.parseQName("cx:sink")
 
         val input = decl.input("source", primary=true, sequence=true)
         input.contentTypes = MediaType.parseList("any")
@@ -194,8 +193,8 @@ class StandardLibrary private constructor(builder: PipelineBuilder, private val 
     }
 
     private fun cxExpression(): DeclareStepInstruction {
-        val decl = library.declareStep()
-        decl._type = stepConfig.parseQName("cx:expression")
+        val decl = library.declareAtomicStep()
+        decl._type = stepConfig.typeUtils.parseQName("cx:expression")
 
         val input = decl.input("source", primary=false, sequence=true)
         input.contentTypes = MediaType.parseList("any")
@@ -208,8 +207,8 @@ class StandardLibrary private constructor(builder: PipelineBuilder, private val 
     }
 
     private fun cxGuard(): DeclareStepInstruction {
-        val decl = library.declareStep()
-        decl._type = stepConfig.parseQName("cx:guard")
+        val decl = library.declareAtomicStep()
+        decl._type = stepConfig.typeUtils.parseQName("cx:guard")
 
         val input = decl.input("source", primary=true, sequence=true)
         input.contentTypes = MediaType.parseList("any")
@@ -219,8 +218,8 @@ class StandardLibrary private constructor(builder: PipelineBuilder, private val 
     }
 
     private fun cxInline(): DeclareStepInstruction {
-        val decl = library.declareStep()
-        decl._type = stepConfig.parseQName("cx:inline")
+        val decl = library.declareAtomicStep()
+        decl._type = stepConfig.typeUtils.parseQName("cx:inline")
 
         val input = decl.input("source", primary=false, sequence=true)
         input.contentTypes = MediaType.parseList("any")
@@ -233,8 +232,8 @@ class StandardLibrary private constructor(builder: PipelineBuilder, private val 
     }
 
     private fun cxInputFilter(): DeclareStepInstruction {
-        val decl = library.declareStep()
-        decl._type = stepConfig.parseQName("cx:input-filter")
+        val decl = library.declareAtomicStep()
+        decl._type = stepConfig.typeUtils.parseQName("cx:input-filter")
 
         var input = decl.input("source", primary=true, sequence=true)
         input.contentTypes = MediaType.parseList("any")
@@ -248,8 +247,8 @@ class StandardLibrary private constructor(builder: PipelineBuilder, private val 
     }
 
     private fun cxSelect(): DeclareStepInstruction {
-        val decl = library.declareStep()
-        decl._type = stepConfig.parseQName("cx:select")
+        val decl = library.declareAtomicStep()
+        decl._type = stepConfig.typeUtils.parseQName("cx:select")
 
         val input = decl.input("source", primary=true, sequence=true)
         input.contentTypes = MediaType.parseList("any")
@@ -261,8 +260,8 @@ class StandardLibrary private constructor(builder: PipelineBuilder, private val 
     }
 
     private fun pAddAttribute(): DeclareStepInstruction {
-        val decl = library.declareStep()
-        decl._type = stepConfig.parseQName("p:add-attribute")
+        val decl = library.declareAtomicStep()
+        decl._type = stepConfig.typeUtils.parseQName("p:add-attribute")
 
         val input = decl.input("source", primary=true, sequence=false)
         input.contentTypes = MediaType.parseList("xml html")
@@ -272,21 +271,21 @@ class StandardLibrary private constructor(builder: PipelineBuilder, private val 
 
         var option = decl.option(QName("match"))
         option.select = XProcExpression.select(stepConfig, "'/*'")
-        option.asType = stepConfig.parseSequenceType("xs:string")
-        option.specialType = stepConfig.parseSpecialType("XSLTSelectionPattern")
+        option.asType = stepConfig.typeUtils.parseSequenceType("xs:string")
+        option.specialType = stepConfig.typeUtils.parseSpecialType("XSLTSelectionPattern")
         option = decl.option(QName("attribute-name"))
-        option.asType = stepConfig.parseSequenceType("xs:QName")
+        option.asType = stepConfig.typeUtils.parseSequenceType("xs:QName")
         option.required = true
         option = decl.option(QName("attribute-value"))
-        option.asType = stepConfig.parseSequenceType("xs:string")
+        option.asType = stepConfig.typeUtils.parseSequenceType("xs:string")
         option.required = true
 
         return decl
     }
 
     private fun pAddXmlBase(): DeclareStepInstruction {
-        val decl = library.declareStep()
-        decl._type = stepConfig.parseQName("p:add-xml-base")
+        val decl = library.declareAtomicStep()
+        decl._type = stepConfig.typeUtils.parseQName("p:add-xml-base")
 
         val input = decl.input("source", primary=true, sequence=false)
         input.contentTypes = MediaType.parseList("xml html")
@@ -296,17 +295,17 @@ class StandardLibrary private constructor(builder: PipelineBuilder, private val 
 
         var option = decl.option(QName("all"))
         option.select = XProcExpression.select(stepConfig, "false()")
-        option.asType = stepConfig.parseSequenceType("xs:boolean")
+        option.asType = stepConfig.typeUtils.parseSequenceType("xs:boolean")
         option = decl.option(QName("relative"))
         option.select = XProcExpression.select(stepConfig, "true()")
-        option.asType = stepConfig.parseSequenceType("xs:boolean")
+        option.asType = stepConfig.typeUtils.parseSequenceType("xs:boolean")
 
         return decl
     }
 
     private fun pArchive(): DeclareStepInstruction {
-        val decl = library.declareStep()
-        decl._type = stepConfig.parseQName("p:archive")
+        val decl = library.declareAtomicStep()
+        decl._type = stepConfig.typeUtils.parseQName("p:archive")
 
         var input = decl.input("source", primary=true, sequence=true)
         input.contentTypes = MediaType.parseList("any")
@@ -324,18 +323,18 @@ class StandardLibrary private constructor(builder: PipelineBuilder, private val 
 
         var option = decl.option(QName("format"))
         option.select = XProcExpression.select(stepConfig, "'zip'")
-        option.asType = stepConfig.parseSequenceType("xs:QName")
+        option.asType = stepConfig.typeUtils.parseSequenceType("xs:QName")
         option = decl.option(QName("relative-to"))
-        option.asType = stepConfig.parseSequenceType("xs:anyURI?")
+        option.asType = stepConfig.typeUtils.parseSequenceType("xs:anyURI?")
         option = decl.option(QName("parameters"))
-        option.asType = stepConfig.parseSequenceType("map(xs:QName, item()*)?")
+        option.asType = stepConfig.typeUtils.parseSequenceType("map(xs:QName, item()*)?")
 
         return decl
     }
 
     private fun pArchiveManifest(): DeclareStepInstruction {
-        val decl = library.declareStep()
-        decl._type = stepConfig.parseQName("p:archive-manifest")
+        val decl = library.declareAtomicStep()
+        decl._type = stepConfig.typeUtils.parseQName("p:archive-manifest")
 
         val input = decl.input("source", primary=true, sequence=false)
         input.contentTypes = MediaType.parseList("any")
@@ -344,20 +343,20 @@ class StandardLibrary private constructor(builder: PipelineBuilder, private val 
         output.contentTypes = MediaType.parseList("application/xml")
 
         var option = decl.option(QName("format"))
-        option.asType = stepConfig.parseSequenceType("xs:QName?")
+        option.asType = stepConfig.typeUtils.parseSequenceType("xs:QName?")
         option = decl.option(QName("parameters"))
-        option.asType = stepConfig.parseSequenceType("map(xs:QName, item()*)?")
+        option.asType = stepConfig.typeUtils.parseSequenceType("map(xs:QName, item()*)?")
         option = decl.option(QName("relative-to"))
-        option.asType = stepConfig.parseSequenceType("xs:anyURI?")
+        option.asType = stepConfig.typeUtils.parseSequenceType("xs:anyURI?")
         option = decl.option(QName("override-content-types"))
-        option.asType = stepConfig.parseSequenceType("array(array(xs:string))?")
+        option.asType = stepConfig.typeUtils.parseSequenceType("array(array(xs:string))?")
 
         return decl
     }
 
     private fun pCastContentType(): DeclareStepInstruction {
-        val decl = library.declareStep()
-        decl._type = stepConfig.parseQName("p:cast-content-type")
+        val decl = library.declareAtomicStep()
+        decl._type = stepConfig.typeUtils.parseQName("p:cast-content-type")
 
         val input = decl.input("source", primary=true, sequence=false)
         input.contentTypes = MediaType.parseList("any")
@@ -366,17 +365,17 @@ class StandardLibrary private constructor(builder: PipelineBuilder, private val 
         output.contentTypes = MediaType.parseList("any")
 
         var option = decl.option(QName("content-type"))
-        option.asType = stepConfig.parseSequenceType("xs:string")
+        option.asType = stepConfig.typeUtils.parseSequenceType("xs:string")
         option.required = true
         option = decl.option(QName("parameters"))
-        option.asType = stepConfig.parseSequenceType("map(xs:QName,item()*)?")
+        option.asType = stepConfig.typeUtils.parseSequenceType("map(xs:QName,item()*)?")
 
         return decl
     }
 
     private fun pCompare(): DeclareStepInstruction {
-        val decl = library.declareStep()
-        decl._type = stepConfig.parseQName("p:compare")
+        val decl = library.declareAtomicStep()
+        decl._type = stepConfig.typeUtils.parseQName("p:compare")
 
         var input = decl.input("source", primary=true, sequence=false)
         input.contentTypes = MediaType.parseList("any")
@@ -389,19 +388,19 @@ class StandardLibrary private constructor(builder: PipelineBuilder, private val 
         output.contentTypes = MediaType.parseList("any")
 
         var option = decl.option(QName("parameters"))
-        option.asType = stepConfig.parseSequenceType("map(xs:QName,item()*)?")
+        option.asType = stepConfig.typeUtils.parseSequenceType("map(xs:QName,item()*)?")
         option = decl.option(QName("method"))
-        option.asType = stepConfig.parseSequenceType("xs:QName?")
+        option.asType = stepConfig.typeUtils.parseSequenceType("xs:QName?")
         option = decl.option(QName("fail-if-not-equal"))
         option.select = XProcExpression.select(stepConfig, "false()")
-        option.asType = stepConfig.parseSequenceType("xs:boolean")
+        option.asType = stepConfig.typeUtils.parseSequenceType("xs:boolean")
 
         return decl
     }
 
     private fun pCompress(): DeclareStepInstruction {
-        val decl = library.declareStep()
-        decl._type = stepConfig.parseQName("p:compress")
+        val decl = library.declareAtomicStep()
+        decl._type = stepConfig.typeUtils.parseQName("p:compress")
 
         val input = decl.input("source", primary=true, sequence=false)
         input.contentTypes = MediaType.parseList("any")
@@ -411,18 +410,18 @@ class StandardLibrary private constructor(builder: PipelineBuilder, private val 
 
         var option = decl.option(QName("format"))
         option.select = XProcExpression.select(stepConfig, "'gzip'")
-        option.asType = stepConfig.parseSequenceType("xs:QName")
+        option.asType = stepConfig.typeUtils.parseSequenceType("xs:QName")
         option = decl.option(QName("serialization"))
-        option.asType = stepConfig.parseSequenceType("map(xs:QName,item()*)?")
+        option.asType = stepConfig.typeUtils.parseSequenceType("map(xs:QName,item()*)?")
         option = decl.option(QName("parameters"))
-        option.asType = stepConfig.parseSequenceType("map(xs:QName, item()*)?")
+        option.asType = stepConfig.typeUtils.parseSequenceType("map(xs:QName, item()*)?")
 
         return decl
     }
 
     private fun pCount(): DeclareStepInstruction {
-        val decl = library.declareStep()
-        decl._type = stepConfig.parseQName("p:count")
+        val decl = library.declareAtomicStep()
+        decl._type = stepConfig.typeUtils.parseQName("p:count")
 
         val input = decl.input("source", primary=true, sequence=true)
         input.contentTypes = MediaType.parseList("any")
@@ -432,14 +431,14 @@ class StandardLibrary private constructor(builder: PipelineBuilder, private val 
 
         val option = decl.option(QName("limit"))
         option.select = XProcExpression.select(stepConfig, "0")
-        option.asType = stepConfig.parseSequenceType("xs:integer")
+        option.asType = stepConfig.typeUtils.parseSequenceType("xs:integer")
 
         return decl
     }
 
     private fun pCssFormatter(): DeclareStepInstruction {
-        val decl = library.declareStep()
-        decl._type = stepConfig.parseQName("p:css-formatter")
+        val decl = library.declareAtomicStep()
+        decl._type = stepConfig.typeUtils.parseQName("p:css-formatter")
 
         var input = decl.input("source", primary=false, sequence=false)
         input.contentTypes = MediaType.parseList("xml html")
@@ -451,16 +450,16 @@ class StandardLibrary private constructor(builder: PipelineBuilder, private val 
         output.contentTypes = MediaType.parseList("any")
 
         var option = decl.option(QName("parameters"))
-        option.asType = stepConfig.parseSequenceType("map(xs:QName,item()*)?")
+        option.asType = stepConfig.typeUtils.parseSequenceType("map(xs:QName,item()*)?")
         option = decl.option(QName("content-type"))
-        option.asType = stepConfig.parseSequenceType("xs:string?")
+        option.asType = stepConfig.typeUtils.parseSequenceType("xs:string?")
 
         return decl
     }
 
     private fun pDelete(): DeclareStepInstruction {
-        val decl = library.declareStep()
-        decl._type = stepConfig.parseQName("p:delete")
+        val decl = library.declareAtomicStep()
+        decl._type = stepConfig.typeUtils.parseQName("p:delete")
 
         val input = decl.input("source", primary=true, sequence=false)
         input.contentTypes = MediaType.parseList("xml html")
@@ -469,42 +468,42 @@ class StandardLibrary private constructor(builder: PipelineBuilder, private val 
         output.contentTypes = MediaType.parseList("text xml html")
 
         val option = decl.option(QName("match"))
-        option.asType = stepConfig.parseSequenceType("xs:string")
-        option.specialType = stepConfig.parseSpecialType("XSLTSelectionPattern")
+        option.asType = stepConfig.typeUtils.parseSequenceType("xs:string")
+        option.specialType = stepConfig.typeUtils.parseSpecialType("XSLTSelectionPattern")
         option.required = true
 
         return decl
     }
 
     private fun pDirectoryList(): DeclareStepInstruction {
-        val decl = library.declareStep()
-        decl._type = stepConfig.parseQName("p:directory-list")
+        val decl = library.declareAtomicStep()
+        decl._type = stepConfig.typeUtils.parseQName("p:directory-list")
 
         val output = decl.output("result", primary=true, sequence=false)
         output.contentTypes = MediaType.parseList("application/xml")
 
         var option = decl.option(QName("path"))
-        option.asType = stepConfig.parseSequenceType("xs:anyURI")
+        option.asType = stepConfig.typeUtils.parseSequenceType("xs:anyURI")
         option.required = true
         option = decl.option(QName("detailed"))
         option.select = XProcExpression.select(stepConfig, "false()")
-        option.asType = stepConfig.parseSequenceType("xs:boolean")
+        option.asType = stepConfig.typeUtils.parseSequenceType("xs:boolean")
         option = decl.option(QName("max-depth"))
         option.select = XProcExpression.select(stepConfig, "'1'")
-        option.asType = stepConfig.parseSequenceType("xs:string?")
+        option.asType = stepConfig.typeUtils.parseSequenceType("xs:string?")
         option = decl.option(QName("include-filter"))
-        option.asType = stepConfig.parseSequenceType("xs:string*")
+        option.asType = stepConfig.typeUtils.parseSequenceType("xs:string*")
         option = decl.option(QName("exclude-filter"))
-        option.asType = stepConfig.parseSequenceType("xs:string*")
+        option.asType = stepConfig.typeUtils.parseSequenceType("xs:string*")
         option = decl.option(QName("override-content-types"))
-        option.asType = stepConfig.parseSequenceType("array(array(xs:string))?")
+        option.asType = stepConfig.typeUtils.parseSequenceType("array(array(xs:string))?")
 
         return decl
     }
 
     private fun pEncode(): DeclareStepInstruction {
-        val decl = library.declareStep()
-        decl._type = stepConfig.parseQName("p:encode")
+        val decl = library.declareAtomicStep()
+        decl._type = stepConfig.typeUtils.parseQName("p:encode")
 
         val input = decl.input("source", primary=true, sequence=false)
 
@@ -513,16 +512,16 @@ class StandardLibrary private constructor(builder: PipelineBuilder, private val 
 
         var option = decl.option(QName("encoding"))
         option.select = XProcExpression.select(stepConfig, "'base64'")
-        option.asType = stepConfig.parseSequenceType("xs:string")
+        option.asType = stepConfig.typeUtils.parseSequenceType("xs:string")
         option = decl.option(QName("serialization"))
-        option.asType = stepConfig.parseSequenceType("map(xs:QName,item()*)?")
+        option.asType = stepConfig.typeUtils.parseSequenceType("map(xs:QName,item()*)?")
 
         return decl
     }
 
     private fun pError(): DeclareStepInstruction {
-        val decl = library.declareStep()
-        decl._type = stepConfig.parseQName("p:error")
+        val decl = library.declareAtomicStep()
+        decl._type = stepConfig.typeUtils.parseQName("p:error")
 
         val input = decl.input("source", primary=true, sequence=true)
         input.contentTypes = MediaType.parseList("text xml")
@@ -531,156 +530,156 @@ class StandardLibrary private constructor(builder: PipelineBuilder, private val 
         output.contentTypes = MediaType.parseList("any")
 
         val option = decl.option(QName("code"))
-        option.asType = stepConfig.parseSequenceType("xs:QName")
+        option.asType = stepConfig.typeUtils.parseSequenceType("xs:QName")
         option.required = true
 
         return decl
     }
 
     private fun pFileCopy(): DeclareStepInstruction {
-        val decl = library.declareStep()
-        decl._type = stepConfig.parseQName("p:file-copy")
+        val decl = library.declareAtomicStep()
+        decl._type = stepConfig.typeUtils.parseQName("p:file-copy")
 
         val output = decl.output("result", primary=true, sequence=false)
         output.contentTypes = MediaType.parseList("application/xml")
 
         var option = decl.option(QName("href"))
-        option.asType = stepConfig.parseSequenceType("xs:anyURI")
+        option.asType = stepConfig.typeUtils.parseSequenceType("xs:anyURI")
         option.required = true
         option = decl.option(QName("target"))
-        option.asType = stepConfig.parseSequenceType("xs:anyURI")
+        option.asType = stepConfig.typeUtils.parseSequenceType("xs:anyURI")
         option.required = true
         option = decl.option(QName("fail-on-error"))
         option.select = XProcExpression.select(stepConfig, "true()")
-        option.asType = stepConfig.parseSequenceType("xs:boolean")
+        option.asType = stepConfig.typeUtils.parseSequenceType("xs:boolean")
         option = decl.option(QName("overwrite"))
         option.select = XProcExpression.select(stepConfig, "true()")
-        option.asType = stepConfig.parseSequenceType("xs:boolean")
+        option.asType = stepConfig.typeUtils.parseSequenceType("xs:boolean")
 
         return decl
     }
 
     private fun pFileCreateTempfile(): DeclareStepInstruction {
-        val decl = library.declareStep()
-        decl._type = stepConfig.parseQName("p:file-create-tempfile")
+        val decl = library.declareAtomicStep()
+        decl._type = stepConfig.typeUtils.parseQName("p:file-create-tempfile")
 
         val output = decl.output("result", primary=true, sequence=false)
         output.contentTypes = MediaType.parseList("application/xml")
 
         var option = decl.option(QName("href"))
-        option.asType = stepConfig.parseSequenceType("xs:anyURI?")
+        option.asType = stepConfig.typeUtils.parseSequenceType("xs:anyURI?")
         option = decl.option(QName("suffix"))
-        option.asType = stepConfig.parseSequenceType("xs:string?")
+        option.asType = stepConfig.typeUtils.parseSequenceType("xs:string?")
         option = decl.option(QName("prefix"))
-        option.asType = stepConfig.parseSequenceType("xs:string?")
+        option.asType = stepConfig.typeUtils.parseSequenceType("xs:string?")
         option = decl.option(QName("delete-on-exit"))
         option.select = XProcExpression.select(stepConfig, "false()")
-        option.asType = stepConfig.parseSequenceType("xs:boolean")
+        option.asType = stepConfig.typeUtils.parseSequenceType("xs:boolean")
         option = decl.option(QName("fail-on-error"))
         option.select = XProcExpression.select(stepConfig, "true()")
-        option.asType = stepConfig.parseSequenceType("xs:boolean")
+        option.asType = stepConfig.typeUtils.parseSequenceType("xs:boolean")
 
         return decl
     }
 
     private fun pFileDelete(): DeclareStepInstruction {
-        val decl = library.declareStep()
-        decl._type = stepConfig.parseQName("p:file-delete")
+        val decl = library.declareAtomicStep()
+        decl._type = stepConfig.typeUtils.parseQName("p:file-delete")
 
         val output = decl.output("result", primary=true, sequence=false)
         output.contentTypes = MediaType.parseList("application/xml")
 
         var option = decl.option(QName("href"))
-        option.asType = stepConfig.parseSequenceType("xs:anyURI")
+        option.asType = stepConfig.typeUtils.parseSequenceType("xs:anyURI")
         option.required = true
         option = decl.option(QName("recursive"))
         option.select = XProcExpression.select(stepConfig, "false()")
-        option.asType = stepConfig.parseSequenceType("xs:boolean")
+        option.asType = stepConfig.typeUtils.parseSequenceType("xs:boolean")
         option = decl.option(QName("fail-on-error"))
         option.select = XProcExpression.select(stepConfig, "true()")
-        option.asType = stepConfig.parseSequenceType("xs:boolean")
+        option.asType = stepConfig.typeUtils.parseSequenceType("xs:boolean")
 
         return decl
     }
 
     private fun pFileInfo(): DeclareStepInstruction {
-        val decl = library.declareStep()
-        decl._type = stepConfig.parseQName("p:file-info")
+        val decl = library.declareAtomicStep()
+        decl._type = stepConfig.typeUtils.parseQName("p:file-info")
 
         val output = decl.output("result", primary=true, sequence=false)
         output.contentTypes = MediaType.parseList("application/xml")
 
         var option = decl.option(QName("href"))
-        option.asType = stepConfig.parseSequenceType("xs:anyURI")
+        option.asType = stepConfig.typeUtils.parseSequenceType("xs:anyURI")
         option.required = true
         option = decl.option(QName("fail-on-error"))
         option.select = XProcExpression.select(stepConfig, "true()")
-        option.asType = stepConfig.parseSequenceType("xs:boolean")
+        option.asType = stepConfig.typeUtils.parseSequenceType("xs:boolean")
         option = decl.option(QName("override-content-types"))
-        option.asType = stepConfig.parseSequenceType("array(array(xs:string))?")
+        option.asType = stepConfig.typeUtils.parseSequenceType("array(array(xs:string))?")
 
         return decl
     }
 
     private fun pFileMkdir(): DeclareStepInstruction {
-        val decl = library.declareStep()
-        decl._type = stepConfig.parseQName("p:file-mkdir")
+        val decl = library.declareAtomicStep()
+        decl._type = stepConfig.typeUtils.parseQName("p:file-mkdir")
 
         val output = decl.output("result", primary=true, sequence=false)
         output.contentTypes = MediaType.parseList("application/xml")
 
         var option = decl.option(QName("href"))
-        option.asType = stepConfig.parseSequenceType("xs:anyURI")
+        option.asType = stepConfig.typeUtils.parseSequenceType("xs:anyURI")
         option.required = true
         option = decl.option(QName("fail-on-error"))
         option.select = XProcExpression.select(stepConfig, "true()")
-        option.asType = stepConfig.parseSequenceType("xs:boolean")
+        option.asType = stepConfig.typeUtils.parseSequenceType("xs:boolean")
 
         return decl
     }
 
     private fun pFileMove(): DeclareStepInstruction {
-        val decl = library.declareStep()
-        decl._type = stepConfig.parseQName("p:file-move")
+        val decl = library.declareAtomicStep()
+        decl._type = stepConfig.typeUtils.parseQName("p:file-move")
 
         val output = decl.output("result", primary=true, sequence=false)
         output.contentTypes = MediaType.parseList("application/xml")
 
         var option = decl.option(QName("href"))
-        option.asType = stepConfig.parseSequenceType("xs:anyURI")
+        option.asType = stepConfig.typeUtils.parseSequenceType("xs:anyURI")
         option.required = true
         option = decl.option(QName("target"))
-        option.asType = stepConfig.parseSequenceType("xs:anyURI")
+        option.asType = stepConfig.typeUtils.parseSequenceType("xs:anyURI")
         option.required = true
         option = decl.option(QName("fail-on-error"))
         option.select = XProcExpression.select(stepConfig, "true()")
-        option.asType = stepConfig.parseSequenceType("xs:boolean")
+        option.asType = stepConfig.typeUtils.parseSequenceType("xs:boolean")
 
         return decl
     }
 
     private fun pFileTouch(): DeclareStepInstruction {
-        val decl = library.declareStep()
-        decl._type = stepConfig.parseQName("p:file-touch")
+        val decl = library.declareAtomicStep()
+        decl._type = stepConfig.typeUtils.parseQName("p:file-touch")
 
         val output = decl.output("result", primary=true, sequence=false)
         output.contentTypes = MediaType.parseList("application/xml")
 
         var option = decl.option(QName("href"))
-        option.asType = stepConfig.parseSequenceType("xs:anyURI")
+        option.asType = stepConfig.typeUtils.parseSequenceType("xs:anyURI")
         option.required = true
         option = decl.option(QName("timestamp"))
-        option.asType = stepConfig.parseSequenceType("xs:dateTime?")
+        option.asType = stepConfig.typeUtils.parseSequenceType("xs:dateTime?")
         option = decl.option(QName("fail-on-error"))
         option.select = XProcExpression.select(stepConfig, "true()")
-        option.asType = stepConfig.parseSequenceType("xs:boolean")
+        option.asType = stepConfig.typeUtils.parseSequenceType("xs:boolean")
 
         return decl
     }
 
     private fun pFilter(): DeclareStepInstruction {
-        val decl = library.declareStep()
-        decl._type = stepConfig.parseQName("p:filter")
+        val decl = library.declareAtomicStep()
+        decl._type = stepConfig.typeUtils.parseQName("p:filter")
 
         val input = decl.input("source", primary=true, sequence=false)
         input.contentTypes = MediaType.parseList("xml html")
@@ -689,16 +688,16 @@ class StandardLibrary private constructor(builder: PipelineBuilder, private val 
         output.contentTypes = MediaType.parseList("text xml html json")
 
         val option = decl.option(QName("select"))
-        option.asType = stepConfig.parseSequenceType("xs:string")
-        option.specialType = stepConfig.parseSpecialType("XPathExpression")
+        option.asType = stepConfig.typeUtils.parseSequenceType("xs:string")
+        option.specialType = stepConfig.typeUtils.parseSpecialType("XPathExpression")
         option.required = true
 
         return decl
     }
 
     private fun pHash(): DeclareStepInstruction {
-        val decl = library.declareStep()
-        decl._type = stepConfig.parseQName("p:hash")
+        val decl = library.declareAtomicStep()
+        decl._type = stepConfig.typeUtils.parseQName("p:hash")
 
         val input = decl.input("source", primary=true, sequence=false)
         input.contentTypes = MediaType.parseList("xml html")
@@ -707,26 +706,26 @@ class StandardLibrary private constructor(builder: PipelineBuilder, private val 
         output.contentTypes = MediaType.parseList("text xml html")
 
         var option = decl.option(QName("parameters"))
-        option.asType = stepConfig.parseSequenceType("map(xs:QName,item()*)?")
+        option.asType = stepConfig.typeUtils.parseSequenceType("map(xs:QName,item()*)?")
         option = decl.option(QName("value"))
-        option.asType = stepConfig.parseSequenceType("xs:string")
+        option.asType = stepConfig.typeUtils.parseSequenceType("xs:string")
         option.required = true
         option = decl.option(QName("algorithm"))
-        option.asType = stepConfig.parseSequenceType("xs:QName")
+        option.asType = stepConfig.typeUtils.parseSequenceType("xs:QName")
         option.required = true
         option = decl.option(QName("match"))
         option.select = XProcExpression.select(stepConfig, "'/*/node()'")
-        option.asType = stepConfig.parseSequenceType("xs:string")
-        option.specialType = stepConfig.parseSpecialType("XSLTSelectionPattern")
+        option.asType = stepConfig.typeUtils.parseSequenceType("xs:string")
+        option.specialType = stepConfig.typeUtils.parseSpecialType("XSLTSelectionPattern")
         option = decl.option(QName("version"))
-        option.asType = stepConfig.parseSequenceType("xs:string?")
+        option.asType = stepConfig.typeUtils.parseSequenceType("xs:string?")
 
         return decl
     }
 
     private fun pHttpRequest(): DeclareStepInstruction {
-        val decl = library.declareStep()
-        decl._type = stepConfig.parseQName("p:http-request")
+        val decl = library.declareAtomicStep()
+        decl._type = stepConfig.typeUtils.parseQName("p:http-request")
 
         val input = decl.input("source", primary=true, sequence=true)
         input.contentTypes = MediaType.parseList("any")
@@ -737,29 +736,29 @@ class StandardLibrary private constructor(builder: PipelineBuilder, private val 
         output.contentTypes = MediaType.parseList("application/json")
 
         var option = decl.option(QName("href"))
-        option.asType = stepConfig.parseSequenceType("xs:anyURI")
+        option.asType = stepConfig.typeUtils.parseSequenceType("xs:anyURI")
         option.required = true
         option = decl.option(QName("method"))
         option.select = XProcExpression.select(stepConfig, "'GET'")
-        option.asType = stepConfig.parseSequenceType("xs:string?")
+        option.asType = stepConfig.typeUtils.parseSequenceType("xs:string?")
         option = decl.option(QName("serialization"))
-        option.asType = stepConfig.parseSequenceType("map(xs:QName,item()*)?")
+        option.asType = stepConfig.typeUtils.parseSequenceType("map(xs:QName,item()*)?")
         option = decl.option(QName("headers"))
-        option.asType = stepConfig.parseSequenceType("map(xs:string, xs:string)?")
+        option.asType = stepConfig.typeUtils.parseSequenceType("map(xs:string, xs:string)?")
         option = decl.option(QName("auth"))
-        option.asType = stepConfig.parseSequenceType("map(xs:string, item()+)?")
+        option.asType = stepConfig.typeUtils.parseSequenceType("map(xs:string, item()+)?")
         option = decl.option(QName("parameters"))
-        option.asType = stepConfig.parseSequenceType("map(xs:QName, item()*)?")
+        option.asType = stepConfig.typeUtils.parseSequenceType("map(xs:QName, item()*)?")
         option = decl.option(QName("assert"))
         option.select = XProcExpression.select(stepConfig, "'.?status-code lt 400'")
-        option.asType = stepConfig.parseSequenceType("xs:string")
+        option.asType = stepConfig.typeUtils.parseSequenceType("xs:string")
 
         return decl
     }
 
     private fun pIdentity(): DeclareStepInstruction {
-        val decl = library.declareStep()
-        decl._type = stepConfig.parseQName("p:identity")
+        val decl = library.declareAtomicStep()
+        decl._type = stepConfig.typeUtils.parseQName("p:identity")
 
         val input = decl.input("source", primary=true, sequence=true)
         input.contentTypes = MediaType.parseList("any")
@@ -771,8 +770,8 @@ class StandardLibrary private constructor(builder: PipelineBuilder, private val 
     }
 
     private fun pInsert(): DeclareStepInstruction {
-        val decl = library.declareStep()
-        decl._type = stepConfig.parseQName("p:insert")
+        val decl = library.declareAtomicStep()
+        decl._type = stepConfig.typeUtils.parseQName("p:insert")
 
         var input = decl.input("source", primary=true, sequence=false)
         input.contentTypes = MediaType.parseList("xml html")
@@ -784,8 +783,8 @@ class StandardLibrary private constructor(builder: PipelineBuilder, private val 
 
         var option = decl.option(QName("match"))
         option.select = XProcExpression.select(stepConfig, "'/*'")
-        option.asType = stepConfig.parseSequenceType("xs:string")
-        option.specialType = stepConfig.parseSpecialType("XSLTSelectionPattern")
+        option.asType = stepConfig.typeUtils.parseSequenceType("xs:string")
+        option.specialType = stepConfig.typeUtils.parseSpecialType("XSLTSelectionPattern")
         option = decl.option(QName("position"))
         option.select = XProcExpression.select(stepConfig, "'after'")
         option.values = listOf(XdmAtomicValue("first-child"), XdmAtomicValue("last-child"), XdmAtomicValue("before"), XdmAtomicValue("after"))
@@ -794,8 +793,8 @@ class StandardLibrary private constructor(builder: PipelineBuilder, private val 
     }
 
     private fun pIxml(): DeclareStepInstruction {
-        val decl = library.declareStep()
-        decl._type = stepConfig.parseQName("p:ixml")
+        val decl = library.declareAtomicStep()
+        decl._type = stepConfig.typeUtils.parseQName("p:ixml")
 
         var input = decl.input("grammar", primary=false, sequence=true)
         input.contentTypes = MediaType.parseList("text xml")
@@ -806,17 +805,17 @@ class StandardLibrary private constructor(builder: PipelineBuilder, private val 
         output.contentTypes = MediaType.parseList("any")
 
         var option = decl.option(QName("parameters"))
-        option.asType = stepConfig.parseSequenceType("map(xs:QName, item()*)?")
+        option.asType = stepConfig.typeUtils.parseSequenceType("map(xs:QName, item()*)?")
         option = decl.option(QName("fail-on-error"))
         option.select = XProcExpression.select(stepConfig, "true()")
-        option.asType = stepConfig.parseSequenceType("xs:boolean")
+        option.asType = stepConfig.typeUtils.parseSequenceType("xs:boolean")
 
         return decl
     }
 
     private fun pInvisibleXml(): DeclareStepInstruction {
-        val decl = library.declareStep()
-        decl._type = stepConfig.parseQName("p:invisible-xml")
+        val decl = library.declareAtomicStep()
+        decl._type = stepConfig.typeUtils.parseQName("p:invisible-xml")
 
         var input = decl.input("grammar", primary=false, sequence=true)
         input.contentTypes = MediaType.parseList("text xml")
@@ -827,17 +826,17 @@ class StandardLibrary private constructor(builder: PipelineBuilder, private val 
         output.contentTypes = MediaType.parseList("any")
 
         var option = decl.option(QName("parameters"))
-        option.asType = stepConfig.parseSequenceType("map(xs:QName, item()*)?")
+        option.asType = stepConfig.typeUtils.parseSequenceType("map(xs:QName, item()*)?")
         option = decl.option(QName("fail-on-error"))
         option.select = XProcExpression.select(stepConfig, "true()")
-        option.asType = stepConfig.parseSequenceType("xs:boolean")
+        option.asType = stepConfig.typeUtils.parseSequenceType("xs:boolean")
 
         return decl
     }
 
     private fun pJsonJoin(): DeclareStepInstruction {
-        val decl = library.declareStep()
-        decl._type = stepConfig.parseQName("p:json-join")
+        val decl = library.declareAtomicStep()
+        decl._type = stepConfig.typeUtils.parseQName("p:json-join")
 
         val input = decl.input("source", primary=true, sequence=true)
         input.contentTypes = MediaType.parseList("any")
@@ -847,14 +846,14 @@ class StandardLibrary private constructor(builder: PipelineBuilder, private val 
 
         val option = decl.option(QName("flatten-to-depth"))
         option.select = XProcExpression.select(stepConfig, "'0'")
-        option.asType = stepConfig.parseSequenceType("xs:string?")
+        option.asType = stepConfig.typeUtils.parseSequenceType("xs:string?")
 
         return decl
     }
 
     private fun pJsonMerge(): DeclareStepInstruction {
-        val decl = library.declareStep()
-        decl._type = stepConfig.parseQName("p:json-merge")
+        val decl = library.declareAtomicStep()
+        decl._type = stepConfig.typeUtils.parseQName("p:json-merge")
 
         val input = decl.input("source", primary=true, sequence=true)
         input.contentTypes = MediaType.parseList("any")
@@ -867,15 +866,15 @@ class StandardLibrary private constructor(builder: PipelineBuilder, private val 
         option.values = listOf(XdmAtomicValue("reject"), XdmAtomicValue("use-first"), XdmAtomicValue("use-last"), XdmAtomicValue("use-any"), XdmAtomicValue("combine"))
         option = decl.option(QName("key"))
         option.select = XProcExpression.select(stepConfig, "'concat(\"_\",\$p:index)'")
-        option.asType = stepConfig.parseSequenceType("xs:string")
-        option.specialType = stepConfig.parseSpecialType("XPathExpression")
+        option.asType = stepConfig.typeUtils.parseSequenceType("xs:string")
+        option.specialType = stepConfig.typeUtils.parseSpecialType("XPathExpression")
 
         return decl
     }
 
     private fun pLabelElements(): DeclareStepInstruction {
-        val decl = library.declareStep()
-        decl._type = stepConfig.parseQName("p:label-elements")
+        val decl = library.declareAtomicStep()
+        decl._type = stepConfig.typeUtils.parseQName("p:label-elements")
 
         val input = decl.input("source", primary=true, sequence=false)
         input.contentTypes = MediaType.parseList("xml html")
@@ -885,45 +884,45 @@ class StandardLibrary private constructor(builder: PipelineBuilder, private val 
 
         var option = decl.option(QName("attribute"))
         option.select = XProcExpression.select(stepConfig, "'xml:id'")
-        option.asType = stepConfig.parseSequenceType("xs:QName")
+        option.asType = stepConfig.typeUtils.parseSequenceType("xs:QName")
         option = decl.option(QName("label"))
         option.select = XProcExpression.select(stepConfig, "'concat(\"_\",\$p:index)'")
-        option.asType = stepConfig.parseSequenceType("xs:string")
-        option.specialType = stepConfig.parseSpecialType("XPathExpression")
+        option.asType = stepConfig.typeUtils.parseSequenceType("xs:string")
+        option.specialType = stepConfig.typeUtils.parseSpecialType("XPathExpression")
         option = decl.option(QName("match"))
         option.select = XProcExpression.select(stepConfig, "'*'")
-        option.asType = stepConfig.parseSequenceType("xs:string")
-        option.specialType = stepConfig.parseSpecialType("XSLTSelectionPattern")
+        option.asType = stepConfig.typeUtils.parseSequenceType("xs:string")
+        option.specialType = stepConfig.typeUtils.parseSpecialType("XSLTSelectionPattern")
         option = decl.option(QName("replace"))
         option.select = XProcExpression.select(stepConfig, "true()")
-        option.asType = stepConfig.parseSequenceType("xs:boolean")
+        option.asType = stepConfig.typeUtils.parseSequenceType("xs:boolean")
 
         return decl
     }
 
     private fun pLoad(): DeclareStepInstruction {
-        val decl = library.declareStep()
-        decl._type = stepConfig.parseQName("p:load")
+        val decl = library.declareAtomicStep()
+        decl._type = stepConfig.typeUtils.parseQName("p:load")
 
         val output = decl.output("result", primary=true, sequence=false)
         output.contentTypes = MediaType.parseList("any")
 
         var option = decl.option(QName("href"))
-        option.asType = stepConfig.parseSequenceType("xs:anyURI")
+        option.asType = stepConfig.typeUtils.parseSequenceType("xs:anyURI")
         option.required = true
         option = decl.option(QName("parameters"))
-        option.asType = stepConfig.parseSequenceType("map(xs:QName,item()*)?")
+        option.asType = stepConfig.typeUtils.parseSequenceType("map(xs:QName,item()*)?")
         option = decl.option(QName("content-type"))
-        option.asType = stepConfig.parseSequenceType("xs:string?")
+        option.asType = stepConfig.typeUtils.parseSequenceType("xs:string?")
         option = decl.option(QName("document-properties"))
-        option.asType = stepConfig.parseSequenceType("map(xs:QName, item()*)?")
+        option.asType = stepConfig.typeUtils.parseSequenceType("map(xs:QName, item()*)?")
 
         return decl
     }
 
     private fun pMakeAbsoluteUris(): DeclareStepInstruction {
-        val decl = library.declareStep()
-        decl._type = stepConfig.parseQName("p:make-absolute-uris")
+        val decl = library.declareAtomicStep()
+        decl._type = stepConfig.typeUtils.parseQName("p:make-absolute-uris")
 
         val input = decl.input("source", primary=true, sequence=false)
         input.contentTypes = MediaType.parseList("xml html")
@@ -932,18 +931,18 @@ class StandardLibrary private constructor(builder: PipelineBuilder, private val 
         output.contentTypes = MediaType.parseList("xml html")
 
         var option = decl.option(QName("match"))
-        option.asType = stepConfig.parseSequenceType("xs:string")
-        option.specialType = stepConfig.parseSpecialType("XSLTSelectionPattern")
+        option.asType = stepConfig.typeUtils.parseSequenceType("xs:string")
+        option.specialType = stepConfig.typeUtils.parseSpecialType("XSLTSelectionPattern")
         option.required = true
         option = decl.option(QName("base-uri"))
-        option.asType = stepConfig.parseSequenceType("xs:anyURI?")
+        option.asType = stepConfig.typeUtils.parseSequenceType("xs:anyURI?")
 
         return decl
     }
 
     private fun pMarkdownToHtml(): DeclareStepInstruction {
-        val decl = library.declareStep()
-        decl._type = stepConfig.parseQName("p:markdown-to-html")
+        val decl = library.declareAtomicStep()
+        decl._type = stepConfig.typeUtils.parseQName("p:markdown-to-html")
 
         val input = decl.input("source", primary=true, sequence=false)
         input.contentTypes = MediaType.parseList("text")
@@ -952,14 +951,14 @@ class StandardLibrary private constructor(builder: PipelineBuilder, private val 
         output.contentTypes = MediaType.parseList("html")
 
         val option = decl.option(QName("parameters"))
-        option.asType = stepConfig.parseSequenceType("map(xs:QName, item()*)?")
+        option.asType = stepConfig.typeUtils.parseSequenceType("map(xs:QName, item()*)?")
 
         return decl
     }
 
     private fun pMessage(): DeclareStepInstruction {
-        val decl = library.declareStep()
-        decl._type = stepConfig.parseQName("p:message")
+        val decl = library.declareAtomicStep()
+        decl._type = stepConfig.typeUtils.parseQName("p:message")
 
         val input = decl.input("source", primary=true, sequence=true)
 
@@ -967,17 +966,17 @@ class StandardLibrary private constructor(builder: PipelineBuilder, private val 
 
         var option = decl.option(QName("test"))
         option.select = XProcExpression.select(stepConfig, "true()")
-        option.asType = stepConfig.parseSequenceType("xs:boolean")
+        option.asType = stepConfig.typeUtils.parseSequenceType("xs:boolean")
         option = decl.option(QName("select"))
-        option.asType = stepConfig.parseSequenceType("item()*")
+        option.asType = stepConfig.typeUtils.parseSequenceType("item()*")
         option.required = true
 
         return decl
     }
 
     private fun pNamespaceDelete(): DeclareStepInstruction {
-        val decl = library.declareStep()
-        decl._type = stepConfig.parseQName("p:namespace-delete")
+        val decl = library.declareAtomicStep()
+        decl._type = stepConfig.typeUtils.parseQName("p:namespace-delete")
 
         val input = decl.input("source", primary=true, sequence=false)
         input.contentTypes = MediaType.parseList("xml html")
@@ -986,15 +985,15 @@ class StandardLibrary private constructor(builder: PipelineBuilder, private val 
         output.contentTypes = MediaType.parseList("xml html")
 
         val option = decl.option(QName("prefixes"))
-        option.asType = stepConfig.parseSequenceType("xs:string")
+        option.asType = stepConfig.typeUtils.parseSequenceType("xs:string")
         option.required = true
 
         return decl
     }
 
     private fun pNamespaceRename(): DeclareStepInstruction {
-        val decl = library.declareStep()
-        decl._type = stepConfig.parseQName("p:namespace-rename")
+        val decl = library.declareAtomicStep()
+        decl._type = stepConfig.typeUtils.parseQName("p:namespace-rename")
 
         val input = decl.input("source", primary=true, sequence=false)
         input.contentTypes = MediaType.parseList("xml html")
@@ -1003,9 +1002,9 @@ class StandardLibrary private constructor(builder: PipelineBuilder, private val 
         output.contentTypes = MediaType.parseList("xml html")
 
         var option = decl.option(QName("from"))
-        option.asType = stepConfig.parseSequenceType("xs:anyURI?")
+        option.asType = stepConfig.typeUtils.parseSequenceType("xs:anyURI?")
         option = decl.option(QName("to"))
-        option.asType = stepConfig.parseSequenceType("xs:anyURI?")
+        option.asType = stepConfig.typeUtils.parseSequenceType("xs:anyURI?")
         option = decl.option(QName("apply-to"))
         option.select = XProcExpression.select(stepConfig, "'all'")
         option.values = listOf(XdmAtomicValue("all"), XdmAtomicValue("elements"), XdmAtomicValue("attributes"))
@@ -1014,8 +1013,8 @@ class StandardLibrary private constructor(builder: PipelineBuilder, private val 
     }
 
     private fun pOsExec(): DeclareStepInstruction {
-        val decl = library.declareStep()
-        decl._type = stepConfig.parseQName("p:os-exec")
+        val decl = library.declareAtomicStep()
+        decl._type = stepConfig.typeUtils.parseQName("p:os-exec")
 
         val input = decl.input("source", primary=true, sequence=true)
         input.contentTypes = MediaType.parseList("any")
@@ -1028,32 +1027,32 @@ class StandardLibrary private constructor(builder: PipelineBuilder, private val 
         output.contentTypes = MediaType.parseList("application/xml")
 
         var option = decl.option(QName("command"))
-        option.asType = stepConfig.parseSequenceType("xs:string")
+        option.asType = stepConfig.typeUtils.parseSequenceType("xs:string")
         option.required = true
         option = decl.option(QName("args"))
         option.select = XProcExpression.select(stepConfig, "()")
-        option.asType = stepConfig.parseSequenceType("xs:string*")
+        option.asType = stepConfig.typeUtils.parseSequenceType("xs:string*")
         option = decl.option(QName("cwd"))
-        option.asType = stepConfig.parseSequenceType("xs:string?")
+        option.asType = stepConfig.typeUtils.parseSequenceType("xs:string?")
         option = decl.option(QName("result-content-type"))
         option.select = XProcExpression.select(stepConfig, "'text/plain'")
-        option.asType = stepConfig.parseSequenceType("xs:string")
+        option.asType = stepConfig.typeUtils.parseSequenceType("xs:string")
         option = decl.option(QName("error-content-type"))
         option.select = XProcExpression.select(stepConfig, "'text/plain'")
-        option.asType = stepConfig.parseSequenceType("xs:string")
+        option.asType = stepConfig.typeUtils.parseSequenceType("xs:string")
         option = decl.option(QName("path-separator"))
-        option.asType = stepConfig.parseSequenceType("xs:string?")
+        option.asType = stepConfig.typeUtils.parseSequenceType("xs:string?")
         option = decl.option(QName("failure-threshold"))
-        option.asType = stepConfig.parseSequenceType("xs:integer?")
+        option.asType = stepConfig.typeUtils.parseSequenceType("xs:integer?")
         option = decl.option(QName("serialization"))
-        option.asType = stepConfig.parseSequenceType("map(xs:QName,item()*)?")
+        option.asType = stepConfig.typeUtils.parseSequenceType("map(xs:QName,item()*)?")
 
         return decl
     }
 
     private fun pOsInfo(): DeclareStepInstruction {
-        val decl = library.declareStep()
-        decl._type = stepConfig.parseQName("p:os-info")
+        val decl = library.declareAtomicStep()
+        decl._type = stepConfig.typeUtils.parseQName("p:os-info")
 
         val output = decl.output("result", primary=true, sequence=false)
         output.contentTypes = MediaType.parseList("application/xml")
@@ -1062,8 +1061,8 @@ class StandardLibrary private constructor(builder: PipelineBuilder, private val 
     }
 
     private fun pPack(): DeclareStepInstruction {
-        val decl = library.declareStep()
-        decl._type = stepConfig.parseQName("p:pack")
+        val decl = library.declareAtomicStep()
+        decl._type = stepConfig.typeUtils.parseQName("p:pack")
 
         var input = decl.input("source", primary=true, sequence=true)
         input.contentTypes = MediaType.parseList("text xml html")
@@ -1074,17 +1073,17 @@ class StandardLibrary private constructor(builder: PipelineBuilder, private val 
         output.contentTypes = MediaType.parseList("application/xml")
 
         var option = decl.option(QName("wrapper"))
-        option.asType = stepConfig.parseSequenceType("xs:QName")
+        option.asType = stepConfig.typeUtils.parseSequenceType("xs:QName")
         option.required = true
         option = decl.option(QName("attributes"))
-        option.asType = stepConfig.parseSequenceType("map(xs:QName, xs:anyAtomicType)?")
+        option.asType = stepConfig.typeUtils.parseSequenceType("map(xs:QName, xs:anyAtomicType)?")
 
         return decl
     }
 
     private fun pRename(): DeclareStepInstruction {
-        val decl = library.declareStep()
-        decl._type = stepConfig.parseQName("p:rename")
+        val decl = library.declareAtomicStep()
+        decl._type = stepConfig.typeUtils.parseQName("p:rename")
 
         val input = decl.input("source", primary=true, sequence=false)
         input.contentTypes = MediaType.parseList("xml html")
@@ -1094,18 +1093,18 @@ class StandardLibrary private constructor(builder: PipelineBuilder, private val 
 
         var option = decl.option(QName("match"))
         option.select = XProcExpression.select(stepConfig, "'/*'")
-        option.asType = stepConfig.parseSequenceType("xs:string")
-        option.specialType = stepConfig.parseSpecialType("XSLTSelectionPattern")
+        option.asType = stepConfig.typeUtils.parseSequenceType("xs:string")
+        option.specialType = stepConfig.typeUtils.parseSpecialType("XSLTSelectionPattern")
         option = decl.option(QName("new-name"))
-        option.asType = stepConfig.parseSequenceType("xs:QName")
+        option.asType = stepConfig.typeUtils.parseSequenceType("xs:QName")
         option.required = true
 
         return decl
     }
 
     private fun pReplace(): DeclareStepInstruction {
-        val decl = library.declareStep()
-        decl._type = stepConfig.parseQName("p:replace")
+        val decl = library.declareAtomicStep()
+        decl._type = stepConfig.typeUtils.parseQName("p:replace")
 
         var input = decl.input("source", primary=true, sequence=false)
         input.contentTypes = MediaType.parseList("xml html")
@@ -1116,16 +1115,16 @@ class StandardLibrary private constructor(builder: PipelineBuilder, private val 
         output.contentTypes = MediaType.parseList("text xml html")
 
         val option = decl.option(QName("match"))
-        option.asType = stepConfig.parseSequenceType("xs:string")
-        option.specialType = stepConfig.parseSpecialType("XSLTSelectionPattern")
+        option.asType = stepConfig.typeUtils.parseSequenceType("xs:string")
+        option.specialType = stepConfig.typeUtils.parseSpecialType("XSLTSelectionPattern")
         option.required = true
 
         return decl
     }
 
     private fun pSendMail(): DeclareStepInstruction {
-        val decl = library.declareStep()
-        decl._type = stepConfig.parseQName("p:send-mail")
+        val decl = library.declareAtomicStep()
+        decl._type = stepConfig.typeUtils.parseQName("p:send-mail")
 
         val input = decl.input("source", primary=true, sequence=true)
         input.contentTypes = MediaType.parseList("any")
@@ -1134,18 +1133,18 @@ class StandardLibrary private constructor(builder: PipelineBuilder, private val 
         output.contentTypes = MediaType.parseList("application/xml")
 
         var option = decl.option(QName("serialization"))
-        option.asType = stepConfig.parseSequenceType("map(xs:QName,item()*)?")
+        option.asType = stepConfig.typeUtils.parseSequenceType("map(xs:QName,item()*)?")
         option = decl.option(QName("auth"))
-        option.asType = stepConfig.parseSequenceType("map(xs:string, item()+)?")
+        option.asType = stepConfig.typeUtils.parseSequenceType("map(xs:string, item()+)?")
         option = decl.option(QName("parameters"))
-        option.asType = stepConfig.parseSequenceType("map(xs:QName, item()*)?")
+        option.asType = stepConfig.typeUtils.parseSequenceType("map(xs:QName, item()*)?")
 
         return decl
     }
 
     private fun pSetAttributes(): DeclareStepInstruction {
-        val decl = library.declareStep()
-        decl._type = stepConfig.parseQName("p:set-attributes")
+        val decl = library.declareAtomicStep()
+        decl._type = stepConfig.typeUtils.parseQName("p:set-attributes")
 
         val input = decl.input("source", primary=true, sequence=false)
         input.contentTypes = MediaType.parseList("xml html")
@@ -1155,18 +1154,18 @@ class StandardLibrary private constructor(builder: PipelineBuilder, private val 
 
         var option = decl.option(QName("match"))
         option.select = XProcExpression.select(stepConfig, "'/*'")
-        option.asType = stepConfig.parseSequenceType("xs:string")
-        option.specialType = stepConfig.parseSpecialType("XSLTSelectionPattern")
+        option.asType = stepConfig.typeUtils.parseSequenceType("xs:string")
+        option.specialType = stepConfig.typeUtils.parseSpecialType("XSLTSelectionPattern")
         option = decl.option(QName("attributes"))
-        option.asType = stepConfig.parseSequenceType("map(xs:QName, xs:anyAtomicType)")
+        option.asType = stepConfig.typeUtils.parseSequenceType("map(xs:QName, xs:anyAtomicType)")
         option.required = true
 
         return decl
     }
 
     private fun pSetProperties(): DeclareStepInstruction {
-        val decl = library.declareStep()
-        decl._type = stepConfig.parseQName("p:set-properties")
+        val decl = library.declareAtomicStep()
+        decl._type = stepConfig.typeUtils.parseQName("p:set-properties")
 
         val input = decl.input("source", primary=true, sequence=false)
         input.contentTypes = MediaType.parseList("any")
@@ -1175,18 +1174,18 @@ class StandardLibrary private constructor(builder: PipelineBuilder, private val 
         output.contentTypes = MediaType.parseList("any")
 
         var option = decl.option(QName("properties"))
-        option.asType = stepConfig.parseSequenceType("map(xs:QName,item()*)")
+        option.asType = stepConfig.typeUtils.parseSequenceType("map(xs:QName,item()*)")
         option.required = true
         option = decl.option(QName("merge"))
         option.select = XProcExpression.select(stepConfig, "true()")
-        option.asType = stepConfig.parseSequenceType("xs:boolean")
+        option.asType = stepConfig.typeUtils.parseSequenceType("xs:boolean")
 
         return decl
     }
 
     private fun pSink(): DeclareStepInstruction {
-        val decl = library.declareStep()
-        decl._type = stepConfig.parseQName("p:sink")
+        val decl = library.declareAtomicStep()
+        decl._type = stepConfig.typeUtils.parseQName("p:sink")
 
         val input = decl.input("source", primary=true, sequence=true)
         input.contentTypes = MediaType.parseList("any")
@@ -1195,8 +1194,8 @@ class StandardLibrary private constructor(builder: PipelineBuilder, private val 
     }
 
     private fun pSleep(): DeclareStepInstruction {
-        val decl = library.declareStep()
-        decl._type = stepConfig.parseQName("p:sleep")
+        val decl = library.declareAtomicStep()
+        decl._type = stepConfig.typeUtils.parseQName("p:sleep")
 
         val input = decl.input("source", primary=true, sequence=true)
         input.contentTypes = MediaType.parseList("any")
@@ -1205,15 +1204,15 @@ class StandardLibrary private constructor(builder: PipelineBuilder, private val 
         output.contentTypes = MediaType.parseList("any")
 
         val option = decl.option(QName("duration"))
-        option.asType = stepConfig.parseSequenceType("xs:string")
+        option.asType = stepConfig.typeUtils.parseSequenceType("xs:string")
         option.required = true
 
         return decl
     }
 
     private fun pSplitSequence(): DeclareStepInstruction {
-        val decl = library.declareStep()
-        decl._type = stepConfig.parseQName("p:split-sequence")
+        val decl = library.declareAtomicStep()
+        decl._type = stepConfig.typeUtils.parseQName("p:split-sequence")
 
         val input = decl.input("source", primary=true, sequence=true)
         input.contentTypes = MediaType.parseList("any")
@@ -1225,18 +1224,18 @@ class StandardLibrary private constructor(builder: PipelineBuilder, private val 
 
         var option = decl.option(QName("initial-only"))
         option.select = XProcExpression.select(stepConfig, "false()")
-        option.asType = stepConfig.parseSequenceType("xs:boolean")
+        option.asType = stepConfig.typeUtils.parseSequenceType("xs:boolean")
         option = decl.option(QName("test"))
-        option.asType = stepConfig.parseSequenceType("xs:string")
-        option.specialType = stepConfig.parseSpecialType("XPathExpression")
+        option.asType = stepConfig.typeUtils.parseSequenceType("xs:string")
+        option.specialType = stepConfig.typeUtils.parseSpecialType("XPathExpression")
         option.required = true
 
         return decl
     }
 
     private fun pStore(): DeclareStepInstruction {
-        val decl = library.declareStep()
-        decl._type = stepConfig.parseQName("p:store")
+        val decl = library.declareAtomicStep()
+        decl._type = stepConfig.typeUtils.parseQName("p:store")
 
         val input = decl.input("source", primary=true, sequence=false)
         input.contentTypes = MediaType.parseList("any")
@@ -1247,17 +1246,17 @@ class StandardLibrary private constructor(builder: PipelineBuilder, private val 
         output.contentTypes = MediaType.parseList("application/xml")
 
         var option = decl.option(QName("href"))
-        option.asType = stepConfig.parseSequenceType("xs:anyURI")
+        option.asType = stepConfig.typeUtils.parseSequenceType("xs:anyURI")
         option.required = true
         option = decl.option(QName("serialization"))
-        option.asType = stepConfig.parseSequenceType("map(xs:QName,item()*)?")
+        option.asType = stepConfig.typeUtils.parseSequenceType("map(xs:QName,item()*)?")
 
         return decl
     }
 
     private fun pStringReplace(): DeclareStepInstruction {
-        val decl = library.declareStep()
-        decl._type = stepConfig.parseQName("p:string-replace")
+        val decl = library.declareAtomicStep()
+        decl._type = stepConfig.typeUtils.parseQName("p:string-replace")
 
         val input = decl.input("source", primary=true, sequence=false)
         input.contentTypes = MediaType.parseList("xml html")
@@ -1266,20 +1265,20 @@ class StandardLibrary private constructor(builder: PipelineBuilder, private val 
         output.contentTypes = MediaType.parseList("text xml html")
 
         var option = decl.option(QName("match"))
-        option.asType = stepConfig.parseSequenceType("xs:string")
-        option.specialType = stepConfig.parseSpecialType("XSLTSelectionPattern")
+        option.asType = stepConfig.typeUtils.parseSequenceType("xs:string")
+        option.specialType = stepConfig.typeUtils.parseSpecialType("XSLTSelectionPattern")
         option.required = true
         option = decl.option(QName("replace"))
-        option.asType = stepConfig.parseSequenceType("xs:string")
-        option.specialType = stepConfig.parseSpecialType("XPathExpression")
+        option.asType = stepConfig.typeUtils.parseSequenceType("xs:string")
+        option.specialType = stepConfig.typeUtils.parseSpecialType("XPathExpression")
         option.required = true
 
         return decl
     }
 
     private fun pTextCount(): DeclareStepInstruction {
-        val decl = library.declareStep()
-        decl._type = stepConfig.parseQName("p:text-count")
+        val decl = library.declareAtomicStep()
+        decl._type = stepConfig.typeUtils.parseQName("p:text-count")
 
         val input = decl.input("source", primary=true, sequence=false)
         input.contentTypes = MediaType.parseList("text")
@@ -1291,8 +1290,8 @@ class StandardLibrary private constructor(builder: PipelineBuilder, private val 
     }
 
     private fun pTextHead(): DeclareStepInstruction {
-        val decl = library.declareStep()
-        decl._type = stepConfig.parseQName("p:text-head")
+        val decl = library.declareAtomicStep()
+        decl._type = stepConfig.typeUtils.parseQName("p:text-head")
 
         val input = decl.input("source", primary=true, sequence=false)
         input.contentTypes = MediaType.parseList("text")
@@ -1301,15 +1300,15 @@ class StandardLibrary private constructor(builder: PipelineBuilder, private val 
         output.contentTypes = MediaType.parseList("text")
 
         val option = decl.option(QName("count"))
-        option.asType = stepConfig.parseSequenceType("xs:integer")
+        option.asType = stepConfig.typeUtils.parseSequenceType("xs:integer")
         option.required = true
 
         return decl
     }
 
     private fun pTextJoin(): DeclareStepInstruction {
-        val decl = library.declareStep()
-        decl._type = stepConfig.parseQName("p:text-join")
+        val decl = library.declareAtomicStep()
+        decl._type = stepConfig.typeUtils.parseQName("p:text-join")
 
         val input = decl.input("source", primary=true, sequence=true)
         input.contentTypes = MediaType.parseList("text")
@@ -1318,20 +1317,20 @@ class StandardLibrary private constructor(builder: PipelineBuilder, private val 
         output.contentTypes = MediaType.parseList("text")
 
         var option = decl.option(QName("separator"))
-        option.asType = stepConfig.parseSequenceType("xs:string?")
+        option.asType = stepConfig.typeUtils.parseSequenceType("xs:string?")
         option = decl.option(QName("prefix"))
-        option.asType = stepConfig.parseSequenceType("xs:string?")
+        option.asType = stepConfig.typeUtils.parseSequenceType("xs:string?")
         option = decl.option(QName("suffix"))
-        option.asType = stepConfig.parseSequenceType("xs:string?")
+        option.asType = stepConfig.typeUtils.parseSequenceType("xs:string?")
         option = decl.option(QName("override-content-type"))
-        option.asType = stepConfig.parseSequenceType("xs:string?")
+        option.asType = stepConfig.typeUtils.parseSequenceType("xs:string?")
 
         return decl
     }
 
     private fun pTextReplace(): DeclareStepInstruction {
-        val decl = library.declareStep()
-        decl._type = stepConfig.parseQName("p:text-replace")
+        val decl = library.declareAtomicStep()
+        decl._type = stepConfig.typeUtils.parseQName("p:text-replace")
 
         val input = decl.input("source", primary=true, sequence=false)
         input.contentTypes = MediaType.parseList("text")
@@ -1340,20 +1339,20 @@ class StandardLibrary private constructor(builder: PipelineBuilder, private val 
         output.contentTypes = MediaType.parseList("text")
 
         var option = decl.option(QName("pattern"))
-        option.asType = stepConfig.parseSequenceType("xs:string")
+        option.asType = stepConfig.typeUtils.parseSequenceType("xs:string")
         option.required = true
         option = decl.option(QName("replacement"))
-        option.asType = stepConfig.parseSequenceType("xs:string")
+        option.asType = stepConfig.typeUtils.parseSequenceType("xs:string")
         option.required = true
         option = decl.option(QName("flags"))
-        option.asType = stepConfig.parseSequenceType("xs:string?")
+        option.asType = stepConfig.typeUtils.parseSequenceType("xs:string?")
 
         return decl
     }
 
     private fun pTextSort(): DeclareStepInstruction {
-        val decl = library.declareStep()
-        decl._type = stepConfig.parseQName("p:text-sort")
+        val decl = library.declareAtomicStep()
+        decl._type = stepConfig.typeUtils.parseQName("p:text-sort")
 
         val input = decl.input("source", primary=true, sequence=false)
         input.contentTypes = MediaType.parseList("text")
@@ -1363,29 +1362,29 @@ class StandardLibrary private constructor(builder: PipelineBuilder, private val 
 
         var option = decl.option(QName("sort-key"))
         option.select = XProcExpression.select(stepConfig, "'.'")
-        option.asType = stepConfig.parseSequenceType("xs:string")
-        option.specialType = stepConfig.parseSpecialType("XPathExpression")
+        option.asType = stepConfig.typeUtils.parseSequenceType("xs:string")
+        option.specialType = stepConfig.typeUtils.parseSpecialType("XPathExpression")
         option = decl.option(QName("order"))
         option.select = XProcExpression.select(stepConfig, "'ascending'")
-        option.asType = stepConfig.parseSequenceType("xs:string")
+        option.asType = stepConfig.typeUtils.parseSequenceType("xs:string")
         option.values = listOf(XdmAtomicValue("ascending"), XdmAtomicValue("descending"))
         option = decl.option(QName("case-order"))
-        option.asType = stepConfig.parseSequenceType("xs:string?")
+        option.asType = stepConfig.typeUtils.parseSequenceType("xs:string?")
         option.values = listOf(XdmAtomicValue("upper-first"), XdmAtomicValue("lower-first"))
         option = decl.option(QName("lang"))
-        option.asType = stepConfig.parseSequenceType("xs:language?")
+        option.asType = stepConfig.typeUtils.parseSequenceType("xs:language?")
         option = decl.option(QName("collation"))
-        option.asType = stepConfig.parseSequenceType("xs:string?")
+        option.asType = stepConfig.typeUtils.parseSequenceType("xs:string?")
         option = decl.option(QName("stable"))
         option.select = XProcExpression.select(stepConfig, "true()")
-        option.asType = stepConfig.parseSequenceType("xs:boolean")
+        option.asType = stepConfig.typeUtils.parseSequenceType("xs:boolean")
 
         return decl
     }
 
     private fun pTextTail(): DeclareStepInstruction {
-        val decl = library.declareStep()
-        decl._type = stepConfig.parseQName("p:text-tail")
+        val decl = library.declareAtomicStep()
+        decl._type = stepConfig.typeUtils.parseQName("p:text-tail")
 
         val input = decl.input("source", primary=true, sequence=false)
         input.contentTypes = MediaType.parseList("text")
@@ -1394,15 +1393,15 @@ class StandardLibrary private constructor(builder: PipelineBuilder, private val 
         output.contentTypes = MediaType.parseList("text")
 
         val option = decl.option(QName("count"))
-        option.asType = stepConfig.parseSequenceType("xs:integer")
+        option.asType = stepConfig.typeUtils.parseSequenceType("xs:integer")
         option.required = true
 
         return decl
     }
 
     private fun pUnarchive(): DeclareStepInstruction {
-        val decl = library.declareStep()
-        decl._type = stepConfig.parseQName("p:unarchive")
+        val decl = library.declareAtomicStep()
+        decl._type = stepConfig.typeUtils.parseQName("p:unarchive")
 
         val input = decl.input("source", primary=true, sequence=false)
         input.contentTypes = MediaType.parseList("any")
@@ -1411,26 +1410,26 @@ class StandardLibrary private constructor(builder: PipelineBuilder, private val 
         output.contentTypes = MediaType.parseList("any")
 
         var option = decl.option(QName("include-filter"))
-        option.asType = stepConfig.parseSequenceType("xs:string*")
-        option.specialType = stepConfig.parseSpecialType("RegularExpression")
+        option.asType = stepConfig.typeUtils.parseSequenceType("xs:string*")
+        option.specialType = stepConfig.typeUtils.parseSpecialType("RegularExpression")
         option = decl.option(QName("exclude-filter"))
-        option.asType = stepConfig.parseSequenceType("xs:string*")
-        option.specialType = stepConfig.parseSpecialType("RegularExpression")
+        option.asType = stepConfig.typeUtils.parseSequenceType("xs:string*")
+        option.specialType = stepConfig.typeUtils.parseSpecialType("RegularExpression")
         option = decl.option(QName("format"))
-        option.asType = stepConfig.parseSequenceType("xs:QName?")
+        option.asType = stepConfig.typeUtils.parseSequenceType("xs:QName?")
         option = decl.option(QName("parameters"))
-        option.asType = stepConfig.parseSequenceType("map(xs:QName, item()*)?")
+        option.asType = stepConfig.typeUtils.parseSequenceType("map(xs:QName, item()*)?")
         option = decl.option(QName("relative-to"))
-        option.asType = stepConfig.parseSequenceType("xs:anyURI?")
+        option.asType = stepConfig.typeUtils.parseSequenceType("xs:anyURI?")
         option = decl.option(QName("override-content-types"))
-        option.asType = stepConfig.parseSequenceType("array(array(xs:string))?")
+        option.asType = stepConfig.typeUtils.parseSequenceType("array(array(xs:string))?")
 
         return decl
     }
 
     private fun pUncompress(): DeclareStepInstruction {
-        val decl = library.declareStep()
-        decl._type = stepConfig.parseQName("p:uncompress")
+        val decl = library.declareAtomicStep()
+        decl._type = stepConfig.typeUtils.parseQName("p:uncompress")
 
         val input = decl.input("source", primary=true, sequence=false)
         input.contentTypes = MediaType.parseList("any")
@@ -1439,19 +1438,19 @@ class StandardLibrary private constructor(builder: PipelineBuilder, private val 
         output.contentTypes = MediaType.parseList("any")
 
         var option = decl.option(QName("format"))
-        option.asType = stepConfig.parseSequenceType("xs:QName?")
+        option.asType = stepConfig.typeUtils.parseSequenceType("xs:QName?")
         option = decl.option(QName("parameters"))
-        option.asType = stepConfig.parseSequenceType("map(xs:QName,item()*)?")
+        option.asType = stepConfig.typeUtils.parseSequenceType("map(xs:QName,item()*)?")
         option = decl.option(QName("content-type"))
         option.select = XProcExpression.select(stepConfig, "'application/octet-stream'")
-        option.asType = stepConfig.parseSequenceType("xs:string")
+        option.asType = stepConfig.typeUtils.parseSequenceType("xs:string")
 
         return decl
     }
 
     private fun pUnwrap(): DeclareStepInstruction {
-        val decl = library.declareStep()
-        decl._type = stepConfig.parseQName("p:unwrap")
+        val decl = library.declareAtomicStep()
+        decl._type = stepConfig.typeUtils.parseQName("p:unwrap")
 
         val input = decl.input("source", primary=true, sequence=false)
         input.contentTypes = MediaType.parseList("xml html")
@@ -1461,15 +1460,15 @@ class StandardLibrary private constructor(builder: PipelineBuilder, private val 
 
         val option = decl.option(QName("match"))
         option.select = XProcExpression.select(stepConfig, "'/*'")
-        option.asType = stepConfig.parseSequenceType("xs:string")
-        option.specialType = stepConfig.parseSpecialType("XSLTSelectionPattern")
+        option.asType = stepConfig.typeUtils.parseSequenceType("xs:string")
+        option.specialType = stepConfig.typeUtils.parseSpecialType("XSLTSelectionPattern")
 
         return decl
     }
 
     private fun pUuid(): DeclareStepInstruction {
-        val decl = library.declareStep()
-        decl._type = stepConfig.parseQName("p:uuid")
+        val decl = library.declareAtomicStep()
+        decl._type = stepConfig.typeUtils.parseQName("p:uuid")
 
         val input = decl.input("source", primary=true, sequence=false)
         input.contentTypes = MediaType.parseList("xml html")
@@ -1479,17 +1478,17 @@ class StandardLibrary private constructor(builder: PipelineBuilder, private val 
 
         var option = decl.option(QName("match"))
         option.select = XProcExpression.select(stepConfig, "'/*'")
-        option.asType = stepConfig.parseSequenceType("xs:string")
-        option.specialType = stepConfig.parseSpecialType("XSLTSelectionPattern")
+        option.asType = stepConfig.typeUtils.parseSequenceType("xs:string")
+        option.specialType = stepConfig.typeUtils.parseSpecialType("XSLTSelectionPattern")
         option = decl.option(QName("version"))
-        option.asType = stepConfig.parseSequenceType("xs:integer?")
+        option.asType = stepConfig.typeUtils.parseSequenceType("xs:integer?")
 
         return decl
     }
 
     private fun pValidateWithJsonSchema(): DeclareStepInstruction {
-        val decl = library.declareStep()
-        decl._type = stepConfig.parseQName("p:validate-with-json-schema")
+        val decl = library.declareAtomicStep()
+        decl._type = stepConfig.typeUtils.parseQName("p:validate-with-json-schema")
 
         var input = decl.input("source", primary=true, sequence=false)
         input.contentTypes = MediaType.parseList("json")
@@ -1503,21 +1502,21 @@ class StandardLibrary private constructor(builder: PipelineBuilder, private val 
 
         var option = decl.option(QName("assert-valid"))
         option.select = XProcExpression.select(stepConfig, "true()")
-        option.asType = stepConfig.parseSequenceType("xs:boolean")
+        option.asType = stepConfig.typeUtils.parseSequenceType("xs:boolean")
         option = decl.option(QName("default-version"))
-        option.asType = stepConfig.parseSequenceType("xs:string?")
+        option.asType = stepConfig.typeUtils.parseSequenceType("xs:string?")
         option = decl.option(QName("parameters"))
-        option.asType = stepConfig.parseSequenceType("map(xs:QName,item()*)?")
+        option.asType = stepConfig.typeUtils.parseSequenceType("map(xs:QName,item()*)?")
         option = decl.option(QName("report-format"))
         option.select = XProcExpression.select(stepConfig, "'xvrl'")
-        option.asType = stepConfig.parseSequenceType("xs:string")
+        option.asType = stepConfig.typeUtils.parseSequenceType("xs:string")
 
         return decl
     }
 
     private fun pValidateWithNvdl(): DeclareStepInstruction {
-        val decl = library.declareStep()
-        decl._type = stepConfig.parseQName("p:validate-with-nvdl")
+        val decl = library.declareAtomicStep()
+        decl._type = stepConfig.typeUtils.parseQName("p:validate-with-nvdl")
 
         var input = decl.input("source", primary=true, sequence=false)
         input.contentTypes = MediaType.parseList("xml html")
@@ -1534,19 +1533,19 @@ class StandardLibrary private constructor(builder: PipelineBuilder, private val 
 
         var option = decl.option(QName("assert-valid"))
         option.select = XProcExpression.select(stepConfig, "true()")
-        option.asType = stepConfig.parseSequenceType("xs:boolean")
+        option.asType = stepConfig.typeUtils.parseSequenceType("xs:boolean")
         option = decl.option(QName("report-format"))
         option.select = XProcExpression.select(stepConfig, "'xvrl'")
-        option.asType = stepConfig.parseSequenceType("xs:string")
+        option.asType = stepConfig.typeUtils.parseSequenceType("xs:string")
         option = decl.option(QName("parameters"))
-        option.asType = stepConfig.parseSequenceType("map(xs:QName,item()*)?")
+        option.asType = stepConfig.typeUtils.parseSequenceType("map(xs:QName,item()*)?")
 
         return decl
     }
 
     private fun pValidateWithRelaxNg(): DeclareStepInstruction {
-        val decl = library.declareStep()
-        decl._type = stepConfig.parseQName("p:validate-with-relax-ng")
+        val decl = library.declareAtomicStep()
+        decl._type = stepConfig.typeUtils.parseQName("p:validate-with-relax-ng")
 
         var input = decl.input("source", primary=true, sequence=false)
         input.contentTypes = MediaType.parseList("xml html")
@@ -1560,25 +1559,25 @@ class StandardLibrary private constructor(builder: PipelineBuilder, private val 
 
         var option = decl.option(QName("dtd-attribute-values"))
         option.select = XProcExpression.select(stepConfig, "false()")
-        option.asType = stepConfig.parseSequenceType("xs:boolean")
+        option.asType = stepConfig.typeUtils.parseSequenceType("xs:boolean")
         option = decl.option(QName("dtd-id-idref-warnings"))
         option.select = XProcExpression.select(stepConfig, "false()")
-        option.asType = stepConfig.parseSequenceType("xs:boolean")
+        option.asType = stepConfig.typeUtils.parseSequenceType("xs:boolean")
         option = decl.option(QName("assert-valid"))
         option.select = XProcExpression.select(stepConfig, "true()")
-        option.asType = stepConfig.parseSequenceType("xs:boolean")
+        option.asType = stepConfig.typeUtils.parseSequenceType("xs:boolean")
         option = decl.option(QName("report-format"))
         option.select = XProcExpression.select(stepConfig, "'xvrl'")
-        option.asType = stepConfig.parseSequenceType("xs:string")
+        option.asType = stepConfig.typeUtils.parseSequenceType("xs:string")
         option = decl.option(QName("parameters"))
-        option.asType = stepConfig.parseSequenceType("map(xs:QName,item()*)?")
+        option.asType = stepConfig.typeUtils.parseSequenceType("map(xs:QName,item()*)?")
 
         return decl
     }
 
     private fun pValidateWithSchematron(): DeclareStepInstruction {
-        val decl = library.declareStep()
-        decl._type = stepConfig.parseQName("p:validate-with-schematron")
+        val decl = library.declareAtomicStep()
+        decl._type = stepConfig.typeUtils.parseQName("p:validate-with-schematron")
 
         var input = decl.input("source", primary=true, sequence=false)
         input.contentTypes = MediaType.parseList("xml html")
@@ -1591,23 +1590,23 @@ class StandardLibrary private constructor(builder: PipelineBuilder, private val 
         output.contentTypes = MediaType.parseList("xml json")
 
         var option = decl.option(QName("parameters"))
-        option.asType = stepConfig.parseSequenceType("map(xs:QName,item()*)?")
+        option.asType = stepConfig.typeUtils.parseSequenceType("map(xs:QName,item()*)?")
         option = decl.option(QName("phase"))
         option.select = XProcExpression.select(stepConfig, "'#DEFAULT'")
-        option.asType = stepConfig.parseSequenceType("xs:string")
+        option.asType = stepConfig.typeUtils.parseSequenceType("xs:string")
         option = decl.option(QName("assert-valid"))
         option.select = XProcExpression.select(stepConfig, "true()")
-        option.asType = stepConfig.parseSequenceType("xs:boolean")
+        option.asType = stepConfig.typeUtils.parseSequenceType("xs:boolean")
         option = decl.option(QName("report-format"))
         option.select = XProcExpression.select(stepConfig, "'svrl'")
-        option.asType = stepConfig.parseSequenceType("xs:string")
+        option.asType = stepConfig.typeUtils.parseSequenceType("xs:string")
 
         return decl
     }
 
     private fun pValidateWithXmlSchema(): DeclareStepInstruction {
-        val decl = library.declareStep()
-        decl._type = stepConfig.parseQName("p:validate-with-xml-schema")
+        val decl = library.declareAtomicStep()
+        decl._type = stepConfig.typeUtils.parseQName("p:validate-with-xml-schema")
 
         var input = decl.input("source", primary=true, sequence=false)
         input.contentTypes = MediaType.parseList("xml html")
@@ -1621,30 +1620,30 @@ class StandardLibrary private constructor(builder: PipelineBuilder, private val 
 
         var option = decl.option(QName("use-location-hints"))
         option.select = XProcExpression.select(stepConfig, "false()")
-        option.asType = stepConfig.parseSequenceType("xs:boolean")
+        option.asType = stepConfig.typeUtils.parseSequenceType("xs:boolean")
         option = decl.option(QName("try-namespaces"))
         option.select = XProcExpression.select(stepConfig, "false()")
-        option.asType = stepConfig.parseSequenceType("xs:boolean")
+        option.asType = stepConfig.typeUtils.parseSequenceType("xs:boolean")
         option = decl.option(QName("assert-valid"))
         option.select = XProcExpression.select(stepConfig, "true()")
-        option.asType = stepConfig.parseSequenceType("xs:boolean")
+        option.asType = stepConfig.typeUtils.parseSequenceType("xs:boolean")
         option = decl.option(QName("parameters"))
-        option.asType = stepConfig.parseSequenceType("map(xs:QName,item()*)?")
+        option.asType = stepConfig.typeUtils.parseSequenceType("map(xs:QName,item()*)?")
         option = decl.option(QName("mode"))
         option.select = XProcExpression.select(stepConfig, "'strict'")
         option.values = listOf(XdmAtomicValue("strict"), XdmAtomicValue("lax"))
         option = decl.option(QName("version"))
-        option.asType = stepConfig.parseSequenceType("xs:string?")
+        option.asType = stepConfig.typeUtils.parseSequenceType("xs:string?")
         option = decl.option(QName("report-format"))
         option.select = XProcExpression.select(stepConfig, "'xvrl'")
-        option.asType = stepConfig.parseSequenceType("xs:string")
+        option.asType = stepConfig.typeUtils.parseSequenceType("xs:string")
 
         return decl
     }
 
     private fun pValidateWithDtd(): DeclareStepInstruction {
-        val decl = library.declareStep()
-        decl._type = stepConfig.parseQName("p:validate-with-dtd")
+        val decl = library.declareAtomicStep()
+        decl._type = stepConfig.typeUtils.parseQName("p:validate-with-dtd")
 
         val input = decl.input("source", primary=true, sequence=false)
         input.contentTypes = MediaType.parseList("xml html")
@@ -1656,19 +1655,19 @@ class StandardLibrary private constructor(builder: PipelineBuilder, private val 
 
         var option = decl.option(QName("report-format"))
         option.select = XProcExpression.select(stepConfig, "'xvrl'")
-        option.asType = stepConfig.parseSequenceType("xs:string")
+        option.asType = stepConfig.typeUtils.parseSequenceType("xs:string")
         option = decl.option(QName("serialization"))
-        option.asType = stepConfig.parseSequenceType("map(xs:QName,item()*)?")
+        option.asType = stepConfig.typeUtils.parseSequenceType("map(xs:QName,item()*)?")
         option = decl.option(QName("assert-valid"))
         option.select = XProcExpression.select(stepConfig, "true()")
-        option.asType = stepConfig.parseSequenceType("xs:boolean")
+        option.asType = stepConfig.typeUtils.parseSequenceType("xs:boolean")
 
         return decl
     }
 
     private fun pWrap(): DeclareStepInstruction {
-        val decl = library.declareStep()
-        decl._type = stepConfig.parseQName("p:wrap")
+        val decl = library.declareAtomicStep()
+        decl._type = stepConfig.typeUtils.parseQName("p:wrap")
 
         val input = decl.input("source", primary=true, sequence=false)
         input.contentTypes = MediaType.parseList("xml html")
@@ -1677,24 +1676,24 @@ class StandardLibrary private constructor(builder: PipelineBuilder, private val 
         output.contentTypes = MediaType.parseList("application/xml")
 
         var option = decl.option(QName("wrapper"))
-        option.asType = stepConfig.parseSequenceType("xs:QName")
+        option.asType = stepConfig.typeUtils.parseSequenceType("xs:QName")
         option.required = true
         option = decl.option(QName("match"))
-        option.asType = stepConfig.parseSequenceType("xs:string")
-        option.specialType = stepConfig.parseSpecialType("XSLTSelectionPattern")
+        option.asType = stepConfig.typeUtils.parseSequenceType("xs:string")
+        option.specialType = stepConfig.typeUtils.parseSpecialType("XSLTSelectionPattern")
         option.required = true
         option = decl.option(QName("group-adjacent"))
-        option.asType = stepConfig.parseSequenceType("xs:string?")
-        option.specialType = stepConfig.parseSpecialType("XPathExpression")
+        option.asType = stepConfig.typeUtils.parseSequenceType("xs:string?")
+        option.specialType = stepConfig.typeUtils.parseSpecialType("XPathExpression")
         option = decl.option(QName("attributes"))
-        option.asType = stepConfig.parseSequenceType("map(xs:QName, xs:anyAtomicType)?")
+        option.asType = stepConfig.typeUtils.parseSequenceType("map(xs:QName, xs:anyAtomicType)?")
 
         return decl
     }
 
     private fun pWrapSequence(): DeclareStepInstruction {
-        val decl = library.declareStep()
-        decl._type = stepConfig.parseQName("p:wrap-sequence")
+        val decl = library.declareAtomicStep()
+        decl._type = stepConfig.typeUtils.parseQName("p:wrap-sequence")
 
         val input = decl.input("source", primary=true, sequence=true)
         input.contentTypes = MediaType.parseList("text xml html")
@@ -1703,48 +1702,48 @@ class StandardLibrary private constructor(builder: PipelineBuilder, private val 
         output.contentTypes = MediaType.parseList("application/xml")
 
         var option = decl.option(QName("wrapper"))
-        option.asType = stepConfig.parseSequenceType("xs:QName")
+        option.asType = stepConfig.typeUtils.parseSequenceType("xs:QName")
         option.required = true
         option = decl.option(QName("group-adjacent"))
-        option.asType = stepConfig.parseSequenceType("xs:string?")
-        option.specialType = stepConfig.parseSpecialType("XPathExpression")
+        option.asType = stepConfig.typeUtils.parseSequenceType("xs:string?")
+        option.specialType = stepConfig.typeUtils.parseSpecialType("XPathExpression")
         option = decl.option(QName("attributes"))
-        option.asType = stepConfig.parseSequenceType("map(xs:QName, xs:anyAtomicType)?")
+        option.asType = stepConfig.typeUtils.parseSequenceType("map(xs:QName, xs:anyAtomicType)?")
 
         return decl
     }
 
     private fun pWwwFormUrldecode(): DeclareStepInstruction {
-        val decl = library.declareStep()
-        decl._type = stepConfig.parseQName("p:www-form-urldecode")
+        val decl = library.declareAtomicStep()
+        decl._type = stepConfig.typeUtils.parseQName("p:www-form-urldecode")
 
         val output = decl.output("result", primary=true, sequence=false)
         output.contentTypes = MediaType.parseList("application/json")
 
         val option = decl.option(QName("value"))
-        option.asType = stepConfig.parseSequenceType("xs:string")
+        option.asType = stepConfig.typeUtils.parseSequenceType("xs:string")
         option.required = true
 
         return decl
     }
 
     private fun pWwwFormUrlencode(): DeclareStepInstruction {
-        val decl = library.declareStep()
-        decl._type = stepConfig.parseQName("p:www-form-urlencode")
+        val decl = library.declareAtomicStep()
+        decl._type = stepConfig.typeUtils.parseQName("p:www-form-urlencode")
 
         val output = decl.output("result", primary=true, sequence=false)
         output.contentTypes = MediaType.parseList("text/plain")
 
         val option = decl.option(QName("parameters"))
-        option.asType = stepConfig.parseSequenceType("map(xs:string,xs:anyAtomicType+)")
+        option.asType = stepConfig.typeUtils.parseSequenceType("map(xs:string,xs:anyAtomicType+)")
         option.required = true
 
         return decl
     }
 
     private fun pXinclude(): DeclareStepInstruction {
-        val decl = library.declareStep()
-        decl._type = stepConfig.parseQName("p:xinclude")
+        val decl = library.declareAtomicStep()
+        decl._type = stepConfig.typeUtils.parseQName("p:xinclude")
 
         val input = decl.input("source", primary=true, sequence=false)
         input.contentTypes = MediaType.parseList("xml html")
@@ -1754,17 +1753,17 @@ class StandardLibrary private constructor(builder: PipelineBuilder, private val 
 
         var option = decl.option(QName("fixup-xml-base"))
         option.select = XProcExpression.select(stepConfig, "false()")
-        option.asType = stepConfig.parseSequenceType("xs:boolean")
+        option.asType = stepConfig.typeUtils.parseSequenceType("xs:boolean")
         option = decl.option(QName("fixup-xml-lang"))
         option.select = XProcExpression.select(stepConfig, "false()")
-        option.asType = stepConfig.parseSequenceType("xs:boolean")
+        option.asType = stepConfig.typeUtils.parseSequenceType("xs:boolean")
 
         return decl
     }
 
     private fun pXquery(): DeclareStepInstruction {
-        val decl = library.declareStep()
-        decl._type = stepConfig.parseQName("p:xquery")
+        val decl = library.declareAtomicStep()
+        decl._type = stepConfig.typeUtils.parseQName("p:xquery")
 
         var input = decl.input("source", primary=true, sequence=true)
         input.contentTypes = MediaType.parseList("any")
@@ -1775,16 +1774,16 @@ class StandardLibrary private constructor(builder: PipelineBuilder, private val 
         output.contentTypes = MediaType.parseList("any")
 
         var option = decl.option(QName("parameters"))
-        option.asType = stepConfig.parseSequenceType("map(xs:QName,item()*)?")
+        option.asType = stepConfig.typeUtils.parseSequenceType("map(xs:QName,item()*)?")
         option = decl.option(QName("version"))
-        option.asType = stepConfig.parseSequenceType("xs:string?")
+        option.asType = stepConfig.typeUtils.parseSequenceType("xs:string?")
 
         return decl
     }
 
     private fun pXslFormatter(): DeclareStepInstruction {
-        val decl = library.declareStep()
-        decl._type = stepConfig.parseQName("p:xsl-formatter")
+        val decl = library.declareAtomicStep()
+        decl._type = stepConfig.typeUtils.parseQName("p:xsl-formatter")
 
         val input = decl.input("source", primary=true, sequence=false)
         input.contentTypes = MediaType.parseList("xml")
@@ -1793,16 +1792,16 @@ class StandardLibrary private constructor(builder: PipelineBuilder, private val 
         output.contentTypes = MediaType.parseList("any")
 
         var option = decl.option(QName("parameters"))
-        option.asType = stepConfig.parseSequenceType("map(xs:QName,item()*)?")
+        option.asType = stepConfig.typeUtils.parseSequenceType("map(xs:QName,item()*)?")
         option = decl.option(QName("content-type"))
-        option.asType = stepConfig.parseSequenceType("xs:string?")
+        option.asType = stepConfig.typeUtils.parseSequenceType("xs:string?")
 
         return decl
     }
 
     private fun pXslt(): DeclareStepInstruction {
-        val decl = library.declareStep()
-        decl._type = stepConfig.parseQName("p:xslt")
+        val decl = library.declareAtomicStep()
+        decl._type = stepConfig.typeUtils.parseQName("p:xslt")
 
         var input = decl.input("source", primary=true, sequence=true)
         input.contentTypes = MediaType.parseList("any")
@@ -1815,22 +1814,22 @@ class StandardLibrary private constructor(builder: PipelineBuilder, private val 
         output.contentTypes = MediaType.parseList("any")
 
         var option = decl.option(QName("parameters"))
-        option.asType = stepConfig.parseSequenceType("map(xs:QName,item()*)?")
+        option.asType = stepConfig.typeUtils.parseSequenceType("map(xs:QName,item()*)?")
         option = decl.option(QName("static-parameters"))
-        option.asType = stepConfig.parseSequenceType("map(xs:QName,item()*)?")
+        option.asType = stepConfig.typeUtils.parseSequenceType("map(xs:QName,item()*)?")
         option = decl.option(QName("global-context-item"))
-        option.asType = stepConfig.parseSequenceType("item()?")
+        option.asType = stepConfig.typeUtils.parseSequenceType("item()?")
         option = decl.option(QName("populate-default-collection"))
         option.select = XProcExpression.select(stepConfig, "true()")
-        option.asType = stepConfig.parseSequenceType("xs:boolean?")
+        option.asType = stepConfig.typeUtils.parseSequenceType("xs:boolean?")
         option = decl.option(QName("initial-mode"))
-        option.asType = stepConfig.parseSequenceType("xs:QName?")
+        option.asType = stepConfig.typeUtils.parseSequenceType("xs:QName?")
         option = decl.option(QName("template-name"))
-        option.asType = stepConfig.parseSequenceType("xs:QName?")
+        option.asType = stepConfig.typeUtils.parseSequenceType("xs:QName?")
         option = decl.option(QName("output-base-uri"))
-        option.asType = stepConfig.parseSequenceType("xs:anyURI?")
+        option.asType = stepConfig.typeUtils.parseSequenceType("xs:anyURI?")
         option = decl.option(QName("version"))
-        option.asType = stepConfig.parseSequenceType("xs:string?")
+        option.asType = stepConfig.typeUtils.parseSequenceType("xs:string?")
 
         return decl
     }
