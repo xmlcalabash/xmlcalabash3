@@ -13,7 +13,26 @@ See the commits and pull requests on
 finer detail.</para>
 
 <revhistory>
-
+<revision xml:id="r300-alpha27">
+<revnumber>3.0.0-alpha27</revnumber>
+<date>2025-04-14</date>
+<revdescription>
+<itemizedlist>
+<listitem><para>The big (as in “sweeping” and arguably a little riskier than
+most recent updates) fix in this release is a substantial refactor of the core
+of the application. This was partly done to clean up the API for creating a
+processor, and partly because I had outstanding concerns about the previous
+big refactor from about a year ago. It’s a mostly not-visible change if you’re just
+using the command line application, but there was at least one bug fix where the
+document properties of a variable were wrong (the tests passed by accident).
+</para></listitem>
+<listitem><para>Fixed <ghissue number="378"/>. The SVG output doesn’t display
+options on steps that have no binding. They still have a binding to the empty
+sequence, but the diagram is a lot less cluttered without them.
+</para></listitem>
+</itemizedlist>
+</revdescription>
+</revision>
 <revision xml:id="r300-alpha26">
 <revnumber>3.0.0-alpha26</revnumber>
 <date>2025-03-25</date>
