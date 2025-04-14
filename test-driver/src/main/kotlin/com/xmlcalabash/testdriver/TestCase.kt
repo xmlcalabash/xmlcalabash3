@@ -1,12 +1,11 @@
 package com.xmlcalabash.testdriver
 
-import com.xmlcalabash.datamodel.CompileEnvironment
+import com.xmlcalabash.XmlCalabash
 import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.exceptions.XProcException
 import com.xmlcalabash.namespace.Ns
 import com.xmlcalabash.namespace.NsCx
-import com.xmlcalabash.namespace.NsErr
 import com.xmlcalabash.namespace.NsXs
 import com.xmlcalabash.util.*
 import net.sf.saxon.event.ReceiverOption
@@ -31,7 +30,7 @@ import java.util.*
 import java.util.function.Supplier
 import javax.xml.transform.sax.SAXSource
 
-class TestCase(val suite: TestSuite, val testFile: File) {
+class TestCase(val xmlCalabash: XmlCalabash, val testOptions: TestOptions, val testFile: File) {
     companion object {
         val isWindows = System.getProperty("os.name").startsWith("Windows")
         val CODE = QName("code")
@@ -55,14 +54,13 @@ class TestCase(val suite: TestSuite, val testFile: File) {
         }
     }
 
-    val xmlCalabash = suite.xmlCalabash
     val builder = xmlCalabash.newPipelineBuilder()
     val testConfig = builder.stepConfig.copy()
     val messageReporter = testConfig.environment.messageReporter as BufferingMessageReporter
 
     var loaded = false
 
-    var status = TestStatus("NOTRUN")
+    var status = TestStatus(testFile, "NOTRUN")
     var singleTest = false
     var expected = "UNKNOWN"
     val errorCodes = mutableListOf<QName>()
@@ -85,9 +83,6 @@ class TestCase(val suite: TestSuite, val testFile: File) {
     var origErr: PrintStream? = null
 
     fun load() {
-        val eagerEval = "eager-eval" in features
-        val noPsvi = "no-psvi-support" in features
-
         loaded = true
         val builder = xmlCalabash.saxonConfiguration.processor.newDocumentBuilder()
         builder.isLineNumbering = true
@@ -125,7 +120,12 @@ class TestCase(val suite: TestSuite, val testFile: File) {
         }
 
         try {
-            println(testFile.absolutePath)
+            if (testFile.absolutePath.contains("/tests/")) {
+                val pos = testFile.absolutePath.indexOf("/tests/")
+                println("…/${testFile.absolutePath.substring(pos+7)}")
+            } else {
+                println(testFile.absolutePath)
+            }
 
             val parser = xmlCalabash.newXProcParser(builder)
             for ((name, value) in staticOptions) {
@@ -150,9 +150,9 @@ class TestCase(val suite: TestSuite, val testFile: File) {
 
             val pipeline = runtime.executable()
 
-            if (suite.options.outputGraph != null) {
+            if (testOptions.outputGraph != null) {
                 val description = runtime.description()
-                val vis = VisualizerOutput(xmlCalabash, description, suite.options.outputGraph!!)
+                val vis = VisualizerOutput(xmlCalabash, description, testOptions.outputGraph!!)
                 vis.xml()
                 if (xmlCalabash.config.graphviz == null) {
                     logger.warn { "Cannot create SVG descriptions, graphviz is not configured" }
@@ -174,7 +174,7 @@ class TestCase(val suite: TestSuite, val testFile: File) {
             val outputReceiver = BufferingReceiver()
             pipeline.receiver = outputReceiver
 
-            if (suite.options.report != null) {
+            if (testOptions.report != null) {
                 startIO()
             }
 
@@ -313,32 +313,46 @@ class TestCase(val suite: TestSuite, val testFile: File) {
         }
     }
 
+
     private fun skip(reason: String) {
-        suite.skip(this, reason)
+        status = TestStatus(testFile, "skip", reason)
     }
 
     private fun pass() {
-        suite.pass(this)
+        status = TestStatus(testFile, "pass")
+        status.elapsed = elapsedSeconds
     }
 
     private fun fail(msgxml: XdmNode) {
-        messages = msgxml
-        suite.fail(this)
+        status = TestStatus(testFile, "fail")
+        status.elapsed = elapsedSeconds
+        status.messagesXml = msgxml
+        status.stdError = stderrOutput
+        status.stdOutput = stdoutOutput
     }
 
     private fun fail(error: XProcError, msgxml: XdmNode) {
-        messages = msgxml
-        suite.fail(this, error)
+        status = TestStatus(testFile, "fail", error)
+        status.elapsed = elapsedSeconds
+        status.messagesXml = msgxml
+        status.stdError = stderrOutput
+        status.stdOutput = stdoutOutput
     }
 
     private fun fail(errors: List<XdmNode>, msgxml: XdmNode) {
-        messages = msgxml
-        suite.fail(this, errors)
+        status = TestStatus(testFile, "fail", errors)
+        status.elapsed = elapsedSeconds
+        status.messagesXml = msgxml
+        status.stdError = stderrOutput
+        status.stdOutput = stdoutOutput
     }
 
     private fun fail(error: XProcError, codes: List<QName>, msgxml: XdmNode) {
-        messages = msgxml
-        suite.fail(this, error, codes)
+        status = TestStatus(testFile, "fail", error, codes)
+        status.elapsed = elapsedSeconds
+        status.messagesXml = msgxml
+        status.stdError = stderrOutput
+        status.stdOutput = stdoutOutput
     }
 
     private fun messagesXml(messages: List<BufferingMessageReporter.Message>): XdmNode {
@@ -654,49 +668,6 @@ class TestCase(val suite: TestSuite, val testFile: File) {
         }
         builder.endDocument()
         return rootElement(builder.result)
-    }
-
-    private fun toSvg(desc: XdmNode, filename: String, stylesheet: String) {
-        if (suite.xmlCalabash.config.graphviz == null) {
-            return
-        }
-
-        var styleStream = TestCase::class.java.getResourceAsStream(stylesheet)
-        var styleSource = SAXSource(InputSource(styleStream))
-        var xsltCompiler = desc.processor.newXsltCompiler()
-        xsltCompiler.isSchemaAware = desc.processor.isSchemaAware
-        var xsltExec = xsltCompiler.compile(styleSource)
-
-        var transformer = xsltExec.load30()
-        val xmlResult = XdmDestination()
-        transformer.applyTemplates(desc.asSource(), xmlResult)
-        val dotxml = xmlResult.xdmNode
-
-        styleStream = TestCase::class.java.getResourceAsStream("/com/xmlcalabash/dot2txt.xsl")
-        styleSource = SAXSource(InputSource(styleStream))
-        xsltCompiler = desc.processor.newXsltCompiler()
-        xsltCompiler.isSchemaAware = desc.processor.isSchemaAware
-        xsltExec = xsltCompiler.compile(styleSource)
-
-        transformer = xsltExec.load30()
-        val textResult = RawDestination()
-        transformer.applyTemplates(dotxml.asSource(), textResult)
-
-        val tempFile = File.createTempFile("xmlcalabash-", ".dot")
-        tempFile.deleteOnExit()
-
-        val dot = PrintStream(tempFile)
-        val iter = textResult.xdmValue.iterator()
-        while (iter.hasNext()) {
-            dot.print(iter.next().stringValue)
-        }
-        dot.close()
-
-        val rt = Runtime.getRuntime()
-        val args = arrayOf(suite.xmlCalabash.config.graphviz!!.absoluteFile.toString(), "-Tsvg", tempFile.getAbsolutePath().toString(), "-o", filename)
-        val process = rt.exec(args)
-        process.waitFor()
-        tempFile.delete()
     }
 
     override fun toString(): String {

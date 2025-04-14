@@ -20,39 +20,16 @@ import java.time.ZonedDateTime
 import kotlin.system.exitProcess
 
 class TestDriver(val testOptions: TestOptions, val exclusions: Map<String, String>) {
-    val failedTests = mutableListOf<String>()
-    val passedTests = mutableListOf<String>()
-    val allTestCases = mutableListOf<TestCase>()
     var total = 0
     var pass = 0
     var fail = 0
     var notrun = 0
+    val testResults = mutableListOf<TestStatus>()
     var suiteElapsed: Double = -1.0
 
     fun run() {
         val buildDir = File("build")
         buildDir.mkdirs()
-
-        val previousStatus = if (testOptions.prevRun != null) {
-            File(buildDir, testOptions.prevRun!!)
-        } else {
-            File(buildDir, "test-suite-results.txt")
-        }
-
-        val statusDir = File(buildDir, "test-status")
-        val statusFiles = statusDir.listFiles()
-
-        if (statusFiles != null) {
-            for (statusFile in statusFiles) {
-                val lines = statusFile.readLines()
-                val status = if (lines.isEmpty()) { "unknown" } else { lines.first() }
-                if (status.startsWith("pass")) {
-                    passedTests.add(statusFile.name)
-                } else {
-                    failedTests.add(statusFile.name)
-                }
-            }
-        }
 
         val allTests = mutableListOf<File>()
         val skipTests = mutableMapOf<File, String>()
@@ -76,37 +53,6 @@ class TestDriver(val testOptions: TestOptions, val exclusions: Map<String, Strin
         val sortedFiles = allTests.sortedWith(compareBy { it.toString() })
         allTests.clear()
         allTests.addAll(sortedFiles)
-
-        val testsToRun = mutableListOf<File>()
-
-        if (testOptions.firstFailed || testOptions.onlyFailedTests) {
-            for (test in allTests) {
-                if (failedTests.contains(test.name)) {
-                    testsToRun.add(test)
-                    if (testOptions.firstFailed) {
-                        break
-                    }
-                }
-            }
-            if (testsToRun.isEmpty()) {
-                println("Found no matching failed tests!")
-            }
-        }
-
-        if (testOptions.onlyExpectedToPass) {
-            for (test in allTests) {
-                if (passedTests.contains(test.name)) {
-                    testsToRun.add(test)
-                }
-            }
-            if (testsToRun.isEmpty()) {
-                println("Found no matching passed tests!")
-            }
-        }
-
-        if (testsToRun.isEmpty()) {
-            testsToRun.addAll(allTests)
-        }
 
         // We need different XmlCalabash instances for the different configurations.
         // licensed/unlicensed
@@ -142,186 +88,86 @@ class TestDriver(val testOptions: TestOptions, val exclusions: Map<String, Strin
         val saxonConfig = eagerLicensed.saxonConfiguration
         println("Running tests with ${saxonConfig.processor.saxonEdition} version ${saxonConfig.processor.saxonProductVersion}")
 
-        val eagerLicensedSuite = TestSuite(eagerLicensed, testOptions)
-        val eagerUnlicensedSuite = TestSuite(eagerUnlicensed, testOptions)
-        val lazyLicensedSuite = TestSuite(lazyLicensed, testOptions)
-        val lazyUnlicensedSuite = TestSuite(lazyUnlicensed, testOptions)
+        val modulus = allTests.size / 10
+        val suiteStart = System.nanoTime()
 
-        for (testFile in testsToRun) {
-            var case = lazyLicensedSuite.loadTest(testFile)
+        for (testFile in allTests) {
+            var case = loadTest(lazyLicensed, testFile)
             if (case.features.contains("no-psvi-support")) {
-                lazyLicensedSuite.removeTest(case)
                 if (case.features.contains("eager-eval")) {
-                    eagerUnlicensedSuite.loadTest(testFile)
+                    case = loadTest(eagerUnlicensed, testFile)
                 } else {
-                    lazyUnlicensedSuite.loadTest(testFile)
+                    case = loadTest(lazyUnlicensed, testFile)
                 }
             } else {
                 if (case.features.contains("eager-eval")) {
-                    lazyLicensedSuite.removeTest(case)
-                    eagerLicensedSuite.loadTest(testFile)
+                    case = loadTest(eagerLicensed, testFile)
                 }
             }
-        }
 
-        for ((testFile, _) in skipTests) {
-            lazyLicensedSuite.loadTest(testFile)
-        }
+            total++
+            case.run()
+            testResults.add(case.status)
 
-        val allSuites = mutableListOf<TestSuite>()
-        for (suite in listOf(lazyLicensedSuite, lazyUnlicensedSuite, eagerLicensedSuite, eagerUnlicensedSuite)) {
-            if (suite.testCases.isNotEmpty()) {
-                allSuites.add(suite)
-            }
-        }
-
-        val suiteStart = System.nanoTime()
-        for (suite in allSuites) {
-            allTestCases.addAll(suite.tests)
-            val repeat = 0
-
-            try {
-                for (test in suite.tests) {
-                    test.singleTest = testOptions.stopOnFirstFailed || testsToRun.size == 1
-                    for (rep in 0..repeat) {
-                        if (test.testFile in skipTests) {
-                            suite.skip(test, skipTests[test.testFile]!!)
-                        } else {
-                            test.run()
-                        }
-                    }
-                    if (testOptions.stopOnFirstFailed) {
-                        var stop = false
-                        for (result in suite.testCases.values) {
-                            stop = stop || result.status == "fail"
-                        }
-                        if (stop) {
-                            break;
-                        }
-                    }
-                }
-            } catch (ex: Exception) {
-                // This should never happen. Added on 31 Jan 2025 trying to chase down a failure
-                // in the polyglot steps. Didn't work. Java crashes without throwing a stack trace.
-                ex.printStackTrace()
-                throw ex
-            }
-
-            for (test in suite.tests) {
-                val status = suite.testCases[test]!!
-                total++
-                if (status.status == "pass") {
-                    pass++
-                } else if (status.status == "fail") {
+            when (case.status.status) {
+                "pass" -> pass++
+                "fail" -> {
                     fail++
-                } else {
-                    notrun++
+                    if (testOptions.stopOnFirstFailed) {
+                        break
+                    }
                 }
+                else -> notrun++
+            }
+
+            if (total % modulus == 0) {
+                suiteElapsed = (System.nanoTime() - suiteStart) / 1e9
+                val percent = "%.1f".format((100.0 * total) / (1.0 * allTests.size))
+                val tpt = total / suiteElapsed
+                val remaining = (allTests.size - total) * tpt
+
+                val elapsedString = "%.1f".format(suiteElapsed)
+                val remainingString = "%.1f".format(remaining)
+                println("${total} tests (${percent}%) in ${elapsedString}s, estimating ${remainingString}s remaining")
             }
         }
+
+        for ((testFile, reason) in skipTests) {
+            testResults.add(TestStatus(testFile, "skip", reason))
+        }
+
         suiteElapsed = (System.nanoTime() - suiteStart) / 1e9
 
         val attempted = total - notrun
         val percent = "%.1f".format(100.0 * (1.0 * pass) / (1.0 * attempted))
 
-        statusDir.mkdirs()
-
-        makeReport(lazyLicensedSuite.xmlCalabash)
+        makeReport(lazyLicensed)
 
         println("Test suite: ${pass} pass (${percent}%), ${fail} fail, ${notrun} not run (${total} total)")
+
         var max = 10
-        for (suite in allSuites) {
-            for (testCase in suite.tests) {
-                val status = suite.testCases[testCase]!!
-
-                val testResult = File(statusDir, testCase.testFile.name)
-                testResult.writeText("${status}\n")
-
-                if (max > 0 && status.status == "fail") {
-                    max--
-                    if (status.error != null && status.expectedCodes.isNotEmpty()) {
-                        println("FAIL: ${testCase.testFile} (${status.error.code} ≠ ${status.expectedCodes[0]})")
-                    } else if (status.failedAssertions.isNotEmpty()) {
-                        println("FAIL: ${testCase.testFile}: ${status.failedAssertions[0].stringValue}${if (status.failedAssertions.size > 1) " ..." else ""}")
-                    } else {
-                        println("FAIL: ${testCase.testFile}")
-                    }
+        for (status in testResults) {
+            if (max > 0 && status.status == "fail") {
+                max--
+                if (status.error != null && status.expectedCodes.isNotEmpty()) {
+                    println("FAIL: ${status.testFile.name} (${status.error.code} ≠ ${status.expectedCodes[0]})")
+                } else if (status.failedAssertions.isNotEmpty()) {
+                    println("FAIL: ${status.testFile.name}: ${status.failedAssertions[0].stringValue}${if (status.failedAssertions.size > 1) " ..." else ""}")
+                } else {
+                    println("FAIL: ${status.testFile.name}")
                 }
             }
-        }
-
-        if (testsToRun.size > 1 && previousStatus.exists() && previousStatus.isFile) {
-            val previous = mutableMapOf<String, String>()
-            val reader = BufferedReader(InputStreamReader(FileInputStream(previousStatus)))
-            var line = reader.readLine()
-            while (line != null) {
-                val pos = line.lastIndexOf(" ")
-                if (pos > 0) {
-                    previous[line.substring(pos + 1)] = line.substring(0, pos)
-                }
-                line = reader.readLine()
-            }
-            var firstRegression = true
-            var newPass = 0
-            var failingDifferently = 0
-            for (suite in allSuites) {
-                for (testCase in suite.tests) {
-                    val status = suite.testCases[testCase]!!
-                    if (status.status != "NOTRUN") {
-                        val prev = previous[testCase.testFile.toString()]
-                        if (prev == null) {
-                            if (firstRegression) {
-                                println("== Regressions ==========================================================")
-                                firstRegression = false
-                            }
-                            if (status.status == "fail") {
-                                println("NEW  ${status} ${testCase.testFile}")
-                            }
-                        } else if (prev == status.toString()) {
-                            // no change
-                        } else {
-                            if (status.status == "pass") {
-                                newPass++
-                                //println("PASS ${testCase.testFile}")
-                            } else {
-                                if (prev.startsWith("fail")) {
-                                    failingDifferently++
-                                } else {
-                                    if (firstRegression) {
-                                        println("== Regressions ==========================================================")
-                                        firstRegression = false
-                                    }
-                                    println("FAIL ${prev}->${status} ${testCase.testFile}")
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            if (newPass > 0) {
-                println("${newPass} new passing tests")
-            }
-            if (failingDifferently > 0) {
-                println("${failingDifferently} differently failing tests")
-            }
-        }
-
-        if (testOptions.updateRegressions || !previousStatus.exists()) {
-            val fos = FileOutputStream(previousStatus)
-            val out = PrintStream(fos)
-            for (suite in allSuites) {
-                for (testCase in suite.tests) {
-                    val status = suite.testCases[testCase]!!
-                    out.println("${status} ${testCase.testFile}")
-                }
-            }
-            fos.close()
-            out.close()
         }
 
         if (testOptions.requirePass && fail > 0) {
             exitProcess(1)
         }
+    }
+
+    private fun loadTest(xmlCalabash: XmlCalabash, testFile: File): TestCase {
+        val case = TestCase(xmlCalabash, testOptions, testFile)
+        case.load()
+        return case
     }
 
     fun makeReport(xmlCalabash: XmlCalabash) {
@@ -360,50 +206,49 @@ class TestDriver(val testOptions: TestOptions, val exclusions: Map<String, Strin
         property(report, "psviSupported", "mixed")
         report.addEndElement()
 
-        for (test in allTestCases) {
+        for (test in testResults) {
             map.clear()
             map[NsReport.name] = test.testFile.name
-            map[NsReport.time] = String.format("%1.4f", test.elapsedSeconds)
+            map[NsReport.time] = String.format("%1.4f", test.elapsed)
 
             report.addStartElement(NsReport.testcase, attributeMap(map))
 
-            if (test.status.status == "skip") {
+            if (test.status == "skip") {
                 report.addStartElement(NsReport.skipped)
-                report.addText(test.status.message!!)
+                report.addText(test.message!!)
                 report.addEndElement()
             } else {
-                if (test.status.status == "fail") {
+                if (test.status == "fail") {
                     report.addStartElement(NsReport.failure)
-                    if (test.status.error != null) {
-                        if (test.status.expectedCodes.isNotEmpty()) {
-                            if (test.status.expectedCodes.size == 1) {
-                                report.addText("Expected ${test.status.expectedCodes[0]}, raised ${test.status.error!!.code}")
+                    if (test.error != null) {
+                        if (test.expectedCodes.isNotEmpty()) {
+                            if (test.expectedCodes.size == 1) {
+                                report.addText("Expected ${test.expectedCodes[0]}, raised ${test.error.code}")
                             } else {
-                                report.addText("Expected ${test.status.expectedCodes}, raised ${test.status.error!!.code}")
+                                report.addText("Expected ${test.expectedCodes}, raised ${test.error.code}")
                             }
                         } else {
-                            report.addText("Expected pass, raised ${test.status.error!!.code}")
+                            report.addText("Expected pass, raised ${test.error.code}")
                         }
                     }
                     report.addEndElement()
-                    if (test.messages != null) {
-                        report.addSubtree(test.messages!!)
+                    if (test.messagesXml != null) {
+                        report.addSubtree(test.messagesXml!!)
                     }
                 }
 
-                if (test.stdoutOutput.isNotEmpty()) {
+                if (test.stdOutput != null) {
                     report.addStartElement(NsReport.systemOut)
-                    report.addText(test.stdoutOutput)
+                    report.addText(test.stdOutput!!)
                     report.addEndElement()
                 }
 
-                if (test.stderrOutput.isNotEmpty()) {
+                if (test.stdError != null) {
                     report.addStartElement(NsReport.systemErr)
-                    report.addText(test.stderrOutput)
+                    report.addText(test.stdError!!)
                     report.addEndElement()
                 }
             }
-
 
             report.addEndElement()
         }
