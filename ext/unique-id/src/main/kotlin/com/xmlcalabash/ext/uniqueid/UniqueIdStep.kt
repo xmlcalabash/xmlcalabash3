@@ -132,7 +132,7 @@ class UniqueIdStep(): AbstractAtomicStep(), ProcessMatchingNodes {
 
     override fun attributes(node: XdmNode, matchingAttributes: AttributeMap, nonMatchingAttributes: AttributeMap): AttributeMap? {
         val amap = mutableMapOf<QName, String?>()
-        amap.putAll(stepConfig.attributeMap(nonMatchingAttributes))
+        amap.putAll(stepConfig.typeUtils.attributeMap(nonMatchingAttributes))
 
         for (attr in matchingAttributes.asList()) {
             val lexical = attr.nodeName.displayName
@@ -141,7 +141,7 @@ class UniqueIdStep(): AbstractAtomicStep(), ProcessMatchingNodes {
             amap[qname] = nextId()
         }
 
-        return stepConfig.attributeMap(amap)
+        return stepConfig.typeUtils.attributeMap(amap)
     }
 
     override fun endElement(node: XdmNode) {

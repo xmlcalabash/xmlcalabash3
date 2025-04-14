@@ -1,15 +1,14 @@
 package com.xmlcalabash.ext.rdf
 
+import com.xmlcalabash.config.StepConfiguration
 import com.xmlcalabash.documents.XProcBinaryDocument
 import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.io.DocumentLoader
 import com.xmlcalabash.io.MediaType
 import com.xmlcalabash.namespace.Ns
-import com.xmlcalabash.namespace.Ns.attributes
 import com.xmlcalabash.namespace.NsCx
 import com.xmlcalabash.namespace.NsXml
-import com.xmlcalabash.runtime.XProcStepConfiguration
 import com.xmlcalabash.spi.ContentTypeConverter
 import com.xmlcalabash.spi.ContentTypeConverterProvider
 import com.xmlcalabash.util.MediaClassification
@@ -68,7 +67,7 @@ class RdfConverter(): ContentTypeConverter, ContentTypeConverterProvider, Abstra
         return this
     }
 
-    override fun convert(stepConfig: XProcStepConfiguration, doc: XProcDocument, convertTo: MediaType, serialization: Map<QName, XdmValue>): XProcDocument {
+    override fun convert(stepConfig: StepConfiguration, doc: XProcDocument, convertTo: MediaType, serialization: Map<QName, XdmValue>): XProcDocument {
         return when (doc.contentType) {
             MediaType.SPARQL_RESULTS_XML -> convertXmlSparqlToText(stepConfig, doc.value as XdmNode, serialization)
             MediaType.SPARQL_RESULTS_JSON -> convertJsonSparqlToText(stepConfig, doc, serialization)
@@ -76,7 +75,7 @@ class RdfConverter(): ContentTypeConverter, ContentTypeConverterProvider, Abstra
         }
     }
 
-    private fun convertToRdf(stepConfig: XProcStepConfiguration, doc: XProcDocument, convertTo: MediaType): XProcDocument {
+    private fun convertToRdf(stepConfig: StepConfiguration, doc: XProcDocument, convertTo: MediaType): XProcDocument {
         val dataset = parseDocument(doc, rdfLang(doc.contentType ?: MediaType.OCTET_STREAM), null)
         val lang = rdfLang(convertTo)
 
@@ -128,7 +127,7 @@ class RdfConverter(): ContentTypeConverter, ContentTypeConverterProvider, Abstra
         return XProcDocument.ofText(baos.toString(StandardCharsets.UTF_8), stepConfig).with(convertTo)
     }
 
-    private fun convertXmlSparqlToText(stepConfig: XProcStepConfiguration, xml: XdmNode, serialization: Map<QName, XdmValue>): XProcDocument {
+    private fun convertXmlSparqlToText(stepConfig: StepConfiguration, xml: XdmNode, serialization: Map<QName, XdmValue>): XProcDocument {
         val cxNumberRows = QName(NsCx.namespace, "cx:number-rows")
         val cxPageLength = QName(NsCx.namespace, "cx:page-length")
         val cxFormfeed = QName(NsCx.namespace, "cx:formfeed")
@@ -166,7 +165,7 @@ class RdfConverter(): ContentTypeConverter, ContentTypeConverterProvider, Abstra
         return XProcDocument.ofText(text, stepConfig)
     }
 
-    private fun convertJsonSparqlToText(stepConfig: XProcStepConfiguration, doc: XProcDocument, serialization: Map<QName, XdmValue>): XProcDocument {
+    private fun convertJsonSparqlToText(stepConfig: StepConfiguration, doc: XProcDocument, serialization: Map<QName, XdmValue>): XProcDocument {
         // I have a stylesheet that does application/sparql-results+xml to text.
         // Rather than repeat all that logic here, just convert this map into the
         // appropriate XML and call that. Efficient? Maybe not. Easy? Yes.
@@ -183,7 +182,7 @@ class RdfConverter(): ContentTypeConverter, ContentTypeConverterProvider, Abstra
         val variables = head.get(XdmAtomicValue("vars")) as XdmArray
         for (name in variables.asList()) {
             builder.addStartElement(NsSparqlResults.variable,
-                stepConfig.attributeMap(mapOf(Ns.name to name.underlyingValue.stringValue)))
+                stepConfig.typeUtils.attributeMap(mapOf(Ns.name to name.underlyingValue.stringValue)))
             builder.addEndElement()
             varnames.add(name as XdmAtomicValue)
         }
@@ -210,9 +209,9 @@ class RdfConverter(): ContentTypeConverter, ContentTypeConverterProvider, Abstra
                 }
 
                 builder.addStartElement(NsSparqlResults.binding,
-                    stepConfig.attributeMap(mapOf(Ns.name to name.stringValue)))
+                    stepConfig.typeUtils.attributeMap(mapOf(Ns.name to name.stringValue)))
                 builder.addStartElement(QName(NsSparqlResults.namespace, type.stringValue),
-                    stepConfig.attributeMap(attr))
+                    stepConfig.typeUtils.attributeMap(attr))
                 builder.addText(value.stringValue)
                 builder.addEndElement()
                 builder.addEndElement()

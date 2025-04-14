@@ -42,7 +42,7 @@ class EncodeStep(): AbstractAtomicStep() {
 
         val builder = SaxonTreeBuilder(stepConfig)
         builder.startDocument(stepConfig.baseUri)
-        builder.addStartElement(NsC.data, stepConfig.attributeMap(attr))
+        builder.addStartElement(NsC.data, stepConfig.typeUtils.attributeMap(attr))
         builder.addText(encoded)
         builder.addEndElement()
         builder.endDocument()

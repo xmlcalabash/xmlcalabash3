@@ -1,13 +1,13 @@
 package com.xmlcalabash.util
 
 import com.xmlcalabash.XmlCalabashBuildConfig
+import com.xmlcalabash.config.StepConfiguration
 import com.xmlcalabash.exceptions.XProcError
-import com.xmlcalabash.runtime.XProcStepConfiguration
 import net.sf.saxon.om.NamespaceUri
 import net.sf.saxon.s9api.*
 import javax.xml.transform.stream.StreamSource
 
-class SchematronImpl(val stepConfig: XProcStepConfiguration) {
+class SchematronImpl(val stepConfig: StepConfiguration) {
     companion object {
         val _phase = QName(NamespaceUri.of("http://dmaus.name/ns/2023/schxslt"), "schxslt:phase")
         val transpilerResource = "/com/xmlcalabash/schxslt2-${XmlCalabashBuildConfig.SCHXSLT2}/transpile.xsl"

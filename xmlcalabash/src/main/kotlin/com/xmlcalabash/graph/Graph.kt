@@ -7,10 +7,10 @@ import com.xmlcalabash.namespace.NsP
 import net.sf.saxon.s9api.XdmNode
 import java.util.*
 
-class Graph private constructor(val environment: PipelineEnvironment) {
+class Graph private constructor(val environment: GraphEnvironment) {
     companion object {
-        fun build(decl: DeclareStepInstruction, environment: PipelineEnvironment): SubpipelineModel {
-            val graph = Graph(environment)
+        fun build(decl: DeclareStepInstruction): SubpipelineModel {
+            val graph = Graph(GraphEnvironment(decl.stepConfig.environment as CompileEnvironment))
             return SubpipelineModel(graph.build(decl), graph.modelName("pipeline"))
         }
     }

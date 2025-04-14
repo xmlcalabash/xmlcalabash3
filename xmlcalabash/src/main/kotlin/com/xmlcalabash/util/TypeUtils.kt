@@ -1,25 +1,65 @@
 package com.xmlcalabash.util
 
+import com.xmlcalabash.datamodel.DocumentContext
+import com.xmlcalabash.datamodel.SpecialType
+import com.xmlcalabash.datamodel.Visibility
 import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.exceptions.XProcException
+import com.xmlcalabash.io.MediaType
 import com.xmlcalabash.namespace.Ns
 import com.xmlcalabash.namespace.NsErr
 import com.xmlcalabash.namespace.NsFn
+import com.xmlcalabash.namespace.NsP
 import com.xmlcalabash.namespace.NsXs
-import com.xmlcalabash.runtime.XProcStepConfiguration
 import net.sf.saxon.event.ReceiverOption
 import net.sf.saxon.expr.parser.XPathParser
 import net.sf.saxon.ma.arrays.ArrayItemType
 import net.sf.saxon.ma.map.MapItem
 import net.sf.saxon.ma.map.MapType
-import net.sf.saxon.om.*
-import net.sf.saxon.s9api.*
+import net.sf.saxon.om.AttributeInfo
+import net.sf.saxon.om.AttributeMap
+import net.sf.saxon.om.EmptyAttributeMap
+import net.sf.saxon.om.FingerprintedQName
+import net.sf.saxon.om.NamespaceUri
+import net.sf.saxon.s9api.ItemType
+import net.sf.saxon.s9api.Location
+import net.sf.saxon.s9api.OccurrenceIndicator
+import net.sf.saxon.s9api.QName
+import net.sf.saxon.s9api.SaxonApiException
 import net.sf.saxon.s9api.SequenceType
+import net.sf.saxon.s9api.XdmArray
+import net.sf.saxon.s9api.XdmAtomicValue
+import net.sf.saxon.s9api.XdmEmptySequence
+import net.sf.saxon.s9api.XdmMap
+import net.sf.saxon.s9api.XdmValue
 import net.sf.saxon.sxpath.IndependentContext
+import net.sf.saxon.trans.XPathException
 import net.sf.saxon.type.BuiltInAtomicType
-import net.sf.saxon.value.*
+import net.sf.saxon.value.AnyURIValue
+import net.sf.saxon.value.AtomicValue
+import net.sf.saxon.value.Base64BinaryValue
+import net.sf.saxon.value.BooleanValue
+import net.sf.saxon.value.DateTimeValue
+import net.sf.saxon.value.DateValue
+import net.sf.saxon.value.DayTimeDurationValue
+import net.sf.saxon.value.DecimalValue
+import net.sf.saxon.value.DoubleValue
+import net.sf.saxon.value.DurationValue
+import net.sf.saxon.value.FloatValue
+import net.sf.saxon.value.GDayValue
+import net.sf.saxon.value.GMonthDayValue
+import net.sf.saxon.value.GMonthValue
+import net.sf.saxon.value.GYearMonthValue
+import net.sf.saxon.value.GYearValue
+import net.sf.saxon.value.HexBinaryValue
+import net.sf.saxon.value.Int64Value
+import net.sf.saxon.value.QNameValue
+import net.sf.saxon.value.StringValue
+import net.sf.saxon.value.TimeValue
+import net.sf.saxon.value.YearMonthDurationValue
+import kotlin.collections.iterator
 
-class TypeUtils(val stepConfig: XProcStepConfiguration) {
+class TypeUtils(val context: DocumentContext) {
     companion object {
         private val parsedXsTypes = mutableMapOf<String, SequenceType>()
         private var vara = QName("a")
@@ -32,15 +72,13 @@ class TypeUtils(val stepConfig: XProcStepConfiguration) {
         }
     }
 
-    val inscopeNamespaces = stepConfig.inscopeNamespaces
-
     fun parseBoolean(bool: String): Boolean {
         val value = castAtomicAs(XdmAtomicValue(bool), ItemType.BOOLEAN, mapOf())
         return value.booleanValue
     }
 
     fun parseQName(name: String): QName {
-        return parseQName(name, inscopeNamespaces, NamespaceUri.NULL)
+        return parseQName(name, context.inscopeNamespaces, NamespaceUri.NULL)
     }
 
     fun parseQName(
@@ -58,9 +96,9 @@ class TypeUtils(val stepConfig: XProcStepConfiguration) {
         if (name.startsWith("Q{")) {
             val pos = name.indexOf("}")
             if (pos < 0) {
-                throw stepConfig.exception(XProcError.xdInvalidQName(name))
+                throw context.exception(XProcError.Companion.xdInvalidQName(name))
             }
-            return QName(NamespaceUri.of(name.substring(2, pos)), parseNCName(name.substring(pos+1)))
+            return QName(NamespaceUri.of(name.substring(2, pos)), parseNCName(name.substring(pos + 1)))
         }
 
         val pos = name.indexOf(":")
@@ -73,7 +111,7 @@ class TypeUtils(val stepConfig: XProcStepConfiguration) {
             parseNCName(name.substring(pos+1)) // check that the local name is an NCName
             return QName(inscopeNamespaces[prefix], name)
         } else {
-            throw stepConfig.exception(XProcError.xdInvalidPrefix(name, prefix))
+            throw context.exception(XProcError.Companion.xdInvalidPrefix(name, prefix))
         }
     }
 
@@ -137,7 +175,7 @@ class TypeUtils(val stepConfig: XProcStepConfiguration) {
     fun parseXsSequenceType(asExpr: String): SequenceType {
         parsedXsTypes[asExpr]?.let { return it }
 
-        val processor = stepConfig.processor
+        val processor = context.processor
         val config = processor.getUnderlyingConfiguration()
         val icontext = IndependentContext(config)
         icontext.clearAllNamespaces() // We get no defaults
@@ -155,6 +193,106 @@ class TypeUtils(val stepConfig: XProcStepConfiguration) {
         return parsedXsTypes[asExpr]!!
     }
 
+    fun parseSpecialType(type: String): SpecialType {
+        when (type) {
+            "XPathExpression" -> return SpecialType.XPATH_EXPRESSION
+            "XSLTSelectionPattern" -> return SpecialType.XSLT_SELECTION_PATTERN
+            "RegularExpression" -> return SpecialType.REGULAR_EXPRESSION
+            "EQNameList" -> return SpecialType.EQNAME_LIST
+            else -> {
+                throw context.exception(XProcError.Companion.xiNotASpecialType(type))
+            }
+        }
+    }
+
+    fun parseExcludeInlinePrefixes(prefixes: String): Set<NamespaceUri> {
+        if (prefixes.trim() == "") {
+            throw context.exception(XProcError.Companion.xsInvalidExcludePrefix())
+        }
+
+        val uriSet = mutableSetOf<NamespaceUri>()
+        uriSet.add(NsP.namespace)
+        for (token in prefixes.split("\\s+".toRegex())) {
+            when (token) {
+                "#all" -> {
+                    for ((_, uri) in context.inscopeNamespaces) {
+                        uriSet.add(uri)
+                    }
+                }
+                "#default" -> {
+                    if (context.inscopeNamespaces[""] == null) {
+                        throw context.exception(XProcError.Companion.xsNoDefaultNamespace())
+                    } else {
+                        uriSet.add(context.inscopeNamespaces[""]!!)
+                    }
+                }
+                else -> {
+                    val uri = context.inscopeNamespaces[token]
+                    if (uri == null) {
+                        throw context.exception(XProcError.Companion.xsInvalidExcludePrefix(token))
+                    } else {
+                        uriSet.add(uri)
+                    }
+                }
+            }
+        }
+
+        return uriSet
+    }
+
+    fun parseValues(text: String): List<XdmAtomicValue> {
+        val values = mutableListOf<XdmAtomicValue>()
+        val compiler = context.newXPathCompiler()
+        val selector = compiler.compile(text).load()
+        //selector.resourceResolver = context.pipelineConfig.documentManager
+        for (value in selector.evaluate().iterator()) {
+            when (value) {
+                is XdmAtomicValue -> values.add(value)
+                else -> throw context.exception(XProcError.Companion.xsInvalidValues(value.toString()))
+            }
+        }
+
+        return values
+    }
+
+    fun parseVisibility(visible: String): Visibility {
+        when (visible) {
+            "private" -> return Visibility.PRIVATE
+            "public" -> return Visibility.PUBLIC
+            else -> throw context.exception(XProcError.Companion.xsValueDoesNotSatisfyType(visible, "Visibility"))
+        }
+    }
+
+    fun parseContentTypes(text: String): List<MediaType> {
+        try {
+            val alist = ArrayList<MediaType>()
+            for (mt in MediaType.Companion.parseList(text)) {
+                alist.add(mt)
+            }
+            return alist
+        } catch (ex: XProcException) {
+            throw ex.error.asStatic().exception()
+        }
+    }
+
+    fun parseSequenceType(asExpr: String): SequenceType {
+        val config = context.processor.getUnderlyingConfiguration()
+        val icontext = IndependentContext(config)
+        icontext.clearAllNamespaces() // We get no defaults
+        for ((prefix, uri) in context.inscopeNamespaces) {
+            icontext.declareNamespace(prefix, uri)
+        }
+
+        try {
+            icontext.setXPathLanguageLevel(31)
+            val parser = XPathParser(icontext)
+            val st = parser.parseSequenceType(asExpr, icontext)
+            return SequenceType.fromUnderlyingSequenceType(context.processor, st)
+        } catch (ex: XPathException) {
+            throw context.exception(XProcError.Companion.xsInvalidSequenceType(asExpr))
+        }
+    }
+
     fun xpathEq(left: XdmValue, right: XdmValue): Boolean {
         return xpathEqual(left, right, "eq")
     }
@@ -164,7 +302,7 @@ class TypeUtils(val stepConfig: XProcStepConfiguration) {
     }
 
     private fun xpathEqual(left: XdmValue, right: XdmValue, op: String): Boolean {
-        val compiler = stepConfig.newXPathCompiler()
+        val compiler = context.newXPathCompiler()
         compiler.declareVariable(vara)
         compiler.declareVariable(varb)
         val exec = compiler.compile("\$a ${op} \$b")
@@ -175,7 +313,7 @@ class TypeUtils(val stepConfig: XProcStepConfiguration) {
     }
 
     fun xpathDeepEqual(left: XdmValue, right: XdmValue): Boolean {
-        val compiler = stepConfig.newXPathCompiler()
+        val compiler = context.newXPathCompiler()
         compiler.declareVariable(vara)
         compiler.declareVariable(varb)
         val exec = compiler.compile("deep-equal(\$a,\$b)")
@@ -186,7 +324,7 @@ class TypeUtils(val stepConfig: XProcStepConfiguration) {
     }
 
     fun parseAsType(value: String, type: SequenceType, inscopeNamespaces: Map<String, NamespaceUri>): XdmValue {
-        val compiler = stepConfig.newXPathCompiler()
+        val compiler = context.newXPathCompiler()
         val exec = compiler.compile(value)
         val selector = exec.load()
         val result = selector.evaluate()
@@ -542,10 +680,10 @@ class TypeUtils(val stepConfig: XProcStepConfiguration) {
 
     fun xpathInstanceOf(value: XdmValue, type: QName): Boolean {
         if (type.namespaceUri != NsXs.namespace) {
-            throw stepConfig.exception(XProcError.xiImpossible("Attempt to cast to non-xs type"))
+            throw context.exception(XProcError.Companion.xiImpossible("Attempt to cast to non-xs type"))
         }
 
-        val compiler = stepConfig.newXPathCompiler()
+        val compiler = context.newXPathCompiler()
         compiler.declareVariable(vara)
         val exec = compiler.compile("\$a instance of Q{${NsXs.namespace}}${type.localName}")
         val selector = exec.load()
@@ -555,10 +693,10 @@ class TypeUtils(val stepConfig: XProcStepConfiguration) {
 
     fun xpathCastAs(value: XdmValue, type: QName): XdmValue {
         if (type.namespaceUri != NsXs.namespace) {
-            throw stepConfig.exception(XProcError.xiImpossible("Attempt to cast to non-xs type"))
+            throw context.exception(XProcError.Companion.xiImpossible("Attempt to cast to non-xs type"))
         }
 
-        val compiler = stepConfig.newXPathCompiler()
+        val compiler = context.newXPathCompiler()
         compiler.declareVariable(vara)
         val exec = compiler.compile("\$a cast as Q{${NsXs.namespace}}${type.localName}")
         val selector = exec.load()
@@ -568,10 +706,10 @@ class TypeUtils(val stepConfig: XProcStepConfiguration) {
 
     fun xpathTreatAs(value: XdmValue, type: QName): XdmValue {
         if (type.namespaceUri != NsXs.namespace) {
-            throw stepConfig.exception(XProcError.xiImpossible("Attempt to cast to non-xs type"))
+            throw context.exception(XProcError.Companion.xiImpossible("Attempt to cast to non-xs type"))
         }
 
-        val compiler = stepConfig.newXPathCompiler()
+        val compiler = context.newXPathCompiler()
         compiler.declareVariable(vara)
         val exec = compiler.compile("\$a treat as Q{${NsXs.namespace}}${type.localName}")
         val selector = exec.load()
@@ -579,16 +717,16 @@ class TypeUtils(val stepConfig: XProcStepConfiguration) {
         try {
             return selector.evaluate()
         } catch (ex: Exception) {
-            throw stepConfig.exception(XProcError.xdBadType(ex.message ?: ""), ex)
+            throw context.exception(XProcError.Companion.xdBadType(ex.message ?: ""), ex)
         }
     }
 
     fun xpathPromote(value: XdmValue, type: QName): XdmValue {
         if (type.namespaceUri != NsXs.namespace) {
-            throw stepConfig.exception(XProcError.xiImpossible("Attempt to cast to non-xs type"))
+            throw context.exception(XProcError.Companion.xiImpossible("Attempt to cast to non-xs type"))
         }
         if (value.underlyingValue !is AtomicValue) {
-            throw stepConfig.exception(XProcError.xiImpossible("Attempt to promote non-atomic: ${value}"))
+            throw context.exception(XProcError.Companion.xiImpossible("Attempt to promote non-atomic: ${value}"))
         }
 
         val curType = (value.underlyingValue as AtomicValue).primitiveType
@@ -628,7 +766,7 @@ class TypeUtils(val stepConfig: XProcStepConfiguration) {
             val qname = when (value.primitiveTypeName) {
                 NsXs.string, NsXs.untypedAtomic -> XdmAtomicValue(parseQName(value.stringValue, inscopeNamespaces))
                 NsXs.QName -> value
-                else -> throw stepConfig.exception(XProcError.xdBadType(value.stringValue, xsdtype))
+                else -> throw context.exception(XProcError.Companion.xdBadType(value.stringValue, xsdtype))
             }
             return qname
         }
@@ -639,9 +777,9 @@ class TypeUtils(val stepConfig: XProcStepConfiguration) {
             when (ex) {
                 is SaxonApiException -> {
                     if (ex.message!!.contains("Invalid URI")) {
-                        throw stepConfig.exception(XProcError.xdInvalidUri(value.stringValue))
+                        throw context.exception(XProcError.Companion.xdInvalidUri(value.stringValue))
                     }
-                    throw stepConfig.exception(XProcError.xdBadType(value.stringValue, xsdtype))
+                    throw context.exception(XProcError.Companion.xdBadType(value.stringValue, xsdtype))
 
                 }
                 else -> throw ex
@@ -650,7 +788,7 @@ class TypeUtils(val stepConfig: XProcStepConfiguration) {
     }
 
     fun checkType(varName: QName?, value: XdmValue, sequenceType: SequenceType?, values: List<XdmAtomicValue>): XdmValue {
-        return checkType(varName, value, sequenceType, inscopeNamespaces, values)
+        return checkType(varName, value, sequenceType, context.inscopeNamespaces, values)
     }
 
     fun checkType(varName: QName?, value: XdmValue, sequenceType: SequenceType?, inscopeNamespaces: Map<String, NamespaceUri>, values: List<XdmAtomicValue>): XdmValue {
@@ -664,7 +802,7 @@ class TypeUtils(val stepConfig: XProcStepConfiguration) {
                     || sequenceType.occurrenceIndicator == OccurrenceIndicator.ZERO_OR_MORE) {
                     return value
                 }
-                throw stepConfig.exception(XProcError.xdBadType("Empty sequence not allowed"))
+                throw context.exception(XProcError.Companion.xdBadType("Empty sequence not allowed"))
             }
 
             // We've got a bit of a hack here. If the input is a string, but the type is a
@@ -692,11 +830,11 @@ class TypeUtils(val stepConfig: XProcStepConfiguration) {
                 return
             }
         }
-        throw stepConfig.exception(XProcError.xdValueNotAllowed(value, values))
+        throw context.exception(XProcError.Companion.xdValueNotAllowed(value, values))
     }
 
     fun forceQNameKeys(inputMap: MapItem): XdmMap {
-        return forceQNameKeys(inputMap, inscopeNamespaces)
+        return forceQNameKeys(inputMap, context.inscopeNamespaces)
     }
 
     fun forceQNameKeys(
@@ -726,7 +864,7 @@ class TypeUtils(val stepConfig: XProcStepConfiguration) {
     }
 
     fun forceQNameKeys(inputMap: XdmMap): XdmMap {
-        return forceQNameKeys(inputMap, inscopeNamespaces)
+        return forceQNameKeys(inputMap, context.inscopeNamespaces)
     }
 
     fun forceQNameKeys(
@@ -754,13 +892,13 @@ class TypeUtils(val stepConfig: XProcStepConfiguration) {
                         if (ex.error.code == NsErr.xd(36)) {
                             val name = ex.error.details.getOrNull(0)
                             if (name is String) {
-                                throw stepConfig.exception(XProcError.xdInvalidSerialization(name))
+                                throw context.exception(XProcError.Companion.xdInvalidSerialization(name))
                             }
-                            throw stepConfig.exception(XProcError.xdInvalidSerialization())
+                            throw context.exception(XProcError.Companion.xdInvalidSerialization())
                         }
                     }
                 } else {
-                    throw stepConfig.exception(XProcError.xdInvalidSerialization())
+                    throw context.exception(XProcError.Companion.xdInvalidSerialization())
                 }
             } else {
                 map = map.put(XdmAtomicValue(mapkey), value)
@@ -771,9 +909,11 @@ class TypeUtils(val stepConfig: XProcStepConfiguration) {
 
     // ============================================================
 
-    private fun attributeInfo(name: QName, value: String, location: net.sf.saxon.s9api.Location? = null): AttributeInfo {
+    private fun attributeInfo(name: QName, value: String, location: Location? = null): AttributeInfo {
         return AttributeInfo(fqName(name), BuiltInAtomicType.UNTYPED_ATOMIC, value, location, ReceiverOption.NONE)
     }
 
-    private fun fqName(name: QName): FingerprintedQName = FingerprintedQName(name.prefix, name.namespaceUri, name.localName)
+    private fun fqName(name: QName): FingerprintedQName =
+        FingerprintedQName(name.prefix, name.namespaceUri, name.localName)
+
 }

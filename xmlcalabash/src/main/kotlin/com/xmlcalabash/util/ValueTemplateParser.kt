@@ -1,5 +1,6 @@
 package com.xmlcalabash.util
 
+import com.xmlcalabash.config.StepConfiguration
 import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.runtime.XProcStepConfiguration
 
@@ -13,7 +14,7 @@ Inside an expr, { and } are ignored inside strings or comments. An unbalanced } 
 (I don't think a balanced pair of { } is valid in XPath 3.1, but let's look towards the future.)
 */
 
-class ValueTemplateParser private constructor(private val stepConfig: XProcStepConfiguration?, val expr: String) {
+class ValueTemplateParser private constructor(private val stepConfig: StepConfiguration?, val expr: String) {
     companion object {
         private const val DOUBLEQUOTE = "\""
         private const val SINGLEQUOTE ="'"
@@ -23,7 +24,7 @@ class ValueTemplateParser private constructor(private val stepConfig: XProcStepC
             return parser.template()
         }
 
-        fun parse(config: XProcStepConfiguration, expr: String): ValueTemplate {
+        fun parse(config: StepConfiguration, expr: String): ValueTemplate {
             val parser = ValueTemplateParser(config, expr)
             return parser.template()
         }

@@ -1,17 +1,16 @@
 package com.xmlcalabash.xvrl
 
+import com.xmlcalabash.config.StepConfiguration
 import com.xmlcalabash.namespace.NsXvrl
-import com.xmlcalabash.runtime.XProcStepConfiguration
 import com.xmlcalabash.util.SaxonTreeBuilder
 import net.sf.saxon.s9api.QName
-import net.sf.saxon.s9api.XdmNode
 import java.net.URI
 
-class XvrlProvenance private constructor(stepConfiguration: XProcStepConfiguration): XvrlElement(stepConfiguration) {
+class XvrlProvenance private constructor(stepConfiguration: StepConfiguration): XvrlElement(stepConfiguration) {
     val locations = mutableListOf<XvrlLocation>()
 
     companion object {
-        fun newInstance(stepConfig: XProcStepConfiguration, attr: Map<QName,String?> = emptyMap()): XvrlProvenance {
+        fun newInstance(stepConfig: StepConfiguration, attr: Map<QName,String?> = emptyMap()): XvrlProvenance {
             val provenance = XvrlProvenance(stepConfig)
             provenance.setAttributes(attr)
             return provenance
@@ -46,7 +45,7 @@ class XvrlProvenance private constructor(stepConfiguration: XProcStepConfigurati
     // ============================================================
 
     override fun serialize(builder: SaxonTreeBuilder) {
-        builder.addStartElement(NsXvrl.provenance, stepConfig.attributeMap(attributes))
+        builder.addStartElement(NsXvrl.provenance, stepConfig.typeUtils.attributeMap(attributes))
         for (location in locations) {
             location.serialize(builder)
         }

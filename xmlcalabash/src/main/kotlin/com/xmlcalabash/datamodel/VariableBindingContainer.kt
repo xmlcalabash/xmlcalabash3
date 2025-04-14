@@ -4,12 +4,7 @@ import com.xmlcalabash.exceptions.XProcError
 import net.sf.saxon.s9api.QName
 import net.sf.saxon.s9api.SequenceType
 
-abstract class VariableBindingContainer(
-    parent: XProcInstruction,
-    val name: QName,
-    stepConfig: InstructionConfiguration,
-    instructionType: QName
-): BindingContainer(parent, stepConfig, instructionType) {
+abstract class VariableBindingContainer(parent: XProcInstruction, val name: QName, stepConfig: InstructionConfiguration, instructionType: QName): BindingContainer(parent, stepConfig, instructionType) {
 
     internal var _asType: SequenceType? = null
     var asType: SequenceType?
@@ -51,7 +46,7 @@ abstract class VariableBindingContainer(
             if (value == null) {
                 _href = null
             } else {
-                _href = value.cast(stepConfig.parseXsSequenceType("xs:anyURI"))
+                _href = value.cast(stepConfig.typeUtils.parseXsSequenceType("xs:anyURI"))
             }
         }
 
@@ -85,7 +80,7 @@ abstract class VariableBindingContainer(
     }
 
     override fun elaborateInstructions() {
-        asType = asType ?: stepConfig.parseSequenceType("item()*")
+        asType = asType ?: stepConfig.typeUtils.parseSequenceType("item()*")
 
         if (href != null && children.isNotEmpty()) {
             throw stepConfig.exception(XProcError.xsHrefAndChildren())
@@ -136,7 +131,7 @@ abstract class VariableBindingContainer(
                 }
             }
 
-            val eager = stepConfig.environment.commonEnvironment.eagerEvaluation
+            val eager = stepConfig.eagerEvaluation
             if (eager) {
                 // Make sure it doesn't throw an exception
                 select!!.computeStaticValue(stepConfig)
@@ -203,13 +198,13 @@ abstract class VariableBindingContainer(
     }
 
     fun primaryOutput(): WithOutputInstruction {
-    for (child in children) {
-        if (child is WithOutputInstruction) {
-            return child
+        for (child in children) {
+            if (child is WithOutputInstruction) {
+                return child
+            }
         }
+        throw stepConfig.exception(XProcError.xiImpossible("expression has no output"))
     }
-    throw stepConfig.exception(XProcError.xiImpossible("expression has no output"))
-}
 
     override fun toString(): String {
         return "${instructionType}/${id} ${name}"

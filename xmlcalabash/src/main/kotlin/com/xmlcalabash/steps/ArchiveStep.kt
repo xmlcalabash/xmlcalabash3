@@ -256,7 +256,7 @@ open class ArchiveStep(): AbstractArchiveStep() {
                 Ns.method to entry.method
             )
 
-            builder.addStartElement(NsC.entry, stepConfig.attributeMap(amap))
+            builder.addStartElement(NsC.entry, stepConfig.typeUtils.attributeMap(amap))
             builder.addEndElement()
         }
 

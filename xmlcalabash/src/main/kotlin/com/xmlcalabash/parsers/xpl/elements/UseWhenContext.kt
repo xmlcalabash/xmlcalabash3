@@ -1,14 +1,9 @@
 package com.xmlcalabash.parsers.xpl.elements
 
-import com.xmlcalabash.datamodel.DeclareStepInstruction
 import com.xmlcalabash.datamodel.InstructionConfiguration
 import com.xmlcalabash.datamodel.PipelineBuilder
 import com.xmlcalabash.exceptions.XProcError
-import net.sf.saxon.s9api.QName
-import net.sf.saxon.s9api.SaxonApiException
-import net.sf.saxon.s9api.XPathSelector
-import net.sf.saxon.s9api.XdmAtomicValue
-import net.sf.saxon.s9api.XdmValue
+import net.sf.saxon.s9api.*
 import net.sf.saxon.trans.XPathException
 import net.sf.saxon.value.BooleanValue
 
@@ -24,9 +19,9 @@ class UseWhenContext internal constructor(val builder: PipelineBuilder) {
     val contextId = ++id
 
     init {
-        val environment = builder.pipelineContext
+        val environment = builder.stepConfig
         for ((type, decl) in environment.standardSteps) {
-            stepTypes[type] = StepImplementation(true, { environment.commonEnvironment.atomicStepAvailable(type) })
+            stepTypes[type] = StepImplementation(true, { environment.atomicStepAvailable(type) })
         }
     }
 
@@ -54,7 +49,7 @@ class UseWhenContext internal constructor(val builder: PipelineBuilder) {
 
     private fun resolveExpressionInternal(stepConfig: InstructionConfiguration, expr: String, ebv: Boolean): XdmValue? {
         val context = ConditionalExecutionContext(stepConfig, this)
-        stepConfig.environment.xmlCalabash.setExecutionContext(context)
+        stepConfig.saxonConfig.setExecutionContext(context)
         try {
             val selector = makeSelector(stepConfig, expr)
             if (ebv) {
@@ -75,7 +70,7 @@ class UseWhenContext internal constructor(val builder: PipelineBuilder) {
                 else -> Unit // Just assume this will work better next time...
             }
         } finally {
-            stepConfig.environment.xmlCalabash.releaseExecutionContext()
+            stepConfig.saxonConfig.releaseExecutionContext()
         }
         return null
     }
@@ -115,7 +110,7 @@ class UseWhenContext internal constructor(val builder: PipelineBuilder) {
                         val cpos = name.indexOf("}")
                         QName("", name.substring(1, cpos), name.substring(cpos+1))
                     } else {
-                        stepConfig.parseQName(name)
+                        stepConfig.typeUtils.parseQName(name)
                     }
                     for ((option, _) in staticOptions) {
                         if (option.name == qname) {

@@ -1,6 +1,6 @@
 package com.xmlcalabash.util.spi
 
-import com.xmlcalabash.config.XmlCalabash
+import com.xmlcalabash.XmlCalabash
 import com.xmlcalabash.spi.Configurer
 import net.sf.saxon.Configuration
 import javax.activation.MimetypesFileTypeMap

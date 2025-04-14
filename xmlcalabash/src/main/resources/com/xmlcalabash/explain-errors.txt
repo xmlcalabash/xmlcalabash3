@@ -1589,13 +1589,11 @@ cxerr:XI0047
 At most one document is allowed on the source port, found $1.
 
 cxerr:XI0048
-The schema document is not an XSD schema: “$1”.
-
-cxerr:XI0049
-The cc:xml-schema element cannot have both an href attribute and content.
-
-cxerr:XI0050
-Non-whitespace text nodes are forbidden in cc:xml-schema elements.
+No additional configuration allowed.
+If a Saxon Configuration object is provided when building an XML Calabash
+instance, you may not provide any other configuration to the builder (no
+configuration file or properties, schema documents, initializers, or
+configurers). You must configure the Saxon Configuration externally.
 
 cxerr:XI0051
 The p:document instruction does not support multipart messages.

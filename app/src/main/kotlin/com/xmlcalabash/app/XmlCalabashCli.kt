@@ -1,9 +1,9 @@
 package com.xmlcalabash.app
 
+import com.xmlcalabash.XmlCalabash
 import com.xmlcalabash.XmlCalabashBuildConfig
+import com.xmlcalabash.XmlCalabashBuilder
 import com.xmlcalabash.config.ConfigurationLoader
-import com.xmlcalabash.config.XmlCalabash
-import com.xmlcalabash.config.XmlCalabashConfiguration
 import com.xmlcalabash.datamodel.*
 import com.xmlcalabash.documents.DocumentProperties
 import com.xmlcalabash.documents.XProcDocument
@@ -12,26 +12,20 @@ import com.xmlcalabash.exceptions.ErrorExplanation
 import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.exceptions.XProcException
 import com.xmlcalabash.io.DocumentLoader
-import com.xmlcalabash.io.DocumentWriter
 import com.xmlcalabash.io.MediaType
+import com.xmlcalabash.io.MessagePrinter
 import com.xmlcalabash.namespace.Ns
 import com.xmlcalabash.namespace.NsErr
 import com.xmlcalabash.namespace.NsFn
 import com.xmlcalabash.namespace.NsXs
-import com.xmlcalabash.runtime.api.RuntimeOption
-import com.xmlcalabash.runtime.api.RuntimePort
 import com.xmlcalabash.spi.DocumentResolverServiceProvider
 import com.xmlcalabash.util.*
-import com.xmlcalabash.visualizers.Detail
-import com.xmlcalabash.visualizers.Plain
-import com.xmlcalabash.visualizers.Silent
 import net.sf.saxon.Configuration
 import net.sf.saxon.lib.Initializer
 import net.sf.saxon.om.NamespaceUri
 import net.sf.saxon.s9api.*
 import org.apache.logging.log4j.kotlin.logger
 import org.slf4j.MDC
-import org.xml.sax.InputSource
 import java.io.BufferedReader
 import java.io.File
 import java.io.InputStreamReader
@@ -39,7 +33,6 @@ import java.text.SimpleDateFormat
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
-import javax.xml.transform.sax.SAXSource
 import kotlin.system.exitProcess
 
 /**
@@ -54,20 +47,21 @@ class XmlCalabashCli private constructor() {
         }
     }
 
+    private lateinit var builder: XmlCalabashBuilder
     private lateinit var xmlCalabash: XmlCalabash
     private lateinit var commandLine: CommandLine
-    private lateinit var config: XmlCalabashConfiguration
+    private lateinit var cliPrinter: MessagePrinter
+    private lateinit var cliExplain: ErrorExplanation
     private lateinit var stepConfig: InstructionConfiguration
-    private var sawStdin = false
     private var sawStdout = false
 
     private fun run(args: Array<out String>) {
-        val messagePrinter = DefaultMessagePrinter(XmlCalabashConfiguration.DEFAULT_CONSOLE_ENCODING)
-        var errorExplanation: ErrorExplanation = DefaultErrorExplanation(messagePrinter)
-
+        builder = XmlCalabashBuilder()
+        cliPrinter = DefaultMessagePrinter(XmlCalabashBuilder.DEFAULT_CONSOLE_ENCODING)
+        cliExplain = DefaultErrorExplanation(cliPrinter)
         commandLine = CommandLine.parse(args)
         if (commandLine.errors.isNotEmpty()) {
-            abort(errorExplanation, commandLine.errors)
+            abort(cliExplain, commandLine.errors)
         }
 
         if (commandLine.debug == true) {
@@ -81,122 +75,104 @@ class XmlCalabashCli private constructor() {
             }
         }
 
+        loadConfiguration(commandLine.config)
+
+        if (commandLine.verbosity != null) {
+            builder.setVerbosity(commandLine.verbosity!!)
+            if (commandLine.debug == true) {
+                when (builder.getVerbosity()) {
+                    Verbosity.TRACE -> MDC.put("LOG_LEVEL", "TRACE")
+                    Verbosity.DEBUG -> MDC.put("LOG_LEVEL", "DEBUG")
+                    Verbosity.INFO -> MDC.put("LOG_LEVEL", "INFO")
+                    Verbosity.WARN -> MDC.put("LOG_LEVEL", "WARN")
+                    Verbosity.ERROR -> MDC.put("LOG_LEVEL", "ERROR")
+                }
+            }
+        }
+
+        commandLine.pipe?.let { builder.setPipe(it) }
+        commandLine.trace?.let { builder.setTrace(it) }
+        commandLine.traceDocuments?.let { builder.setTraceDocuments(it) }
+        commandLine.assertions?.let { builder.setAssertions(it) }
+        commandLine.tryNamespaces?.let { builder.setTryNamespaces(it) }
+        commandLine.useLocationHints?.let { builder.setUseLocationHints(it) }
+
+        builder.setLicensed(builder.getLicensed() && commandLine.licensed)
+
+        commandLine.debug?.let { builder.setDebug(it) }
+        commandLine.debugger?.let { builder.setDebugger(it) }
+        when (commandLine.visualizer) {
+            null -> {
+                // If the user didn't specify one on the command line, use the one from
+                // the configuration file, unless --debugger has been specified, in which
+                // case turn it off. Debugging and visualization don't play nicely together.
+                if (builder.getDebugger()) {
+                    builder.setVisualizer("silent", emptyMap())
+                }
+            }
+            "silent", "plain", "detail" -> builder.setVisualizer(commandLine.visualizer!!, commandLine.visualizerOptions)
+            else -> {
+                cliPrinter.print("Unexpected visualizer: ${commandLine.visualizer}")
+                builder.setVisualizer("silent", emptyMap())
+            }
+        }
+
+        if (builder.getTrace() == null && builder.getTraceDocuments() != null) {
+            builder.setTrace(builder.getTraceDocuments()!!.resolve("trace.xml"))
+        }
+
+        for (uri in commandLine.xmlSchemas) {
+            builder.addXmlSchemaDocument(uri)
+        }
+
+        for (uri in commandLine.xmlCatalogs) {
+            builder.addXmlCatalog(uri)
+        }
+
+        for (name in commandLine.initializers) {
+            builder.addInitializer(name)
+        }
+
+        // It feels like this configuration should go somewhere else...but since
+        // CoffeeSacks is now bundled, try to initialize it for the user...
+        val csi = "org.nineml.coffeesacks.RegisterCoffeeSacks"
+        if (csi !in commandLine.initializers) {
+            builder.addInitializer(csi, ignoreErrors = true)
+        }
+
+        val moon = Moon.illumination()
+        if (moon > builder.mpt) {
+            if (moon > 0.99) {
+                logger.warn { "The moon is full." }
+            } else {
+                logger.warn { "The moon is ${"%3.1f".format(moon * 100.0)}% full." }
+            }
+        }
+
+        xmlCalabash = builder.build()
+
+        val xprocParser = xmlCalabash.newXProcParser()
+        stepConfig = xprocParser.builder.stepConfig
+        cliExplain = stepConfig.errorExplanation
+
+        if (commandLine.help || (commandLine.command == "run" && commandLine.pipeline == null && commandLine.step == null)) {
+            help()
+            return
+        }
+
+        if (commandLine.command == "version") {
+            version()
+            return
+        }
+
         try {
-            config = loadConfiguration(commandLine.config)
-
-            if (config.verbosity != commandLine.verbosity) {
-                config.verbosity = commandLine.verbosity ?: config.verbosity
-                if (commandLine.debug == true) {
-                    when (config.verbosity) {
-                        Verbosity.TRACE -> MDC.put("LOG_LEVEL", "TRACE")
-                        Verbosity.DEBUG -> MDC.put("LOG_LEVEL", "DEBUG")
-                        Verbosity.INFO -> MDC.put("LOG_LEVEL", "INFO")
-                        Verbosity.WARN -> MDC.put("LOG_LEVEL", "WARN")
-                        Verbosity.ERROR -> MDC.put("LOG_LEVEL", "ERROR")
-                    }
-                }
-            }
-
-            config.pipe = commandLine.pipe ?: config.pipe
-            config.trace = commandLine.trace
-            config.traceDocuments = commandLine.traceDocuments
-            config.assertions = commandLine.assertions
-            config.licensed = config.licensed && commandLine.licensed
-
-            config.debug = commandLine.debug == true
-            config.debugger = commandLine.debugger
-            when (commandLine.visualizer) {
-                null -> {
-                    // If the user didn't specify one on the command line, use the one from
-                    // the configuration file, unless --debugger has been specified, in which
-                    // case turn it off. Debugging and visualization don't play nicely together.
-                    if (config.debugger) {
-                        Silent(emptyMap())
-                    }
-                }
-                "silent" -> config.visualizer = Silent(commandLine.visualizerOptions)
-                "plain" -> config.visualizer = Plain(config.messagePrinter, commandLine.visualizerOptions)
-                "detail" -> config.visualizer = Detail(config.messagePrinter, commandLine.visualizerOptions)
-                else -> {
-                    logger.warn("Unexpected visualizer: ${commandLine.visualizer}")
-                    config.visualizer = Silent(emptyMap())
-                }
-            }
-
-            if (config.trace == null && config.traceDocuments != null) {
-                config.trace = config.traceDocuments!!.resolve("trace.xml")
-            }
-
-            xmlCalabash = XmlCalabash.newInstance(config)
-
-            if (commandLine.help || (commandLine.command == "run" && commandLine.pipeline == null && commandLine.step == null)) {
-                help()
-                return
-            }
-
-            if (commandLine.command == "version") {
-                version()
-                return
-            }
-
-            // These won't be in the base configuration, but I think they'll be in all subsequent configurations
-            for (uri in commandLine.xmlSchemas) {
-                val builder = xmlCalabash.saxonConfig.processor.newDocumentBuilder()
-                val destination = XdmDestination()
-                val source = SAXSource(InputSource(uri.toString()))
-                builder.parse(source, destination)
-                val schema = S9Api.documentElement(destination.xdmNode)
-                if (schema.nodeName == NsXs.schema) {
-                    config.xmlSchemaDocuments.add(schema)
-                } else {
-                    throw XProcError.xiNotAnXmlSchema(schema.nodeName).exception()
-                }
-            }
-            if (commandLine.tryNamespaces != null) {
-                config.tryNamespaces = commandLine.tryNamespaces!!
-            }
-            if (commandLine.useLocationHints != null) {
-                config.useLocationHints = commandLine.useLocationHints!!
-            }
-
-            for (name in commandLine.initializers) {
-                saxonInitializer(name)
-            }
-            // It feels like this configuration should go somewhere else...but since
-            // CoffeeSacks is now bundled, try to initialize it for the user...
-            val csi = "org.nineml.coffeesacks.RegisterCoffeeSacks"
-            if (csi !in commandLine.initializers) {
-                saxonInitializer(csi, ignoreErrors = true)
-            }
-
-            val moon = Moon.illumination()
-            if (moon > config.mpt) {
-                if (moon > 0.99) {
-                    logger.warn { "The moon is full." }
-                } else {
-                    logger.warn { "The moon is ${"%3.1f".format(moon * 100.0)}% full." }
-                }
-            }
-
-            val xprocParser = xmlCalabash.newXProcParser()
-            stepConfig = xprocParser.builder.stepConfig
-            errorExplanation = stepConfig.environment.errorExplanation
-            errorExplanation.setEnvironment(xmlCalabash.commonEnvironment)
-
-            for (uri in commandLine.xmlCatalogs) {
-                xmlCalabash.commonEnvironment.documentManager.resolverConfiguration.addCatalog(uri.toString())
-            }
-
-            for (uri in config.xmlCatalogs) {
-                xmlCalabash.commonEnvironment.documentManager.resolverConfiguration.addCatalog(uri.toString())
-            }
 
             evaluateOptions(xprocParser.builder, commandLine)
 
             val declstep = if (commandLine.pipeline != null) {
                 xprocParser.parse(commandLine.pipeline!!.toURI(), commandLine.step)
             } else {
-                val type = stepConfig.parseQName(commandLine.step!!, commandLine.namespaces)
+                val type = stepConfig.typeUtils.parseQName(commandLine.step!!, commandLine.namespaces)
                 constructWrapper(type)
             }
 
@@ -213,7 +189,7 @@ class XmlCalabashCli private constructor() {
             }
 
             var implicitStdin: String? = null
-            if (explicitStdin == null && xmlCalabash.xmlCalabashConfig.pipe) {
+            if (explicitStdin == null && xmlCalabash.config.pipe) {
                 for ((port, input) in pipeline.inputManifold) {
                     if (input.primary && port !in commandLine.inputs) {
                         implicitStdin = port
@@ -229,7 +205,7 @@ class XmlCalabashCli private constructor() {
             }
 
             var implicitStdout: String? = null
-            if (xmlCalabash.xmlCalabashConfig.pipe) {
+            if (xmlCalabash.config.pipe) {
                 for ((port, output) in pipeline.outputManifold) {
                     if (output.primary) {
                         implicitStdout = port
@@ -240,7 +216,7 @@ class XmlCalabashCli private constructor() {
             if (commandLine.pipelineGraphs != null) {
                 val description = runtime.description()
                 val vis = VisualizerOutput(xmlCalabash, description, commandLine.pipelineGraphs!!)
-                if (config.graphviz == null) {
+                if (xmlCalabash.config.graphviz == null) {
                     logger.warn { "Cannot create SVG, graphviz is not configured"}
                     vis.xml()
                 } else {
@@ -249,7 +225,7 @@ class XmlCalabashCli private constructor() {
             }
 
             if (commandLine.nogo) {
-                xmlCalabash.commonEnvironment.messageReporter().debug { "Execution suppressed with --nogo" }
+                stepConfig.messageReporter.debug { "Execution suppressed with --nogo" }
                 exitProcess(0)
             }
 
@@ -312,14 +288,14 @@ class XmlCalabashCli private constructor() {
                 pipeline.option(name, XProcDocument.ofValue(value, stepConfig, MediaType.OCTET_STREAM, DocumentProperties()))
             }
 
-            pipeline.receiver = FileOutputReceiver(xmlCalabash, xmlCalabash.saxonConfig.processor, pipeline.outputManifold, commandLine.outputs, explicitStdout ?: implicitStdout)
+            pipeline.receiver = FileOutputReceiver(xmlCalabash, stepConfig.processor, pipeline.outputManifold, commandLine.outputs, explicitStdout ?: implicitStdout)
             pipeline.run()
         } catch (ex: Exception) {
             if (ex is XProcException) {
                 if (ex.error.code == NsErr.xi(XProcError.DEBUGGER_ABORT)) {
                     exitProcess(1)
                 }
-                abort(errorExplanation, ex)
+                abort(cliExplain, ex)
             } else {
                 if (commandLine.verbosity != null && commandLine.verbosity!! <= Verbosity.DEBUG) {
                     ex.printStackTrace()
@@ -353,29 +329,6 @@ class XmlCalabashCli private constructor() {
         return MediaType.XML
     }
 
-    private fun saxonInitializer(name: String, ignoreErrors: Boolean = false) {
-        try {
-            val klass = Class.forName(name)
-            val constructor = klass.getConstructor()
-            val init = constructor.newInstance()
-            if (init is Initializer) {
-                init.initialize(xmlCalabash.saxonConfig.configuration)
-                xmlCalabash.commonEnvironment.addInitializer(init)
-            } else {
-                throw XProcError.xiInitializerError("${name} is not a net.sf.saxon.lib.Initializer").exception()
-            }
-        } catch (ex: Exception) {
-            if (ex is XProcException) {
-                throw ex
-            } else {
-                if (!ignoreErrors) {
-                    throw XProcError.xiInitializerError(ex.toString()).exception(ex)
-                }
-                // Should we print a warning about this?
-            }
-        }
-    }
-
     private fun evaluateOptions(pipelineBuilder: PipelineBuilder, commandLine: CommandLine) {
         val defaults = mutableMapOf<NamespaceUri, String>(
             NsXs.namespace to "xs",
@@ -395,7 +348,7 @@ class XmlCalabashCli private constructor() {
             nsmap[key] = value
         }
 
-        val processor = xmlCalabash.saxonConfig.newProcessor()
+        val processor = stepConfig.processor
 
         val compiler = processor.newXPathCompiler()
         compiler.baseURI = UriUtils.cwdAsUri()
@@ -405,7 +358,7 @@ class XmlCalabashCli private constructor() {
         }
 
         for ((name, initializers) in commandLine.options) {
-            val qname = stepConfig.parseQName(name, nsmap)
+            val qname = stepConfig.typeUtils.parseQName(name, nsmap)
             var value: XdmValue? = null
             for (initializer in initializers) {
                 val ivalue = if (initializer.startsWith("?")) {
@@ -425,17 +378,18 @@ class XmlCalabashCli private constructor() {
         }
     }
 
-    private fun loadConfiguration(commandLineConfig: File?): XmlCalabashConfiguration {
+    private fun loadConfiguration(commandLineConfig: File?) {
         val configLocations = mutableListOf<File>()
         commandLineConfig?.let { configLocations.add(it) }
         configLocations.add(File(UriUtils.cwdAsUri().resolve(".xmlcalabash3").path))
         configLocations.add(File(UriUtils.homeAsUri().resolve(".xmlcalabash3").path))
         for (config in configLocations) {
             if (config.exists() && config.isFile) {
-                return ConfigurationLoader.load(config)
+                val loader = ConfigurationLoader(builder)
+                loader.load(config)
+                return
             }
         }
-        return DefaultXmlCalabashConfiguration()
     }
 
     private fun abort(errorExplanation: ErrorExplanation, error: XProcException) {
@@ -461,7 +415,7 @@ class XmlCalabashCli private constructor() {
             if (errors[0].cause != null && errors[0].cause != errors[0]) {
                 val message = errors[0].cause!!.message
                 if (message != null) {
-                    xmlCalabash.commonEnvironment.messagePrinter.println(message)
+                    stepConfig.messagePrinter.println(message)
                 }
             }
         }
@@ -472,17 +426,17 @@ class XmlCalabashCli private constructor() {
     private fun help() {
         val stream = XmlCalabashCli::class.java.getResourceAsStream("/com/xmlcalabash/help.txt")
         if (stream == null) {
-            xmlCalabash.println("Error: help is not available.")
+           stepConfig.messagePrinter.println("Error: help is not available.")
             return
         }
         val reader = BufferedReader(InputStreamReader(stream, Charsets.UTF_8))
         for (line in reader.lines()) {
-            xmlCalabash.println(line)
+            stepConfig.messagePrinter.println(line)
         }
     }
 
     private fun version() {
-        val proc = xmlCalabash.saxonConfig.processor
+        val proc = stepConfig.processor
         val license = proc.underlyingConfiguration.isLicensedFeature(Configuration.LicenseFeature.SCHEMA_VALIDATION)
                 || proc.underlyingConfiguration.isLicensedFeature(Configuration.LicenseFeature.PROFESSIONAL_EDITION)
         var edition = proc.saxonEdition
@@ -496,7 +450,7 @@ class XmlCalabashCli private constructor() {
 
         val deplist = XmlCalabashBuildConfig.DEPENDENCIES.keys.toList().sorted()
 
-        if (xmlCalabash.xmlCalabashConfig.verbosity <= Verbosity.DEBUG) {
+        if (xmlCalabash.config.verbosity <= Verbosity.DEBUG) {
             println("PRODUCT_NAME=${XmlCalabashBuildConfig.PRODUCT_NAME}")
             println("VERSION=${XmlCalabashBuildConfig.VERSION}")
             println("BUILD_DATE=${XmlCalabashBuildConfig.BUILD_DATE}")
@@ -514,11 +468,11 @@ class XmlCalabashCli private constructor() {
             val date = LocalDateTime.ofInstant(dateInstant, ZoneId.systemDefault())
             val dateFormatter = DateTimeFormatter.ofPattern("dd LLLL yyyy")
 
-            xmlCalabash.print("${XmlCalabashBuildConfig.PRODUCT_NAME} version ${XmlCalabashBuildConfig.VERSION} ")
-            xmlCalabash.println("(build ${XmlCalabashBuildConfig.BUILD_ID}, ${dateFormatter.format(date)})")
-            xmlCalabash.println("Running with Saxon ${proc.saxonEdition} version ${proc.saxonProductVersion}")
+            stepConfig.messagePrinter.print("${XmlCalabashBuildConfig.PRODUCT_NAME} version ${XmlCalabashBuildConfig.VERSION} ")
+            stepConfig.messagePrinter.println("(build ${XmlCalabashBuildConfig.BUILD_ID}, ${dateFormatter.format(date)})")
+            stepConfig.messagePrinter.println("Running with Saxon ${proc.saxonEdition} version ${proc.saxonProductVersion}")
             if (edition != proc.saxonEdition) {
-                if (xmlCalabash.xmlCalabashConfig.licensed) {
+                if (xmlCalabash.config.licensed) {
                     println("(You appear to have ${edition}; perhaps a license wasn't found?)")
                 } else {
                     println("(You appear to have ${edition} but the license is explicitly disabled.)")
@@ -581,7 +535,7 @@ class XmlCalabashCli private constructor() {
     }
 
     private fun findDeclaration(type: QName): Pair<LibraryInstruction?, DeclareStepInstruction> {
-        val pstep = xmlCalabash.commonEnvironment.standardSteps[type]
+        val pstep = stepConfig.standardSteps[type]
         if (pstep != null) {
             return Pair(null, pstep)
         }

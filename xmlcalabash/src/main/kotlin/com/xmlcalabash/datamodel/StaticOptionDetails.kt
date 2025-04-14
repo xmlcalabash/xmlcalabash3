@@ -1,6 +1,6 @@
 package com.xmlcalabash.datamodel
 
-import com.xmlcalabash.runtime.XProcStepConfiguration
+import com.xmlcalabash.config.StepConfiguration
 import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.util.TypeUtils
 import net.sf.saxon.s9api.QName
@@ -8,7 +8,7 @@ import net.sf.saxon.s9api.SequenceType
 import net.sf.saxon.s9api.XdmAtomicValue
 import net.sf.saxon.s9api.XdmValue
 
-class StaticOptionDetails(val stepConfig: XProcStepConfiguration, val name: QName, val asType: SequenceType, val values: List<XdmAtomicValue>, initialStaticValue: XProcExpression) {
+class StaticOptionDetails(val stepConfig: StepConfiguration, val name: QName, val asType: SequenceType, val values: List<XdmAtomicValue>, initialStaticValue: XProcExpression) {
     internal var _staticValue = initialStaticValue
     val staticValue: XProcExpression
         get() = _staticValue

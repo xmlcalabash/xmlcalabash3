@@ -191,7 +191,7 @@ open class LibraryInstruction(stepConfig: InstructionConfiguration): XProcInstru
             }
         }
 
-        if (stepConfig.xmlCalabash.xmlCalabashConfig.assertions != AssertionsLevel.IGNORE) {
+        if (stepConfig.assertions != AssertionsLevel.IGNORE) {
             AssertionsMonitor.parseFromPipeinfo(this)
         }
 
@@ -266,7 +266,6 @@ open class LibraryInstruction(stepConfig: InstructionConfiguration): XProcInstru
     fun getExecutable(stepName: String?): XProcPipeline {
         return getRuntime(stepName).executable()
     }
-
 
     /*
     fun compile(stepName: String?): XProcPipeline {
@@ -347,8 +346,14 @@ open class LibraryInstruction(stepConfig: InstructionConfiguration): XProcInstru
         return option
     }
 
+    internal fun declareAtomicStep(): DeclareStepInstruction {
+        val decl = DeclareStepInstruction(this, stepConfig)
+        _children.add(decl)
+        return decl
+    }
+
     override fun declareStep(): DeclareStepInstruction {
-        val decl = DeclareStepInstruction(this, stepConfig.copy())
+        val decl = DeclareStepInstruction(this, stepConfig.copyNew())
         _children.add(decl)
         return decl
     }

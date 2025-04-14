@@ -20,7 +20,7 @@ abstract class RootNode(parent: AnyNode?, parentConfig: InstructionConfiguration
                     val impl = if (useWhen == null) {
                         StepImplementation(false, { false })
                     } else {
-                        StepImplementation(true, { (useWhen == true) && (!isAtomic || stepConfig.environment.commonEnvironment.atomicStepAvailable(type!!)) })
+                        StepImplementation(true, { (useWhen == true) && (!isAtomic || stepConfig.atomicStepAvailable(type!!)) })
                     }
                     localContext.stepTypes[type!!] = impl
                 }
@@ -31,7 +31,7 @@ abstract class RootNode(parent: AnyNode?, parentConfig: InstructionConfiguration
                     val impl = if (child.useWhen == null) {
                         StepImplementation(false, { false })
                     } else {
-                        StepImplementation(true, { (child.useWhen == true) && (!child.isAtomic || stepConfig.environment.commonEnvironment.atomicStepAvailable(child.type!!)) })
+                        StepImplementation(true, { (child.useWhen == true) && (!child.isAtomic || stepConfig.atomicStepAvailable(child.type!!)) })
                     }
                     localContext.stepTypes[child.type!!] = impl
                 }

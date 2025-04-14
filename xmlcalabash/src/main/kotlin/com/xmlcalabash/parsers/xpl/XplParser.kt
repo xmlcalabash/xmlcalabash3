@@ -78,6 +78,11 @@ class XplParser internal constructor(val builder: PipelineBuilder) {
         return pipelineForContainer(stepContainer, stepName)
     }
 
+    fun parseLibrary(filename: String): LibraryInstruction {
+        val uri = UriUtils.cwdAsUri().resolve(filename)
+        return parseLibrary(uri)
+    }
+
     fun parseLibrary(uri: URI): LibraryInstruction {
         val stepContainer = parseUri(uri);
         if (errors.isNotEmpty()) {
@@ -117,7 +122,7 @@ class XplParser internal constructor(val builder: PipelineBuilder) {
         val document = manager.load(uri)
         val stepContainer = if (document.rootNode is LibraryNode) {
             val library = builder.newLibrary()
-            library.stepConfig.updateWith(document.rootNode.node)
+            library.stepConfig.copyNew().updateWith(document.rootNode.node)
             parsedUris[uri] = library
             parseLibrary(document.rootNode as LibraryNode, library)
         } else {
@@ -132,11 +137,12 @@ class XplParser internal constructor(val builder: PipelineBuilder) {
 
     private fun parseLibrary(node: LibraryNode, library: LibraryInstruction): StepContainerInterface {
         val stepConfig = library.stepConfig
+        library.stepConfig.updateWith(node.node)
 
         val attributeMapping = mapOf<QName, (String) -> Unit>(
-            Ns.psviRequired to { value -> library.psviRequired = stepConfig.parseBoolean(value) },
+            Ns.psviRequired to { value -> library.psviRequired = stepConfig.typeUtils.parseBoolean(value) },
             Ns.xpathVersion to { value -> library.xpathVersion = value.toDouble() },
-            Ns.excludeInlinePrefixes to { value -> stepConfig.parseExcludeInlinePrefixes(value) },
+            Ns.excludeInlinePrefixes to { value -> stepConfig.typeUtils.parseExcludeInlinePrefixes(value) },
             Ns.version to { value -> library.version = parseVersion(node, value) },
         )
 
@@ -144,7 +150,7 @@ class XplParser internal constructor(val builder: PipelineBuilder) {
 
         val elementMapping = mapOf<QName, (ElementNode) -> Unit>(
             NsP.import to { child -> parseImport(library as StepContainerInterface, child) },
-            NsP.importFunctions to { child -> parseImportFunctions(library as StepContainerInterface, child) },
+            NsP.importFunctions to { child -> parseImportFunctions(library as StepContainerInterface, child as ImportFunctionsNode) },
             NsP.option to { child -> parseLibraryOption(library, child) },
             NsP.declareStep to { child -> parseNestedDeclareStep(library, child as DeclareStepNode) },
         )
@@ -162,12 +168,12 @@ class XplParser internal constructor(val builder: PipelineBuilder) {
 
             val attributeMapping = mapOf<QName, (String) -> Unit>(
                 Ns.name to { _ -> },
-                Ns.asType to { value -> option.asType = stepConfig.parseSequenceType(value) },
-                Ns.values to { value -> option.values = stepConfig.parseValues(value) },
-                Ns.static to { value -> option.static = stepConfig.parseBoolean(value) },
-                Ns.required to { value -> option.required = stepConfig.parseBoolean(value) },
+                Ns.asType to { value -> option.asType = stepConfig.typeUtils.parseSequenceType(value) },
+                Ns.values to { value -> option.values = stepConfig.typeUtils.parseValues(value) },
+                Ns.static to { value -> option.static = stepConfig.typeUtils.parseBoolean(value) },
+                Ns.required to { value -> option.required = stepConfig.typeUtils.parseBoolean(value) },
                 Ns.select to { value -> option.select = XProcExpression.select(stepConfig, value) },
-                Ns.visibility to { value -> option.visibility = stepConfig.parseVisibility(value) }
+                Ns.visibility to { value -> option.visibility = stepConfig.typeUtils.parseVisibility(value) }
             )
 
             processAttributes(node, option, attributeMapping)
@@ -209,20 +215,20 @@ class XplParser internal constructor(val builder: PipelineBuilder) {
         val stepConfig = decl.stepConfig.copyNew()
 
         val attributeMapping = mapOf<QName, (String) -> Unit>(
-            Ns.name to { value -> decl.name = stepConfig.parseNCName(value) },
-            Ns.type to { value -> decl.type = stepConfig.parseQName(value) },
-            Ns.psviRequired to { value -> decl.psviRequired = stepConfig.parseBoolean(value) },
+            Ns.name to { value -> decl.name = stepConfig.typeUtils.parseNCName(value) },
+            Ns.type to { value -> decl.type = stepConfig.typeUtils.parseQName(value) },
+            Ns.psviRequired to { value -> decl.psviRequired = stepConfig.typeUtils.parseBoolean(value) },
             Ns.xpathVersion to { value -> decl.xpathVersion = value.toDouble() },
-            Ns.excludeInlinePrefixes to { value -> stepConfig.parseExcludeInlinePrefixes(value) },
+            Ns.excludeInlinePrefixes to { value -> stepConfig.typeUtils.parseExcludeInlinePrefixes(value) },
             Ns.version to { value -> decl.version = parseVersion(node, value) },
-            Ns.visibility to { value -> decl.visibility = stepConfig.parseVisibility(value) },
+            Ns.visibility to { value -> decl.visibility = stepConfig.typeUtils.parseVisibility(value) },
         )
 
         processAttributes(node, decl, attributeMapping)
 
         val elementMapping = mutableMapOf<QName, (ElementNode) -> Unit>(
             NsP.import to { child -> parseImport(decl as StepContainerInterface, child) },
-            NsP.importFunctions to { child -> parseImportFunctions(decl as StepContainerInterface, child) },
+            NsP.importFunctions to { child -> parseImportFunctions(decl as StepContainerInterface, child as ImportFunctionsNode) },
             NsP.input to { child -> parseInput(decl, child) },
             NsP.output to { child -> parseOutput(decl, child) },
             NsP.option to { child -> parseOption(decl, child) },
@@ -246,13 +252,13 @@ class XplParser internal constructor(val builder: PipelineBuilder) {
         val stepConfig = input.stepConfig
 
         val attributeMapping = mapOf<QName, (String) -> Unit>(
-            Ns.port to { value -> input.port = stepConfig.parseNCName(value) },
-            Ns.sequence to { value -> input.sequence = stepConfig.parseBoolean(value) },
-            Ns.primary to { value -> input.primary = stepConfig.parseBoolean(value) },
+            Ns.port to { value -> input.port = stepConfig.typeUtils.parseNCName(value) },
+            Ns.sequence to { value -> input.sequence = stepConfig.typeUtils.parseBoolean(value) },
+            Ns.primary to { value -> input.primary = stepConfig.typeUtils.parseBoolean(value) },
             Ns.select to { value -> input.select = XProcExpression.select(stepConfig, value) },
-            Ns.contentTypes to { value -> input.contentTypes = stepConfig.parseContentTypes(value) },
+            Ns.contentTypes to { value -> input.contentTypes = stepConfig.typeUtils.parseContentTypes(value) },
             Ns.href to { value -> input.href = XProcExpression.avt(stepConfig, value) },
-            Ns.excludeInlinePrefixes to { value -> stepConfig.parseExcludeInlinePrefixes(value) },
+            Ns.excludeInlinePrefixes to { value -> stepConfig.typeUtils.parseExcludeInlinePrefixes(value) },
         )
 
         processAttributes(node, input, attributeMapping)
@@ -289,13 +295,13 @@ class XplParser internal constructor(val builder: PipelineBuilder) {
         val stepConfig = output.stepConfig
 
         val attributeMapping = mapOf<QName, (String) -> Unit>(
-            Ns.port to { value -> output.port = stepConfig.parseNCName(value) },
-            Ns.sequence to { value -> output.sequence = stepConfig.parseBoolean(value) },
-            Ns.primary to { value -> output.primary = stepConfig.parseBoolean(value) },
-            Ns.contentTypes to { value -> output.contentTypes = stepConfig.parseContentTypes(value) },
+            Ns.port to { value -> output.port = stepConfig.typeUtils.parseNCName(value) },
+            Ns.sequence to { value -> output.sequence = stepConfig.typeUtils.parseBoolean(value) },
+            Ns.primary to { value -> output.primary = stepConfig.typeUtils.parseBoolean(value) },
+            Ns.contentTypes to { value -> output.contentTypes = stepConfig.typeUtils.parseContentTypes(value) },
             Ns.href to { value -> output.href = XProcExpression.avt(stepConfig, value) },
             Ns.pipe to { value -> output.pipe = value },
-            Ns.excludeInlinePrefixes to { value -> stepConfig.parseExcludeInlinePrefixes(value) },
+            Ns.excludeInlinePrefixes to { value -> stepConfig.typeUtils.parseExcludeInlinePrefixes(value) },
             Ns.serialization to { value -> output.serialization = XProcExpression.select(stepConfig, value) },
         )
 
@@ -314,7 +320,7 @@ class XplParser internal constructor(val builder: PipelineBuilder) {
 
     private fun parseOption(decl: DeclareStepInstruction, node: ElementNode) {
         val name = try {
-            node.attributes[Ns.name]?.let { decl.stepConfig.parseQName(it) }
+            node.attributes[Ns.name]?.let { decl.stepConfig.typeUtils.parseQName(it) }
         } catch (ex: XProcException) {
             when (ex.error.code) {
                 NsErr.xd(69) -> throw decl.stepConfig.exception(XProcError.xsUnboundPrefix(node.attributes[Ns.name]!!))
@@ -332,12 +338,12 @@ class XplParser internal constructor(val builder: PipelineBuilder) {
 
         val attributeMapping = mapOf<QName, (String) -> Unit>(
             Ns.name to { _ -> },
-            Ns.asType to { value -> option.asType = stepConfig.parseSequenceType(value) },
-            Ns.values to { value -> option.values = stepConfig.parseValues(value) },
-            Ns.static to { value -> option.static = stepConfig.parseBoolean(value) },
-            Ns.required to { value -> option.required = stepConfig.parseBoolean(value) },
+            Ns.asType to { value -> option.asType = stepConfig.typeUtils.parseSequenceType(value) },
+            Ns.values to { value -> option.values = stepConfig.typeUtils.parseValues(value) },
+            Ns.static to { value -> option.static = stepConfig.typeUtils.parseBoolean(value) },
+            Ns.required to { value -> option.required = stepConfig.typeUtils.parseBoolean(value) },
             Ns.select to { value -> option.select = XProcExpression.select(stepConfig, value) },
-            Ns.visibility to { value -> option.visibility = stepConfig.parseVisibility(value) }
+            Ns.visibility to { value -> option.visibility = stepConfig.typeUtils.parseVisibility(value) }
         )
 
         processAttributes(node, option, attributeMapping)
@@ -346,7 +352,7 @@ class XplParser internal constructor(val builder: PipelineBuilder) {
 
     private fun parseVariable(decl: CompoundStepDeclaration, node: ElementNode) {
         val name = try {
-            node.attributes[Ns.name]?.let { decl.stepConfig.parseQName(it) }
+            node.attributes[Ns.name]?.let { decl.stepConfig.typeUtils.parseQName(it) }
         } catch (ex: XProcException) {
             throw ex.error.asStatic().exception()
         }
@@ -360,12 +366,12 @@ class XplParser internal constructor(val builder: PipelineBuilder) {
 
         val attributeMapping = mapOf<QName, (String) -> Unit>(
             Ns.name to { _ -> },
-            Ns.asType to { value -> variable.asType = stepConfig.parseSequenceType(value) },
+            Ns.asType to { value -> variable.asType = stepConfig.typeUtils.parseSequenceType(value) },
             Ns.select to { _ -> }, // see below
-            Ns.collection to { value -> variable.collection = stepConfig.parseBoolean(value) },
+            Ns.collection to { value -> variable.collection = stepConfig.typeUtils.parseBoolean(value) },
             Ns.href to { value -> variable.href = XProcExpression.avt(stepConfig, value) },
             Ns.pipe to { value -> variable.pipe = value },
-            Ns.excludeInlinePrefixes to { value -> stepConfig.parseExcludeInlinePrefixes(value) }
+            Ns.excludeInlinePrefixes to { value -> stepConfig.typeUtils.parseExcludeInlinePrefixes(value) }
         )
 
         processAttributes(node, variable, attributeMapping)
@@ -390,7 +396,7 @@ class XplParser internal constructor(val builder: PipelineBuilder) {
     }
 
     private fun parseWithOption(decl: StepDeclaration, node: ElementNode) {
-        val name = node.attributes[Ns.name]?.let { decl.stepConfig.parseQName(it) }
+        val name = node.attributes[Ns.name]?.let { decl.stepConfig.typeUtils.parseQName(it) }
         if (name == null) {
             throw decl.stepConfig.exception(XProcError.xsMissingRequiredAttribute(Ns.name))
         }
@@ -405,16 +411,16 @@ class XplParser internal constructor(val builder: PipelineBuilder) {
 
         val attributeMapping = mutableMapOf<QName, (String) -> Unit>(
             Ns.name to { _ -> },
-            Ns.asType to { value -> withOption.asType = stepConfig.parseSequenceType(value) },
+            Ns.asType to { value -> withOption.asType = stepConfig.typeUtils.parseSequenceType(value) },
             Ns.select to { value -> withOption.select = XProcExpression.select(stepConfig, value) },
-            Ns.collection to { value -> withOption.collection = stepConfig.parseBoolean(value) },
+            Ns.collection to { value -> withOption.collection = stepConfig.typeUtils.parseBoolean(value) },
             Ns.href to { value -> withOption.href = XProcExpression.avt(stepConfig, value) },
             Ns.pipe to { value -> withOption.pipe = value },
-            Ns.excludeInlinePrefixes to { value -> stepConfig.parseExcludeInlinePrefixes(value) }
+            Ns.excludeInlinePrefixes to { value -> stepConfig.typeUtils.parseExcludeInlinePrefixes(value) }
         )
 
         if (node.node.nodeName == NsP.runOption) {
-            attributeMapping[Ns.static] = { value -> (withOption as RunOptionInstruction).static = stepConfig.parseBoolean(value) }
+            attributeMapping[Ns.static] = { value -> (withOption as RunOptionInstruction).static = stepConfig.typeUtils.parseBoolean(value) }
         }
 
         processAttributes(node, withOption, attributeMapping)
@@ -474,7 +480,7 @@ class XplParser internal constructor(val builder: PipelineBuilder) {
             Ns.documentProperties to { value -> inline.documentProperties = XProcExpression.select(inline.stepConfig, value) },
             Ns.contentType to { value -> inline.contentType = MediaType.parse(value) },
             Ns.encoding to { value -> inline.encoding = value},
-            Ns.excludeInlinePrefixes to { value -> inline.stepConfig.parseExcludeInlinePrefixes(value) }
+            Ns.excludeInlinePrefixes to { value -> inline.stepConfig.typeUtils.parseExcludeInlinePrefixes(value) }
         )
 
         processAttributes(node, inline, attributeMapping)
@@ -518,21 +524,15 @@ class XplParser internal constructor(val builder: PipelineBuilder) {
         instruction.import(container)
     }
 
-    private fun parseImportFunctions(instruction: StepContainerInterface, node: ElementNode) {
-        val href = node.attributes[Ns.href] ?: throw XProcError.xsMissingRequiredAttribute(Ns.href).at(node.node).exception()
-        val contentType = node.attributes[Ns.contentType]?.let { MediaType.parse(it) }
-        val namespace = node.attributes[Ns.namespace]
-
-        val stepConfig = (instruction as XProcInstruction).stepConfig
-        val uri = stepConfig.resolve(href)
-
+    private fun parseImportFunctions(instruction: StepContainerInterface, node: ImportFunctionsNode) {
+        val contentType = node.contentType?.let { MediaType.parse(it) }
         val attributeMapping = mapOf<QName, (String) -> Unit>(
             Ns.href to { _ -> Unit },
             Ns.contentType to { _ -> Unit },
             Ns.namespace to { _ -> Unit },
         )
 
-        val import = instruction.importFunctions(uri, contentType, namespace)
+        val import = instruction.importFunctions(node.href, contentType, node.namespace)
 
         processAttributes(node, import, attributeMapping)
         processElements(node, import, emptyMap())
@@ -552,15 +552,15 @@ class XplParser internal constructor(val builder: PipelineBuilder) {
         stepConfig.updateWith(node.node)
 
         val attributeMapping = mutableMapOf<QName, (String) -> Unit>(
-            Ns.port to { value -> input.port = stepConfig.parseNCName(value) },
+            Ns.port to { value -> input.port = stepConfig.typeUtils.parseNCName(value) },
             Ns.select to { value -> input.select = XProcExpression.select(stepConfig, value) },
             Ns.href to { value -> input.href = XProcExpression.avt(stepConfig, value) },
             Ns.pipe to { value -> input.pipe = value },
-            Ns.excludeInlinePrefixes to { value -> stepConfig.parseExcludeInlinePrefixes(value) },
+            Ns.excludeInlinePrefixes to { value -> stepConfig.typeUtils.parseExcludeInlinePrefixes(value) },
         )
 
         if (decl is RunInstruction) {
-            attributeMapping[Ns.primary] = { value -> input.primary = stepConfig.parseBoolean(value) }
+            attributeMapping[Ns.primary] = { value -> input.primary = stepConfig.typeUtils.parseBoolean(value) }
         }
 
         processAttributes(node, input, attributeMapping)
@@ -619,7 +619,7 @@ class XplParser internal constructor(val builder: PipelineBuilder) {
 
     private fun parseStaticBoolean(stepConfig: InstructionConfiguration, value: String): Boolean {
         try {
-            return stepConfig.parseBoolean(value)
+            return stepConfig.typeUtils.parseBoolean(value)
         } catch (ex: XProcException) {
             throw ex.error.asStatic().exception()
         }
@@ -652,7 +652,7 @@ class XplParser internal constructor(val builder: PipelineBuilder) {
         val attributeMapping = mapOf<QName, (String) -> Unit>(
             Ns.name to { value -> ifInstr.name = value },
             Ns.test to { value -> ifInstr.test = value },
-            Ns.collection to { value -> ifInstr.collection = stepConfig.parseBoolean(value) }
+            Ns.collection to { value -> ifInstr.collection = stepConfig.typeUtils.parseBoolean(value) }
         )
 
         processAttributes(node, ifInstr, attributeMapping)
@@ -1049,7 +1049,7 @@ class XplParser internal constructor(val builder: PipelineBuilder) {
                                 }
                                 val uri = child.node.baseURI.resolve(child.attributes[NsCx.href]!!)
                                 val info = try {
-                                    builder.pipelineContext.documentManager.load(uri, instruction.stepConfig)
+                                    builder.stepConfig.documentManager.load(uri, instruction.stepConfig)
                                 } catch (ex: Exception) {
                                     throw instruction.stepConfig.exception(XProcError.xiPipeinfoMustExist(ex.message ?: "???"))
                                 }
@@ -1126,7 +1126,7 @@ class XplParser internal constructor(val builder: PipelineBuilder) {
         val codes = mutableListOf<QName>()
         for (codeValue in value.split("\\s+".toRegex())) {
             try {
-                codes.add(stepConfig.parseQName(codeValue))
+                codes.add(stepConfig.typeUtils.parseQName(codeValue))
             } catch (ex: Exception) {
                 if (ex is XProcException) {
                     throw stepConfig.exception(XProcError.xsCatchCodesNotEQName(codeValue))
@@ -1171,7 +1171,7 @@ class XplParser internal constructor(val builder: PipelineBuilder) {
         builder.startDocument(node.baseUri)
 
         // Will only apply if p:inline was used because nodes is only ever one element node for implicits
-        val inlineTrimWhitespace = stepConfig.xmlCalabash.xmlCalabashConfig.inlineTrimWhitespace
+        val inlineTrimWhitespace = stepConfig.xmlCalabashConfig.inlineTrimWhitespace
 
         for ((index, child) in nodes.withIndex()) {
             if (inlineTrimWhitespace && child is TextNode) {
@@ -1256,7 +1256,7 @@ class XplParser internal constructor(val builder: PipelineBuilder) {
                     }
                 }
 
-                val attMap = stepConfig.attributeMap(attrMap)
+                val attMap = stepConfig.typeUtils.attributeMap(attrMap)
                 val elemName = FingerprintedQName(nodePrefix, nodeNamespace, nodeLocalName)
                 builder.location = BuilderLocation(node.node)
                 builder.addStartElement(elemName, attMap, Untyped.getInstance(), nsMap, adjBaseUri)
@@ -1275,7 +1275,7 @@ class XplParser internal constructor(val builder: PipelineBuilder) {
         if (child is ElementNode && child.node.nodeName.namespaceUri == NsP.namespace
             && child.attributes.contains(Ns.excludeInlinePrefixes)) {
             val prefixes = child.attributes[Ns.excludeInlinePrefixes]!!
-            excludeNamespaceUris.addAll(stepConfig.parseExcludeInlinePrefixes(prefixes))
+            excludeNamespaceUris.addAll(stepConfig.typeUtils.parseExcludeInlinePrefixes(prefixes))
         }
         if (child.parent is ElementNode) {
             excludeNamespaces(stepConfig, excludeNamespaceUris, child.parent)

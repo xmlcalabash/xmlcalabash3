@@ -43,7 +43,7 @@ class SystemPropertyFunction(private val config: SaxonConfiguration): ExtensionF
             val lexicalQName = (arguments!![0].head() as Item).stringValue
             val structuredQName = StructuredQName.fromLexicalQName(lexicalQName, false, true, staticContext?.namespaceResolver)
             val propertyName = QName(structuredQName.namespaceUri, structuredQName.localPart)
-            val dynamicContext = config.environment.getExecutionContext()
+            val dynamicContext = config.getExecutionContext()
             val env = dynamicContext.stepConfig.environment
 
             val value = when (propertyName) {

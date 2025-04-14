@@ -1,26 +1,15 @@
 package com.xmlcalabash.config
 
-import com.xmlcalabash.io.MediaType
+import com.xmlcalabash.XmlCalabashBuilder
 import com.xmlcalabash.exceptions.XProcError
+import com.xmlcalabash.io.MediaType
 import com.xmlcalabash.namespace.Ns
-import com.xmlcalabash.namespace.NsXs
-import com.xmlcalabash.spi.PagedMediaManager
-import com.xmlcalabash.spi.PagedMediaServiceProvider
-import com.xmlcalabash.util.DefaultMessagePrinter
-import com.xmlcalabash.util.DefaultXmlCalabashConfiguration
-import com.xmlcalabash.util.S9Api
-import com.xmlcalabash.util.SaxonTreeBuilder
-import com.xmlcalabash.util.Verbosity
-import com.xmlcalabash.util.spi.StandardPagedMediaProvider
-import com.xmlcalabash.visualizers.Detail
-import com.xmlcalabash.visualizers.Plain
-import com.xmlcalabash.visualizers.Silent
+import com.xmlcalabash.util.*
 import net.sf.saxon.lib.FeatureIndex
 import net.sf.saxon.om.NamespaceUri
 import net.sf.saxon.s9api.*
 import org.apache.logging.log4j.kotlin.logger
 import org.xml.sax.InputSource
-import org.xmlresolver.utils.URIUtils
 import java.io.File
 import java.io.FileInputStream
 import java.io.IOException
@@ -28,7 +17,7 @@ import java.net.URI
 import java.nio.charset.Charset
 import javax.xml.transform.sax.SAXSource
 
-class ConfigurationLoader private constructor(private val config: XmlCalabashConfiguration) {
+class ConfigurationLoader(val builder: XmlCalabashBuilder) {
     companion object {
         private val ns = NamespaceUri.of("https://xmlcalabash.com/ns/configuration")
         private val ccXmlCalabash = QName(ns, "cc:xml-calabash")
@@ -68,30 +57,23 @@ class ConfigurationLoader private constructor(private val config: XmlCalabashCon
         private val _verbosity = QName("verbosity")
         private val _xslFormatter = QName("xsl-formatter")
         private val _bufferSize = QName("buffer-size")
-
-        fun load(source: File): XmlCalabashConfiguration {
-            return load(source, DefaultXmlCalabashConfiguration())
-        }
-
-        fun load(source: File, config: XmlCalabashConfiguration): XmlCalabashConfiguration {
-            val isrc = InputSource(FileInputStream(source))
-            isrc.systemId = source.toURI().toString()
-            return load(isrc, config)
-        }
-
-        fun load(source: InputSource): XmlCalabashConfiguration {
-            return load(source, DefaultXmlCalabashConfiguration())
-        }
-
-        fun load(source: InputSource, config: XmlCalabashConfiguration): XmlCalabashConfiguration {
-            val loader = ConfigurationLoader(config)
-            return loader.load(source)
-        }
     }
 
     private lateinit var configFile: String
     private val uninitializedFormatters = mutableSetOf<URI>()
-    private fun load(source: InputSource): XmlCalabashConfiguration {
+
+    fun load(source: File) {
+        val isrc = InputSource(FileInputStream(source))
+        isrc.systemId = source.toURI().toString()
+        return load(isrc)
+    }
+
+    fun load(source: URI) {
+        val isrc = InputSource(source.toString())
+        return load(isrc)
+    }
+
+    fun load(source: InputSource) {
         configFile = source.systemId ?: ""
 
         val processor = Processor(false)
@@ -105,28 +87,10 @@ class ConfigurationLoader private constructor(private val config: XmlCalabashCon
             throw XProcError.xiConfigurationInvalid(configFile).exception()
         }
 
-        val managers = mutableListOf<PagedMediaManager>()
-        for (provider in PagedMediaServiceProvider.providers()) {
-            val manager = provider.create()
-            managers.add(manager)
-            uninitializedFormatters.addAll(manager.formatters())
-        }
-        config.pagedMediaManagers = managers
-
-        val config = parse(root)
-
-        for (manager in managers) {
-            for (formatter in manager.formatters()) {
-                if (formatter in uninitializedFormatters) {
-                    manager.configure(formatter, emptyMap())
-                }
-            }
-        }
-
-        return config
+        parse(root)
     }
 
-    private fun parse(root: XdmNode): XmlCalabashConfiguration {
+    private fun parse(root: XdmNode) {
         checkAttributes(root, listOf(), listOf(_licensed, _saxonConfiguration, _mpt,
             _piped_io, _verbosity, _console_output_encoding,
             Ns.validationMode, Ns.tryNamespaces, Ns.useLocationHints))
@@ -134,15 +98,12 @@ class ConfigurationLoader private constructor(private val config: XmlCalabashCon
         val saxonConfig = root.getAttributeValue(_saxonConfiguration)
         if (saxonConfig != null) {
             val uri = root.baseURI!!.resolve(saxonConfig)
-            config.saxonConfigurationFile = File(uri.path)
-            if (!config.saxonConfigurationFile!!.exists()) {
-                throw XProcError.xiConfigurationInvalid(configFile, "file does not exist: ${saxonConfig}").exception()
-            }
+            builder.setSaxonConfigurationFile(File(uri.path))
         }
 
         if (root.getAttributeValue(_mpt) != null) {
             try {
-                config.mpt = root.getAttributeValue(_mpt).toDouble()
+                builder._mpt = root.getAttributeValue(_mpt).toDouble()
             } catch (_: NumberFormatException) {
                 // nevermind, it's not important
                 logger.debug { "mpt must be a number: ${root.getAttributeValue(_mpt)}"}
@@ -150,42 +111,39 @@ class ConfigurationLoader private constructor(private val config: XmlCalabashCon
         }
 
         if (root.getAttributeValue(_licensed) != null) {
-            config.licensed = booleanAttribute(root.getAttributeValue(_licensed), "licensed")
+            builder.setLicensed(booleanAttribute(root.getAttributeValue(_licensed), "licensed"))
         }
 
-        config.pipe = booleanAttribute(root.getAttributeValue(_piped_io), "piped-io")
-        config.verbosity = verbosityAttribute(root.getAttributeValue(_verbosity))
+        builder.setPipe(booleanAttribute(root.getAttributeValue(_piped_io), "piped-io"))
+        builder.setVerbosity(verbosityAttribute(root.getAttributeValue(_verbosity)))
 
         when (root.getAttributeValue(Ns.validationMode)) {
             null -> Unit
-            "strict" -> config.validationMode = ValidationMode.STRICT
-            "lax" -> config.validationMode = ValidationMode.LAX
-            else -> throw XProcError.xiConfigurationInvalid(configFile, "validation mode: ${root.getAttributeValue(Ns.validationMode)}").exception()
+            "strict" -> builder.setValidationMode(ValidationMode.STRICT)
+            "lax" -> builder.setValidationMode(ValidationMode.LAX)
+            else -> throw XProcError.xiConfigurationInvalid(configFile,
+                "validation mode: ${root.getAttributeValue(Ns.validationMode)}").exception()
         }
 
-        config.tryNamespaces = booleanAttribute(root.getAttributeValue(Ns.tryNamespaces), "try-namespaces")
-        config.useLocationHints = booleanAttribute(root.getAttributeValue(Ns.useLocationHints), "use-location-hints")
+        builder.setTryNamespaces(booleanAttribute(root.getAttributeValue(Ns.tryNamespaces), "try-namespaces"))
+        builder.setUseLocationHints(booleanAttribute(root.getAttributeValue(Ns.useLocationHints), "use-location-hints"))
 
         // If this is Windows, assume the console output is in Windows CP 1252
         if (System.getProperty("os.name")?.lowercase()?.startsWith("windows") == true) {
-            config.consoleEncoding = "windows-1252"
+            builder.setConsoleEncoding("windows-1252")
         }
 
         if (root.getAttributeValue(_console_output_encoding) != null) {
             val encoding = root.getAttributeValue(_console_output_encoding)
             try {
                 if (Charset.isSupported(encoding)) {
-                    config.consoleEncoding = encoding
+                    builder.setConsoleEncoding(encoding)
                 } else {
-                    logger.warn { "Console encoding is not supported: ${encoding}, using ${config.consoleEncoding}" }
+                    logger.warn { "Console encoding is not supported: ${encoding}" }
                 }
             } catch (_: IOException) {
-                logger.warn { "Console encoding is not supported: ${encoding}, using ${config.consoleEncoding}" }
+                logger.warn { "Console encoding is not supported: ${encoding}" }
             }
-        }
-
-        if (config.consoleEncoding.lowercase() != XmlCalabashConfiguration.DEFAULT_CONSOLE_ENCODING) {
-            config.messagePrinter = DefaultMessagePrinter(config.consoleEncoding)
         }
 
         for (child in root.axisIterator(Axis.CHILD)) {
@@ -223,8 +181,6 @@ class ConfigurationLoader private constructor(private val config: XmlCalabashCon
                 else -> Unit
             }
         }
-
-        return config
     }
 
     private fun booleanAttribute(value: String?, name: String): Boolean {
@@ -253,16 +209,13 @@ class ConfigurationLoader private constructor(private val config: XmlCalabashCon
 
     private fun parseProxy(node: XdmNode) {
         checkAttributes(node, listOf(_scheme, _uri))
-        val proxies = mutableMapOf<String,String>()
-        proxies.putAll(config.proxies)
-        proxies[node.getAttributeValue(_scheme)!!] = node.getAttributeValue(_uri)!!
-        config.proxies = proxies
+        builder.addProxy(node.getAttributeValue(_scheme)!!, node.getAttributeValue(_uri)!!)
     }
 
     private fun parseThreading(node: XdmNode) {
         checkAttributes(node, listOf(_count))
         try {
-            config.threadPoolSize = node.getAttributeValue(_count)!!.toInt()
+            builder.setThreadPoolSize(node.getAttributeValue(_count)!!.toInt())
         } catch (_: NumberFormatException) {
             throw XProcError.xiInvalidSaxonConfigurationProperty("cc:threading", node.getAttributeValue(_count)!!).exception()
         }
@@ -272,7 +225,7 @@ class ConfigurationLoader private constructor(private val config: XmlCalabashCon
         checkAttributes(node, listOf(_trimWhitespace))
         val value = node.getAttributeValue(_trimWhitespace)!!
         if (value == "true" || value == "false") {
-            config.inlineTrimWhitespace = value == "true"
+            builder.setInlineTrimWhitespace(value == "true")
         } else {
             throw XProcError.xiUnrecognizedConfigurationValue(node.nodeName, _trimWhitespace, value).exception()
         }
@@ -287,80 +240,60 @@ class ConfigurationLoader private constructor(private val config: XmlCalabashCon
         if (!dot.canExecute()) {
             throw XProcError.xiCannotExecuteGraphviz(dot.absolutePath).exception()
         }
-        config.graphviz = dot
+        builder.setGraphviz(dot)
 
         val style = node.getAttributeValue(_style)
         if (style != null) {
-            config.graphStyle = node.baseURI.resolve(style)
+            builder.setGraphStyle(node.baseURI.resolve(style))
         }
     }
 
     private fun parseSaxonConfigurationProperty(node: XdmNode) {
         checkAttributes(node, listOf(Ns.name, _value))
 
-        val properties = mutableMapOf<String,String>()
-        properties.putAll(config.saxonConfigurationProperties)
-
         val key = node.getAttributeValue(Ns.name)!!
         val value = node.getAttributeValue(_value)!!
         val data = FeatureIndex.getData(key) ?: throw XProcError.xiUnrecognizedSaxonConfigurationProperty(key).exception()
         if (data.type == Boolean::class.java) {
             if (value == "true" || value == "false") {
-                properties[key] = value
+                builder.addSaxonConfigurationProperty(key, value)
             } else {
                 throw XProcError.xiInvalidSaxonConfigurationProperty(key, value).exception()
             }
         } else {
-            properties[key] = value
+            builder.addSaxonConfigurationProperty(key, value)
         }
-
-        config.saxonConfigurationProperties = properties
     }
 
     private fun parseSerialization(node: XdmNode) {
-        val ctype = node.getAttributeValue(Ns.contentType)
-        if (ctype == null) {
+        if (node.getAttributeValue(Ns.contentType) == null) {
             throw XProcError.xiMissingConfigurationAttribute(node.nodeName, Ns.contentType).exception()
         }
+        val ctype = MediaType.parse(node.getAttributeValue(Ns.contentType))
+
         val map = mutableMapOf<QName,String>()
         for (attr in node.axisIterator(Axis.ATTRIBUTE)) {
             if (attr.nodeName == Ns.contentType) {
                 continue
             }
-            map[attr.nodeName] = attr.stringValue
+            builder.addSerializationProperty(ctype, attr.nodeName, attr.stringValue)
         }
-
-        val serialization = mutableMapOf<MediaType, Map<QName, String>>()
-        serialization.putAll(config.serialization)
-        serialization[MediaType.parse(ctype)] = map
-
-        config.serialization = serialization
     }
 
     private fun parseMimetype(node: XdmNode) {
         checkAttributes(node, listOf(Ns.contentType, _extensions))
-
-        val mimetypes = mutableMapOf<String, String>()
-        mimetypes.putAll(config.mimetypes)
-        mimetypes[node.getAttributeValue(Ns.contentType)!!] = node.getAttributeValue(_extensions)!!
-
-        config.mimetypes = mimetypes
+        builder.addMimetype(node.getAttributeValue(Ns.contentType), node.getAttributeValue(_extensions).split("\\s+".toRegex()))
     }
 
     private fun parseSendmail(node: XdmNode) {
         checkAttributes(node, listOf(_host), listOf(_port, _username, _password))
 
-        val sendmail = mutableMapOf<String, String>()
-        sendmail.putAll(config.sendmail)
-
         for (attr in listOf(_host, _port, _username, _password)) {
-            val value = node.getAttributeValue(_host)
+            val value = node.getAttributeValue(attr)
             if (value != null) {
-                sendmail[attr.localName] = value
+                builder.addSendmailProperty(attr.localName, value)
             }
         }
-
-        config.sendmail = sendmail
     }
 
     private fun parsePagedMedia(node: XdmNode) {
@@ -380,43 +313,11 @@ class ConfigurationLoader private constructor(private val config: XmlCalabashCon
         }
 
         if (cssFormatter != null) {
-            val processors = mutableListOf<URI>()
-            processors.addAll(config.pagedMediaCssProcessors)
-            processors.add(cssFormatter)
-            config.pagedMediaCssProcessors = processors
-
-            if (cssFormatter == StandardPagedMediaProvider.genericCssFormatter) {
-                if (properties.isNotEmpty()) {
-                    throw XProcError.xiForbiddenConfigurationAttributes(cssFormatter).exception()
-                }
-            } else {
-                uninitializedFormatters.remove(cssFormatter)
-                for (manager in config.pagedMediaManagers) {
-                    if (manager.formatterSupported(cssFormatter)) {
-                        manager.configure(cssFormatter, properties)
-                    }
-                }
-            }
+            builder.addPagedMediaCssProcessor(cssFormatter, properties)
         }
 
         if (xslFormatter != null) {
-            val processors = mutableListOf<URI>()
-            processors.addAll(config.pagedMediaXslProcessors)
-            processors.add(xslFormatter)
-            config.pagedMediaXslProcessors = processors
-
-            if (xslFormatter == StandardPagedMediaProvider.genericXslFormatter) {
-                if (properties.isNotEmpty()) {
-                    throw XProcError.xiForbiddenConfigurationAttributes(xslFormatter).exception()
-                }
-            } else {
-                uninitializedFormatters.remove(xslFormatter)
-                for (manager in config.pagedMediaManagers) {
-                    if (manager.formatterSupported(xslFormatter)) {
-                        manager.configure(xslFormatter, properties)
-                    }
-                }
-            }
+            builder.addPagedMediaXslProcessor(xslFormatter, properties)
         }
     }
 
@@ -432,7 +333,7 @@ class ConfigurationLoader private constructor(private val config: XmlCalabashCon
 
     private fun parseMessageReporter(node: XdmNode) {
         checkAttributes(node, listOf(_bufferSize))
-        node.getAttributeValue(_bufferSize)?.let { config.messageBufferSize = it.toInt() }
+        node.getAttributeValue(_bufferSize)?.let { builder.setMessageBufferSize(it.toInt()) }
     }
 
     private fun parseVisualizer(node: XdmNode) {
@@ -444,12 +345,8 @@ class ConfigurationLoader private constructor(private val config: XmlCalabashCon
             }
         }
 
-        when (value) {
-            null -> Unit
-            "silent" -> config.visualizer = Silent(options)
-            "plain" -> config.visualizer = Plain(config.messagePrinter, options)
-            "detail" -> config.visualizer = Detail(config.messagePrinter, options)
-            else -> throw XProcError.xiUnrecognizedConfigurationValue(ccVisualizer, Ns.name, value).exception()
+        if (value != null) {
+            builder.setVisualizer(value, options)
         }
     }
 
@@ -458,62 +355,20 @@ class ConfigurationLoader private constructor(private val config: XmlCalabashCon
         for (attr in node.axisIterator(Axis.ATTRIBUTE)) {
             map[attr.nodeName] = attr.stringValue
         }
-        val list = mutableListOf<Map<QName, String>>()
-        if (node.nodeName in config.other) {
-            list.addAll(config.other[node.nodeName]!!)
-        }
-        list.add(map)
-
-        config.other[node.nodeName] = list
+        builder.addOther(node.nodeName, map)
     }
 
     private fun parseXmlSchema(node: XdmNode) {
-        checkAttributes(node, emptyList(), listOf(Ns.href))
-        val href = node.getAttributeValue(Ns.href)
-        if (href != null) {
-            val builder = node.processor.newDocumentBuilder()
-            val destination = XdmDestination()
-            val source = SAXSource(InputSource(href))
-            builder.parse(source, destination)
-            val schema = S9Api.documentElement(destination.xdmNode)
-            if (schema.nodeName == NsXs.schema) {
-                config.xmlSchemaDocuments.add(schema)
-            } else {
-                throw XProcError.xiNotAnXmlSchema(schema.nodeName).exception()
-            }
-            if (node.children().firstOrNull() != null) {
-                throw XProcError.xiXmlSchemaContentOrHref().exception()
-            }
-        } else {
-            for (child in node.axisIterator(Axis.CHILD)) {
-                when (child.nodeKind) {
-                    XdmNodeKind.COMMENT -> Unit
-                    XdmNodeKind.PROCESSING_INSTRUCTION -> Unit
-                    XdmNodeKind.TEXT -> {
-                        if (child.underlyingNode.stringValue.trim().isNotEmpty()) {
-                            throw XProcError.xiNonWhitespaceTextInSchema().exception()
-                        }
-                    }
-                    else -> { // element
-                        if (child.nodeName == NsXs.schema) {
-                            val builder = SaxonTreeBuilder(child.processor)
-                            builder.startDocument(node.baseURI)
-                            builder.addSubtree(child)
-                            builder.endDocument()
-                            val schema = S9Api.documentElement(builder.result)
-                            config.xmlSchemaDocuments.add(schema)
-                        } else {
-                            throw XProcError.xiNotAnXmlSchema(child.nodeName).exception()
-                        }
-                    }
-                }
-            }
+        checkAttributes(node, listOf(Ns.href))
+        builder.addXmlSchemaDocument(node.baseURI.resolve(node.getAttributeValue(Ns.href)))
+        if (node.children().firstOrNull() != null) {
+            throw XProcError.xiConfigurationXmlSchemaElementMustBeEmpty().exception()
         }
     }
 
     private fun parseCatalog(node: XdmNode) {
         checkAttributes(node, listOf(Ns.href))
-        config.xmlCatalogs.add(node.baseURI.resolve(node.getAttributeValue(Ns.href)))
+        builder.addXmlCatalog(node.baseURI.resolve(node.getAttributeValue(Ns.href)))
         if (node.children().firstOrNull() != null) {
             throw XProcError.xiConfigurationCatalogElementMustBeEmpty().exception()
         }

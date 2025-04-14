@@ -52,7 +52,7 @@ class GraphVisualization private constructor(val graph: Graph, private val filen
         builder = SaxonTreeBuilder(root.step.stepConfig)
         builder.startDocument(null)
         builder.addStartElement(NsDescription.g("graph", gPrefix),
-            stepConfig.stringAttributeMap(mapOf("filename" to filenameMap[root.step.id])),
+            stepConfig.typeUtils.stringAttributeMap(mapOf("filename" to filenameMap[root.step.id])),
             nsmap)
 
         for (node in nodes.filterIsInstance<InputNode>()) {
@@ -80,7 +80,7 @@ class GraphVisualization private constructor(val graph: Graph, private val filen
                 "to-step" to node.port.parent.id,
                 "to-port" to node.port.name
             )
-            builder.addStartElement(NsDescription.g("edge", gPrefix), stepConfig.stringAttributeMap(attr), modelMap[root]!!.nsmap)
+            builder.addStartElement(NsDescription.g("edge", gPrefix), stepConfig.typeUtils.stringAttributeMap(attr), modelMap[root]!!.nsmap)
             builder.addEndElement()
         }
 
@@ -92,7 +92,7 @@ class GraphVisualization private constructor(val graph: Graph, private val filen
                 "from-port" to node.port.name,
                 "to" to node.id,
             )
-            builder.addStartElement(NsDescription.g("edge", gPrefix), stepConfig.stringAttributeMap(attr), modelMap[root]!!.nsmap)
+            builder.addStartElement(NsDescription.g("edge", gPrefix), stepConfig.typeUtils.stringAttributeMap(attr), modelMap[root]!!.nsmap)
             builder.addEndElement()
         }
 
@@ -108,7 +108,7 @@ class GraphVisualization private constructor(val graph: Graph, private val filen
                 "to-port" to edge.inputPort,
                 "implicit" to (if (edge.implicit) "true" else null)
             )
-            builder.addStartElement(NsDescription.g("edge", gPrefix), stepConfig.stringAttributeMap(attr), modelMap[root]!!.nsmap)
+            builder.addStartElement(NsDescription.g("edge", gPrefix), stepConfig.typeUtils.stringAttributeMap(attr), modelMap[root]!!.nsmap)
             builder.addEndElement()
         }
 
@@ -240,7 +240,7 @@ class GraphVisualization private constructor(val graph: Graph, private val filen
         }
 
         fun startElement(name: QName, attr: Map<String,String?>) {
-            builder.addStartElement(name, stepConfig.stringAttributeMap(attr), nsmap)
+            builder.addStartElement(name, stepConfig.typeUtils.stringAttributeMap(attr), nsmap)
         }
 
         fun endElement() {

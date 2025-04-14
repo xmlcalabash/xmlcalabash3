@@ -1,5 +1,6 @@
 package com.xmlcalabash.util.spi
 
+import com.xmlcalabash.config.StepConfiguration
 import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.io.MediaType
 import com.xmlcalabash.runtime.XProcStepConfiguration
@@ -13,7 +14,7 @@ class StandardContentTypeConverter(): ContentTypeConverter {
     }
 
     override fun convert(
-        stepConfig: XProcStepConfiguration,
+        stepConfig: StepConfiguration,
         doc: XProcDocument,
         convertTo: MediaType,
         serialization: Map<QName, XdmValue>

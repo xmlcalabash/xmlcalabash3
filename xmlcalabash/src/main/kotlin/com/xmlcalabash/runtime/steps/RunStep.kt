@@ -23,9 +23,9 @@ open class RunStep(config: XProcStepConfiguration, compound: CompoundStepModel):
         cache.putAll(head.cache)
         head.cacheClear()
 
-        stepConfig.environment.newExecutionContext(stepConfig)
+        stepConfig.saxonConfig.newExecutionContext(stepConfig)
 
-        val parser = stepConfig.xmlCalabash.newXProcParser()
+        val parser = stepConfig.environment.xmlCalabash.newXProcParser()
         for ((name, option) in runParams.options) {
             if (option.static) {
                 parser.builder.staticOptionsManager.compileTimeValue(name, option.staticValue!!)
@@ -108,7 +108,7 @@ open class RunStep(config: XProcStepConfiguration, compound: CompoundStepModel):
                 val mtype = option.asType?.underlyingSequenceType?.primaryType as MapType
                 if (mtype.keyType.primitiveItemType == BuiltInAtomicType.QNAME) {
                     if (value is XdmMap) {
-                        value = stepConfig.forceQNameKeys(value)
+                        value = stepConfig.typeUtils.forceQNameKeys(value)
                     } else {
                         throw stepConfig.exception(XProcError.xsXPathStaticError("Value is not a map"))
                     }
@@ -134,7 +134,7 @@ open class RunStep(config: XProcStepConfiguration, compound: CompoundStepModel):
 
         foot.run()
 
-        stepConfig.environment.releaseExecutionContext()
+        stepConfig.saxonConfig.releaseExecutionContext()
     }
 
     private fun listToValue(documents: List<XProcDocument>): XdmValue {

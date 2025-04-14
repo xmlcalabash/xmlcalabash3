@@ -1,21 +1,20 @@
 package com.xmlcalabash.xvrl
 
+import com.xmlcalabash.config.StepConfiguration
 import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.namespace.Ns
 import com.xmlcalabash.namespace.NsXml
 import com.xmlcalabash.namespace.NsXvrl
-import com.xmlcalabash.runtime.XProcStepConfiguration
 import com.xmlcalabash.util.SaxonTreeBuilder
 import net.sf.saxon.s9api.QName
-import net.sf.saxon.s9api.XdmNode
 
-class XvrlMessageElement private constructor(stepConfiguration: XProcStepConfiguration): XvrlElement(stepConfiguration) {
+class XvrlMessageElement private constructor(stepConfiguration: StepConfiguration): XvrlElement(stepConfiguration) {
     private val _content = mutableListOf<XvrlElement>()
     val content: List<XvrlElement>
         get() = _content
 
     companion object {
-        fun newInstance(stepConfig: XProcStepConfiguration, name: QName, text: String?, attr: Map<QName,String?> = emptyMap()): XvrlMessageElement {
+        fun newInstance(stepConfig: StepConfiguration, name: QName, text: String?, attr: Map<QName,String?> = emptyMap()): XvrlMessageElement {
             if (name.namespaceUri in listOf(NsXvrl.namespace)) {
                 throw stepConfig.exception(XProcError.xiXvrlIllegalMessageName(name))
             }
@@ -27,7 +26,7 @@ class XvrlMessageElement private constructor(stepConfiguration: XProcStepConfigu
             return message
         }
 
-        fun newInstance(stepConfig: XProcStepConfiguration, name: QName, valueOf: XvrlValueOf, attr: Map<QName,String?> = emptyMap()): XvrlMessageElement {
+        fun newInstance(stepConfig: StepConfiguration, name: QName, valueOf: XvrlValueOf, attr: Map<QName,String?> = emptyMap()): XvrlMessageElement {
             if (name.namespaceUri in listOf(NsXvrl.namespace)) {
                 throw stepConfig.exception(XProcError.xiXvrlIllegalMessageName(name))
             }
@@ -38,7 +37,7 @@ class XvrlMessageElement private constructor(stepConfiguration: XProcStepConfigu
             return message
         }
 
-        fun newInstance(stepConfig: XProcStepConfiguration, name: QName, message: XvrlMessageElement, attr: Map<QName,String?> = emptyMap()): XvrlMessageElement {
+        fun newInstance(stepConfig: StepConfiguration, name: QName, message: XvrlMessageElement, attr: Map<QName,String?> = emptyMap()): XvrlMessageElement {
             if (name.namespaceUri in listOf(NsXvrl.namespace)) {
                 throw stepConfig.exception(XProcError.xiXvrlIllegalMessageName(name))
             }
@@ -52,7 +51,7 @@ class XvrlMessageElement private constructor(stepConfiguration: XProcStepConfigu
 
     val name: QName
         get() {
-            return stepConfig.parseQName(attributes[Ns.name]!!)
+            return stepConfig.typeUtils.parseQName(attributes[Ns.name]!!)
         }
 
     fun clear() {
@@ -65,7 +64,7 @@ class XvrlMessageElement private constructor(stepConfiguration: XProcStepConfigu
     }
 
     /*
-            fun newInstance(stepConfig: XProcStepConfiguration, name: QName, text: String?, attr: Map<QName,String?> = emptyMap()): XvrlMessageElement {
+            fun newInstance(stepConfig: StepConfiguration, name: QName, text: String?, attr: Map<QName,String?> = emptyMap()): XvrlMessageElement {
             if (name.namespaceUri in listOf(NsXvrl.namespace)) {
                 throw stepConfig.exception(XProcError.xiXvrlIllegalMessageName(name))
             }
@@ -77,7 +76,7 @@ class XvrlMessageElement private constructor(stepConfiguration: XProcStepConfigu
             return message
         }
 
-        fun newInstance(stepConfig: XProcStepConfiguration, name: QName, valueOf: XvrlValueOf, attr: Map<QName,String?> = emptyMap()): XvrlMessageElement {
+        fun newInstance(stepConfig: StepConfiguration, name: QName, valueOf: XvrlValueOf, attr: Map<QName,String?> = emptyMap()): XvrlMessageElement {
             if (name.namespaceUri in listOf(NsXvrl.namespace)) {
                 throw stepConfig.exception(XProcError.xiXvrlIllegalMessageName(name))
             }
@@ -88,7 +87,7 @@ class XvrlMessageElement private constructor(stepConfiguration: XProcStepConfigu
             return message
         }
 
-        fun newInstance(stepConfig: XProcStepConfiguration, name: QName, message: XvrlMessageElement, attr: Map<QName,String?> = emptyMap()): XvrlMessageElement {
+        fun newInstance(stepConfig: StepConfiguration, name: QName, message: XvrlMessageElement, attr: Map<QName,String?> = emptyMap()): XvrlMessageElement {
             if (name.namespaceUri in listOf(NsXvrl.namespace)) {
                 throw stepConfig.exception(XProcError.xiXvrlIllegalMessageName(name))
             }
@@ -116,7 +115,7 @@ class XvrlMessageElement private constructor(stepConfiguration: XProcStepConfigu
     }
 
     override fun serialize(builder: SaxonTreeBuilder) {
-        builder.addStartElement(name, stepConfig.attributeMap(attributes))
+        builder.addStartElement(name, stepConfig.typeUtils.attributeMap(attributes))
         for (item in content) {
             item.serialize(builder)
         }

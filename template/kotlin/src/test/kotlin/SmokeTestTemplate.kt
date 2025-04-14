@@ -1,4 +1,4 @@
-import com.xmlcalabash.config.XmlCalabash
+import com.xmlcalabash.XmlCalabash
 import com.xmlcalabash.util.BufferingReceiver
 import org.junit.jupiter.api.Assertions.fail
 import org.junit.jupiter.api.Test

@@ -8,13 +8,13 @@ import net.sf.saxon.s9api.*
 
 class DocumentInstruction private constructor(parent: XProcInstruction): ConnectionInstruction(parent, NsP.document) {
     constructor(parent: XProcInstruction, href: XProcExpression): this(parent) {
-        this.href = href.cast(parent.stepConfig.parseXsSequenceType("xs:anyURI"))
+        this.href = href.cast(parent.stepConfig.typeUtils.parseXsSequenceType("xs:anyURI"))
     }
 
     var href: XProcExpression = XProcExpression.error(parent.stepConfig)
         set(value) {
             checkOpen()
-            field = value.cast(parent!!.stepConfig.parseXsSequenceType("xs:anyURI"))
+            field = value.cast(parent!!.stepConfig.typeUtils.parseXsSequenceType("xs:anyURI"))
         }
 
     var contentType: MediaType? = null
@@ -28,7 +28,7 @@ class DocumentInstruction private constructor(parent: XProcInstruction): Connect
         get() = _documentProperties!!
         set(value) {
             checkOpen()
-            _documentProperties = value.cast(parent!!.stepConfig.qnameMapType)
+            _documentProperties = value.cast(stepConfig.qnameMapType)
         }
 
     private var _parameters: XProcExpression? = null
@@ -36,18 +36,18 @@ class DocumentInstruction private constructor(parent: XProcInstruction): Connect
         get() = _parameters!!
         set(value) {
             checkOpen()
-            _parameters = value.cast(parent!!.stepConfig.qnameMapType)
+            _parameters = value.cast(stepConfig.qnameMapType)
         }
 
     private val variables = mutableSetOf<QName>()
 
     override fun elaborateInstructions() {
         if (_documentProperties == null) {
-            _documentProperties = XProcExpression.constant(parent!!.stepConfig, XdmMap(), parent!!.stepConfig.qnameMapType)
+            _documentProperties = XProcExpression.constant(parent!!.stepConfig, XdmMap(), stepConfig.qnameMapType)
         }
 
         if (_parameters == null) {
-            _parameters = XProcExpression.constant(parent!!.stepConfig, XdmMap(), parent!!.stepConfig.qnameMapType)
+            _parameters = XProcExpression.constant(parent!!.stepConfig, XdmMap(), stepConfig.qnameMapType)
         }
 
         for (child in children) {
@@ -72,7 +72,7 @@ class DocumentInstruction private constructor(parent: XProcInstruction): Connect
         docStep.depends.addAll(step.depends)
 
         if (href.canBeResolvedStatically()) {
-            docStep._staticOptions[Ns.href] = StaticOptionDetails(href.stepConfig, Ns.href, stepConfig.parseXsSequenceType("xs:anyURI"), emptyList(), href)
+            docStep._staticOptions[Ns.href] = StaticOptionDetails(href.stepConfig, Ns.href, stepConfig.typeUtils.parseXsSequenceType("xs:anyURI"), emptyList(), href)
         } else {
             val bindings = if (stepConfig.drp == null) {
                 emptyList()

@@ -1,6 +1,5 @@
 package com.xmlcalabash.runtime.parameters
 
-import com.xmlcalabash.config.XmlCalabashConfiguration
 import com.xmlcalabash.datamodel.Location
 import com.xmlcalabash.namespace.NsCx
 import com.xmlcalabash.runtime.api.RuntimeOption

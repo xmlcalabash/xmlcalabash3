@@ -1,6 +1,6 @@
 package com.xmlcalabash.ext.rdf
 
-import com.xmlcalabash.config.XmlCalabash
+import com.xmlcalabash.XmlCalabash
 import com.xmlcalabash.spi.Configurer
 import com.xmlcalabash.spi.ConfigurerProvider
 import net.sf.saxon.Configuration

@@ -1,11 +1,11 @@
 package com.xmlcalabash.io
 
+import com.xmlcalabash.config.StepConfiguration
 import com.xmlcalabash.documents.DocumentProperties
 import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.namespace.Ns
 import com.xmlcalabash.runtime.ExpressionEvaluator
-import com.xmlcalabash.runtime.XProcStepConfiguration
 import net.sf.saxon.om.NamespaceUri
 import net.sf.saxon.s9api.*
 import org.apache.hc.client5.http.auth.AuthScope
@@ -34,13 +34,12 @@ import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.net.SocketTimeoutException
 import java.net.URI
-import java.nio.charset.Charset
 import java.nio.charset.StandardCharsets
 import java.time.Instant
 import java.time.format.DateTimeFormatter
 import java.util.concurrent.TimeUnit
 
-class InternetProtocolRequest(val stepConfig: XProcStepConfiguration, val uri: URI) {
+class InternetProtocolRequest(val stepConfig: StepConfiguration, val uri: URI) {
     companion object {
         private val ns_chttp = NamespaceUri.of("http://www.w3.org/ns/xproc-http")
     }

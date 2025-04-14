@@ -16,7 +16,7 @@ open class ChooseWhenStep(config: XProcStepConfiguration, compound: CompoundStep
             instantiate()
         }
 
-        stepConfig.environment.newExecutionContext(stepConfig)
+        stepConfig.saxonConfig.newExecutionContext(stepConfig)
 
         localStepsToRun.clear()
         localStepsToRun.addAll(runnables)
@@ -40,13 +40,13 @@ open class ChooseWhenStep(config: XProcStepConfiguration, compound: CompoundStep
         stepsToRun.addAll(guardSteps)
         runSubpipeline()
 
-        stepConfig.environment.releaseExecutionContext()
+        stepConfig.saxonConfig.releaseExecutionContext()
 
         return ((guardStep as AtomicStep).implementation as GuardStep).effectiveBooleanValue()
     }
 
     override fun run() {
-        stepConfig.environment.newExecutionContext(stepConfig)
+        stepConfig.saxonConfig.newExecutionContext(stepConfig)
 
         stepsToRun.clear()
         stepsToRun.addAll(localStepsToRun)
@@ -59,6 +59,6 @@ open class ChooseWhenStep(config: XProcStepConfiguration, compound: CompoundStep
         }
 
         foot.runStep()
-        stepConfig.environment.releaseExecutionContext()
+        stepConfig.saxonConfig.releaseExecutionContext()
     }
 }

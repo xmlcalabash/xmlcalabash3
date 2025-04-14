@@ -96,7 +96,7 @@ open class OptionInstruction(parent: XProcInstruction, name: QName, stepConfig: 
             if (required == true) {
                 throw stepConfig.exception(XProcError.xsRequiredAndDefaulted(name))
             }
-            asType = asType ?: stepConfig.parseSequenceType("item()*")
+            asType = asType ?: stepConfig.typeUtils.parseSequenceType("item()*")
             select = select!!.cast(asType!!)
         }
 

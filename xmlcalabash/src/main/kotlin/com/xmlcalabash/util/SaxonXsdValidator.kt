@@ -20,8 +20,8 @@ import java.net.URI
 import javax.xml.transform.sax.SAXSource
 
 class SaxonXsdValidator(val stepConfig: XProcStepConfiguration) {
-    var useLocationHints = stepConfig.xmlCalabash.xmlCalabashConfig.useLocationHints
-    var tryNamespaces = stepConfig.xmlCalabash.xmlCalabashConfig.tryNamespaces
+    var useLocationHints = stepConfig.xmlCalabashConfig.useLocationHints
+    var tryNamespaces = stepConfig.xmlCalabashConfig.tryNamespaces
     var mode = stepConfig.validationMode
     var assertValid = true
     var parameters = mapOf<QName,XdmValue>()
@@ -59,16 +59,7 @@ class SaxonXsdValidator(val stepConfig: XProcStepConfiguration) {
             val schemaNode = S9Api.documentElement(schema.value as XdmNode)
             val targetNS = schemaNode.getAttributeValue(Ns.targetNamespace) ?: ""
             stepConfig.debug { "Caching input schema ${schema.baseURI} for ${targetNS}" }
-
-            if (stepConfig.baseUri != null && schema.baseURI != null && schema.baseURI.toString()
-                    .startsWith(stepConfig.baseUri.toString())
-            ) {
-                // It looks like this one was inline...
-                report.report.metadata.schema(schema.baseURI, NsXs.namespace, version, schemaNode)
-            } else {
-                report.report.metadata.schema(schema.baseURI, NsXs.namespace, version)
-            }
-
+            report.report.metadata.schema(schema.baseURI, NsXs.namespace, version)
             schemaDocuments.add(schema.value as XdmNode)
         }
 
@@ -205,8 +196,11 @@ class SaxonXsdValidator(val stepConfig: XProcStepConfiguration) {
             } else {
                 "lax"
             }
-            return XProcDocument.ofXml(destination.xdmNode, stepConfig,
-                DocumentProperties(mapOf(NsCx.validationMode to XdmAtomicValue(vmode))))
+
+            val props = DocumentProperties(source.properties)
+            props[NsCx.validationMode] = XdmAtomicValue(vmode)
+
+            return XProcDocument.ofXml(destination.xdmNode, stepConfig, props)
         }
     }
 }

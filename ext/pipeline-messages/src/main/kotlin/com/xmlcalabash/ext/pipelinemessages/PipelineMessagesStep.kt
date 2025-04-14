@@ -55,7 +55,7 @@ class PipelineMessagesStep(): AbstractAtomicStep() {
             attributes[Ns.message] = message.message
             attributes[Ns.date] = "${message.timestamp}"
 
-            builder.addStartElement(NsCx.message, stepConfig.attributeMap(attributes))
+            builder.addStartElement(NsCx.message, stepConfig.typeUtils.attributeMap(attributes))
             builder.addEndElement()
         }
         builder.addEndElement()

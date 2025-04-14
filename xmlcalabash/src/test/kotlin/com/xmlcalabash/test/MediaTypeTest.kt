@@ -1,12 +1,12 @@
 package com.xmlcalabash.test
 
-import com.xmlcalabash.io.MediaType
 import com.xmlcalabash.exceptions.XProcException
+import com.xmlcalabash.io.MediaType
 import com.xmlcalabash.namespace.NsErr
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 
-internal class MediaTypeTest {
+class MediaTypeTest {
     @Test
     fun parseTest1() {
         val typeList = MediaType.parseList("text/xml  -image/jpeg")

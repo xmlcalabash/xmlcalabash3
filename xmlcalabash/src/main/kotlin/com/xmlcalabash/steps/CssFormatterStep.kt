@@ -44,14 +44,14 @@ open class CssFormatterStep(): AbstractAtomicStep() {
                 formatters.add(URI.create("https://xmlcalabash.com/paged-media/css-formatter/${value}"))
             }
         }
-        formatters.addAll(stepConfig.xmlCalabash.xmlCalabashConfig.pagedMediaCssProcessors)
+        formatters.addAll(stepConfig.xmlCalabashConfig.pagedMediaCssProcessors)
         if (formatters.isEmpty()) {
             formatters.add(StandardPagedMediaProvider.genericCssFormatter)
         }
 
         for (formatter in formatters) {
             stepConfig.debug { "Searching for ${formatter} css-formatter" }
-            for (manager in stepConfig.xmlCalabash.xmlCalabashConfig.pagedMediaManagers) {
+            for (manager in stepConfig.xmlCalabashConfig.pagedMediaManagers) {
                 if (manager.formatterAvailable(formatter)) {
                     cssManager = manager
                     break

@@ -1,6 +1,6 @@
 package com.xmlcalabash.runtime.api
 
-import com.xmlcalabash.config.XmlCalabashConfiguration
+import com.xmlcalabash.XmlCalabashConfiguration
 import net.sf.saxon.s9api.QName
 
 class StepSignature(

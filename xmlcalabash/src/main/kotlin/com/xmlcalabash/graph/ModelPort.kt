@@ -22,7 +22,7 @@ open class ModelPort(val parent: Model, val name: String, val unbound: Boolean, 
         if (portBinding is OutputInstruction) {
             serialization = portBinding.serialization.evaluate(portBinding.stepConfig) as XdmMap
         }
-        if (portBinding.stepConfig.xmlCalabash.xmlCalabashConfig.assertions != AssertionsLevel.IGNORE) {
+        if (portBinding.stepConfig.environment.assertions != AssertionsLevel.IGNORE) {
             assertions.addAll(portBinding.assertions)
         }
     }

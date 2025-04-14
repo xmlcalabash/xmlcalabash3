@@ -9,13 +9,13 @@ open class GroupStep(config: XProcStepConfiguration, compound: CompoundStepModel
         stepsToRun.addAll(runnables)
 
         try {
-            stepConfig.environment.newExecutionContext(stepConfig)
+            stepConfig.saxonConfig.newExecutionContext(stepConfig)
 
             head.runStep()
             runSubpipeline()
             foot.runStep()
         } finally {
-            stepConfig.environment.releaseExecutionContext()
+            stepConfig.saxonConfig.releaseExecutionContext()
         }
     }
 }

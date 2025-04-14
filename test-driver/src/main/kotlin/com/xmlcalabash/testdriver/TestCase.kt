@@ -1,13 +1,12 @@
 package com.xmlcalabash.testdriver
 
+import com.xmlcalabash.XmlCalabash
 import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.exceptions.XProcException
 import com.xmlcalabash.namespace.Ns
 import com.xmlcalabash.namespace.NsCx
-import com.xmlcalabash.namespace.NsErr
 import com.xmlcalabash.namespace.NsXs
-import com.xmlcalabash.runtime.PipelineContext
 import com.xmlcalabash.util.*
 import net.sf.saxon.event.ReceiverOption
 import net.sf.saxon.expr.parser.ExpressionTool
@@ -19,11 +18,7 @@ import net.sf.saxon.s9api.*
 import net.sf.saxon.type.BuiltInAtomicType
 import org.apache.logging.log4j.kotlin.logger
 import org.xml.sax.InputSource
-import java.io.ByteArrayInputStream
-import java.io.ByteArrayOutputStream
-import java.io.File
-import java.io.FileOutputStream
-import java.io.PrintStream
+import java.io.*
 import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 import java.nio.file.attribute.FileTime
@@ -35,7 +30,7 @@ import java.util.*
 import java.util.function.Supplier
 import javax.xml.transform.sax.SAXSource
 
-class TestCase(val suite: TestSuite, val testFile: File) {
+class TestCase(val xmlCalabash: XmlCalabash, val testOptions: TestOptions, val testFile: File) {
     companion object {
         val isWindows = System.getProperty("os.name").startsWith("Windows")
         val CODE = QName("code")
@@ -59,15 +54,13 @@ class TestCase(val suite: TestSuite, val testFile: File) {
         }
     }
 
-    val config = suite.xmlCalabash
-    val builder = config.newPipelineBuilder()
-    var testConfig = builder.stepConfig.copy()
-    //var graphviz: File? = config.xmlCalabashConfig.graphviz
-    var graphviz: File? = File("/opt/homebrew/bin/dot") // FIXME:
+    val builder = xmlCalabash.newPipelineBuilder()
+    val testConfig = builder.stepConfig.copy()
+    val messageReporter = testConfig.environment.messageReporter as BufferingMessageReporter
 
     var loaded = false
 
-    var status = TestStatus("NOTRUN")
+    var status = TestStatus(testFile, "NOTRUN")
     var singleTest = false
     var expected = "UNKNOWN"
     val errorCodes = mutableListOf<QName>()
@@ -91,7 +84,7 @@ class TestCase(val suite: TestSuite, val testFile: File) {
 
     fun load() {
         loaded = true
-        val builder = config.saxonConfig.processor.newDocumentBuilder()
+        val builder = xmlCalabash.saxonConfiguration.processor.newDocumentBuilder()
         builder.isLineNumbering = true
         val testXml = builder.build(testFile)
         loadTest(rootElement(testXml))
@@ -106,8 +99,6 @@ class TestCase(val suite: TestSuite, val testFile: File) {
                 }
             }
         }
-
-        val eagerEval = "eager-eval" in features
 
         val saveOS = Urify.osname
         val saveSep = Urify.filesep
@@ -128,12 +119,15 @@ class TestCase(val suite: TestSuite, val testFile: File) {
             setupFileEnvironment(fileEnvironment!!)
         }
 
-        lateinit var messageReporter: BufferingMessageReporter
         try {
-            println(testFile.absolutePath)
+            if (testFile.absolutePath.contains("/tests/")) {
+                val pos = testFile.absolutePath.indexOf("/tests/")
+                println("…/${testFile.absolutePath.substring(pos+7)}")
+            } else {
+                println(testFile.absolutePath)
+            }
 
-            config.commonEnvironment.eagerEvaluation = eagerEval
-            val parser = config.newXProcParser(builder)
+            val parser = xmlCalabash.newXProcParser(builder)
             for ((name, value) in staticOptions) {
                 parser.builder.option(name, value)
             }
@@ -143,8 +137,6 @@ class TestCase(val suite: TestSuite, val testFile: File) {
             treeBuilder.addSubtree(pipelineXml!!)
             treeBuilder.endDocument()
             val document = treeBuilder.result
-
-            messageReporter = BufferingMessageReporter(LoggingMessageReporter())
 
             val decl = parser.parse(document)
             val runtime = decl.runtime()
@@ -156,20 +148,13 @@ class TestCase(val suite: TestSuite, val testFile: File) {
                 runtime.environment.documentManager.resolverConfiguration.addCatalog(testFile.toURI(), source)
             }
 
-            messageReporter = runtime.environment.messageReporter as BufferingMessageReporter
-
-            // Something of a hack...
-            if (expected == "fail" && errorCodes.contains(NsErr.assertionFailed)) {
-                (runtime.environment as PipelineContext).assertions = AssertionsLevel.ERROR
-            }
-
             val pipeline = runtime.executable()
 
-            if (suite.options.outputGraph != null) {
+            if (testOptions.outputGraph != null) {
                 val description = runtime.description()
-                val vis = VisualizerOutput(suite.xmlCalabash, description, suite.options.outputGraph!!)
+                val vis = VisualizerOutput(xmlCalabash, description, testOptions.outputGraph!!)
                 vis.xml()
-                if (graphviz == null) {
+                if (xmlCalabash.config.graphviz == null) {
                     logger.warn { "Cannot create SVG descriptions, graphviz is not configured" }
                 } else {
                     vis.svg()
@@ -189,9 +174,11 @@ class TestCase(val suite: TestSuite, val testFile: File) {
             val outputReceiver = BufferingReceiver()
             pipeline.receiver = outputReceiver
 
-            if (suite.options.report != null) {
+            if (testOptions.report != null) {
                 startIO()
             }
+
+            messageReporter.clear()
 
             val start = System.nanoTime()
             try {
@@ -326,36 +313,50 @@ class TestCase(val suite: TestSuite, val testFile: File) {
         }
     }
 
+
     private fun skip(reason: String) {
-        suite.skip(this, reason)
+        status = TestStatus(testFile, "skip", reason)
     }
 
     private fun pass() {
-        suite.pass(this)
+        status = TestStatus(testFile, "pass")
+        status.elapsed = elapsedSeconds
     }
 
     private fun fail(msgxml: XdmNode) {
-        messages = msgxml
-        suite.fail(this)
+        status = TestStatus(testFile, "fail")
+        status.elapsed = elapsedSeconds
+        status.messagesXml = msgxml
+        status.stdError = stderrOutput
+        status.stdOutput = stdoutOutput
     }
 
     private fun fail(error: XProcError, msgxml: XdmNode) {
-        messages = msgxml
-        suite.fail(this, error)
+        status = TestStatus(testFile, "fail", error)
+        status.elapsed = elapsedSeconds
+        status.messagesXml = msgxml
+        status.stdError = stderrOutput
+        status.stdOutput = stdoutOutput
     }
 
     private fun fail(errors: List<XdmNode>, msgxml: XdmNode) {
-        messages = msgxml
-        suite.fail(this, errors)
+        status = TestStatus(testFile, "fail", errors)
+        status.elapsed = elapsedSeconds
+        status.messagesXml = msgxml
+        status.stdError = stderrOutput
+        status.stdOutput = stdoutOutput
     }
 
     private fun fail(error: XProcError, codes: List<QName>, msgxml: XdmNode) {
-        messages = msgxml
-        suite.fail(this, error, codes)
+        status = TestStatus(testFile, "fail", error, codes)
+        status.elapsed = elapsedSeconds
+        status.messagesXml = msgxml
+        status.stdError = stderrOutput
+        status.stdOutput = stdoutOutput
     }
 
     private fun messagesXml(messages: List<BufferingMessageReporter.Message>): XdmNode {
-        val builder = SaxonTreeBuilder(suite.xmlCalabash.saxonConfig.processor)
+        val builder = SaxonTreeBuilder(xmlCalabash.saxonConfiguration.processor)
         builder.startDocument(null)
         builder.addStartElement(NsCx.messages)
         for (message in messages) {
@@ -474,10 +475,10 @@ class TestCase(val suite: TestSuite, val testFile: File) {
     private fun loadOption(option: XdmNode) {
         val localConfig = builder.stepConfig.copy()
         localConfig.updateWith(option)
-        localConfig.putNamespace(   "xs", NsXs.namespace)
+        localConfig.updateWith("xs", NsXs.namespace)
 
         val name = option.getAttributeValue(Ns.name) ?: throw RuntimeException("No name on option?")
-        val qname = localConfig.parseQName(name)
+        val qname = localConfig.typeUtils.parseQName(name)
         val static = option.getAttributeValue(Ns.static) == "true"
         val asType = option.getAttributeValue(Ns.asType)
 
@@ -505,7 +506,7 @@ class TestCase(val suite: TestSuite, val testFile: File) {
         var result = selector.evaluate()
 
         if (asType != null) {
-            val seqtype = localConfig.parseSequenceType(asType)
+            val seqtype = localConfig.typeUtils.parseSequenceType(asType)
 
             val uncheckedExpr = ExpressionTool.make(select, compiler.underlyingStaticContext, 0, Token.EOF, null)
             val checker = localConfig.saxonConfig.configuration.getTypeChecker(false)
@@ -522,7 +523,7 @@ class TestCase(val suite: TestSuite, val testFile: File) {
             val visitor = ExpressionVisitor.make(compiler.underlyingStaticContext)
             checker.staticTypeCheck(uncheckedExpr, seqtype.underlyingSequenceType, role, visitor)
 
-            result = localConfig.checkType(qname, result, seqtype, emptyList())
+            result = localConfig.typeUtils.checkType(qname, result, seqtype, emptyList())
         }
 
         val doc = XProcDocument.ofJson(result, localConfig)
@@ -669,45 +670,6 @@ class TestCase(val suite: TestSuite, val testFile: File) {
         return rootElement(builder.result)
     }
 
-    private fun toSvg(desc: XdmNode, filename: String, stylesheet: String) {
-        var styleStream = TestCase::class.java.getResourceAsStream(stylesheet)
-        var styleSource = SAXSource(InputSource(styleStream))
-        var xsltCompiler = desc.processor.newXsltCompiler()
-        xsltCompiler.isSchemaAware = desc.processor.isSchemaAware
-        var xsltExec = xsltCompiler.compile(styleSource)
-
-        var transformer = xsltExec.load30()
-        val xmlResult = XdmDestination()
-        transformer.applyTemplates(desc.asSource(), xmlResult)
-        val dotxml = xmlResult.xdmNode
-
-        styleStream = TestCase::class.java.getResourceAsStream("/com/xmlcalabash/dot2txt.xsl")
-        styleSource = SAXSource(InputSource(styleStream))
-        xsltCompiler = desc.processor.newXsltCompiler()
-        xsltCompiler.isSchemaAware = desc.processor.isSchemaAware
-        xsltExec = xsltCompiler.compile(styleSource)
-
-        transformer = xsltExec.load30()
-        val textResult = RawDestination()
-        transformer.applyTemplates(dotxml.asSource(), textResult)
-
-        val tempFile = File.createTempFile("xmlcalabash-", ".dot")
-        tempFile.deleteOnExit()
-
-        val dot = PrintStream(tempFile)
-        val iter = textResult.xdmValue.iterator()
-        while (iter.hasNext()) {
-            dot.print(iter.next().stringValue)
-        }
-        dot.close()
-
-        val rt = Runtime.getRuntime()
-        val args = arrayOf(graphviz!!.absoluteFile.toString(), "-Tsvg", tempFile.getAbsolutePath().toString(), "-o", filename)
-        val process = rt.exec(args)
-        process.waitFor()
-        tempFile.delete()
-    }
-
     override fun toString(): String {
         return testFile.toString()
     }
@@ -824,4 +786,5 @@ class TestCase(val suite: TestSuite, val testFile: File) {
     inner class TestFile(path: String, lastModified: Date? = null,
                          readable: Boolean? = null, writable: Boolean? = null, hidden: Boolean?,
                          val content: String? = null): TestFileProperties(path, lastModified, readable, writable, hidden)
+
 }

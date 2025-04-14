@@ -1,10 +1,10 @@
 package com.xmlcalabash.util
 
+import com.xmlcalabash.config.StepConfiguration
 import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.io.DocumentLoader
 import com.xmlcalabash.io.DocumentManager
 import com.xmlcalabash.io.MediaType
-import com.xmlcalabash.runtime.XProcStepConfiguration
 import com.xmlcalabash.spi.DocumentResolver
 import com.xmlcalabash.spi.DocumentResolverProvider
 import java.io.IOException
@@ -29,7 +29,7 @@ open class SimpleDocumentResolverProvider(val magicUri: URI, val resourcePath: S
         manager.registerPrefix(magicUri.toString(), this)
     }
 
-    override fun resolve(context: XProcStepConfiguration, uri: URI, current: XProcDocument?): XProcDocument? {
+    override fun resolve(context: StepConfiguration, uri: URI, current: XProcDocument?): XProcDocument? {
         if (current != null) {
             return current // WAT?
         }

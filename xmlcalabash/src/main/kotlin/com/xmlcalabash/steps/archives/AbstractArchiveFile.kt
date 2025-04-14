@@ -1,12 +1,12 @@
 package com.xmlcalabash.steps.archives
 
-import com.xmlcalabash.runtime.XProcStepConfiguration
+import com.xmlcalabash.config.StepConfiguration
 import net.sf.saxon.s9api.QName
 import java.nio.file.Path
 import java.nio.file.Paths
 import kotlin.io.path.deleteIfExists
 
-abstract class AbstractArchiveFile(val stepConfig: XProcStepConfiguration) {
+abstract class AbstractArchiveFile(val stepConfig: StepConfiguration) {
     abstract val archiveFormat: QName
 
     // Archives can be large. We probably don't need them in memory and the

@@ -16,7 +16,7 @@ open class WithOptionInstruction(parent: XProcInstruction, name: QName, stepConf
         if (select == null) {
             throw stepConfig.exception(XProcError.xsMissingRequiredAttribute(Ns.select))
         } else {
-            asType = asType ?: stepConfig.parseSequenceType("item()*")
+            asType = asType ?: stepConfig.typeUtils.parseSequenceType("item()*")
 
             when (select) {
                 is XProcShortcutExpression -> {

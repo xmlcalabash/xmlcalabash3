@@ -26,7 +26,7 @@ open class ForEachStep(config: XProcStepConfiguration, compound: CompoundStepMod
         stepsToRun.clear()
         stepsToRun.addAll(runnables)
 
-        val exec = stepConfig.environment.newExecutionContext(stepConfig)
+        val exec = stepConfig.saxonConfig.newExecutionContext(stepConfig)
         exec.iterationSize = sequence.size.toLong()
 
         if (sequence.isEmpty()) {
@@ -58,7 +58,7 @@ open class ForEachStep(config: XProcStepConfiguration, compound: CompoundStepMod
         }
 
         cache.clear()
-        stepConfig.environment.releaseExecutionContext()
+        stepConfig.saxonConfig.releaseExecutionContext()
     }
 
     override fun abort() {

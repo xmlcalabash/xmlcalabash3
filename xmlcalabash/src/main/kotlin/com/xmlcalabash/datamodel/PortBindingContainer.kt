@@ -5,14 +5,13 @@ import com.xmlcalabash.io.MediaType
 import com.xmlcalabash.namespace.NsCx
 import com.xmlcalabash.namespace.NsP
 import com.xmlcalabash.namespace.NsS
-import com.xmlcalabash.util.S9Api
 import com.xmlcalabash.util.AssertionsLevel
 import com.xmlcalabash.util.AssertionsMonitor
+import com.xmlcalabash.util.S9Api
 import net.sf.saxon.s9api.Axis
 import net.sf.saxon.s9api.QName
 import net.sf.saxon.s9api.XdmNode
 import net.sf.saxon.value.StringValue
-import kotlin.collections.iterator
 
 open class PortBindingContainer(parent: XProcInstruction, stepConfig: InstructionConfiguration, instructionType: QName): BindingContainer(parent, stepConfig, instructionType) {
     companion object {
@@ -35,7 +34,7 @@ open class PortBindingContainer(parent: XProcInstruction, stepConfig: Instructio
         get() = _port
         set(value) {
             checkOpen()
-            val pname = stepConfig.parseNCName(value)
+            val pname = stepConfig.typeUtils.parseNCName(value)
             _port = pname
         }
 
@@ -65,7 +64,7 @@ open class PortBindingContainer(parent: XProcInstruction, stepConfig: Instructio
             if (value == null) {
                 _select = null
             } else {
-                _select = value.cast(parent!!.stepConfig.parseSequenceType("item()*"))
+                _select = value.cast(parent!!.stepConfig.typeUtils.parseSequenceType("item()*"))
                 for (name in _select!!.details.variableRefs) {
                     val ref = inscopeVariables[name]
                     if (ref == null) {
@@ -95,7 +94,7 @@ open class PortBindingContainer(parent: XProcInstruction, stepConfig: Instructio
             if (value == null) {
                 _href = null
             } else {
-                _href = value.cast(stepConfig.parseXsSequenceType("xs:anyURI"))
+                _href = value.cast(stepConfig.typeUtils.parseXsSequenceType("xs:anyURI"))
             }
         }
 
@@ -189,7 +188,7 @@ open class PortBindingContainer(parent: XProcInstruction, stepConfig: Instructio
         primary = primary == true
         sequence = sequence == true
 
-        if (stepConfig.xmlCalabash.xmlCalabashConfig.assertions != AssertionsLevel.IGNORE) {
+        if (stepConfig.assertions != AssertionsLevel.IGNORE) {
             for (info in pipeinfo) {
                 val pipeinfo = S9Api.documentElement(info)
                 for (child in pipeinfo.axisIterator(Axis.CHILD)) {

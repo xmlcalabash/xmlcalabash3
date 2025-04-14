@@ -311,15 +311,15 @@ class MediaType private constructor(val mediaType: String, val mediaSubtype: Str
 
         // application/xml should match */*
         // but text/plain shouldn't match */*+xml
-/*
-        // I wonder how many special cases there really are...can this be generalized somehow?
-        if (testMatching(mtype, "xml", "xml")) {
-            return true
-        }
-        if (testMatching(mtype, "json", "json")) {
-            return true
-        }
-*/
+        /*
+                // I wonder how many special cases there really are...can this be generalized somehow?
+                if (testMatching(mtype, "xml", "xml")) {
+                    return true
+                }
+                if (testMatching(mtype, "json", "json")) {
+                    return true
+                }
+        */
         var mmatch = mediaType == mtype.mediaType || mtype.mediaType == "*"
         mmatch = mmatch && (mediaSubtype == mtype.mediaSubtype || mtype.mediaSubtype == "*")
         mmatch = mmatch && (mtype.suffix == null || suffix == mtype.suffix)

@@ -1,14 +1,14 @@
 package com.xmlcalabash.xvrl
 
+import com.xmlcalabash.config.StepConfiguration
 import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.namespace.NsXml
 import com.xmlcalabash.namespace.NsXvrl
-import com.xmlcalabash.runtime.XProcStepConfiguration
 import com.xmlcalabash.util.SaxonTreeBuilder
 import net.sf.saxon.om.NamespaceUri
 import net.sf.saxon.s9api.QName
 
-abstract class XvrlElement(val stepConfig: XProcStepConfiguration) {
+abstract class XvrlElement(val stepConfig: StepConfiguration) {
     companion object {
         val xpathDefaultNamespace = QName("xpath-default-namespace")
     }

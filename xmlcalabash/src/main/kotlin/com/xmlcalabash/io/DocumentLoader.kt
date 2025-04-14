@@ -3,12 +3,12 @@ package com.xmlcalabash.io
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.dataformat.toml.TomlFactory
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory
+import com.xmlcalabash.config.StepConfiguration
 import com.xmlcalabash.documents.DocumentProperties
 import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.namespace.Ns
 import com.xmlcalabash.namespace.NsCx
-import com.xmlcalabash.runtime.XProcStepConfiguration
 import com.xmlcalabash.spi.ContentTypeLoader
 import com.xmlcalabash.spi.ContentTypeLoaderServiceProvider
 import com.xmlcalabash.tracing.TraceListener
@@ -33,7 +33,7 @@ import java.util.*
 import javax.xml.transform.dom.DOMSource
 import javax.xml.transform.sax.SAXSource
 
-class DocumentLoader(val stepConfig: XProcStepConfiguration,
+class DocumentLoader(val stepConfig: StepConfiguration,
                      val href: URI?,
                      val documentProperties: DocumentProperties = DocumentProperties(),
                      val parameters: Map<QName,XdmValue> = mapOf(),
@@ -262,7 +262,7 @@ class DocumentLoader(val stepConfig: XProcStepConfiguration,
             if (value is BooleanValue) {
                 value.booleanValue
             } else {
-                stepConfig.parseBoolean(value.stringValue)
+                stepConfig.typeUtils.parseBoolean(value.stringValue)
             }
         } else {
             false

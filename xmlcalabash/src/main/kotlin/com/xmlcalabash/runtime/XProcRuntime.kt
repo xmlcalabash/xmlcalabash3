@@ -20,10 +20,11 @@ class XProcRuntime private constructor(internal val start: DeclareStepInstructio
         val uniqueNames = mutableListOf<String>()
 
         internal fun newInstance(start: DeclareStepInstruction): XProcRuntime {
-            val environment = PipelineContext(start.stepConfig.environment as PipelineCompilerContext)
-            val config = XProcStepConfigurationImpl(environment, start.stepConfig.saxonConfig, start.location)
+            val runtimeEnvironment = RuntimeEnvironment.newInstance(start.stepConfig.environment as CompileEnvironment)
+            val saxonConfig = start.stepConfig.saxonConfig.newConfiguration()
+            val config = XProcStepConfiguration(saxonConfig, start.stepConfig.context.copy(), runtimeEnvironment)
 
-            if (start.psviRequired == true && !config.saxonConfig.configuration.isLicensedFeature(Configuration.LicenseFeature.SCHEMA_VALIDATION)) {
+            if (start.psviRequired == true && !saxonConfig.configuration.isLicensedFeature(Configuration.LicenseFeature.SCHEMA_VALIDATION)) {
                 throw XProcError.xdPsviUnsupported().exception()
             }
 
@@ -50,18 +51,7 @@ class XProcRuntime private constructor(internal val start: DeclareStepInstructio
                                     if (href == null) {
                                         config.warn { "Ignoring ${element.nodeName}: missing href" }
                                     } else {
-                                        val builder = config.processor.newDocumentBuilder()
-                                        val destination = XdmDestination()
-                                        val uri = element.baseURI.resolve(href).toString()
-                                        val source = SAXSource(InputSource(uri))
-                                        builder.parse(source, destination)
-                                        val schema = S9Api.documentElement(destination.xdmNode)
-                                        if (schema.nodeName == NsXs.schema) {
-                                            config.debug { "Loading XML Schema: ${uri}" }
-                                            config.xmlCalabash.xmlCalabashConfig.xmlSchemaDocuments.add(schema)
-                                        } else {
-                                            config.warn { "Ignoring ${element.nodeName}: not a schema: ${uri}" }
-                                        }
+                                        config.saxonConfig.addSchemaDocument(element.baseURI.resolve(href))
                                     }
                                 }
                                 else -> {
@@ -78,7 +68,7 @@ class XProcRuntime private constructor(internal val start: DeclareStepInstructio
 
             val pipelines = mutableMapOf<DeclareStepInstruction, SubpipelineModel>()
             for (decl in usedSteps) {
-                val model = Graph.build(decl, config.environment)
+                val model = Graph.build(decl)
                 model.init()
                 pipelines[decl] = model
             }
@@ -95,9 +85,7 @@ class XProcRuntime private constructor(internal val start: DeclareStepInstructio
 
     fun stepConfiguration(instructionConfig: InstructionConfiguration): XProcStepConfiguration {
         // Issue #160, don't create a new Saxon configuration here
-        val impl = XProcStepConfigurationImpl(config.environment, instructionConfig.saxonConfig, instructionConfig.location)
-        impl.putAllNamespaces(instructionConfig.inscopeNamespaces)
-        impl.putAllStepTypes(instructionConfig.inscopeStepTypes)
+        val impl = config.from(instructionConfig, false)
         impl.validationMode = instructionConfig.validationMode
         return impl
     }
@@ -159,7 +147,7 @@ class XProcRuntime private constructor(internal val start: DeclareStepInstructio
             val smodel = graph.models.filterIsInstance<SubpipelineModel>().first { it.model is PipelineModel }
             graphList.add(graph)
 
-            val pipelineUserStep = CompoundStepModel(this, smodel.model)  // YAtomicCompoundStep(this, smodel)
+            val pipelineUserStep = CompoundStepModel(this, smodel.model)
             runnables[smodel.step.id] = pipelineUserStep
             if (decl.type == start.type) {
                 pipelineStep = pipelineUserStep

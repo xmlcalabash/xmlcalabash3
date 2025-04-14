@@ -1,11 +1,11 @@
 package com.xmlcalabash.steps.archives
 
-import com.xmlcalabash.io.MediaType
+import com.xmlcalabash.config.StepConfiguration
 import com.xmlcalabash.documents.XProcBinaryDocument
 import com.xmlcalabash.exceptions.XProcError
+import com.xmlcalabash.io.MediaType
 import com.xmlcalabash.namespace.Ns
 import com.xmlcalabash.namespace.NsCx
-import com.xmlcalabash.runtime.XProcStepConfiguration
 import net.sf.saxon.s9api.QName
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream
@@ -16,7 +16,7 @@ import java.io.IOException
 import java.io.InputStream
 import kotlin.io.path.inputStream
 
-open class TarInputArchive(stepConfig: XProcStepConfiguration, doc: XProcBinaryDocument): InputArchive(stepConfig, doc) {
+open class TarInputArchive(stepConfig: StepConfiguration, doc: XProcBinaryDocument): InputArchive(stepConfig, doc) {
     override val archiveFormat = Ns.tar
     override val baseUri = doc.baseURI
     private var gzipped = false

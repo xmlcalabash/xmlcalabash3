@@ -1,5 +1,6 @@
 package com.xmlcalabash.util
 
+import com.xmlcalabash.config.StepConfiguration
 import com.xmlcalabash.datamodel.XProcExpression
 import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.runtime.LazyValue
@@ -9,7 +10,7 @@ import net.sf.saxon.s9api.XdmNode
 import java.net.URI
 
 class ValueTemplateFilterNone(val encodedNode: XdmNode, val baseUri: URI): ValueTemplateFilter {
-    override fun containsMarkup(config: XProcStepConfiguration): Boolean {
+    override fun containsMarkup(config: StepConfiguration): Boolean {
         return false
     }
 
@@ -33,11 +34,11 @@ class ValueTemplateFilterNone(val encodedNode: XdmNode, val baseUri: URI): Value
         return setOf()
     }
 
-    override fun expandStaticValueTemplates(config: XProcStepConfiguration, initialExpand: Boolean, staticBindings: Map<QName,XProcExpression>): XdmNode {
+    override fun expandStaticValueTemplates(config: StepConfiguration, initialExpand: Boolean, staticBindings: Map<QName,XProcExpression>): XdmNode {
         return encodedNode
     }
 
-    override fun expandValueTemplates(config: XProcStepConfiguration, contextItem: XProcDocument?, bindings: Map<QName, LazyValue>): XdmNode {
+    override fun expandValueTemplates(config: StepConfiguration, contextItem: XProcDocument?, bindings: Map<QName, LazyValue>): XdmNode {
         return encodedNode
     }
 }

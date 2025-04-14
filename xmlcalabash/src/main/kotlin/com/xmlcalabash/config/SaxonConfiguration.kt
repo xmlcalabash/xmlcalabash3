@@ -1,127 +1,134 @@
 package com.xmlcalabash.config
 
-import com.xmlcalabash.datamodel.PipelineEnvironment
+import com.xmlcalabash.datamodel.DeclareStepInstruction
 import com.xmlcalabash.exceptions.XProcError
-import com.xmlcalabash.functions.*
+import com.xmlcalabash.exceptions.XProcException
+import com.xmlcalabash.functions.DocumentPropertiesFunction
+import com.xmlcalabash.functions.DocumentPropertyFunction
+import com.xmlcalabash.functions.ErrorFunction
+import com.xmlcalabash.functions.FunctionLibraryImportableFunction
+import com.xmlcalabash.functions.IterationPositionFunction
+import com.xmlcalabash.functions.IterationSizeFunction
+import com.xmlcalabash.functions.LookupUriFunction
+import com.xmlcalabash.functions.PipelineFunction
+import com.xmlcalabash.functions.StepAvailableFunction
+import com.xmlcalabash.functions.SystemPropertyFunction
+import com.xmlcalabash.functions.UrifyFunction
+import com.xmlcalabash.spi.Configurer
 import net.sf.saxon.Configuration
 import net.sf.saxon.functions.FunctionLibrary
 import net.sf.saxon.lib.ExtensionFunctionDefinition
 import net.sf.saxon.lib.FeatureIndex
+import net.sf.saxon.lib.Initializer
 import net.sf.saxon.s9api.Processor
 import net.sf.saxon.s9api.Xslt30Transformer
-import org.apache.logging.log4j.kotlin.logger
+import org.apache.commons.lang3.function.Functions.function
 import org.xml.sax.InputSource
-import java.io.File
 import java.net.URI
 import javax.xml.transform.sax.SAXSource
+import kotlin.collections.iterator
 
-class SaxonConfiguration private constructor(
-    val environment: PipelineEnvironment,
-    val configuration: Configuration,
-    val processor: Processor
-) {
+class SaxonConfiguration private constructor(val licensed: Boolean,
+                                             val saxonConfigurationFile: URI?,
+                                             val saxonConfigurationProperties: Map<String,String>,
+                                             initialSchemaDocuments: List<URI>,
+                                             val initializerClasses: Map<String,Boolean>,
+                                             val configurers: List<Configurer>,
+                                             private val contextManager: ExecutionContextManager): ExecutionContextManager by contextManager {
     companion object {
-        private var _id = 0
-        fun newInstance(environment: PipelineEnvironment): SaxonConfiguration {
-            // There's a little bit of chicken-and-egg here as I want to make a SaxonValueConverter,
-            // but I need a Processor to do that.
-            val newConfiguration = newConfiguration(environment.xmlCalabash)
-            val processor = Processor(newConfiguration)
-            newConfiguration.processor = processor
-
-            val saxon = SaxonConfiguration(environment, newConfiguration, processor)
-
-            saxon._xmlCalabash = environment.xmlCalabash
-            saxon.configurationFile = environment.xmlCalabash.xmlCalabashConfig.saxonConfigurationFile
-            saxon.configurationProperties.putAll(environment.xmlCalabash.xmlCalabashConfig.saxonConfigurationProperties)
-            saxon.configureProcessor(processor)
-            return saxon
+        fun newInstance(licensed: Boolean): SaxonConfiguration {
+            return newInstance(licensed, null, emptyMap(), emptyList(), emptyMap(), emptyList())
         }
 
-        private fun newConfiguration(xmlCalabash: XmlCalabash): Configuration {
-            val newConfiguration = if (xmlCalabash.xmlCalabashConfig.saxonConfigurationFile == null) {
-                if (xmlCalabash.xmlCalabashConfig.licensed) {
+        fun newInstance(configuration: Configuration): SaxonConfiguration {
+            val licensed = configuration.isLicensedFeature(Configuration.LicenseFeature.SCHEMA_VALIDATION)
+            val contextManager: ExecutionContextManager = ExecutionContextImpl()
+            val saxonConfiguration = SaxonConfiguration(licensed, null, emptyMap(), emptyList(), emptyMap(), emptyList(), contextManager)
+            saxonConfiguration.init(configuration)
+            return saxonConfiguration
+        }
+
+        fun newInstance(licensed: Boolean,
+                        configurationFile: URI?,
+                        properties: Map<String,String>,
+                        schemaDocuments: List<URI>,
+                        initializers: Map<String,Boolean>,
+                        configurers: List<Configurer>): SaxonConfiguration {
+            val contextManager: ExecutionContextManager = ExecutionContextImpl()
+            val saxonConfiguration = SaxonConfiguration(licensed, configurationFile, properties, schemaDocuments, initializers, configurers, contextManager)
+            saxonConfiguration.init()
+            return saxonConfiguration
+        }
+    }
+
+    private val schemaDocuments = mutableListOf<URI>()
+    private lateinit var _configuration: Configuration
+    private lateinit var _processor: Processor
+
+    lateinit var _environment: XProcEnvironment
+    var environment: XProcEnvironment
+        internal set(value) {
+            _environment = value
+        }
+        get() = _environment
+
+    init {
+        schemaDocuments.addAll(initialSchemaDocuments)
+    }
+
+    private fun init(suppliedConfiguration: Configuration? = null) {
+        _configuration = suppliedConfiguration
+            ?: if (saxonConfigurationFile == null) {
+                if (licensed) {
                     Configuration.newLicensedConfiguration()
                 } else {
                     Configuration()
                 }
             } else {
-                val source = SAXSource(InputSource(xmlCalabash.xmlCalabashConfig.saxonConfigurationFile!!.toURI().toString()))
+                val source = SAXSource(InputSource(saxonConfigurationFile.toString()))
                 Configuration.readConfiguration(source)
             }
 
-            for ((key, value) in xmlCalabash.xmlCalabashConfig.saxonConfigurationProperties) {
-                val data = FeatureIndex.getData(key) ?: throw XProcError.xiUnrecognizedSaxonConfigurationProperty(key).exception()
-                if (data.type == java.lang.Boolean::class.java) {
-                    if (value == "true" || value == "false") {
-                        newConfiguration.setConfigurationProperty(key, value == "true")
-                    } else {
-                        throw XProcError.xiInvalidSaxonConfigurationProperty(key, value).exception()
-                    }
+        for ((key, value) in saxonConfigurationProperties) {
+            val data = FeatureIndex.getData(key) ?: throw XProcError.xiUnrecognizedSaxonConfigurationProperty(key).exception()
+            if (data.type == java.lang.Boolean::class.java) {
+                if (value == "true" || value == "false") {
+                    _configuration.setConfigurationProperty(key, value == "true")
                 } else {
-                    newConfiguration.setConfigurationProperty(key, value)
+                    throw XProcError.xiInvalidSaxonConfigurationProperty(key, value).exception()
                 }
+            } else {
+                _configuration.setConfigurationProperty(key, value)
             }
-
-            loadConfigurationSchemas(xmlCalabash, newConfiguration)
-
-            newConfiguration.processor = Processor(newConfiguration)
-
-            for (init in xmlCalabash.commonEnvironment.additionalInitializers) {
-                init.initialize(newConfiguration)
-            }
-
-            for (configurer in xmlCalabash.configurers) {
-                configurer.configureSaxon(newConfiguration)
-            }
-
-            return newConfiguration
         }
 
-        private var warnedAlready = false
-        private fun loadConfigurationSchemas(xmlCalabash: XmlCalabash, configuration: Configuration) {
-            if (xmlCalabash.xmlCalabashConfig.xmlSchemaDocuments.isNotEmpty()) {
-                if (configuration.isLicensedFeature(Configuration.LicenseFeature.SCHEMA_VALIDATION)) {
-                    for (schema in xmlCalabash.xmlCalabashConfig.xmlSchemaDocuments) {
-                        configuration.addSchemaSource(schema.asSource())
-                    }
-                } else {
-                    if (!warnedAlready) {
-                        logger.warn { "Schema validation feature is not enabled, ignoring configured schemas " }
-                    }
-                    warnedAlready = true
-                }
-            }
+        loadConfigurationSchemas(_configuration)
 
+        for ((className, ignoreErrors) in initializerClasses) {
+            saxonInitializer(_configuration, className, ignoreErrors)
         }
 
+        for (configurer in configurers) {
+            configurer.configureSaxon(_configuration)
+        }
+
+        _processor = Processor(configuration)
+        configuration.processor = _processor
+        configureProcessor(_processor)
     }
 
-    val id = ++_id
-    private lateinit var _xmlCalabash: XmlCalabash
-    private var configurationFile: File? = null
-    private val configurationProperties = mutableMapOf<String,String>()
-    private var _xpathTransformer: Xslt30Transformer? = null
-
-    val xmlCalabash: XmlCalabash
-        get() = _xmlCalabash
-
-    // This is on the SaxonConfiguration because it needs to use a compatible configuration
-    // and I want to cache it somewhere so that it doesn't have to be parsed for *every* expression
-    internal val xpathTransformer: Xslt30Transformer
+    val configuration: Configuration
         get() {
-            if (_xpathTransformer == null) {
-                var styleStream = SaxonConfiguration::class.java.getResourceAsStream("/com/xmlcalabash/xpath.xsl")
-                var styleSource = SAXSource(InputSource(styleStream))
-                var xsltCompiler = processor.newXsltCompiler()
-                xsltCompiler.isSchemaAware = processor.isSchemaAware
-                var xsltExec = xsltCompiler.compile(styleSource)
-                _xpathTransformer = xsltExec.load30()
-            }
-            return _xpathTransformer!!
+            return _configuration
         }
 
-    private val functionLibraries = mutableListOf<Pair<URI,FunctionLibrary>>()
+    val processor: Processor
+        get() {
+            return _processor
+        }
+
+    private val functionLibraries = mutableListOf<Pair<URI, FunctionLibrary>>()
+    private val pipelineExtensionFunctions = mutableListOf<ExtensionFunctionDefinition>()
     private val standardExtensionFunctions = listOf<(SaxonConfiguration) -> ExtensionFunctionDefinition>(
         { config -> DocumentPropertyFunction(config) },
         { config -> DocumentPropertiesFunction(config) },
@@ -136,36 +143,65 @@ class SaxonConfiguration private constructor(
     )
 
     fun newConfiguration(): SaxonConfiguration {
-        return newConfiguration(environment)
-    }
+        val newConfig = SaxonConfiguration(licensed, saxonConfigurationFile, saxonConfigurationProperties, schemaDocuments, initializerClasses, configurers, contextManager)
+        newConfig.functionLibraries.addAll(functionLibraries)
+        newConfig.pipelineExtensionFunctions.addAll(pipelineExtensionFunctions)
+        newConfig.environment = environment
+        newConfig.init()
 
-    fun newConfiguration(environment: PipelineEnvironment): SaxonConfiguration {
-        val newConfig = newConfiguration(xmlCalabash)
-        val processor = Processor(newConfig)
-        val saxon = SaxonConfiguration(environment, newConfig, processor)
-        saxon.configuration.namePool = configuration.namePool
-        saxon.configuration.documentNumberAllocator = configuration.documentNumberAllocator
-        saxon.configuration.processor = processor
+        newConfig.configuration.namePool = configuration.namePool
+        newConfig.configuration.documentNumberAllocator = configuration.documentNumberAllocator
 
-        saxon._xmlCalabash = xmlCalabash
-        saxon.configurationFile = configurationFile
-        saxon.configurationProperties.putAll(configurationProperties)
-        saxon.functionLibraries.addAll(functionLibraries)
+        newConfig._processor = Processor(newConfig.configuration)
+        newConfig.configureProcessor(newConfig._processor)
 
-        saxon.configureProcessor(processor)
-        return saxon
-    }
-
-    fun newProcessor(): Processor {
-        val newproc = Processor(configuration)
-        configureProcessor(newproc)
-        return newproc
+        newConfig.configuration.processor = newConfig._processor
+        return newConfig
     }
 
     fun clearSchemaCache() {
         // Yes, but keep the ones that were loaded at configuration time...
         configuration.clearSchemaCache()
-        loadConfigurationSchemas(xmlCalabash, configuration)
+        loadConfigurationSchemas(configuration)
+    }
+
+    fun addSchemaDocument(uri: URI) {
+        schemaDocuments.add(uri)
+    }
+
+    private fun loadConfigurationSchemas(configuration: Configuration) {
+        if (schemaDocuments.isNotEmpty()) {
+            if (configuration.isLicensedFeature(Configuration.LicenseFeature.SCHEMA_VALIDATION)) {
+                for (schema in schemaDocuments) {
+                    val source = SAXSource(InputSource(schema.toString()))
+                    configuration.addSchemaSource(source)
+                }
+            } else {
+                // nop; we will already have done the warning when we loaded the first one
+            }
+        }
+    }
+
+    private fun saxonInitializer(configuration: Configuration, name: String, ignoreErrors: Boolean = false) {
+        try {
+            val klass = Class.forName(name)
+            val constructor = klass.getConstructor()
+            val init = constructor.newInstance()
+            if (init is Initializer) {
+                init.initialize(configuration)
+            } else {
+                throw XProcError.xiInitializerError("${name} is not a net.sf.saxon.lib.Initializer").exception()
+            }
+        } catch (ex: Exception) {
+            if (ex is XProcException) {
+                throw ex
+            } else {
+                if (!ignoreErrors) {
+                    throw XProcError.xiInitializerError(ex.toString()).exception(ex)
+                }
+                // Should we print a warning about this?
+            }
+        }
     }
 
     internal fun addFunctionLibrary(href: URI, flib: FunctionLibrary) {
@@ -187,6 +223,12 @@ class SaxonConfiguration private constructor(
         setBinder.invoke(configuration, "xmlcalabash:${href}", flib)
     }
 
+    fun declareFunction(decl: DeclareStepInstruction) {
+        val function = PipelineFunction(decl)
+        pipelineExtensionFunctions.add(function)
+        processor.registerExtensionFunction(function)
+    }
+
     // ============================================================
 
     private fun configureProcessor(processor: Processor) {
@@ -194,9 +236,31 @@ class SaxonConfiguration private constructor(
             processor.registerExtensionFunction(function(this))
         }
 
+        for (function in pipelineExtensionFunctions) {
+            processor.registerExtensionFunction(function)
+        }
+
         // So that libraries loaded later "come first" when searching...
         for (flib in functionLibraries.reversed()) {
             loadFunctionLibrary(flib.first, flib.second)
         }
     }
+
+    // ============================================================
+
+    // This is on the SaxonConfiguration because it needs to use a compatible configuration
+    // and I want to cache it somewhere so that it doesn't have to be parsed for *every* expression
+    private var _xpathTransformer: Xslt30Transformer? = null
+    internal val xpathTransformer: Xslt30Transformer
+        get() {
+            if (_xpathTransformer == null) {
+                var styleStream = SaxonConfiguration::class.java.getResourceAsStream("/com/xmlcalabash/xpath.xsl")
+                var styleSource = SAXSource(InputSource(styleStream))
+                var xsltCompiler = processor.newXsltCompiler()
+                xsltCompiler.isSchemaAware = processor.isSchemaAware
+                var xsltExec = xsltCompiler.compile(styleSource)
+                _xpathTransformer = xsltExec.load30()
+            }
+            return _xpathTransformer!!
+        }
 }

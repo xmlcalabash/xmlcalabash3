@@ -1,18 +1,18 @@
 package com.xmlcalabash.xvrl
 
+import com.xmlcalabash.config.StepConfiguration
 import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.namespace.NsXvrl
-import com.xmlcalabash.runtime.XProcStepConfiguration
 import com.xmlcalabash.util.SaxonTreeBuilder
 import net.sf.saxon.s9api.QName
 
-class XvrlMessage private constructor(stepConfiguration: XProcStepConfiguration): XvrlElement(stepConfiguration) {
+class XvrlMessage private constructor(stepConfiguration: StepConfiguration): XvrlElement(stepConfiguration) {
     private val _content = mutableListOf<XvrlElement>()
     val content: List<XvrlElement>
         get() = _content
 
     companion object {
-        fun newInstance(stepConfig: XProcStepConfiguration, text: String?, attr: Map<QName,String?> = emptyMap()): XvrlMessage {
+        fun newInstance(stepConfig: StepConfiguration, text: String?, attr: Map<QName,String?> = emptyMap()): XvrlMessage {
             val message = XvrlMessage(stepConfig)
             message.commonAttributes(attr)
             text?.let { message._content.add(XvrlText(stepConfig, it)) }
@@ -62,7 +62,7 @@ class XvrlMessage private constructor(stepConfiguration: XProcStepConfiguration)
     }
 
     override fun serialize(builder: SaxonTreeBuilder) {
-        builder.addStartElement(NsXvrl.message, stepConfig.attributeMap(attributes))
+        builder.addStartElement(NsXvrl.message, stepConfig.typeUtils.attributeMap(attributes))
         for (item in content) {
             item.serialize(builder)
         }

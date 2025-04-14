@@ -1,6 +1,6 @@
 package com.xmlcalabash.test
 
-import com.xmlcalabash.config.XmlCalabash
+import com.xmlcalabash.XmlCalabash
 import com.xmlcalabash.util.BufferingReceiver
 import com.xmlcalabash.util.UriUtils
 import com.xmlcalabash.parsers.xpl.XplParser
@@ -32,5 +32,4 @@ class ParserTest {
             }
         }
     }
-
 }

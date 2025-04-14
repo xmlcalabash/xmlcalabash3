@@ -32,7 +32,7 @@ class CliDebugger(val runtime: XProcRuntime): Monitor {
     val terminal = TerminalBuilder.terminal()
     var reader: LineReader? = null
     val prompt = "> "
-    val printer = runtime.environment.xmlCalabash.xmlCalabashConfig.messagePrinter
+    val printer = runtime.environment.messagePrinter
 
     var parser: InvisibleXmlParser? = null
     val stacks = mutableMapOf<Long, Stack<StackFrame>>()
@@ -111,7 +111,7 @@ class CliDebugger(val runtime: XProcRuntime): Monitor {
         for (point in catchpoints) {
             val catchCode = if (point.code != null) {
                 try {
-                    step.stepConfig.parseQName(point.code)
+                    step.stepConfig.typeUtils.parseQName(point.code)
                 } catch (_: Exception) {
                     printer.println("Catch failed to parse ${point.code}")
                     continue
@@ -285,7 +285,7 @@ class CliDebugger(val runtime: XProcRuntime): Monitor {
         val selector = exec.load()
         selector.setVariable(a, XdmAtomicValue(json))
         val value = (selector.evaluate() as XdmMap).get("command") as XdmMap
-        val command = stepConfig.asMap(stepConfig.forceQNameKeys(value))
+        val command = stepConfig.typeUtils.asMap(stepConfig.typeUtils.forceQNameKeys(value))
         val map = mutableMapOf<String, String>()
         for ((key, value) in command) {
             map[key.localName] = value.underlyingValue.stringValue
@@ -297,7 +297,7 @@ class CliDebugger(val runtime: XProcRuntime): Monitor {
         val inscopeNS = combinedNamespaces()
 
         val varname = try {
-            curFrame.step.stepConfig.parseQName(command["varname"]!!, inscopeNS)
+            curFrame.step.stepConfig.typeUtils.parseQName(command["varname"]!!, inscopeNS)
         } catch (ex: Exception) {
             printer.println(ex.message ?: "Cannot parse name: ${command["varname"]}: ${ex.message ?: ""}")
             return
@@ -343,7 +343,7 @@ class CliDebugger(val runtime: XProcRuntime): Monitor {
         val inscopeNS = combinedNamespaces()
 
         val varname = try {
-            curFrame.step.stepConfig.parseQName(command["varname"]!!, inscopeNS)
+            curFrame.step.stepConfig.typeUtils.parseQName(command["varname"]!!, inscopeNS)
         } catch (ex: Exception) {
             printer.println(ex.message ?: "Cannot parse name: ${command["varname"]}: ${ex.message ?: ""}")
             return
@@ -416,7 +416,7 @@ class CliDebugger(val runtime: XProcRuntime): Monitor {
         val variables = combinedVariables()
 
         try {
-            val execContext = curFrame.step.stepConfig.environment.newExecutionContext(curFrame.step.stepConfig)
+            val execContext = curFrame.step.stepConfig.saxonConfig.newExecutionContext(curFrame.step.stepConfig)
             for ((port, list) in curFrame.inputs) {
                 for (doc in list) {
                     execContext.addProperties(doc)
@@ -460,7 +460,7 @@ class CliDebugger(val runtime: XProcRuntime): Monitor {
             }
             return XdmEmptySequence.getInstance()
         } finally {
-            curFrame.step.stepConfig.environment.releaseExecutionContext()
+            curFrame.step.stepConfig.saxonConfig.releaseExecutionContext()
         }
     }
 

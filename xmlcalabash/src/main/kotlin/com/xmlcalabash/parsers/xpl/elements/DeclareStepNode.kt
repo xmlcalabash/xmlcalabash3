@@ -29,7 +29,7 @@ class DeclareStepNode(parent: AnyNode, node: XdmNode): RootNode(parent, parent.s
         }
         val typestr = node.getAttributeValue(Ns.type)
         if (typestr != null) {
-            type = stepConfig.parseQName(typestr)
+            type = stepConfig.typeUtils.parseQName(typestr)
         } else {
             visible = false
         }

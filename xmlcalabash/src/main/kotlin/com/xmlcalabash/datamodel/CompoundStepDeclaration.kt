@@ -244,7 +244,7 @@ abstract class CompoundStepDeclaration(parent: XProcInstruction?, stepConfig: In
 
         checkInputBindings()
 
-        if (stepConfig.xmlCalabash.xmlCalabashConfig.assertions != AssertionsLevel.IGNORE) {
+        if (stepConfig.assertions != AssertionsLevel.IGNORE) {
             AssertionsMonitor.parseStepAssertions(this)
         }
 

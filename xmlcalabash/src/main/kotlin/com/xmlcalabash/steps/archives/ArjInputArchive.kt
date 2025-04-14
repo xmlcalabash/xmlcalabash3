@@ -1,11 +1,11 @@
 package com.xmlcalabash.steps.archives
 
-import com.xmlcalabash.io.MediaType
+import com.xmlcalabash.config.StepConfiguration
 import com.xmlcalabash.documents.XProcBinaryDocument
 import com.xmlcalabash.exceptions.XProcError
+import com.xmlcalabash.io.MediaType
 import com.xmlcalabash.namespace.Ns
 import com.xmlcalabash.namespace.NsCx
-import com.xmlcalabash.runtime.XProcStepConfiguration
 import net.sf.saxon.s9api.QName
 import org.apache.commons.compress.archivers.arj.ArjArchiveEntry
 import org.apache.commons.compress.archivers.arj.ArjArchiveInputStream
@@ -15,7 +15,7 @@ import java.io.InputStream
 import java.nio.file.attribute.FileTime
 import kotlin.io.path.inputStream
 
-open class ArjInputArchive(stepConfig: XProcStepConfiguration, doc: XProcBinaryDocument): InputArchive(stepConfig, doc) {
+open class ArjInputArchive(stepConfig: StepConfiguration, doc: XProcBinaryDocument): InputArchive(stepConfig, doc) {
     override val archiveFormat = Ns.arj
     override val baseUri = doc.baseURI
     lateinit var archive: ArjArchiveInputStream

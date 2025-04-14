@@ -82,7 +82,7 @@ class AddXmlBaseStep(): AbstractAtomicStep(), ProcessMatchingNodes {
         if (addBase) {
             attrs[NsXml.base] = base!!.toString()
         }
-        matcher.addStartElement(node, stepConfig.attributeMap(attrs))
+        matcher.addStartElement(node, stepConfig.typeUtils.attributeMap(attrs))
         return true
     }
 

@@ -1,5 +1,6 @@
 package com.xmlcalabash.util
 
+import com.xmlcalabash.config.StepConfiguration
 import com.xmlcalabash.namespace.Ns
 import com.xmlcalabash.namespace.NsSaxon
 import com.xmlcalabash.runtime.XProcStepConfiguration
@@ -10,7 +11,7 @@ import net.sf.saxon.s9api.XmlProcessingError
 import net.sf.saxon.trans.XPathException
 import kotlin.collections.set
 
-class SaxonErrorReporter(val stepConfig: XProcStepConfiguration): ErrorReporter {
+class SaxonErrorReporter(val stepConfig: StepConfiguration): ErrorReporter {
     private var _error: XmlProcessingError? = null
     val error: XmlProcessingError?
         get() = _error
@@ -56,6 +57,6 @@ class SaxonErrorReporter(val stepConfig: XProcStepConfiguration): ErrorReporter 
             error.message
         }
 
-        stepConfig.environment.messageReporter.report(Verbosity.DEBUG, extra) { message }
+        stepConfig.messageReporter.report(Verbosity.DEBUG, extra) { message }
     }
 }

@@ -58,12 +58,12 @@ class CommandLine private constructor(val args: Array<out String>) {
     private var _licensed = true
     private var _pipe: Boolean? = null
     private var _debug: Boolean? = null
-    private var _debugger = false
+    private var _debugger: Boolean? = null
     private var _visualizer: String? = null
     private val _visualizerOptions = mutableMapOf<String,String>()
     private var _verbosity: Verbosity? = null
     private var _explainErrors = false
-    private var _assertions = AssertionsLevel.IGNORE
+    private var _assertions: AssertionsLevel? = null
     private var _help = false
     private var _trace: File? = null
     private var _traceDocuments: File? = null
@@ -133,7 +133,7 @@ class CommandLine private constructor(val args: Array<out String>) {
         get() = _visualizerOptions
 
     /** Evaluate assertions? */
-    val assertions: AssertionsLevel
+    val assertions: AssertionsLevel?
         get() = _assertions
 
     /** Display command line help instructions?
@@ -157,7 +157,7 @@ class CommandLine private constructor(val args: Array<out String>) {
         get() = _traceDocuments
 
     /** Enable the debugger? */
-    val debugger: Boolean
+    val debugger: Boolean?
         get() = _debugger
 
     /** The pipeline inputs.

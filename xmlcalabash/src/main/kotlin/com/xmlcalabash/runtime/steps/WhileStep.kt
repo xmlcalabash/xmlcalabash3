@@ -59,7 +59,7 @@ open class WhileStep(config: XProcStepConfiguration, compound: CompoundStepModel
         stepsToRun.clear()
         stepsToRun.addAll(runnables)
 
-        val exec = stepConfig.environment.newExecutionContext(stepConfig)
+        val exec = stepConfig.saxonConfig.newExecutionContext(stepConfig)
         var position = 0L
 
         while (runSubpipeline) {
@@ -99,7 +99,7 @@ open class WhileStep(config: XProcStepConfiguration, compound: CompoundStepModel
         foot.runStep()
 
         cache.clear()
-        stepConfig.environment.releaseExecutionContext()
+        stepConfig.saxonConfig.releaseExecutionContext()
     }
 
     override fun reset() {

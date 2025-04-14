@@ -47,7 +47,7 @@ class WhenInstruction(parent: ChooseInstruction): CompoundStepDeclaration(parent
             throw stepConfig.exception(XProcError.xsMissingRequiredAttribute(Ns.test))
         }
 
-        testExpression = XProcExpression.select(stepConfig, test, stepConfig.parseXsSequenceType("xs:boolean?"), collection == true)
+        testExpression = XProcExpression.select(stepConfig, test, stepConfig.typeUtils.parseXsSequenceType("xs:boolean?"), collection == true)
 
         guardDrp = (parent as ChooseInstruction).namedInput("!context")
         if (guardDrp == null) {
@@ -131,7 +131,7 @@ class WhenInstruction(parent: ChooseInstruction): CompoundStepDeclaration(parent
             newSteps.addAll(testExpression.promoteToStep(this, Ns.test, readFrom, explicitBinding))
             newChildren.addAll(newSteps)
         } else {
-            val expr = XProcExpression.constant(stepConfig, testExpression.staticValue!!, stepConfig.parseXsSequenceType("xs:boolean"))
+            val expr = XProcExpression.constant(stepConfig, testExpression.staticValue!!, stepConfig.typeUtils.parseXsSequenceType("xs:boolean"))
             val exprStep = AtomicExpressionStepInstruction(this, Ns.test, expr)
 
             exprStep.elaborateAtomicStep()

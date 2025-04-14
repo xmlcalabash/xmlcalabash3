@@ -1,5 +1,6 @@
 package com.xmlcalabash.ext.rdf
 
+import com.xmlcalabash.config.StepConfiguration
 import com.xmlcalabash.documents.DocumentProperties
 import com.xmlcalabash.documents.XProcBinaryDocument
 import com.xmlcalabash.documents.XProcDocument
@@ -36,7 +37,7 @@ class RdfLoader(): ContentTypeLoader, ContentTypeLoaderProvider {
         )
     }
 
-    override fun load(context: XProcStepConfiguration, uri: URI?, inputStream: InputStream, contentType: MediaType, inputCharset: Charset?): XProcDocument {
+    override fun load(context: StepConfiguration, uri: URI?, inputStream: InputStream, contentType: MediaType, inputCharset: Charset?): XProcDocument {
         val lang = RdfConverter.rdfLang(contentType)
         val stream = if (lang == Lang.RDFTHRIFT) {
             inputStream

@@ -1,12 +1,11 @@
 package com.xmlcalabash.test
 
-import com.xmlcalabash.config.XmlCalabash
+import com.xmlcalabash.XmlCalabash
 import com.xmlcalabash.exceptions.XProcException
 import com.xmlcalabash.namespace.NsErr
-import com.xmlcalabash.namespace.NsP
-import com.xmlcalabash.util.UriUtils
 import com.xmlcalabash.parsers.xpl.elements.ElementNode
 import com.xmlcalabash.parsers.xpl.elements.XplDocumentManager
+import com.xmlcalabash.util.UriUtils
 import net.sf.saxon.s9api.QName
 import net.sf.saxon.s9api.XdmAtomicValue
 import org.junit.jupiter.api.Assertions

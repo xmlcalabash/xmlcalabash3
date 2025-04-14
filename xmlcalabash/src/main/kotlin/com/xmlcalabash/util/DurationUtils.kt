@@ -1,14 +1,14 @@
 package com.xmlcalabash.util
 
+import com.xmlcalabash.config.StepConfiguration
 import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.namespace.NsXs
-import com.xmlcalabash.runtime.XProcStepConfiguration
 import net.sf.saxon.value.DayTimeDurationValue
 import java.time.Duration
 
 class DurationUtils {
     companion object {
-        fun parseDuration(stepConfig: XProcStepConfiguration, str: String): Duration {
+        fun parseDuration(stepConfig: StepConfiguration, str: String): Duration {
             var xdtStr = ""
             try {
                 val s = str.toLong()

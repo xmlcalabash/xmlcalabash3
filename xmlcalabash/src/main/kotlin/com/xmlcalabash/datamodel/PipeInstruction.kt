@@ -2,7 +2,6 @@ package com.xmlcalabash.datamodel
 
 import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.namespace.NsP
-import com.xmlcalabash.runtime.steps.CompoundStep
 import java.lang.RuntimeException
 
 class PipeInstruction(parent: XProcInstruction): ConnectionInstruction(parent, NsP.pipe) {

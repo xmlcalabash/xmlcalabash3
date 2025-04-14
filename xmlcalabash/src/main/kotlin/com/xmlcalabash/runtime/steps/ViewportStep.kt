@@ -68,7 +68,7 @@ open class ViewportStep(config: XProcStepConfiguration, compound: CompoundStepMo
         stepsToRun.clear()
         stepsToRun.addAll(runnables)
 
-        val exec = stepConfig.environment.newExecutionContext(stepConfig)
+        val exec = stepConfig.saxonConfig.newExecutionContext(stepConfig)
         var firstTime = true
 
         while (sequence.isNotEmpty()) {
@@ -132,7 +132,7 @@ open class ViewportStep(config: XProcStepConfiguration, compound: CompoundStepMo
         }
 
         cache.clear()
-        stepConfig.environment.releaseExecutionContext()
+        stepConfig.saxonConfig.releaseExecutionContext()
     }
 
     override fun reset() {

@@ -52,12 +52,12 @@ open class InlineStep(val params: InlineStepParameters): AbstractAtomicStep() {
             XdmMap()
         } else {
             try {
-                stepConfig.forceQNameKeys(docProps as XdmMap)
+                stepConfig.typeUtils.forceQNameKeys(docProps as XdmMap)
             } catch (ex: Exception) {
                 throw stepConfig.exception(XProcError.xdInvalidSerialization(docProps.toString()))
             }
         }
-        val props = DocumentProperties(stepConfig.asMap(docMap))
+        val props = DocumentProperties(stepConfig.typeUtils.asMap(docMap))
 
         val ptype = props[Ns.contentType]
         if (ptype != null) {

@@ -4,7 +4,6 @@ import com.xmlcalabash.datamodel.AtomicExpressionStepInstruction
 import com.xmlcalabash.datamodel.CatchInstruction
 import com.xmlcalabash.graph.*
 import com.xmlcalabash.namespace.NsP
-import com.xmlcalabash.runtime.PipelineContext
 import com.xmlcalabash.runtime.XProcRuntime
 import com.xmlcalabash.runtime.XProcStepConfiguration
 import com.xmlcalabash.runtime.api.RuntimePort

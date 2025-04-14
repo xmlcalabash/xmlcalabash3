@@ -1,9 +1,7 @@
 package com.xmlcalabash.parsers.xpl.elements
 
-import com.xmlcalabash.exceptions.XProcError
-import com.xmlcalabash.namespace.Ns
-import com.xmlcalabash.runtime.XProcStepConfigurationImpl
 import com.xmlcalabash.util.TypeUtils
+import com.xmlcalabash.namespace.Ns
 import net.sf.saxon.s9api.QName
 import net.sf.saxon.s9api.SequenceType
 import net.sf.saxon.s9api.XdmNode
@@ -17,7 +15,7 @@ class OptionNode(parent: AnyNode, node: XdmNode, val name: QName, val select: St
 
         val typeStr = node.getAttributeValue(Ns.asType)
         if (typeStr != null) {
-            asType = stepConfig.parseSequenceType(typeStr)
+            asType = stepConfig.typeUtils.parseSequenceType(typeStr)
         }
     }
 

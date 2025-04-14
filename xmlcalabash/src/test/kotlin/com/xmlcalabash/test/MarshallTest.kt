@@ -1,16 +1,16 @@
 package com.xmlcalabash.test
 
-import com.xmlcalabash.config.XmlCalabash
+import com.xmlcalabash.XmlCalabashBuilder
+import com.xmlcalabash.config.StepConfiguration
 import com.xmlcalabash.documents.DocumentProperties
-import com.xmlcalabash.io.MediaType
 import com.xmlcalabash.documents.XProcBinaryDocument
 import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.exceptions.XProcException
 import com.xmlcalabash.io.DocumentConverter
 import com.xmlcalabash.io.DocumentLoader
 import com.xmlcalabash.io.DocumentWriter
+import com.xmlcalabash.io.MediaType
 import com.xmlcalabash.namespace.*
-import com.xmlcalabash.runtime.XProcStepConfiguration
 import com.xmlcalabash.util.S9Api
 import com.xmlcalabash.util.UriUtils
 import net.sf.saxon.om.NamespaceUri
@@ -32,7 +32,7 @@ import kotlin.io.path.deleteIfExists
 
 @TestInstance(PER_CLASS)
 class MarshallTest {
-    lateinit var stepConfig: XProcStepConfiguration
+    lateinit var stepConfig: StepConfiguration
     lateinit var cwd: URI
     val tempdir = if (System.getProperty("java.io.tmpdir") == null) {
         Paths.get(".")
@@ -42,7 +42,7 @@ class MarshallTest {
 
     @BeforeAll
     fun init() {
-        val xmlCalabash = XmlCalabash.newInstance()
+        val xmlCalabash = XmlCalabashBuilder().build()
         val builder = xmlCalabash.newPipelineBuilder()
         stepConfig = builder.stepConfig
         cwd = UriUtils.cwdAsUri()
@@ -51,7 +51,7 @@ class MarshallTest {
     fun propertyMap(props: Map<String,String>): MutableMap<QName, XdmValue> {
         val properties = mutableMapOf<QName, XdmValue>()
         for ((name, value) in props) {
-            val pname = stepConfig.parseQName(name)
+            val pname = stepConfig.typeUtils.parseQName(name)
             if (value == "true" || value == "false") {
                 properties[pname] = XdmAtomicValue(value == "true")
             } else {
@@ -458,7 +458,7 @@ class MarshallTest {
             "method" to "xml",
             "omit-xml-declaration" to "true"
         ))
-        doc.properties.setSerialization(stepConfig.asXdmMap(props))
+        doc.properties.setSerialization(stepConfig.typeUtils.asXdmMap(props))
         doc.properties.set(NsCx.link, XdmAtomicValue("false"))
 
         val converter = DocumentConverter(stepConfig, doc, MediaType.XSLT)
@@ -480,7 +480,7 @@ class MarshallTest {
             "method" to "xml",
             "omit-xml-declaration" to "true"
         ))
-        doc.properties.setSerialization(stepConfig.asXdmMap(props))
+        doc.properties.setSerialization(stepConfig.typeUtils.asXdmMap(props))
         doc.properties.set(NsCx.link, XdmAtomicValue("false"))
 
         val converter = DocumentConverter(stepConfig, doc, MediaType.HTML)
@@ -703,7 +703,7 @@ class MarshallTest {
             "method" to "xml",
             "omit-xml-declaration" to "true"
         ))
-        doc.properties.setSerialization(stepConfig.asXdmMap(props))
+        doc.properties.setSerialization(stepConfig.typeUtils.asXdmMap(props))
         doc.properties.set(NsCx.link, XdmAtomicValue("false"))
 
         val converted = DocumentConverter(stepConfig, doc, MediaType.XSLT).convert()
@@ -725,7 +725,7 @@ class MarshallTest {
             "method" to "xml",
             "omit-xml-declaration" to "true"
         ))
-        doc.properties.setSerialization(stepConfig.asXdmMap(props))
+        doc.properties.setSerialization(stepConfig.typeUtils.asXdmMap(props))
         doc.properties.set(NsCx.link, XdmAtomicValue("false"))
 
         val converted = DocumentConverter(stepConfig, doc, MediaType.HTML).convert()
@@ -746,7 +746,7 @@ class MarshallTest {
             "method" to "xml",
             "omit-xml-declaration" to "true"
         ))
-        doc.properties.setSerialization(stepConfig.asXdmMap(props))
+        doc.properties.setSerialization(stepConfig.typeUtils.asXdmMap(props))
         doc.properties.set(NsCx.link, XdmAtomicValue("false"))
 
         val converted = DocumentConverter(stepConfig, doc, MediaType.JSON).convert()
@@ -765,7 +765,7 @@ class MarshallTest {
             "method" to "xml",
             "omit-xml-declaration" to "true"
         ))
-        doc.properties.setSerialization(stepConfig.asXdmMap(props))
+        doc.properties.setSerialization(stepConfig.typeUtils.asXdmMap(props))
         doc.properties.set(NsCx.link, XdmAtomicValue("false"))
 
         val converted = DocumentConverter(stepConfig, doc, MediaType.YAML).convert()
@@ -784,7 +784,7 @@ class MarshallTest {
             "method" to "xml",
             "omit-xml-declaration" to "true"
         ))
-        doc.properties.setSerialization(stepConfig.asXdmMap(props))
+        doc.properties.setSerialization(stepConfig.typeUtils.asXdmMap(props))
         doc.properties.set(NsCx.link, XdmAtomicValue("false"))
 
         val converted = DocumentConverter(stepConfig, doc, MediaType.TOML).convert()
@@ -803,7 +803,7 @@ class MarshallTest {
             "method" to "xml",
             "omit-xml-declaration" to "true"
         ))
-        doc.properties.setSerialization(stepConfig.asXdmMap(props))
+        doc.properties.setSerialization(stepConfig.typeUtils.asXdmMap(props))
         doc.properties.set(NsCx.link, XdmAtomicValue("false"))
 
         val converted = DocumentConverter(stepConfig, doc, MediaType.parse("text/arbitrary")).convert()
@@ -826,5 +826,4 @@ class MarshallTest {
             // pass
         }
     }
-
 }

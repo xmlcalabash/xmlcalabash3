@@ -1,7 +1,7 @@
 package com.xmlcalabash.parsers.xpath31
 
+import com.xmlcalabash.config.StepConfiguration
 import com.xmlcalabash.exceptions.XProcError
-import com.xmlcalabash.runtime.XProcStepConfiguration
 import com.xmlcalabash.namespace.NsFn
 import com.xmlcalabash.namespace.NsP
 import com.xmlcalabash.parsers.XPath31
@@ -13,11 +13,8 @@ import net.sf.saxon.om.NamespaceMap
 import net.sf.saxon.om.NamespaceUri
 import net.sf.saxon.s9api.QName
 import net.sf.saxon.s9api.XdmDestination
-import net.sf.saxon.s9api.Xslt30Transformer
-import org.xml.sax.InputSource
-import javax.xml.transform.sax.SAXSource
 
-class XPathExpressionParser(val stepConfig: XProcStepConfiguration) {
+class XPathExpressionParser(val stepConfig: StepConfiguration) {
     companion object {
         private val TRACE = false
         private val DEBUG = false
@@ -237,7 +234,7 @@ class XPathExpressionParser(val stepConfig: XProcStepConfiguration) {
                         if (ns == null) {
                             throw XProcError.xsXPathStaticError("No namespace in-scope for prefix \"$prefix\"").exception()
                         }
-                        val atts = stepConfig.stringAttributeMap(mapOf("name" to "Q{${encodeForUri(ns)}}${localName}"))
+                        val atts = stepConfig.typeUtils.stringAttributeMap(mapOf("name" to "Q{${encodeForUri(ns)}}${localName}"))
                         builder.addStartElement(QName(nsT, "t:" + terminal.name), atts, nsmap)
                         builder.addText(terminal.token)
                         builder.addEndElement()
@@ -246,13 +243,13 @@ class XPathExpressionParser(val stepConfig: XProcStepConfiguration) {
                         val pos = terminal.token.indexOf("}")
                         val ns = terminal.token.substring(2, pos)
                         val localName = terminal.token.substring(pos+1)
-                        val atts = stepConfig.stringAttributeMap(mapOf("name" to "Q{${encodeForUri(ns)}}${localName}"))
+                        val atts = stepConfig.typeUtils.stringAttributeMap(mapOf("name" to "Q{${encodeForUri(ns)}}${localName}"))
                         builder.addStartElement(QName(nsT, "t:QName"), atts, nsmap)
                         builder.addText(localName)
                         builder.addEndElement()
                     }
                     else -> {
-                        val atts = stepConfig.stringAttributeMap(mapOf("token" to terminal.token))
+                        val atts = stepConfig.typeUtils.stringAttributeMap(mapOf("token" to terminal.token))
                         builder.addStartElement(QName(nsT, "t:" + terminal.name), atts, nsmap)
                         builder.addEndElement()
                     }

@@ -1,5 +1,6 @@
 package com.xmlcalabash.util.spi
 
+import com.xmlcalabash.config.StepConfiguration
 import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.io.MediaType
 import com.xmlcalabash.runtime.XProcStepConfiguration
@@ -13,7 +14,7 @@ class StandardContentTypeLoader(): ContentTypeLoader {
         return emptyList()
     }
 
-    override fun load(context: XProcStepConfiguration, uri: URI?, stream: InputStream, contentType: MediaType, charset: Charset?): XProcDocument {
+    override fun load(context: StepConfiguration, uri: URI?, stream: InputStream, contentType: MediaType, charset: Charset?): XProcDocument {
         throw IllegalArgumentException("The StandardContentTypeLoader doesn't support any content types")
     }
 }

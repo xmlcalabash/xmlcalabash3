@@ -212,7 +212,7 @@ abstract class AbstractAtomicStep(): XProcStep {
         if (value == XdmEmptySequence.getInstance()) {
             return mapOf()
         }
-        return stepConfig.asMap(stepConfig.forceQNameKeys(value as XdmMap))
+        return stepConfig.typeUtils.asMap(stepConfig.typeUtils.forceQNameKeys(value as XdmMap))
     }
 
     fun qnameBinding(name: QName): QName? {
@@ -224,8 +224,8 @@ abstract class AbstractAtomicStep(): XProcStep {
         val qname = when (value) {
             is QName -> value
             is QNameValue -> QName(value.structuredQName)
-            is StringValue -> stepConfig.parseQName(value.stringValue)
-            is NodeInfo -> stepConfig.parseQName(value.stringValue)
+            is StringValue -> stepConfig.typeUtils.parseQName(value.stringValue)
+            is NodeInfo -> stepConfig.typeUtils.parseQName(value.stringValue)
             else -> throw RuntimeException("bang")
         }
         return qname

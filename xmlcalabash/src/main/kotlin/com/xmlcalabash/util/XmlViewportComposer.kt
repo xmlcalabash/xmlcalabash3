@@ -72,7 +72,7 @@ class XmlViewportComposer(val stepConfig: XProcStepConfiguration, val match: Str
 
     inner class Decomposer(): ProcessMatchingNodes {
         private fun insertMarker() {
-            matcher.addStartElement(NsCx.viewport, stepConfig.attributeMap(mapOf(Ns.index to itemIndex.toString())))
+            matcher.addStartElement(NsCx.viewport, stepConfig.typeUtils.attributeMap(mapOf(Ns.index to itemIndex.toString())))
             itemIndex++
         }
 

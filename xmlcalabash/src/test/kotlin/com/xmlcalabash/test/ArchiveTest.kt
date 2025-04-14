@@ -1,8 +1,8 @@
 package com.xmlcalabash.test
 
-import com.xmlcalabash.config.XmlCalabash
+import com.xmlcalabash.XmlCalabashBuilder
+import com.xmlcalabash.config.StepConfiguration
 import com.xmlcalabash.documents.XProcBinaryDocument
-import com.xmlcalabash.runtime.XProcStepConfiguration
 import com.xmlcalabash.steps.archives.*
 import com.xmlcalabash.util.UriUtils
 import org.junit.jupiter.api.Assertions
@@ -13,11 +13,11 @@ import org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS
 
 @TestInstance(PER_CLASS)
 class ArchiveTest {
-    lateinit var stepConfig: XProcStepConfiguration
+    lateinit var stepConfig: StepConfiguration
 
     @BeforeAll
     fun init() {
-        val xmlCalabash = XmlCalabash.newInstance()
+        val xmlCalabash = XmlCalabashBuilder().build()
         val builder = xmlCalabash.newPipelineBuilder()
         stepConfig = builder.stepConfig
     }

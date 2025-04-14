@@ -2,7 +2,6 @@ package com.xmlcalabash.datamodel
 
 import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.io.MediaType
-import com.xmlcalabash.namespace.NsCx.processor
 import com.xmlcalabash.namespace.NsP
 import com.xmlcalabash.util.SaxonErrorReporter
 import net.sf.saxon.functions.ExecutableFunctionLibrary
@@ -46,13 +45,13 @@ class ImportFunctionsInstruction(parent: XProcInstruction?, stepConfig: Instruct
         get() = _functionLibrary
 
     fun prefetch(): FunctionLibrary? {
-        if (stepConfig.processor.underlyingConfiguration.editionCode != "EE") {
+        if (stepConfig.saxonConfig.processor.underlyingConfiguration.editionCode != "EE") {
             stepConfig.warn { "Saxon EE required for p:import-functions" }
             return null
         }
 
         val ctype = if (contentType == null) {
-            MediaType.parse(stepConfig.environment.mimeTypes.getContentType(href.toString()))
+            MediaType.parse(stepConfig.mimeTypes.getContentType(href.toString()))
         } else {
             contentType!!
         }
@@ -81,8 +80,8 @@ class ImportFunctionsInstruction(parent: XProcInstruction?, stepConfig: Instruct
 
     private fun loadXsltLibrary(conn: URLConnection): FunctionLibrary? {
         val stylesheet = SAXSource(InputSource(conn.getInputStream()))
-        val compiler = stepConfig.processor.newXsltCompiler()
-        compiler.isSchemaAware = stepConfig.processor.isSchemaAware
+        val compiler = stepConfig.saxonConfig.processor.newXsltCompiler()
+        compiler.isSchemaAware = stepConfig.saxonConfig.processor.isSchemaAware
         compiler.errorReporter = errorReporter
         val exec = compiler.compile(stylesheet)
         val ps = exec.underlyingCompiledStylesheet

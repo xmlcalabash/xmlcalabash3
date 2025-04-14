@@ -31,7 +31,7 @@ class AtomicCompoundStepModel(runtime: XProcRuntime, model: SubpipelineModel): A
     }
 
     override fun runnable(config: XProcStepConfiguration): () -> AbstractStep {
-        return { CompoundStep.newInstance(config.copy(stepConfig), impl) }
+        return { CompoundStep.newInstance(config.copy(), impl) }
     }
 
     override fun toString(): String {

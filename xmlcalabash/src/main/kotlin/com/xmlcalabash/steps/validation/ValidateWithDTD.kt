@@ -39,14 +39,14 @@ class ValidateWithDTD(): AbstractAtomicStep() {
             if (map.value == XdmEmptySequence.getInstance()) {
                 mapOf()
             } else {
-                stepConfig.asMap(map.value as XdmMap)
+                stepConfig.typeUtils.asMap(map.value as XdmMap)
             }
         } else {
             mapOf()
         }
 
-        val documentSerialization = stepConfig.asMap(
-            stepConfig.forceQNameKeys(
+        val documentSerialization = stepConfig.typeUtils.asMap(
+            stepConfig.typeUtils.forceQNameKeys(
                 (source.properties[Ns.serialization] ?: XdmMap()) as XdmMap
             )
         )

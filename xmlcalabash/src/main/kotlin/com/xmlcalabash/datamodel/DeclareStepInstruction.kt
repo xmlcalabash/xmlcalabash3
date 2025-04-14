@@ -99,7 +99,7 @@ class DeclareStepInstruction(parent: XProcInstruction?, stepConfig: InstructionC
                 throw stepConfig.exception(XProcError.xsDuplicateStepType(child.type!!))
             }
 
-            if (!child.isAtomic || stepConfig.environment.commonEnvironment.atomicStepAvailable(child.type!!)) {
+            if (!child.isAtomic || stepConfig.atomicStepAvailable(child.type!!)) {
                 child.type?.let { newStepTypes[it] = child }
                 stepConfig.addVisibleStepType(child)
             }
@@ -177,7 +177,7 @@ class DeclareStepInstruction(parent: XProcInstruction?, stepConfig: InstructionC
                     throw stepConfig.exception(XProcError.xsDuplicateStepType(type!!))
                 }
             }
-            if (!isAtomic || stepConfig.environment.commonEnvironment.atomicStepAvailable(type!!)) {
+            if (!isAtomic || stepConfig.atomicStepAvailable(type!!)) {
                 stepConfig.addVisibleStepType(this)
                 newStepTypes[type!!] = this
             }
@@ -267,7 +267,7 @@ class DeclareStepInstruction(parent: XProcInstruction?, stepConfig: InstructionC
             }
         }
 
-        stepConfig.validationMode = stepConfig.xmlCalabash.xmlCalabashConfig.validationMode
+        stepConfig.validationMode = stepConfig.xmlCalabashConfig.validationMode
         when (extensionAttributes[NsCx.validationMode]) {
             null -> Unit
             "strict" -> stepConfig.validationMode = ValidationMode.STRICT
@@ -284,14 +284,22 @@ class DeclareStepInstruction(parent: XProcInstruction?, stepConfig: InstructionC
             return
         }
 
-        if (stepConfig.xmlCalabash.xmlCalabashConfig.assertions != AssertionsLevel.IGNORE) {
+        if (stepConfig.assertions != AssertionsLevel.IGNORE) {
             AssertionsMonitor.parseFromPipeinfo(this)
         }
 
         for (import in _imported) {
             when (import) {
-                is DeclareStepInstruction -> import.validate()
-                is LibraryInstruction -> import.validate()
+                is DeclareStepInstruction -> {
+                    import.validate()
+                    registerPipelineFunction(import)
+                }
+                is LibraryInstruction -> {
+                    import.validate()
+                    for ((_, decl) in import.exportedSteps) {
+                        registerPipelineFunction(decl)
+                    }
+                }
                 else -> throw stepConfig.exception(XProcError.xiImpossible("Import not a library or declared step?"))
             }
         }
@@ -301,10 +309,14 @@ class DeclareStepInstruction(parent: XProcInstruction?, stepConfig: InstructionC
             if (child is DeclareStepInstruction) {
                 child.elaborateInstructions()
                 declaredSteps.add(child)
+                registerPipelineFunction(child)
             } else {
                 newChildren.add(child)
             }
         }
+
+        // For recursive use...
+        registerPipelineFunction(this)
 
         _children.clear()
         _children.addAll(newChildren)
@@ -312,6 +324,12 @@ class DeclareStepInstruction(parent: XProcInstruction?, stepConfig: InstructionC
         super.elaborateInstructions()
 
         open = false
+    }
+
+    private fun registerPipelineFunction(decl: DeclareStepInstruction) {
+        if (decl.type != null) {
+            stepConfig.saxonConfig.declareFunction(decl)
+        }
     }
 
     private var validated = false

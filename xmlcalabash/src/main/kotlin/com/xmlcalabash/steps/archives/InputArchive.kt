@@ -1,7 +1,7 @@
 package com.xmlcalabash.steps.archives
 
+import com.xmlcalabash.config.StepConfiguration
 import com.xmlcalabash.documents.XProcBinaryDocument
-import com.xmlcalabash.runtime.XProcStepConfiguration
 import com.xmlcalabash.util.FileUtils
 import java.io.InputStream
 import java.net.URI
@@ -10,7 +10,7 @@ import java.nio.file.attribute.FileTime
 import java.time.Instant
 import java.time.format.DateTimeFormatter
 
-abstract class InputArchive(stepConfig: XProcStepConfiguration, val doc: XProcBinaryDocument): AbstractArchiveFile(stepConfig) {
+abstract class InputArchive(stepConfig: StepConfiguration, val doc: XProcBinaryDocument): AbstractArchiveFile(stepConfig) {
     protected val _entries = mutableListOf< XArchiveEntry>()
     val entries: List<XArchiveEntry>
         get() = _entries

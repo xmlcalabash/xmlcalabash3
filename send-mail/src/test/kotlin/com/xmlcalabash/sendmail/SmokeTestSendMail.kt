@@ -1,6 +1,6 @@
 package com.xmlcalabash.sendmail
 
-import com.xmlcalabash.config.XmlCalabash
+import com.xmlcalabash.XmlCalabash
 import com.xmlcalabash.util.BufferingReceiver
 import org.json.JSONObject
 import org.junit.jupiter.api.Assertions

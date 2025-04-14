@@ -3,21 +3,26 @@ package com.xmlcalabash.testdriver
 import com.xmlcalabash.exceptions.XProcError
 import net.sf.saxon.s9api.QName
 import net.sf.saxon.s9api.XdmNode
+import java.io.File
 
-class TestStatus(val status: String, val error: XProcError? = null) {
+class TestStatus(val testFile: File, val status: String, val error: XProcError? = null) {
     val failedAssertions = mutableListOf<XdmNode>()
     val expectedCodes = mutableListOf<QName>()
     var message: String? = null
+    var stdOutput: String? = null
+    var stdError: String? = null
+    var elapsed: Double = -1.0
+    var messagesXml: XdmNode? = null
 
-    constructor(status: String, message: String): this(status, null) {
+    constructor(testFile: File, status: String, message: String): this(testFile, status, null) {
         this.message = message
     }
 
-    constructor(status: String, errors: List<XdmNode>): this(status, null) {
+    constructor(testFile: File, status: String, errors: List<XdmNode>): this(testFile, status, null) {
         failedAssertions.addAll(errors)
     }
 
-    constructor(status: String, error: XProcError, codes: List<QName>): this(status, error) {
+    constructor(testFile: File, status: String, error: XProcError, codes: List<QName>): this(testFile, status, error) {
         expectedCodes.addAll(codes)
     }
 

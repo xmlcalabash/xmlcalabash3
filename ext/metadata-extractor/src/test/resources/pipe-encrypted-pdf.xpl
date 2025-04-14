@@ -3,7 +3,6 @@
                 xmlns:cx="http://xmlcalabash.com/ns/extensions"
                 exclude-inline-prefixes="cx xs"
                 version="3.0">
-
 <p:output port="result"/>
 
 <p:declare-step type="cx:metadata-extractor">
