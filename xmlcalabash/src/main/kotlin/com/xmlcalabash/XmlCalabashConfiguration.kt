@@ -22,6 +22,7 @@ interface XmlCalabashConfiguration {
     val eagerEvaluation: Boolean
     val graphStyle: URI?
     val graphviz: File?
+    val implicitParameterName: QName?
     val inlineTrimWhitespace: Boolean
     val licensed: Boolean
     val messageBufferSize: Int

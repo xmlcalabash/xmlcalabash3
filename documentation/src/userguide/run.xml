@@ -555,21 +555,76 @@ used to change the namespace bindings.</para>
 <varlistentry xml:id="cli-option">
   <term><option><replaceable>option</replaceable>=<replaceable>value</replaceable></option>, sets an option</term>
 <listitem>
-<para>You can provide values for pipeline options on the command line. These override any defaults
-declared in the pipeline. There must be a pipeline option named <replaceable>option</replaceable>.</para>
+<para>You can provide values for pipeline options on the command line. These
+override any defaults declared in the pipeline. There must be a pipeline option
+(or a static option) named <replaceable>option</replaceable>.</para>
 
-<para>The option name can be an EQName or it can use a prefix
-previously defined with <option linkend="cli-namespace">--namespace</option>; if the option is a simple
-<type>NCName</type>, it is not in a namespace.</para>
+<para>If the option name includes “::”, then it is treated as a shortcut for
+setting the value in a map. In this case, the name before the “::” is the name
+of the actual parameter and the name after the “::” is the name of a key in that
+map. (With the additional special case that if the name <emphasis>begins
+with</emphasis> “::”, then the option name is take to be default option name,
+currently <code>parameters</code>.) This is intended to be somewhat reminiscent
+of XPath axes.</para>
+
+<para>In both cases, the name can be an EQName or it can use a prefix previously
+defined with <option linkend="cli-namespace">--namespace</option>; if the name
+is a simple <type>NCName</type>, it is not in a namespace.</para>
+
 <para>If the <replaceable>value</replaceable> begins with “?”, what follows is taken to be
 an XPath expression. That expression is evaluated using the namespace bindings defined. The
 context item is undefined. The result of evaluating the expression is the value of the option.
 If the <replaceable>value</replaceable> does not begin with a “?”, the whole string
 becomes the value as an <type>xs:untypedAtomic</type>.</para>
 
-<para>If multiple assignments to the same <option>option</option>
-appear, the option’s value will be a sequence with those values in the order
+<para>If multiple assignments to the same <option>option</option> (or map item)
+appear, the value will be a sequence with those values in the order
 specified.</para>
+
+<para>For example, suppose that the following sequences of options are given:</para>
+
+<variablelist>
+<varlistentry><term><code>a=1 b=2</code></term>
+<listitem><para>Sets the option <code>a</code> to 1 and the option <code>b</code> to 2.
+</para></listitem>
+</varlistentry>
+<varlistentry><term><code>a=1 b=2+3</code></term>
+<listitem><para>Sets the option <code>a</code> to 1 and the option <code>b</code> to “2+3”.
+</para></listitem>
+</varlistentry>
+<varlistentry><term><code>a=1 a=2 b=?2+3</code></term>
+<listitem><para>Sets the option <code>a</code> to (1, 2) and the option <code>b</code> to 5.
+</para></listitem>
+</varlistentry>
+<varlistentry><term><code>a=1 parameters="map{'key': 'value'}"</code></term>
+<listitem><para>Sets the option <code>a</code> to 1 and the option <code>parameters</code> to a map
+with the QName key “key” and the value “value”.
+</para></listitem>
+</varlistentry>
+<varlistentry><term><code>a=1 parameters::key=value</code></term>
+<listitem><para>Sets the option <code>a</code> to 1 and the option <code>parameters</code> to a map
+with the QName key “key” and the value “value”.
+</para></listitem>
+</varlistentry>
+<varlistentry><term><code>a=1 parameters::key=value serialization::method=xml serialization::indent=true</code></term>
+<listitem><para>Sets the option <code>a</code> to 1 and the option <code>parameters</code> to a map
+with the QName key “key” and the value “value” and the option <code>serialization</code> to a map
+with the QName key “method” with the value “xml” and the QName key “indent” with the value “true”.
+</para></listitem>
+</varlistentry>
+<varlistentry><term><code>a=1 ::key=value serialization::method=xml serialization::indent=true</code></term>
+<listitem><para>Sets the option <code>a</code> to 1 and the option <code>parameters</code> to a map
+with the QName key “key” and the value “value” and the option <code>serialization</code> to a map
+with the QName key “method” with the value “xml” and the QName key “indent” with the value “true”.
+</para></listitem>
+</varlistentry>
+</variablelist>
+
+<para>Note that the use of <code>serialization</code> in these examples assumes
+that the step being run has an <emphasis>option</emphasis> named
+<code>serialization</code>. This doesn’t otherwise have any effect on the
+serialization options of any output port.</para>
+
 </listitem>
 </varlistentry>
 </variablelist>

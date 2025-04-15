@@ -19,11 +19,16 @@ import com.xmlcalabash.namespace.NsErr
 import com.xmlcalabash.namespace.NsFn
 import com.xmlcalabash.namespace.NsXs
 import com.xmlcalabash.spi.DocumentResolverServiceProvider
-import com.xmlcalabash.util.*
+import com.xmlcalabash.util.DefaultMessagePrinter
+import com.xmlcalabash.util.UriUtils
+import com.xmlcalabash.util.Verbosity
+import com.xmlcalabash.util.VisualizerOutput
 import net.sf.saxon.Configuration
-import net.sf.saxon.lib.Initializer
 import net.sf.saxon.om.NamespaceUri
-import net.sf.saxon.s9api.*
+import net.sf.saxon.s9api.ItemType
+import net.sf.saxon.s9api.QName
+import net.sf.saxon.s9api.XdmAtomicValue
+import net.sf.saxon.s9api.XdmValue
 import org.apache.logging.log4j.kotlin.logger
 import org.slf4j.MDC
 import java.io.BufferedReader
@@ -166,7 +171,10 @@ class XmlCalabashCli private constructor() {
         }
 
         try {
-
+            // N.B. It's illegal to shadow a static option name, so we can shove all the
+            // options into the static options before we parse the pipeline. This is...odd
+            // and, I expect, unsatisfactory in the long term. But I'm not going to try
+            // to fix that today.
             evaluateOptions(xprocParser.builder, commandLine)
 
             val declstep = if (commandLine.pipeline != null) {
@@ -284,8 +292,11 @@ class XmlCalabashCli private constructor() {
                 }
             }
 
-            for ((name, value) in xprocParser.builder.staticOptionsManager.useWhenOptions) {
-                pipeline.option(name, XProcDocument.ofValue(value, stepConfig, MediaType.OCTET_STREAM, DocumentProperties()))
+            val optManager = xprocParser.builder.staticOptionsManager
+            for ((name, value) in optManager.useWhenOptions) {
+                if (name !in optManager.staticOptions) {
+                    pipeline.option(name, XProcDocument.ofValue(value, stepConfig, MediaType.OCTET_STREAM, DocumentProperties()))
+                }
             }
 
             pipeline.receiver = FileOutputReceiver(xmlCalabash, stepConfig.processor, pipeline.outputManifold, commandLine.outputs, explicitStdout ?: implicitStdout)
@@ -357,9 +368,29 @@ class XmlCalabashCli private constructor() {
             compiler.declareNamespace(name, namespace.toString())
         }
 
+        val implicitParameterName = pipelineBuilder.stepConfig.xmlCalabashConfig.implicitParameterName
+        val mapOptions = mutableMapOf<QName, XdmValue>()
+
         for ((name, initializers) in commandLine.options) {
-            val qname = stepConfig.typeUtils.parseQName(name, nsmap)
-            var value: XdmValue? = null
+            var mapName: QName? = null
+            val ccpos = name.indexOf("::")
+            val qname = if (ccpos >= 0) {
+                if (ccpos > 0) {
+                    mapName = stepConfig.typeUtils.parseQName(name.substring(0, ccpos), nsmap)
+                } else {
+                    mapName = implicitParameterName
+                }
+                stepConfig.typeUtils.parseQName(name.substring(ccpos + 2), nsmap)
+            } else {
+                stepConfig.typeUtils.parseQName(name, nsmap)
+            }
+
+            var value: XdmValue? = if (mapName != null) {
+                mapOptions[qname]
+            } else {
+                null
+            }
+
             for (initializer in initializers) {
                 val ivalue = if (initializer.startsWith("?")) {
                     val exec = compiler.compile(initializer.substring(1))
@@ -374,7 +405,16 @@ class XmlCalabashCli private constructor() {
                     value = value.append(ivalue)
                 }
             }
-            pipelineBuilder.option(qname, value!!)
+
+            if (mapName != null) {
+                mapOptions[qname] = value!!
+            } else {
+                pipelineBuilder.option(qname, value!!)
+            }
+        }
+
+        if (mapOptions.isNotEmpty()) {
+            pipelineBuilder.option(implicitParameterName!!, stepConfig.typeUtils.asXdmMap(mapOptions))
         }
     }
 

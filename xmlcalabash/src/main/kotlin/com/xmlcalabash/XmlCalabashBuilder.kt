@@ -5,6 +5,7 @@ import com.xmlcalabash.config.SaxonConfiguration
 import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.io.MediaType
 import com.xmlcalabash.io.MessagePrinter
+import com.xmlcalabash.namespace.Ns
 import com.xmlcalabash.spi.Configurer
 import com.xmlcalabash.spi.ConfigurerServiceProvider
 import com.xmlcalabash.spi.PagedMediaManager
@@ -104,6 +105,12 @@ class XmlCalabashBuilder {
     fun getGraphviz() = config._graphviz
     fun setGraphviz(executable: File?): XmlCalabashBuilder {
         config._graphviz = executable
+        return this
+    }
+
+    fun getImplicitParameterName() = config._implicitParameterName
+    fun setImplicitParameterName(name: QName?): XmlCalabashBuilder {
+        config._implicitParameterName = name
         return this
     }
 
@@ -437,6 +444,7 @@ class XmlCalabashBuilder {
         internal var _eagerEvaluation = true
         internal var _graphStyle: URI? = null
         internal var _graphviz: File? = null
+        internal var _implicitParameterName: QName? = Ns.parameters
         internal var _inlineTrimWhitespace = false
         internal var _licensed = true
         internal var _messageBufferSize = 32
@@ -501,6 +509,8 @@ class XmlCalabashBuilder {
             get() = _graphStyle
         override val graphviz: File?
             get() = _graphviz
+        override val implicitParameterName: QName?
+            get() = _implicitParameterName
         override val inlineTrimWhitespace: Boolean
             get() = _inlineTrimWhitespace
         override val licensed: Boolean
