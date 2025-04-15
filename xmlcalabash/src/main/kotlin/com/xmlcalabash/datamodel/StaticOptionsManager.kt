@@ -12,16 +12,12 @@ class StaticOptionsManager() {
     private val options = mutableMapOf<VariableBindingContainer, StaticOptionDetails>()
     private val _useWhenOptions = mutableMapOf<QName, XdmValue>()
     private val compileTimeOptions = mutableMapOf<QName,XProcExpression>()
+    private val _staticOptions = mutableSetOf<QName>()
 
     val useWhenOptions: Map<QName,XdmValue>
         get() = _useWhenOptions
 
-    internal fun copy(): StaticOptionsManager {
-        val manager = StaticOptionsManager()
-        manager.options.putAll(options)
-        manager.compileTimeOptions.putAll(compileTimeOptions)
-        return manager
-    }
+    val staticOptions: Set<QName> = _staticOptions
 
     fun compileTimeValue(name: QName, value: XProcExpression) {
         compileTimeOptions[name] = value
@@ -35,11 +31,17 @@ class StaticOptionsManager() {
     fun get(variable: VariableBindingContainer): StaticOptionDetails {
         if (!options.containsKey(variable)) {
             val details = when (variable) {
-                is OptionInstruction -> StaticOptionDetails(variable)
+                is OptionInstruction -> {
+                    if (variable.static == true) {
+                        _staticOptions.add(variable.name)
+                    }
+                    StaticOptionDetails(variable)
+                }
                 is WithOptionInstruction -> StaticOptionDetails(variable)
                 is VariableInstruction -> StaticOptionDetails(variable)
                 else -> throw XProcError.xiImpossible("Unexpected static option type").exception()
             }
+
             if (compileTimeOptions.containsKey(variable.name)) {
                 details.override(compileTimeOptions[variable.name]!!.evaluate(variable.stepConfig))
             }

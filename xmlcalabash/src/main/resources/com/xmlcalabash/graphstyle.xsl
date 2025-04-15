@@ -131,9 +131,14 @@
           <xsl:when test="string-length(@expression) lt $width">
             <g:detail>
               <td>
+                <!-- An unspecified expression defaults to (), so make that the default -->
+                <xsl:variable name="expression"
+                              select="if (normalize-space(@expression) = '')
+                                      then '()'
+                                      else string(@expression)"/>
                 <font face="{$expression-font}"
                       point-size="10"
-                      >{string(@expression)}</font>
+                      >{$expression}</font>
               </td>
             </g:detail>
           </xsl:when>
