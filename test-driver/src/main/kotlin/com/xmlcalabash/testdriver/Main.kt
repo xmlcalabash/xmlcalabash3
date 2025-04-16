@@ -19,22 +19,10 @@ class Main {
             for (arg in args) {
                 if (arg.startsWith("-t:")) {
                     testOptions.testRegex = arg.substring(3)
-                } else if (arg == "--trace" || arg == "-T") {
-                    testOptions.traceExecution = true
                 } else if (arg.startsWith("--title:")) {
                     testOptions.title = arg.substring(8)
                 } else if (arg.startsWith("--graph:")) {
                     testOptions.outputGraph = arg.substring(8)
-                } else if (arg == "--update-regressions" || arg == "-U") {
-                    testOptions.updateRegressions = true
-                } else if (arg == "--test-logging") {
-                    testOptions.testLogging = true
-                } else if (arg == "--first-failed") {
-                    testOptions.firstFailed = true
-                } else if (arg == "--only-failed") {
-                    testOptions.onlyFailedTests = true
-                } else if (arg == "--only-passing") {
-                    testOptions.onlyExpectedToPass = true
                 } else if (arg == "--stop-on-fail") {
                     testOptions.stopOnFirstFailed = true
                 } else if (arg.startsWith("--require-pass:")) {
@@ -43,8 +31,6 @@ class Main {
                     testOptions.report = arg.substring(9)
                 } else if (arg.startsWith("--dir:")) {
                     testOptions.testDirectoryList.add(arg.substring(6))
-                } else if (arg.startsWith("--prev:")) {
-                    testOptions.prevRun = arg.substring(7)
                 } else {
                     throw RuntimeException("Unrecognized argument: ${arg}")
                 }

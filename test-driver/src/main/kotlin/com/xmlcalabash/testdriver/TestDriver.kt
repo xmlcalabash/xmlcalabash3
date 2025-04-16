@@ -88,9 +88,10 @@ class TestDriver(val testOptions: TestOptions, val exclusions: Map<String, Strin
         val saxonConfig = eagerLicensed.saxonConfiguration
         println("Running tests with ${saxonConfig.processor.saxonEdition} version ${saxonConfig.processor.saxonProductVersion}")
 
-        val modulus = allTests.size / 10
+        val modulus = Math.max(allTests.size / 10, 10)
         val suiteStart = System.nanoTime()
 
+        var width = 0
         for (testFile in allTests) {
             var case = loadTest(lazyLicensed, testFile)
             if (case.features.contains("no-psvi-support")) {
@@ -105,9 +106,23 @@ class TestDriver(val testOptions: TestOptions, val exclusions: Map<String, Strin
                 }
             }
 
+            if (testFile.absolutePath.contains("/tests/")) {
+                val pos = testFile.absolutePath.indexOf("/tests/")
+                val message = "\r…/${testFile.absolutePath.substring(pos+7)}"
+                width = message.length
+                print("${message}\r")
+            } else {
+                width = testFile.absolutePath.length
+                print("${testFile.absolutePath}\r")
+            }
+
             total++
             case.run()
             testResults.add(case.status)
+
+            if (width > 0) {
+                print("\r".padStart(width, ' '))
+            }
 
             when (case.status.status) {
                 "pass" -> pass++
@@ -123,12 +138,13 @@ class TestDriver(val testOptions: TestOptions, val exclusions: Map<String, Strin
             if (total % modulus == 0) {
                 suiteElapsed = (System.nanoTime() - suiteStart) / 1e9
                 val percent = "%.1f".format((100.0 * total) / (1.0 * allTests.size))
-                val tpt = total / suiteElapsed
+                val tpt = suiteElapsed / total
                 val remaining = (allTests.size - total) * tpt
 
+                val tptString = "%.3f".format(tpt)
                 val elapsedString = "%.1f".format(suiteElapsed)
                 val remainingString = "%.1f".format(remaining)
-                println("${total} tests (${percent}%) in ${elapsedString}s, estimating ${remainingString}s remaining")
+                println("${total} tests (${percent}%) in ${elapsedString}s (${tptString}s/test), estimating ${remainingString}s remain")
             }
         }
 
