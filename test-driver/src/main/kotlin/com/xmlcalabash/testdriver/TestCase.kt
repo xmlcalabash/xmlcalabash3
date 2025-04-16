@@ -120,13 +120,6 @@ class TestCase(val xmlCalabash: XmlCalabash, val testOptions: TestOptions, val t
         }
 
         try {
-            if (testFile.absolutePath.contains("/tests/")) {
-                val pos = testFile.absolutePath.indexOf("/tests/")
-                println("…/${testFile.absolutePath.substring(pos+7)}")
-            } else {
-                println(testFile.absolutePath)
-            }
-
             val parser = xmlCalabash.newXProcParser(builder)
             for ((name, value) in staticOptions) {
                 parser.builder.option(name, value)

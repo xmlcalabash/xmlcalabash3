@@ -93,9 +93,9 @@ tasks.register<JavaExec>("test-suite") {
   outputs.file(layout.buildDirectory.file("test-suite-results.xml"))
   outputs.file(layout.buildDirectory.file("test-suite-results.txt"))
 
-  args("--dir:${layout.projectDirectory.dir("../tests/3.0-test-suite/test-suite/tests")}",
+  args("--title:XProc 3.0 Test Suite",
        "--require-pass:${requirePass}",
-       "--prev:test-suite-results.txt",
+       "--dir:${layout.projectDirectory.dir("../tests/3.0-test-suite/test-suite/tests")}",
        "--report:${layout.buildDirectory.file("test-suite-results.xml").get().asFile}")
 }
 
@@ -110,10 +110,9 @@ tasks.register<JavaExec>("extra-suite") {
   outputs.file(layout.buildDirectory.file("extra-suite-results.xml"))
   outputs.file(layout.buildDirectory.file("extra-suite-results.txt"))
 
-  args("--title:XML Calabash Test Suite",
+  args("--title:XML Calabash Extra Test Suite",
        "--require-pass:${requirePass}",
        "--dir:${layout.projectDirectory.dir("../tests/extra-suite/test-suite/tests")}",
-       "--prev:extra-suite-results.txt",
        "--report:${layout.buildDirectory.file("extra-suite-results.xml").get().asFile}")
 }
 
@@ -161,22 +160,5 @@ tasks.register("copy-extra") {
       into(layout.buildDirectory.dir("test-report"))
       from(layout.projectDirectory.file("src/js"))
     }
-  }
-}
-
-// ============================================================
-
-tasks.register("helloWorld") {
-  doLast {
-/*
-    sourceSets.main.get().runtimeClasspath.forEach {
-      println("RT: ${it}")                      
-    }
-
-    configurations.named("testrunner").get().forEach {
-      println("RUN: ${it}")                      
-    }
-*/
-    println("Hello, world.")
   }
 }
