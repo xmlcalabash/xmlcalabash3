@@ -152,13 +152,44 @@ class MediaType private constructor(val mediaType: String, val mediaSubtype: Str
         }
 
         fun parse(mtype: String, forceEncoding: String? = null): MediaType {
-            var ctype = parseMatch(mtype, forceEncoding)
+            val ctype = parseMatch(mtype, forceEncoding)
             if (!"[A-Za-z0-9][-A-Za-z0-9!#\$&0^_\\\\.+]*".toRegex().matches(ctype.mediaType) || ctype.mediaType.length > 127) {
                 throw XProcError.xdInvalidContentType(mtype).exception()
             }
-            if (!"[A-Za-z0-9][-A-Za-z0-9!#\$&0^_\\\\.+]*".toRegex().matches(ctype.mediaSubtype) || ctype.mediaSubtype.length > 127) {
+
+            val subtype = if (ctype.suffix != null) {
+                "${ctype.mediaSubtype}+${ctype.suffix}"
+            } else {
+                ctype.mediaSubtype
+            }
+
+            if (!"[A-Za-z0-9][-A-Za-z0-9!#\$&0^_\\\\.+]*".toRegex().matches(subtype) || subtype.length > 127) {
                 throw XProcError.xdInvalidContentType(mtype).exception()
             }
+
+            return ctype
+        }
+
+        fun parseWildcard(mtype: String, forceEncoding: String? = null): MediaType {
+            val ctype = parseMatch(mtype, forceEncoding)
+            if (ctype.mediaType != "*") {
+                if (!"[A-Za-z0-9][-A-Za-z0-9!#\$&0^_\\\\.+]*".toRegex().matches(ctype.mediaType) || ctype.mediaType.length > 127) {
+                    throw XProcError.xdInvalidContentType(mtype).exception()
+                }
+            }
+
+            val subtype = if (ctype.suffix != null) {
+                "${ctype.mediaSubtype}+${ctype.suffix}"
+            } else {
+                ctype.mediaSubtype
+            }
+
+            if (ctype.mediaSubtype != "*") {
+                if (!"[A-Za-z0-9][-A-Za-z0-9!#\$&0^_\\\\.+]*".toRegex().matches(subtype) || subtype.length > 127) {
+                    throw XProcError.xdInvalidContentType(mtype).exception()
+                }
+            }
+
             return ctype
         }
 

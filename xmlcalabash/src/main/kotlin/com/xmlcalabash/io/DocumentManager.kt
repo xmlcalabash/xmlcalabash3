@@ -1,6 +1,7 @@
 package com.xmlcalabash.io
 
 import com.xmlcalabash.config.StepConfiguration
+import com.xmlcalabash.config.XProcEnvironment
 import com.xmlcalabash.documents.DocumentProperties
 import com.xmlcalabash.documents.XProcBinaryDocument
 import com.xmlcalabash.documents.XProcDocument
@@ -28,8 +29,8 @@ import javax.xml.transform.Source
 import javax.xml.transform.sax.SAXSource
 import javax.xml.transform.stream.StreamSource
 
-class DocumentManager(): EntityResolver, EntityResolver2, ResourceResolver, ModuleURIResolver {
-    constructor(manager: DocumentManager): this() {
+class DocumentManager(val environment: XProcEnvironment): EntityResolver, EntityResolver2, ResourceResolver, ModuleURIResolver {
+    constructor(manager: DocumentManager): this(manager.environment) {
         prefixMap.putAll(manager.prefixMap)
         prefixList.addAll(manager.prefixList)
         _cache.putAll(manager._cache)
@@ -39,7 +40,7 @@ class DocumentManager(): EntityResolver, EntityResolver2, ResourceResolver, Modu
 
     private val prefixMap = mutableMapOf<String, DocumentResolver>()
     private val prefixList = mutableListOf<String>()
-    private val _cache = mutableMapOf<URI, XProcDocument>()
+    private val _cache = mutableMapOf<URI, MutableMap<MediaType,XProcDocument>>()
 
     private var _resolver: XMLResolver? = null
     private var _resolverConfiguration = XMLResolverConfiguration()
@@ -150,12 +151,27 @@ class DocumentManager(): EntityResolver, EntityResolver2, ResourceResolver, Modu
     }
 
     fun getCached(href: URI): XProcDocument? {
+        val contentType = MediaType.parse(environment.mimeTypes.getContentType(href.toString()))
+        return getCached(href, contentType)
+    }
+
+    fun getCached(href: URI, contentType: MediaType): XProcDocument? {
         synchronized(_cache) {
-            val doc = _cache[href]
-            if (doc != null) {
-                logger.debug { "Using cached: ${doc.baseURI}"}
+            val typeMap = _cache[href] ?: return null
+            if (contentType in typeMap) {
+                logger.debug { "Using cached: ${typeMap[contentType]!!.baseURI}/${contentType}"}
+                return typeMap[contentType]!!
             }
-            return doc
+            var randomDoc: XProcDocument? = null
+            val typeClass = contentType.classification()
+            for ((type, doc) in typeMap) {
+                randomDoc = randomDoc ?: doc
+                if (type.classification() == typeClass) {
+                    logger.debug { "Using cached: ${doc.baseURI}/${type}"}
+                    return doc
+                }
+            }
+            return randomDoc
         }
     }
 
@@ -164,24 +180,55 @@ class DocumentManager(): EntityResolver, EntityResolver2, ResourceResolver, Modu
             if (document.baseURI == null) {
                 throw XProcError.xiBaseUriRequiredToCache().exception()
             }
-            if (_cache[document.baseURI] != null) {
-                logger.debug { "Replacing cache entry: ${document.baseURI}"}
-            } else {
-                logger.debug { "Caching: ${document.baseURI}"}
+            val contentType = document.contentType ?: MediaType.OCTET_STREAM
+            if (_cache[document.baseURI] == null) {
+                logger.debug { "Caching: ${document.baseURI}/${contentType}"}
+                _cache[document.baseURI!!] = mutableMapOf()
+                _cache[document.baseURI]!![contentType] = document
+                return
             }
-            _cache[document.baseURI!!] = document
+
+            val typeMap = _cache[document.baseURI]!!
+            if (contentType in typeMap) {
+                logger.debug { "Replacing cache entry: ${document.baseURI}/${contentType}"}
+            } else {
+                logger.debug { "Caching: ${document.baseURI}.${contentType}"}
+            }
+            typeMap[contentType] = document
         }
     }
 
     fun uncache(document: XProcDocument) {
+        uncache(document, MediaType.ANY)
+    }
+
+    fun uncache(document: XProcDocument, contentType: MediaType) {
         synchronized(_cache) {
-            if (document.baseURI != null) {
-                val doc = _cache.remove(document.baseURI!!)
-                if (doc == null) {
-                    logger.debug { "Was not cached: ${document.baseURI}" }
-                } else {
-                    logger.debug { "Removed from cache: ${document.baseURI}" }
+            val typeMap = _cache[document.baseURI]
+            if (typeMap == null) {
+                logger.debug { "Was not cached: ${document.baseURI}" }
+                return
+            }
+
+            val doc = typeMap[contentType]
+            if (doc != null) {
+                typeMap.remove(contentType)
+                logger.debug { "Removed from cache: ${document.baseURI}/${contentType}" }
+                return
+            }
+
+            var removed = false
+            for ((type, doc) in typeMap) {
+                if (contentType.mediaType == "*"
+                    || (contentType.mediaType == type.mediaType && contentType.mediaSubtype == "*")) {
+                    typeMap.remove(type)
+                    logger.debug { "Removed from cache: ${document.baseURI}/${type}" }
+                    removed = true
                 }
+            }
+
+            if (!removed) {
+                logger.debug { "Was not cached: ${document.baseURI}/${contentType}" }
             }
         }
     }

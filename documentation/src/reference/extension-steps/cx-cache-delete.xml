@@ -13,7 +13,7 @@
 <refsynopsisdiv>
 <refsection role="introduction">
 <title>Introduction</title>
-<para>XML Calabash maintains a cache of documents. This step removes a document from
+<para>XML Calabash maintains a cache of documents. This step deletes a document from
 the cache.</para>
 
 </refsection>
@@ -29,31 +29,32 @@ the cache.</para>
 <refsection>
 <title>Description</title>
 
-<para>XML Calabash maintains a cache of documents. If a step attempts to load a
-URI, and that URI is present in the cache, the cached value will always be
-returned. Some steps use the cache implicitly (for example, the validate steps
-update it to hold schema documents).</para>
-
-<para>A pipeline can remove a document from the cache explicitly with <tag>cx:cache-delete</tag>.
-If the <option>href</option> option is provided, it is used as the URI for
-caching, otherwise the <port>source</port> document URI is used.
-<error code="I0030">It is a
-<glossterm>dynamic error</glossterm> if the <port>source</port> document does not have
-a base URI and the <option>href</option> option is not provided.</error>
+<para>XML Calabash maintains a cache of documents, see <tag>cx:cache-add</tag>
+for a description of how this works. A pipeline can delete a document from the
+cache explicitly with <tag>cx:cache-delete</tag>. If the <option>href</option>
+option is provided, it is used as the URI for caching, otherwise the
+<port>source</port> document URI is used. <error code="I0030">It is a
+<glossterm>dynamic error</glossterm> if the <port>source</port> document does
+not have a base URI and the <option>href</option> option is not
+provided.</error>
 </para>
 
-<para>Irrespective of the cache URI, the step simply copies it’s <port>source</port>
+<para>Irrespective of the cache URI, the step simply copies its <port>source</port>
 document to the <port>result</port> port. (It does not change the document’s base URI,
-even if an <option>href</option> option is provided to the <tag>cx:cache-add</tag> step.)</para>
+even if an <option>href</option> option is provided to the <tag>cx:cache-delete</tag> step.)</para>
 
 <para><error code="I0038">It is a <glossterm>dynamic error</glossterm> if the
 <option>fail-if-not-in-cache</option> option is <literal>true</literal> and the
 cache does not contains a document with the URI being cached.</error></para>
 
+<para>The <tag>cx:cache-delete</tag> step will only delete documents that match
+that content type. (Wildcards may be used for the media type and
+subtype).</para>
+
 <refsection>
 <title>Options</title>
 
-<para>There are two  options.</para>
+<para>There are three options.</para>
 
 <variablelist>
 <varlistentry><term><option>href</option></term>
@@ -64,6 +65,11 @@ cache does not contains a document with the URI being cached.</error></para>
 <varlistentry><term><option>fail-if-not-in-cache</option></term>
 <listitem>
 <para>Determines whether the URI must already exist in the cache.</para>
+</listitem>
+</varlistentry>
+<varlistentry><term><option>content-type</option></term>
+<listitem>
+<para>Determines which content-type hits in the cache will be deleted.</para>
 </listitem>
 </varlistentry>
 </variablelist>
