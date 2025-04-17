@@ -28,25 +28,42 @@ the cache.</para>
 <refsection>
 <title>Description</title>
 
-<para>If a step attempts to load a URI, and that URI is present in the cache,
-the cached value will always be returned. Some steps use the cache implicitly
-(for example, the validate steps update it to hold schema documents).</para>
+<para>XML Calabash maintains a document cache while the pipeline is running. The
+<tag>cx:cache-add</tag> allows a pipeline author to explicitly add a document to
+the cache. Some steps use the cache implicitly (for example, the validate steps
+update it to hold schema documents). When a request is made for a document (by a
+step, by one of the URI resolvers, etc.), if it appears in the cache, a cached document
+will be returned.</para>
 
-<para>A pipeline can add a document to the cache explicitly with <tag>cx:cache-add</tag>.
-If the <option>href</option> option is provided, it is used as the URI for
+<para>The cache has two levels. At the top level, a URI maps to a second level
+cache that maps from content types to documents. In this way, the cache can
+contain different representations for the same URI provided that they have
+different content types.</para>
+
+<para>The processor uses the combination of a URI and a content type to locate
+documents in the cache. If an exact content type match is found
+for a URI, that document is returned. If there isn’t an exact match, the cache
+tries to return a document of the right “type”: an XML document for an XML content type,
+a text document for a text content type, etc. If there’s no type match at all, an arbitrary
+document will be returned.</para>
+
+<para>If the <option>href</option> option is provided, it is used as the URI for
 caching, otherwise the <port>source</port> document URI is used.
 <error code="I0030">It is a
 <glossterm>dynamic error</glossterm> if the <port>source</port> document does not have
 a base URI and the <option>href</option> option is not provided.</error>
 </para>
 
-<para>Irrespective of the cache URI, the step simply copies it’s <port>source</port>
+<para>Irrespective of the cache URI, the step simply copies its <port>source</port>
 document to the <port>result</port> port. (It does not change the document’s base URI,
 even if an <option>href</option> option is provided to the <tag>cx:cache-add</tag> step.)</para>
 
 <para><error code="I0037">It is a <glossterm>dynamic error</glossterm> if the
 <option>fail-if-in-cache</option> option is <literal>true</literal> and the
 cache already contains a document with the URI being cached.</error></para>
+
+<para>A pipeline author can remove documents from the cache with <tag>cx:cache-delete</tag>.
+</para>
 
 <refsection>
 <title>Options</title>

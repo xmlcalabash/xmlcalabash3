@@ -180,6 +180,8 @@ class PipelineVisualization private constructor(val instruction: XProcInstructio
             when (child) {
                 is InputInstruction, is OutputInstruction -> Unit
                 is WithInputInstruction, is WithOutputInstruction -> Unit
+                // What should we actually do with this?
+                is WithOptionInstruction -> Unit
                 else -> describe(child, localns)
             }
         }

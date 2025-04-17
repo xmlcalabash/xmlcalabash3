@@ -3,6 +3,7 @@ package com.xmlcalabash.ext.cache
 import com.xmlcalabash.documents.DocumentProperties
 import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.exceptions.XProcError
+import com.xmlcalabash.io.MediaType
 import com.xmlcalabash.namespace.Ns
 import com.xmlcalabash.steps.AbstractAtomicStep
 import net.sf.saxon.om.NamespaceUri
@@ -26,7 +27,8 @@ class CacheAddStep(): AbstractAtomicStep() {
         }
 
         if (href != null) {
-            if (failIfCached && stepConfig.environment.documentManager.getCached(href) != null) {
+            val contentType = document.contentType ?: MediaType.OCTET_STREAM
+            if (failIfCached && stepConfig.environment.documentManager.getCached(href, contentType) != null) {
                 throw stepConfig.exception(XProcError.xiDocumentInCache(href))
             }
             val props = DocumentProperties(document.properties)

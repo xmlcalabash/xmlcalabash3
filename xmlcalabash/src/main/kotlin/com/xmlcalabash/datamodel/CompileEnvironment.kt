@@ -83,8 +83,8 @@ open class CompileEnvironment(override val episode: String, override val xmlCala
     override val messagePrinter: MessagePrinter = xmlCalabash.config.messagePrinter
     override val messageReporter: MessageReporter = xmlCalabash.config.messageReporter
     override val monitors: MutableList<Monitor> = mutableListOf()
-    override val documentManager: DocumentManager = DocumentManager()
     override val mimeTypes: MimetypesFileTypeMap = MimetypesFileTypeMap()
+    override val documentManager: DocumentManager = DocumentManager(this)
     override val errorExplanation: ErrorExplanation = DefaultErrorExplanation(messagePrinter)
     override val proxies: Map<String, String> = emptyMap()
     override val assertions: AssertionsLevel = xmlCalabash.config.assertions

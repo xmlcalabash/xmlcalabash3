@@ -13,6 +13,7 @@
   <p:declare-step type="cx:cache-delete">
     <p:option name="href" as="xs:anyURI?" select="()"/>
     <p:option name="fail-if-not-in-cache" as="xs:boolean" select="false()"/>
+    <p:option name="content-type" as="xs:string" select="'*/*'"/>
     <p:input port="source"/>
     <p:output port="result"/>
   </p:declare-step>

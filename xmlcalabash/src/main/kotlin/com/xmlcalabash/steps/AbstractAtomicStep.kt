@@ -239,6 +239,14 @@ abstract class AbstractAtomicStep(): XProcStep {
         return MediaType.parse(value.underlyingValue.stringValue)
     }
 
+    fun wildcardMediaTypeBinding(name: QName, default: MediaType = MediaType.ANY): MediaType {
+        val value = options[name]!!.value
+        if (value == XdmEmptySequence.getInstance()) {
+            return default
+        }
+        return MediaType.parseWildcard(value.underlyingValue.stringValue)
+    }
+
     fun stringMapBinding(name: QName): Map<String,String> {
         if (options[name] == null) {
             return mapOf()
