@@ -108,19 +108,27 @@ class TestDriver(val testOptions: TestOptions, val exclusions: Map<String, Strin
 
             if (testFile.absolutePath.contains("/tests/")) {
                 val pos = testFile.absolutePath.indexOf("/tests/")
-                val message = "\r…/${testFile.absolutePath.substring(pos+7)}"
-                width = message.length
-                print("${message}\r")
+                if (testOptions.consoleOutput) {
+                    val message = "\r…/${testFile.absolutePath.substring(pos+7)}"
+                    width = message.length
+                    print("${message}\r")
+                } else {
+                    println("…/${testFile.absolutePath.substring(pos+7)}")
+                }
             } else {
                 width = testFile.absolutePath.length
-                print("${testFile.absolutePath}\r")
+                if (testOptions.consoleOutput) {
+                    print("${testFile.absolutePath}\r")
+                } else {
+                    println(testFile.absolutePath)
+                }
             }
 
             total++
             case.run()
             testResults.add(case.status)
 
-            if (width > 0) {
+            if (testOptions.consoleOutput && width > 0) {
                 print("\r".padStart(width, ' '))
             }
 
@@ -135,7 +143,7 @@ class TestDriver(val testOptions: TestOptions, val exclusions: Map<String, Strin
                 else -> notrun++
             }
 
-            if (total % modulus == 0) {
+            if (testOptions.consoleOutput && (total % modulus == 0)) {
                 suiteElapsed = (System.nanoTime() - suiteStart) / 1e9
                 val percent = "%.1f".format((100.0 * total) / (1.0 * allTests.size))
                 val tpt = suiteElapsed / total

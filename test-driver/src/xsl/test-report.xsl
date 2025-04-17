@@ -23,12 +23,21 @@
       <xsl:variable name="extra"
                     select="if (doc-available($extra-xml)) then doc($extra-xml)/testsuite else ()"/>
 
+      <xsl:variable name="selenium-xml" select="resolve-uri('selenium-results.xml', base-uri(.))"/>
+      <xsl:variable name="selenium"
+                    select="if (doc-available($selenium-xml)) then doc($selenium-xml)/testsuite else ()"/>
+
       <h1>XML Calabash Test Report</h1>
       
-      <xsl:if test="exists($extra)">
+      <xsl:if test="exists($extra) or exists($selenium)">
         <ul>
           <li><a href="#test-suite">XProc test suite</a></li>
-          <li><a href="#extra-suite">XML Calabash test suite</a></li>
+          <xsl:if test="exists($extra)">
+            <li><a href="#extra-suite">XML Calabash extra test suite</a></li>
+          </xsl:if>
+          <xsl:if test="exists($selenium)">
+            <li><a href="#selenium-suite">XML Calabash Selenium test suite</a></li>
+          </xsl:if>
         </ul>
       </xsl:if>
 
@@ -37,9 +46,16 @@
           <xsl:with-param name="link" select="true()" tunnel="yes"/>
         </xsl:apply-templates>
       </div>
-      <div id="extra-suite">
-        <xsl:apply-templates select="$extra"/>
-      </div>      
+      <xsl:where-populated>
+        <div id="extra-suite">
+          <xsl:apply-templates select="$extra"/>
+        </div>      
+      </xsl:where-populated>
+      <xsl:where-populated>
+        <div id="selenium-suite">
+          <xsl:apply-templates select="$selenium"/>
+        </div>      
+      </xsl:where-populated>
     </body>
   </html>
 </xsl:template>
