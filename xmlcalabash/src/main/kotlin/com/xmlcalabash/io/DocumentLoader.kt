@@ -167,7 +167,7 @@ class DocumentLoader(val stepConfig: StepConfiguration,
         properties.setAll(documentProperties)
         properties[Ns.contentType] = mediaType
 
-        if (properties.baseURI == null) {
+        if (!properties.has(Ns.baseUri)) {
             properties[Ns.baseUri] = file.toURI()
         }
 
@@ -215,7 +215,7 @@ class DocumentLoader(val stepConfig: StepConfiguration,
         mediaType = overrideMediaType
         properties.setAll(documentProperties)
         properties[Ns.contentType] = mediaType
-        if (href != null && properties.baseURI == null) {
+        if (href != null && !properties.has(Ns.baseUri)) {
             properties[Ns.baseUri] = href
         }
 

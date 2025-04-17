@@ -200,6 +200,12 @@ class SaxonXsdValidator(val stepConfig: XProcStepConfiguration) {
             val props = DocumentProperties(source.properties)
             props[NsCx.validationMode] = XdmAtomicValue(vmode)
 
+            // Special case, if the input document has no base URI, don't let this
+            // validation manufacture a default one...
+            if (props.baseURI == null) {
+                props[Ns.baseUri] = XdmEmptySequence.getInstance()
+            }
+
             return XProcDocument.ofXml(destination.xdmNode, stepConfig, props)
         }
     }

@@ -5,6 +5,7 @@ import com.xmlcalabash.namespace.Ns
 import com.xmlcalabash.util.MediaClassification
 import net.sf.saxon.s9api.QName
 import net.sf.saxon.s9api.XdmAtomicValue
+import net.sf.saxon.s9api.XdmEmptySequence
 import net.sf.saxon.s9api.XdmMap
 import net.sf.saxon.s9api.XdmValue
 import java.net.URI
@@ -124,9 +125,9 @@ class DocumentProperties() {
 
     val baseURI: URI?
         get() {
-            if (properties.containsKey(Ns.baseUri)) {
-                // FIXME: get directly from the underlying value?
-                return URI(properties[Ns.baseUri]!!.underlyingValue.stringValue)
+            val base = properties[Ns.baseUri]
+            if (base != null && (base !== XdmEmptySequence.getInstance())) {
+                return URI(base.underlyingValue.stringValue)
             }
             return null
         }

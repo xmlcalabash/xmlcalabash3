@@ -8,6 +8,7 @@ import com.xmlcalabash.namespace.NsP
 import com.xmlcalabash.runtime.XProcStepConfiguration
 import com.xmlcalabash.runtime.model.HeadModel
 import com.xmlcalabash.runtime.parameters.RuntimeStepParameters
+import com.xmlcalabash.util.MediaClassification
 import com.xmlcalabash.util.SaxonXsdValidator
 import com.xmlcalabash.util.Verbosity
 import net.sf.saxon.s9api.*
@@ -220,8 +221,8 @@ class CompoundStepHead(config: XProcStepConfiguration, val parent: CompoundStep,
             if (cache[port] != null) {
                 if (params.outputs[port]?.primary == true) {
                     for (doc in cache[port]!!) {
-                        //documents.add(validate(doc))
-                        documents.add(doc)
+                        documents.add(validate(doc))
+                        //documents.add(doc)
                     }
                 } else {
                     documents.addAll(cache[port]!!)
@@ -271,7 +272,7 @@ class CompoundStepHead(config: XProcStepConfiguration, val parent: CompoundStep,
     }
 
     private fun validate(document: XProcDocument): XProcDocument {
-        if (stepConfig.validationMode == ValidationMode.DEFAULT) {
+        if (stepConfig.validationMode == ValidationMode.DEFAULT || document.contentType?.classification() != MediaClassification.XML) {
             return document
         }
 

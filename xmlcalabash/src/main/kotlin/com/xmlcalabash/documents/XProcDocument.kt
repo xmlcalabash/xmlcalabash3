@@ -157,7 +157,7 @@ open class XProcDocument internal constructor() {
             return ofXml(value, context, contentType, DocumentProperties())
         }
         fun ofXml(value: XdmNode, context: DocumentContext, contentType: MediaType, properties: DocumentProperties): XProcDocument {
-            val baseURI = value.baseURI ?: context.baseUri
+            val baseURI = properties.baseURI ?: value.baseURI ?: context.baseUri
             return XProcDocument(value, context, withDefaults(properties, baseURI, contentType))
         }
         fun ofXml(value: XdmNode, context: DocumentContext): XProcDocument {

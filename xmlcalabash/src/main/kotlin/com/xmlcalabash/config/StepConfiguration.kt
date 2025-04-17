@@ -16,7 +16,7 @@ open class StepConfiguration(val saxonConfig: SaxonConfiguration,
     protected val _inscopeStepTypes = mutableMapOf<QName, DeclareStepInstruction>()
     val inscopeStepTypes: Map<QName, DeclareStepInstruction> = _inscopeStepTypes
 
-    var validationMode = ValidationMode.LAX
+    var validationMode = ValidationMode.DEFAULT
 
     var _qnameMapType: SequenceType? = null
     val qnameMapType: SequenceType

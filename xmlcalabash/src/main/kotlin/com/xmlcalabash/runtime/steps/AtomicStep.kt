@@ -13,6 +13,7 @@ import com.xmlcalabash.runtime.api.Receiver
 import com.xmlcalabash.runtime.model.AtomicBuiltinStepModel
 import com.xmlcalabash.runtime.parameters.RuntimeStepParameters
 import com.xmlcalabash.steps.AbstractAtomicStep
+import com.xmlcalabash.util.MediaClassification
 import com.xmlcalabash.util.S9Api
 import com.xmlcalabash.util.SaxonXsdValidator
 import net.sf.saxon.s9api.ValidationMode
@@ -71,8 +72,8 @@ open class AtomicStep(config: XProcStepConfiguration, atomic: AtomicBuiltinStepM
             } else {
                 if (stepConfig.validationMode != ValidationMode.DEFAULT && params.inputs[port]?.primary == true) {
                     val curVal = doc.properties[NsCx.validationMode]?.underlyingValue?.stringValue
-                    val validatable = (doc.value is XdmNode) &&!S9Api.isTextDocument(doc.value as XdmNode)
-                    if (false && validatable && (curVal == null || (curVal == "lax" && stepConfig.validationMode != ValidationMode.STRICT))) {
+                    val validatable = doc.contentType?.classification() == MediaClassification.XML
+                    if (validatable && (curVal == null || (curVal == "lax" && stepConfig.validationMode != ValidationMode.STRICT))) {
                         if (validator == null) {
                             validator = SaxonXsdValidator(stepConfig)
                         }
