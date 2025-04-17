@@ -14,6 +14,7 @@ repositories {
 
 val saxonVersion = project.properties["saxonVersion"].toString()
 val requirePass = project.findProperty("requirePass")?.toString() ?: "true"
+val consoleOutput = project.findProperty("xmlcalabash.testDriver.consoleOutput")?.toString() ?: "false"
 
 val transformation by configurations.creating
 val testrunner by configurations.creating {
@@ -91,10 +92,10 @@ tasks.register<JavaExec>("test-suite") {
   inputs.dir(layout.projectDirectory.dir("../tests/3.0-test-suite"))
   inputs.file(layout.projectDirectory.file("src/test/resources/exclusions.txt"))
   outputs.file(layout.buildDirectory.file("test-suite-results.xml"))
-  outputs.file(layout.buildDirectory.file("test-suite-results.txt"))
 
   args("--title:XProc 3.0 Test Suite",
        "--require-pass:${requirePass}",
+       "--console:${consoleOutput}",
        "--dir:${layout.projectDirectory.dir("../tests/3.0-test-suite/test-suite/tests")}",
        "--report:${layout.buildDirectory.file("test-suite-results.xml").get().asFile}")
 }
@@ -108,17 +109,35 @@ tasks.register<JavaExec>("extra-suite") {
   inputs.dir(layout.projectDirectory.dir("../tests/extra-suite"))
   inputs.file(layout.projectDirectory.file("src/test/resources/exclusions.txt"))
   outputs.file(layout.buildDirectory.file("extra-suite-results.xml"))
-  outputs.file(layout.buildDirectory.file("extra-suite-results.txt"))
 
   args("--title:XML Calabash Extra Test Suite",
        "--require-pass:${requirePass}",
+       "--console:${consoleOutput}",
        "--dir:${layout.projectDirectory.dir("../tests/extra-suite/test-suite/tests")}",
        "--report:${layout.buildDirectory.file("extra-suite-results.xml").get().asFile}")
+}
+
+tasks.register<JavaExec>("selenium") {
+  dependsOn("build")
+
+  classpath = configurations.named("testrunner").get()
+  mainClass = "com.xmlcalabash.testdriver.Main"
+
+  inputs.dir(layout.projectDirectory.dir("../tests/selenium"))
+  inputs.file(layout.projectDirectory.file("src/test/resources/exclusions.txt"))
+  outputs.file(layout.buildDirectory.file("selenium-results.xml"))
+
+  args("--title:XML Calabash Selenium Test Suite",
+       "--require-pass:${requirePass}",
+       "--console:${consoleOutput}",
+       "--dir:${layout.projectDirectory.dir("../tests/selenium/test-suite/tests")}",
+       "--report:${layout.buildDirectory.file("selenium-results.xml").get().asFile}")
 }
 
 tasks.register<JavaExec>("test-report") {
   dependsOn("test-suite")
   dependsOn("extra-suite")
+  dependsOn("selenium")
   dependsOn("copy-extra")
 
   classpath = configurations.named("transformation").get()
@@ -126,6 +145,7 @@ tasks.register<JavaExec>("test-report") {
 
   inputs.file(layout.buildDirectory.file("test-suite-results.xml"))
   inputs.file(layout.buildDirectory.file("extra-suite-results.xml"))
+  inputs.file(layout.buildDirectory.file("selenium-results.xml"))
   inputs.file(layout.projectDirectory.file("src/xsl/test-report.xsl"))
   outputs.file(layout.buildDirectory.file("test-report/index.html"))
   outputs.file(layout.buildDirectory.file("test-report/version.json"))
@@ -141,6 +161,15 @@ tasks.register<JavaExec>("test-report") {
     stream.println("\"version\": \"${xmlbuild.version.get()}\"")
     stream.println("}")
     stream.close()
+  }
+}
+
+// Doesn't run the most time consuming tests...
+tasks.register("quick-report") {
+  dependsOn("test-suite")
+  dependsOn("extra-suite")
+  doLast {
+    println("Report finished")
   }
 }
 

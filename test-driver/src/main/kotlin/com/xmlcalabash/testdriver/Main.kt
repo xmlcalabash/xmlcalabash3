@@ -31,6 +31,8 @@ class Main {
                     testOptions.report = arg.substring(9)
                 } else if (arg.startsWith("--dir:")) {
                     testOptions.testDirectoryList.add(arg.substring(6))
+                } else if (arg.startsWith("--console:")) {
+                    testOptions.consoleOutput = (arg.substring(10) == "true")
                 } else {
                     throw RuntimeException("Unrecognized argument: ${arg}")
                 }

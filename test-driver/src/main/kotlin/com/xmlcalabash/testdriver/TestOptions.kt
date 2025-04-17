@@ -8,4 +8,5 @@ class TestOptions() {
     var stopOnFirstFailed = false
     var report: String? = null
     var testDirectoryList = mutableListOf<String>()
+    var consoleOutput = false
 }
