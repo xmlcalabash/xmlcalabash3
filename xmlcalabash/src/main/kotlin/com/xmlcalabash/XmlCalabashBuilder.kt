@@ -490,6 +490,7 @@ class XmlCalabashBuilder {
             get() {
                 if (_messageReporter == null) {
                     _messageReporter = DefaultMessageReporter()
+                    _messageReporter!!.threshold = verbosity
                     _messageReporter!!.setMessagePrinter(messagePrinter)
                 }
                 return _messageReporter!!
