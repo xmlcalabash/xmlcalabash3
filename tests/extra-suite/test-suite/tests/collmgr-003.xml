@@ -28,13 +28,13 @@
       <p:output port="result"/>
 
       <!-- N.B. The test-driver does not make inline URIs unique -->
-      <cx:collection-manager source="http://example.com/c1">
+      <cx:collection-manager name="one" source="http://example.com/c1">
         <p:with-input>
           <p:inline><doc/></p:inline>
         </p:with-input>
       </cx:collection-manager>
 
-      <cx:collection-manager source="http://example.com/c1">
+      <cx:collection-manager source="http://example.com/c1" p:depends="one">
         <p:with-input>
           <p:inline><doc/></p:inline>
         </p:with-input>
