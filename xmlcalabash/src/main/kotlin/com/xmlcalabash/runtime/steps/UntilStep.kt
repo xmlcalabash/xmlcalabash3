@@ -63,50 +63,53 @@ open class UntilStep(config: XProcStepConfiguration, compound: CompoundStepModel
         stepsToRun.clear()
         stepsToRun.addAll(runnables)
 
-        val exec = stepConfig.saxonConfig.newExecutionContext(stepConfig)
-        var position = 0L
+        stepConfig.saxonConfig.newExecutionContext(stepConfig)
+        try {
+            var position = 0L
 
-        while (!done) {
-            position++
-            exec.iterationSize = position
-            exec.iterationPosition = position
+            while (!done) {
+                position++
+                iterationSize = position
+                iterationPosition = position
 
-            if (position > 1L) {
-                head.reset()
-                head.showMessage = false
-                foot.reset()
-                for (step in stepsToRun) {
-                    step.reset()
+                if (position > 1L) {
+                    head.reset()
+                    head.showMessage = false
+                    foot.reset()
+                    for (step in stepsToRun) {
+                        step.reset()
+                    }
                 }
+
+                head.cacheInputs(cache)
+                head.input("current", document)
+
+                head.runStep(this)
+
+                runSubpipeline()
+
+                val result = foot.cache.remove(outputPort)
+                if (result == null || result.size != 1) {
+                    throw stepConfig.exception(XProcError.xdSequenceForbidden())
+                }
+
+                val nextDocument = result.first()
+                selector.setVariable(cx_previous, document.value)
+                if (nextDocument.value is XdmItem) {
+                    selector.contextItem = nextDocument.value as XdmItem
+                }
+                done = selector.effectiveBooleanValue()
+
+                document = nextDocument
             }
 
-            head.cacheInputs(cache)
-            head.input("current", document)
+            foot.write("result", document) // Always "result"
+            foot.runStep(this)
 
-            head.runStep()
-
-            runSubpipeline()
-
-            val result = foot.cache.remove(outputPort)
-            if (result == null || result.size != 1) {
-                throw stepConfig.exception(XProcError.xdSequenceForbidden())
-            }
-
-            val nextDocument = result.first()
-            selector.setVariable(cx_previous, document.value)
-            if (nextDocument.value is XdmItem) {
-                selector.contextItem = nextDocument.value as XdmItem
-            }
-            done = selector.effectiveBooleanValue()
-
-            document = nextDocument
+            cache.clear()
+        } finally {
+            stepConfig.saxonConfig.releaseExecutionContext()
         }
-
-        foot.write("result", document) // Always "result"
-        foot.runStep()
-
-        cache.clear()
-        stepConfig.saxonConfig.releaseExecutionContext()
     }
 
     override fun reset() {

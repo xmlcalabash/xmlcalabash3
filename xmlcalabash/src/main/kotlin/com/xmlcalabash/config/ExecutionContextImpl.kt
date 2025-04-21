@@ -2,11 +2,18 @@ package com.xmlcalabash.config
 
 import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.runtime.XProcExecutionContext
+import com.xmlcalabash.runtime.steps.AbstractStep
 import net.sf.saxon.s9api.XdmValue
 import java.util.Stack
 
 class ExecutionContextImpl: ExecutionContextManager {
     private val executables = mutableMapOf<Long, Stack<XProcExecutionContext>>()
+
+    override fun newExecutionContext(step: AbstractStep): XProcExecutionContext {
+        val context = newExecutionContext(step.stepConfig)
+        context.runtimeStep = step
+        return context
+    }
 
     override fun newExecutionContext(stepConfig: StepConfiguration): XProcExecutionContext {
         synchronized(executables) {
@@ -19,7 +26,7 @@ class ExecutionContextImpl: ExecutionContextManager {
                 if (stack.isEmpty()) {
                     XProcExecutionContext(stepConfig)
                 } else {
-                    XProcExecutionContext(stack.peek()!!)
+                    XProcExecutionContext(stepConfig,stack.peek()!!)
                 }
             }
             stack.push(context)
@@ -52,6 +59,9 @@ class ExecutionContextImpl: ExecutionContextManager {
         synchronized(executables) {
             val stack: Stack<XProcExecutionContext> = executables[Thread.currentThread().id]!!
             val context = stack.pop()
+            if (stack.isEmpty()) {
+                executables.remove(Thread.currentThread().id)
+            }
             //println("Rel ${this}: ${context} for ${Thread.currentThread().id} (${stack.size})")
         }
     }
@@ -95,5 +105,11 @@ class ExecutionContextImpl: ExecutionContextManager {
         }
         val stack: Stack<XProcExecutionContext> = executables[Thread.currentThread().id]!!
         stack.peek()!!.removeProperties(doc)
+    }
+
+    fun assertContextIsEmpty() {
+        if (executables.isNotEmpty()) {
+            throw IllegalStateException("Execution context is not empty")
+        }
     }
 }

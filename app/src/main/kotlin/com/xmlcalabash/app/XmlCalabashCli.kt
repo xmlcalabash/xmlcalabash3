@@ -510,7 +510,18 @@ class XmlCalabashCli private constructor() {
 
             stepConfig.messagePrinter.print("${XmlCalabashBuildConfig.PRODUCT_NAME} version ${XmlCalabashBuildConfig.VERSION} ")
             stepConfig.messagePrinter.println("(build ${XmlCalabashBuildConfig.BUILD_ID}, ${dateFormatter.format(date)})")
-            stepConfig.messagePrinter.println("Running with Saxon ${proc.saxonEdition} version ${proc.saxonProductVersion}")
+            stepConfig.messagePrinter.print("Running with Saxon ${proc.saxonEdition} version ${proc.saxonProductVersion}")
+
+            val totThreads = 2.coerceAtLeast(Runtime.getRuntime().availableProcessors())
+            val maxThreads = totThreads.coerceAtMost(stepConfig.xmlCalabashConfig.maxThreadCount)
+            if (maxThreads == 1) {
+                stepConfig.messagePrinter.println(" using a single thread")
+            } else if (totThreads == maxThreads) {
+                stepConfig.messagePrinter.println(" using ${totThreads} threads")
+            } else {
+                stepConfig.messagePrinter.println(" using at most ${maxThreads} of ${totThreads} available threads")
+            }
+
             if (edition != proc.saxonEdition) {
                 if (xmlCalabash.config.licensed) {
                     println("(You appear to have ${edition}; perhaps a license wasn't found?)")

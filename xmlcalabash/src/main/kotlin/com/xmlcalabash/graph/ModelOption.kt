@@ -1,5 +1,6 @@
 package com.xmlcalabash.graph
 
+import com.xmlcalabash.datamodel.AtomicExpressionStepInstruction
 import com.xmlcalabash.datamodel.OptionInstruction
 import com.xmlcalabash.datamodel.StaticOptionDetails
 import com.xmlcalabash.datamodel.WithOptionInstruction
@@ -52,4 +53,9 @@ class ModelOption private constructor(val parent: Model, val name: QName, val re
         _staticValue = option.staticValue
     }
 
+    constructor(parent: Model, option: AtomicExpressionStepInstruction): this(parent, option.bindingName, true) {
+        _static = false
+        _asType = SequenceType.ANY
+        _values = emptyList()
+    }
 }

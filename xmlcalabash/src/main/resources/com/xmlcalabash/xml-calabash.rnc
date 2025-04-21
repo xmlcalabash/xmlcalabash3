@@ -47,7 +47,7 @@ cc.proxy =
 
 cc.threading =
     element cc:threading {
-        attribute count { xsd:integer },
+        attribute count { xsd:integer }?,
         empty
     }
 

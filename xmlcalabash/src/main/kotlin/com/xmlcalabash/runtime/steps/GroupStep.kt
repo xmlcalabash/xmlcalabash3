@@ -11,9 +11,9 @@ open class GroupStep(config: XProcStepConfiguration, compound: CompoundStepModel
         try {
             stepConfig.saxonConfig.newExecutionContext(stepConfig)
 
-            head.runStep()
+            head.runStep(this)
             runSubpipeline()
-            foot.runStep()
+            foot.runStep(this)
         } finally {
             stepConfig.saxonConfig.releaseExecutionContext()
         }

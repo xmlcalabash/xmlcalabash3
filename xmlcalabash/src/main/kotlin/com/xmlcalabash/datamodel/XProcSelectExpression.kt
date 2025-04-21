@@ -18,6 +18,8 @@ class XProcSelectExpression private constructor(stepConfig: StepConfiguration, v
         }
     }
 
+    internal var requiresValue = false
+
     override fun cast(asType: SequenceType, values: List<XdmAtomicValue>): XProcExpression {
         return select(stepConfig, select, asType, collection, values)
     }
@@ -73,14 +75,12 @@ class XProcSelectExpression private constructor(stepConfig: StepConfiguration, v
         val result = try {
             selector.evaluate()
         } catch (ex: Throwable) {
-            selector.underlyingXPathContext.collectionFinder = collectionFinder.chain
             throw ex
+        } finally {
+            selector.underlyingXPathContext.collectionFinder = collectionFinder.chain
+            sconfig.defaultCollection = defaultCollectionUri
+            teardownExecutionContext()
         }
-
-        selector.underlyingXPathContext.collectionFinder = collectionFinder.chain
-        sconfig.defaultCollection = defaultCollectionUri
-
-        teardownExecutionContext()
 
         if (asType !== SequenceType.ANY || values.isNotEmpty()) {
             try {

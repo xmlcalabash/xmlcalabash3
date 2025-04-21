@@ -26,15 +26,17 @@ open class ForEachStep(config: XProcStepConfiguration, compound: CompoundStepMod
         stepsToRun.clear()
         stepsToRun.addAll(runnables)
 
-        val exec = stepConfig.saxonConfig.newExecutionContext(stepConfig)
-        exec.iterationSize = sequence.size.toLong()
+        iterationSize = sequence.size.toLong()
+
+        foot.looping = sequence.isNotEmpty()
 
         if (sequence.isEmpty()) {
-            head.runStep()
-            foot.runStep()
+            head.runStep(this)
+            foot.runStep(this)
         } else {
             while (sequence.isNotEmpty()) {
-                exec.iterationPosition = position
+                iterationPosition = position
+
                 if (position > 1) {
                     head.reset()
                     head.showMessage = false
@@ -48,17 +50,17 @@ open class ForEachStep(config: XProcStepConfiguration, compound: CompoundStepMod
 
                 head.input("current", sequence.removeFirst())
 
-                head.runStep()
+                head.runStep(this)
 
                 runSubpipeline()
 
-                foot.runStep()
+                foot.looping = sequence.isNotEmpty()
+                foot.runStep(this)
                 position++
             }
         }
 
         cache.clear()
-        stepConfig.saxonConfig.releaseExecutionContext()
     }
 
     override fun abort() {

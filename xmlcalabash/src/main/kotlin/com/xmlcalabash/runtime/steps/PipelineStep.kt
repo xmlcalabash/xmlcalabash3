@@ -8,7 +8,7 @@ import com.xmlcalabash.runtime.XProcStepConfiguration
 import com.xmlcalabash.runtime.model.CompoundStepModel
 
 class PipelineStep(config: XProcStepConfiguration, compound: CompoundStepModel): GroupStep(config,compound) {
-    override fun runStep() {
+    override fun runStep(parent: CompoundStep) {
         if (runnables.isEmpty()) {
             instantiate()
         }
@@ -33,6 +33,6 @@ class PipelineStep(config: XProcStepConfiguration, compound: CompoundStepModel):
             }
         }
 
-        super.runStep()
+        super.runStep(parent)
     }
 }

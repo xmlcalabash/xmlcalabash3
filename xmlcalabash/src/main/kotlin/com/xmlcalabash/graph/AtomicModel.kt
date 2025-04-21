@@ -45,6 +45,6 @@ open class AtomicModel(graph: Graph, parent: Model, step: AtomicStepInstruction,
     }
 
     override fun toString(): String {
-        return step.toString()
+        return "${step} (${threadGroup})"
     }
 }

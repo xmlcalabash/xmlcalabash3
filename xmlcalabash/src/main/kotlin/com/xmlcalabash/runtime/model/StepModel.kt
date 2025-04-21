@@ -16,6 +16,7 @@ import net.sf.saxon.s9api.QName
 abstract class StepModel(val runtime: XProcRuntime, model: Model) {
     val stepConfig = runtime.stepConfiguration(model.step.stepConfig)
     val id: String = model.id
+    val threadGroup = model.threadGroup
     val location: Location = model.step.location
     val name: String = model.step.name
     val type: QName = model.step.instructionType

@@ -59,6 +59,7 @@ class Main {
             }
 
             val testDriver = TestDriver(testOptions, exclusions)
+            //testDriver.threadTest()
             testDriver.run()
         }
     }

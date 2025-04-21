@@ -169,7 +169,7 @@ class PolyglotStep(val stepLanguage: String): AbstractAtomicStep() {
                     is DateValue -> return jscontext.asValue(uvalue.toLocalDate())
                     is QNameValue -> return jscontext.asValue(uvalue.eqName)
                     else -> {
-                        println("Unexpected atomic value: ${uvalue}")
+                        stepConfig.warn { "Unexpected atomic value: ${uvalue}" }
                         return jscontext.asValue(uvalue.toString())
                     }
                 }
@@ -195,7 +195,7 @@ class PolyglotStep(val stepLanguage: String): AbstractAtomicStep() {
                 return jscontext.asValue(baos.toString(StandardCharsets.UTF_8))
             }
             else -> {
-                println("Unexpected value: ${xdmValue}")
+                stepConfig.warn { "Unexpected value: ${xdmValue}" }
                 return jscontext.asValue(xdmValue.underlyingValue.stringValue)
             }
         }
@@ -270,7 +270,7 @@ class PolyglotStep(val stepLanguage: String): AbstractAtomicStep() {
             return map
         }
 
-        println("Unconvertable value: ${value}")
+        stepConfig.warn { "Unconvertable value: ${value}" }
         return XdmAtomicValue(value.toString())
     }
 }

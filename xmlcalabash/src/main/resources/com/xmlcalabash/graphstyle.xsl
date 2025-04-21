@@ -18,6 +18,11 @@
 
 <xsl:mode on-no-match="shallow-copy"/>
 
+<xsl:variable name="thread-groups"
+              select="('⓪', '①', '②', '③', '④', '⑤', '⑥', '⑦',
+                       '⑧', '⑩', '⑪', '⑫', '⑬', '⑭', '⑮', '⑯',
+                       '⑰', '⑱', '⑲', '⑳')"/>
+
 <xsl:template match="/g:declare-step">
   <g:pipeline-container>
     <xsl:next-match/>
@@ -114,14 +119,29 @@
         <xsl:choose>
           <xsl:when test="@variable-name">
             <g:detail><td>variable</td></g:detail>
-            <g:detail><td bgcolor="{$light-orange}">${string(@variable-name)}</td></g:detail>
+            <g:detail>
+              <td bgcolor="{$light-orange}">
+                <xsl:text>${string(@variable-name)}</xsl:text>
+                <xsl:call-template name="thread-group"/>
+              </td>
+            </g:detail>
           </xsl:when>
           <xsl:when test="@option-name">
             <g:detail><td>option</td></g:detail>
-            <g:detail><td bgcolor="{$light-orange}">${string(@option-name)}</td></g:detail>
+            <g:detail>
+              <td bgcolor="{$light-orange}">
+                <xsl:text>${string(@option-name)}</xsl:text>
+                <xsl:call-template name="thread-group"/>
+              </td>
+            </g:detail>
           </xsl:when>
           <xsl:otherwise>
-            <g:detail><td>cx:expression</td></g:detail>
+            <g:detail>
+              <td>
+                <xsl:text>cx:expression</xsl:text>
+                <xsl:call-template name="thread-group"/>
+              </td>
+            </g:detail>
           </xsl:otherwise>
         </xsl:choose>
 
@@ -183,6 +203,7 @@
                 <xsl:text>{@type}</xsl:text>
               </xsl:otherwise>
             </xsl:choose>
+            <xsl:call-template name="thread-group"/>
           </td>
           <xsl:if test="not(starts-with(@name, '!'))">
             <td>“{string(@name)}”</td>
@@ -197,6 +218,23 @@
     </xsl:choose>
     <xsl:apply-templates select="g:outputs"/>
   </g:atomic-step>
+</xsl:template>
+
+<xsl:template name="thread-group">
+  <xsl:if test="exists(@thread-group)">
+    <xsl:text> </xsl:text>
+    <font point-size="8">
+      <sup>
+        <xsl:variable name="tg" select="xs:integer(@thread-group)"/>
+        <xsl:choose>
+          <xsl:when test="$tg lt count($thread-groups)">
+            <xsl:value-of select="$thread-groups[$tg+1]"/>
+          </xsl:when>
+          <xsl:otherwise>(<xsl:value-of select="$tg"/>)</xsl:otherwise>
+        </xsl:choose>
+      </sup>
+    </font>
+  </xsl:if>
 </xsl:template>
 
 <xsl:template match="g:inputs">

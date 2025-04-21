@@ -50,6 +50,8 @@ dependencies {
   implementation(project(":ext:ebnf-convert"))
   implementation(project(":ext:trang"))
 
+  implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0")
+
   transformation ("net.sf.saxon:Saxon-HE:${saxonVersion}")
 }
 

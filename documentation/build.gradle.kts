@@ -665,10 +665,3 @@ tasks.register<JavaExec>("dxx") {
 }
 
 // ============================================================
-
-
-tasks.register("helloWorld") {
-  doLast {
-    println("Hello, world.")
-  }
-}

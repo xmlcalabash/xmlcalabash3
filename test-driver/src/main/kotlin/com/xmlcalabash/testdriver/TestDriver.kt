@@ -6,6 +6,13 @@ import com.xmlcalabash.util.BufferingMessageReporter
 import com.xmlcalabash.util.NopMessageReporter
 import com.xmlcalabash.util.SaxonTreeBuilder
 import com.xmlcalabash.util.AssertionsLevel
+import kotlinx.coroutines.CoroutineName
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.yield
 import net.sf.saxon.event.ReceiverOption
 import net.sf.saxon.om.AttributeInfo
 import net.sf.saxon.om.AttributeMap
@@ -26,6 +33,66 @@ class TestDriver(val testOptions: TestOptions, val exclusions: Map<String, Strin
     var notrun = 0
     val testResults = mutableListOf<TestStatus>()
     var suiteElapsed: Double = -1.0
+
+    fun threadTest() {
+        val pcount = Runtime.getRuntime().availableProcessors()
+        println("Processors: ${pcount}")
+    }
+
+    fun x_threadTest() {
+        val ready = mutableListOf<Boolean>()
+        val completed = mutableListOf<Boolean>()
+        val index = mutableListOf<Int>()
+        val show = mutableListOf<Boolean>()
+        val total = 100
+
+        for (count in 0..total) {
+            index.add(count)
+            ready.add(false)
+            completed.add(false)
+            show.add(true)
+        }
+
+        ready[total] = true
+
+        runBlocking {
+            val jobs: List<Job> = index.map { pos ->
+                launch(Dispatchers.Default + CoroutineName("R{$pos}") + SupervisorJob()) {
+                    var done = false
+                    while (!done) {
+                        if (ready[pos]) {
+                            println("RUN ${pos}")
+                            if (pos > 0) {
+                                ready[pos - 1] = true
+                            }
+                            completed[pos] = true
+                            done = true
+                        } else {
+                            if (show[pos]) {
+                                println("NOT READY ${pos}")
+                                show[pos] = false
+                            }
+                            yield()
+                        }
+                    }
+                }
+            }
+
+            println("JOIN THEM")
+
+            var done = false
+            while (!done) {
+                done = true
+                for ((index, check) in completed.withIndex()) {
+                    if (!check && ready[index]) {
+                        done = false;
+                        jobs[index].join()
+                    }
+                }
+            }
+        }
+
+    }
 
     fun run() {
         val buildDir = File("build")
@@ -105,6 +172,8 @@ class TestDriver(val testOptions: TestOptions, val exclusions: Map<String, Strin
                     case = loadTest(eagerLicensed, testFile)
                 }
             }
+
+            case.singleTest = allTests.size == 1
 
             if (testFile.absolutePath.contains("/tests/")) {
                 val pos = testFile.absolutePath.indexOf("/tests/")

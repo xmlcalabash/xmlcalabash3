@@ -26,7 +26,7 @@ import java.io.*
 import java.text.SimpleDateFormat
 import java.util.*
 
-class MetadataExtractorImpl(private val config: XProcStepConfiguration, private val document: XProcDocument, private val properties: Map<QName, XdmValue>) {
+class MetadataExtractorImpl(private val stepConfig: XProcStepConfiguration, private val document: XProcDocument, private val properties: Map<QName, XdmValue>) {
     companion object {
         private val cTag = QName(NsC.namespace, "c:tag")
         private val _dir = QName("dir")
@@ -64,7 +64,7 @@ class MetadataExtractorImpl(private val config: XProcStepConfiguration, private 
             throw IllegalArgumentException("Document is not binary")
         }
 
-        builder = SaxonTreeBuilder(config.processor)
+        builder = SaxonTreeBuilder(stepConfig.processor)
         builder.startDocument(document.baseURI)
 
         try {
@@ -149,7 +149,7 @@ class MetadataExtractorImpl(private val config: XProcStepConfiguration, private 
             amap[_units] = "pt"
         }
 
-        builder.addStartElement(NsC.result, config.typeUtils.attributeMap(amap), nsmap)
+        builder.addStartElement(NsC.result, stepConfig.typeUtils.attributeMap(amap), nsmap)
 
         try {
             if (meta != null) {
@@ -184,7 +184,7 @@ class MetadataExtractorImpl(private val config: XProcStepConfiguration, private 
                                 builder.addText(df.format(value.time))
                             }
                             else -> {
-                                println("cx:metadata-extractor: unknown property type: ${prop}")
+                                stepConfig.warn { "cx:metadata-extractor: unknown property type: ${prop}" }
                                 builder.addText(prop.toString())
                             }
                         }
@@ -225,7 +225,7 @@ class MetadataExtractorImpl(private val config: XProcStepConfiguration, private 
                     _type to tag.tagTypeHex,
                     _name to tag.tagName
                 )
-                builder.addStartElement(cTag, config.typeUtils.attributeMap(attr))
+                builder.addStartElement(cTag, stepConfig.typeUtils.attributeMap(attr))
 
                 var value = tag.description
 
@@ -343,7 +343,7 @@ class MetadataExtractorImpl(private val config: XProcStepConfiguration, private 
             }
 
             if (width > 0) {
-                builder.addStartElement(cTag, config.typeUtils.attributeMap(mapOf(
+                builder.addStartElement(cTag, stepConfig.typeUtils.attributeMap(mapOf(
                     _dir to "Exif",
                     _type to "0x9000",
                     _name to "Exif Version"
@@ -351,7 +351,7 @@ class MetadataExtractorImpl(private val config: XProcStepConfiguration, private 
                 builder.addText("0")
                 builder.addEndElement()
 
-                builder.addStartElement(cTag, config.typeUtils.attributeMap(mapOf(
+                builder.addStartElement(cTag, stepConfig.typeUtils.attributeMap(mapOf(
                     _dir to "Jpeg",
                     _type to "0x0001",
                     _name to "Image Height"
@@ -359,7 +359,7 @@ class MetadataExtractorImpl(private val config: XProcStepConfiguration, private 
                 builder.addText("${height} pixels")
                 builder.addEndElement()
 
-                builder.addStartElement(cTag, config.typeUtils.attributeMap(mapOf(
+                builder.addStartElement(cTag, stepConfig.typeUtils.attributeMap(mapOf(
                     _dir to "Jpeg",
                     _type to "0x0003",
                     _name to "Image Width"

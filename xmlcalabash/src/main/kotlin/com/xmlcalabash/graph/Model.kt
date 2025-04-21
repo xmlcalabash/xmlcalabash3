@@ -9,6 +9,9 @@ abstract class Model(val graph: Graph, val parent: Model?, val step: StepDeclara
     internal val inputs = mutableMapOf<String, ModelPort>()
     internal val outputs = mutableMapOf<String, ModelPort>()
     internal val options = mutableMapOf<QName, ModelOption>()
+    internal var _threadGroup = 0
+    val threadGroup: Int
+        get() = _threadGroup
 
     internal abstract fun init()
 }

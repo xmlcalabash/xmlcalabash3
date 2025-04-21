@@ -8,6 +8,9 @@ import net.sf.saxon.s9api.XdmMap
 
 open class CompoundModel internal constructor(graph: Graph, parent: Model?, step: CompoundStepDeclaration, id: String): Model(graph, parent, step, id) {
     val timeout = step.timeout
+    private var _childThreadGroups = 0
+    val childThreadGroups: Int
+        get() = _childThreadGroups
 
     private val _head = Head(graph, this, "${id}_head")
     val head: Head
@@ -49,6 +52,15 @@ open class CompoundModel internal constructor(graph: Graph, parent: Model?, step
                         }
                         else -> {
                             head.outputs[child.port] = ModelPort(this, child)
+                        }
+                    }
+                }
+                is AtomicExpressionStepInstruction -> {
+                    if (child.externalName != null) {
+                        if (child.expression is XProcSelectExpression) {
+                            if (child.expression.requiresValue) {
+                                head.options[child.externalName!!] = ModelOption(this, child)
+                            }
                         }
                     }
                 }
@@ -172,6 +184,8 @@ open class CompoundModel internal constructor(graph: Graph, parent: Model?, step
                 addOrderedChildren(orderedChildren)
             }
         }
+
+        computeThreadGroups()
     }
 
     private fun computeChooseOrder() {
@@ -297,6 +311,67 @@ open class CompoundModel internal constructor(graph: Graph, parent: Model?, step
             }
             _children.add(child)
         }
+    }
+
+    private fun computeThreadGroups() {
+        var done = false
+        while (!done) {
+            done = true
+
+            for (child in children) {
+                if (child._threadGroup == 0) {
+                    _childThreadGroups++
+                    child._threadGroup = childThreadGroups
+                    if (child is SubpipelineModel) {
+                        child.model._threadGroup = childThreadGroups
+                    }
+                    done = false
+                    assignChildrenToGroup(child, childThreadGroups)
+                }
+            }
+        }
+    }
+
+    private fun assignChildrenToGroup(model: Model, group: Int) {
+        var primaryOutput: ModelPort? = null
+        for ((_, output) in model.outputs) {
+            if (output.primary) {
+                primaryOutput = output
+                break
+            }
+        }
+
+        if (primaryOutput != null) {
+            val next = findNext(model, primaryOutput)
+            if (next.threadGroup == 0) {
+                next._threadGroup = group
+                if (next is SubpipelineModel) {
+                    next.model._threadGroup = childThreadGroups
+                }
+                assignChildrenToGroup(next, group)
+                return
+            }
+        }
+
+        for ((_, output) in model.outputs) {
+            val next = findNext(model, output)
+            if (next.threadGroup == 0) {
+                next._threadGroup = group
+                if (next is SubpipelineModel) {
+                    next.model._threadGroup = childThreadGroups
+                }
+                assignChildrenToGroup(next, group)
+            }
+        }
+    }
+
+    private fun findNext(model: Model, output: ModelPort): Model {
+        for (edge in graph.edges) {
+            if (edge.from == model && edge.outputPort == output.name) {
+                return edge.to
+            }
+        }
+        throw IllegalStateException("Cannot find node for model: $model/${output.name}")
     }
 
     override fun toString(): String {

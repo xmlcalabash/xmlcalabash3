@@ -248,17 +248,25 @@ class SaxonConfiguration private constructor(val licensed: Boolean,
 
     // ============================================================
 
+    fun assertContextIsEmpty() {
+        if (contextManager is ExecutionContextImpl) {
+            contextManager.assertContextIsEmpty()
+        }
+    }
+
+    // ============================================================
+
     // This is on the SaxonConfiguration because it needs to use a compatible configuration
     // and I want to cache it somewhere so that it doesn't have to be parsed for *every* expression
     private var _xpathTransformer: Xslt30Transformer? = null
     internal val xpathTransformer: Xslt30Transformer
         get() {
             if (_xpathTransformer == null) {
-                var styleStream = SaxonConfiguration::class.java.getResourceAsStream("/com/xmlcalabash/xpath.xsl")
-                var styleSource = SAXSource(InputSource(styleStream))
-                var xsltCompiler = processor.newXsltCompiler()
+                val styleStream = SaxonConfiguration::class.java.getResourceAsStream("/com/xmlcalabash/xpath.xsl")
+                val styleSource = SAXSource(InputSource(styleStream))
+                val xsltCompiler = processor.newXsltCompiler()
                 xsltCompiler.isSchemaAware = processor.isSchemaAware
-                var xsltExec = xsltCompiler.compile(styleSource)
+                val xsltExec = xsltCompiler.compile(styleSource)
                 _xpathTransformer = xsltExec.load30()
             }
             return _xpathTransformer!!

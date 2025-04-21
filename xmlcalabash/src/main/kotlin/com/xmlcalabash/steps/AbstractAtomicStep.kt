@@ -19,6 +19,8 @@ import net.sf.saxon.s9api.*
 import net.sf.saxon.value.QNameValue
 import net.sf.saxon.value.StringValue
 import java.net.URI
+import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.ConcurrentMap
 
 abstract class AbstractAtomicStep(): XProcStep {
     companion object {
@@ -31,8 +33,12 @@ abstract class AbstractAtomicStep(): XProcStep {
     private lateinit var _receiver: Receiver
     private lateinit var _stepParams: RuntimeStepParameters
     internal val _options = mutableMapOf<QName, LazyValue>()
-    internal val _queues = mutableMapOf<String, MutableList<XProcDocument>>()
+    internal val _queues: ConcurrentMap<String, List<XProcDocument>>
     private var _nodeId: Long = -1
+
+    init {
+        _queues = ConcurrentHashMap()
+    }
 
     val stepParams: RuntimeStepParameters
         get() = _stepParams
@@ -44,8 +50,6 @@ abstract class AbstractAtomicStep(): XProcStep {
         get() = _options
     val queues: Map<String, List<XProcDocument>>
         get() = _queues
-    val nodeId: Long
-        get() = _nodeId
 
     override fun setup(stepConfig: XProcStepConfiguration, receiver: Receiver, stepParams: RuntimeStepParameters) {
         this._stepConfig = stepConfig
@@ -62,8 +66,14 @@ abstract class AbstractAtomicStep(): XProcStep {
     }
 
     final override fun input(port: String, doc: XProcDocument) {
-        if (!port.startsWith("Q{")) {
-            _queues[port]?.add(doc)
+        synchronized(this) {
+            stepConfig.debug { "RECVD ${this} input on $port" }
+            if (!port.startsWith("Q{")) {
+                val list = mutableListOf<XProcDocument>()
+                list.addAll(_queues[port] ?: emptyList())
+                list.add(doc)
+                _queues[port] = list
+            }
         }
     }
 
@@ -77,17 +87,26 @@ abstract class AbstractAtomicStep(): XProcStep {
 
     override fun reset() {
         _options.clear()
-        for ((_, list) in _queues) {
-            list.clear()
+        for ((key, _) in _queues) {
+            _queues[key] = emptyList()
         }
     }
 
     override fun option(name: QName, binding: LazyValue) {
-        _options[name] = binding
+        synchronized(this) {
+            stepConfig.debug { "RECVD ${this} option $name" }
+            _options[name] = binding
+        }
     }
 
     override fun run() {
-        // nop
+        stepConfig.debug { "  RUNNING ${this}" }
+        for ((name, value) in options) {
+            stepConfig.debug { "    OPT: ${name}" }
+        }
+        for ((name, docs) in queues) {
+            stepConfig.debug { "    INP: ${name}: ${docs.size}" }
+        }
     }
 
     override fun abort() {

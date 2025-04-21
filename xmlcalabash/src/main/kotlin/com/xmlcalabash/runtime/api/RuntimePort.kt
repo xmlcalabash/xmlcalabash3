@@ -16,6 +16,10 @@ open class RuntimePort(val name: String, val unbound: Boolean, val primary: Bool
         weldedShut = port.weldedShut
     }
 
+    constructor(port: RuntimeOption): this(port.name.eqName, true, false, true, emptyList(), XdmMap()) {
+        weldedShut = false
+    }
+
     override fun toString(): String {
         return name
     }

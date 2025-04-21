@@ -983,7 +983,7 @@ class CliDebugger(val runtime: XProcRuntime): Monitor {
 
     inner class StackFrame(val step: AbstractStep) {
         val options: MutableMap<QName, LazyValue>
-        val inputs: MutableMap<String, MutableList<XProcDocument>>
+        val inputs: MutableMap<String, List<XProcDocument>>
         val subpipeline = mutableListOf<AbstractStep>()
         val cx: String
 
@@ -999,12 +999,14 @@ class CliDebugger(val runtime: XProcRuntime): Monitor {
             when (step) {
                 is AtomicStep -> {
                     val impl = step.implementation as AbstractAtomicStep
-                    inputs = impl._queues
+                    inputs = mutableMapOf()
+                    inputs.putAll(impl._queues)
                     options = mutableMapOf()
                     options.putAll(impl._options)
                 }
                 is CompoundStepHead -> {
-                    inputs = step._cache
+                    inputs = mutableMapOf()
+                    inputs.putAll(step._cache)
                     options = mutableMapOf() // FIXME: this is wrong
                 }
                 is CompoundStepFoot -> {

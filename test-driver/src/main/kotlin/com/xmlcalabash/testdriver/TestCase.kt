@@ -74,7 +74,6 @@ class TestCase(val xmlCalabash: XmlCalabash, val testOptions: TestOptions, val t
     var elapsedSeconds: Double = -1.0
     var stderrOutput = ""
     var stdoutOutput = ""
-    var messages: XdmNode? = null
     val catalogs = mutableListOf<String>()
 
     var stdoutBais: ByteArrayOutputStream? = null
@@ -167,7 +166,7 @@ class TestCase(val xmlCalabash: XmlCalabash, val testOptions: TestOptions, val t
             val outputReceiver = BufferingReceiver()
             pipeline.receiver = outputReceiver
 
-            if (testOptions.report != null) {
+            if (    testOptions.report != null) {
                 startIO()
             }
 

@@ -10,6 +10,7 @@ import java.time.Duration
 
 class CompoundStepFoot(config: XProcStepConfiguration, val parent: CompoundStep, step: FootModel): AbstractStep(config, step, NsCx.foot, "${step.name}/foot") {
     internal var alwaysAllowSequences = false
+    internal var looping = false
     val cache = mutableMapOf<String, MutableList<XProcDocument>>()
     val holdPorts = mutableSetOf<String>()
     override val params = RuntimeStepParameters(NsCx.foot, "!foot",
@@ -17,10 +18,11 @@ class CompoundStepFoot(config: XProcStepConfiguration, val parent: CompoundStep,
 
     override val stepTimeout: Duration = Duration.ZERO
 
-    override val readyToRun: Boolean
-        get() = true
+    override val readyToRun: Boolean = true
 
     override fun input(port: String, doc: XProcDocument) {
+        stepConfig.debug { "RECVD ${this} input on $port" }
+
         // N.B. inputs to a foot are outputs for the compound step
         checkOutputPort(port, doc, params.inputs[port])
 
@@ -45,7 +47,7 @@ class CompoundStepFoot(config: XProcStepConfiguration, val parent: CompoundStep,
 
         val rpair = receiver[port]
         if (rpair == null) {
-            println("No receiver for ${port} from ${this} (in foot)")
+            stepConfig.debug { "No receiver for ${port} from ${this} (in foot)" }
             return
         }
 
@@ -61,7 +63,7 @@ class CompoundStepFoot(config: XProcStepConfiguration, val parent: CompoundStep,
     }
 
     override fun close(port: String) {
-        // nop
+        stepConfig.debug { "CLOSE ${this} port ${port}" }
     }
 
     override fun instantiate() {
@@ -80,8 +82,11 @@ class CompoundStepFoot(config: XProcStepConfiguration, val parent: CompoundStep,
         }
 
         cache.clear()
-        for ((_, rpair) in receiver) {
-            rpair.first.close(rpair.second)
+
+        if (!looping) {
+            for ((_, rpair) in receiver) {
+                rpair.first.close(rpair.second)
+            }
         }
     }
 

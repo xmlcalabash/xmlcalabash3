@@ -35,12 +35,6 @@ val sourcesJar by tasks.registering(Jar::class) {
   from(sourceSets.main.get().allSource)
 }
 
-tasks.register("helloWorld") {
-  doLast {
-    println("Hello, world.")
-  }
-}
-
 tasks.register("stage-release") {
   dependsOn("jar")
 
