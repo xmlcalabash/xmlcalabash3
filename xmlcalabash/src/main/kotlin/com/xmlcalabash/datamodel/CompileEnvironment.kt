@@ -24,6 +24,10 @@ import java.util.*
 import javax.activation.MimetypesFileTypeMap
 
 open class CompileEnvironment(override val episode: String, override val xmlCalabash: XmlCalabash): XProcEnvironment {
+    companion object {
+        var showAssignments = true // So we only do all the debug messages once
+    }
+
     override val productName = XmlCalabashBuildConfig.PRODUCT_NAME
     override val productVersion = XmlCalabashBuildConfig.VERSION
     override val buildId = XmlCalabashBuildConfig.BUILD_ID
@@ -33,9 +37,7 @@ open class CompileEnvironment(override val episode: String, override val xmlCala
     override val version = "3.1"
     override val xpathVersion = "3.1"
     override val xmlCalabashConfig = xmlCalabash.config
-
-    internal val _standardSteps = mutableMapOf<QName, DeclareStepInstruction>()
-    override val standardSteps = _standardSteps
+    override val standardSteps = mutableMapOf<QName, DeclareStepInstruction>()
 
     internal val _defaultContentTypes = mutableMapOf<String, String>(
         "7z" to "application/x-7z-compressed",
@@ -96,7 +98,9 @@ open class CompileEnvironment(override val episode: String, override val xmlCala
         for (provider in AtomicStepServiceProvider.providers()) {
             val manager = provider.create();
             for (stepType in manager.stepTypes()) {
-                messageReporter.debug { "Added available step type '$stepType'" }
+                if (showAssignments) {
+                    messageReporter.debug { "Added available step type '$stepType'" }
+                }
                 knownAtomicSteps.add(stepType)
             }
             stepManagers.add(manager)
@@ -104,7 +108,9 @@ open class CompileEnvironment(override val episode: String, override val xmlCala
 
         for ((ext, contentType) in _defaultContentTypes) {
             if (mimeTypes.getContentType("test.${ext}") == "application/octet-stream") {
-                messageReporter.debug { "Assigning default content type to '.${ext}' files: ${contentType}" }
+                if (showAssignments) {
+                    messageReporter.debug { "Assigning default content type to '.${ext}' files: ${contentType}" }
+                }
                 mimeTypes.addMimeTypes("${contentType} ${ext}")
             }
         }
@@ -114,7 +120,9 @@ open class CompileEnvironment(override val episode: String, override val xmlCala
         }
 
         for ((contentType, extensions) in xmlCalabash.config.mimetypes) {
-            messageReporter.debug { "Assigning content type to '${extensions}' files: ${contentType}" }
+            if (showAssignments) {
+                messageReporter.debug { "Assigning content type to '${extensions}' files: ${contentType}" }
+            }
             mimeTypes.addMimeTypes("${contentType} ${extensions}")
         }
 
@@ -122,6 +130,8 @@ open class CompileEnvironment(override val episode: String, override val xmlCala
             val manager = provider.create();
             manager.configure(documentManager)
         }
+
+        showAssignments = false
     }
 
     override fun stepProvider(params: StepParameters): () -> XProcStep {
