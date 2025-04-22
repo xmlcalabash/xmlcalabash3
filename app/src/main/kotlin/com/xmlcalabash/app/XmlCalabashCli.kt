@@ -170,6 +170,8 @@ class XmlCalabashCli private constructor() {
             return
         }
 
+        var tstart: Long = 0
+        var tend: Long = 0
         try {
             // N.B. It's illegal to shadow a static option name, so we can shove all the
             // options into the static options before we parse the pipeline. This is...odd
@@ -238,7 +240,7 @@ class XmlCalabashCli private constructor() {
             }
 
             if (implicitStdin != null) {
-                var ctype = implicitContentType(pipeline.inputManifold[implicitStdin]?.contentTypes)
+                val ctype = implicitContentType(pipeline.inputManifold[implicitStdin]?.contentTypes)
                 commandLine._inputs[implicitStdin] = mutableListOf(Pair(CommandLine.STDIO_URI, ctype))
             }
 
@@ -300,8 +302,11 @@ class XmlCalabashCli private constructor() {
             }
 
             pipeline.receiver = FileOutputReceiver(xmlCalabash, stepConfig.processor, pipeline.outputManifold, commandLine.outputs, explicitStdout ?: implicitStdout)
+            tstart = System.nanoTime()
             pipeline.run()
+            tend = System.nanoTime()
         } catch (ex: Exception) {
+            tend = System.nanoTime()
             if (ex is XProcException) {
                 if (ex.error.code == NsErr.xi(XProcError.DEBUGGER_ABORT)) {
                     exitProcess(1)
@@ -315,6 +320,8 @@ class XmlCalabashCli private constructor() {
                 exitProcess(1)
             }
         }
+
+        stepConfig.debug { "Elapsed time: ${(tend - tstart) / 1e9}s" }
     }
 
     private fun implicitContentType(types: List<MediaType>?): MediaType {
@@ -488,6 +495,8 @@ class XmlCalabashCli private constructor() {
             }
         }
 
+        val totThreads = 2.coerceAtLeast(Runtime.getRuntime().availableProcessors())
+        val maxThreads = totThreads.coerceAtMost(stepConfig.xmlCalabashConfig.maxThreadCount)
         val deplist = XmlCalabashBuildConfig.DEPENDENCIES.keys.toList().sorted()
 
         if (xmlCalabash.config.verbosity <= Verbosity.DEBUG) {
@@ -498,6 +507,8 @@ class XmlCalabashCli private constructor() {
             println("SAXON_EDITION=${proc.saxonEdition}")
             println("VENDOR_NAME=${XmlCalabashBuildConfig.VENDOR_NAME}")
             println("VENDOR_URI=${XmlCalabashBuildConfig.VENDOR_URI}")
+            println("THREADS=${maxThreads}")
+            println("MAX_THREADS=${totThreads}")
             for (name in deplist) {
                 val version = XmlCalabashBuildConfig.DEPENDENCIES[name]!!
                 println("DEPENDENCY_${name}=${version}")
@@ -512,11 +523,7 @@ class XmlCalabashCli private constructor() {
             stepConfig.messagePrinter.println("(build ${XmlCalabashBuildConfig.BUILD_ID}, ${dateFormatter.format(date)})")
             stepConfig.messagePrinter.print("Running with Saxon ${proc.saxonEdition} version ${proc.saxonProductVersion}")
 
-            val totThreads = 2.coerceAtLeast(Runtime.getRuntime().availableProcessors())
-            val maxThreads = totThreads.coerceAtMost(stepConfig.xmlCalabashConfig.maxThreadCount)
-            if (maxThreads == 1) {
-                stepConfig.messagePrinter.println(" using a single thread")
-            } else if (totThreads == maxThreads) {
+            if (totThreads == maxThreads) {
                 stepConfig.messagePrinter.println(" using ${totThreads} threads")
             } else {
                 stepConfig.messagePrinter.println(" using at most ${maxThreads} of ${totThreads} available threads")
