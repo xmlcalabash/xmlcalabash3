@@ -12,6 +12,8 @@
 
 <xsl:output method="xml" encoding="utf-8" indent="no"/>
 
+<xsl:param name="show-thread-groups" as="xs:boolean" select="false()"/>
+
 <xsl:key name="port" match="g:port" use="@id"/>
 <xsl:key name="edge-from" match="g:edge" use="@from"/>
 <xsl:key name="edge-to" match="g:edge" use="@to"/>
@@ -221,7 +223,7 @@
 </xsl:template>
 
 <xsl:template name="thread-group">
-  <xsl:if test="exists(@thread-group)">
+  <xsl:if test="$show-thread-groups and exists(@thread-group)">
     <xsl:text> </xsl:text>
     <font point-size="8">
       <sup>
