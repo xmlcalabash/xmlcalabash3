@@ -656,7 +656,7 @@ command line arguments are ignored.</para>
 
 <screen><userinput><prompt>$</prompt> xmlcalabash version</userinput>
 <computeroutput>XML Calabash version <?version?> (build <?version build-id?>, <?version build-date display?>)
-Running with Saxon <?version saxon-edition?> version <?dep saxon?></computeroutput></screen>
+Running with Saxon <?version saxon-edition?> version <?dep saxon?> using at most 1 of 12 available threads</computeroutput></screen>
 
 <para>Most options are ignored when the <command>version</command> command is
 used, but if the <literal>debug</literal> level of <option>--verbosity</option>
@@ -672,6 +672,8 @@ BUILD_ID=<?version BUILD_ID?>
 SAXON_EDITION=<?version SAXON_EDITION?>
 VENDOR_NAME=Norm Tovey-Walsh
 VENDOR_URI=https://xmlcalabash.com/
+THREADS=1
+MAX_THREADS=12
 DEPENDENCY_brotliDec=<?version DEPENDENCY_brotliDec?>
 DEPENDENCY_commonsCodec=<?version DEPENDENCY_commonsCodec?>
 DEPENDENCY_commonsCompress=<?version DEPENDENCY_commonsCompress?>
