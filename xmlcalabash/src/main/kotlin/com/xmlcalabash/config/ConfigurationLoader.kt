@@ -215,7 +215,7 @@ class ConfigurationLoader(val builder: XmlCalabashBuilder) {
     private fun parseThreading(node: XdmNode) {
         checkAttributes(node, emptyList(), listOf(_count))
         try {
-            node.getAttributeValue(_count)?.let { builder.setMaxThreadCount(it.toInt()) }
+            builder.setMaxThreadCount( (node.getAttributeValue(_count)?.toInt() ?: Runtime.getRuntime().availableProcessors()) )
         } catch (_: NumberFormatException) {
             throw XProcError.xiInvalidSaxonConfigurationProperty("cc:threading", node.getAttributeValue(_count)!!).exception()
         }
