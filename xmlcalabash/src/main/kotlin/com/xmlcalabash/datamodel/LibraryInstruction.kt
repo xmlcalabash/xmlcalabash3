@@ -117,7 +117,8 @@ open class LibraryInstruction(stepConfig: InstructionConfiguration): XProcInstru
                 is LibraryInstruction -> {
                     import.findDeclarations(stepTypes, emptyMap(), bindings)
                     for ((name, opt) in import.exportedOptions) {
-                        if (newBindings.containsKey(name)) {
+                        val existing = newBindings[name]
+                        if (existing != null && existing !== opt) {
                             throw stepConfig.exception(XProcError.xsDuplicateOption(name))
                         }
                         newBindings[name] = opt
