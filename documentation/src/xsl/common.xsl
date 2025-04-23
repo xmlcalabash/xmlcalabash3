@@ -45,6 +45,27 @@
 <xsl:param name="footnote-numeration" select="('*', '**', '†','‡', '§', '1')"/>
 <xsl:param name="use-id-as-filename" select="'true'"/>
 
+<xsl:template mode="m:toc-entry"
+              match="db:colophon">
+  <xsl:param name="persistent" as="xs:boolean" tunnel="yes"/>
+  <xsl:param name="root-element" as="element()" tunnel="yes"/>
+  <li>
+    <a href="#{f:id(.)}">
+      <xsl:apply-templates select="." mode="m:headline">
+        <xsl:with-param name="purpose" select="'lot'"/>
+      </xsl:apply-templates>
+    </a>
+    <xsl:where-populated>
+      <ul class="toc">
+        <xsl:apply-templates mode="m:toc-nested">
+          <xsl:with-param name="persistent" select="$persistent" tunnel="yes"/>
+          <xsl:with-param name="root-element" select="$root-element" tunnel="yes"/>
+        </xsl:apply-templates>
+      </ul>
+    </xsl:where-populated>
+  </li>
+</xsl:template>
+
 <!-- ============================================================ -->
 
 <xsl:template match="db:port">

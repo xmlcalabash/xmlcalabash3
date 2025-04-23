@@ -225,3 +225,9 @@ main {
 .fgbody .figure header .title {
     background-color: white;
 }
+
+.colophon {
+  border: inherit;
+  margin: inherit;
+  padding: inherit;
+}

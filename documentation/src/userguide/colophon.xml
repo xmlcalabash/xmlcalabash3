@@ -1,0 +1,17 @@
+<colophon xmlns="http://docbook.org/ns/docbook"
+          xmlns:xlink="http://www.w3.org/1999/xlink"
+          xmlns:xi='http://www.w3.org/2001/XInclude'
+          version="5.2" xml:id="colophon">
+<title>Colophon</title>
+
+<para>This document was authored in
+<link xlink:href="https://docbook.org/">DocBook</link> version <?version docbookVersion?>,
+edited in Emacs, and transformed to HTML, PDF, and EPUB with the
+<link xlink:href="https://xsltng.docbook.org">DocBook xslTNG</link> stylesheets
+version <?version xslTNGversion?>.</para>
+
+<para>Dr. Bethan Tovey-Walsh designed the cover art and
+<link linkend="ItDepends">the sticker</link> at the end of the threading chapter.
+</para>
+
+</colophon>

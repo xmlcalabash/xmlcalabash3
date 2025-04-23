@@ -30,7 +30,7 @@ buildscript {
 
   dependencies {
     classpath("net.sf.saxon:Saxon-HE:${project.properties["saxonVersion"]}")
-    classpath("org.docbook:schemas-docbook:5.2")
+    classpath("org.docbook:schemas-docbook:${project.properties["docbookVersion"]}")
     classpath("org.docbook:docbook-xslTNG:${project.properties["xslTNGversion"]}")
   }
 }
@@ -137,7 +137,9 @@ val xmlCalabashVersion = tasks.register<JavaExec>("xmlCalabashVersion") {
       }
     }
     stream.println("\"refVersion\": \"${refVersion}\",")
-    stream.println("\"guideVersion\": \"${guideVersion}\"")
+    stream.println("\"guideVersion\": \"${guideVersion}\",")
+    stream.println("\"docbookVersion\": \"${project.properties["docbookVersion"]}\",")
+    stream.println("\"xslTNGversion\": \"${project.properties["xslTNGversion"]}\"")
     stream.println("}")
     stream.close()
   }
