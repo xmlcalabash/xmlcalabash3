@@ -79,12 +79,9 @@ class DefaultErrorExplanation(val printer: MessagePrinter): ErrorExplanation {
             sb.append("\n").append("   cause: ${error.throwable!!.toString()}")
         }
 
-        if (error.details.isNotEmpty()) {
-            sb.append("\n")
-        }
-
         for (detail in error.details) {
             if (detail is XProcDocument) {
+                sb.append("\n")
                 sb.append(showDetail(detail))
             }
         }

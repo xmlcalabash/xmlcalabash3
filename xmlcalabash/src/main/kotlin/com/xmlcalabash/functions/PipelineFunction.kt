@@ -36,11 +36,11 @@ class PipelineFunction(private val decl: DeclareStepInstruction): ExtensionFunct
     }
 
     override fun getMinimumNumberOfArguments(): Int {
-        return inputs.size
+        return 1
     }
 
     override fun getMaximumNumberOfArguments(): Int {
-        return 1
+        return inputs.size + 1
     }
 
     override fun getArgumentTypes(): Array<out SequenceType?>? {
