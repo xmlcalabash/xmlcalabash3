@@ -1,6 +1,8 @@
 import com.xmlcalabash.build.XmlCalabashBuildExtension
 
+import org.jetbrains.dokka.DokkaConfiguration.Visibility
 import org.jetbrains.dokka.gradle.DokkaTask
+import org.jetbrains.dokka.gradle.DokkaTaskPartial
 import org.jetbrains.dokka.base.DokkaBase
 import org.jetbrains.dokka.base.DokkaBaseConfiguration
 
@@ -192,7 +194,7 @@ val sourcesJar by tasks.registering(Jar::class) {
   from(sourceSets.main.get().allSource)
 }
 
-tasks.withType<DokkaTask>().configureEach {
+tasks.withType<DokkaTaskPartial>().configureEach {
   pluginConfiguration<DokkaBase, DokkaBaseConfiguration> {
     customStyleSheets = listOf(file("../documentation/src/dokka/resources/css/xmlcalabash.css"))
     //templatesDir = file("../documentation/src/dokka/resources/templates")
@@ -203,11 +205,12 @@ tasks.withType<DokkaTask>().configureEach {
 
   dokkaSourceSets {
     named("main") {
+      documentedVisibilities.set(setOf(Visibility.PUBLIC, Visibility.PROTECTED))
       moduleName.set("XMLCalabash")
       includes.from("Module.md")
       sourceLink {
         localDirectory.set(file("src/main/kotlin"))
-        remoteUrl.set(URI("https://github.com/xmlcalabash3/xmlcalabash").toURL())
+        remoteUrl.set(URI("https://github.com/xmlcalabash/xmlcalabash3").toURL())
         remoteLineSuffix.set("#L")
       }
     }

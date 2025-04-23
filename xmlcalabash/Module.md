@@ -1,4 +1,4 @@
-# Module XML Calabash
+# Module XMLCalabash
 
 This is XML Calabash, an implementation of [XProc 3.1](https://xproc.org/).
 

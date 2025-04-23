@@ -1,46 +1,47 @@
 package com.xmlcalabash.app
 
-import com.xmlcalabash.api.Monitor
 import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.exceptions.XProcException
 import com.xmlcalabash.io.MediaType
-import com.xmlcalabash.namespace.NsCx
-import com.xmlcalabash.namespace.NsFn
-import com.xmlcalabash.namespace.NsP
-import com.xmlcalabash.namespace.NsSaxon
-import com.xmlcalabash.namespace.NsXml
-import com.xmlcalabash.namespace.NsXs
+import com.xmlcalabash.namespace.*
 import com.xmlcalabash.util.AssertionsLevel
 import com.xmlcalabash.util.UriUtils
 import com.xmlcalabash.util.Verbosity
-import com.xmlcalabash.visualizers.Detail
-import com.xmlcalabash.visualizers.Plain
-import com.xmlcalabash.visualizers.Silent
 import net.sf.saxon.om.NamespaceUri
 import net.sf.saxon.s9api.ValidationMode
 import java.io.File
 import java.net.URI
 
 /**
- * Command line parser.
+ * The parser for options, arguments, and parameters passed on the command line.
  *
  * This class parses an array of strings (as might appear as arguments on the command line). The resulting
  * object has properties for all the options provided. If an option is not provided, and it is not required,
  * the value of the corresponding property will be `null`.
  *
- * @param args The array of command line arguments to parse.
+ * @constructor The (private) primary constructor.
+ * @property args The array of command line arguments to parse.
  */
 
 class CommandLine private constructor(val args: Array<out String>) {
     /**
      * Provides a static method to create a [CommandLine] from a list of arguments.
+     * You cannot instantiate a [CommandLine] directly.
      */
     companion object {
+        /** The name of "standard input".
+         * The string "-" is used to represent `stdin`.
+         */
         val STDIO_NAME = "-"
+
+        /** The URI used to represent "standard output".
+         * Outputs are sent to URIs, generally `file:` URIs, this URI is magic and represents
+         * `stdout`.
+         */
         val STDIO_URI = URI("https://xmlcalabash.com/ns/stdio")
 
         /**
-         * Parse a set of arguments.
+         * Parse a list of arguments.
          *
          * The caller must check the [errors] property. If it is empty, the parse was successful.
          */
@@ -82,7 +83,11 @@ class CommandLine private constructor(val args: Array<out String>) {
     private val _xmlCatalogs = mutableListOf<URI>()
     private var _nogo = false
 
-    /** The command. */
+    /** The command.
+     *
+     * One of "run", "version", or "help". The run command is implied
+     * if no explicit command is provided.
+     */
     val command: String
         get() = _command
 
@@ -90,7 +95,7 @@ class CommandLine private constructor(val args: Array<out String>) {
     val config: File?
         get() = _config
 
-    /** The pipeline graph description output filename. */
+    /** The pipeline graph output directory. */
     val pipelineGraphs: String?
         get() {
             if (_pipelineGraphs == null) {
@@ -103,7 +108,8 @@ class CommandLine private constructor(val args: Array<out String>) {
         }
 
     /** Enable licensed features?
-     * <p>Setting licensed to false will disable licensed features in Saxon PE and Saxon EE.</p>
+     *
+     * Setting licensed to false will disable licensed features in Saxon PE and Saxon EE.
      */
     val licensed: Boolean
         get() = _licensed
@@ -112,7 +118,7 @@ class CommandLine private constructor(val args: Array<out String>) {
     val pipe: Boolean?
         get() = _pipe
 
-    /** Enable debugging output? Adjust the logging level accordingly. */
+    /** Enable debugging output? */
     val debug: Boolean?
         get() = _debug
 

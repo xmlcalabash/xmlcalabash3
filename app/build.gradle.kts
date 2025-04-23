@@ -1,7 +1,9 @@
 import com.xmlcalabash.build.XmlCalabashBuildExtension
-import org.jetbrains.dokka.gradle.DokkaTask
+import org.jetbrains.dokka.DokkaConfiguration.Visibility
 import org.jetbrains.dokka.base.DokkaBase
 import org.jetbrains.dokka.base.DokkaBaseConfiguration
+import org.jetbrains.dokka.gradle.DokkaTask
+import org.jetbrains.dokka.gradle.DokkaTaskPartial
 import java.net.URI
 import java.net.URL
 
@@ -138,22 +140,23 @@ application {
 
 val xmlbuild = the<XmlCalabashBuildExtension>()
 
-tasks.withType<DokkaTask>().configureEach {
+tasks.withType<DokkaTaskPartial>().configureEach {
   pluginConfiguration<DokkaBase, DokkaBaseConfiguration> {
     customStyleSheets = listOf(file("../documentation/src/dokka/resources/css/xmlcalabash.css"))
     //templatesDir = file("../documentation/src/dokka/resources/templates")
-    footerMessage = "© 2024 Norm Tovey-Walsh"
+    footerMessage = "© 2024-2025 Norm Tovey-Walsh"
     separateInheritedMembers = false
     mergeImplicitExpectActualDeclarations = false
   }
 
   dokkaSourceSets {
     named("main") {
-      moduleName.set("XML Calabash")
+      documentedVisibilities.set(setOf(Visibility.PUBLIC))
+      moduleName.set("XML Calabash Application")
       includes.from("Module.md")
       sourceLink {
         localDirectory.set(file("src/main/kotlin"))
-        remoteUrl.set(URI("https://github.com/xmlcalabash3/xmlcalabash").toURL())
+        remoteUrl.set(URI("https://github.com/xmlcalabash/xmlcalabash3").toURL())
         remoteLineSuffix.set("#L")
       }
     }

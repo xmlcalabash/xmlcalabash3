@@ -208,7 +208,7 @@
 
  }"/>
 
-<xsl:variable name="not-xprocref" select="('p:message')"/>
+<xsl:variable name="not-xprocref" select="()"/>
 
 <xsl:template match="db:para[@role='external-refs']">
   <xsl:if test="node()">

@@ -126,7 +126,7 @@ jobs:
 
       - name: Build the documentation
         run: |
-          ./gradlew documentation:reference documentation:userguide xmlcalabash:apidocs
+          ./gradlew documentation:reference documentation:userguide xmlcalabash:apidocs dokkaHtmlMultiModule
 
       - name: Publish tagged release
         uses: softprops/action-gh-release@v1
@@ -212,13 +212,13 @@ jobs:
 
       - name: Update api docs
         run: |
-          APIVER=`jq -r .version xmlcalabash/build/dokka/javadoc/details.json`
+          APIVER=`jq -r .version documentation/build/reference/details.json`
           rm -rf docs/docs/apidocs/current
           rm -rf docs/docs/apidocs/$APIVER
           mkdir -p docs/docs/apidocs/current
           mkdir -p docs/docs/apidocs/$APIVER
-          rsync -ar xmlcalabash/build/dokka/javadoc/ docs/docs/apidocs/current/
-          rsync -ar xmlcalabash/build/dokka/javadoc/ docs/docs/apidocs/$APIVER/
+          rsync -ar build/dokka/htmlMultiModule/ docs/docs/apidocs/current/
+          rsync -ar build/dokka/htmlMultiModule/ docs/docs/apidocs/$APIVER/
 
       - name: Deploy the updated user guide
         if: ${{ env.HAVE_DOCS == 'true' && env.HAVE_ACCESS_TOKEN == 'true' && env.CI_BRANCH == 'main' && !contains(env.XMLCALABASH_VER, 'SNAPSHOT')}}
