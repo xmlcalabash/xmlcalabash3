@@ -543,12 +543,16 @@ the documents produced during execution are recorded. (Defaults to false.)</para
 <variablelist>
 <varlistentry><term><tag class="attribute">count</tag> (integer)</term>
 <listitem>
-<para>The size of the thread pool.</para>
+<para>The size of the thread pool. If unspecified, the processor will use the
+maximum number of threads possible (one per processor). Specifing a value larger
+than the number of processors won’t increase the numbrer of threads, at most one
+thread per processor will be allocated.</para>
 </listitem>
 </varlistentry>
 </variablelist>
 
-<para>Irrelevant at the moment. XML Calabash is currently single-threaded.</para>
+<para>This configuration option enables threading, see <xref linkend="threading"/>.</para>
+
 </section>
 
 <section xml:id="cc.xml-schema">

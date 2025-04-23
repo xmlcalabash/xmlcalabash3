@@ -55,6 +55,13 @@ available and constructs one group for each available thread. (This may result
 in combining several thread groups if there are fewer available threads than
 statically determined thread groups.)</para>
 
+<note>
+<para>The processor makes no effort to determine an optimal arrangement if it has
+to combine several thread groups. In principle, you’d want to have long running steps
+distributed into different threads and short running steps combined together.
+The processor only assures that deadlock won’t occur across different threads.</para>
+</note>
+
 <para>Then a thread is started for each runtime thread group and they run (to
 the largest extent possible) in parallel. In a complicated pipeline, there may
 be dependencies that cross thread boundaries, in this case the threads will
