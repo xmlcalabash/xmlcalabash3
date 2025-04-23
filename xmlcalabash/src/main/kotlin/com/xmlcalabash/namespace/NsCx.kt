@@ -44,6 +44,7 @@ object NsCx {
     val inputLocation = QName(namespace, "cx:input-location")
     val joiner = QName(namespace, "cx:joiner")
     val link = QName(namespace, "cx:link")
+    val maxThreadCount = QName(namespace, "cx:max-thread-count")
     val mergeDuplicates = QName(namespace, "cx:merge-duplicates")
     val messages = QName(namespace, "cx:messages")
     val message = QName(namespace, "cx:message")

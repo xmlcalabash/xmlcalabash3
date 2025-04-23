@@ -7,6 +7,7 @@ import java.util.*
 
 class RuntimeEnvironment(override val episode: String, environment: CompileEnvironment): XProcEnvironment by environment {
     override val monitors = mutableListOf<Monitor>()
+    internal var threadsAvailable = environment.xmlCalabashConfig.maxThreadCount
 
     companion object {
         fun newInstance(environment: CompileEnvironment): RuntimeEnvironment {

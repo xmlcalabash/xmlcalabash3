@@ -88,8 +88,9 @@ class VisualizerOutput(val xmlCalabash: XmlCalabash, val description: XProcDescr
     }
 
     private fun styleDescription() {
-        var styleStream = VisualizerOutput::class.java.getResourceAsStream(defaultStyle)
-        transformDescription(SAXSource(InputSource(styleStream)), ".xml")
+        val styleStream = VisualizerOutput::class.java.getResourceAsStream(defaultStyle)
+        transformDescription(SAXSource(InputSource(styleStream)), ".xml",
+            params = mapOf(QName("show-thread-groups") to XdmAtomicValue(xmlCalabash.config.maxThreadCount > 1)))
 
         if (debug) {
             val builder = SaxonTreeBuilder(xmlCalabash.config.saxonConfiguration.processor)
@@ -120,8 +121,8 @@ class VisualizerOutput(val xmlCalabash: XmlCalabash, val description: XProcDescr
         transformDescription(SAXSource(InputSource(styleStream)), ".dot", store=true)
     }
 
-    private fun transformDescription(stylesheet: SAXSource, ext: String, store: Boolean = debug) {
-        var xsltCompiler = description.stepConfig.processor.newXsltCompiler()
+    private fun transformDescription(stylesheet: SAXSource, ext: String, params: Map<QName,XdmAtomicValue> = emptyMap(), store: Boolean = debug) {
+        val xsltCompiler = description.stepConfig.processor.newXsltCompiler()
         xsltCompiler.isSchemaAware = description.stepConfig.processor.isSchemaAware
         xsltCompiler.resourceResolver = VisualizerResourceResolver()
         val xsltExec = xsltCompiler.compile(stylesheet)
@@ -131,13 +132,15 @@ class VisualizerOutput(val xmlCalabash: XmlCalabash, val description: XProcDescr
 
         for (pipeline in description.pipelines) {
             val result = transform(xsltExec, pipeline,
-                if (store) "${outputDirectory}pipelines/${description.pipelineName(pipeline)}${ext}" else null)
+                filename = if (store) "${outputDirectory}pipelines/${description.pipelineName(pipeline)}${ext}" else null,
+                params = params)
             styledPipelines.add(result)
         }
 
         for (graph in description.graphs) {
             val result = transform(xsltExec, graph,
-                if (store) "${outputDirectory}graphs/${description.graphName(graph)}${ext}" else null)
+                filename = if (store) "${outputDirectory}graphs/${description.graphName(graph)}${ext}" else null,
+                params = params)
             styledGraphs.add(result)
         }
 

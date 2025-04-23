@@ -68,9 +68,9 @@ dependencies {
   implementation("org.nineml:coffeegrinder:${dep_nineml}")
   implementation("org.nineml:coffeefilter:${dep_nineml}")
 
-  implementation("org.jetbrains.kotlin:kotlin-stdlib:2.0.21")
-  implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.1")
-  implementation("org.jetbrains.kotlin:kotlin-reflect:2.0.21")
+  implementation("org.jetbrains.kotlin:kotlin-stdlib:2.1.20")
+  implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2")
+  implementation("org.jetbrains.kotlin:kotlin-reflect:2.1.20")
 
   // implementation("name.dmaus.schxslt:schxslt:${dep_schxslt}")
   // The SchXslt2 transpiler is included in our resources

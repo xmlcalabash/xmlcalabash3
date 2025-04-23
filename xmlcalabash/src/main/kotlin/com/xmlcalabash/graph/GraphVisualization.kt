@@ -288,7 +288,8 @@ class GraphVisualization private constructor(val graph: Graph, private val filen
                     "id" to port.id,
                     "primary" to "${port.primary}",
                     "sequence" to "${port.sequence}",
-                    "welded-shut" to (if (port.weldedShut) "true" else null)
+                    "welded-shut" to (if (port.weldedShut) "true" else null),
+                    "thread-group" to "${model.threadGroup}"
                 ))
                 text(port.name)
                 endElement()
@@ -328,7 +329,8 @@ class GraphVisualization private constructor(val graph: Graph, private val filen
                 "name" to model.step.name,
                 "filename" to filenameMap[model.step.declId],
                 "option-name" to optName,
-                "expression" to optExpression))
+                "expression" to optExpression,
+                "thread-group" to "${model.threadGroup}"))
 
             startElement(NsDescription.g("inputs", gPrefix))
             describePorts(inputs)
@@ -371,7 +373,9 @@ class GraphVisualization private constructor(val graph: Graph, private val filen
         }
 
         override fun describe() {
-            startElement(NsDescription.g("head", gPrefix))
+            startElement(NsDescription.g("head", gPrefix), mapOf(
+                "thread-group" to "${model.threadGroup}"
+            ))
 
             startElement(NsDescription.g("inputs", gPrefix))
             describePorts(inputs)
@@ -397,7 +401,9 @@ class GraphVisualization private constructor(val graph: Graph, private val filen
         }
 
         override fun describe() {
-            startElement(NsDescription.g("foot", gPrefix))
+            startElement(NsDescription.g("foot", gPrefix), mapOf(
+                "thread-group" to "${model.threadGroup}"
+            ))
 
             startElement(NsDescription.g("inputs", gPrefix))
             describePorts(inputs)
@@ -436,7 +442,9 @@ class GraphVisualization private constructor(val graph: Graph, private val filen
                 "id" to id,
                 "ref" to (model as SubpipelineModel).model.id,
                 "type" to model.step.instructionType.toString(),
-                "name" to model.step.name))
+                "name" to model.step.name,
+                "thread-group" to "${model.threadGroup}"
+            ))
 
             startElement(NsDescription.g("inputs", gPrefix))
             describePorts(inputs)
@@ -461,7 +469,9 @@ class GraphVisualization private constructor(val graph: Graph, private val filen
             startElement(NsDescription.g("compound-step", gPrefix), mapOf(
                 "id" to id,
                 "type" to model.step.instructionType.toString(),
-                "name" to model.step.name))
+                "name" to model.step.name,
+                "thread-group" to "${model.threadGroup}"
+            ))
             head.describe()
             for (child in children) {
                 child.describe()
@@ -480,7 +490,8 @@ class GraphVisualization private constructor(val graph: Graph, private val filen
                 "base-uri" to baseUri,
                 "type" to type,
                 "id" to id,
-                "name" to model.step.name))
+                "name" to model.step.name,
+                "thread-group" to "${model.threadGroup}"))
             head.describe()
             for (child in children) {
                 child.describe()

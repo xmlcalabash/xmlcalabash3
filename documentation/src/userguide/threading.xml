@@ -1,0 +1,132 @@
+<chapter xmlns="http://docbook.org/ns/docbook"
+         xmlns:xlink="http://www.w3.org/1999/xlink"
+         xmlns:xi='http://www.w3.org/2001/XInclude'
+         version="5.2" xml:id="threading">
+<info>
+  <?db filename="threading"?>
+  <title>Running steps in parallel</title>
+</info>
+
+<para>If your processor has multiple cores (or if you have multiple processors), you may
+be able to run pipelines with multiple threads. This allows some steps to run in parallel.
+The <link linkend="run-version">version command</link> will tell you how many threads
+are available.</para>
+
+<para>Even if multiple threads are available, XML Calabash will only use a single thread
+unless you enable more in the <link linkend="cc.threading">configuration file</link>.
+You must explicitly enable support for multiple threads because writing multithreaded pipelines
+demands extra care.</para>
+
+<para>Consider <xref linkend="thread.ex.bad"/>. In a single threaded
+environment, that pipeline might run correctly. It would depend entirely on the
+order in which the processor choose to run the steps.</para>
+
+<example xml:id="thread.ex.bad">
+<title>A dubious pipeline</title>
+<programlisting language='xml'
+><xi:include href="../examples/xml/threading.xml" parse="text"/></programlisting>
+</example>
+
+<para>In a multithreaded environment, it’s unlikely, but unfortunately not
+impossible, that the pipeline would be successful. The easiest way to see why is
+by looking at the pipeline graph:</para>
+
+<figure>
+<title>The dubious pipeline graph</title>
+<mediaobject>
+<imageobject>
+<imagedata fileref="img/threading-graph.svg"/>
+</imageobject>
+</mediaobject>
+</figure>
+
+<para>There you can see that there are two independent sequences of steps. Steps
+in the first sequence are labeled “①”, steps in the second are labeled “②”.
+(There’s actually a third sequence; it contains the sink step represented as a •
+in the graph.)</para>
+
+<para>These are “thread groups”. Static analysis of the pipeline divides all of
+the children of each compound step into thread groups. A thread group consists
+of a linear sequence of connected steps. They’re connected, so they have to run
+sequentially, so there’s no benefit in putting them into different threads.</para>
+
+<para>At runtime, the processor considers the number of threads actually
+available and constructs one group for each available thread. (This may result
+in combining several thread groups if there are fewer available threads than
+statically determined thread groups.)</para>
+
+<note>
+<para>The processor makes no effort to determine an optimal arrangement if it has
+to combine several thread groups. In principle, you’d want to have long running steps
+distributed into different threads and short running steps combined together.
+The processor only assures that deadlock won’t occur across different threads.</para>
+</note>
+
+<para>Then a thread is started for each runtime thread group and they run (to
+the largest extent possible) in parallel. In a complicated pipeline, there may
+be dependencies that cross thread boundaries, in this case the threads will
+pause where necessary until the dependencies are satisfied.</para>
+
+<para>The order in which steps in different thread groups are executed is
+<emphasis>indeterminate</emphasis>. In <xref linkend="thread.ex.bad"/>, it’s
+likely that the inline and load steps will execute “at the same time” and the
+pipeline will fail (because the store step hasn’t created the file yet) or, if
+the file exists, that it will produce the wrong result (because the “old version”
+will be loaded before the “new version” is written). But it isn’t impossible,
+depending on how much load the processor is under and a wide variety of unknowable
+circumstances, that the inline and store steps could run before the load step.</para>
+
+<para>The problem here is the <emphasis>invisible dependency</emphasis> between
+the <tag>p:document</tag> instruction and the “preceding” <tag>p:load</tag>
+step. It’s invisible because it isn’t visible in the connections between the steps.</para>
+
+<para>There are a number of ways to fix this pipeline, but for the purposes of this chapter,
+let’s fix it by adding a “depends” link between the load step and the store step. The
+resulting pipeline will run correctly, as we can see from its graph:</para>
+
+<figure>
+<title>The fixed pipeline graph</title>
+<mediaobject>
+<imageobject>
+<imagedata fileref="img/threading-fixed.svg"/>
+</imageobject>
+</mediaobject>
+</figure>
+
+<para>Even though the store and load steps are in separate thread groups, the
+dependency link assures that the store step will always run first. It’s also
+reduced almost all parallism in the graph, making threading largely
+inconsequential.</para>
+
+<para>The pipeline in <xref linkend="thread.ex.good"/> shows a pipeline that
+benefits much more substantially from multithreading. </para>
+
+<example xml:id="thread.ex.good">
+<title>A highly parallel pipeline</title>
+<programlisting language='xml'
+><xi:include href="../examples/xml/multithreading.xml" parse="text"/></programlisting>
+</example>
+
+<para>The graph shows that the three processing steps (real work being simulated here
+with <tag>p:sleep</tag>) can be run in parallel.</para>
+
+<figure>
+<title>The highly parallel graph</title>
+<mediaobject>
+<imageobject>
+<imagedata fileref="img/multithreading.svg"/>
+</imageobject>
+</mediaobject>
+</figure>
+
+<para>Run with a single thread, this pipeline will take at least nine seconds to
+execute. With three threads, it is likely to finish in just over four seconds.</para>
+
+<para>If there is any opportunity for parallelism in a pipeline, using multiple
+threads will introduce unpredictable behavior into it. This can cause pipelines
+that have invisible dependencies to fail or produce incorrect results. It can
+also make pipelines run substantially faster.</para>
+
+<para>Is threading worth it? It depends.</para>
+
+</chapter>

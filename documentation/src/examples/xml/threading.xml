@@ -1,0 +1,18 @@
+<p:declare-step xmlns:p="http://www.w3.org/ns/xproc"
+                version="3.0">
+
+  <p:output port="result"/>
+
+  <p:store name="store" href="/tmp/file.txt">
+    <p:with-input>
+      <p:inline content-type="text/plain">One&#10;Two&#10;Three</p:inline>
+    </p:with-input>
+  </p:store>
+
+  <p:sink/>
+
+  <p:load name="load" href="/tmp/file.txt"/>
+
+  <p:text-count/>
+
+</p:declare-step>

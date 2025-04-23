@@ -4,7 +4,7 @@ import com.xmlcalabash.runtime.XProcStepConfiguration
 import com.xmlcalabash.runtime.model.CompoundStepModel
 
 open class ChooseOtherwiseStep(yconfig: XProcStepConfiguration, compound: CompoundStepModel): ChooseWhenStep(yconfig, compound) {
-    override fun evaluateGuardExpression(): Boolean {
+    override fun evaluateGuardExpression(parent: CompoundStep): Boolean {
         if (runnables.isEmpty()) {
             instantiate()
         }
@@ -12,7 +12,8 @@ open class ChooseOtherwiseStep(yconfig: XProcStepConfiguration, compound: Compou
         localStepsToRun.clear()
         localStepsToRun.addAll(runnables)
 
-        head.runStep()
+        runtimeParent = parent
+        head.runStep(this)
 
         return true
     }

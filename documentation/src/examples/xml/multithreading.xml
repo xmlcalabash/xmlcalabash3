@@ -1,0 +1,28 @@
+<p:declare-step xmlns:p="http://www.w3.org/ns/xproc"
+                version="3.0">
+
+  <p:output port="result"/>
+
+  <p:identity name="source-A">
+    <p:with-input><A/></p:with-input>
+  </p:identity>
+
+  <p:sleep name="processed-A" duration="PT2S"/>
+
+  <p:identity name="source-B">
+    <p:with-input><B/></p:with-input>
+  </p:identity>
+
+  <p:sleep name="processed-B" duration="PT3S"/>
+
+  <p:identity name="source-C">
+    <p:with-input><C/></p:with-input>
+  </p:identity>
+
+  <p:sleep name="processed-C" duration="PT4S"/>
+
+  <p:wrap-sequence wrapper="results">
+    <p:with-input pipe="@processed-A @processed-B @processed-C"/>
+  </p:wrap-sequence>
+
+</p:declare-step>

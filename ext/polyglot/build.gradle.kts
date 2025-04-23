@@ -74,12 +74,6 @@ tasks.withType<Test> {
   jvmArgs(jvmDefaultArgs)
 }
 
-tasks.register("helloWorld") {
-  doLast {
-    println("Hello, world.")
-  }
-}
-
 tasks.register("stage-release") {
   dependsOn("jar")
 

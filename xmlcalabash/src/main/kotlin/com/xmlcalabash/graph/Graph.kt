@@ -402,14 +402,6 @@ class Graph private constructor(val environment: GraphEnvironment) {
         }
     }
 
-    private fun identifyGuards() {
-        for ((instruction, node) in instructionMap) {
-            if (instruction is WhenInstruction) {
-                identifyGuards((node as SubpipelineModel).model)
-            }
-        }
-    }
-
     private fun identifyGuards(node: CompoundModel) {
         val guardSteps = mutableSetOf<Model>()
         val candidates = mutableSetOf<Model>()

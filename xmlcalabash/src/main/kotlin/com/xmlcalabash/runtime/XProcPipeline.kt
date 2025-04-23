@@ -127,11 +127,13 @@ class XProcPipeline internal constructor(runtime: XProcRuntime, pipeline: Compou
 
         val executionContext = config.saxonConfig.preserveExecutionContext()
         try {
-            runnable.runStep()
+            runnable.runStep(runnable)
+        } finally {
+            val finalContext = config.saxonConfig.preserveExecutionContext()
+            if (finalContext.isNotEmpty()) {
+                throw IllegalStateException("Execution context is not empty")
+            }
             config.saxonConfig.restoreExecutionContext(executionContext)
-        } catch (e: Exception) {
-            config.saxonConfig.restoreExecutionContext(executionContext)
-            throw e
         }
 
         val trace = config.xmlCalabashConfig.trace

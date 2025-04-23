@@ -239,8 +239,8 @@ class CssWeasyprint: CssProcessor {
         }
 
         if (rc != 0) {
-            println(stdout.toString())
-            println(stderr.toString())
+            stepConfig.warn { stdout.toString() }
+            stepConfig.warn { stderr.toString() }
             throw stepConfig.exception(XProcError.xdStepFailed("Weasyprint failed: ${rc}"))
         }
 

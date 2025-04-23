@@ -39,7 +39,7 @@ interface XmlCalabashConfiguration {
     val saxonConfigurationProperties: Map<String,String>
     val sendmail: Map<String, String>
     val serialization: Map<MediaType, Map<QName,String>>
-    val threadPoolSize: Int
+    val maxThreadCount: Int
     val trace: File?
     val traceDocuments: File?
     val tryNamespaces: Boolean

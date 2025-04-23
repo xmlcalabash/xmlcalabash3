@@ -43,9 +43,7 @@ class StepAvailableFunction(private val config: SaxonConfiguration): ExtensionFu
             val structuredQName = StructuredQName.fromLexicalQName(lexicalQName, false, true, staticContext?.namespaceResolver)
             val stepType = QName(structuredQName.namespaceUri, structuredQName.localPart)
             val dynamicContext = config.getExecutionContext()
-
             val available = dynamicContext.stepAvailable(stepType)
-            //println("AVAIL ${stepType}: ${available}")
             return if (available) BooleanValue.TRUE else BooleanValue.FALSE
         }
     }

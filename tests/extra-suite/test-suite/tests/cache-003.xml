@@ -34,7 +34,8 @@
       </cx:cache-add>
 
       <cx:cache-add name="cache-add"
-                    href="https://xmlcalabash.com/does/not/exist.xml">
+                    href="https://xmlcalabash.com/does/not/exist.xml"
+                    p:depends="cache-pre-add">
         <p:with-input>
           <does-so/>
         </p:with-input>

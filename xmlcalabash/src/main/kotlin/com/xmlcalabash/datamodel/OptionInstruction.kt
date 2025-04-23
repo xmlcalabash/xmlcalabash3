@@ -71,6 +71,7 @@ open class OptionInstruction(parent: XProcInstruction, name: QName, stepConfig: 
                     select = XProcExpression.select(stepConfig,
                         "Q{http://xmlcalabash.com/ns/extensions}error('static', 18, Q{http://www.w3.org/2005/xpath-functions}QName('${name.namespaceUri}', '${lexical}'))",
                         SequenceType.ANY, false)
+                    (select as XProcSelectExpression).requiresValue = true
                 }
             } else {
                 if (static && stepConfig.staticBindings.contains(name)) {

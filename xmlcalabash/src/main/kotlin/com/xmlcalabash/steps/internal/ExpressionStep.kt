@@ -8,6 +8,7 @@ import com.xmlcalabash.documents.LazyDocumentValue
 import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.namespace.Ns
+import com.xmlcalabash.namespace.Ns.port
 import com.xmlcalabash.namespace.NsCx
 import com.xmlcalabash.namespace.NsFn
 import com.xmlcalabash.namespace.NsP
@@ -31,7 +32,7 @@ open class ExpressionStep(val params: ExpressionStepParameters): AbstractAtomicS
         super.run()
 
         params.expression.details.error?.let {
-            throw throw stepConfig.exception(XProcError.xsXPathStaticError(params.expression.toString()), it)
+            throw stepConfig.exception(XProcError.xsXPathStaticError(params.expression.toString()), it)
         }
 
         // Expression steps are unusual in that source may not exist

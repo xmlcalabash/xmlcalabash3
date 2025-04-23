@@ -27,6 +27,7 @@
 -->
 <xi:include href="install.xml"/>
 <xi:include href="run.xml"/>
+<xi:include href="threading.xml"/>
 <xi:include href="validation.xml"/>
 <xi:include href="graphs.xml"/>
 <xi:include href="logging.xml"/>

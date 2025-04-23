@@ -1,7 +1,6 @@
 package com.xmlcalabash.runtime.steps
 
 import com.xmlcalabash.documents.DocumentProperties
-import com.xmlcalabash.documents.XProcBinaryDocument
 import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.namespace.Ns
@@ -14,10 +13,8 @@ import com.xmlcalabash.runtime.model.AtomicBuiltinStepModel
 import com.xmlcalabash.runtime.parameters.RuntimeStepParameters
 import com.xmlcalabash.steps.AbstractAtomicStep
 import com.xmlcalabash.util.MediaClassification
-import com.xmlcalabash.util.S9Api
 import com.xmlcalabash.util.SaxonXsdValidator
 import net.sf.saxon.s9api.ValidationMode
-import net.sf.saxon.s9api.XdmNode
 import net.sf.saxon.s9api.XdmValue
 
 open class AtomicStep(config: XProcStepConfiguration, atomic: AtomicBuiltinStepModel): AbstractStep(config, atomic), Receiver {
@@ -27,12 +24,13 @@ open class AtomicStep(config: XProcStepConfiguration, atomic: AtomicBuiltinStepM
     val contextDocuments = mutableSetOf<XProcDocument>()
     val inputPorts = mutableSetOf<String>()
     val initiallyOpenPorts = mutableSetOf<String>()
-    val openPorts = mutableSetOf<String>()
+    private val openPorts = mutableSetOf<String>()
     private var message: XdmValue? = null
     private val inputErrors = mutableListOf<XProcError>()
     override val stepTimeout = atomic.model.step.timeout
     private var validator: SaxonXsdValidator? = null
 
+    private var notReadyReason: String
     init {
         inputPorts.addAll(atomic.inputs.keys)
         for ((name, port) in atomic.inputs) {
@@ -40,7 +38,19 @@ open class AtomicStep(config: XProcStepConfiguration, atomic: AtomicBuiltinStepM
                 initiallyOpenPorts.add(name)
             }
         }
+
         openPorts.addAll(initiallyOpenPorts)
+        val sb = StringBuilder()
+        for (portName in openPorts) {
+            val port = params.inputs[portName]!!
+            sb.append(port.name).append(" ")
+        }
+        notReadyReason = sb.toString()
+        if (notReadyReason.isEmpty()) {
+            stepConfig.debug { "WAIT4 ${this}: <nothing>" }
+        } else {
+            stepConfig.debug { "WAIT4 ${this}: ${notReadyReason}" }
+        }
 
         implementation.setup(stepConfig, this, params)
         implementation.extensionAttributes(atomic.extensionAttributes)
@@ -48,48 +58,72 @@ open class AtomicStep(config: XProcStepConfiguration, atomic: AtomicBuiltinStepM
 
     override val readyToRun: Boolean
         get() {
-            for (portName in openPorts) {
-                val port = params.inputs[portName]!!
-                if (!port.unbound) {
-                    return false
+            var isReady = true
+            lateinit var reason: String
+            synchronized(openPorts) {
+                val sb = StringBuilder()
+                for (portName in openPorts) {
+                    val port = params.inputs[portName]!!
+                    if (!port.unbound) {
+                        sb.append(port.name).append(" ")
+                        isReady = false
+                    }
                 }
+                reason = sb.toString()
             }
-            return true
+
+            if (isReady) {
+                stepConfig.debug { "READY ${this}" }
+                notReadyReason = reason
+                return true
+            }
+
+            if (notReadyReason != reason) {
+                stepConfig.debug { "NORDY ${this}: ${reason}" }
+                notReadyReason = reason
+            }
+
+            return false
         }
 
     override fun input(port: String, doc: XProcDocument) {
-        val error = checkInputPort(port, doc, params.inputs[port])
-        if (error == null) {
-            if (port.startsWith("Q{")) {
-                contextDocuments.add(doc)
-                val name = stepConfig.typeUtils.parseQName(port)
-                if ((type.namespaceUri == NsP.namespace && name == Ns.message)
-                    || (type.namespaceUri != NsP.namespace && name == NsP.message)) {
-                    message = doc.value
-                } else {
-                    implementation.option(name, LazyValue(doc, stepConfig))
-                }
-            } else {
-                if (stepConfig.validationMode != ValidationMode.DEFAULT && params.inputs[port]?.primary == true) {
-                    val curVal = doc.properties[NsCx.validationMode]?.underlyingValue?.stringValue
-                    val validatable = doc.contentType?.classification() == MediaClassification.XML
-                    if (validatable && (curVal == null || (curVal == "lax" && stepConfig.validationMode != ValidationMode.STRICT))) {
-                        if (validator == null) {
-                            validator = SaxonXsdValidator(stepConfig)
-                        }
-                        val valid = validator!!.validate(doc)
-                        stepConfig.saxonConfig.addProperties(valid)
-                        implementation.input(port, valid)
+        synchronized(this) {
+            val error = checkInputPort(port, doc, params.inputs[port])
+
+            stepConfig.debug { "RECVD ${this} input on $port ${error ?: ""}: ${inputCount[port]}" }
+
+            if (error == null) {
+                if (port.startsWith("Q{")) {
+                    contextDocuments.add(doc)
+                    val name = stepConfig.typeUtils.parseQName(port)
+                    if ((type.namespaceUri == NsP.namespace && name == Ns.message)
+                        || (type.namespaceUri != NsP.namespace && name == NsP.message)) {
+                        message = doc.value
                     } else {
-                        // This one's already validated or can't be validated
-                        implementation.input(port, doc)
+                        implementation.option(name, LazyValue(doc, stepConfig))
                     }
                 } else {
-                    implementation.input(port, doc)
+                    if (stepConfig.validationMode != ValidationMode.DEFAULT && params.inputs[port]?.primary == true) {
+                        val curVal = doc.properties[NsCx.validationMode]?.underlyingValue?.stringValue
+                        val validatable = doc.contentType?.classification() == MediaClassification.XML
+                        if (validatable && (curVal == null || (curVal == "lax" && stepConfig.validationMode != ValidationMode.STRICT))) {
+                            if (validator == null) {
+                                validator = SaxonXsdValidator(stepConfig)
+                            }
+                            val valid = validator!!.validate(doc)
+                            stepConfig.saxonConfig.addProperties(valid)
+                            implementation.input(port, valid)
+                        } else {
+                            // This one's already validated or can't be validated
+                            implementation.input(port, doc)
+                        }
+                    } else {
+                        implementation.input(port, doc)
+                    }
                 }
+            } else {
+                inputErrors.add(error)
             }
-        } else {
-            inputErrors.add(error)
         }
     }
 
@@ -102,7 +136,7 @@ open class AtomicStep(config: XProcStepConfiguration, atomic: AtomicBuiltinStepM
 
         val rpair = receiver[port]
         if (rpair == null) {
-            println("No receiver for ${port} from ${this} (in step)")
+            stepConfig.debug { "No receiver for ${port} from ${this} (in step)" }
             return
         }
 
@@ -133,7 +167,10 @@ open class AtomicStep(config: XProcStepConfiguration, atomic: AtomicBuiltinStepM
     }
 
     override fun close(port: String) {
-        openPorts.remove(port)
+        synchronized(openPorts) {
+            stepConfig.debug { "CLOSE ${this} port ${port}: ${inputCount[port]}" }
+            openPorts.remove(port)
+        }
     }
 
     override fun instantiate() {
@@ -154,14 +191,16 @@ open class AtomicStep(config: XProcStepConfiguration, atomic: AtomicBuiltinStepM
             throw inputErrors.first().exception()
         }
 
-        for (portName in openPorts) {
-            val port = params.inputs[portName]!!
-            if (!port.weldedShut && port.defaultBindings.isEmpty()) {
-                throw stepConfig.exception(XProcError.xiImpossible("Unbound input port with no default bindings?"))
-            }
-            for (binding in port.defaultBindings) {
-                for (document in defaultBindingDocuments(binding)) {
-                    input(portName, document)
+        synchronized(openPorts) {
+            for (portName in openPorts) {
+                val port = params.inputs[portName]!!
+                if (!port.weldedShut && port.defaultBindings.isEmpty()) {
+                    throw stepConfig.exception(XProcError.xiImpossible("Unbound input port with no default bindings?"))
+                }
+                for (binding in port.defaultBindings) {
+                    for (document in defaultBindingDocuments(binding)) {
+                        input(portName, document)
+                    }
                 }
             }
         }
@@ -186,16 +225,19 @@ open class AtomicStep(config: XProcStepConfiguration, atomic: AtomicBuiltinStepM
         val stepConfig = (implementation as AbstractAtomicStep).stepConfig
 
         val execContext = stepConfig.saxonConfig.newExecutionContext(stepConfig)
-        for (doc in contextDocuments) {
-            execContext.addProperties(doc)
-        }
+        try {
+            for (doc in contextDocuments) {
+                execContext.addProperties(doc)
+            }
 
-        runImplementation()
+            runImplementation()
 
-        for (doc in contextDocuments) {
-            execContext.removeProperties(doc)
+            for (doc in contextDocuments) {
+                execContext.removeProperties(doc)
+            }
+        } finally {
+            stepConfig.saxonConfig.releaseExecutionContext()
         }
-        stepConfig.saxonConfig.releaseExecutionContext()
 
         for ((_, rpair) in receiver) {
             rpair.first.close(rpair.second)

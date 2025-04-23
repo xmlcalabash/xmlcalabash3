@@ -44,6 +44,10 @@ class AtomicUserStepModel(runtime: XProcRuntime, model: AtomicModel, private val
             impl._inputs.clear()
             impl._inputs.putAll(inputs)
 
+            for ((name, option) in options) {
+                impl._inputs["Q{${name.namespaceUri}}${name.localName}"] = RuntimePort(option)
+            }
+
             val headPorts = impl.head.outputs.keys.toList()
             impl.head._outputs.clear()
             for (name in headPorts) {
@@ -76,6 +80,7 @@ class AtomicUserStepModel(runtime: XProcRuntime, model: AtomicModel, private val
 
         step.staticOptions.putAll(staticOptions)
         step.head.staticOptions.putAll(staticOptions)
+        step._threadGroup = threadGroup
 
         return { step }
     }

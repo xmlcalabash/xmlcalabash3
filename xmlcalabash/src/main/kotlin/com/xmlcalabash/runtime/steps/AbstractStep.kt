@@ -38,6 +38,10 @@ abstract class AbstractStep(val stepConfig: XProcStepConfiguration, step: StepMo
     }
     override val id = _id
 
+    internal var runtimeParent: CompoundStep? = null
+    internal var _threadGroup = step.threadGroup
+    val threadGroup: Int
+        get() = _threadGroup
     val location = step.location
     internal val receiver = mutableMapOf<String, Pair<Consumer, String>>()
     val inputCount = mutableMapOf<String, Int>()
@@ -124,8 +128,11 @@ abstract class AbstractStep(val stepConfig: XProcStepConfiguration, step: StepMo
         //println("output ${port}: on ${this}")
     }
 
-    open fun runStep() {
-        stepConfig.debug { "Running ${this}" }
+    open fun runStep(parent: CompoundStep) {
+        stepConfig.debug { "START ${this} (${Thread.currentThread().id})" }
+
+        runtimeParent = parent
+        stepConfig.saxonConfig.newExecutionContext(this)
 
         try {
             prepare()
@@ -173,6 +180,9 @@ abstract class AbstractStep(val stepConfig: XProcStepConfiguration, step: StepMo
                     throw stepConfig.exception(XProcError.xdStepFailed(msg).updateAt(type, name), ex)
                 }
             }
+        } finally {
+            stepConfig.saxonConfig.releaseExecutionContext()
+            stepConfig.debug { "FINSH ${this}" }
         }
     }
 

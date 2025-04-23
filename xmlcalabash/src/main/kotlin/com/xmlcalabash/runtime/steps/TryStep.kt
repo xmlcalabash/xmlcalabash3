@@ -32,67 +32,69 @@ open class TryStep(config: XProcStepConfiguration, compound: CompoundStepModel):
         }
 
         stepConfig.saxonConfig.newExecutionContext(stepConfig)
-        head.runStep()
-
-        var errorDocument: XProcDocument? = null
-        var throwException: Exception? = null
         try {
-            runSubpipeline()
-            group!!.runStep()
-        } catch (ex: Exception) {
-            foot.cache.clear() // anything that accumulated so far? nope.
+            head.runStep(this)
 
-            throwException = ex
-            val errorCode = if (ex is XProcException) {
-                ex.error.code
-            } else {
-                stepConfig.warn { "Caught unwrapped exception: ${ex}" }
-                null
-            }
-
-            errorDocument = errorDocument(group!!, ex)
-
-            for (step in catches) {
-                val codes = step.codes
-                if (codes.isEmpty() || (errorCode != null && codes.contains(errorCode))) {
-                    throwException = null
-                    try {
-                        step.head.input("error", errorDocument)
-                        step.runStep()
-                    } catch (cex: Exception) {
-                        throwException = cex
-                    }
-                    break;
-                }
-            }
-        }
-
-        if (finally != null) {
+            var errorDocument: XProcDocument? = null
+            var throwException: Exception? = null
             try {
-                if (errorDocument != null) {
-                    finally.head.input("error", errorDocument)
-                }
-                finally.runStep()
+                runSubpipeline()
+                group!!.runStep(this)
             } catch (ex: Exception) {
-                if (throwException == null) {
-                    throwException = ex
+                foot.cache.clear() // anything that accumulated so far? nope.
+
+                throwException = ex
+                val errorCode = if (ex is XProcException) {
+                    ex.error.code
+                } else {
+                    stepConfig.warn { "Caught unwrapped exception: ${ex}" }
+                    null
+                }
+
+                errorDocument = errorDocument(group!!, ex)
+
+                for (step in catches) {
+                    val codes = step.codes
+                    if (codes.isEmpty() || (errorCode != null && codes.contains(errorCode))) {
+                        throwException = null
+                        try {
+                            step.head.input("error", errorDocument)
+                            step.runStep(this)
+                        } catch (cex: Exception) {
+                            throwException = cex
+                        }
+                        break;
+                    }
                 }
             }
-        }
 
-        stepConfig.saxonConfig.releaseExecutionContext()
-
-        if (throwException != null) {
-            throw throwException
-        }
-
-        for ((port, documents) in foot.cache) {
-            for (document in documents) {
-                foot.write(port, document)
+            if (finally != null) {
+                try {
+                    if (errorDocument != null) {
+                        finally.head.input("error", errorDocument)
+                    }
+                    finally.runStep(this)
+                } catch (ex: Exception) {
+                    if (throwException == null) {
+                        throwException = ex
+                    }
+                }
             }
-        }
 
-        foot.runStep()
+            if (throwException != null) {
+                throw throwException
+            }
+
+            for ((port, documents) in foot.cache) {
+                for (document in documents) {
+                    foot.write(port, document)
+                }
+            }
+
+            foot.runStep(this)
+        } finally {
+            stepConfig.saxonConfig.releaseExecutionContext()
+        }
     }
 
     private fun errorDocument(step: AbstractStep, exception: Exception): XProcDocument {

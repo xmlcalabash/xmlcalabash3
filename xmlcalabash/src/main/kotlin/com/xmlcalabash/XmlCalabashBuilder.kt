@@ -87,6 +87,9 @@ class XmlCalabashBuilder {
     fun getDebugger() = config._debugger
     fun setDebugger(debugger: Boolean): XmlCalabashBuilder {
         config._debugger = debugger
+        if (debugger) {
+            config._maxThreadCount = 1
+        }
         return this
     }
 
@@ -294,9 +297,24 @@ class XmlCalabashBuilder {
         return this
     }
 
-    fun getThreadPoolSize() = config._threadPoolSize
-    fun setThreadPoolSize(size: Int): XmlCalabashBuilder {
-        config._threadPoolSize = size
+    fun getMaxThreadCount() = config._maxThreadCount
+    fun setMaxThreadCount(size: Int): XmlCalabashBuilder {
+        val pcount = Runtime.getRuntime().availableProcessors()
+        if (size > 0) {
+            if (config._debug) {
+                config._maxThreadCount = 1
+                logger.debug { "Using the debugger requires single threaded operation" }
+            } else {
+                if (size > pcount) {
+                    logger.debug { "Upper limit for thread count is ${pcount}" }
+                    config._maxThreadCount = pcount
+                } else {
+                    config._maxThreadCount = size
+                }
+            }
+        } else {
+            logger.warn { "Ignoring absurd thread count: ${size}" }
+        }
         return this
     }
 
@@ -441,7 +459,7 @@ class XmlCalabashBuilder {
         internal var _consoleEncoding = DEFAULT_CONSOLE_ENCODING
         internal var _debug = false
         internal var _debugger = false
-        internal var _eagerEvaluation = true
+        internal var _eagerEvaluation = false
         internal var _graphStyle: URI? = null
         internal var _graphviz: File? = null
         internal var _implicitParameterName: QName? = Ns.parameters
@@ -460,7 +478,7 @@ class XmlCalabashBuilder {
         internal val _saxonConfigurationProperties = mutableMapOf<String,String>()
         internal val _sendmail = mutableMapOf<String, String>()
         internal val _serialization = mutableMapOf<MediaType, Map<QName,String>>()
-        internal var _threadPoolSize = 1
+        internal var _maxThreadCount = 1
         internal var _trace: File? = null
         internal var _traceDocuments: File? = null
         internal var _tryNamespaces = false
@@ -540,8 +558,8 @@ class XmlCalabashBuilder {
             get() = _sendmail
         override val serialization: Map<MediaType, Map<QName, String>>
             get() = _serialization
-        override val threadPoolSize: Int
-            get() = _threadPoolSize
+        override val maxThreadCount: Int
+            get() = _maxThreadCount
         override val trace: File?
             get() = _trace
         override val traceDocuments: File?
@@ -596,7 +614,7 @@ class XmlCalabashBuilder {
             config._saxonConfigurationProperties.putAll(_saxonConfigurationProperties)
             config._sendmail.putAll(_sendmail)
             config._serialization.putAll(_serialization)
-            config._threadPoolSize = _threadPoolSize
+            config._maxThreadCount = _maxThreadCount
             config._trace = _trace
             config._traceDocuments = _traceDocuments
             config._tryNamespaces = _tryNamespaces

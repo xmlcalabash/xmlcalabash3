@@ -7,11 +7,16 @@ import com.xmlcalabash.namespace.NsCx
 import com.xmlcalabash.namespace.NsErr
 import com.xmlcalabash.namespace.NsP
 import com.xmlcalabash.runtime.LazyValue
+import com.xmlcalabash.runtime.RuntimeEnvironment
 import com.xmlcalabash.runtime.XProcStepConfiguration
+import com.xmlcalabash.runtime.model.AtomicBuiltinOptionModel
 import com.xmlcalabash.runtime.model.CompoundStepModel
 import com.xmlcalabash.runtime.model.StepModel
+import com.xmlcalabash.runtime.parameters.OptionStepParameters
 import com.xmlcalabash.steps.internal.ExpressionStep
+import kotlinx.coroutines.*
 import net.sf.saxon.s9api.QName
+import kotlin.collections.mutableMapOf
 
 abstract class CompoundStep(config: XProcStepConfiguration, compound: CompoundStepModel): AbstractStep(config, compound) {
     companion object {
@@ -40,6 +45,7 @@ abstract class CompoundStep(config: XProcStepConfiguration, compound: CompoundSt
     final override val params = compound.params
     val inputPorts = mutableSetOf<String>()
 
+    private val extensionAttributes = compound.extensionAttributes.toList()
     internal val runnableProviders = mutableMapOf<StepModel, () -> AbstractStep>()
     internal val edges = compound.edges
     internal val runnables = mutableListOf<AbstractStep>()
@@ -48,10 +54,27 @@ abstract class CompoundStep(config: XProcStepConfiguration, compound: CompoundSt
     internal var stepName: String? = null
     internal var stepType: QName? = null
     override val stepTimeout = compound.timeout
+    internal val childThreadGroups = compound.childThreadGroups
+    internal var iterationPosition = 0L
+    internal var iterationSize = 0L
     protected val stepsToRun = mutableListOf<AbstractStep>()
+    private var exception: Throwable? = null
 
+    private var showedReady = true
     override val readyToRun: Boolean
-        get() = head.readyToRun
+        get() {
+            val ready = head.readyToRun
+            if (ready) {
+                stepConfig.debug { "READY ${this}" }
+                showedReady = true
+            } else {
+                if (showedReady) {
+                    stepConfig.debug { "NORDY ${this}" }
+                    showedReady = false
+                }
+            }
+            return ready
+        }
 
     init {
         inputPorts.addAll(compound.inputs.keys)
@@ -108,8 +131,65 @@ abstract class CompoundStep(config: XProcStepConfiguration, compound: CompoundSt
     }
 
     protected fun runSubpipeline() {
+        if (stepsToRun.isEmpty()) {
+            return
+        }
+
+        var maxThreads = Int.MAX_VALUE
+        for (pair in extensionAttributes) {
+            if (pair.first == NsCx.maxThreadCount) {
+                maxThreads = pair.second.toInt()
+            }
+        }
+
+        var threadsToUse = 1
+        var threadsConsumed = 0
+        var threadsAvailable = 0
+        synchronized(stepConfig.environment) {
+            if (stepConfig.environment is RuntimeEnvironment) {
+                maxThreads = Math.min(maxThreads, stepConfig.environment.threadsAvailable)
+                threadsAvailable = maxThreads
+                threadsToUse = Math.max(1, Math.min(threadsAvailable, childThreadGroups))
+                if (threadsToUse > 1 && stepConfig.environment.threadsAvailable > 1) {
+                    threadsConsumed = threadsToUse
+                    stepConfig.environment.threadsAvailable -= threadsConsumed
+                }
+            }
+        }
+
         try {
-            runStepsExhaustively(stepsToRun)
+            if (threadsToUse == 1) {
+                val atomicOptionValues = mutableMapOf<QName, LazyValue>()
+                if (threadsAvailable > 0) {
+                    stepConfig.debug {
+                        var sep = ": "
+                        val sb = StringBuilder()
+                        sb.append("Single threading")
+                        for (step in stepsToRun) {
+                            sb.append(sep).append(step.name)
+                            sep = "-> "
+                        }
+                        sb.toString()
+                    }
+                }
+                runSequentialStepsExhaustively(atomicOptionValues, stepsToRun)
+            } else {
+                stepConfig.debug { "Assigning ${threadsToUse}/${threadsAvailable} threads to ${childThreadGroups} thread groups" }
+                val groups = assignToThreads(threadsToUse)
+                for ((index, group) in groups.withIndex()) {
+                    stepConfig.debug {
+                        var sep = ": "
+                        val sb = StringBuilder()
+                        sb.append("Thread ${index+1}")
+                        for (step in group) {
+                            sb.append(sep).append(step.name)
+                            sep = "-> "
+                        }
+                        sb.toString()
+                    }
+                }
+                runConcurrentStepsExhaustively(groups)
+            }
         } catch (ex: XProcException) {
             if (ex.error.code == NsErr.threadInterrupted) {
                 for (step in stepsToRun) {
@@ -117,11 +197,94 @@ abstract class CompoundStep(config: XProcStepConfiguration, compound: CompoundSt
                 }
             }
             throw ex
+        } finally {
+            synchronized(stepConfig.environment) {
+                (stepConfig.environment as RuntimeEnvironment).threadsAvailable += threadsConsumed
+            }
         }
     }
 
-    override fun abort() {
-        super.abort()
+    private fun assignToThreads(threadsAvailable: Int): List<List<AbstractStep>> {
+        var groups = mutableListOf<MutableList<Int>>()
+        for (num in 0 ..< childThreadGroups) {
+            groups.add(mutableListOf())
+            for ((index, step) in stepsToRun.withIndex()) {
+                if (step.threadGroup == 0) {
+                    throw IllegalStateException("Step not assigned a thread group: ${step}")
+                }
+                if (step.threadGroup == num+1) {
+                    groups[num].add(index)
+                }
+            }
+        }
+
+        // If we're running some subset of steps that doesn't include every group,
+        // discard the empty groups
+        val collapsedGroups = mutableListOf<MutableList<Int>>()
+        for (group in groups) {
+            if (group.isNotEmpty()) {
+                collapsedGroups.add(group)
+            }
+        }
+
+        groups = collapsedGroups
+        while (groups.size > threadsAvailable) {
+            groups = combineTwoGroups(groups)
+        }
+
+        val threadedSteps = mutableListOf<MutableList<AbstractStep>>()
+        for (group in groups) {
+            val list = mutableListOf<AbstractStep>()
+            for (index in group) {
+                list.add(stepsToRun[index])
+            }
+            threadedSteps.add(list)
+        }
+
+        return threadedSteps
+    }
+
+    private fun combineTwoGroups(groups: MutableList<MutableList<Int>>): MutableList<MutableList<Int>> {
+        // Find the two shortest groups...
+        var firstIndex = -1
+        var firstSize = Int.MAX_VALUE
+        var secondIndex = -1
+        var secondSize = Int.MAX_VALUE
+
+        for ((index, group) in groups.withIndex()) {
+            if (group.size <= secondSize) {
+                secondSize = group.size
+                secondIndex = index
+            }
+        }
+
+        for ((index, group) in groups.withIndex()) {
+            if (index != secondIndex && group.size <= firstSize) {
+                firstSize = group.size
+                firstIndex = index
+            }
+        }
+
+        val newGroups = mutableListOf<MutableList<Int>>()
+        for ((index, group) in groups.withIndex()) {
+            when (index) {
+                firstIndex -> {
+                    val list = mutableListOf<Int>()
+                    list.addAll(groups[index])
+                    list.addAll(groups[secondIndex])
+                    list.sortWith(Comparator { a, b -> a.compareTo(b) })
+                    newGroups.add(list)
+                }
+                secondIndex -> Unit
+                else -> {
+                    val list = mutableListOf<Int>()
+                    list.addAll(groups[index])
+                    newGroups.add(list)
+                }
+            }
+        }
+
+        return newGroups
     }
 
     override fun input(port: String, doc: XProcDocument) {
@@ -145,25 +308,64 @@ abstract class CompoundStep(config: XProcStepConfiguration, compound: CompoundSt
         }
     }
 
-    open fun runStepsExhaustively(steps: List<AbstractStep>) {
+    private fun runConcurrentStepsExhaustively(groups: List<List<AbstractStep>>) {
+        // When we're running a step defined by a pipeline, the options passed in or computed
+        // must be available for computing subsequent options.
+        val atomicOptionValues = mutableMapOf<QName, LazyValue>()
+
+        runBlocking {
+            val handler = CoroutineExceptionHandler { context, ex ->
+                exception = ex
+            }
+
+            val jobs: List<Job> = groups.map { group ->
+                launch (Dispatchers.Default + handler + SupervisorJob()) {
+                    runSequentialStepsExhaustively(atomicOptionValues, group)
+                }
+            }
+            jobs.forEach { it.join() }
+        }
+
+        if (exception != null) {
+            throw exception!!
+        }
+    }
+
+    private fun runSequentialStepsExhaustively(atomicOptionValues: MutableMap<QName, LazyValue>, steps: List<AbstractStep>) {
         val stepsToRun = mutableListOf<AbstractStep>()
         stepsToRun.addAll(steps)
 
         // When we're running a step defined by a pipeline, the options passed in or computed
         // must be available for computing subsequent options.
-        val atomicOptionValues = mutableMapOf<QName, LazyValue>()
 
         for (runMe in steps) {
+            while (!runMe.readyToRun) {
+                if (exception != null) {
+                    // This must be in the threaded case and something's gone wrong on another thread
+                    return
+                }
+                Thread.sleep(20)
+            }
+
             if (runMe is AtomicOptionStep) {
-                runMe.atomicOptionValues.putAll(atomicOptionValues)
-                runMe.runStep()
-                if (runMe.externalValue == null) {
-                    atomicOptionValues[runMe.externalName] = LazyValue(runMe.stepConfig, (runMe.implementation as ExpressionStep).expression, stepConfig)
-                } else {
-                    atomicOptionValues[runMe.externalName] = LazyValue(XProcDocument.ofValue(runMe.externalValue!!.value, runMe.stepConfig), stepConfig)
+                synchronized(atomicOptionValues) {
+                    runMe.atomicOptionValues.putAll(atomicOptionValues)
+                }
+                runMe.runStep(this)
+                synchronized(atomicOptionValues) {
+                    if (runMe.externalValue == null) {
+                        atomicOptionValues[runMe.externalName] = LazyValue(runMe.stepConfig, (runMe.implementation as ExpressionStep).expression, stepConfig)
+                    } else {
+                        atomicOptionValues[runMe.externalName] = LazyValue(XProcDocument.ofValue(runMe.externalValue!!.value, runMe.stepConfig), stepConfig)
+                    }
                 }
             } else {
-                runMe.runStep()
+                runMe.runStep(this)
+            }
+
+            if (exception != null) {
+                // This must be in the threaded case and something's gone wrong on another thread
+                return
             }
         }
     }

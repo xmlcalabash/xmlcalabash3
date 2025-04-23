@@ -24,25 +24,28 @@ open class ChooseStep(config: XProcStepConfiguration, compound: CompoundStepMode
 
         stepConfig.saxonConfig.newExecutionContext(stepConfig)
 
-        head.cacheInputs(cache)
-        for (doc in context) {
-            head.input("!context", doc)
-        }
-
-        head.runStep()
-
-        runSubpipeline()
-
-        for (step in runnables.filterIsInstance<ChooseWhenStep>()) {
-            val guard = step.evaluateGuardExpression()
-            if (guard) {
-                step.runStep()
-                break
+        try {
+            head.cacheInputs(cache)
+            for (doc in context) {
+                head.input("!context", doc)
             }
-        }
 
-        foot.runStep()
-        stepConfig.saxonConfig.releaseExecutionContext()
+            head.runStep(this)
+
+            runSubpipeline()
+
+            for (step in runnables.filterIsInstance<ChooseWhenStep>()) {
+                val guard = step.evaluateGuardExpression(this)
+                if (guard) {
+                    step.runStep(this)
+                    break
+                }
+            }
+
+            foot.runStep(this)
+        } finally {
+            stepConfig.saxonConfig.releaseExecutionContext()
+        }
     }
 
     override fun reset() {

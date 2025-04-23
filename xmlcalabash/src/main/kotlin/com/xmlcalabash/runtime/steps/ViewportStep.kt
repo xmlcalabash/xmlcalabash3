@@ -68,71 +68,74 @@ open class ViewportStep(config: XProcStepConfiguration, compound: CompoundStepMo
         stepsToRun.clear()
         stepsToRun.addAll(runnables)
 
-        val exec = stepConfig.saxonConfig.newExecutionContext(stepConfig)
-        var firstTime = true
+        stepConfig.saxonConfig.newExecutionContext(stepConfig)
+        try {
+            var firstTime = true
 
-        while (sequence.isNotEmpty()) {
-            val document = sequence.removeFirst()
-            val itemList = composer.decompose(document)
+            while (sequence.isNotEmpty()) {
+                val document = sequence.removeFirst()
+                val itemList = composer.decompose(document)
 
-            var position = 1L
-            exec.iterationSize = itemList.size.toLong()
+                var position = 1L
+                iterationSize = itemList.size.toLong()
 
-            for (item in itemList) {
-                exec.iterationPosition = position
-                if (!firstTime) {
-                    head.reset()
-                    head.showMessage = false
-                    foot.reset()
-                    for (step in stepsToRun) {
-                        step.reset()
-                    }
-                } else {
-                    firstTime = false
-                }
-
-                val currentProperties = DocumentProperties(document.properties)
-                currentProperties[Ns.baseUri] = item.node.baseURI
-
-                head.cacheInputs(cache)
-                if (S9Api.isTextDocument(item.node)) {
-                    head.input("current", XProcDocument.ofText(item.node, stepConfig, MediaType.TEXT, currentProperties))
-                } else {
-                    head.input("current", XProcDocument.ofXml(item.node, stepConfig, currentProperties))
-                }
-
-                head.runStep()
-
-                runSubpipeline()
-
-                val nodes = mutableListOf<XdmNode>()
-                for (doc in foot.cache[outputPort] ?: emptyList()) {
-                    // Different default here...
-                    val ctc = doc.contentType?.classification() ?: MediaClassification.XML
-                    if (ctc in listOf(MediaClassification.XML, MediaClassification.XHTML, MediaClassification.HTML, MediaClassification.TEXT)) {
-                        when (doc.value) {
-                            is XdmNode -> nodes.add(doc.value as XdmNode)
-                            else -> throw stepConfig.exception(XProcError.xdViewportResultNotXml())
+                for (item in itemList) {
+                    iterationPosition = position
+                    if (!firstTime) {
+                        head.reset()
+                        head.showMessage = false
+                        foot.reset()
+                        for (step in stepsToRun) {
+                            step.reset()
                         }
                     } else {
-                        throw stepConfig.exception(XProcError.xdViewportResultNotXml())
+                        firstTime = false
                     }
+
+                    val currentProperties = DocumentProperties(document.properties)
+                    currentProperties[Ns.baseUri] = item.node.baseURI
+
+                    head.cacheInputs(cache)
+                    if (S9Api.isTextDocument(item.node)) {
+                        head.input("current", XProcDocument.ofText(item.node, stepConfig, MediaType.TEXT, currentProperties))
+                    } else {
+                        head.input("current", XProcDocument.ofXml(item.node, stepConfig, currentProperties))
+                    }
+
+                    head.runStep(this)
+
+                    runSubpipeline()
+
+                    val nodes = mutableListOf<XdmNode>()
+                    for (doc in foot.cache[outputPort] ?: emptyList()) {
+                        // Different default here...
+                        val ctc = doc.contentType?.classification() ?: MediaClassification.XML
+                        if (ctc in listOf(MediaClassification.XML, MediaClassification.XHTML, MediaClassification.HTML, MediaClassification.TEXT)) {
+                            when (doc.value) {
+                                is XdmNode -> nodes.add(doc.value as XdmNode)
+                                else -> throw stepConfig.exception(XProcError.xdViewportResultNotXml())
+                            }
+                        } else {
+                            throw stepConfig.exception(XProcError.xdViewportResultNotXml())
+                        }
+                    }
+
+                    item.replaceWith(nodes)
+
+                    foot.cache.remove(outputPort)
+                    position++
                 }
 
-                item.replaceWith(nodes)
+                val composed = composer.recompose()
 
-                foot.cache.remove(outputPort)
-                position++
+                foot.write("result", composed) // Always "result"
+                foot.runStep(this)
             }
 
-            val composed = composer.recompose()
-
-            foot.write("result", composed) // Always "result"
-            foot.runStep()
+            cache.clear()
+        } finally {
+            stepConfig.saxonConfig.releaseExecutionContext()
         }
-
-        cache.clear()
-        stepConfig.saxonConfig.releaseExecutionContext()
     }
 
     override fun reset() {

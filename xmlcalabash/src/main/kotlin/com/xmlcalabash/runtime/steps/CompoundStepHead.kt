@@ -13,17 +13,19 @@ import com.xmlcalabash.util.SaxonXsdValidator
 import com.xmlcalabash.util.Verbosity
 import net.sf.saxon.s9api.*
 import java.time.Duration
+import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.ConcurrentMap
 
 class CompoundStepHead(config: XProcStepConfiguration, val parent: CompoundStep, step: HeadModel): AbstractStep(config, step, NsCx.head, "${step.name}/head") {
     override val params = RuntimeStepParameters(NsCx.head, "!head",
         step.location, step.inputs, step.outputs, step.options)
     val defaultInputs = step.defaultInputs
-    val openPorts = mutableSetOf<String>()
+    internal val openPorts = mutableSetOf<String>()
     internal val unboundInputs = mutableSetOf<String>()
     private var message: XdmValue? = null
     internal var showMessage = true
-    internal val _cache = mutableMapOf<String, MutableList<XProcDocument>>()
-    internal val _options = mutableMapOf<QName, MutableList<XProcDocument>>()
+    internal val _cache: ConcurrentMap<String, List<XProcDocument>> = ConcurrentHashMap()
+    internal val _options: ConcurrentMap<QName, List<XProcDocument>> = ConcurrentHashMap()
     private val inputErrors = mutableListOf<XProcError>()
     override val stepTimeout: Duration = Duration.ZERO
     private var validator: SaxonXsdValidator? = null
@@ -34,36 +36,69 @@ class CompoundStepHead(config: XProcStepConfiguration, val parent: CompoundStep,
     val options: Map<QName, List<XProcDocument>>
         get() = _options
 
+    private var notReadyReason: String
     init {
+        val sb = StringBuilder()
         // Inputs = step inputs that aren't passed on to the subpipeline; !source on p:for-each, for example
         for ((name, port) in params.inputs) {
             if (!port.weldedShut) {
+                sb.append(port.name).append(" ")
                 openPorts.add(name)
             }
         }
         // Outputs = step inputs that are passed on to the subpipeline, caches and current on p:for-each, for example
         for ((name, port) in params.outputs) {
             if (!port.weldedShut) {
+                sb.append(port.name).append(" ")
                 openPorts.add(name)
             }
         }
 
         // Also wait for any bindings that are expected
-        for ((name, port) in parent.params.inputs) {
-            if (name.startsWith("Q{") && !port.weldedShut) {
-                openPorts.add(name)
-            }
+        for ((name, port) in params.options) {
+            val eqname = "Q{${name.namespaceUri}}${name.localName}"
+            sb.append(eqname).append(" ")
+            openPorts.add(eqname)
+        }
+
+        notReadyReason = sb.toString()
+        if (notReadyReason.isEmpty()) {
+            stepConfig.debug { "WAIT4 ${this}: <nothing>" }
+        } else {
+            stepConfig.debug { "WAIT4 ${this}: ${notReadyReason}" }
         }
     }
 
     override val readyToRun: Boolean
         get() {
-            for (port in openPorts) {
-                if (!unboundInputs.contains(port)) {
-                    return false
-                }
+            for ((name, _) in parent.staticOptions) {
+                openPorts.remove("Q{${name.namespaceUri}}${name.localName}")
             }
-            return true
+
+            var isReady = true
+            lateinit var reason: String
+            synchronized(openPorts) {
+                val sb = StringBuilder()
+                for (port in openPorts) {
+                    if (!unboundInputs.contains(port)) {
+                        sb.append(port).append(" ")
+                        isReady = false
+                    }
+                }
+                reason = sb.toString()
+            }
+
+            if (isReady) {
+                stepConfig.debug { "READY ${this}: ${reason}" }
+                notReadyReason = reason
+                return true
+            }
+
+            if (notReadyReason != reason) {
+                stepConfig.debug { "NORDY ${this}: ${reason}" }
+                notReadyReason = reason
+            }
+            return false
         }
 
     internal fun cacheClear() {
@@ -74,9 +109,11 @@ class CompoundStepHead(config: XProcStepConfiguration, val parent: CompoundStep,
     private fun cacheInput(port: String, documents: List<XProcDocument>) {
         val count = (inputCount[port] ?: 0) + documents.size
         inputCount[port] = count
-        val docList = _cache[port] ?: mutableListOf()
 
+        val docList = mutableListOf<XProcDocument>()
+        docList.addAll(_cache[port] ?: emptyList())
         docList.addAll(documents)
+
         _cache[port] = docList
     }
 
@@ -87,33 +124,39 @@ class CompoundStepHead(config: XProcStepConfiguration, val parent: CompoundStep,
     }
 
     override fun input(port: String, doc: XProcDocument) {
-        // N.B. inputs and outputs are swapped in the head
-        if (port.startsWith("Q{")) {
-            val name = stepConfig.typeUtils.parseQName(port)
+        synchronized(this) {
+            stepConfig.debug { "RECVD ${this} input on $port" }
 
-            if ((type.namespaceUri == NsP.namespace && name == Ns.message)
-                || (type.namespaceUri != NsP.namespace && name == NsP.message)) {
-                message = doc.value
-            } else {
-                val olist = _options[name] ?: mutableListOf()
-                olist.add(doc)
-                _options[name] = olist
+            // N.B. inputs and outputs are swapped in the head
+            if (port.startsWith("Q{")) {
+                val name = stepConfig.typeUtils.parseQName(port)
+
+                if ((type.namespaceUri == NsP.namespace && name == Ns.message)
+                    || (type.namespaceUri != NsP.namespace && name == NsP.message)) {
+                    message = doc.value
+                } else {
+                    val olist = mutableListOf<XProcDocument>()
+                    olist.addAll(_options[name] ?: emptyList())
+                    olist.add(doc)
+                    _options[name] = olist
+                }
+                return
             }
-            return
-        }
 
-        val error = if (port in params.inputs) {
-            checkInputPort(port, doc, params.inputs[port])
-        } else {
-            checkInputPort(port, doc, params.outputs[port])
-        }
+            val error = if (port in params.inputs) {
+                checkInputPort(port, doc, params.inputs[port])
+            } else {
+                checkInputPort(port, doc, params.outputs[port])
+            }
 
-        if (error == null) {
-            val list = _cache[port] ?: mutableListOf()
-            list.add(doc)
-            _cache[port] = list
-        } else {
-            inputErrors.add(error)
+            if (error == null) {
+                val list = mutableListOf<XProcDocument>()
+                list.addAll(_cache[port] ?: emptyList())
+                list.add(doc)
+                _cache[port] = list
+            } else {
+                inputErrors.add(error)
+            }
         }
     }
 
@@ -122,7 +165,10 @@ class CompoundStepHead(config: XProcStepConfiguration, val parent: CompoundStep,
     }
 
     override fun close(port: String) {
-        openPorts.remove(port)
+        synchronized(openPorts) {
+            stepConfig.debug { "CLOSE ${this} port ${port} ${_cache[port]?.size}" }
+            openPorts.remove(port)
+        }
     }
 
     override fun instantiate() {
@@ -189,7 +235,8 @@ class CompoundStepHead(config: XProcStepConfiguration, val parent: CompoundStep,
                                     )
                                     val error = checkInputPort(port, itemdoc, params.outputs[port])
                                     if (error == null) {
-                                        val list = _cache[port] ?: mutableListOf()
+                                        val list = mutableListOf<XProcDocument>()
+                                        list.addAll(_cache[port] ?: emptyList())
                                         list.add(itemdoc)
                                         _cache[port] = list
                                     } else {
@@ -199,7 +246,8 @@ class CompoundStepHead(config: XProcStepConfiguration, val parent: CompoundStep,
                             } else {
                                 val error = checkInputPort(port, document, params.outputs[port])
                                 if (error == null) {
-                                    val list = _cache[port] ?: mutableListOf()
+                                    val list = mutableListOf<XProcDocument>()
+                                    list.addAll(_cache[port] ?: emptyList())
                                     list.add(document)
                                     _cache[port] = list
                                 } else {
@@ -238,7 +286,7 @@ class CompoundStepHead(config: XProcStepConfiguration, val parent: CompoundStep,
                         || ((type == NsP.forEach || type == NsP.viewport) && port == "current")) {
                         // ignore
                     } else {
-                        println("No receiver for ${port} from ${this} (in head)")
+                        stepConfig.debug { "No receiver for ${port} from ${this} (in head)" }
                     }
                 }
             } else {

@@ -40,14 +40,14 @@ class XProcAvtExpression private constructor(stepConfig: StepConfiguration, val 
                 //selector.resourceResolver = stepConfiguration.pipelineConfig.documentManager
 
                 setupExecutionContext(config, selector)
-
-                for ((name, value) in variableBindings) {
-                    selector.setVariable(name, value)
+                val result = try {
+                    for ((name, value) in variableBindings) {
+                        selector.setVariable(name, value)
+                    }
+                    selector.evaluate()
+                } finally {
+                    teardownExecutionContext()
                 }
-
-                val result = selector.evaluate()
-
-                teardownExecutionContext()
 
                 // Check that all the parts are ok, but rely on sequence construction from the top
                 // level (so that we get the correct separators, for example).
