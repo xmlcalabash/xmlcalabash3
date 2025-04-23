@@ -192,7 +192,7 @@ open class XsltStep(): AbstractAtomicStep() {
                 else -> throw stepConfig.exception(XProcError.xcXsltRuntimeError(sae.message!!))
             }
 
-            throw stepConfig.exception(XProcError.xcXsltCompileError(sae.message!!, sae))
+            throw stepConfig.exception(XProcError.xcXsltCompileError(sae.message!!, sae, errorReporter.errorMessages))
         }
 
         val transformer = exec.load30()

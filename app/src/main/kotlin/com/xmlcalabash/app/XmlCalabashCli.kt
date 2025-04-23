@@ -20,6 +20,7 @@ import com.xmlcalabash.namespace.NsFn
 import com.xmlcalabash.namespace.NsXs
 import com.xmlcalabash.spi.DocumentResolverServiceProvider
 import com.xmlcalabash.util.DefaultMessagePrinter
+import com.xmlcalabash.util.ErrorDetail
 import com.xmlcalabash.util.UriUtils
 import com.xmlcalabash.util.Verbosity
 import com.xmlcalabash.util.VisualizerOutput
@@ -448,6 +449,19 @@ class XmlCalabashCli private constructor() {
 
         for (error in errors) {
             errorExplanation.report(error.error)
+
+            when (error.error.code) {
+                NsErr.xc(93) -> {
+                    // This is kind of awful
+                    val reports = error.error.details[2] as List<*>
+                    for (anyReport in reports) {
+                        val report = anyReport as ErrorDetail
+                        stepConfig.xmlCalabashConfig.messageReporter.report(Verbosity.ERROR, report.extra) { report.message }
+                    }
+                }
+                else -> Unit
+            }
+
             if (commandLine.explainErrors) {
                 errorExplanation.reportExplanation(error.error)
             }

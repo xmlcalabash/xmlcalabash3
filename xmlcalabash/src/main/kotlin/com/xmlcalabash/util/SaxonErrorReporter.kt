@@ -16,6 +16,10 @@ class SaxonErrorReporter(val stepConfig: StepConfiguration): ErrorReporter {
     val error: XmlProcessingError?
         get() = _error
 
+    private var _errorMessages = mutableListOf<ErrorDetail>()
+    val errorMessages: List<ErrorDetail>
+        get() = _errorMessages
+
     override fun report(error: XmlProcessingError?) {
         if (error == null) {
             stepConfig.error({ "Saxon error reporter called with null error?"} )
@@ -56,6 +60,8 @@ class SaxonErrorReporter(val stepConfig: StepConfiguration): ErrorReporter {
         } else {
             error.message
         }
+
+        _errorMessages.add(ErrorDetail(message, extra))
 
         stepConfig.messageReporter.report(Verbosity.DEBUG, extra) { message }
     }
