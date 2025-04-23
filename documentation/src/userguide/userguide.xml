@@ -39,5 +39,6 @@
 <xi:include href="tracing.xml"/>
 <xi:include href="mediatypes.xml"/>
 <xi:include href="changelog.xml"/>
+<xi:include href="colophon.xml"/>
 
 </book>

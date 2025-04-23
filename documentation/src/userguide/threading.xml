@@ -129,7 +129,7 @@ also make pipelines run substantially faster.</para>
 
 <para>Is threading worth it? It depends.</para>
 
-<mediaobject>
+<mediaobject xml:id="ItDepends">
 <imageobject>
 <imagedata fileref="img/ItDepends.png" align="center" width="900px" contentwidth="5in"/>
 </imageobject>
