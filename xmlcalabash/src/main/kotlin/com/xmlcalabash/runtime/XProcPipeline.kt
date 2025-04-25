@@ -20,20 +20,20 @@ import com.xmlcalabash.visualizers.Detail
 import com.xmlcalabash.visualizers.Plain
 import com.xmlcalabash.visualizers.Silent
 import net.sf.saxon.s9api.QName
+import net.sf.saxon.s9api.XdmValue
 import java.io.FileOutputStream
 
 class XProcPipeline internal constructor(runtime: XProcRuntime, pipeline: CompoundStepModel, val config: XProcStepConfiguration) {
     val inputManifold = pipeline.inputs
     val outputManifold = pipeline.outputs
     val optionManifold = pipeline.options
-    val runnable: CompoundStep
+    val runnable: CompoundStep = pipeline.runnable(config)() as CompoundStep
     var receiver: Receiver = DefaultOutputReceiver(pipeline.stepConfig, outputManifold)
     private val setOptions = mutableSetOf<QName>()
     private val boundInputs = mutableSetOf<String>()
     private var traceListener: TraceListener? = null
 
     init {
-        runnable = pipeline.runnable(config)() as CompoundStep
         runnable.instantiate()
 
         val monitors = config.environment.monitors
@@ -71,6 +71,10 @@ class XProcPipeline internal constructor(runtime: XProcRuntime, pipeline: Compou
 
         boundInputs.add(port)
         runnable.head.input(port, document)
+    }
+
+    fun option(name: QName, value: XdmValue) {
+        option(name, XProcDocument.ofValue(value, runnable.stepConfig))
     }
 
     fun option(name: QName, value: XProcDocument) {

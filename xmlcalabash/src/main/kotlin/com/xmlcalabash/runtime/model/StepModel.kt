@@ -1,5 +1,6 @@
 package com.xmlcalabash.runtime.model
 
+import com.xmlcalabash.datamodel.DeclareStepInstruction
 import com.xmlcalabash.datamodel.Location
 import com.xmlcalabash.datamodel.StaticOptionDetails
 import com.xmlcalabash.graph.Model
@@ -57,7 +58,8 @@ abstract class StepModel(val runtime: XProcRuntime, model: Model) {
         val roptions = mutableMapOf<QName, RuntimeOption>()
         for ((name, option) in model.options) {
             // Don't report [p:]messages as options
-            if ((type.namespaceUri == NsP.namespace && name != Ns.message)
+            if (model.step is DeclareStepInstruction
+                || (type.namespaceUri == NsP.namespace && name != Ns.message)
                 || (type.namespaceUri != NsP.namespace && name != NsP.message)) {
                 roptions[name] = RuntimeOption(name, option.required, option.asType, option.values, option.static, option.staticValue)
             }

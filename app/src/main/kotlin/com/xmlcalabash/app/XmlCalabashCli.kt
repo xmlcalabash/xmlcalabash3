@@ -451,7 +451,7 @@ class XmlCalabashCli private constructor() {
             errorExplanation.report(error.error)
 
             when (error.error.code) {
-                NsErr.xc(93) -> {
+                NsErr.xc(93) -> { // XSLT compile error
                     // This is kind of awful
                     val reports = error.error.details[2] as List<*>
                     for (anyReport in reports) {
