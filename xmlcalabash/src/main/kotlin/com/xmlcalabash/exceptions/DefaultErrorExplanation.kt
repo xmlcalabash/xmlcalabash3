@@ -22,6 +22,8 @@ import java.nio.charset.StandardCharsets
 import javax.xml.transform.sax.SAXSource
 
 class DefaultErrorExplanation(val printer: MessagePrinter): ErrorExplanation {
+    var showStackTrace = true
+
     companion object {
         private var loaded = false
         private val messages = mutableListOf<ErrorExplanationTemplate>()
@@ -91,6 +93,18 @@ class DefaultErrorExplanation(val printer: MessagePrinter): ErrorExplanation {
 
     override fun report(error: XProcError) {
         printer.println(message(error, true))
+        if (showStackTrace) {
+            printer.println("Stack trace:")
+            var count = error.stackTrace.size
+            for (frame in error.stackTrace) {
+                if (frame.stepName.startsWith('!')) {
+                    printer.println("\t[${count}] <${frame.stepType}>")
+                } else {
+                    printer.println("\t[${count}] <${frame.stepType} name=\"${frame.stepName}\">")
+                }
+                count--
+            }
+        }
     }
 
     override fun explanation(error: XProcError): String {
