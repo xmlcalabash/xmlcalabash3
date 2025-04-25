@@ -259,7 +259,7 @@ class Urify(filepath: String, basedir: String?) {
             return _path!!
         }
 
-        var newpath = path!!.replace("\\?", "%3F")
+        var newpath = path!!.replace("?", "%3F")
             .replace("#", "%23")
             .replace("\\", "%5C")
             .replace(" ", "%20")
