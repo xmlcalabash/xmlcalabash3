@@ -6,10 +6,14 @@ import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.io.DocumentWriter
 import com.xmlcalabash.namespace.Ns
 import com.xmlcalabash.namespace.NsC
+import com.xmlcalabash.runtime.XProcStepConfiguration
+import com.xmlcalabash.runtime.parameters.RuntimeStepParameters
 import com.xmlcalabash.util.MediaClassification
 import com.xmlcalabash.util.S9Api
+import com.xmlcalabash.util.SaxonErrorReporter
 import com.xmlcalabash.util.ValueUtils
 import com.xmlcalabash.util.XProcCollectionFinder
+import com.xmlcalabash.util.XsdResolver
 import net.sf.saxon.event.PipelineConfiguration
 import net.sf.saxon.event.Receiver
 import net.sf.saxon.lib.SaxonOutputKeys
@@ -32,6 +36,14 @@ open class XQueryStep(): AbstractAtomicStep() {
 
     private var primaryDestination: Destination? = null
     private var outputProperties = mutableMapOf<QName, XdmValue>()
+    lateinit var errorReporter: SaxonErrorReporter
+
+    override fun setup(stepConfig: XProcStepConfiguration, receiver: com.xmlcalabash.runtime.api.Receiver, stepParams: RuntimeStepParameters) {
+        super.setup(stepConfig, receiver, stepParams)
+        // FIXME: I expect this could be more centrally handled...
+        errorReporter = SaxonErrorReporter(stepConfig)
+        stepConfig.saxonConfig.configuration.setErrorReporterFactory { config -> errorReporter }
+    }
 
     override fun run() {
         super.run()
@@ -93,10 +105,17 @@ open class XQueryStep(): AbstractAtomicStep() {
         underlyingConfig.setDefaultCollection(XProcCollectionFinder.DEFAULT)
         underlyingConfig.setCollectionFinder(XProcCollectionFinder(sources, collectionFinder))
 
+        val manager = stepConfig.processor.getSchemaManager()
+        if (manager != null) {
+            manager.errorReporter = errorReporter
+            manager.schemaURIResolver = XsdResolver(stepConfig)
+        }
+
         val compiler = processor.newXQueryCompiler()
         compiler.isSchemaAware = processor.isSchemaAware
-        compiler.errorListener = MyErrorListener(true)
+        compiler.errorReporter = errorReporter
         val exec = try {
+            compiler.baseURI = query.baseURI
             var xquery = query.value.underlyingValue.stringValue
             if (query.contentClassification == MediaClassification.XML) {
                 val root = try {
@@ -120,9 +139,11 @@ open class XQueryStep(): AbstractAtomicStep() {
             if (goesBang != null) {
                 throw goesBang!!.exception()
             }
-            throw ex
+            throw stepConfig.exception(XProcError.xcXQueryCompileError(ex.message ?: "null", ex))
         }
         val queryEval = exec.load()
+        queryEval.errorReporter = errorReporter
+        queryEval.setUnparsedTextResolver(unparsedTextURIResolver)
 
         for ((param, value) in parameters) {
             queryEval.setExternalVariable(param, value)
@@ -136,7 +157,6 @@ open class XQueryStep(): AbstractAtomicStep() {
         queryEval.setDestination(result)
 
         queryEval.setSchemaValidationMode(ValidationMode.DEFAULT)
-        queryEval.setErrorListener(MyErrorListener(false))
 
         try {
             queryEval.run()
@@ -144,11 +164,16 @@ open class XQueryStep(): AbstractAtomicStep() {
                 receiver.output("result", document)
             }
         } catch (ex: Throwable) {
+            // Generally speaking, we can get more useful information from the error reporter
+            val error = errorReporter.errorMessages.lastOrNull()
+            val location = com.xmlcalabash.datamodel.Location.from(error)
+            if (ex.message == error?.message) {
+                throw stepConfig.exception(XProcError.xcXQueryEvalError(ex.message ?: "null", location, error?.message), ex)
+            }
+            throw stepConfig.exception(XProcError.xcXQueryEvalError(ex.message ?: "null", location), ex)
+        } finally {
             underlyingConfig.collectionFinder = collectionFinder
-            throw stepConfig.exception(XProcError.xcXQueryEvalError(ex.message ?: "null"), ex)
         }
-
-        underlyingConfig.collectionFinder = collectionFinder
     }
 
     inner class MyDestination(var map: MutableMap<QName,XdmValue>): RawDestination() {
@@ -209,26 +234,6 @@ open class XQueryStep(): AbstractAtomicStep() {
         override fun close() {
             if (destination != null) {
                 destination!!.close()
-            }
-        }
-    }
-
-    inner class MyErrorListener(val compileTime: Boolean): ErrorListener {
-        override fun warning(e: TransformerException) {
-            stepConfig.warn { e.messageAndLocation }
-        }
-
-        override fun error(e: TransformerException) {
-            stepConfig.error { e.messageAndLocation }
-            if (compileTime) {
-                goesBang = XProcError.xcXQueryCompileError(e.message!!, e)
-            }
-        }
-
-        override fun fatalError(e: TransformerException) {
-            stepConfig.error { e.messageAndLocation }
-            if (compileTime) {
-                goesBang = XProcError.xcXQueryCompileError(e.message!!, e)
             }
         }
     }

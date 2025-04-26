@@ -14,6 +14,8 @@ import net.sf.saxon.Configuration
 import net.sf.saxon.event.PipelineConfiguration
 import net.sf.saxon.event.Receiver
 import net.sf.saxon.expr.XPathContext
+import net.sf.saxon.expr.instruct.TerminationException
+import net.sf.saxon.functions.Error
 import net.sf.saxon.functions.ResolveURI
 import net.sf.saxon.lib.ResultDocumentResolver
 import net.sf.saxon.lib.SaxonOutputKeys
@@ -331,15 +333,25 @@ open class XsltStep(): AbstractAtomicStep() {
                 transformer.applyTemplates(inputSelection, primaryDestination)
             }
         } catch (ex: SaxonApiException) {
-            when (ex.errorCode) {
-                NsFn.errXTMM9000 -> {
-                    if (terminationError != null) {
-                        throw terminationError!!.exception(ex)
-                    }
-                    throw stepConfig.exception(XProcError.xcXsltUserTermination(ex.message ?: ""), ex)
+            // Generally speaking, we can get more useful information from the error reporter
+            val error = errorReporter.errorMessages.lastOrNull()
+            val location = com.xmlcalabash.datamodel.Location.from(error)
+
+            if (ex.cause is Error.UserDefinedXPathException || ex.cause is TerminationException) {
+                if (terminationError != null) {
+                    throw terminationError!!.exception(ex)
                 }
-                NsFn.errXTDE0040 -> throw stepConfig.exception(XProcError.xcXsltNoTemplate(templateName!!), ex)
-                else -> throw stepConfig.exception(XProcError.xcXsltRuntimeError(ex.message!!), ex)
+                throw stepConfig.exception(XProcError.xcXsltUserTermination(ex.message ?: "", location), ex)
+            } else {
+                when (ex.errorCode) {
+                    NsFn.errXTDE0040 -> throw stepConfig.exception(XProcError.xcXsltNoTemplate(templateName!!), ex)
+                    else -> {
+                        if (ex.message == error?.message) {
+                            throw stepConfig.exception(XProcError.xcXsltRuntimeError(ex.message!!, location), ex)
+                        }
+                        throw stepConfig.exception(XProcError.xcXsltRuntimeError(ex.message!!, location, error?.message), ex)
+                    }
+                }
             }
         }
 

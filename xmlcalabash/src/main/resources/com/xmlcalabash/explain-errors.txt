@@ -1027,7 +1027,7 @@ that cannot be represented in the XDM version associated with the chosen XQuery
 version, e.g. with a map, an array, or a function when XDM 3.0 is used.
 
 XC0103
-Failed to compile query: $1 ($2).
+Failed to compile query: $1.
 It is a dynamic error if any error occurs during XQuery’s static analysis phase.
 
 XC0104
