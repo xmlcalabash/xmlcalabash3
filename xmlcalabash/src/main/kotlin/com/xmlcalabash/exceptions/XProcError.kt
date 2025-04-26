@@ -48,11 +48,17 @@ open class XProcError protected constructor(val code: QName, val variant: Int, e
         fun dynamic(code: Int, vararg details: Any): XProcError = dynamic(Pair(code, 1), *details)
 
         private fun step(code: Pair<Int,Int>, vararg details: Any): XProcError {
+            return step(code, Location.NULL, *details)
+        }
+
+        private fun step(code: Pair<Int,Int>, inputLocation: Location, vararg details: Any): XProcError {
             val ecode = stepError(code.first)
-            return XProcError(ecode, code.second, Location.NULL, Location.NULL, *details)
+            return XProcError(ecode, code.second, Location.NULL, inputLocation, *details)
         }
 
         fun step(code: Int, vararg details: Any): XProcError = step(Pair(code, 1), *details)
+
+        private fun step(code: Int, location: Location, vararg details: Any): XProcError = step(Pair(code, 1), location, *details)
 
         private fun internal(code: Pair<Int,Int>, vararg details: Any): XProcError {
             val ecode = internalError(code.first)
@@ -282,8 +288,14 @@ open class XProcError protected constructor(val code: QName, val variant: Int, e
         fun xcXsltCompileError(message: String, exception: Exception, details: List<ErrorDetail>) = step(93, message, exception, details)
         fun xcXsltInputNot20Compatible() = step(Pair(94,1))
         fun xcXsltInputNot20Compatible(media: MediaType) = step(Pair(94,2), media)
-        fun xcXsltRuntimeError(message: String) = step(95, message)
-        fun xcXsltUserTermination(message: String) = step(96, message)
+
+        fun xcXsltRuntimeError(message: String, location: Location = Location.NULL, detailMessage: String? = null): XProcError {
+            val error = step(95, location, message)
+            detailMessage?.let { error._moreDetails.add(it) }
+            return error
+        }
+
+        fun xcXsltUserTermination(message: String, location: Location = Location.NULL) = step(96, location,message)
         fun xcInvalidManifest() = step(Pair(100, 1))
         fun xcInvalidManifest(name: QName) = step(Pair(100, 2), name)
         fun xcInvalidManifestEntry(name: QName) = step(Pair(100, 3), name)
@@ -292,7 +304,13 @@ open class XProcError protected constructor(val code: QName, val variant: Int, e
         fun xcXQueryInputNot30Compatible(contentType: MediaType) = step(101, contentType)
         fun xcXQueryInvalidParameterType(name: QName, type: String) = step(102, name, type)
         fun xcXQueryCompileError(message: String, exception: Exception) = step(103, message, exception)
-        fun xcXQueryEvalError(msg: String) = step(104, msg)
+
+        fun xcXQueryEvalError(message: String, location: Location = Location.NULL, detailMessage: String? = null): XProcError {
+            val error = step(104, location, message)
+            detailMessage?.let { error._moreDetails.add(it) }
+            return error
+        }
+
         fun xcDuplicateKeyInJsonMerge(key: XdmAtomicValue) = step(106, key)
         fun xcUnsupportedForJsonMerge() = step(107)
         fun xcNoNamespaceBindingForPrefix(prefix: String) = step(108, prefix)
@@ -479,6 +497,10 @@ open class XProcError protected constructor(val code: QName, val variant: Int, e
     val location: Location
         get() = _location
 
+    internal var _moreDetails = mutableListOf<String>()
+    val moreDetails: List<String>
+        get() = _moreDetails
+
     var _throwable: Throwable? = null
     val throwable: Throwable?
         get() = _throwable
@@ -486,6 +508,7 @@ open class XProcError protected constructor(val code: QName, val variant: Int, e
 
     private constructor(error: XProcError, location: Location, inputLocation: Location): this(error.code, error.variant, location, inputLocation, *error.details) {
         _throwable = error.throwable
+        _moreDetails.addAll(error.moreDetails)
         stackTrace.addAll(error.stackTrace)
     }
 
@@ -500,20 +523,14 @@ open class XProcError protected constructor(val code: QName, val variant: Int, e
             return xsUnboundPrefix(details[0].toString())
         }
 
-        // Don't do this one, xd0079 is bad content type, xs0111 is bad content type shortcut
-        /*
-        if (code == errXD0079) {
-            val detail0 = details[0].toString()
-            return xsInvalidContentType(detail0)
-        }
-         */
-
         return this
     }
 
     fun at(location: Location): XProcError {
         if (location != Location.NULL) {
-            return XProcError(code, variant, location, inputLocation, *details)
+            val error = XProcError(code, variant, location, inputLocation, *details)
+            error._moreDetails.addAll(moreDetails)
+            return error
         }
         return this
     }
@@ -521,7 +538,9 @@ open class XProcError protected constructor(val code: QName, val variant: Int, e
     fun at(saxonLocation: net.sf.saxon.s9api.Location?): XProcError {
         if (saxonLocation != null && saxonLocation.systemId != null) {
             val xloc = Location(URI(saxonLocation.systemId), saxonLocation.lineNumber, saxonLocation.columnNumber)
-            return XProcError(code, variant, location, xloc, *details)
+            val error = XProcError(code, variant, location, xloc, *details)
+            error._moreDetails.addAll(moreDetails)
+            return error
         }
         return this
     }
@@ -541,11 +560,15 @@ open class XProcError protected constructor(val code: QName, val variant: Int, e
             node
         }
 
-        return XProcError(this, location, Location(locNode))
+        val error = XProcError(this, location, Location(locNode))
+        error._moreDetails.addAll(moreDetails)
+        return error
     }
 
     fun at(doc: XProcDocument): XProcError {
-        return XProcError(this, location, Location(doc.baseURI))
+        val error = XProcError(this, location, Location(doc.baseURI))
+        error._moreDetails.addAll(moreDetails)
+        return error
     }
 
     fun updateAt(type: QName, name: String): XProcError {
@@ -567,7 +590,9 @@ open class XProcError protected constructor(val code: QName, val variant: Int, e
     }
 
     fun with(newCode: QName): XProcError {
-        return XProcError(newCode, 1, location, inputLocation, *details)
+        val error = XProcError(newCode, 1, location, inputLocation, *details)
+        error._moreDetails.addAll(moreDetails)
+        return error
     }
 
     fun with(cause: Throwable): XProcError {

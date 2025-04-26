@@ -57,11 +57,20 @@ class DefaultErrorExplanation(val printer: MessagePrinter): ErrorExplanation {
             val message = template(error.code, error.variant, error.details.size).message
             substitute(message, *error.details)
         } else {
-            "(no message for error)"
+            null
         }
 
         if (!includeDetails) {
-            return errorMessage
+            return errorMessage ?: "(no message for error)"
+        }
+
+        val details = mutableListOf<String>()
+        for (detail in error.details) {
+            // If this error was caused by p:error, then the detail will be a document sequence.
+            // In all other cases, the detail will have been handled by substitute() above.
+            if (detail is XProcDocument) {
+                details.add(showDetail(detail, error.details.size > 1))
+            }
         }
 
         val sb = StringBuilder()
@@ -71,9 +80,17 @@ class DefaultErrorExplanation(val printer: MessagePrinter): ErrorExplanation {
             sb.append("Fatal ${error.code}")
         }
 
-        sb.append(": ").append(errorMessage)
+        if (errorMessage == null) {
+            if (details.isNotEmpty()
+                && !details.first().contains("\n")
+                && !details.first().contains("<")) {
+                sb.append(": ").append(details.removeFirst())
+            }
+        } else {
+            sb.append(": ").append(errorMessage)
+        }
 
-        if (error.inputLocation != Location.NULL) {
+        if (error.inputLocation != Location.NULL && error.inputLocation.baseUri != error.location.baseUri) {
             sb.append("\n").append("   in ${error.inputLocation}")
         }
 
@@ -81,11 +98,12 @@ class DefaultErrorExplanation(val printer: MessagePrinter): ErrorExplanation {
             sb.append("\n").append("   cause: ${error.throwable!!.toString()}")
         }
 
-        for (detail in error.details) {
-            if (detail is XProcDocument) {
-                sb.append("\n")
-                sb.append(showDetail(detail))
-            }
+        for (detail in details) {
+            sb.append("\n").append(detail)
+        }
+
+        for (detail in error.moreDetails) {
+            sb.append("\n").append(detail)
         }
 
         return sb.toString()
@@ -283,9 +301,10 @@ class DefaultErrorExplanation(val printer: MessagePrinter): ErrorExplanation {
         }
     }
 
-    private fun showDetail(doc: XProcDocument): String {
+    private fun showDetail(doc: XProcDocument, alwaysSerialize: Boolean): String {
         var message: String? = null
         if (doc is XProcBinaryDocument) {
+            // This can't actually happen, but just in case it does...
             message = "...binary message cannot be displayed..."
         } else if (doc.contentType?.classification() == MediaClassification.TEXT) {
             message = doc.value.underlyingValue.stringValue
@@ -300,7 +319,7 @@ class DefaultErrorExplanation(val printer: MessagePrinter): ErrorExplanation {
                 return showXvrl(doc)
             }
 
-            var markup = false
+            var markup = alwaysSerialize
             for (node in root.axisIterator(Axis.CHILD)) {
                 if (node.nodeKind != XdmNodeKind.TEXT) {
                     markup = true

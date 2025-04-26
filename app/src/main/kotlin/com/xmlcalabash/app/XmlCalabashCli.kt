@@ -472,13 +472,6 @@ class XmlCalabashCli private constructor() {
             if (errors[0].cause != null && errors[0].cause != errors[0]) {
                 errors[0].cause!!.printStackTrace()
             }
-        } else {
-            if (errors[0].cause != null && errors[0].cause != errors[0]) {
-                val message = errors[0].cause!!.message
-                if (message != null) {
-                    stepConfig.messagePrinter.println(message)
-                }
-            }
         }
 
         exitProcess(1)

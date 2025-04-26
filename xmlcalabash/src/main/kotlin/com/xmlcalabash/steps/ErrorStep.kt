@@ -19,7 +19,6 @@ class ErrorStep(): AbstractAtomicStep() {
     override fun run() {
         super.run()
 
-        val document = queues["source"]!!.firstOrNull()
         val value = options[Ns.code]!!.value.underlyingValue
         val code = when (value) {
             is QName -> value
@@ -57,26 +56,24 @@ class ErrorStep(): AbstractAtomicStep() {
             QName("code") to code.toString(),
             QName("type") to "${pPrefix}:error"
         )
-        /*
-        if (stepConfig.stepName != "" && !stepConfig.stepName.startsWith("!")) {
-            map = map.put(TypeUtils.attributeInfo(QName("name"), stepConfig.stepName))
-        }
-         */
 
-        val builder = SaxonTreeBuilder(stepConfig)
-        builder.startDocument(stepConfig.baseUri)
-        if (document != null) {
-            builder.addSubtree(document.value)
-        }
-        builder.endDocument()
-
-        val location = if (document != null) {
-            Location(document)
+        val sources = queues["source"]
+        val documents = if (sources == null || sources.isEmpty()) {
+            val builder = SaxonTreeBuilder(stepConfig)
+            builder.startDocument(stepConfig.baseUri)
+            builder.endDocument()
+            listOf(XProcDocument.ofXml(builder.result, stepConfig))
         } else {
-            Location.NULL
+            sources
         }
 
-        throw XProcUserError(code, stepParams.location, location, XProcDocument.ofXml(builder.result, stepConfig)).exception()
+        val location = if (sources == null || sources.isEmpty()) {
+            Location.NULL
+        } else {
+            Location(sources.first())
+        }
+
+        throw XProcUserError(code, stepParams.location, location, *documents.toTypedArray()).exception()
     }
 
     override fun toString(): String = "p:error"
