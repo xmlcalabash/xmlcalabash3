@@ -13,6 +13,73 @@ See the commits and pull requests on
 finer detail.</para>
 
 <revhistory>
+<revision xml:id="r300-alpha28">
+<revnumber>3.0.0-alpha28</revnumber>
+<date>2025-04-26</date>
+<revdescription>
+<itemizedlist>
+<listitem><para>Made a variety of changes to improve functionality 
+on Windows: make sure files get closed, sort out some edge cases with Windows filenames,
+corrected a few tests that depended on end-of-line characters, fixed a bug in
+<tag>p:file-create-tempfile</tag> (it returned the path instead of a URI).</para>
+</listitem>
+<listitem><para>Added the ability to run pipeline steps in parallel (“multi threading”).
+This required a substantial bit of refactoring. I <emphasis>think</emphasis> it works correctly.
+See <link linkend="threading">Running steps in parallel</link>.
+</para></listitem>
+<listitem><para>Fixed <ghissue number="403"/>. Improved the presentation of error output
+to address <link xlink:href="https://lists.w3.org/Archives/Public/xproc-dev/2025Apr/0006.html">a comment</link>
+on the mailing list. I’ve also made the error output from the <tag>p:xslt</tag> and
+<tag>p:xquery</tag> steps more informative (and generally fixed a few loose ends in
+the <tag>p:xquery</tag> step).
+</para></listitem>
+<listitem><para>Fixed <ghissue number="400"/>. Corrected a typo that prevented
+“?” from being correctly escaped in <function>p:urify</function>.
+</para></listitem>
+<listitem><para>Fixed <ghissue number="393"/>. Static options imported in a common
+library (one imported by several other libraries) no longer get flagged as illegal duplicates.
+</para></listitem>
+<listitem><para>Fixed <ghissue number="390"/>. Somewhere along the line, I broke the
+<option>--verbosity</option> option so that it had no effect on the output. Now it does again.
+</para></listitem>
+<listitem><para>Fixed <ghissue number="384"/>. Added a shortcut for setting map parameters
+on the command line.
+</para></listitem>
+<listitem><para>Fixed <ghissue number="383"/> and made a number of other improvements
+in the test driver.
+</para></listitem>
+<listitem><para>Fixed <ghissue number="362"/> by improving the
+<function>p:urify</function> function. This is a little bit speculative
+as <link xlink:href="https://github.com/xproc/3.0-specification/issues/1145">xproc/#1145</link>
+is still being discussed. But the current behavior is so fundamentally broken
+that I’m making a few proactive fixes. These changes also mean that <function>p:urify</function>
+is implicitly called in many places which should also help on Windows.</para>
+</listitem>
+<listitem><para>Fixed <ghissue number="353"/>. Added support for content-types in the
+document cache. You can now cache the same document parsed with different content types.
+</para></listitem>
+<listitem><para>Added some new unit tests to demonstrate programmatic use of XML Calabash
+from your own JVM application.
+</para></listitem>
+<listitem><para>Fixed a bug where it wasn’t possible to set the value of a pipeline option
+named “message”. This was an accidental consequence of how the message attribute is handled
+on compound steps.
+</para></listitem>
+<listitem><para>Added a stack trace to the error output. If a step fails, the
+default error reporter now prints a “stack trace” showing the step that failed
+and the steps it was nested inside. If this turns out to be annoying, I’ll add a
+configuration option to turn it off.
+</para></listitem>
+<listitem><para>Fixed several bugs in the implicit validation feature. Implicit
+validation was accidentally enabled by default and there were also some issues
+with correct handling of the base URI when the base URI was explicitly absent.
+</para></listitem>
+<listitem><para>Fixed several, small bugs in the SVG visualizer.
+</para></listitem>
+</itemizedlist>
+</revdescription>
+</revision>
+
 <revision xml:id="r300-alpha27">
 <revnumber>3.0.0-alpha27</revnumber>
 <date>2025-04-14</date>
