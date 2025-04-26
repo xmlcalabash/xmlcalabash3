@@ -8,6 +8,7 @@ import com.xmlcalabash.namespace.NsC
 import com.xmlcalabash.namespace.NsErr
 import com.xmlcalabash.namespace.NsP
 import com.xmlcalabash.util.SaxonTreeBuilder
+import com.xmlcalabash.util.Urify
 import net.sf.saxon.s9api.QName
 import java.io.IOException
 import java.nio.file.Files
@@ -35,7 +36,14 @@ class CreateTempfileStep(): FileStep(NsP.fileCreateTempfile) {
                 if (href.scheme != "file") {
                     throw stepConfig.exception(XProcError.xcUnsupportedFileCreateTempfileScheme(href.scheme))
                 }
-                dir = Paths.get(href.path)
+
+                // On Windows URI.create("file:/C:/path").path == /C:/path which doesn't work.
+                if (Urify.windows && href.path.length > 2 && href.path[0] == '/' && href.path[2] == ':') {
+                    dir = Paths.get(href.path.substring(1))
+                } else {
+                    dir = Paths.get(href.path)
+                }
+
                 if (!Files.exists(dir) || !Files.isDirectory(dir)) {
                     if (failOnError) {
                         throw stepConfig.exception(XProcError.xdDoesNotExist(dir.toString(), "path is not a directory"))
@@ -80,7 +88,7 @@ class CreateTempfileStep(): FileStep(NsP.fileCreateTempfile) {
             errorFromException(builder, NsErr.xc(116), exception)
         } else {
             builder.addStartElement(NsC.result)
-            builder.addText(tempfile.toString())
+            builder.addText(tempfile!!.toUri().toString())
             builder.addEndElement()
         }
 

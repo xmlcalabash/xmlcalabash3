@@ -52,10 +52,10 @@
       </s:pattern>
       <s:pattern>
         <s:rule context="/props">
-          <s:assert test="contains(., 'first=One&#10;')">first is missing.</s:assert>
-          <s:assert test="contains(., 'second=Two&#10;')">second is missing.</s:assert>
-          <s:assert test="contains(., 'third=&#10;')">third is missing.</s:assert>
-          <s:assert test="contains(., 'fourth=3.14&#10;')">fourth is missing.</s:assert>
+          <s:assert test="contains(replace(., '&#13;', ''), 'first=One&#10;')">first is missing.</s:assert>
+          <s:assert test="contains(replace(., '&#13;', ''), 'second=Two&#10;')">second is missing.</s:assert>
+          <s:assert test="contains(replace(., '&#13;', ''), 'third=&#10;')">third is missing.</s:assert>
+          <s:assert test="contains(replace(., '&#13;', ''), 'fourth=3.14&#10;')">fourth is missing.</s:assert>
         </s:rule>
       </s:pattern>
     </s:schema>

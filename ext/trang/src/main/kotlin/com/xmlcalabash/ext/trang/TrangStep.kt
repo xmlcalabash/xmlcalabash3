@@ -67,6 +67,7 @@ class TrangStep(): AbstractTrangStep() {
             val stream = FileOutputStream(tempFile)
             val writer = DocumentWriter(doc, stream)
             writer.write()
+            stream.close()
             sources.add(tempFile)
 
             if (doc.baseURI == null) {

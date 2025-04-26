@@ -56,9 +56,9 @@ lines‽</entry>
       <s:pattern>
         <s:rule context="/props">
           <s:assert test="contains(., '# Hello, world')">Comment is missing.</s:assert>
-          <s:assert test="contains(., '&#10;first=One&#10;')">first is missing.</s:assert>
-          <s:assert test="contains(., '&#10;second=Two&#10;')">second is missing.</s:assert>
-          <s:assert test="contains(., '&#10;three=\u201CSeveral\u201D\nlines\u203D&#10;')"
+          <s:assert test="contains(replace(., '&#13;', ''), '&#10;first=One&#10;')">first is missing.</s:assert>
+          <s:assert test="contains(replace(., '&#13;', ''), '&#10;second=Two&#10;')">second is missing.</s:assert>
+          <s:assert test="contains(replace(., '&#13;', ''), '&#10;three=\u201CSeveral\u201D\nlines\u203D&#10;')"
                     >third is missing.</s:assert>
         </s:rule>
       </s:pattern>
