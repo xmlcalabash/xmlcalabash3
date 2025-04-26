@@ -80,6 +80,8 @@ class TestCase(val xmlCalabash: XmlCalabash, val testOptions: TestOptions, val t
     var stderrBais: ByteArrayOutputStream? = null
     var origOut: PrintStream? = null
     var origErr: PrintStream? = null
+    var requiresUnreadableFiles = false
+    var requiresUnwritableDirectory = false
 
     fun load() {
         loaded = true
@@ -116,6 +118,16 @@ class TestCase(val xmlCalabash: XmlCalabash, val testOptions: TestOptions, val t
 
         if (fileEnvironment != null) {
             setupFileEnvironment(fileEnvironment!!)
+        }
+
+        if (isWindows && (requiresUnreadableFiles || requiresUnwritableDirectory)) {
+            if (requiresUnreadableFiles) {
+                skip("Unreadable files aren't supported on Windows")
+            } else {
+                skip("Unwritable directories aren't supported on Windows")
+            }
+            teardownFileEnvironment()
+            return
         }
 
         try {
@@ -723,18 +735,30 @@ class TestCase(val xmlCalabash: XmlCalabash, val testOptions: TestOptions, val t
             Files.setLastModifiedTime(file.toPath(), ft)
         }
 
-        val posix = mutableSetOf<PosixFilePermission>()
-        if (file.isDirectory) {
-            posix.add(PosixFilePermission.OWNER_EXECUTE)
-        }
-        if (prop.readable != false) {
-            posix.add(PosixFilePermission.OWNER_READ)
-        }
-        if (prop.writable != false) {
-            posix.add(PosixFilePermission.OWNER_WRITE)
-        }
+        try {
+            val posix = mutableSetOf<PosixFilePermission>()
+            if (file.isDirectory) {
+                posix.add(PosixFilePermission.OWNER_EXECUTE)
+            }
+            if (prop.readable != false) {
+                posix.add(PosixFilePermission.OWNER_READ)
+            }
+            if (prop.writable != false) {
+                posix.add(PosixFilePermission.OWNER_WRITE)
+            }
 
-        Files.setPosixFilePermissions(file.toPath(), posix)
+            Files.setPosixFilePermissions(file.toPath(), posix)
+        } catch (ex: UnsupportedOperationException) {
+            if (prop.writable == false) {
+                if (file.isDirectory) {
+                    requiresUnwritableDirectory = true
+                }
+                Files.setAttribute(file.toPath(), "dos:readonly", true)
+            }
+            if (prop.readable == false) {
+                requiresUnreadableFiles = true
+            }
+        }
     }
 
     private fun teardownFileEnvironment() {
@@ -749,8 +773,13 @@ class TestCase(val xmlCalabash: XmlCalabash, val testOptions: TestOptions, val t
             return
         }
 
-        val perms = PosixFilePermissions.fromString("rwxr--r--")
-        Files.setPosixFilePermissions(dir.toPath(), perms)
+        try {
+            val perms = PosixFilePermissions.fromString("rwxr--r--")
+            Files.setPosixFilePermissions(dir.toPath(), perms)
+        } catch (ex: UnsupportedOperationException) {
+            dir.setReadable(true)
+            dir.setWritable(true)
+        }
 
         if (dir.isDirectory) {
             val files = dir.listFiles()

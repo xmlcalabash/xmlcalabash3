@@ -182,6 +182,7 @@ class DocumentLoader(val stepConfig: StepConfiguration,
 
         val stream = FileInputStream(file)
         val doc = load(absURI, stream, mediaType)
+        stream.close()
         val end = System.nanoTime()
 
         for (monitor in stepConfig.environment.monitors) {
