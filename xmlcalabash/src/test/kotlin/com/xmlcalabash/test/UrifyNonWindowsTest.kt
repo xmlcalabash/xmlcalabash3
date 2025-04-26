@@ -32,6 +32,42 @@ class UrifyNonWindowsTest {
     }
 
     @Test
+    fun urify_fragid1() {
+        val path = Urify.urify("#fragid", "file:///path/to/thing")
+        Assertions.assertEquals("file:///path/to/thing#fragid", path)
+    }
+
+    @Test
+    fun urify_fragid2() {
+        val path = Urify.urify("x#fragid", "file:///path/to/thing")
+        Assertions.assertEquals("file:///path/to/x#fragid", path)
+    }
+
+    @Test
+    fun urify_fragid3() {
+        val path = Urify.urify("?x#fragid", "file:///path/to/thing")
+        Assertions.assertEquals("file:///path/to/thing?x#fragid", path)
+    }
+
+    @Test
+    fun urify_i18n() {
+        val path = Urify.urify("?föö=bär#ß", "file:///path/to/thing")
+        Assertions.assertEquals("file:///path/to/thing?f%C3%B6%C3%B6=b%C3%A4r#%C3%9F", path)
+    }
+
+    @Test
+    fun urify_path1() {
+        val path = Urify.urify("xyzzy", "file:///path/to/thing.txt")
+        Assertions.assertEquals("file:///path/to/xyzzy", path)
+    }
+
+    @Test
+    fun urify_path2() {
+        val path = Urify.urify(".", "file:///path/to/thing.txt")
+        Assertions.assertEquals("file:///path/to/", path)
+    }
+
+    @Test
     fun urify_emptyString() {
         val path = Urify("")
         Assertions.assertNull(path.scheme)
