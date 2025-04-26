@@ -58,7 +58,26 @@ class Urify(filepath: String, basedir: String?) {
         }
 
         fun urify(filestr: String, basedir: String?): String {
-            val filepath = Urify(filestr, basedir)
+            var filepath = Urify(filestr, basedir)
+
+            var suffix: String? = null
+            var onlySuffix = false
+
+            if (filepath.hierarchical) {
+                val qpos = filestr.indexOf('?')
+                val hpos = filestr.indexOf('#')
+                val pos = if (qpos >= 0 && qpos < hpos) {
+                    qpos
+                } else {
+                    hpos
+                }
+
+                if (pos >= 0) {
+                    suffix = UriUtils.encodeForUri(filestr.substring(pos))
+                    onlySuffix = pos == 0
+                    filepath = Urify(filestr.substring(0, pos), basedir)
+                }
+            }
 
             if (!filepath.hierarchical || (filepath.scheme != null && filepath.absolute)) {
                 return filepath.toString()
@@ -106,7 +125,11 @@ class Urify(filepath: String, basedir: String?) {
             val rpath = if (filepath.authority != null || filepath.absolute) {
                 filepath.fixedPath()
             } else {
-                basepath.resolvePaths(basepath.fixedPath(), filepath.fixedPath())
+                if (onlySuffix) {
+                    basepath.fixedPath()
+                } else {
+                    basepath.resolvePaths(basepath.fixedPath(), filepath.fixedPath())
+                }
             }
 
             val sb = StringBuilder()
@@ -130,6 +153,7 @@ class Urify(filepath: String, basedir: String?) {
                 sb.append(":")
             }
             sb.append(rpath)
+            suffix?.let { sb.append(it) }
             return sb.toString()
         }
     }
@@ -335,11 +359,16 @@ class Urify(filepath: String, basedir: String?) {
 
     private fun resolveDotSegments(path: String): String {
         val parts = path.split("/")
-        var stack = mutableListOf<String>()
+        val stack = mutableListOf<String>()
+        var endingDots = false
         for (part in parts) {
+            endingDots = false
             when (part) {
-                "." -> Unit
+                "." -> {
+                    endingDots = true
+                }
                 ".." -> {
+                    endingDots = true
                     if (stack.isNotEmpty()) {
                         stack.removeLast()
                     }
@@ -350,6 +379,9 @@ class Urify(filepath: String, basedir: String?) {
             }
         }
 
+        if (endingDots) {
+            return "${stack.joinToString("/")}/"
+        }
         return stack.joinToString("/")
     }
 

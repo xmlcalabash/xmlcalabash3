@@ -1,6 +1,7 @@
 package com.xmlcalabash.util
 
 import java.net.URI
+import java.nio.charset.StandardCharsets
 import java.nio.file.Paths
 
 class UriUtils {
@@ -44,6 +45,34 @@ class UriUtils {
             builder.append(lastPart)
 
             return URI(builder.toString())
+        }
+        fun encodeForUri(value: String): String {
+            val genDelims = ":/?#[]@"
+            val subDelims = "!$'()*,;=" // N.B. no "&" and no "+" !
+            val unreserved = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-._~"
+            val okChars = genDelims + subDelims + unreserved
+
+            val encoded = StringBuilder()
+            for (byte in value.toByteArray(StandardCharsets.UTF_8)) {
+                // Whoever decided that bytes should be signed needs their head examined
+                val bint = if (byte.toInt() < 0) {
+                    byte.toInt() + 256
+                } else {
+                    byte.toInt()
+                }
+                val ch = Char(bint)
+                if (okChars.indexOf(ch) >= 0) {
+                    encoded.append(ch)
+                } else {
+                    if (ch == ' ') {
+                        encoded.append("+")
+                    } else {
+                        encoded.append(String.format("%%%02X", ch.code))
+                    }
+                }
+            }
+
+            return encoded.toString()
         }
     }
 }

@@ -1,16 +1,19 @@
 package com.xmlcalabash.steps
 
 import com.xmlcalabash.api.XProcStep
-import com.xmlcalabash.runtime.XProcStepConfiguration
-import com.xmlcalabash.io.MediaType
 import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.exceptions.XProcError
+import com.xmlcalabash.io.MediaType
 import com.xmlcalabash.namespace.Ns
 import com.xmlcalabash.namespace.NsXml
 import com.xmlcalabash.namespace.NsXmlns
-import com.xmlcalabash.runtime.*
+import com.xmlcalabash.runtime.LazyValue
+import com.xmlcalabash.runtime.ProcessMatch
+import com.xmlcalabash.runtime.ProcessMatchingNodes
+import com.xmlcalabash.runtime.XProcStepConfiguration
 import com.xmlcalabash.runtime.api.Receiver
 import com.xmlcalabash.runtime.parameters.RuntimeStepParameters
+import com.xmlcalabash.util.UriUtils
 import com.xmlcalabash.util.Urify
 import net.sf.saxon.om.NamespaceMap
 import net.sf.saxon.om.NamespaceUri
@@ -189,21 +192,36 @@ abstract class AbstractAtomicStep(): XProcStep {
         if (opt.value == XdmEmptySequence.getInstance()) {
             return null
         }
-        return opt.context.resolve(opt.value.underlyingValue.stringValue)
-/*
-        val uri = if (opt.context.baseUri == null) {
+
+        // If it raises a URISyntaxException, let that be thrown...except that...
+        // If this is Windows, change  \ into / because reasons.
+        val href = if (Urify.windows) {
+            opt.value.underlyingValue.stringValue.replace("\\", "/")
+        } else {
+            opt.value.underlyingValue.stringValue
+        }
+
+        if (Urify.windows && href.length > 1 && href[1] == ':') {
+            // And if this is Windows and it begins with a drive letter, don't treat that as the scheme!
+            opt.context.resolve("file:/${href}")
+        } else {
+            opt.context.resolve(opt.value.underlyingValue.stringValue)
+        }
+
+        val resolved = if (opt.context.baseUri == null) {
             Urify.urify(opt.value.underlyingValue.stringValue)
         } else {
             Urify.urify(opt.value.underlyingValue.stringValue, opt.context.baseUri!!)
         }
 
-        // Because *everywhere else*, the JVM will have used a single "/"
-        if (uri.startsWith("file:///")) {
-            return URI("file:/${uri.substring(8)}")
+        // Normalize file:/// back to file:/ for consistency
+        val result = if (!resolved.startsWith("file:////") && resolved.startsWith("file:///")) {
+            URI("file:/${resolved.substring(8)}")
+        } else {
+            URI(resolved)
         }
 
-        return URI(uri)
- */
+        return result
     }
 
     fun integerBinding(name: QName): Int? {
