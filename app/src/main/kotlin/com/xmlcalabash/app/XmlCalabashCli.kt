@@ -429,8 +429,8 @@ class XmlCalabashCli private constructor() {
     private fun loadConfiguration(commandLineConfig: File?) {
         val configLocations = mutableListOf<File>()
         commandLineConfig?.let { configLocations.add(it) }
-        configLocations.add(File(UriUtils.cwdAsUri().resolve(".xmlcalabash3").path))
-        configLocations.add(File(UriUtils.homeAsUri().resolve(".xmlcalabash3").path))
+        configLocations.add(File(UriUtils.resolve(".xmlcalabash3").path))
+        configLocations.add(File(UriUtils.resolve(".xmlcalabash3").path))
         for (config in configLocations) {
             if (config.exists() && config.isFile) {
                 val loader = ConfigurationLoader(builder)

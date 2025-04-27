@@ -13,7 +13,6 @@ import com.xmlcalabash.runtime.ProcessMatchingNodes
 import com.xmlcalabash.runtime.XProcStepConfiguration
 import com.xmlcalabash.runtime.api.Receiver
 import com.xmlcalabash.runtime.parameters.RuntimeStepParameters
-import com.xmlcalabash.util.UriUtils
 import com.xmlcalabash.util.Urify
 import net.sf.saxon.om.NamespaceMap
 import net.sf.saxon.om.NamespaceUri
@@ -195,13 +194,13 @@ abstract class AbstractAtomicStep(): XProcStep {
 
         // If it raises a URISyntaxException, let that be thrown...except that...
         // If this is Windows, change  \ into / because reasons.
-        val href = if (Urify.windows) {
+        val href = if (Urify.isWindows) {
             opt.value.underlyingValue.stringValue.replace("\\", "/")
         } else {
             opt.value.underlyingValue.stringValue
         }
 
-        if (Urify.windows && href.length > 1 && href[1] == ':') {
+        if (Urify.isWindows && href.length > 1 && href[1] == ':') {
             // And if this is Windows and it begins with a drive letter, don't treat that as the scheme!
             opt.context.resolve("file:/${href}")
         } else {

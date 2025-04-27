@@ -23,7 +23,7 @@ class FileUtils {
         }
 
         fun outputStream(path: String): OutputStream {
-            return outputStream(UriUtils.cwdAsUri().resolve(path))
+            return outputStream(UriUtils.resolve(path))
         }
 
         fun outputStream(file: File): OutputStream {

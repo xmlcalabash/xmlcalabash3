@@ -6,6 +6,7 @@ import com.xmlcalabash.namespace.Ns
 import com.xmlcalabash.runtime.ProcessMatch
 import com.xmlcalabash.runtime.ProcessMatchingNodes
 import com.xmlcalabash.runtime.parameters.StepParameters
+import com.xmlcalabash.util.UriUtils
 import net.sf.saxon.om.AttributeMap
 import net.sf.saxon.om.EmptyAttributeMap
 import net.sf.saxon.s9api.QName
@@ -48,11 +49,9 @@ open class MakeAbsoluteUrisStep(): AbstractAtomicStep(), ProcessMatchingNodes {
         matcher.addStartElement(node, attributes)
 
         if (baseUri != null) {
-            matcher.addText(baseUri!!.resolve(node.stringValue).toString())
+            matcher.addText(UriUtils.resolve(baseUri, node.stringValue).toString())
         } else {
-            if (node.baseURI != null) {
-                matcher.addText(node.baseURI.resolve(node.stringValue).toString())
-            }
+            UriUtils.resolve(node.baseURI, node.stringValue)?.let { matcher.addText(it.toString()) }
         }
 
         return false
@@ -65,13 +64,9 @@ open class MakeAbsoluteUrisStep(): AbstractAtomicStep(), ProcessMatchingNodes {
         for (attr in matchingAttributes.asList()) {
             val qname = QName(attr.nodeName.prefix, attr.nodeName.namespaceUri.toString(), attr.nodeName.localPart)
             val urivalue = if (baseUri != null) {
-                baseUri!!.resolve(attr.value).toString()
+                UriUtils.resolve(baseUri, attr.value)!!.toString()
             } else {
-                if (node.baseURI != null) {
-                    node.baseURI.resolve(attr.value).toString()
-                } else {
-                    ""
-                }
+                UriUtils.resolve(node.baseURI, attr.value)?.toString() ?: ""
             }
             amap[qname] = urivalue
         }

@@ -15,6 +15,7 @@ import com.xmlcalabash.steps.archives.SevenZInputArchive
 import com.xmlcalabash.steps.archives.TarInputArchive
 import com.xmlcalabash.steps.archives.ZipInputArchive
 import com.xmlcalabash.util.SaxonTreeBuilder
+import com.xmlcalabash.util.UriUtils
 import net.sf.saxon.s9api.QName
 import net.sf.saxon.s9api.XdmArray
 import net.sf.saxon.s9api.XdmEmptySequence
@@ -98,7 +99,7 @@ open class ArchiveManifestStep(): AbstractArchiveStep() {
         for (entry in archive.entries) {
             val amap = mutableMapOf<QName, String>()
             amap.putAll(entry.properties)
-            amap[Ns.href] = "${relativeTo.resolve(entry.name)}"
+            amap[Ns.href] = UriUtils.resolve(relativeTo,  entry.name)!!.toString()
             amap[Ns.contentType] = "${contentType(entry.name)}"
             builder.addStartElement(NsC.entry, stepConfig.typeUtils.attributeMap(amap))
             builder.addEndElement()

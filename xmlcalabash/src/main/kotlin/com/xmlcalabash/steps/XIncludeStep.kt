@@ -8,6 +8,7 @@ import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.io.MediaType
 import com.xmlcalabash.namespace.Ns
 import com.xmlcalabash.namespace.NsCx
+import com.xmlcalabash.util.UriUtils
 import net.sf.saxon.s9api.XdmNode
 
 open class XIncludeStep(): AbstractAtomicStep() {
@@ -33,7 +34,7 @@ open class XIncludeStep(): AbstractAtomicStep() {
 
     inner class XiResolver(val defaultResolver: DocumentResolver): DocumentResolver {
         override fun resolveXml(base: XdmNode, uri: String, accept: String?, acceptLanguage: String?): XdmNode? {
-            val href = base.baseURI.resolve(uri)
+            val href = UriUtils.resolve(base.baseURI, uri)!!
             val cached = stepConfig.environment.documentManager.getCached(href, MediaType.XML)
             if (cached == null) {
                 return defaultResolver.resolveXml(base, uri, accept, acceptLanguage)
@@ -47,7 +48,7 @@ open class XIncludeStep(): AbstractAtomicStep() {
         }
 
         override fun resolveText(base: XdmNode, uri: String, encoding: String?, accept: String?, acceptLanguage: String?): XdmNode? {
-            val href = base.baseURI.resolve(uri)
+            val href = UriUtils.resolve(base.baseURI, uri)!!
             val cached = stepConfig.environment.documentManager.getCached(href, MediaType.TEXT)
             if (cached == null) {
                 return defaultResolver.resolveText(base, uri, encoding, accept, acceptLanguage)

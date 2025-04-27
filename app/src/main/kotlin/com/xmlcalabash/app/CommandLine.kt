@@ -351,7 +351,7 @@ class CommandLine private constructor(val args: Array<out String>) {
                             }
                         }
                         ArgumentType.URI -> {
-                            value = UriUtils.cwdAsUri().resolve(value).toString()
+                            value = UriUtils.resolve(value).toString()
                         }
                     }
 
@@ -433,7 +433,7 @@ class CommandLine private constructor(val args: Array<out String>) {
         if (href == STDIO_NAME) {
             _inputs[port]!!.add(Pair(STDIO_URI, contentType))
         } else {
-            _inputs[port]!!.add(Pair(UriUtils.cwdAsUri().resolve(href), MediaType.ANY))
+            _inputs[port]!!.add(Pair(UriUtils.resolve(href), MediaType.ANY))
         }
     }
 
