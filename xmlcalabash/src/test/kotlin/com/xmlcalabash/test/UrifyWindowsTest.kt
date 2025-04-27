@@ -91,7 +91,7 @@ class UrifyWindowsTest {
     @Test
     fun urify_pathtothing_againsthttp() {
         val path = Urify.urify("\\path\\to\\thing", "http://example.com/")
-        Assertions.assertEquals("http://example.com/%5Cpath%5Cto%5Cthing", path)
+        Assertions.assertEquals("http://example.com/path/to/thing", path)
     }
 
     @Test

@@ -11,6 +11,7 @@ import com.xmlcalabash.steps.AbstractAtomicStep
 import com.xmlcalabash.util.DurationUtils
 import com.xmlcalabash.util.S9Api
 import com.xmlcalabash.util.SaxonTreeBuilder
+import com.xmlcalabash.util.UriUtils
 import net.sf.saxon.om.NamespaceUri
 import net.sf.saxon.s9api.*
 import net.sf.saxon.value.BooleanValue
@@ -660,8 +661,8 @@ class SeleniumStep(): AbstractAtomicStep() {
     private fun interpretNavigate(navigate: XdmNode) {
         val to = navigate.getAttributeValue(Ns.to)
         if (to != null) {
-            val url = URI(driver.currentUrl!!).resolve(to).toURL()
-            checkWhitelist(to.toString())
+            val url = UriUtils.resolve(URI(driver.currentUrl!!),to)!!.toURL()
+            checkWhitelist(to)
             driver.navigate().to(url)
             return
         }

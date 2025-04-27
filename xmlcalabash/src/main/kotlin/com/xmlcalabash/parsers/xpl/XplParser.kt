@@ -32,7 +32,7 @@ class XplParser internal constructor(val builder: PipelineBuilder) {
     }
 
     fun parse(filename: String, stepName: String?): DeclareStepInstruction {
-        val uri = UriUtils.cwdAsUri().resolve(filename)
+        val uri = UriUtils.resolve(filename)
         return parse(uri, stepName)
     }
 
@@ -79,7 +79,7 @@ class XplParser internal constructor(val builder: PipelineBuilder) {
     }
 
     fun parseLibrary(filename: String): LibraryInstruction {
-        val uri = UriUtils.cwdAsUri().resolve(filename)
+        val uri = UriUtils.resolve(filename)
         return parseLibrary(uri)
     }
 
@@ -1047,7 +1047,7 @@ class XplParser internal constructor(val builder: PipelineBuilder) {
                                 for (gchild in child.node.axisIterator(Axis.CHILD)) {
                                     throw instruction.stepConfig.exception(XProcError.xiPipeinfoMustBeEmpty())
                                 }
-                                val uri = child.node.baseURI.resolve(child.attributes[NsCx.href]!!)
+                                val uri = UriUtils.resolve(child.node.baseURI, child.attributes[NsCx.href])!!
                                 val info = try {
                                     builder.stepConfig.documentManager.load(uri, instruction.stepConfig)
                                 } catch (ex: Exception) {
@@ -1251,7 +1251,7 @@ class XplParser internal constructor(val builder: PipelineBuilder) {
                         if (adjBaseUri == null) {
                             adjBaseUri = URI(attr.stringValue)
                         } else {
-                            adjBaseUri = adjBaseUri.resolve(attr.stringValue)
+                            adjBaseUri = UriUtils.resolve(adjBaseUri, attr.stringValue)
                         }
                     }
                 }

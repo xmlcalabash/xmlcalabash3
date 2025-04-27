@@ -12,3 +12,36 @@ ab-import-functions-031 because that doesn’t work
 nw-import-functions-025 because that doesn’t work
 nw-import-functions-026 because that doesn’t work
 nw-import-functions-031 because that doesn’t work
+
+nw-urify-windows-bs-002 because https://github.com/xproc/3.0-test-suite/issues/841
+
+ab-os-exec-005 on Windows because it’s platform dependent
+ab-os-exec-006 on Windows because it’s platform dependent
+ab-os-exec-007 on Windows because it’s platform dependent
+ab-os-exec-008 on Windows because it’s platform dependent
+ab-os-exec-009 on Windows because it’s platform dependent
+ab-os-exec-010 on Windows because it’s platform dependent
+ab-os-exec-011 on Windows because it’s platform dependent
+ab-os-exec-012 on Windows because it’s platform dependent
+ab-os-exec-013 on Windows because it’s platform dependent
+ab-os-exec-014 on Windows because it’s platform dependent
+ab-os-exec-015 on Windows because it’s platform dependent
+ab-os-exec-016 on Windows because it’s platform dependent
+ab-os-exec-017 on Windows because it’s platform dependent
+ab-os-exec-018 on Windows because it’s platform dependent
+ab-os-exec-019 on Windows because it’s platform dependent
+ab-os-exec-020 on Windows because it’s platform dependent
+ab-os-exec-021 on Windows because it’s platform dependent
+ab-os-exec-022 on Windows because it’s platform dependent
+ab-os-exec-023 on Windows because it’s platform dependent
+ab-os-exec-024 on Windows because it’s platform dependent
+
+polyglot-001 on Windows because Python isn’t configured
+polyglot-002 on Windows because Python isn’t configured
+polyglot-003 on Windows because Python isn’t configured
+polyglot-004 on Windows because Python isn’t configured
+polyglot-009 on Windows because Python isn’t configured
+polyglot-011 on Windows because Python isn’t configured
+
+nw-css-formatter on Windows because it isn’t configured
+nw-xsl-formatter-001 on Windows because it isn’t configured

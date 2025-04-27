@@ -8,6 +8,7 @@ import com.xmlcalabash.namespace.NsCx
 import com.xmlcalabash.namespace.NsXs
 import com.xmlcalabash.runtime.model.CompoundStepModel
 import com.xmlcalabash.util.S9Api
+import com.xmlcalabash.util.UriUtils
 import net.sf.saxon.Configuration
 import net.sf.saxon.s9api.Axis
 import net.sf.saxon.s9api.XdmDestination
@@ -41,7 +42,7 @@ class XProcRuntime private constructor(internal val start: DeclareStepInstructio
                                     if (href == null) {
                                         config.warn { "Ignoring ${element.nodeName}: missing href" }
                                     } else {
-                                        val uri = element.baseURI.resolve(href).toString()
+                                        val uri = UriUtils.resolve(element.baseURI, href).toString()
                                         config.debug { "Adding catalog: ${uri}" }
                                         config.environment.documentManager.resolverConfiguration.addCatalog(uri)
                                     }
@@ -51,7 +52,8 @@ class XProcRuntime private constructor(internal val start: DeclareStepInstructio
                                     if (href == null) {
                                         config.warn { "Ignoring ${element.nodeName}: missing href" }
                                     } else {
-                                        config.saxonConfig.addSchemaDocument(element.baseURI.resolve(href))
+                                        val uri = UriUtils.resolve(element.baseURI, href)!!
+                                        config.saxonConfig.addSchemaDocument(uri)
                                     }
                                 }
                                 else -> {

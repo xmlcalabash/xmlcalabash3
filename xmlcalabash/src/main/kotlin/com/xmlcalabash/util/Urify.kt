@@ -22,7 +22,7 @@ class Urify(filepath: String, basedir: String?) {
                 return _osname
             }
 
-        val windows: Boolean
+        val isWindows: Boolean
             get() {
                 return osname.startsWith("Windows")
             }
@@ -48,6 +48,7 @@ class Urify(filepath: String, basedir: String?) {
         private val filepathRE = "^(?i)(file:)(.*)$".toRegex()
         private val otherSchemeRE = "^(?i)([-a-z0-9+.]+):(.*)$".toRegex()
         private val authorityRE = "^//([^/]+)(/.*)?$".toRegex()
+        private val plainPathRE = "^[^:]+$".toRegex()
 
         fun urify(filestr: String): String {
             return urify(filestr, null)
@@ -118,7 +119,7 @@ class Urify(filepath: String, basedir: String?) {
                 val result = if(filepath.toString() == "") {
                     basepath.toString()
                 } else {
-                    URI(basepath.toString()).resolve(filepath.toString()).toString()
+                    UriUtils.resolve(URI(basepath.toString()), filepath.toString())!!.toString()
                 }
                 if (suffix == null) {
                     return result
@@ -200,12 +201,17 @@ class Urify(filepath: String, basedir: String?) {
         val osMatch = otherSchemeRE.find(filepath)
         val aMatch = authorityRE.find(filepath)
         val wfMatch = windowsFilepathRE.find(filepath)
+        val ppMatch = if (plainPathRE.find(filepath) != null) {
+            !filepath.replace('\\', '/').startsWith("//")
+        } else {
+            false
+        }
 
         if (filesep != "/") {
             var fileuri: Boolean? = null
             if (osMatch != null) {
                 val scheme = osMatch.groupValues[1]
-                if (scheme == "file" || (windows && scheme.length == 1)) {
+                if (scheme == "file" || (isWindows && scheme.length == 1)) {
                     fileuri = true
                 } else {
                     fileuri = false
@@ -240,7 +246,7 @@ class Urify(filepath: String, basedir: String?) {
         } else if (filepath == "//") {
             _path = "/"
             _absolute = true
-        } else if (windows && wfMatch != null) {
+        } else if (isWindows && wfMatch != null) {
             val fpfile = wfMatch.groupValues[1]
             val fpdrive = wfMatch.groupValues[2]
             val fppath = wfMatch.groupValues[3].replace("\\", "/")
@@ -248,6 +254,12 @@ class Urify(filepath: String, basedir: String?) {
             _explicit = fpfile.lowercase().startsWith("file:")
             _driveLetter = fpdrive
             _path = fppath.replace("^/+".toRegex(), "/")
+            _absolute = _path!!.startsWith("/")
+        } else if (isWindows && ppMatch) {
+            _scheme = null
+            _explicit = false
+            _driveLetter = null
+            _path = UriUtils.normalizePath(filepath)
             _absolute = _path!!.startsWith("/")
         } else if (faMatch != null) {
             val fpauthority = faMatch.groupValues[2]

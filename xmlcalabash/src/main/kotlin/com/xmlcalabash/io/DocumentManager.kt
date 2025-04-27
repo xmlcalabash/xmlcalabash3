@@ -9,6 +9,7 @@ import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.namespace.NsCx
 import com.xmlcalabash.spi.DocumentResolver
 import com.xmlcalabash.tracing.TraceListener
+import com.xmlcalabash.util.UriUtils
 import net.sf.saxon.lib.ModuleURIResolver
 import net.sf.saxon.lib.ResourceResolver
 import net.sf.saxon.s9api.QName
@@ -314,7 +315,7 @@ class DocumentManager(val environment: XProcEnvironment): EntityResolver, Entity
             if (baseURI == null) {
                 URI(moduleURI)
             } else {
-                URI(baseURI).resolve(moduleURI)
+                UriUtils.resolve(URI(baseURI), moduleURI)!!
             }
         }
 

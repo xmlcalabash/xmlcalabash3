@@ -16,6 +16,7 @@ import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.io.MediaType
 import com.xmlcalabash.namespace.NsC
 import com.xmlcalabash.util.SaxonTreeBuilder
+import com.xmlcalabash.util.UriUtils
 import net.sf.saxon.s9api.QName
 import java.io.File
 import java.net.URI
@@ -110,7 +111,7 @@ class TrangFilesStep(): AbstractTrangStep() {
             var resolved = stepConfig.environment.documentManager.lookup(href, URI(id.base))
 
             if (resolved == href) {
-                resolved = stepConfig.environment.documentManager.lookup(URI(id.base).resolve(id.uriReference))
+                resolved = stepConfig.environment.documentManager.lookup(UriUtils.resolve(URI(id.base), id.uriReference)!!)
             }
 
             stepConfig.debug { "Trang: ${id.uriReference} (${id.base}) = ${resolved}" }

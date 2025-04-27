@@ -14,6 +14,7 @@ import com.xmlcalabash.namespace.NsRng
 import com.xmlcalabash.namespace.NsXs
 import com.xmlcalabash.util.MediaClassification
 import com.xmlcalabash.util.S9Api
+import com.xmlcalabash.util.UriUtils
 import net.sf.saxon.s9api.XdmNode
 import java.io.File
 import java.io.FileOutputStream
@@ -119,7 +120,7 @@ class TrangStep(): AbstractTrangStep() {
 
         val inputFile = File(inputUris.first().path)
         val primaryOutputFile = "${inputFile.nameWithoutExtension}.${resultFormat}"
-        val primaryOutput = outputDirectory.resolve(primaryOutputFile).path
+        val primaryOutput = UriUtils.resolve(outputDirectory, primaryOutputFile)!!.path
 
         val od = LocalOutputDirectory(baseUriToFile[primaryInput]!!, File(primaryOutput), ".${resultFormat}", outputEncoding, lineLength, indent)
 
@@ -174,7 +175,7 @@ class TrangStep(): AbstractTrangStep() {
                 URI(id.base)
             }
 
-            val resolved = baseUri.resolve(id.uriReference).toString()
+            val resolved =  UriUtils.resolve(baseUri, id.uriReference).toString()
 
             if (resolved !in baseUriToFile) {
                 throw stepConfig.exception(XProcError.xcxTrangUnresolvedInput(resolved))
@@ -217,7 +218,7 @@ class TrangStep(): AbstractTrangStep() {
 
             val path = doc.baseURI!!.path
             val pos = path.lastIndexOf('/')
-            val newbase = outputBaseUri.resolve(path.substring(pos + 1))
+            val newbase = UriUtils.resolve(outputBaseUri, path.substring(pos + 1))
 
             val newdoc = doc.with(newbase)
 

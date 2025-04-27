@@ -151,11 +151,7 @@ class S9Api {
                 }
                 XdmNodeKind.ELEMENT -> {
                     val xmlBase = xml.getAttributeValue(NsXml.base)
-                    val adjBaseUri = if (xmlBase == null) {
-                        baseUri
-                    } else {
-                        baseUri.resolve(xmlBase)
-                    }
+                    val adjBaseUri = UriUtils.resolve(baseUri, xmlBase)!!
                     builder.addStartElement(xml, adjBaseUri)
                     for (child in xml.axisIterator(Axis.CHILD)) {
                         adjustBaseUri(child, baseUri, builder)

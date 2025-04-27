@@ -68,7 +68,7 @@ class SaxonXsdValidator(val stepConfig: XProcStepConfiguration) {
             val nonsSchemaHint = sourceNode.getAttributeValue(NsXsi.noNamespaceSchemaLocation)
             val schemaHint = sourceNode.getAttributeValue(NsXsi.schemaLocation)
             if (nonsSchemaHint != null) {
-                val uri = sourceNode.baseURI.resolve(nonsSchemaHint)
+                val uri =  UriUtils.resolve(sourceNode.baseURI, nonsSchemaHint)!!
                 val docManager = stepConfig.environment.documentManager
                 val doc = docManager.load(uri, stepConfig)
                 schemaDocuments.add(doc.value as XdmNode)
@@ -77,7 +77,7 @@ class SaxonXsdValidator(val stepConfig: XProcStepConfiguration) {
                 val parts = schemaHint.split("\\s+".toRegex())
                 var idx = 1
                 while (idx < parts.size) {
-                    val uri = sourceNode.baseURI.resolve(parts[idx])
+                    val uri = UriUtils.resolve(sourceNode.baseURI, parts[idx])!!
                     val docManager = stepConfig.environment.documentManager
                     try {
                         val schema = docManager.load(uri, stepConfig)

@@ -6,6 +6,7 @@ import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.namespace.Ns
 import com.xmlcalabash.runtime.ExpressionEvaluator
+import com.xmlcalabash.util.UriUtils
 import net.sf.saxon.om.NamespaceUri
 import net.sf.saxon.s9api.*
 import org.apache.hc.client5.http.auth.AuthScope
@@ -394,7 +395,7 @@ class InternetProtocolRequest(val stepConfig: StepConfiguration, val uri: URI) {
                     val parts = parseHeader(header.value)
                     if (parts.containsKey("attachment") && parts["attachment"] == null) {
                         if (parts.containsKey("filename")) {
-                            baseURI = baseURI!!.resolve(parts["filename"]!!)
+                            baseURI = UriUtils.resolve(baseURI, parts["filename"])!!
                         }
                     }
                 }

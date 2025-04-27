@@ -97,7 +97,7 @@ class ConfigurationLoader(val builder: XmlCalabashBuilder) {
 
         val saxonConfig = root.getAttributeValue(_saxonConfiguration)
         if (saxonConfig != null) {
-            val uri = root.baseURI!!.resolve(saxonConfig)
+            val uri = UriUtils.resolve(root.baseURI, saxonConfig)!!
             builder.setSaxonConfigurationFile(File(uri.path))
         }
 
@@ -244,7 +244,7 @@ class ConfigurationLoader(val builder: XmlCalabashBuilder) {
 
         val style = node.getAttributeValue(_style)
         if (style != null) {
-            builder.setGraphStyle(node.baseURI.resolve(style))
+            builder.setGraphStyle(UriUtils.resolve(node.baseURI, style))
         }
     }
 
@@ -360,7 +360,7 @@ class ConfigurationLoader(val builder: XmlCalabashBuilder) {
 
     private fun parseXmlSchema(node: XdmNode) {
         checkAttributes(node, listOf(Ns.href))
-        builder.addXmlSchemaDocument(node.baseURI.resolve(node.getAttributeValue(Ns.href)))
+        builder.addXmlSchemaDocument(UriUtils.resolve(node.baseURI, node.getAttributeValue(Ns.href))!!)
         if (node.children().firstOrNull() != null) {
             throw XProcError.xiConfigurationXmlSchemaElementMustBeEmpty().exception()
         }
@@ -368,7 +368,7 @@ class ConfigurationLoader(val builder: XmlCalabashBuilder) {
 
     private fun parseCatalog(node: XdmNode) {
         checkAttributes(node, listOf(Ns.href))
-        builder.addXmlCatalog(node.baseURI.resolve(node.getAttributeValue(Ns.href)))
+        builder.addXmlCatalog( UriUtils.resolve(node.baseURI, node.getAttributeValue(Ns.href))!!)
         if (node.children().firstOrNull() != null) {
             throw XProcError.xiConfigurationCatalogElementMustBeEmpty().exception()
         }

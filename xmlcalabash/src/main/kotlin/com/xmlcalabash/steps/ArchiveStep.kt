@@ -27,6 +27,7 @@ import com.xmlcalabash.steps.archives.ZipInputArchive
 import com.xmlcalabash.steps.archives.ZipOutputArchive
 import com.xmlcalabash.util.S9Api
 import com.xmlcalabash.util.SaxonTreeBuilder
+import com.xmlcalabash.util.UriUtils
 import net.sf.saxon.om.NamespaceUri
 import net.sf.saxon.s9api.*
 import org.apache.logging.log4j.kotlin.logger
@@ -193,9 +194,9 @@ open class ArchiveStep(): AbstractArchiveStep() {
             val relStr = relativeTo?.toString()
             val hStr = uri.toString()
             val path = if (relStr != null && hStr.startsWith(relStr)) {
-                hStr.substring(relStr.length)
+                UriUtils.normalizePath(hStr.substring(relStr.length))
             } else {
-                uri.path
+                UriUtils.normalizePath(uri.path)
             }
             val name = if (path.startsWith("/")) {
                 path.substring(1)
@@ -318,9 +319,9 @@ open class ArchiveStep(): AbstractArchiveStep() {
             }
 
             val muri = try {
-                entry.baseURI.resolve(properties[Ns.href]!!)
-            } catch (ex: IllegalArgumentException) {
-                throw stepConfig.exception(XProcError.xdInvalidUri(properties[Ns.href]!!.toString()))
+                UriUtils.resolve(entry.baseURI, properties[Ns.href])!!
+            } catch (_: IllegalArgumentException) {
+                throw stepConfig.exception(XProcError.xdInvalidUri(properties[Ns.href]!!))
             }
 
             val mentry = ManifestEntry(muri, properties)
@@ -371,8 +372,8 @@ open class ArchiveStep(): AbstractArchiveStep() {
                 map.remove(entry.name)
             } else {
                 if (needsUpdating(entry)) {
-                    val localUri = entry.archive?.baseUri?.resolve(entry.name)
-                    val doc = stepConfig.environment.documentManager.load(localUri!!, stepConfig)
+                    val localUri = UriUtils.resolve(entry.archive?.baseUri, entry.name)!!
+                    val doc = stepConfig.environment.documentManager.load(localUri, stepConfig)
                     val newEntry = XArchiveEntry(stepConfig, entry.name, doc)
                     outputEntries.add(newEntry)
                 } else {
@@ -424,7 +425,7 @@ open class ArchiveStep(): AbstractArchiveStep() {
             FileTime.from(Instant.EPOCH)
         }
 
-        val localUri = entry.archive?.baseUri?.resolve(entry.name)
+        val localUri = UriUtils.resolve(entry.archive?.baseUri, entry.name)
         if (localUri?.scheme != "file") {
             if (localUri != null) {
                 stepConfig.warn { "Ignoring update for non-file URI: ${localUri}" }
