@@ -46,6 +46,7 @@ class UriUtils {
 
             return URI(builder.toString())
         }
+
         fun encodeForUri(value: String): String {
             val genDelims = ":/?#[]@"
             val subDelims = "!$'()*,;=" // N.B. no "&" and no "+" !
@@ -69,6 +70,26 @@ class UriUtils {
                     } else {
                         encoded.append(String.format("%%%02X", ch.code))
                     }
+                }
+            }
+
+            return encoded.toString()
+        }
+
+        fun escapeHtmlUri(value: String): String {
+            val encoded = StringBuilder()
+            for (byte in value.toByteArray(StandardCharsets.UTF_8)) {
+                // Whoever decided that bytes should be signed needs their head examined
+                val bint = if (byte.toInt() < 0) {
+                    byte.toInt() + 256
+                } else {
+                    byte.toInt()
+                }
+                val ch = Char(bint)
+                if (bint >= 32 && bint <= 126) {
+                    encoded.append(ch)
+                } else {
+                    encoded.append(String.format("%%%02X", ch.code))
                 }
             }
 

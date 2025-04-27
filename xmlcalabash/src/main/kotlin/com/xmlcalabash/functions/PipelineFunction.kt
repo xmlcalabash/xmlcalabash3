@@ -6,11 +6,14 @@ import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.runtime.XProcRuntime
 import com.xmlcalabash.util.BufferingReceiver
 import com.xmlcalabash.util.MediaClassification
+import com.xmlcalabash.util.SaxonTreeBuilder
 import net.sf.saxon.expr.XPathContext
 import net.sf.saxon.lib.ExtensionFunctionCall
 import net.sf.saxon.lib.ExtensionFunctionDefinition
+import net.sf.saxon.ma.arrays.ArrayItem
 import net.sf.saxon.ma.map.MapItem
 import net.sf.saxon.ma.map.MapType
+import net.sf.saxon.om.GroundedValue
 import net.sf.saxon.om.NodeInfo
 import net.sf.saxon.om.Sequence
 import net.sf.saxon.om.StructuredQName
@@ -18,6 +21,7 @@ import net.sf.saxon.s9api.XdmAtomicValue
 import net.sf.saxon.s9api.XdmEmptySequence
 import net.sf.saxon.s9api.XdmMap
 import net.sf.saxon.s9api.XdmNode
+import net.sf.saxon.s9api.XdmNodeKind
 import net.sf.saxon.s9api.XdmValue
 import net.sf.saxon.type.BuiltInAtomicType
 import net.sf.saxon.value.Cardinality
@@ -114,12 +118,36 @@ class PipelineFunction(private val decl: DeclareStepInstruction): ExtensionFunct
                     val items = sequences.elementAt(index)!!.materialize()
                     for (itemindex in 0..<items.length) {
                         val item = items.itemAt(itemindex)
-                        if (item is NodeInfo) {
-                            val node = XdmNode(item)
-                            val doc = XProcDocument.ofXml(node, decl.stepConfig)
-                            exec.input(input.port, doc)
-                        } else {
-                            throw IllegalArgumentException("Failed to configure input: ${item}")
+                        when (item) {
+                            is NodeInfo -> {
+                                val node = XdmNode(item)
+                                val doc = if (node.nodeKind == XdmNodeKind.DOCUMENT) {
+                                    XProcDocument.ofXml(node, decl.stepConfig)
+                                } else {
+                                    val builder = SaxonTreeBuilder(node.processor)
+                                    builder.startDocument(node.baseURI)
+                                    builder.addSubtree(node)
+                                    builder.endDocument()
+                                    XProcDocument.ofXml(builder.result, decl.stepConfig)
+                                }
+                                exec.input(input.port, doc)
+                            }
+                            is MapItem -> {
+                                val map = decl.stepConfig.typeUtils.asXdmMap(item)
+                                val doc = XProcDocument.ofValue(map, decl.stepConfig)
+                                exec.input(input.port, doc)
+                            }
+                            is ArrayItem -> {
+                                val array = decl.stepConfig.typeUtils.asXdmArray(item)
+                                val doc = XProcDocument.ofValue(array, decl.stepConfig)
+                                exec.input(input.port, doc)
+                            }
+                            is GroundedValue -> {
+                                val doc = XProcDocument.ofValue(XdmValue.wrap(item), decl.stepConfig)
+                                exec.input(input.port, doc)
+                            }
+
+                            else -> throw IllegalArgumentException("Failed to convert item to input: ${item}")
                         }
                     }
                 }

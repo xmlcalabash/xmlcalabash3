@@ -25,7 +25,7 @@ class DefaultMessageReporter(nextReporter: MessageReporter? = null): NopMessageR
                     extraAttributes[Ns.columnNumber]?.let { prefix.append(it).append(":") }
                     prefix.append(" ")
                 }
-            } else {
+            } else if (verbosity != Verbosity.INFO) {
                 prefix.append(": ")
             }
 
