@@ -1,5 +1,6 @@
 package com.xmlcalabash.testdriver
 
+import com.xmlcalabash.util.Urify
 import java.io.File
 
 class Main {
@@ -47,11 +48,24 @@ class Main {
             val exclusions = mutableMapOf<String, String>()
             File("src/test/resources/exclusions.txt").forEachLine { line ->
                 val pos = line.trim().indexOf(" because ")
-                val filename = if (pos >= 0) {
+                var filename = if (pos >= 0) {
                     line.substring(0, pos).trim()
                 } else {
                     line.trim()
                 }
+
+                val onpos = filename.indexOf(" on ")
+                if (onpos >= 0) {
+                    val platform = filename.substring(onpos + 4).trim()
+                    filename = filename.substring(0, onpos).trim()
+                    when (platform) {
+                        "Windows" -> if (!Urify.isWindows) {
+                            filename = ""
+                        }
+                        else -> throw UnsupportedOperationException("Unrecognized platform: $platform")
+                    }
+                }
+
                 if (filename.isNotEmpty()) {
                     val reason = line.substring(pos + 9).trim()
                     exclusions[filename] = reason
