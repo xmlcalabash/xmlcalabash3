@@ -66,21 +66,24 @@ class Urify(filepath: String, basedir: String?) {
             if (filepath.hierarchical) {
                 val qpos = filestr.indexOf('?')
                 val hpos = filestr.indexOf('#')
-                val pos = if (qpos >= 0 && qpos < hpos) {
+                val pos = if (qpos >= 0 && (hpos < 0 || qpos < hpos)) {
                     qpos
                 } else {
                     hpos
                 }
 
                 if (pos >= 0) {
-                    suffix = UriUtils.encodeForUri(filestr.substring(pos))
+                    suffix = UriUtils.escapeHtmlUri(filestr.substring(pos))
                     onlySuffix = pos == 0
                     filepath = Urify(filestr.substring(0, pos), basedir)
                 }
             }
 
             if (!filepath.hierarchical || (filepath.scheme != null && filepath.absolute)) {
-                return filepath.toString()
+                if (suffix == null) {
+                    return filepath.toString()
+                }
+                return "${filepath}${suffix}"
             }
 
             val basepath = if (basedir == null) {
@@ -112,7 +115,15 @@ class Urify(filepath: String, basedir: String?) {
             }
 
             if (basepath.scheme != null && basepath.scheme != "file" && basepath.absolute) {
-                return URI.create(basepath.toString()).resolve(filepath.toString()).toString()
+                val result = if(filepath.toString() == "") {
+                    basepath.toString()
+                } else {
+                    URI(basepath.toString()).resolve(filepath.toString()).toString()
+                }
+                if (suffix == null) {
+                    return result
+                }
+                return "${result}${suffix}"
             }
 
             val rscheme = basepath.scheme

@@ -13,6 +13,7 @@ import com.xmlcalabash.namespace.NsP
 import com.xmlcalabash.namespace.NsXs
 import net.sf.saxon.event.ReceiverOption
 import net.sf.saxon.expr.parser.XPathParser
+import net.sf.saxon.ma.arrays.ArrayItem
 import net.sf.saxon.ma.arrays.ArrayItemType
 import net.sf.saxon.ma.map.MapItem
 import net.sf.saxon.ma.map.MapType
@@ -20,7 +21,9 @@ import net.sf.saxon.om.AttributeInfo
 import net.sf.saxon.om.AttributeMap
 import net.sf.saxon.om.EmptyAttributeMap
 import net.sf.saxon.om.FingerprintedQName
+import net.sf.saxon.om.GroundedValue
 import net.sf.saxon.om.NamespaceUri
+import net.sf.saxon.om.NodeInfo
 import net.sf.saxon.s9api.ItemType
 import net.sf.saxon.s9api.Location
 import net.sf.saxon.s9api.OccurrenceIndicator
@@ -30,7 +33,9 @@ import net.sf.saxon.s9api.SequenceType
 import net.sf.saxon.s9api.XdmArray
 import net.sf.saxon.s9api.XdmAtomicValue
 import net.sf.saxon.s9api.XdmEmptySequence
+import net.sf.saxon.s9api.XdmItem
 import net.sf.saxon.s9api.XdmMap
+import net.sf.saxon.s9api.XdmNode
 import net.sf.saxon.s9api.XdmValue
 import net.sf.saxon.sxpath.IndependentContext
 import net.sf.saxon.trans.XPathException
@@ -157,6 +162,24 @@ class TypeUtils(val context: DocumentContext) {
         return map
     }
 
+    fun asXdmMap(inputMap: MapItem): XdmMap {
+        var map = XdmMap()
+        for (pair in inputMap.keyValuePairs()) {
+            var value: XdmValue = XdmEmptySequence.getInstance()
+            val key = XdmAtomicValue(pair.key)
+            for (index in 0 ..< pair.value.length) {
+                val item = pair.value.itemAt(index)
+                when (item) {
+                    is NodeInfo -> value = value.append(XdmNode(item))
+                    is GroundedValue -> value = value.append(XdmValue.wrap(item))
+                    else -> throw IllegalArgumentException("Unsupported item type in map conversion")
+                }
+            }
+            map = map.put(key, value)
+        }
+        return map
+    }
+
     fun asMap(inputMap: XdmMap): Map<QName, XdmValue> {
         val map = mutableMapOf<QName, XdmValue>()
         for (key in inputMap.keySet()) {
@@ -170,6 +193,19 @@ class TypeUtils(val context: DocumentContext) {
             map.put(qkey, value)
         }
         return map
+    }
+
+    fun asXdmArray(inputArray: ArrayItem): XdmArray {
+        var array = XdmArray()
+        for (index in 0 ..< inputArray.length) {
+            val item = inputArray.itemAt(index)
+            when (item) {
+                is NodeInfo -> array = array.addMember(XdmNode(item))
+                is GroundedValue -> array = array.addMember(XdmValue.wrap(item))
+                else -> throw IllegalArgumentException("Unsupported item type in array conversion")
+            }
+        }
+        return array
     }
 
     fun parseXsSequenceType(asExpr: String): SequenceType {
