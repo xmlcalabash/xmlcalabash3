@@ -9,7 +9,6 @@ import com.xmlcalabash.namespace.NsErr
 import com.xmlcalabash.namespace.NsP
 import com.xmlcalabash.util.SaxonTreeBuilder
 import com.xmlcalabash.util.Urify
-import net.sf.saxon.s9api.QName
 import java.io.IOException
 import java.nio.file.Files
 import java.nio.file.Path
@@ -38,7 +37,7 @@ class CreateTempfileStep(): FileStep(NsP.fileCreateTempfile) {
                 }
 
                 // On Windows URI.create("file:/C:/path").path == /C:/path which doesn't work.
-                if (Urify.windows && href.path.length > 2 && href.path[0] == '/' && href.path[2] == ':') {
+                if (Urify.isWindows && href.path.length > 2 && href.path[0] == '/' && href.path[2] == ':') {
                     dir = Paths.get(href.path.substring(1))
                 } else {
                     dir = Paths.get(href.path)
