@@ -13,6 +13,24 @@ See the commits and pull requests on
 finer detail.</para>
 
 <revhistory>
+<revision xml:id="r300-alpha29">
+<revnumber>3.0.0-alpha29</revnumber>
+<date>2025-04-28</date>
+<revdescription>
+<itemizedlist>
+<listitem><para>This release is a handful of small bug fixes, many related to
+tidying up loose ends in Windows functionality. Essentially all of the test suite
+tests now pass on Windows.
+</para></listitem>
+<listitem><para>Fixed <ghissue number="413"/>. Don’t put leading slash or, on
+Windows, drive letters in ZIP archive names. This change applies across all the
+archive formats, for consistency. </para></listitem>
+<listitem><para>Fixed <ghissue number="411"/>. Removed the spurious “:” from the start
+of <tag class="attribute">message</tag> output on steps.
+</para></listitem>
+</itemizedlist>
+</revdescription>
+</revision>
 <revision xml:id="r300-alpha28">
 <revnumber>3.0.0-alpha28</revnumber>
 <date>2025-04-26</date>
