@@ -3,6 +3,7 @@ package com.xmlcalabash.steps.file
 import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.namespace.*
+import com.xmlcalabash.util.UriUtils
 import java.io.File
 import java.io.IOException
 
@@ -22,7 +23,7 @@ class FileMkdirStep(): FileStep(NsP.fileDelete) {
 
         failOnError = booleanBinding(Ns.failOnError) != false
 
-        val file = File(href.path)
+        val file = File(UriUtils.path(href))
 
         if (file.exists() && file.isDirectory) {
             val result = resultDocument(href)
@@ -38,11 +39,11 @@ class FileMkdirStep(): FileStep(NsP.fileDelete) {
         try {
             val success = file.mkdirs()
             if (!success) {
-                maybeThrow(XProcError.xcMkdirFailed(href.path), href)
+                maybeThrow(XProcError.xcMkdirFailed(UriUtils.path(href)), href)
                 return
             }
         } catch (ex: IOException) {
-            maybeThrow(XProcError.xcMkdirFailed(href.path), href)
+            maybeThrow(XProcError.xcMkdirFailed(UriUtils.path(href)), href)
             return
         }
 

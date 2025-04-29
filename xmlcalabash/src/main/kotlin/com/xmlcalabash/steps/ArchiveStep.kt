@@ -28,6 +28,7 @@ import com.xmlcalabash.steps.archives.ZipOutputArchive
 import com.xmlcalabash.util.S9Api
 import com.xmlcalabash.util.SaxonTreeBuilder
 import com.xmlcalabash.util.UriUtils
+import com.xmlcalabash.util.Urify
 import net.sf.saxon.om.NamespaceUri
 import net.sf.saxon.s9api.*
 import org.apache.logging.log4j.kotlin.logger
@@ -192,16 +193,23 @@ open class ArchiveStep(): AbstractArchiveStep() {
             }
 
             val relStr = relativeTo?.toString()
-            val hStr = uri.toString()
+            val hStr = uri.normalize().toString()
             val path = if (relStr != null && hStr.startsWith(relStr)) {
                 UriUtils.normalizePath(hStr.substring(relStr.length))
             } else {
-                UriUtils.normalizePath(uri.path)
+                UriUtils.normalizePath(UriUtils.path(uri))
             }
-            val name = if (path.startsWith("/")) {
-                path.substring(1)
+
+            val nodrivepath = if (Urify.isWindows && path.length > 1 && path[1] == ':') {
+                path.substring(2)
             } else {
                 path
+            }
+
+            val name = if (nodrivepath.startsWith("/")) {
+                nodrivepath.substring(1)
+            } else {
+                nodrivepath
             }
 
             val entry = ManifestEntry(uri, mapOf(Ns.name to name))
@@ -433,7 +441,7 @@ open class ArchiveStep(): AbstractArchiveStep() {
             return false
         }
 
-        val file = File(localUri.path)
+        val file = File(UriUtils.path(localUri))
         if (!file.exists()) {
             return false
         }

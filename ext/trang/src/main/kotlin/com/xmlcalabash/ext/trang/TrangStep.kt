@@ -118,9 +118,9 @@ class TrangStep(): AbstractTrangStep() {
         rootUriMap[underlyingInput] = primaryInput
         val sc = trangInputFormat.load(underlyingInput, inputArray, sourceFormat, errorHandler, resolver)
 
-        val inputFile = File(inputUris.first().path)
+        val inputFile = File(UriUtils.path(inputUris.first()))
         val primaryOutputFile = "${inputFile.nameWithoutExtension}.${resultFormat}"
-        val primaryOutput = UriUtils.resolve(outputDirectory, primaryOutputFile)!!.path
+        val primaryOutput = UriUtils.path(UriUtils.resolve(outputDirectory, primaryOutputFile)!!)
 
         val od = LocalOutputDirectory(baseUriToFile[primaryInput]!!, File(primaryOutput), ".${resultFormat}", outputEncoding, lineLength, indent)
 
@@ -200,7 +200,7 @@ class TrangStep(): AbstractTrangStep() {
             }
 
             val uri = URI(includeToFile[input.uri]!!)
-            val file = File(uri.path)
+            val file = File(UriUtils.path(uri))
             input.byteStream = file.inputStream()
         }
     }
@@ -216,7 +216,7 @@ class TrangStep(): AbstractTrangStep() {
             val loader = DocumentLoader(stepConfig, file.toUri(), props)
             val doc = loader.load()
 
-            val path = doc.baseURI!!.path
+            val path = UriUtils.path(doc.baseURI!!)
             val pos = path.lastIndexOf('/')
             val newbase = UriUtils.resolve(outputBaseUri, path.substring(pos + 1))
 

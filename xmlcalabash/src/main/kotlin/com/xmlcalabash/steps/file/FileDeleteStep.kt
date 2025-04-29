@@ -4,6 +4,7 @@ import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.namespace.Ns
 import com.xmlcalabash.namespace.NsP
+import com.xmlcalabash.util.UriUtils
 import java.io.File
 import java.io.IOException
 
@@ -24,7 +25,7 @@ class FileDeleteStep(): FileStep(NsP.fileDelete) {
         val recursive = booleanBinding(Ns.recursive) ?: false
         failOnError = booleanBinding(Ns.failOnError) ?: true
 
-        val file = File(href.path)
+        val file = File(UriUtils.path(href))
         if (!file.exists()) {
             val result = resultDocument(href)
             receiver.output("result", XProcDocument.ofXml(result, stepConfig))
@@ -38,11 +39,11 @@ class FileDeleteStep(): FileStep(NsP.fileDelete) {
                 file.delete()
             }
             if (!success) {
-                maybeThrow(XProcError.xcDeleteFailed(href.path), href)
+                maybeThrow(XProcError.xcDeleteFailed(UriUtils.path(href)), href)
                 return
             }
         } catch (ex: IOException) {
-            maybeThrow(XProcError.xcDeleteFailed(href.path), href)
+            maybeThrow(XProcError.xcDeleteFailed(UriUtils.path(href)), href)
             return
         }
 

@@ -44,13 +44,13 @@ class TrangFilesStep(): AbstractTrangStep() {
             throw stepConfig.exception(XProcError.xcxTrangFileUriRequired())
         }
 
-        sourceFormat = stringBinding(_sourceFormat) ?: inferredFormat(sourceSchema.path)
+        sourceFormat = stringBinding(_sourceFormat) ?: inferredFormat(UriUtils.path(sourceSchema))
 
         if (sourceFormat == "xsd") {
             throw stepConfig.exception(XProcError.xcxTrangNoXsdSource())
         }
 
-        resultFormat = stringBinding(_resultFormat) ?: inferredFormat(resultSchema.path)
+        resultFormat = stringBinding(_resultFormat) ?: inferredFormat(UriUtils.path(resultSchema))
 
         if (sourceFormat == resultFormat) {
             throw stepConfig.exception(XProcError.xcxTrangIdenticalFormats(sourceFormat!!))
@@ -73,7 +73,7 @@ class TrangFilesStep(): AbstractTrangStep() {
         val errorHandler = TrangErrorHandler()
 
         val sc = trangInputFormat.load(sourceSchema.toString(), inputArray, sourceFormat, errorHandler, resolver)
-        val od = LocalOutputDirectory(sourceSchema.toString(), File(resultSchema.path), ".${resultFormat}", outputEncoding, lineLength, indent)
+        val od = LocalOutputDirectory(sourceSchema.toString(), File(UriUtils.path(resultSchema)), ".${resultFormat}", outputEncoding, lineLength, indent)
 
         try {
             trangOutputFormat.output(sc, od, outputArray, sourceFormat, errorHandler)
@@ -125,7 +125,7 @@ class TrangFilesStep(): AbstractTrangStep() {
             }
 
             val uri = URI(input.uri)
-            val file = File(uri.path)
+            val file = File(UriUtils.path(uri))
             input.byteStream = file.inputStream()
         }
     }
