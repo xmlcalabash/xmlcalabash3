@@ -19,11 +19,7 @@ import com.xmlcalabash.namespace.NsErr
 import com.xmlcalabash.namespace.NsFn
 import com.xmlcalabash.namespace.NsXs
 import com.xmlcalabash.spi.DocumentResolverServiceProvider
-import com.xmlcalabash.util.DefaultMessagePrinter
-import com.xmlcalabash.util.ErrorDetail
-import com.xmlcalabash.util.UriUtils
-import com.xmlcalabash.util.Verbosity
-import com.xmlcalabash.util.VisualizerOutput
+import com.xmlcalabash.util.*
 import net.sf.saxon.Configuration
 import net.sf.saxon.om.NamespaceUri
 import net.sf.saxon.s9api.ItemType
@@ -236,7 +232,7 @@ class XmlCalabashCli private constructor() {
             }
 
             if (commandLine.nogo) {
-                stepConfig.messageReporter.debug { "Execution suppressed with --nogo" }
+                stepConfig.messageReporter.debug { Report(Verbosity.DEBUG, "Execution suppressed with --nogo") }
                 exitProcess(0)
             }
 
@@ -455,8 +451,8 @@ class XmlCalabashCli private constructor() {
                     // This is kind of awful
                     val reports = error.error.details[2] as List<*>
                     for (anyReport in reports) {
-                        val report = anyReport as ErrorDetail
-                        stepConfig.xmlCalabashConfig.messageReporter.report(Verbosity.ERROR, report.extra) { report.message }
+                        val report = anyReport as Report
+                        stepConfig.xmlCalabashConfig.messageReporter.report(report.severity) { report }
                     }
                 }
                 else -> Unit

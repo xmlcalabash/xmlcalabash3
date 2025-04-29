@@ -6,6 +6,7 @@ import com.xmlcalabash.namespace.Ns
 import com.xmlcalabash.namespace.NsCx
 import com.xmlcalabash.steps.AbstractAtomicStep
 import com.xmlcalabash.util.BufferingMessageReporter
+import com.xmlcalabash.util.Report
 import com.xmlcalabash.util.SaxonTreeBuilder
 import com.xmlcalabash.util.Verbosity
 import net.sf.saxon.s9api.QName
@@ -32,7 +33,7 @@ class PipelineMessagesStep(): AbstractAtomicStep() {
         }
         val clear = booleanBinding(_clear) ?: false
 
-        val messages: List<BufferingMessageReporter.Message> = if (stepConfig.environment.messageReporter is BufferingMessageReporter) {
+        val messages: List<Report> = if (stepConfig.environment.messageReporter is BufferingMessageReporter) {
             val reporter = stepConfig.environment.messageReporter as BufferingMessageReporter
             val msgs = reporter.messages(level)
             if (clear) {
@@ -48,12 +49,9 @@ class PipelineMessagesStep(): AbstractAtomicStep() {
         builder.addStartElement(NsCx.messages)
         for (message in messages) {
             val attributes = mutableMapOf<QName, String>()
-            for ((name, value) in message.attributes) {
-                attributes[name] = value
-            }
-            attributes[Ns.level] = "${message.level}"
+            attributes.putAll(message.extraDetail)
+            attributes[Ns.level] = "${message.severity}"
             attributes[Ns.message] = message.message
-            attributes[Ns.date] = "${message.timestamp}"
 
             builder.addStartElement(NsCx.message, stepConfig.typeUtils.attributeMap(attributes))
             builder.addEndElement()

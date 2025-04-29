@@ -13,6 +13,8 @@ import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.namespace.Ns
 import com.xmlcalabash.steps.AbstractAtomicStep
+import com.xmlcalabash.util.Report
+import com.xmlcalabash.util.Verbosity
 import com.xmlcalabash.xvrl.XvrlDetection
 import com.xmlcalabash.xvrl.XvrlReport
 import net.sf.saxon.om.NamespaceUri
@@ -70,25 +72,25 @@ class EPubCheckStep(): AbstractAtomicStep() {
 
             var detection: XvrlDetection? = null
             when (message.severity) {
-                Severity.SUPPRESSED -> reporter.trace { text }
+                Severity.SUPPRESSED -> reporter.trace { Report(Verbosity.TRACE, text) }
                 Severity.USAGE -> {
-                    reporter.debug { text }
+                    reporter.debug { Report(Verbosity.DEBUG, text) }
                     detection = report.detection("error", "${id}", text, attr)
                 }
                 Severity.ERROR -> {
-                    reporter.error { text }
+                    reporter.error { Report(Verbosity.ERROR, text) }
                     detection = report.detection("error", "${id}", text, attr)
                 }
                 Severity.WARNING -> {
-                    reporter.warn { text }
+                    reporter.warn { Report(Verbosity.WARN, text) }
                     detection = report.detection("warning", "${id}", text, attr)
                 }
                 Severity.INFO -> {
-                    reporter.info { text }
+                    reporter.info { Report(Verbosity.INFO, text) }
                     detection = report.detection("info", "${id}", text, attr)
                 }
                 Severity.FATAL -> {
-                    reporter.error { text }
+                    reporter.error { Report(Verbosity.ERROR, text) }
                     detection = report.detection("fatal-error", "${id}", text, attr)
                 }
             }

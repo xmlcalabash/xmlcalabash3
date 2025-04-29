@@ -16,8 +16,8 @@ class SaxonErrorReporter(val stepConfig: StepConfiguration): ErrorReporter {
     val error: XmlProcessingError?
         get() = _error
 
-    private var _errorMessages = mutableListOf<ErrorDetail>()
-    val errorMessages: List<ErrorDetail>
+    private var _errorMessages = mutableListOf<Report>()
+    val errorMessages: List<Report>
         get() = _errorMessages
 
     override fun report(error: XmlProcessingError?) {
@@ -30,39 +30,10 @@ class SaxonErrorReporter(val stepConfig: StepConfiguration): ErrorReporter {
             _error = error
         }
 
-        val extra = mutableMapOf<QName, String>()
-        extra[NsSaxon.hostLanguage] = "${error.hostLanguage}"
-        extra[NsSaxon.static] = "${error.isStaticError}"
-        extra[NsSaxon.type] = "${error.isTypeError}"
-        if (error.errorCode != null) {
-            extra[Ns.code] = "Q{${error.errorCode.namespaceUri}}${error.errorCode.localName}"
-        }
+        val report = Report(Verbosity.DEBUG, stepConfig, error)
 
-        error.location.publicId?.let { extra[Ns.publicIdentifier] = it }
-        if (error.location.systemId != null && error.location.systemId != "") {
-            extra[Ns.systemIdentifier] = error.location.systemId
-        }
-        if (error.location.lineNumber > 0) {
-            extra[Ns.lineNumber] = "${error.location.lineNumber}"
-        }
-        if (error.location.columnNumber > 0) {
-            extra[Ns.columnNumber] = "${error.location.columnNumber}"
-        }
-        error.failingExpression?.let { extra[NsSaxon.expression] = "${error.failingExpression}" }
-        error.path?.let { extra[Ns.path] = it }
-        error.terminationMessage?.let { extra[NsSaxon.terminationMessage] = it }
-        if (error.isAlreadyReported) {
-            extra[NsSaxon.alreadyReported] = "${error.isAlreadyReported}"
-        }
+        _errorMessages.add(report)
 
-        val message = if (error.cause is XPathException && error.cause.message != null) {
-            error.cause.message!!
-        } else {
-            error.message
-        }
-
-        _errorMessages.add(ErrorDetail(message, extra))
-
-        stepConfig.messageReporter.report(Verbosity.DEBUG, extra) { message }
+        stepConfig.messageReporter.report(Verbosity.DEBUG) { report }
     }
 }

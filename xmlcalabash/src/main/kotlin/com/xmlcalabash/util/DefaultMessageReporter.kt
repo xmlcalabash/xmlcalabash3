@@ -1,15 +1,17 @@
 package com.xmlcalabash.util
 
 import com.xmlcalabash.api.MessageReporter
+import com.xmlcalabash.datamodel.Location
 import com.xmlcalabash.namespace.Ns
 import net.sf.saxon.s9api.QName
 
 class DefaultMessageReporter(nextReporter: MessageReporter? = null): NopMessageReporter(nextReporter) {
-    override fun report(verbosity: Verbosity, extraAttributes: Map<QName, String>, message: () -> String) {
-        if (verbosity >= threshold) {
+    override fun report(severity: Verbosity, report: () -> Report) {
+        if (severity >= threshold) {
+            val reified = report()
             val prefix = StringBuilder()
 
-            when (verbosity) {
+            when (severity) {
                 Verbosity.TRACE -> prefix.append("Trace")
                 Verbosity.DEBUG -> prefix.append("Debug")
                 Verbosity.INFO -> Unit
@@ -17,24 +19,28 @@ class DefaultMessageReporter(nextReporter: MessageReporter? = null): NopMessageR
                 Verbosity.ERROR -> prefix.append("Error")
             }
 
-            if (verbosity == Verbosity.WARN || verbosity == Verbosity.ERROR) {
-                val uri = extraAttributes[Ns.baseUri] ?: extraAttributes[Ns.systemIdentifier]
-                if (uri != null) {
-                    prefix.append(" at ").append(uri).append(":")
-                    extraAttributes[Ns.lineNumber]?.let { prefix.append(it).append(":") }
-                    extraAttributes[Ns.columnNumber]?.let { prefix.append(it).append(":") }
+            if (severity == Verbosity.WARN || severity == Verbosity.ERROR) {
+                if (reified.location !== Location.NULL) {
+                    prefix.append(" at ").append(reified.location.baseUri!!).append(":")
+                    if (reified.location.lineNumber > 0) {
+                        prefix.append(reified.location.lineNumber).append(":")
+                    }
+                    if (reified.location.columnNumber > 0) {
+                        prefix.append(reified.location.columnNumber).append(":")
+                    }
                     prefix.append(" ")
                 }
-            } else if (verbosity != Verbosity.INFO) {
+            } else if (reified.severity != Verbosity.INFO) {
                 prefix.append(": ")
             }
 
             try {
-                messagePrinter.println("${prefix}${message()}")
+                messagePrinter.println("${prefix}${reified.message}")
             } catch (ex: Exception) {
                 messagePrinter.println("${prefix} failed to evaluate message: ${ex.message}")
             }
         }
-        nextReporter?.report(verbosity, extraAttributes, message)
+
+        nextReporter?.report(severity, report)
     }
 }

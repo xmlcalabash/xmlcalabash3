@@ -1,10 +1,10 @@
 package com.xmlcalabash.exceptions
 
 import com.xmlcalabash.datamodel.Location
-import com.xmlcalabash.io.MediaType
 import com.xmlcalabash.documents.XProcDocument
+import com.xmlcalabash.io.MediaType
 import com.xmlcalabash.namespace.NsErr
-import com.xmlcalabash.util.ErrorDetail
+import com.xmlcalabash.util.Report
 import net.sf.saxon.s9api.*
 import java.net.URI
 import java.util.*
@@ -285,7 +285,7 @@ open class XProcError protected constructor(val code: QName, val variant: Int, e
 
         fun xcUnsupportedScheme(scheme: String) = step(90, scheme)
         fun xcAttributeNameCollision(name: String) = step(92, name)
-        fun xcXsltCompileError(message: String, exception: Exception, details: List<ErrorDetail>) = step(93, message, exception, details)
+        fun xcXsltCompileError(message: String, exception: Exception, details: List<Report>) = step(93, message, exception, details)
         fun xcXsltInputNot20Compatible() = step(Pair(94,1))
         fun xcXsltInputNot20Compatible(media: MediaType) = step(Pair(94,2), media)
 

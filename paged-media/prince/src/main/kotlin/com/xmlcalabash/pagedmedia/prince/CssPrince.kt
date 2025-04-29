@@ -244,6 +244,7 @@ class CssPrince: CssProcessor {
             when (msgType) {
                 "inf" -> stepConfig.info { message ?: "Prince message event without message?" }
                 "wrn" -> stepConfig.warn { message ?: "Prince message event without message?" }
+                "dbg" -> stepConfig.debug { message ?: "Prince message event without message?" }
                 else -> stepConfig.error { message ?: "Prince message event without message?" }
             }
         }

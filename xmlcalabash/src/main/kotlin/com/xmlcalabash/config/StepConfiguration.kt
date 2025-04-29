@@ -4,6 +4,7 @@ import com.xmlcalabash.datamodel.DeclareStepInstruction
 import com.xmlcalabash.datamodel.DocumentContext
 import com.xmlcalabash.util.TypeUtils
 import com.xmlcalabash.namespace.Ns
+import com.xmlcalabash.util.Report
 import com.xmlcalabash.util.Verbosity
 import net.sf.saxon.s9api.QName
 import net.sf.saxon.s9api.SequenceType
@@ -52,40 +53,23 @@ open class StepConfiguration(val saxonConfig: SaxonConfiguration,
     }
 
     fun error(message: () -> String) {
-        report(Verbosity.ERROR, emptyMap(), message)
+        environment.messageReporter.error { Report(Verbosity.ERROR, message(), location) }
     }
 
     fun warn(message: () -> String) {
-        report(Verbosity.WARN, emptyMap(), message)
+        environment.messageReporter.warn { Report(Verbosity.WARN, message(), location) }
     }
 
     fun info(message: () -> String) {
-        report(Verbosity.INFO, emptyMap(), message)
+        environment.messageReporter.info { Report(Verbosity.INFO, message(), location) }
     }
 
     fun debug(message: () -> String) {
-        report(Verbosity.DEBUG, emptyMap(), message)
+        environment.messageReporter.debug { Report(Verbosity.DEBUG, message(), location) }
     }
 
     fun trace(message: () -> String) {
-        report(Verbosity.TRACE, emptyMap(), message)
-    }
-
-    fun report(verbosity: Verbosity, extraAttributes: Map<QName, String>, message: () -> String) {
-        val extra = mutableMapOf<QName, String>()
-        extra.putAll(extraAttributes)
-
-        if (_stepName != null && !stepName.startsWith("!")) {
-            extra[Ns.stepName] = stepName
-        }
-        baseUri?.let { extra[Ns.baseUri] = "${it}" }
-        if (location.lineNumber > 0) {
-            extra[Ns.lineNumber] = "${location.lineNumber}"
-        }
-        if (location.columnNumber > 0) {
-            extra[Ns.columnNumber] = "${location.columnNumber}"
-        }
-        environment.messageReporter.report(verbosity, extra, message)
+        environment.messageReporter.trace { Report(Verbosity.TRACE, message(), location) }
     }
 
     fun putStepType(type: QName, decl: DeclareStepInstruction) {

@@ -7,6 +7,7 @@ import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.io.MediaType
 import com.xmlcalabash.io.MessagePrinter
 import com.xmlcalabash.util.BufferingReceiver
+import com.xmlcalabash.util.Report
 import com.xmlcalabash.util.Verbosity
 import net.sf.saxon.s9api.Processor
 import net.sf.saxon.s9api.QName
@@ -213,29 +214,29 @@ class ApiTest {
             _messagePrinter = messagePrinter
         }
 
-        override fun error(message: () -> String) {
-            report(Verbosity.ERROR, emptyMap(), message)
+        override fun error(report: () -> Report) {
+            report(Verbosity.ERROR, report)
         }
 
-        override fun warn(message: () -> String) {
-            report(Verbosity.WARN, emptyMap(), message)
+        override fun warn(report: () -> Report) {
+            report(Verbosity.WARN, report)
         }
 
-        override fun info(message: () -> String) {
-            report(Verbosity.INFO, emptyMap(), message)
+        override fun info(report: () -> Report) {
+            report(Verbosity.INFO, report)
         }
 
-        override fun debug(message: () -> String) {
-            report(Verbosity.DEBUG, emptyMap(), message)
+        override fun debug(report: () -> Report) {
+            report(Verbosity.DEBUG, report)
         }
 
-        override fun trace(message: () -> String) {
-            report(Verbosity.TRACE, emptyMap(), message)
+        override fun trace(report: () -> Report) {
+            report(Verbosity.TRACE, report)
         }
 
-        override fun report(verbosity: Verbosity, extraAttributes: Map<QName, String>, message: () -> String) {
-            if (verbosity >= threshold) {
-                println(message())
+        override fun report(severity: Verbosity, report: () -> Report) {
+            if (severity >= threshold) {
+                println(report().message)
             }
         }
     }
