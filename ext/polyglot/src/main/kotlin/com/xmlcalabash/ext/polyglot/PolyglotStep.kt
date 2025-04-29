@@ -130,11 +130,7 @@ class PolyglotStep(val stepLanguage: String): AbstractAtomicStep() {
     }
 
     override fun toString(): String {
-        if (language == "js") {
-            return "cx:javascript"
-        } else {
-            return "cx:${language}"
-        }
+        return "cx:${stepLanguage}"
     }
 
     private fun messages(text: String, warning: Boolean) {

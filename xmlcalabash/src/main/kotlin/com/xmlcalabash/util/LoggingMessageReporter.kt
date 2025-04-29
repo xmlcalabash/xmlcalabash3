@@ -6,14 +6,14 @@ import net.sf.saxon.s9api.QName
 import org.apache.logging.log4j.kotlin.logger
 
 class LoggingMessageReporter(nextReporter: MessageReporter? = null): NopMessageReporter(nextReporter) {
-    override fun report(verbosity: Verbosity, extraAttributes: Map<QName, String>, message: () -> String) {
-        when (verbosity) {
-            Verbosity.ERROR -> logger.error(message)
-            Verbosity.WARN -> logger.warn(message)
-            Verbosity.INFO -> logger.info(message)
-            Verbosity.DEBUG -> logger.debug(message)
-            Verbosity.TRACE -> logger.trace(message)
+    override fun report(severity: Verbosity, report: () -> Report) {
+        when (severity) {
+            Verbosity.ERROR -> logger.error(report().message)
+            Verbosity.WARN -> logger.warn(report().message)
+            Verbosity.INFO -> logger.info(report().message)
+            Verbosity.DEBUG -> logger.debug(report().message)
+            Verbosity.TRACE -> logger.trace(report().message)
         }
-        nextReporter?.report(verbosity, extraAttributes, message)
+        nextReporter?.report(severity, report)
     }
 }

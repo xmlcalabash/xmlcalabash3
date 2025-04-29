@@ -18,6 +18,8 @@ import com.xmlcalabash.spi.ConfigurerServiceProvider
 import com.xmlcalabash.spi.DocumentResolverProvider
 import com.xmlcalabash.spi.DocumentResolverServiceProvider
 import com.xmlcalabash.util.AssertionsLevel
+import com.xmlcalabash.util.Report
+import com.xmlcalabash.util.Verbosity
 import net.sf.saxon.s9api.QName
 import java.net.URI
 import java.util.*
@@ -99,7 +101,7 @@ open class CompileEnvironment(override val episode: String, override val xmlCala
             val manager = provider.create();
             for (stepType in manager.stepTypes()) {
                 if (showAssignments) {
-                    messageReporter.debug { "Added available step type '$stepType'" }
+                    messageReporter.debug { Report(Verbosity.DEBUG, "Added available step type '$stepType'") }
                 }
                 knownAtomicSteps.add(stepType)
             }
@@ -109,7 +111,7 @@ open class CompileEnvironment(override val episode: String, override val xmlCala
         for ((ext, contentType) in _defaultContentTypes) {
             if (mimeTypes.getContentType("test.${ext}") == "application/octet-stream") {
                 if (showAssignments) {
-                    messageReporter.debug { "Assigning default content type to '.${ext}' files: ${contentType}" }
+                    messageReporter.debug { Report(Verbosity.DEBUG, "Assigning default content type to '.${ext}' files: ${contentType}") }
                 }
                 mimeTypes.addMimeTypes("${contentType} ${ext}")
             }
@@ -121,7 +123,7 @@ open class CompileEnvironment(override val episode: String, override val xmlCala
 
         for ((contentType, extensions) in xmlCalabash.config.mimetypes) {
             if (showAssignments) {
-                messageReporter.debug { "Assigning content type to '${extensions}' files: ${contentType}" }
+                messageReporter.debug { Report(Verbosity.DEBUG, "Assigning content type to '${extensions}' files: ${contentType}") }
             }
             mimeTypes.addMimeTypes("${contentType} ${extensions}")
         }

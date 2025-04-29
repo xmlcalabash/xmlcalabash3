@@ -166,7 +166,7 @@ open class XQueryStep(): AbstractAtomicStep() {
         } catch (ex: Throwable) {
             // Generally speaking, we can get more useful information from the error reporter
             val error = errorReporter.errorMessages.lastOrNull()
-            val location = com.xmlcalabash.datamodel.Location.from(error)
+            val location = error?.location ?: com.xmlcalabash.datamodel.Location.NULL
             if (ex.message == error?.message) {
                 throw stepConfig.exception(XProcError.xcXQueryEvalError(ex.message ?: "null", location, error?.message), ex)
             }

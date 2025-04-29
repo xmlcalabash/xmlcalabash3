@@ -11,6 +11,7 @@ import com.xmlcalabash.parsers.xpl.XplParser;
 import com.xmlcalabash.runtime.XProcPipeline;
 import com.xmlcalabash.runtime.XProcRuntime;
 import com.xmlcalabash.util.BufferingReceiver;
+import com.xmlcalabash.util.Report;
 import com.xmlcalabash.util.Verbosity;
 import kotlin.jvm.functions.Function0;
 import net.sf.saxon.s9api.*;
@@ -254,34 +255,34 @@ public class JavaApiTest {
         }
 
         @Override
-        public void error(@NotNull Function0<@NotNull String> message) {
-            report(Verbosity.ERROR, Collections.emptyMap(), message);
+        public void error(@NotNull Function0<? extends @NotNull Report> report) {
+            report(Verbosity.ERROR, report);
         }
 
         @Override
-        public void warn(@NotNull Function0<@NotNull String> message) {
-            report(Verbosity.WARN, Collections.emptyMap(), message);
+        public void warn(@NotNull Function0<? extends @NotNull Report> report) {
+            report(Verbosity.WARN, report);
         }
 
         @Override
-        public void info(@NotNull Function0<@NotNull String> message) {
-            report(Verbosity.INFO, Collections.emptyMap(), message);
+        public void info(@NotNull Function0<? extends @NotNull Report> report) {
+            report(Verbosity.INFO, report);
         }
 
         @Override
-        public void debug(@NotNull Function0<@NotNull String> message) {
-            report(Verbosity.DEBUG, Collections.emptyMap(), message);
+        public void debug(@NotNull Function0<? extends @NotNull Report> report) {
+            report(Verbosity.DEBUG, report);
         }
 
         @Override
-        public void trace(@NotNull Function0<@NotNull String> message) {
-            report(Verbosity.TRACE, Collections.emptyMap(), message);
+        public void trace(@NotNull Function0<? extends @NotNull Report> report) {
+            report(Verbosity.TRACE, report);
         }
 
         @Override
-        public void report(@NotNull Verbosity verbosity, @NotNull Map<@NotNull QName, @NotNull String> extraAttributes, @NotNull Function0<@NotNull String> message) {
-            if (levels.get(verbosity) >= levels.get(threshold)) {
-                printer.println(message.invoke());
+        public void report(@NotNull Verbosity severity, @NotNull Function0<? extends @NotNull Report> report) {
+            if (levels.get(severity) >= levels.get(threshold)) {
+                printer.println(report.invoke().getMessage());
             }
         }
     }

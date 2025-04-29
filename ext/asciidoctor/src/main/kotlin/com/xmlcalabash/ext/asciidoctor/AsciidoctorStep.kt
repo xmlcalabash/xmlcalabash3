@@ -6,7 +6,9 @@ import com.xmlcalabash.io.DocumentLoader
 import com.xmlcalabash.io.MediaType
 import com.xmlcalabash.namespace.Ns
 import com.xmlcalabash.steps.AbstractAtomicStep
+import com.xmlcalabash.util.Report
 import com.xmlcalabash.util.SaxonTreeBuilder
+import com.xmlcalabash.util.Verbosity
 import net.sf.saxon.om.NamespaceUri
 import net.sf.saxon.s9api.Axis
 import net.sf.saxon.s9api.QName
@@ -417,12 +419,12 @@ class AsciidoctorStep(): AbstractAtomicStep() {
 
             val reporter = stepConfig.environment.messageReporter
             when (logRecord.severity) {
-                Severity.ERROR -> reporter.error { sb.toString() }
-                Severity.FATAL -> reporter.error { sb.toString() }
-                Severity.UNKNOWN -> reporter.error { sb.toString() }
-                Severity.WARN -> reporter.warn { sb.toString() }
-                Severity.INFO -> reporter.info { sb.toString() }
-                Severity.DEBUG -> reporter.debug { sb.toString() }
+                Severity.ERROR -> reporter.error { Report(Verbosity.ERROR, sb.toString()) }
+                Severity.FATAL -> reporter.error { Report(Verbosity.ERROR, sb.toString()) }
+                Severity.UNKNOWN -> reporter.error { Report(Verbosity.ERROR, sb.toString()) }
+                Severity.WARN -> reporter.warn { Report(Verbosity.WARN, sb.toString()) }
+                Severity.INFO -> reporter.info { Report(Verbosity.INFO, sb.toString()) }
+                Severity.DEBUG -> reporter.debug { Report(Verbosity.DEBUG, sb.toString()) }
             }
         }
     }

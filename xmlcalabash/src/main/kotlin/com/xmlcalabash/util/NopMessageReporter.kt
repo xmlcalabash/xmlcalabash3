@@ -15,27 +15,27 @@ open class NopMessageReporter(val nextReporter: MessageReporter? = null): Messag
         _messagePrinter = messagePrinter
     }
 
-    override fun error(message: () -> String) {
-        report(Verbosity.ERROR, emptyMap(), message)
+    override fun error(report: () -> Report) {
+        report(Verbosity.ERROR, report)
     }
 
-    override fun warn(message: () -> String) {
-        report(Verbosity.WARN, emptyMap(), message)
+    override fun warn(report: () -> Report) {
+        report(Verbosity.WARN, report)
     }
 
-    override fun info(message: () -> String) {
-        report(Verbosity.INFO, emptyMap(), message)
+    override fun info(report: () -> Report) {
+        report(Verbosity.INFO, report)
     }
 
-    override fun debug(message: () -> String) {
-        report(Verbosity.DEBUG, emptyMap(), message)
+    override fun debug(report: () -> Report) {
+        report(Verbosity.DEBUG, report)
     }
 
-    override fun trace(message: () -> String) {
-        report(Verbosity.TRACE, emptyMap(), message)
+    override fun trace(report: () -> Report) {
+        report(Verbosity.TRACE, report)
     }
 
-    override fun report(verbosity: Verbosity, extraAttributes: Map<QName, String>, message: () -> String) {
-        nextReporter?.report(verbosity, extraAttributes, message)
+    override fun report(severity: Verbosity, report: () -> Report) {
+        nextReporter?.report(severity, report)
     }
 }

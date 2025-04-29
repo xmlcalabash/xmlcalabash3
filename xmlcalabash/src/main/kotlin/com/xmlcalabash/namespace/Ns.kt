@@ -166,6 +166,7 @@ object Ns {
     val tar = QName("tar")
     val target = QName("target")
     val templateName = QName("template-name")
+    val terminate = QName("terminate")
     val test = QName("test")
     val text = QName("text")
     val textLines = QName("text-lines")

@@ -1,34 +1,12 @@
 package com.xmlcalabash.datamodel
 
 import com.xmlcalabash.documents.XProcDocument
-import com.xmlcalabash.namespace.Ns
-import com.xmlcalabash.util.ErrorDetail
 import net.sf.saxon.s9api.XdmNode
 import java.net.URI
 
 class Location(uri: URI?, lineNo: Int?, colNo: Int?) {
     companion object {
         val NULL = Location(null, null, null)
-
-        fun from(detail: ErrorDetail?): Location {
-            if (detail == null) {
-                return NULL
-            }
-
-            val baseUri = detail.extra[Ns.systemIdentifier]
-            val line = detail.extra[Ns.lineNumber]?.toInt()
-            val col = detail.extra[Ns.columnNumber]?.toInt()
-
-            if (baseUri == null) {
-                if (line == null) {
-                    return NULL
-                }
-                return Location(baseUri, line, col)
-            }
-
-            return Location(URI(baseUri), line, col)
-        }
-
     }
 
     val baseUri: URI? = uri

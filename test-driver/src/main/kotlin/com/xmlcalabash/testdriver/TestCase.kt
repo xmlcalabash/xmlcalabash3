@@ -359,15 +359,15 @@ class TestCase(val xmlCalabash: XmlCalabash, val testOptions: TestOptions, val t
         status.stdOutput = stdoutOutput
     }
 
-    private fun messagesXml(messages: List<BufferingMessageReporter.Message>): XdmNode {
+    private fun messagesXml(reports: List<Report>): XdmNode {
         val builder = SaxonTreeBuilder(xmlCalabash.saxonConfiguration.processor)
         builder.startDocument(null)
         builder.addStartElement(NsCx.messages)
-        for (message in messages) {
+        for (report in reports) {
             builder.addStartElement(NsCx.message, attributeMap(mapOf(
-                Ns.level to "${message.level}",
-                Ns.message to message.message,
-                Ns.date to "${message.timestamp}"
+                Ns.level to "${report.severity}",
+                Ns.message to report.message,
+                Ns.date to report.extraDetail[Ns.date]
             )))
             builder.addEndElement()
         }

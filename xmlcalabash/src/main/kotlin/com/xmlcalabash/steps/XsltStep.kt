@@ -29,9 +29,6 @@ import java.net.URI
 open class XsltStep(): AbstractAtomicStep() {
     companion object {
         val BUILD_TREE = ValueUtils.parseClarkName(SaxonOutputKeys.BUILD_TREE)
-        val _terminate = QName("terminate")
-        val _systemIdentifier = QName("system-identifier")
-        val _publicIdentifier = QName("public-identifier")
     }
 
     val sources = mutableListOf<XProcDocument>()
@@ -228,29 +225,20 @@ open class XsltStep(): AbstractAtomicStep() {
         }
 
         transformer.setMessageHandler { message ->
-            val extra = mutableMapOf<QName, String>()
-            extra[Ns.code] = "Q{${message.errorCode.namespaceUri}}${message.errorCode.localName}"
+            val report = if (message.isTerminate) {
+                Report(Verbosity.ERROR, stepConfig, message)
+            } else {
+                Report(Verbosity.INFO, stepConfig, message)
+            }
+            report.addDetail(Ns.code, "Q{${message.errorCode.namespaceUri}}${message.errorCode.localName}")
             if (!stepParams.stepName.startsWith("!")) {
-                extra[Ns.stepName] = stepParams.stepName
+                report.addDetail(Ns.stepName, stepParams.stepName)
             }
-            message.location.systemId?.let { extra[_systemIdentifier] = it }
-            message.location.publicId?.let { extra[_publicIdentifier] = it }
-            if (message.location.lineNumber > 0) {
-                extra[Ns.lineNumber] = "${message.location.lineNumber}"
-            }
-            if (message.location.columnNumber > 0) {
-                extra[Ns.columnNumber] = "${message.location.columnNumber}"
-            }
-            if (message.isTerminate) {
-                extra[_terminate] = "true"
-            }
+            stepConfig.environment.messageReporter.report(report.severity) { report }
 
             if (message.isTerminate) {
-                stepConfig.environment.messageReporter.report(Verbosity.ERROR, extra, { message.toString() })
                 terminationError = XProcError.xcXsltUserTermination(message.content.stringValue)
                     .at(stepParams.location).at(message.location)
-            } else {
-                stepConfig.environment.messageReporter.report(Verbosity.INFO, extra, { message.toString() })
             }
         }
 
@@ -335,7 +323,7 @@ open class XsltStep(): AbstractAtomicStep() {
         } catch (ex: SaxonApiException) {
             // Generally speaking, we can get more useful information from the error reporter
             val error = errorReporter.errorMessages.lastOrNull()
-            val location = com.xmlcalabash.datamodel.Location.from(error)
+            val location = error?.location ?: com.xmlcalabash.datamodel.Location.NULL
 
             if (ex.cause is Error.UserDefinedXPathException || ex.cause is TerminationException) {
                 if (terminationError != null) {
