@@ -11,6 +11,7 @@ import com.xmlcalabash.runtime.parameters.RuntimeStepParameters
 import com.xmlcalabash.steps.AbstractAtomicStep
 import com.xmlcalabash.util.S9Api
 import com.xmlcalabash.util.SaxonTreeBuilder
+import com.xmlcalabash.util.UriUtils
 import net.sf.saxon.om.NamespaceUri
 import net.sf.saxon.s9api.*
 import java.io.ByteArrayInputStream
@@ -181,7 +182,7 @@ class SendMailStep(): AbstractAtomicStep() {
             while (sources.isNotEmpty()) {
                 val doc = sources.removeFirst()
                 val contentType = doc.contentType?.toString() ?: "application/octet-stream"
-                var filename = doc.baseURI?.path ?: "unknown"
+                var filename = if (doc.baseURI != null) UriUtils.path(doc.baseURI!!) else "unknown"
                 val pos = filename.lastIndexOf("/")
                 if (pos > 0) {
                     filename = filename.substring(pos+1)

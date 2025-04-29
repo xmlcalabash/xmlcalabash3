@@ -4,6 +4,7 @@ import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.namespace.Ns
 import com.xmlcalabash.namespace.NsP
+import com.xmlcalabash.util.UriUtils
 import net.sf.saxon.value.DateTimeValue
 import java.io.File
 import java.io.IOException
@@ -33,11 +34,11 @@ class FileTouchStep(): FileStep(NsP.fileTouch) {
 
         failOnError = booleanBinding(Ns.failOnError) != false
 
-        val file = File(href.path)
+        val file = File(UriUtils.path(href))
         try {
             if (!file.exists()) {
                 if (!file.createNewFile()) {
-                    maybeThrow(XProcError.xdDoesNotExist(href.path, "does not exist and failed to create"), href)
+                    maybeThrow(XProcError.xdDoesNotExist(UriUtils.path(href), "does not exist and failed to create"), href)
                     return
                 }
             }
@@ -45,7 +46,7 @@ class FileTouchStep(): FileStep(NsP.fileTouch) {
             val millis = timestamp.toInstant().toEpochMilli()
             file.setLastModified(millis)
         } catch (ex: IOException) {
-            maybeThrow(XProcError.xdDoesNotExist(href.path, ex.message ?: "???").with(ex), href)
+            maybeThrow(XProcError.xdDoesNotExist(UriUtils.path(href), ex.message ?: "???").with(ex), href)
             return
         }
 

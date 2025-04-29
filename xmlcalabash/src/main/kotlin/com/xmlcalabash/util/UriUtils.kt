@@ -21,8 +21,8 @@ class UriUtils {
             val normParts = mutableListOf<String>()
             val relativeParts = mutableListOf<String>()
 
-            normParts.addAll(base.normalize().path.split("/"))
-            relativeParts.addAll(relative.normalize().path.split("/"))
+            normParts.addAll(path(base.normalize()).split("/"))
+            relativeParts.addAll(path(relative.normalize()).split("/"))
 
             normParts.removeLast()
             val lastPart = relativeParts.removeLast()
@@ -72,40 +72,21 @@ class UriUtils {
             return (cp >= 'A' && cp <= 'Z') || (cp >= 'a' && cp <= 'z')
         }
 
-        fun normalizePath(path: String): String {
-            // #facepalm On windows, sometimes the path is /C:/path and sometimes
-            // it's C:/path, in either case remove the leading drive
-            val fixed = if (couldBeWindowsPath(path)) {
-                if (path.length > 2 && path[0] == '/' && path[2] == ':') {
-                    path.substring(3).replace('\\', '/')
-                } else if (path.length > 1 && path[1] == ':') {
-                    path.substring(2).replace('\\', '/')
-                } else {
-                    path.replace('\\', '/')
-                }
-            } else {
-                path.replace('\\', '/')
+        fun path(uri: URI): String {
+            if (uri.scheme == "file") {
+                return normalizePath(uri.path)
             }
+            return uri.path
+        }
 
-            var lastSegment = false
-            val stack = Stack<String>()
-            for (part in fixed.split("/")) {
-                lastSegment = false
-                when (part) {
-                    "." -> lastSegment = true
-                    ".." -> {
-                        if (stack.isNotEmpty()) {
-                            stack.pop()
-                        }
-                        lastSegment = true
-                    }
-                    else -> stack.push(part)
-                }
+        fun normalizePath(path: String): String {
+            // #facepalm On windows, sometimes the path is /C:/path because
+            // URI("file:///C:/path).path is /C:/path
+            if (couldBeWindowsPath(path) && path.length > 2 && path[0] == '/' && path[2] == ':') {
+                return path.substring(1).replace('\\', '/')
+            } else {
+                return path.replace('\\', '/')
             }
-            if (lastSegment) {
-                stack.push("")
-            }
-            return stack.joinToString("/")
         }
 
         fun resolve(path: URI?): URI {
@@ -127,8 +108,11 @@ class UriUtils {
             if (path == null) {
                 return baseUri
             }
-            if (couldBeWindowsPath(path) && path.length > 1 && path[1] == ':') {
-                return baseUri.resolve(path.substring(2).replace('\\', '/'))
+            if (couldBeWindowsPath(path)) {
+                if (path.length > 1 && path[1] == ':') {
+                    return URI("file:/${path.replace('\\', '/')}")
+                }
+                return baseUri.resolve(path.replace('\\', '/'))
             }
             return baseUri.resolve(path)
         }

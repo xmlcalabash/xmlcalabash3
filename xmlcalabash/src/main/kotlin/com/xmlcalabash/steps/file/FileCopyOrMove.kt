@@ -4,6 +4,7 @@ import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.namespace.Ns
 import com.xmlcalabash.namespace.NsP
+import com.xmlcalabash.util.UriUtils
 import net.sf.saxon.s9api.QName
 import java.io.File
 import java.io.IOException
@@ -44,13 +45,13 @@ abstract class FileCopyOrMove(stepType: QName): FileStep(stepType) {
             overwrite = booleanBinding(Ns.overwrite) ?: true
         }
 
-        val source = File(href.path)
+        val source = File(UriUtils.path(href))
         if (!source.exists()) {
-            maybeThrow(XProcError.xdDoesNotExist(href.path, "path does not exist"), href)
+            maybeThrow(XProcError.xdDoesNotExist(UriUtils.path(href), "path does not exist"), href)
             return
         }
 
-        var target = File(targetHref.path)
+        var target = File(UriUtils.path(targetHref))
         if (source.isDirectory) {
             if (target.exists() && target.isFile) {
                 if (stepType == NsP.fileCopy) {

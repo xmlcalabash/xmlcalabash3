@@ -62,7 +62,7 @@ class MarshallTest {
     }
 
     fun openStream(uri: URI): InputStream {
-        val file = File(uri.path)
+        val file = File(UriUtils.path(uri))
         return FileInputStream(file)
     }
 

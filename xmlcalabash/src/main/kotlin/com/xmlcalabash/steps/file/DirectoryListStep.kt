@@ -7,6 +7,7 @@ import com.xmlcalabash.namespace.Ns
 import com.xmlcalabash.namespace.NsC
 import com.xmlcalabash.namespace.NsP
 import com.xmlcalabash.util.SaxonTreeBuilder
+import com.xmlcalabash.util.UriUtils
 import com.xmlcalabash.util.Urify
 import java.io.File
 import java.nio.file.Files
@@ -43,9 +44,9 @@ class DirectoryListStep(): FileStep(NsP.directoryList) {
         }
 
         rootPath = path.toString()
-        val dir = File(path.path)
+        val dir = File(UriUtils.path(path))
         if (!dir.isDirectory) {
-            throw stepConfig.exception(XProcError.xcNotADirectory(path.path))
+            throw stepConfig.exception(XProcError.xcNotADirectory(UriUtils.path(path)))
         }
 
         val depth = if (maxDepth == "unbounded") {

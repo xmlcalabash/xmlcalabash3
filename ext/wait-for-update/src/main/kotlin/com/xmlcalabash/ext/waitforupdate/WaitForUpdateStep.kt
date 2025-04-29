@@ -5,6 +5,7 @@ import com.xmlcalabash.io.InternetProtocolRequest
 import com.xmlcalabash.namespace.Ns
 import com.xmlcalabash.steps.AbstractAtomicStep
 import com.xmlcalabash.util.DurationUtils
+import com.xmlcalabash.util.UriUtils
 import net.sf.saxon.s9api.QName
 import net.sf.saxon.value.DateTimeValue
 import java.io.File
@@ -40,7 +41,7 @@ class WaitForUpdateStep(): AbstractAtomicStep() {
     }
 
     private fun waitForFile() {
-        val file = File(href.path)
+        val file = File(UriUtils.path(href))
         val exists = file.exists()
         val dt = file.lastModified()
 

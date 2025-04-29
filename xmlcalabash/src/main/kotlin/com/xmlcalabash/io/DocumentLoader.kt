@@ -110,7 +110,7 @@ class DocumentLoader(val stepConfig: StepConfiguration,
             try {
                 return loadFile()
             } catch (ex: IOException) {
-                throw stepConfig.exception(XProcError.xdDoesNotExist(absURI.path, ex.message ?: "???"), ex)
+                throw stepConfig.exception(XProcError.xdDoesNotExist(UriUtils.path(absURI), ex.message ?: "???"), ex)
             }
         }
 
@@ -155,7 +155,7 @@ class DocumentLoader(val stepConfig: StepConfiguration,
 
     private fun loadFile(): XProcDocument {
         val start = System.nanoTime()
-        val file = File(absURI.path)
+        val file = File(UriUtils.path(absURI))
 
         mediaType = if (documentProperties.has(Ns.contentType)) {
             MediaType.parse(documentProperties[Ns.contentType]!!.underlyingValue.stringValue)

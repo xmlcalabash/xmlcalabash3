@@ -98,7 +98,7 @@ class ConfigurationLoader(val builder: XmlCalabashBuilder) {
         val saxonConfig = root.getAttributeValue(_saxonConfiguration)
         if (saxonConfig != null) {
             val uri = UriUtils.resolve(root.baseURI, saxonConfig)!!
-            builder.setSaxonConfigurationFile(File(uri.path))
+            builder.setSaxonConfigurationFile(File(UriUtils.path(uri)))
         }
 
         if (root.getAttributeValue(_mpt) != null) {

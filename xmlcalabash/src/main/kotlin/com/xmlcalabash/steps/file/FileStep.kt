@@ -6,6 +6,7 @@ import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.namespace.*
 import com.xmlcalabash.steps.AbstractAtomicStep
 import com.xmlcalabash.util.SaxonTreeBuilder
+import com.xmlcalabash.util.UriUtils
 import com.xmlcalabash.util.XAttributeMap
 import net.sf.saxon.om.AttributeMap
 import net.sf.saxon.s9api.QName
@@ -89,10 +90,10 @@ abstract class FileStep(val stepType: QName): AbstractAtomicStep() {
         if (source == null) {
             builder.addText("I/O error")
         } else {
-            builder.addText("Error accessing ${source.path}")
+            builder.addText("Error accessing ${UriUtils.path(source)}")
         }
         if (target != null) {
-            builder.addText(". Target: ${target.path}")
+            builder.addText(". Target: ${UriUtils.path(target)}")
         }
         builder.addEndElement()
         builder.endDocument()
