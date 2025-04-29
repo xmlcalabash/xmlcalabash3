@@ -111,7 +111,7 @@ class DefaultErrorExplanation(val printer: MessagePrinter): ErrorExplanation {
 
     override fun report(error: XProcError) {
         printer.println(message(error, true))
-        if (showStackTrace) {
+        if (showStackTrace && error.stackTrace.isNotEmpty()) {
             printer.println("Stack trace:")
             var count = error.stackTrace.size
             for (frame in error.stackTrace) {
