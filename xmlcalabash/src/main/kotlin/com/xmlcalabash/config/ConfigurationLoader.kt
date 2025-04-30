@@ -65,12 +65,12 @@ class ConfigurationLoader(val builder: XmlCalabashBuilder) {
     fun load(source: File) {
         val isrc = InputSource(FileInputStream(source))
         isrc.systemId = source.toURI().toString()
-        return load(isrc)
+        load(isrc)
     }
 
     fun load(source: URI) {
         val isrc = InputSource(source.toString())
-        return load(isrc)
+        load(isrc)
     }
 
     fun load(source: InputSource) {
@@ -282,7 +282,9 @@ class ConfigurationLoader(val builder: XmlCalabashBuilder) {
 
     private fun parseMimetype(node: XdmNode) {
         checkAttributes(node, listOf(Ns.contentType, _extensions))
-        builder.addMimetype(node.getAttributeValue(Ns.contentType), node.getAttributeValue(_extensions).split("\\s+".toRegex()))
+        val ctype = node.getAttributeValue(Ns.contentType)!!
+        val ext = node.getAttributeValue(_extensions)!!
+        builder.getMimetypesFileTypeMap().addMimeTypes("${ctype} ${ext}")
     }
 
     private fun parseSendmail(node: XdmNode) {

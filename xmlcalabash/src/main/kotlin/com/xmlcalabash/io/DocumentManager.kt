@@ -1,5 +1,6 @@
 package com.xmlcalabash.io
 
+import com.xmlcalabash.XmlCalabashConfiguration
 import com.xmlcalabash.config.StepConfiguration
 import com.xmlcalabash.config.XProcEnvironment
 import com.xmlcalabash.documents.DocumentProperties
@@ -30,8 +31,8 @@ import javax.xml.transform.Source
 import javax.xml.transform.sax.SAXSource
 import javax.xml.transform.stream.StreamSource
 
-class DocumentManager(val environment: XProcEnvironment): EntityResolver, EntityResolver2, ResourceResolver, ModuleURIResolver {
-    constructor(manager: DocumentManager): this(manager.environment) {
+open class DocumentManager(val xmlCalabasConfiguration: XmlCalabashConfiguration): EntityResolver, EntityResolver2, ResourceResolver, ModuleURIResolver {
+    constructor(manager: DocumentManager): this(manager.xmlCalabasConfiguration) {
         prefixMap.putAll(manager.prefixMap)
         prefixList.addAll(manager.prefixList)
         _cache.putAll(manager._cache)
@@ -46,6 +47,10 @@ class DocumentManager(val environment: XProcEnvironment): EntityResolver, Entity
     private var _resolver: XMLResolver? = null
     private var _resolverConfiguration = XMLResolverConfiguration()
 
+    private var _userEntityResolver: EntityResolver? = null
+    private var _userResourceResolver: ResourceResolver? = null
+    private var _userModuleURIResolver: ModuleURIResolver? = null
+
     val resolverConfiguration: XMLResolverConfiguration
         get() = _resolverConfiguration
 
@@ -56,6 +61,27 @@ class DocumentManager(val environment: XProcEnvironment): EntityResolver, Entity
             }
             return _resolver!!
         }
+
+    fun getEntityResolver(): EntityResolver? {
+        return _userEntityResolver
+    }
+    fun setEntityResolver(resolver: EntityResolver?) {
+        _userEntityResolver = resolver
+    }
+
+    fun getResourceResolver(): ResourceResolver? {
+        return _userResourceResolver
+    }
+    fun setResourceResolver(resolver: ResourceResolver?) {
+        _userResourceResolver = resolver
+    }
+
+    fun getModuleURIResolver(): ModuleURIResolver? {
+        return _userModuleURIResolver
+    }
+    fun setModuleURIResolver(resolver: ModuleURIResolver?) {
+        _userModuleURIResolver = resolver
+    }
 
     fun registerPrefix(prefix: String, resolver: DocumentResolver) {
         prefixMap[prefix] = resolver
@@ -81,6 +107,10 @@ class DocumentManager(val environment: XProcEnvironment): EntityResolver, Entity
     }
 
     fun lookup(href: URI, baseUri: URI? = null): URI {
+        if (_userEntityResolver != null || _userResourceResolver != null || _userModuleURIResolver != null) {
+            throw XProcError.xiLookupIsNotPossible().exception()
+        }
+
         val req = if (baseUri == null) {
             resolver.getRequest("${href}")
         } else {
@@ -152,7 +182,7 @@ class DocumentManager(val environment: XProcEnvironment): EntityResolver, Entity
     }
 
     fun getCached(href: URI): XProcDocument? {
-        val contentType = MediaType.parse(environment.mimeTypes.getContentType(href.toString()))
+        val contentType = MediaType.parse(xmlCalabasConfiguration.mimetypesFileTypeMap.getContentType(href.toString()))
         return getCached(href, contentType)
     }
 
@@ -259,10 +289,23 @@ class DocumentManager(val environment: XProcEnvironment): EntityResolver, Entity
     }
 
     override fun resolveEntity(name: String?, publicId: String?, baseURI: String?, systemId: String?): InputSource {
+        if (_userEntityResolver != null && _userEntityResolver is EntityResolver2) {
+            val source = (_userEntityResolver as EntityResolver2).resolveEntity(name, publicId, baseURI, systemId)
+            if (source != null) {
+                return source
+            }
+        }
         return resolver.entityResolver2.resolveEntity(name, publicId, baseURI, systemId)
     }
 
     override fun resolveEntity(publicId: String?, systemId: String?): InputSource {
+        if (_userEntityResolver != null) {
+            val source = _userEntityResolver!!.resolveEntity(publicId, systemId)
+            if (source != null) {
+                return source
+            }
+        }
+
         if (systemId != null) {
             val source = inputFromCache(URI(systemId))
             if (source != null) {
@@ -274,12 +317,25 @@ class DocumentManager(val environment: XProcEnvironment): EntityResolver, Entity
     }
 
     override fun getExternalSubset(name: String?, baseURI: String?): InputSource {
+        if (_userEntityResolver != null && _userEntityResolver is EntityResolver2) {
+            val source = (_userEntityResolver as EntityResolver2).getExternalSubset(name, baseURI)
+            if (source != null) {
+                return source
+            }
+        }
         return resolver.entityResolver2.getExternalSubset(name, baseURI)
     }
 
     override fun resolve(saxonRequest: net.sf.saxon.lib.ResourceRequest?): Source? {
         if (saxonRequest == null) {
             return null
+        }
+
+        if (_userResourceResolver != null) {
+            val source = _userResourceResolver!!.resolve(saxonRequest)
+            if (source != null) {
+                return source
+            }
         }
 
         if (saxonRequest.uri != null) {
@@ -306,7 +362,14 @@ class DocumentManager(val environment: XProcEnvironment): EntityResolver, Entity
     }
 
     override fun resolve(moduleURI: String?, baseURI: String?, locations: Array<out String>?): Array<StreamSource>? {
-        var href = if (moduleURI == null) {
+        if (_userModuleURIResolver != null) {
+            val streams = _userModuleURIResolver!!.resolve(moduleURI, baseURI, locations)
+            if (streams != null) {
+                return streams
+            }
+        }
+
+        val href = if (moduleURI == null) {
             if (baseURI == null) {
                 return null
             }
