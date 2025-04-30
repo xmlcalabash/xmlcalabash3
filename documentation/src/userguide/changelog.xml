@@ -13,6 +13,31 @@ See the commits and pull requests on
 finer detail.</para>
 
 <revhistory>
+<revision xml:id="r300-alpha30">
+<revnumber>3.0.0-alpha30</revnumber>
+<date>2025-04-30</date>
+<revdescription>
+<itemizedlist>
+<listitem>
+<para>The Windows-related fixes in <code>3.0.0-alpha29</code> weren’t wholly
+satisfactory. Some places where those fixes were incomplete have been
+refactored. (I think two issues had been conflated and their union fixed, leaving
+each of the individual problems only partially resolved.)
+</para>
+</listitem>
+<listitem><para>Fixed <ghissue number="418"/>. Make sure that attempts to get a path
+from a <code>file:</code> URI deal with irregularities on Windows.
+</para></listitem>
+<listitem><para>Fixed <ghissue number="417"/>. Don’t print “Stack trace:” on errors if
+there’s no stack trace.
+</para></listitem>
+<listitem><para>Refactored the <code>MessageReporter</code> API. 
+More information is now available to aid other presentation formats, localization
+requirements, etc.
+</para></listitem>
+</itemizedlist>
+</revdescription>
+</revision>    
 <revision xml:id="r300-alpha29">
 <revnumber>3.0.0-alpha29</revnumber>
 <date>2025-04-28</date>
