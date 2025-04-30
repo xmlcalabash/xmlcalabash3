@@ -87,9 +87,9 @@ open class CompileEnvironment(override val episode: String, override val xmlCala
     override val messagePrinter: MessagePrinter = xmlCalabash.config.messagePrinter
     override val messageReporter: MessageReporter = xmlCalabash.config.messageReporter
     override val monitors: MutableList<Monitor> = mutableListOf()
-    override val mimeTypes: MimetypesFileTypeMap = MimetypesFileTypeMap()
-    override val documentManager: DocumentManager = DocumentManager(this)
-    override val errorExplanation: ErrorExplanation = DefaultErrorExplanation(messagePrinter)
+    override val mimeTypes: MimetypesFileTypeMap = xmlCalabash.config.mimetypesFileTypeMap
+    override val documentManager: DocumentManager = xmlCalabash.config.documentManager
+    override val errorExplanation: ErrorExplanation = xmlCalabash.config.errorExplanation
     override val proxies: Map<String, String> = emptyMap()
     override val assertions: AssertionsLevel = xmlCalabash.config.assertions
 
@@ -119,13 +119,6 @@ open class CompileEnvironment(override val episode: String, override val xmlCala
 
         for (configurer in xmlCalabash.configurers) {
             configurer.configureContentTypes(_defaultContentTypes, mimeTypes)
-        }
-
-        for ((contentType, extensions) in xmlCalabash.config.mimetypes) {
-            if (showAssignments) {
-                messageReporter.debug { Report(Verbosity.DEBUG, "Assigning content type to '${extensions}' files: ${contentType}") }
-            }
-            mimeTypes.addMimeTypes("${contentType} ${extensions}")
         }
 
         for (provider in DocumentResolverServiceProvider.providers()) {

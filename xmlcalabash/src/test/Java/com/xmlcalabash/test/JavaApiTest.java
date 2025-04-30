@@ -3,6 +3,7 @@ package com.xmlcalabash.test;
 import com.xmlcalabash.XmlCalabash;
 import com.xmlcalabash.XmlCalabashBuilder;
 import com.xmlcalabash.api.MessageReporter;
+import com.xmlcalabash.config.ConfigurationLoader;
 import com.xmlcalabash.datamodel.DeclareStepInstruction;
 import com.xmlcalabash.documents.XProcDocument;
 import com.xmlcalabash.io.MediaType;
@@ -12,6 +13,7 @@ import com.xmlcalabash.runtime.XProcPipeline;
 import com.xmlcalabash.runtime.XProcRuntime;
 import com.xmlcalabash.util.BufferingReceiver;
 import com.xmlcalabash.util.Report;
+import com.xmlcalabash.util.UriUtils;
 import com.xmlcalabash.util.Verbosity;
 import kotlin.jvm.functions.Function0;
 import net.sf.saxon.s9api.*;
@@ -187,6 +189,31 @@ public class JavaApiTest {
             Assertions.assertNotNull(ex);
         }
     }
+
+    @Test
+    public void loadConfiguration() {
+        XmlCalabashBuilder builder = new XmlCalabashBuilder();
+        ConfigurationLoader loader = new ConfigurationLoader(builder);
+        loader.load(UriUtils.Companion.cwdAsUri().resolve("src/test/resources/configfile.xml"));
+
+        XmlCalabash xmlCalabash = builder.build();
+        processor = xmlCalabash.getSaxonConfiguration().getProcessor();
+
+        XplParser parser = xmlCalabash.newXProcParser();
+        DeclareStepInstruction declareStep = parser.parse(anIdentityPipeline());
+        XProcRuntime runtime = declareStep.runtime();
+        XProcPipeline pipeline = runtime.executable();
+
+        BufferingReceiver receiver = new BufferingReceiver();
+        pipeline.setReceiver(receiver);
+
+        pipeline.input("source", XProcDocument.Companion.ofXml(parseString("<doc/>"), pipeline.getConfig(), MediaType.Companion.getXML()));
+        pipeline.run();
+
+        XdmValue result = receiver.getOutputs().get("result").get(0).getValue();
+        Assertions.assertEquals("<doc/>", result.toString());
+    }
+
 
     private static class MyMessagePrinter implements MessagePrinter {
         private String _encoding = "UTF-8";

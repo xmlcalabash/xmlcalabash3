@@ -1,0 +1,4 @@
+<!-- -*- nxml -*- -->
+<cc:xml-calabash xmlns:cc="https://xmlcalabash.com/ns/configuration">
+  <cc:inline trim-whitespace="true"/>
+</cc:xml-calabash>

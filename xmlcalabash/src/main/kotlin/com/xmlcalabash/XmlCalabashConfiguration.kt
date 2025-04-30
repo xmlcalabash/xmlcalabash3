@@ -2,6 +2,8 @@ package com.xmlcalabash
 
 import com.xmlcalabash.api.MessageReporter
 import com.xmlcalabash.config.SaxonConfiguration
+import com.xmlcalabash.exceptions.ErrorExplanation
+import com.xmlcalabash.io.DocumentManager
 import com.xmlcalabash.io.MediaType
 import com.xmlcalabash.io.MessagePrinter
 import com.xmlcalabash.spi.Configurer
@@ -12,6 +14,7 @@ import net.sf.saxon.s9api.QName
 import net.sf.saxon.s9api.ValidationMode
 import java.io.File
 import java.net.URI
+import javax.activation.MimetypesFileTypeMap
 
 interface XmlCalabashConfiguration {
     val saxonConfiguration: SaxonConfiguration
@@ -19,7 +22,9 @@ interface XmlCalabashConfiguration {
     val consoleEncoding: String
     val debug: Boolean
     val debugger: Boolean
+    val documentManager: DocumentManager
     val eagerEvaluation: Boolean
+    val errorExplanation: ErrorExplanation
     val graphStyle: URI?
     val graphviz: File?
     val implicitParameterName: QName?
@@ -28,7 +33,7 @@ interface XmlCalabashConfiguration {
     val messageBufferSize: Int
     val messagePrinter: MessagePrinter
     val messageReporter: MessageReporter
-    val mimetypes: Map<String, List<String>>
+    val mimetypesFileTypeMap: MimetypesFileTypeMap
     val other: Map<QName, List<Map<QName, String>>>
     val pagedMediaCssProcessors: List<URI>
     val pagedMediaManagers: List<PagedMediaManager>

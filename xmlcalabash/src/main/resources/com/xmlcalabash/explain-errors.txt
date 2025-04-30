@@ -1633,6 +1633,14 @@ Duplicated name encountered when combining archives: “$1”
 When the cx:merge-duplicates policy is “error”, it is an error if multiple
 entries with the same name are encountered when merging archive files.
 
+cxerr:XI0216
+Input is not a p:library
+
+cxerr:XI0217
+Lookup is not possible when custom resolvers are provided
+If a configuration installs a customer resolver, then lookup is disabled.
+There is no way for it to give a correct answer.
+
 cxerr:XI0300
 Negative line and column numbers are not allowed: $1=$2
 

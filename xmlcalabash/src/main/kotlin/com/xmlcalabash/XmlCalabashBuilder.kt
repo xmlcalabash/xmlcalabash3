@@ -2,7 +2,10 @@ package com.xmlcalabash
 
 import com.xmlcalabash.api.MessageReporter
 import com.xmlcalabash.config.SaxonConfiguration
+import com.xmlcalabash.exceptions.DefaultErrorExplanation
+import com.xmlcalabash.exceptions.ErrorExplanation
 import com.xmlcalabash.exceptions.XProcError
+import com.xmlcalabash.io.DocumentManager
 import com.xmlcalabash.io.MediaType
 import com.xmlcalabash.io.MessagePrinter
 import com.xmlcalabash.namespace.Ns
@@ -23,6 +26,7 @@ import java.io.File
 import java.io.IOException
 import java.net.URI
 import java.nio.charset.Charset
+import javax.activation.MimetypesFileTypeMap
 
 class XmlCalabashBuilder {
     companion object {
@@ -157,16 +161,21 @@ class XmlCalabashBuilder {
         return this
     }
 
-    fun getMimetypes() = config._mimetypes.toList()
-    fun setMimetypes(types: Map<String, List<String>>): XmlCalabashBuilder {
-        config._mimetypes.clear()
-        config._mimetypes.putAll(types)
+    fun getMimetypesFileTypeMap() = config.mimetypesFileTypeMap
+    fun setMimetypesFileTypeMap(typemap: MimetypesFileTypeMap): XmlCalabashBuilder {
+        config._mimetypesFileTypeMap = typemap
         return this
     }
 
-    fun addMimetype(type: String, extensions: List<String>): XmlCalabashBuilder {
-        val list = config._mimetypes[type] ?: emptyList()
-        config._mimetypes[type] = list + extensions
+    fun getErrorExplanation() = config.errorExplanation
+    fun setErrorExplanation(explanation: ErrorExplanation): XmlCalabashBuilder {
+        config._errorExplanation = explanation
+        return this
+    }
+
+    fun getDocumentManager() = config.documentManager
+    fun setDocumentManager(manager: DocumentManager): XmlCalabashBuilder {
+        config._documentManager = manager
         return this
     }
 
@@ -433,6 +442,9 @@ class XmlCalabashBuilder {
     private fun init(config: XConfig): XmlCalabash {
         this.config._messagePrinter = null
         this.config._messageReporter = null
+        this.config._documentManager = null
+        this.config._mimetypesFileTypeMap = null
+        this.config._errorExplanation = null
 
         if (config.xmlSchemaDocuments.isNotEmpty()
             && !config._saxonConfiguration.configuration.isLicensedFeature(Configuration.LicenseFeature.SCHEMA_VALIDATION)) {
@@ -454,6 +466,9 @@ class XmlCalabashBuilder {
         lateinit internal var _saxonConfiguration: SaxonConfiguration
         internal var _messagePrinter: MessagePrinter? = null
         internal var _messageReporter: MessageReporter? = null
+        internal var _mimetypesFileTypeMap: MimetypesFileTypeMap? = null
+        internal var _errorExplanation: ErrorExplanation? = null
+        internal var _documentManager: DocumentManager? = null
 
         internal var _assertions = AssertionsLevel.WARNING
         internal var _consoleEncoding = DEFAULT_CONSOLE_ENCODING
@@ -466,7 +481,6 @@ class XmlCalabashBuilder {
         internal var _inlineTrimWhitespace = false
         internal var _licensed = true
         internal var _messageBufferSize = 32
-        internal val _mimetypes = mutableMapOf<String, List<String>>()
         internal var _mpt: Double = 0.99999998
         internal val _other = mutableMapOf<QName, List<Map<QName, String>>>()
         internal val _pagedMediaCssProcessors = mutableListOf<URI>()
@@ -514,6 +528,30 @@ class XmlCalabashBuilder {
                 return _messageReporter!!
             }
 
+        override val mimetypesFileTypeMap: MimetypesFileTypeMap
+            get() {
+                if (_mimetypesFileTypeMap == null) {
+                    _mimetypesFileTypeMap = MimetypesFileTypeMap()
+                }
+                return _mimetypesFileTypeMap!!
+            }
+
+        override val errorExplanation: ErrorExplanation
+            get() {
+                if (_errorExplanation == null) {
+                    _errorExplanation = DefaultErrorExplanation(messagePrinter)
+                }
+                return _errorExplanation!!
+            }
+
+        override val documentManager: DocumentManager
+            get() {
+                if (_documentManager == null) {
+                    _documentManager = DocumentManager(this)
+                }
+                return _documentManager!!
+            }
+
         override val assertions: AssertionsLevel
             get() = _assertions
         override val consoleEncoding
@@ -536,8 +574,6 @@ class XmlCalabashBuilder {
             get() = _licensed
         override val messageBufferSize: Int
             get() = _messageBufferSize
-        override val mimetypes: Map<String, List<String>>
-            get() = _mimetypes
         override val other: Map<QName, List<Map<QName, String>>>
             get() = _other
         override val pagedMediaCssProcessors: List<URI>
@@ -592,6 +628,9 @@ class XmlCalabashBuilder {
             // Not touching saxonConfiguration on purpose!
             config._messagePrinter = _messagePrinter
             config._messageReporter = _messageReporter
+            config._documentManager = documentManager
+            config._errorExplanation = errorExplanation
+            config._mimetypesFileTypeMap = mimetypesFileTypeMap
             config._assertions = _assertions
             config._consoleEncoding = _consoleEncoding
             config._debug = _debug
@@ -602,7 +641,6 @@ class XmlCalabashBuilder {
             config._inlineTrimWhitespace = _inlineTrimWhitespace
             config._licensed = _licensed
             config._messageBufferSize = _messageBufferSize
-            config._mimetypes.putAll(_mimetypes)
             config._mpt = _mpt
             config._other.putAll(_other)
             config._pagedMediaCssProcessors.addAll(_pagedMediaCssProcessors)
