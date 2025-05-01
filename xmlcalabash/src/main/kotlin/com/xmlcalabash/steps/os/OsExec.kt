@@ -11,9 +11,11 @@ import com.xmlcalabash.namespace.NsC
 import com.xmlcalabash.steps.AbstractAtomicStep
 import com.xmlcalabash.util.MediaClassification
 import com.xmlcalabash.util.SaxonTreeBuilder
+import com.xmlcalabash.util.UriUtils
 import com.xmlcalabash.util.Urify
 import net.sf.saxon.s9api.SaxonApiException
 import java.io.*
+import java.net.URI
 import java.nio.file.FileSystems
 import java.nio.file.Files
 import java.nio.file.Paths
@@ -59,10 +61,15 @@ class OsExec(): AbstractAtomicStep() {
         }
 
         if (cwd != null) {
-            val path = Paths.get(cwd)
+            cwd = Urify.urify(cwd)
+            if (!cwd.startsWith("file:")) {
+                throw stepConfig.exception(XProcError.xcOsExecBadCwd(cwd))
+            }
+            val path = Paths.get(UriUtils.path(URI(cwd)))
             if (!Files.exists(path) || !Files.isDirectory(path)) {
                 throw stepConfig.exception(XProcError.xcOsExecBadCwd(cwd))
             }
+            cwd = path.toString()
         }
 
         val stdout = ByteArrayOutputStream()
