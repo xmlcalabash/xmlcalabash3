@@ -180,30 +180,30 @@ class XvrlReportMetadata private constructor(stepConfiguration: StepConfiguratio
 
     // ============================================================
 
-    fun schema(href: URI?, typens: NamespaceUri, version: String? = null, attr: Map<QName,String?> = emptyMap()): XvrlSchema {
-        val sch = XvrlSchema.newInstance(stepConfig, href, typens, version)
+    fun schema(href: URI?, typens: NamespaceUri, language: String? = null, version: String? = null, attr: Map<QName,String?> = emptyMap()): XvrlSchema {
+        val sch = XvrlSchema.newInstance(stepConfig, href, typens, language, version)
         schema.add(sch)
         return sch
     }
 
-    fun schema(href: URI?, typens: NamespaceUri, version: String, content: String? = null, attr: Map<QName,String?> = emptyMap()): XvrlSchema {
+    fun schema(href: URI?, typens: NamespaceUri, language: String? = null, version: String, content: String? = null, attr: Map<QName,String?> = emptyMap()): XvrlSchema {
         val sch = if (content == null) {
-            XvrlSchema.newInstance(stepConfig, href, typens, version)
+            XvrlSchema.newInstance(stepConfig, href, typens, language, version)
         } else {
-            XvrlSchema.newInstance(stepConfig, href, typens, version, content)
+            XvrlSchema.newInstance(stepConfig, href, typens, language, version, content)
         }
         schema.add(sch)
         return sch
     }
 
-    fun schema(href: URI?, typens: NamespaceUri, version: String? = null, content: XdmNode, attr: Map<QName,String?> = emptyMap()): XvrlSchema {
-        val sch = XvrlSchema.newInstance(stepConfig, href, typens, version, content)
+    fun schema(href: URI?, typens: NamespaceUri, language: String? = null, version: String? = null, content: XdmNode, attr: Map<QName,String?> = emptyMap()): XvrlSchema {
+        val sch = XvrlSchema.newInstance(stepConfig, href, typens, language, version, content)
         schema.add(sch)
         return sch
     }
 
-    fun schema(href: URI?, typens: NamespaceUri, version: String? = null, content: List<XdmNode>, attr: Map<QName,String?> = emptyMap()): XvrlSchema {
-        val sch = XvrlSchema.newInstance(stepConfig, href, typens, version, content)
+    fun schema(href: URI?, typens: NamespaceUri, language: String? = null, version: String? = null, content: List<XdmNode>, attr: Map<QName,String?> = emptyMap()): XvrlSchema {
+        val sch = XvrlSchema.newInstance(stepConfig, href, typens, language, version, content)
         schema.add(sch)
         return sch
     }

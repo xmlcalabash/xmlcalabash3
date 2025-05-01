@@ -49,9 +49,9 @@ open class ValidateWithNVDL(): AbstractAtomicStep() {
         if (stepConfig.baseUri != null && nvdldoc.baseURI != null
             && nvdldoc.baseURI.toString().startsWith(stepConfig.baseUri.toString())) {
             // It looks like this one was inline...
-            report.report.metadata.schema(nvdldoc.baseURI, NamespaceUri.of("http://purl.oclc.org/dsdl/nvdl/ns/structure/1.0"), null, nvdldoc)
+            report.report.metadata.schema(nvdldoc.baseURI, NamespaceUri.of("http://purl.oclc.org/dsdl/nvdl/ns/structure/1.0"), "NVDL", null, nvdldoc)
         } else {
-            report.report.metadata.schema(nvdldoc.baseURI, NamespaceUri.of("http://purl.oclc.org/dsdl/nvdl/ns/structure/1.0"))
+            report.report.metadata.schema(nvdldoc.baseURI, NamespaceUri.of("http://purl.oclc.org/dsdl/nvdl/ns/structure/1.0"), "NVDL")
         }
 
         for (schema in schemas) {

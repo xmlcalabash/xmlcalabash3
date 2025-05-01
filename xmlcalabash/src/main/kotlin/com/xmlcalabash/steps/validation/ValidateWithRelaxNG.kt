@@ -33,6 +33,8 @@ open class ValidateWithRelaxNG(): AbstractAtomicStep() {
         val document = queues["source"]!!.first()
         val schema = queues["schema"]!!.first()
 
+        val compact = schema.contentClassification == MediaClassification.TEXT
+
         val dtdAttributeValues = booleanBinding(dtdAttributeValues) ?: false
         val dtdIdIdRefWarnings = booleanBinding(dtdIdIdrefWarnings) ?: false
         val assertValid = booleanBinding(Ns.assertValid) ?: true
@@ -46,13 +48,14 @@ open class ValidateWithRelaxNG(): AbstractAtomicStep() {
         val report = Errors(stepConfig, document.baseURI)
         report.report.metadata.validator("Jing", XmlCalabashBuildConfig.DEPENDENCIES["jing"] ?: "unknown")
 
+        val language = if (compact) "RNC" else "RNG"
         if (stepConfig.baseUri != null && schema.baseURI != null
             && schema.baseURI.toString().startsWith(stepConfig.baseUri.toString())
             && schema.value is XdmNode) {
             // It looks like this one was inline...
-            report.report.metadata.schema(schema.baseURI, NamespaceUri.of("http://relaxng.org/ns/structure/1.0"), null, schema.value as XdmNode)
+            report.report.metadata.schema(schema.baseURI, NamespaceUri.of("http://relaxng.org/ns/structure/1.0"), language, null, schema.value as XdmNode)
         } else {
-            report.report.metadata.schema(schema.baseURI, NamespaceUri.of("http://relaxng.org/ns/structure/1.0"))
+            report.report.metadata.schema(schema.baseURI, NamespaceUri.of("http://relaxng.org/ns/structure/1.0"), language)
         }
 
         val listener = CachingErrorListener(stepConfig, report)
@@ -65,7 +68,6 @@ open class ValidateWithRelaxNG(): AbstractAtomicStep() {
             RngProperty.CHECK_ID_IDREF.add(properties)
         }
 
-        val compact = schema.contentClassification == MediaClassification.TEXT
         var sr: SchemaReader? = null
         var schemaInputSource: InputSource? = null
 

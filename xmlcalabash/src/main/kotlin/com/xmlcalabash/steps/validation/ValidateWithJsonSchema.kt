@@ -73,9 +73,9 @@ open class ValidateWithJsonSchema(): AbstractAtomicStep() {
             && schema.baseURI.toString().startsWith(stepConfig.baseUri.toString())
             && schema.value is XdmNode) {
             // It looks like this one was inline...
-            report.metadata.schema(schema.baseURI, NamespaceUri.of("https://json-schema.org/draft/2020-12/schema"), null, schema.value as XdmNode)
+            report.metadata.schema(schema.baseURI, NamespaceUri.of("https://json-schema.org/draft/2020-12/schema"), "JSON",null, schema.value as XdmNode)
         } else {
-            report.metadata.schema(schema.baseURI, NamespaceUri.of("https://json-schema.org/draft/2020-12/schema"))
+            report.metadata.schema(schema.baseURI, NamespaceUri.of("https://json-schema.org/draft/2020-12/schema"), "JSON")
         }
 
         document.baseURI?.let { report.metadata.document(it) }
