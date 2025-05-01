@@ -12,43 +12,48 @@ import java.net.URI
 class XvrlSchema private constructor(stepConfiguration: StepConfiguration): XvrlContainer(stepConfiguration) {
     companion object {
         private val _schematypens = QName("schematypens")
+        private val _language = QName("language")
 
-        fun newInstance(stepConfig: StepConfiguration, href: URI?, typens: NamespaceUri, version: String?, attr: Map<QName,String?> = emptyMap()): XvrlSchema {
+        fun newInstance(stepConfig: StepConfiguration, href: URI?, typens: NamespaceUri, language: String?, version: String?, attr: Map<QName,String?> = emptyMap()): XvrlSchema {
             val schema = XvrlSchema(stepConfig)
             schema.setAttributes(attr)
             href?.let { schema.setAttribute(Ns.href, "${it}") }
             schema.setAttribute(_schematypens, "${typens}")
+            language?.let { schema.setAttribute(_language, it) }
             version?.let { schema.setAttribute(Ns.version, it) }
             return schema
         }
 
-        fun newInstance(stepConfig: StepConfiguration, href: URI?, typens: NamespaceUri, version: String?, content: String, attr: Map<QName,String?> = emptyMap()): XvrlSchema {
+        fun newInstance(stepConfig: StepConfiguration, href: URI?, typens: NamespaceUri, language: String?, version: String?, content: String, attr: Map<QName,String?> = emptyMap()): XvrlSchema {
             val schema = XvrlSchema(stepConfig)
             schema.withText(content)
             schema.setAttributes(attr)
             href?.let { schema.setAttribute(Ns.href, "${it}") }
             schema.setAttribute(_schematypens, "${typens}")
+            language?.let { schema.setAttribute(_language, it) }
             version?.let { schema.setAttribute(Ns.version, it) }
             return schema
         }
 
-        fun newInstance(stepConfig: StepConfiguration, href: URI?, typens: NamespaceUri, version: String?, content: XdmNode, attr: Map<QName,String?> = emptyMap()): XvrlSchema {
+        fun newInstance(stepConfig: StepConfiguration, href: URI?, typens: NamespaceUri, language: String?, version: String?, content: XdmNode, attr: Map<QName,String?> = emptyMap()): XvrlSchema {
             val schema = XvrlSchema(stepConfig)
             schema.withNode(content)
             schema.setAttributes(attr)
             href?.let { schema.setAttribute(Ns.href, "${it}") }
             schema.setAttribute(_schematypens, "${typens}")
+            language?.let { schema.setAttribute(_language, it) }
             version?.let { schema.setAttribute(Ns.version, it) }
             return schema
         }
 
 
-        fun newInstance(stepConfig: StepConfiguration, href: URI?, typens: NamespaceUri, version: String?, content: List<XdmNode>, attr: Map<QName,String?> = emptyMap()): XvrlSchema {
+        fun newInstance(stepConfig: StepConfiguration, href: URI?, typens: NamespaceUri, language: String?, version: String?, content: List<XdmNode>, attr: Map<QName,String?> = emptyMap()): XvrlSchema {
             val schema = XvrlSchema(stepConfig)
             schema.withNodes(content)
             schema.setAttributes(attr)
             href?.let { schema.setAttribute(Ns.href, "${it}") }
             schema.setAttribute(_schematypens, "${typens}")
+            language?.let { schema.setAttribute(_language, it) }
             version?.let { schema.setAttribute(Ns.version, it) }
             return schema
         }

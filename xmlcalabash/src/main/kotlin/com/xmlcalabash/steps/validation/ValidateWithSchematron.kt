@@ -85,9 +85,9 @@ open class ValidateWithSchematron(): AbstractAtomicStep() {
             && schema.baseURI.toString().startsWith(stepConfig.baseUri.toString())
             && schema.value is XdmNode) {
             // It looks like this one was inline...
-            xvrl.metadata.schema(schema.baseURI, NamespaceUri.of("http://purl.oclc.org/dsdl/schematron"), null, schema.value as XdmNode)
+            xvrl.metadata.schema(schema.baseURI, NamespaceUri.of("http://purl.oclc.org/dsdl/schematron"), "Schematron", null, schema.value as XdmNode)
         } else {
-            xvrl.metadata.schema(schema.baseURI, NamespaceUri.of("http://purl.oclc.org/dsdl/schematron"))
+            xvrl.metadata.schema(schema.baseURI, NamespaceUri.of("http://purl.oclc.org/dsdl/schematron"), "Schematron")
         }
 
         return xvrl.asXml()

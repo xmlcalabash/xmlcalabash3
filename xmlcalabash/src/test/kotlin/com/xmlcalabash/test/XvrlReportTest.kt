@@ -48,7 +48,7 @@ class XvrlReportTest {
         report.metadata.title(builder.result)
         report.metadata.summary("What summary?")
         report.metadata.category("test", "https://nwalsh.com/ns/vocabulary")
-        report.metadata.schema(URI.create("file://tmp/schema.xml"), NsXs.namespace, "3.4", mapOf(NsXml.id to "test2"))
+        report.metadata.schema(URI.create("file://tmp/schema.xml"), NsXs.namespace, "x-test","3.4", mapOf(NsXml.id to "test2"))
         report.metadata.supplemental("Wat?")
 
         val node = report.asXml()
