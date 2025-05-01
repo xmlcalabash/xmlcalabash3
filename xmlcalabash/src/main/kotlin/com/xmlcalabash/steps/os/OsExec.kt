@@ -9,7 +9,9 @@ import com.xmlcalabash.io.DocumentWriter
 import com.xmlcalabash.namespace.Ns
 import com.xmlcalabash.namespace.NsC
 import com.xmlcalabash.steps.AbstractAtomicStep
+import com.xmlcalabash.util.MediaClassification
 import com.xmlcalabash.util.SaxonTreeBuilder
+import com.xmlcalabash.util.Urify
 import net.sf.saxon.s9api.SaxonApiException
 import java.io.*
 import java.nio.file.FileSystems
@@ -131,13 +133,23 @@ class OsExec(): AbstractAtomicStep() {
 
         if (rc == 0) {
             val outputLoader = DocumentLoader(stepConfig, null, DocumentProperties(), mapOf())
-            val output = outputLoader.load(ByteArrayInputStream(stdout.toByteArray()), resultContentType)
-            receiver.output("result", output)
+            if (Urify.isWindows && resultContentType.classification() == MediaClassification.TEXT) {
+                val text = stdout.toString().replace("\r\n", "\n")
+                receiver.output("result", XProcDocument.ofText(text, stepConfig, resultContentType, DocumentProperties()))
+            } else {
+                val output = outputLoader.load(ByteArrayInputStream(stdout.toByteArray()), resultContentType)
+                receiver.output("result", output)
+            }
         }
 
         val errorLoader = DocumentLoader(stepConfig, null, DocumentProperties(), mapOf())
-        val error = errorLoader.load(ByteArrayInputStream(stderr.toByteArray()), errorContentType)
-        receiver.output("error", error)
+        if (Urify.isWindows && resultContentType.classification() == MediaClassification.TEXT) {
+            val text = stderr.toString().replace("\r\n", "\n")
+            receiver.output("error", XProcDocument.ofText(text, stepConfig, resultContentType, DocumentProperties()))
+        } else {
+            val error = errorLoader.load(ByteArrayInputStream(stderr.toByteArray()), errorContentType)
+            receiver.output("error", error)
+        }
 
         val sbuilder = SaxonTreeBuilder(stepConfig)
         sbuilder.startDocument(null)
@@ -149,11 +161,7 @@ class OsExec(): AbstractAtomicStep() {
     }
 
     inner class ProcessOutputReader(val stream: InputStream, val buffer: ByteArrayOutputStream): Runnable {
-        val tree = SaxonTreeBuilder(stepConfig)
-
         override fun run() {
-            tree.startDocument(null)
-            tree.addStartElement(NsC.result)
             val reader = InputStreamReader(stream)
             val buf = CharArray(4096)
             var len = reader.read(buf)
