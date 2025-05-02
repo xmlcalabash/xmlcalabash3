@@ -1034,6 +1034,8 @@ class StandardLibrary private constructor(builder: PipelineBuilder, private val 
         option.asType = stepConfig.typeUtils.parseSequenceType("xs:string*")
         option = decl.option(QName("cwd"))
         option.asType = stepConfig.typeUtils.parseSequenceType("xs:string?")
+        option = decl.option(QName("charset"))
+        option.asType = stepConfig.typeUtils.parseSequenceType("xs:string?")
         option = decl.option(QName("result-content-type"))
         option.select = XProcExpression.select(stepConfig, "'text/plain'")
         option.asType = stepConfig.typeUtils.parseSequenceType("xs:string")
