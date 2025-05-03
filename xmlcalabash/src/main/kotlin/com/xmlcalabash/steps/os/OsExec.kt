@@ -22,8 +22,6 @@ import java.nio.file.Files
 import java.nio.file.Paths
 
 class OsExec(): AbstractAtomicStep() {
-    private lateinit var charset: String
-
     override fun run() {
         super.run()
 
@@ -45,7 +43,9 @@ class OsExec(): AbstractAtomicStep() {
         val pathSeparator = stringBinding(Ns.pathSeparator)
         val failureThreshold = integerBinding(Ns.failureThreshold)
         val serialization = qnameMapBinding(Ns.serialization)
-        charset = stringBinding(Ns.charset) ?: Charset.defaultCharset().name()
+
+        val resultCharset = defaultCharset(resultContentType, errorContentType)
+        val errorCharset = defaultCharset(errorContentType, resultContentType)
 
         val slash = FileSystems.getDefault().getSeparator()
         if (pathSeparator != null) {
@@ -97,13 +97,13 @@ class OsExec(): AbstractAtomicStep() {
         }
 
         stepConfig.debug { "OS exec: ${showCmd}" }
-        stepConfig.debug { "OS exec charset: ${charset}" }
+        stepConfig.debug { "OS exec charsets: result=${resultCharset}; error=${errorCharset}" }
 
         try {
             val process = builder.start()
 
-            val stdoutReader = ProcessOutputReader(process.inputStream, stdout)
-            val stderrReader = ProcessOutputReader(process.errorStream, stderr)
+            val stdoutReader = ProcessOutputReader(process.inputStream, stdout, resultCharset)
+            val stderrReader = ProcessOutputReader(process.errorStream, stderr, errorCharset)
 
             val stdoutThread = Thread(stdoutReader)
             val stderrThread = Thread(stderrReader)
@@ -185,7 +185,19 @@ class OsExec(): AbstractAtomicStep() {
         receiver.output("exit-status", XProcDocument.ofXml(sbuilder.result, stepConfig))
     }
 
-    inner class ProcessOutputReader(val stream: InputStream, val buffer: StringBuilder): Runnable {
+    private fun defaultCharset(type1: MediaType, type2: MediaType): Charset {
+        val charset1 = type1.charset()
+        if (charset1 != null) {
+            return charset1
+        }
+        val charset2 = type2.charset()
+        if (charset2 != null) {
+            return charset2
+        }
+        return Charset.defaultCharset()
+    }
+
+    inner class ProcessOutputReader(val stream: InputStream, val buffer: StringBuilder, val charset: Charset): Runnable {
         override fun run() {
             val reader = InputStreamReader(stream, charset)
             val buf = CharArray(4096)
