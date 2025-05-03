@@ -16,11 +16,14 @@ import com.xmlcalabash.util.Urify
 import net.sf.saxon.s9api.SaxonApiException
 import java.io.*
 import java.net.URI
+import java.nio.charset.Charset
 import java.nio.file.FileSystems
 import java.nio.file.Files
 import java.nio.file.Paths
 
 class OsExec(): AbstractAtomicStep() {
+    private lateinit var charset: String
+
     override fun run() {
         super.run()
 
@@ -42,6 +45,7 @@ class OsExec(): AbstractAtomicStep() {
         val pathSeparator = stringBinding(Ns.pathSeparator)
         val failureThreshold = integerBinding(Ns.failureThreshold)
         val serialization = qnameMapBinding(Ns.serialization)
+        charset = stringBinding(Ns.charset) ?: Charset.defaultCharset().name()
 
         val slash = FileSystems.getDefault().getSeparator()
         if (pathSeparator != null) {
@@ -72,8 +76,8 @@ class OsExec(): AbstractAtomicStep() {
             cwd = path.toString()
         }
 
-        val stdout = ByteArrayOutputStream()
-        val stderr = ByteArrayOutputStream()
+        val stdout = StringBuilder()
+        val stderr = StringBuilder()
 
         val showCmd = StringBuilder()
         val commandLine = mutableListOf<String>()
@@ -93,6 +97,7 @@ class OsExec(): AbstractAtomicStep() {
         }
 
         stepConfig.debug { "OS exec: ${showCmd}" }
+        stepConfig.debug { "OS exec charset: ${charset}" }
 
         try {
             val process = builder.start()
@@ -111,7 +116,7 @@ class OsExec(): AbstractAtomicStep() {
                 // can cause an error.
                 try {
                     val os = process.outputStream
-                    DocumentWriter(documents.first(), os).write()
+                    DocumentWriter(documents.first(), os, serialization).write()
                     os.close()
                 } catch (ex: SaxonApiException) {
                     var ignore = false
@@ -131,31 +136,44 @@ class OsExec(): AbstractAtomicStep() {
             stdoutThread.join()
             stderrThread.join()
         } catch (ex: Exception) {
-            throw stepConfig.exception(XProcError.xcOsExecFailed())
+            throw stepConfig.exception(XProcError.xcOsExecFailed(), ex)
         }
 
         if (failureThreshold != null && failureThreshold < rc) {
             throw stepConfig.exception(XProcError.xcOsExecFailed(rc))
         }
 
-        if (rc == 0) {
-            val outputLoader = DocumentLoader(stepConfig, null, DocumentProperties(), mapOf())
-            if (Urify.isWindows && resultContentType.classification() == MediaClassification.TEXT) {
-                val text = stdout.toString().replace("\r\n", "\n")
-                receiver.output("result", XProcDocument.ofText(text, stepConfig, resultContentType, DocumentProperties()))
+        // Always get the result as a string so we can see if there *is* any result
+        var text = stdout.toString()
+        if (text.isNotEmpty()) {
+            if (resultContentType.classification() == MediaClassification.TEXT) {
+                val outputText = if (Urify.isWindows) {
+                    text.replace("\r\n", "\n")
+                } else {
+                    text
+                }
+                receiver.output("result", XProcDocument.ofText(outputText, stepConfig, resultContentType, DocumentProperties()))
             } else {
-                val output = outputLoader.load(ByteArrayInputStream(stdout.toByteArray()), resultContentType)
+                val outputLoader = DocumentLoader(stepConfig, null, DocumentProperties(), mapOf())
+                val output = outputLoader.load(ByteArrayInputStream(text.toByteArray()), resultContentType)
                 receiver.output("result", output)
             }
         }
 
-        val errorLoader = DocumentLoader(stepConfig, null, DocumentProperties(), mapOf())
-        if (Urify.isWindows && resultContentType.classification() == MediaClassification.TEXT) {
-            val text = stderr.toString().replace("\r\n", "\n")
-            receiver.output("error", XProcDocument.ofText(text, stepConfig, resultContentType, DocumentProperties()))
-        } else {
-            val error = errorLoader.load(ByteArrayInputStream(stderr.toByteArray()), errorContentType)
-            receiver.output("error", error)
+        text = stderr.toString()
+        if (text.isNotEmpty()) {
+            if (resultContentType.classification() == MediaClassification.TEXT) {
+                val outputText = if (Urify.isWindows) {
+                    text.replace("\r\n", "\n")
+                } else {
+                    text
+                }
+                receiver.output("error", XProcDocument.ofText(outputText, stepConfig, errorContentType,DocumentProperties()))
+            } else {
+                val errorLoader = DocumentLoader(stepConfig, null, DocumentProperties(), mapOf())
+                val error = errorLoader.load(ByteArrayInputStream(text.toByteArray()), errorContentType)
+                receiver.output("error", error)
+            }
         }
 
         val sbuilder = SaxonTreeBuilder(stepConfig)
@@ -167,19 +185,16 @@ class OsExec(): AbstractAtomicStep() {
         receiver.output("exit-status", XProcDocument.ofXml(sbuilder.result, stepConfig))
     }
 
-    inner class ProcessOutputReader(val stream: InputStream, val buffer: ByteArrayOutputStream): Runnable {
+    inner class ProcessOutputReader(val stream: InputStream, val buffer: StringBuilder): Runnable {
         override fun run() {
-            val reader = InputStreamReader(stream)
+            val reader = InputStreamReader(stream, charset)
             val buf = CharArray(4096)
             var len = reader.read(buf)
             while (len >= 0) {
                 if (len == 0) {
                     Thread.sleep(250)
                 } else {
-                    // This is the most efficient way? Really!?
-                    for (pos in 0 until len) {
-                        buffer.write(buf[pos].code)
-                    }
+                    buffer.append(buf, 0, len)
                 }
                 len = reader.read(buf)
             }

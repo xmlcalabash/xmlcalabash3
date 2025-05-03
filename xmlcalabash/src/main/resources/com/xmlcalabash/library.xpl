@@ -382,6 +382,7 @@
       <p:option name="command" required="true" as="xs:string"/>
       <p:option name="args" select="()" as="xs:string*"/>
       <p:option name="cwd" as="xs:string?"/>
+      <p:option name="charset" as="xs:string?"/>
       <p:option name="result-content-type" select="'text/plain'" as="xs:string"/>
       <p:option name="error-content-type" select="'text/plain'" as="xs:string"/>
       <p:option name="path-separator" as="xs:string?"/>
