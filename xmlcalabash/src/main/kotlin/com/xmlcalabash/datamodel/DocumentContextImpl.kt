@@ -43,6 +43,13 @@ class DocumentContextImpl(private val saxonConfig: SaxonConfiguration): Document
         return context
     }
 
+    override fun copy(newConfig: SaxonConfiguration): DocumentContext {
+        val context = DocumentContextImpl(newConfig)
+        context._location = _location
+        context._inscopeNamespaces.putAll(_inscopeNamespaces)
+        return context
+    }
+
     override fun with(location: Location): DocumentContext {
         val context = DocumentContextImpl(saxonConfig)
         context._location = location

@@ -1,6 +1,7 @@
 package com.xmlcalabash.datamodel
 
 import com.xmlcalabash.exceptions.XProcError
+import com.xmlcalabash.exceptions.XProcException
 import com.xmlcalabash.io.MediaType
 import com.xmlcalabash.namespace.NsP
 import com.xmlcalabash.util.SaxonErrorReporter
@@ -9,6 +10,9 @@ import net.sf.saxon.functions.FunctionLibrary
 import net.sf.saxon.functions.FunctionLibraryList
 import net.sf.saxon.om.NamespaceUri
 import net.sf.saxon.query.XQueryFunctionLibrary
+import net.sf.saxon.s9api.QName
+import net.sf.saxon.s9api.XPathCompiler
+import net.sf.saxon.trans.Visibility
 import net.sf.saxon.trans.XPathException
 import org.xml.sax.InputSource
 import java.io.InputStream
@@ -17,6 +21,10 @@ import java.net.URLConnection
 import javax.xml.transform.sax.SAXSource
 
 class ImportFunctionsInstruction(parent: XProcInstruction?, stepConfig: InstructionConfiguration, val inputHref: URI): XProcInstruction(parent, stepConfig, NsP.importFunctions) {
+    companion object {
+        private val XQueryNs = NamespaceUri.of("http://www.w3.org/2012/xquery")
+    }
+
     val href: URI
         get() {
             val uri = stepConfig.baseUri
@@ -40,11 +48,11 @@ class ImportFunctionsInstruction(parent: XProcInstruction?, stepConfig: Instruct
 
     val errorReporter = SaxonErrorReporter(stepConfig)
 
-    private var _functionLibrary: FunctionLibrary? = null
-    val functionLibrary: FunctionLibrary?
+    private var _functionLibrary: XProcFunctionLibrary? = null
+    val functionLibrary: XProcFunctionLibrary?
         get() = _functionLibrary
 
-    fun prefetch(): FunctionLibrary? {
+    fun prefetch(): XProcFunctionLibrary? {
         if (stepConfig.saxonConfig.processor.underlyingConfiguration.editionCode != "EE") {
             stepConfig.warn { "Saxon EE required for p:import-functions" }
             return null
@@ -74,11 +82,14 @@ class ImportFunctionsInstruction(parent: XProcInstruction?, stepConfig: Instruct
 
             return functionLibrary
         } catch (ex: Exception) {
+            if (ex is XProcException) {
+                throw ex
+            }
             throw stepConfig.exception(XProcError.xsImportFunctionsUnloadable(href), ex)
         }
     }
 
-    private fun loadXsltLibrary(conn: URLConnection): FunctionLibrary? {
+    private fun loadXsltLibrary(conn: URLConnection): XProcFunctionLibrary? {
         val stylesheet = SAXSource(InputSource(conn.getInputStream()))
         val compiler = stepConfig.saxonConfig.processor.newXsltCompiler()
         compiler.isSchemaAware = stepConfig.saxonConfig.processor.isSchemaAware
@@ -87,20 +98,11 @@ class ImportFunctionsInstruction(parent: XProcInstruction?, stepConfig: Instruct
         val ps = exec.underlyingCompiledStylesheet
         val loaded = ps.functionLibrary
 
-        if (namespace == null) {
-            return loaded
-        }
-
         // Find the one we just loaded. This is a bit of a hack...
         var allFunctionsLib: ExecutableFunctionLibrary? = null
         for (lib in loaded.libraryList.filter { it is ExecutableFunctionLibrary }) {
             val elib = lib as ExecutableFunctionLibrary
-            var empty = true
-            for (item in lib.allFunctions) {
-                empty = false
-                break
-            }
-            if (!empty) {
+            if (!lib.allFunctions.toList().isEmpty()) {
                 allFunctionsLib = elib
                 break
             }
@@ -108,32 +110,30 @@ class ImportFunctionsInstruction(parent: XProcInstruction?, stepConfig: Instruct
 
         if (allFunctionsLib != null) {
             val functionLibrary = ExecutableFunctionLibrary(stepConfig.saxonConfig.configuration)
+            val exposedNames = mutableMapOf<QName, Int>()
             val namespaceSet = mutableSetOf<NamespaceUri>()
-            for (ns in namespace!!.split("\\s+")) {
-                namespaceSet.add(NamespaceUri.of(ns))
+            if (namespace != null) {
+                for (ns in namespace!!.split("\\s+")) {
+                    namespaceSet.add(NamespaceUri.of(ns))
+                }
             }
             for (function in allFunctionsLib.allFunctions) {
-                if (function.functionName.namespaceUri in namespaceSet) {
-                    functionLibrary.addFunction(function)
+                if (namespaceSet.isEmpty() || function.functionName.namespaceUri in namespaceSet) {
+                    if (function.declaredVisibility != Visibility.PRIVATE) {
+                        exposedNames.put(stepConfig.typeUtils.QNameFromStructuredQName(function.functionName),
+                            function.numberOfParameters)
+                        functionLibrary.addFunction(function)
+                    }
                 }
             }
 
-            val newList = FunctionLibraryList()
-            for (lib in loaded.libraryList) {
-                if (lib === allFunctionsLib) {
-                    newList.addFunctionLibrary(functionLibrary)
-                } else {
-                    newList.addFunctionLibrary(lib)
-                }
-            }
-
-            return newList
+            return XProcFunctionLibrary(exposedNames, functionLibrary)
         } else {
-            return loaded
+            return null
         }
     }
 
-    private fun loadXQueryLibrary(conn: URLConnection): FunctionLibrary? {
+    private fun loadXQueryLibrary(conn: URLConnection): XProcFunctionLibrary? {
         val compiler = stepConfig.processor.newXQueryCompiler()
         compiler.isSchemaAware = stepConfig.processor.isSchemaAware
         compiler.errorReporter = errorReporter
@@ -176,7 +176,7 @@ class ImportFunctionsInstruction(parent: XProcInstruction?, stepConfig: Instruct
 
             val expression = context.compileQuery("import module namespace f='${newns}';.")
             val module = expression.mainModule
-            return module.globalFunctionLibrary
+            return filterXQueryFunctionLibrary(module.globalFunctionLibrary)
         } catch (ex: XPathException) {
             val message = ex.message ?: ""
             val notQueryModule =
@@ -194,7 +194,7 @@ class ImportFunctionsInstruction(parent: XProcInstruction?, stepConfig: Instruct
         return loadXQueryMainModule(conn.inputStream)
     }
 
-    private fun loadXQueryMainModule(bufstream: InputStream): FunctionLibrary? {
+    private fun loadXQueryMainModule(bufstream: InputStream): XProcFunctionLibrary? {
         val compiler = stepConfig.processor.newXQueryCompiler()
         compiler.isSchemaAware = stepConfig.processor.isSchemaAware
         compiler.errorReporter = errorReporter
@@ -217,34 +217,44 @@ class ImportFunctionsInstruction(parent: XProcInstruction?, stepConfig: Instruct
             }
         }
 
-        if (allFunctionsLib != null) {
-            if (namespace == null) {
-                return allFunctionsLib
-            }
+        if (allFunctionsLib == null) {
+            return null
+        }
 
-            val functionLibrary = XQueryFunctionLibrary(stepConfig.saxonConfig.configuration)
-            val namespaceSet = mutableSetOf<NamespaceUri>()
+        val functionLibrary = XQueryFunctionLibrary(stepConfig.saxonConfig.configuration)
+        val namespaceSet = mutableSetOf<NamespaceUri>()
+        if (namespace != null) {
             for (ns in namespace!!.split("\\s+")) {
                 namespaceSet.add(NamespaceUri.of(ns))
             }
-            for (function in allFunctionsLib.functionDefinitions) {
-                if (function.functionName.namespaceUri in namespaceSet) {
-                    functionLibrary.declareFunction(function)
-                }
+        }
+        for (function in allFunctionsLib.functionDefinitions) {
+            if (namespaceSet.isEmpty() || function.functionName.namespaceUri in namespaceSet) {
+                functionLibrary.declareFunction(function)
             }
-
-            val newList = FunctionLibraryList()
-            for (lib in loaded.libraryList) {
-                if (lib === allFunctionsLib) {
-                    newList.addFunctionLibrary(functionLibrary)
-                } else {
-                    newList.addFunctionLibrary(lib)
-                }
-            }
-
-            return newList
         }
 
-        return null
+        return filterXQueryFunctionLibrary(functionLibrary)
+    }
+
+    private fun filterXQueryFunctionLibrary(library: XQueryFunctionLibrary): XProcFunctionLibrary {
+        val functionLibrary = XQueryFunctionLibrary(library.configuration)
+        val exposedNames = mutableMapOf<QName, Int>()
+        for (function in library.functionDefinitions) {
+            var private = false
+            for (annotation in function.annotations) {
+                if (annotation.annotationQName.namespaceUri == XQueryNs
+                    && annotation.annotationQName.localPart == "private") {
+                    private = true
+                    break
+                }
+            }
+            if (!private) {
+                exposedNames.put(stepConfig.typeUtils.QNameFromStructuredQName (function.functionName),
+                    function.numberOfParameters)
+                functionLibrary.declareFunction(function)
+            }
+        }
+        return XProcFunctionLibrary(exposedNames, functionLibrary)
     }
 }

@@ -621,6 +621,9 @@ XS0104
 Unexpected media type for function loading: “$1”.
 Only XSLT and XQuery function libraries can be loaded by p:import-functions.
 
+XS0105
+Cannot import two functions named “$1” with the same arity ($2).
+
 XS0106
 Functions cannot be imported: “$1”.
 It is a static error if the processor detects that a particular library is unloadable.

@@ -85,9 +85,9 @@ class XProcRuntime private constructor(internal val start: DeclareStepInstructio
     internal val runnables = mutableMapOf<String, CompoundStepModel>()
     val environment = config.environment
 
-    fun stepConfiguration(instructionConfig: InstructionConfiguration): XProcStepConfiguration {
+    fun stepConfiguration(instructionConfig: InstructionConfiguration, newConfig: Boolean): XProcStepConfiguration {
         // Issue #160, don't create a new Saxon configuration here
-        val impl = config.from(instructionConfig, false)
+        val impl = config.from(instructionConfig, newConfig)
         impl.validationMode = instructionConfig.validationMode
         return impl
     }
