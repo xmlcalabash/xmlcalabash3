@@ -17,7 +17,6 @@
   <xsl:text>package com.xmlcalabash.datamodel{$nl}</xsl:text>
   <xsl:text>{$nl}</xsl:text>
 
-  <xsl:text>import com.xmlcalabash.config.SaxonConfiguration{$nl}</xsl:text>
   <xsl:text>import com.xmlcalabash.io.MediaType{$nl}</xsl:text>
   <xsl:text>import com.xmlcalabash.namespace.NsCx{$nl}</xsl:text>
   <xsl:text>import com.xmlcalabash.namespace.NsP{$nl}</xsl:text>
@@ -34,14 +33,14 @@
 
   <xsl:text>class StandardLibrary private constructor(builder: PipelineBuilder, private val stepConfig: InstructionConfiguration) {{{$nl}</xsl:text>
   <xsl:text>    companion object {{{$nl}</xsl:text>
-  <xsl:text>        fun getInstance(environment: PipelineCompilerContext, config: SaxonConfiguration): StandardLibraryInstruction {{{$nl}</xsl:text>
-  <xsl:text>            val builder = PipelineBuilder.newInstance(environment, config){$nl}</xsl:text>
-  <xsl:text>            val localConfig = builder.stepConfig.with(mapOf({$nl}</xsl:text>
-  <xsl:text>                "p" to NsP.namespace,{$nl}</xsl:text>
-  <xsl:text>                "cx" to NsCx.namespace,{$nl}</xsl:text>
-  <xsl:text>                "xml" to NsXml.namespace,{$nl}</xsl:text>
-  <xsl:text>                "xs" to NsXs.namespace{$nl}</xsl:text>
-  <xsl:text>            )).with(Location(URI("https://xmlcalabash.com/library/library.xpl"))){$nl}</xsl:text>
+  <xsl:text>        internal fun getInstance(builder: PipelineBuilder): StandardLibraryInstruction {{{$nl}</xsl:text>
+  <xsl:text>            val nodeContext = builder.stepConfig{$nl}</xsl:text>
+  <xsl:text>                .with("p", NsP.namespace){$nl}</xsl:text>
+  <xsl:text>                .with("cx", NsCx.namespace){$nl}</xsl:text>
+  <xsl:text>                .with("xml", NsXml.namespace){$nl}</xsl:text>
+  <xsl:text>                .with("xs", NsXs.namespace){$nl}</xsl:text>
+  <xsl:text>                .with(Location(URI("https://xmlcalabash.com/library/library.xpl"))){$nl}</xsl:text>
+  <xsl:text>            val localConfig = InstructionConfiguration(builder.stepConfig, nodeContext){$nl}</xsl:text>
   <xsl:text>            val standardLibrary = StandardLibrary(builder, localConfig){$nl}</xsl:text>
   <xsl:text>            val library = standardLibrary.create(){$nl}</xsl:text>
   <xsl:text>            library.findDeclarations(){$nl}</xsl:text>
@@ -71,8 +70,8 @@
   </xsl:for-each>
 
   <xsl:text>{$nl}    private fun {f:method-name(@type)}(): DeclareStepInstruction {{{$nl}</xsl:text>
-  <xsl:text>        val decl = library.declareStep(){$nl}</xsl:text>
-  <xsl:text>        decl._type = stepConfig.parseQName("{@type}"){$nl}{$nl}</xsl:text>
+  <xsl:text>        val decl = library.declareAtomicStep(){$nl}</xsl:text>
+  <xsl:text>        decl._type = stepConfig.typeUtils.parseQName("{@type}"){$nl}{$nl}</xsl:text>
   <xsl:if test="p:input">
     <xsl:sequence select="if (count(p:input) = 1) then '        val ' else '        var '"/>
     <xsl:apply-templates select="p:input"/>
@@ -165,10 +164,10 @@
   </xsl:if>
 
   <xsl:if test="@as">
-    <xsl:text>        option.asType = stepConfig.parseSequenceType("{@as}"){$nl}</xsl:text>
+    <xsl:text>        option.asType = stepConfig.typeUtils.parseSequenceType("{@as}"){$nl}</xsl:text>
   </xsl:if>
   <xsl:if test="@e:type">
-    <xsl:text>        option.specialType = stepConfig.parseSpecialType("{@e:type}"){$nl}</xsl:text>
+    <xsl:text>        option.specialType = stepConfig.typeUtils.parseSpecialType("{@e:type}"){$nl}</xsl:text>
   </xsl:if>
 
   <xsl:if test="@values">
