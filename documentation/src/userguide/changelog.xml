@@ -13,6 +13,36 @@ See the commits and pull requests on
 finer detail.</para>
 
 <revhistory>
+<revision xml:id="r300-alpha31">
+<revnumber>3.0.0-alpha31</revnumber>
+<date>2025-05-03</date>
+<revdescription>
+<itemizedlist>
+<listitem><para>Fixed <ghissue number="434"/>. Improved the conformance of
+<tag>p:import-functions</tag>. Private functions are now excluded and
+nested imports are handled correctly.
+</para></listitem>
+<listitem><para>Fixed <ghissue number="431"/>. Corrected errors in <tag>p:os-exec</tag>.
+Fixed the bug where output to stdout was discarded unless the process ended with
+a return code of zero. Serialization properties and output charsets are now handled
+correctly.
+</para></listitem>
+<listitem><para>Fixed <ghissue number="427"/>. Remove carriage returns from <tag>p:os-exec</tag>
+output on Windows.
+</para></listitem>
+<listitem><para>Fixed <ghissue number="425"/>.  The <option>cwd</option> option on
+<tag>p:os-exec</tag> is handled correctly if it’s a URI.
+</para></listitem>
+<listitem><para>Fixed <ghissue number="424"/>. Reworked the <code>DocumentManager</code> API.
+</para></listitem>
+<listitem><para>Fixed <ghissue number="258"/>. Added support for the language attribute
+on the XVRL schema element. 
+</para></listitem>
+<listitem><para>XML Calabash now uses Saxon 12.6 by default.
+</para></listitem>
+</itemizedlist>
+</revdescription>
+</revision>
 <revision xml:id="r300-alpha30">
 <revnumber>3.0.0-alpha30</revnumber>
 <date>2025-04-30</date>
