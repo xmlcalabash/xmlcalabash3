@@ -24,6 +24,7 @@ import net.sf.saxon.om.FingerprintedQName
 import net.sf.saxon.om.GroundedValue
 import net.sf.saxon.om.NamespaceUri
 import net.sf.saxon.om.NodeInfo
+import net.sf.saxon.om.StructuredQName
 import net.sf.saxon.s9api.ItemType
 import net.sf.saxon.s9api.Location
 import net.sf.saxon.s9api.OccurrenceIndicator
@@ -941,6 +942,13 @@ class TypeUtils(val context: DocumentContext) {
             }
         }
         return map
+    }
+
+    fun QNameFromStructuredQName(qname: StructuredQName): QName {
+        if (qname.prefix == "") {
+            return QName(qname.namespaceUri, qname.localPart)
+        }
+        return QName(qname.namespaceUri, "${qname.prefix}:${qname.localPart}")
     }
 
     // ============================================================

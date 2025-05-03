@@ -1,19 +1,10 @@
 package com.xmlcalabash.config
 
 import com.xmlcalabash.datamodel.DeclareStepInstruction
+import com.xmlcalabash.datamodel.XProcFunctionLibrary
 import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.exceptions.XProcException
-import com.xmlcalabash.functions.DocumentPropertiesFunction
-import com.xmlcalabash.functions.DocumentPropertyFunction
-import com.xmlcalabash.functions.ErrorFunction
-import com.xmlcalabash.functions.FunctionLibraryImportableFunction
-import com.xmlcalabash.functions.IterationPositionFunction
-import com.xmlcalabash.functions.IterationSizeFunction
-import com.xmlcalabash.functions.LookupUriFunction
-import com.xmlcalabash.functions.PipelineFunction
-import com.xmlcalabash.functions.StepAvailableFunction
-import com.xmlcalabash.functions.SystemPropertyFunction
-import com.xmlcalabash.functions.UrifyFunction
+import com.xmlcalabash.functions.*
 import com.xmlcalabash.spi.Configurer
 import net.sf.saxon.Configuration
 import net.sf.saxon.functions.FunctionLibrary
@@ -21,12 +12,11 @@ import net.sf.saxon.lib.ExtensionFunctionDefinition
 import net.sf.saxon.lib.FeatureIndex
 import net.sf.saxon.lib.Initializer
 import net.sf.saxon.s9api.Processor
+import net.sf.saxon.s9api.QName
 import net.sf.saxon.s9api.Xslt30Transformer
-import org.apache.commons.lang3.function.Functions.function
 import org.xml.sax.InputSource
 import java.net.URI
 import javax.xml.transform.sax.SAXSource
-import kotlin.collections.iterator
 
 class SaxonConfiguration private constructor(val licensed: Boolean,
                                              val saxonConfigurationFile: URI?,
@@ -127,7 +117,8 @@ class SaxonConfiguration private constructor(val licensed: Boolean,
             return _processor
         }
 
-    private val functionLibraries = mutableListOf<Pair<URI, FunctionLibrary>>()
+    private val inheritedFunctionLibraries = mutableListOf<Pair<URI, XProcFunctionLibrary>>()
+    private val functionLibraries = mutableListOf<Pair<URI, XProcFunctionLibrary>>()
     private val pipelineExtensionFunctions = mutableListOf<ExtensionFunctionDefinition>()
     private val standardExtensionFunctions = listOf<(SaxonConfiguration) -> ExtensionFunctionDefinition>(
         { config -> DocumentPropertyFunction(config) },
@@ -144,7 +135,8 @@ class SaxonConfiguration private constructor(val licensed: Boolean,
 
     fun newConfiguration(): SaxonConfiguration {
         val newConfig = SaxonConfiguration(licensed, saxonConfigurationFile, saxonConfigurationProperties, schemaDocuments, initializerClasses, configurers, contextManager)
-        newConfig.functionLibraries.addAll(functionLibraries)
+        newConfig.inheritedFunctionLibraries.addAll(inheritedFunctionLibraries)
+        newConfig.inheritedFunctionLibraries.addAll(functionLibraries)
         newConfig.pipelineExtensionFunctions.addAll(pipelineExtensionFunctions)
         newConfig.environment = environment
         newConfig.init()
@@ -204,10 +196,24 @@ class SaxonConfiguration private constructor(val licensed: Boolean,
         }
     }
 
-    internal fun addFunctionLibrary(href: URI, flib: FunctionLibrary) {
+    internal fun addFunctionLibrary(href: URI, flib: XProcFunctionLibrary) {
+        for (current in inheritedFunctionLibraries) {
+            if (current.first == href) {
+                return
+            }
+        }
+
         for (current in functionLibraries) {
             if (current.first == href) {
                 return
+            }
+        }
+
+        for (binding in functionLibraries) {
+            for ((name, arity) in binding.second.exposedNames) {
+                if (flib.exposedNames.get(name) == arity) {
+                    throw XProcError.xsDuplicateFunction(name, arity).exception()
+                }
             }
         }
 
@@ -241,8 +247,16 @@ class SaxonConfiguration private constructor(val licensed: Boolean,
         }
 
         // So that libraries loaded later "come first" when searching...
+        val seen = mutableMapOf<QName, Int>()
         for (flib in functionLibraries.reversed()) {
-            loadFunctionLibrary(flib.first, flib.second)
+            val library = flib.second.suppressDuplicates(seen, processor.underlyingConfiguration)
+            loadFunctionLibrary(flib.first, library)
+            seen.putAll(flib.second.exposedNames)
+        }
+        for (flib in inheritedFunctionLibraries.reversed()) {
+            val library = flib.second.suppressDuplicates(seen, processor.underlyingConfiguration)
+            loadFunctionLibrary(flib.first, library)
+            seen.putAll(flib.second.exposedNames)
         }
     }
 

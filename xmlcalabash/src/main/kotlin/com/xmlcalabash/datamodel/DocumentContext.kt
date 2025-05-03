@@ -1,5 +1,6 @@
 package com.xmlcalabash.datamodel
 
+import com.xmlcalabash.config.SaxonConfiguration
 import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.exceptions.XProcException
 import net.sf.saxon.om.NamespaceUri
@@ -15,6 +16,7 @@ interface DocumentContext {
     val inscopeNamespaces: Map<String, NamespaceUri>
 
     fun copy(): DocumentContext
+    fun copy(newConfiguration: SaxonConfiguration): DocumentContext
 
     fun with(location: Location): DocumentContext
     fun with(prefix: String, uri: NamespaceUri): DocumentContext

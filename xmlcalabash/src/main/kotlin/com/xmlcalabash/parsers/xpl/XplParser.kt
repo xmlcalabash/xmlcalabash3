@@ -136,8 +136,16 @@ class XplParser internal constructor(val builder: PipelineBuilder) {
     }
 
     private fun parseLibrary(node: LibraryNode, library: LibraryInstruction): StepContainerInterface {
-        val stepConfig = library.stepConfig
-        library.stepConfig.updateWith(node.node)
+        // Look for function libraries first so that we can update the Saxon Configuration appropriately
+        for (child in node.children) {
+            if (child is ImportFunctionsNode) {
+                parseImportFunctions(library as StepContainerInterface, child)
+            }
+        }
+
+        val stepConfig = library.stepConfig.copyNew()
+        stepConfig.updateWith(node.node)
+        library.changeInstructionConfiguration(stepConfig)
 
         val attributeMapping = mapOf<QName, (String) -> Unit>(
             Ns.psviRequired to { value -> library.psviRequired = stepConfig.typeUtils.parseBoolean(value) },
@@ -150,7 +158,7 @@ class XplParser internal constructor(val builder: PipelineBuilder) {
 
         val elementMapping = mapOf<QName, (ElementNode) -> Unit>(
             NsP.import to { child -> parseImport(library as StepContainerInterface, child) },
-            NsP.importFunctions to { child -> parseImportFunctions(library as StepContainerInterface, child as ImportFunctionsNode) },
+            NsP.importFunctions to { child -> },
             NsP.option to { child -> parseLibraryOption(library, child) },
             NsP.declareStep to { child -> parseNestedDeclareStep(library, child as DeclareStepNode) },
         )
@@ -212,7 +220,16 @@ class XplParser internal constructor(val builder: PipelineBuilder) {
     }
 
     private fun parseDeclareStep(container: StepContainerInterface?, node: DeclareStepNode, decl: DeclareStepInstruction): StepContainerInterface {
+        // Look for function libraries first so that we can update the Saxon Configuration appropriately
+        for (child in node.children) {
+            if (child is ImportFunctionsNode) {
+                parseImportFunctions(decl as StepContainerInterface, child)
+            }
+        }
+
         val stepConfig = decl.stepConfig.copyNew()
+        stepConfig.updateWith(node.node)
+        decl.changeInstructionConfiguration(stepConfig)
 
         val attributeMapping = mapOf<QName, (String) -> Unit>(
             Ns.name to { value -> decl.name = stepConfig.typeUtils.parseNCName(value) },
@@ -228,7 +245,7 @@ class XplParser internal constructor(val builder: PipelineBuilder) {
 
         val elementMapping = mutableMapOf<QName, (ElementNode) -> Unit>(
             NsP.import to { child -> parseImport(decl as StepContainerInterface, child) },
-            NsP.importFunctions to { child -> parseImportFunctions(decl as StepContainerInterface, child as ImportFunctionsNode) },
+            NsP.importFunctions to { child -> },
             NsP.input to { child -> parseInput(decl, child) },
             NsP.output to { child -> parseOutput(decl, child) },
             NsP.option to { child -> parseOption(decl, child) },

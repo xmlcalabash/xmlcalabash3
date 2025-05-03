@@ -5,6 +5,7 @@ import com.xmlcalabash.datamodel.Location
 import com.xmlcalabash.datamodel.StaticOptionDetails
 import com.xmlcalabash.graph.Model
 import com.xmlcalabash.graph.ModelInputPort
+import com.xmlcalabash.graph.PipelineModel
 import com.xmlcalabash.namespace.Ns
 import com.xmlcalabash.namespace.NsP
 import com.xmlcalabash.runtime.XProcRuntime
@@ -15,7 +16,7 @@ import com.xmlcalabash.runtime.steps.AbstractStep
 import net.sf.saxon.s9api.QName
 
 abstract class StepModel(val runtime: XProcRuntime, model: Model) {
-    val stepConfig = runtime.stepConfiguration(model.step.stepConfig)
+    val stepConfig = runtime.stepConfiguration(model.step.stepConfig, model is PipelineModel)
     val id: String = model.id
     val threadGroup = model.threadGroup
     val location: Location = model.step.location

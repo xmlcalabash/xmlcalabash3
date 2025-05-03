@@ -49,6 +49,10 @@ open class LibraryInstruction(stepConfig: InstructionConfiguration): XProcInstru
     val exportedOptions: Map<QName, OptionInstruction>
         get() = _exportedOptions
 
+    internal fun changeInstructionConfiguration(config: InstructionConfiguration) {
+        _stepConfig = config
+    }
+
     fun findDeclarations() {
         findDeclarations(emptyMap(), emptyMap(), emptyMap())
     }

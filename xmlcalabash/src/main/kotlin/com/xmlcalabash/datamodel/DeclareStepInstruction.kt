@@ -83,6 +83,10 @@ class DeclareStepInstruction(parent: XProcInstruction?, stepConfig: InstructionC
             return true
         }
 
+    internal fun changeInstructionConfiguration(config: InstructionConfiguration) {
+        _stepConfig = config
+    }
+
     // ========================================================================================
 
     private val _imported = mutableSetOf<StepContainerInterface>()

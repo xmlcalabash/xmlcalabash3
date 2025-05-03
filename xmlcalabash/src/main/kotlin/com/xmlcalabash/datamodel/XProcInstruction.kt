@@ -4,9 +4,15 @@ import net.sf.saxon.om.NamespaceUri
 import net.sf.saxon.s9api.QName
 import net.sf.saxon.s9api.XdmNode
 
-abstract class XProcInstruction internal constructor(initialParent: XProcInstruction?, val stepConfig: InstructionConfiguration, val instructionType: QName) {
+abstract class XProcInstruction internal constructor(initialParent: XProcInstruction?, initialStepConfig: InstructionConfiguration, val instructionType: QName) {
     internal lateinit var builder: PipelineBuilder
     internal var _parent = initialParent
+
+    // We have to brute force a changae here for nested step declarations. Ugly as sin, but...
+    protected var _stepConfig: InstructionConfiguration = initialStepConfig
+
+    val stepConfig: InstructionConfiguration
+        get() = _stepConfig
 
     val id = stepConfig.nextId
     var expandText: Boolean? = null
