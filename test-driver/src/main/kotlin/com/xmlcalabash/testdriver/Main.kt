@@ -43,6 +43,7 @@ class Main {
             if (testOptions.testDirectoryList.isEmpty()) {
                 testOptions.testDirectoryList.add("../tests/3.0-test-suite/test-suite/tests")
                 testOptions.testDirectoryList.add("../tests/extra-suite/test-suite/tests")
+                testOptions.testDirectoryList.add("../tests/selenium/test-suite/tests")
             }
 
             val exclusions = mutableMapOf<String, String>()
