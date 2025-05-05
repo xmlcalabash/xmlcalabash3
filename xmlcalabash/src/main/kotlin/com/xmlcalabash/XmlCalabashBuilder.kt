@@ -62,6 +62,7 @@ class XmlCalabashBuilder {
 
     fun getAssertions() = config._assertions
     fun setAssertions(level: AssertionsLevel): XmlCalabashBuilder {
+        logger.debug { "setAssertions: ${level}" }
         config._assertions = level
         return this
     }
@@ -72,6 +73,7 @@ class XmlCalabashBuilder {
             if (Charset.isSupported(encoding)) {
                 config._consoleEncoding = encoding
                 config._messagePrinter?.setEncoding(config.consoleEncoding)
+                logger.debug { "setConsoleEncoding ${encoding}" }
             } else {
                 logger.warn { "Console encoding is not supported: ${encoding}, using ${config.consoleEncoding}" }
             }
@@ -84,12 +86,14 @@ class XmlCalabashBuilder {
 
     fun getDebug() = config._debug
     fun setDebug(debug: Boolean): XmlCalabashBuilder {
+        logger.debug { "setDebug ${debug}" }
         config._debug = debug
         return this
     }
 
     fun getDebugger() = config._debugger
     fun setDebugger(debugger: Boolean): XmlCalabashBuilder {
+        logger.debug { "setDebugger ${debugger}" }
         config._debugger = debugger
         if (debugger) {
             config._maxThreadCount = 1
@@ -99,36 +103,42 @@ class XmlCalabashBuilder {
 
     fun getEagerEvaluation() = config._eagerEvaluation
     fun setEagerEvaluation(eager: Boolean): XmlCalabashBuilder {
+        logger.debug { "setEagerEvaluation ${eager}" }
         config._eagerEvaluation = eager
         return this
     }
 
     fun getGraphStyle() = config._graphStyle
     fun setGraphStyle(style: URI?): XmlCalabashBuilder {
+        logger.debug { "setGraphStyle ${style}" }
         config._graphStyle = style
         return this
     }
 
     fun getGraphviz() = config._graphviz
     fun setGraphviz(executable: File?): XmlCalabashBuilder {
+        logger.debug { "setGraphviz ${executable}" }
         config._graphviz = executable
         return this
     }
 
     fun getImplicitParameterName() = config._implicitParameterName
     fun setImplicitParameterName(name: QName?): XmlCalabashBuilder {
+        logger.debug { "setImplicitParameterName ${name}" }
         config._implicitParameterName = name
         return this
     }
 
     fun getInlineTrimeWhitespace() = config._inlineTrimWhitespace
     fun setInlineTrimWhitespace(trim: Boolean): XmlCalabashBuilder {
+        logger.debug { "setInlineTrimWhitespace ${trim}" }
         config._inlineTrimWhitespace = trim
         return this
     }
 
     fun getLicensed() = config._licensed
     fun setLicensed(licensed: Boolean): XmlCalabashBuilder {
+        logger.debug { "setLicensed ${licensed}" }
         if (config.licensed != licensed) {
             saxonConfiguration = null
             config._licensed = licensed
@@ -138,12 +148,14 @@ class XmlCalabashBuilder {
 
     fun getMessageBufferSize() = config._messageBufferSize
     fun setMessageBufferSize(size: Int): XmlCalabashBuilder {
+        logger.debug { "setMessageBufferSize ${size}" }
         config._messageBufferSize = size
         return this
     }
 
     fun getMessagePrinter() = config._messagePrinter
     fun setMessagePrinter(printer: MessagePrinter): XmlCalabashBuilder {
+        logger.debug { "setMessagePrinter ${printer}" }
         printer.setEncoding(config.consoleEncoding)
         config._messagePrinter = printer
         if (config._messageReporter != null) {
@@ -154,6 +166,7 @@ class XmlCalabashBuilder {
 
     fun getMessageReporter() = config._messageReporter
     fun setMessageReporter(reporter: MessageReporter): XmlCalabashBuilder {
+        logger.debug { "setMessageReporter ${reporter}" }
         config._messageReporter = reporter
         if (config._messagePrinter != null) {
             reporter.setMessagePrinter(config.messagePrinter)
@@ -163,30 +176,35 @@ class XmlCalabashBuilder {
 
     fun getMimetypesFileTypeMap() = config.mimetypesFileTypeMap
     fun setMimetypesFileTypeMap(typemap: MimetypesFileTypeMap): XmlCalabashBuilder {
+        logger.debug { "setMimetypesFileTypeMap ${typemap}" }
         config._mimetypesFileTypeMap = typemap
         return this
     }
 
     fun getErrorExplanation() = config.errorExplanation
     fun setErrorExplanation(explanation: ErrorExplanation): XmlCalabashBuilder {
+        logger.debug { "setErrorExplanation ${explanation}" }
         config._errorExplanation = explanation
         return this
     }
 
     fun getDocumentManager() = config.documentManager
     fun setDocumentManager(manager: DocumentManager): XmlCalabashBuilder {
+        logger.debug { "setDocumentManager ${manager}" }
         config._documentManager = manager
         return this
     }
 
     fun getOther() = config._other.toMap()
     fun setOther(other: Map<QName, List<Map<QName, String>>>): XmlCalabashBuilder {
+        logger.debug { "setOther ${other.keys}" }
         config._other.clear()
         config._other.putAll(other)
         return this
     }
 
     fun addOther(other: QName, properties: Map<QName, String>): XmlCalabashBuilder {
+        logger.debug { "addOther ${other}" }
         val otherProperties = mutableListOf<Map<QName, String>>()
         config._other[other]?.let { otherProperties.addAll(it) }
         otherProperties.add(properties)
@@ -195,6 +213,7 @@ class XmlCalabashBuilder {
     }
 
     fun addPagedMediaCssProcessor(cssFormatter: URI, properties: Map<QName, String>): XmlCalabashBuilder {
+        logger.debug { "addPagedMediaCssProcessor ${cssFormatter}" }
         config._pagedMediaCssProcessors.add(cssFormatter)
 
         if (cssFormatter == StandardPagedMediaProvider.genericCssFormatter) {
@@ -214,6 +233,7 @@ class XmlCalabashBuilder {
     }
 
     fun addPagedMediaXslProcessor(xslFormatter: URI, properties: Map<QName, String>): XmlCalabashBuilder {
+        logger.debug { "addPagedMediaXslProcessor ${xslFormatter}" }
         config._pagedMediaXslProcessors.add(xslFormatter)
 
         if (xslFormatter == StandardPagedMediaProvider.genericXslFormatter) {
@@ -234,24 +254,28 @@ class XmlCalabashBuilder {
 
     fun getPipe() = config._pipe
     fun setPipe(pipe: Boolean): XmlCalabashBuilder {
+        logger.debug { "setPipe ${pipe}" }
         config._pipe = pipe
         return this
     }
 
     fun getProxies() = config._proxies.toMap()
     fun setProxies(proxies: Map<String, String>): XmlCalabashBuilder {
+        logger.debug { "setProxies ${proxies}" }
         config._proxies.clear()
         config._proxies.putAll(proxies)
         return this
     }
 
     fun addProxy(scheme: String, uri: String): XmlCalabashBuilder {
+        logger.debug { "addProxy ${scheme}=${uri}" }
         config._proxies[scheme] = uri
         return this
     }
 
     fun getSaxonConfiguration() = config._saxonConfigurationFile
     fun setSaxonConfigurationFile(configFile: File?): XmlCalabashBuilder {
+        logger.debug { "setSaxonConfigurationFile ${configFile}" }
         saxonConfiguration = null
         config._saxonConfigurationFile = configFile
         if (configFile != null && !configFile.exists()) {
@@ -262,6 +286,7 @@ class XmlCalabashBuilder {
 
     fun getSaxonConfigurationProperties() = config._saxonConfigurationProperties.toMap()
     fun setSaxonConfigurationProperties(properties: Map<String,String>): XmlCalabashBuilder {
+        logger.debug { "setSaxonConfigurationProperties ${properties}" }
         saxonConfiguration = null
         config._saxonConfigurationProperties.clear()
         config._saxonConfigurationProperties.putAll(properties)
@@ -269,6 +294,7 @@ class XmlCalabashBuilder {
     }
 
     fun addSaxonConfigurationProperty(name: String, value: String): XmlCalabashBuilder {
+        logger.debug { "addSaxonConfigurationProperty ${name}=${value}" }
         saxonConfiguration = null
         config._saxonConfigurationProperties[name] = value
         return this
@@ -276,29 +302,34 @@ class XmlCalabashBuilder {
 
     fun getSendmail() = config._sendmail.toMap()
     fun setSendmail(properties: Map<String,String>): XmlCalabashBuilder {
+        logger.debug { "setSendmail ${properties}" }
         config._sendmail.clear()
         config._sendmail.putAll(properties)
         return this
     }
 
     fun addSendmailProperty(name: String, value: String): XmlCalabashBuilder {
+        logger.debug { "addSendmailProperty ${name}=${value}" }
         config._sendmail[name] = value
         return this
     }
 
     fun getSerialization() = config._serialization.toMap()
     fun setSerialization(properties: Map<MediaType, Map<QName, String>>): XmlCalabashBuilder {
+        logger.debug { "setSerialization ${properties.keys}" }
         config._serialization.clear()
         config._serialization.putAll(properties)
         return this
     }
 
     fun addSerialization(contentType: MediaType, properties: Map<QName, String>): XmlCalabashBuilder {
+        logger.debug { "addSerialization ${contentType}" }
         config._serialization[contentType] = properties
         return this
     }
 
     fun addSerializationProperty(contentType: MediaType, property: QName, value: String): XmlCalabashBuilder {
+        logger.debug { "addSerializationProperty ${contentType}: ${property}=${value}" }
         val props = mutableMapOf<QName, String>()
         config._serialization[contentType]?.let { props.putAll(it) }
         props[property] = value
@@ -308,6 +339,7 @@ class XmlCalabashBuilder {
 
     fun getMaxThreadCount() = config._maxThreadCount
     fun setMaxThreadCount(size: Int): XmlCalabashBuilder {
+        logger.debug { "setMaxThreadCount ${size}" }
         val pcount = Runtime.getRuntime().availableProcessors()
         if (size > 0) {
             if (config._debug) {
@@ -329,42 +361,49 @@ class XmlCalabashBuilder {
 
     fun getTrace() = config._trace
     fun setTrace(trace: File?): XmlCalabashBuilder {
+        logger.debug { "setTrace ${trace}" }
         config._trace = trace
         return this
     }
 
     fun getTraceDocuments() = config._traceDocuments
     fun setTraceDocuments(traceDocuments: File?): XmlCalabashBuilder {
+        logger.debug { "setTraceDocuments ${traceDocuments}" }
         config._traceDocuments = traceDocuments
         return this
     }
 
     fun getTryNamespaces() = config._tryNamespaces
     fun setTryNamespaces(namespaces: Boolean): XmlCalabashBuilder {
+        logger.debug { "setTryNamespaces ${namespaces}" }
         config._tryNamespaces = namespaces
         return this
     }
 
     fun getUniqueInlineUris() = config._uniqueInlineUris
     fun setUniqueInlineUris(uniqueInlineUris: Boolean): XmlCalabashBuilder {
+        logger.debug { "setUniqueInlineUris ${uniqueInlineUris}" }
         config._uniqueInlineUris = uniqueInlineUris
         return this
     }
 
     fun getUseLocationHints() = config._useLocationHints
     fun setUseLocationHints(locationHints: Boolean): XmlCalabashBuilder {
+        logger.debug { "setUseLocationHints ${locationHints}" }
         config._useLocationHints = locationHints
         return this
     }
 
     fun getValidationMode() = config._validationMode
     fun setValidationMode(mode: ValidationMode): XmlCalabashBuilder {
+        logger.debug { "setValidationMode ${mode}" }
         config._validationMode = mode
         return this
     }
 
     fun getVerbosity() = config._verbosity
     fun setVerbosity(verbosity: Verbosity): XmlCalabashBuilder {
+        logger.debug { "setVerbosity ${verbosity}" }
         config._verbosity = verbosity
         return this
     }
@@ -372,6 +411,7 @@ class XmlCalabashBuilder {
     fun getVisualizer() = config._visualizer
     fun setVisualizer(visualizer: String, properties: Map<String,String>): XmlCalabashBuilder {
         if (visualizer in listOf("silent", "plain", "detail")) {
+            logger.debug { "setVisualizer ${visualizer}" }
             config._visualizer = visualizer
             config._visualizerProperties.clear()
             config._visualizerProperties.putAll(properties)
@@ -382,18 +422,21 @@ class XmlCalabashBuilder {
 
     fun getXmlCatalogs() = config._xmlCatalogs
     fun setXmlCatalogs(catalogs: List<URI>): XmlCalabashBuilder {
+        logger.debug { "setXmlCatalogs ${catalogs}" }
         config._xmlCatalogs.clear()
         config._xmlCatalogs.addAll(catalogs)
         return this
     }
 
     fun addXmlCatalog(catalog: URI): XmlCalabashBuilder {
+        logger.debug { "addXmlCatalog ${catalog}" }
         config._xmlCatalogs.add(catalog)
         return this
     }
 
     fun getXmlSchemaDocuments() = config._xmlSchemaDocuments
     fun setXmlSchemaDocuments(schemas: List<URI>): XmlCalabashBuilder {
+        logger.debug { "setXmlSchemaDocuments ${schemas}" }
         saxonConfiguration = null
         config._xmlSchemaDocuments.clear()
         config._xmlSchemaDocuments.addAll(schemas)
@@ -401,12 +444,14 @@ class XmlCalabashBuilder {
     }
 
     fun addXmlSchemaDocument(schema: URI): XmlCalabashBuilder {
+        logger.debug { "addXmlSchemaDocument ${schema}" }
         saxonConfiguration = null
         config._xmlSchemaDocuments.add(schema)
         return this
     }
 
     fun addInitializer(className: String, ignoreErrors: Boolean = false): XmlCalabashBuilder {
+        logger.debug { "addInitializer ${className}" }
         config._initializerClasses.add(Pair(className, ignoreErrors))
         return this
     }
@@ -539,7 +584,7 @@ class XmlCalabashBuilder {
         override val errorExplanation: ErrorExplanation
             get() {
                 if (_errorExplanation == null) {
-                    _errorExplanation = DefaultErrorExplanation(messagePrinter)
+                    _errorExplanation = DefaultErrorExplanation(messageReporter)
                 }
                 return _errorExplanation!!
             }

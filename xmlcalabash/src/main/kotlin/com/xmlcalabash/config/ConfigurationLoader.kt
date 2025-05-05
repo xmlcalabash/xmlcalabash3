@@ -60,15 +60,16 @@ class ConfigurationLoader(val builder: XmlCalabashBuilder) {
     }
 
     private lateinit var configFile: String
-    private val uninitializedFormatters = mutableSetOf<URI>()
 
     fun load(source: File) {
+        logger.info { "Loading XML Calabash configuration ${source.absoluteFile}" }
         val isrc = InputSource(FileInputStream(source))
         isrc.systemId = source.toURI().toString()
         load(isrc)
     }
 
     fun load(source: URI) {
+        logger.info { "Loading XML Calabash configuration ${source}" }
         val isrc = InputSource(source.toString())
         load(isrc)
     }

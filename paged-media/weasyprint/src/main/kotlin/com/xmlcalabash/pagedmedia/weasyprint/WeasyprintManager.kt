@@ -5,6 +5,7 @@ import com.xmlcalabash.api.FoProcessor
 import com.xmlcalabash.spi.PagedMediaManager
 import com.xmlcalabash.spi.PagedMediaProvider
 import net.sf.saxon.s9api.QName
+import org.apache.logging.log4j.kotlin.logger
 import java.io.File
 import java.net.URI
 
@@ -20,6 +21,7 @@ class WeasyprintManager: PagedMediaProvider, PagedMediaManager {
     }
 
     override fun create(): PagedMediaManager {
+        logger.info { "Initializing WeasyPrint paged media manager" }
         return this
     }
 

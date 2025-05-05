@@ -4,6 +4,7 @@ import com.xmlcalabash.documents.XProcBinaryDocument
 import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.io.MessagePrinter
 import com.xmlcalabash.runtime.steps.AbstractStep
+import com.xmlcalabash.runtime.steps.AtomicStep
 import com.xmlcalabash.runtime.steps.CompoundStep
 import com.xmlcalabash.runtime.steps.PipelineStep
 import com.xmlcalabash.util.S9Api
@@ -62,13 +63,22 @@ class Detail(printer: MessagePrinter, options: Map<String,String>): Plain(printe
             return
         }
 
+        val sb = StringBuilder()
+
         if (depth == 1) {
-            printer.print(t_start)
+            if (step is AtomicStep) {
+                sb.append(t_tee)
+            } else {
+                sb.append(t_start)
+            }
         } else {
-            printer.print(t_indent.repeat(depth-1))
-            printer.print(t_tee)
+            sb.append(t_indent.repeat(depth-1))
+            sb.append(t_tee)
         }
-        printer.println("${name(step)}${extra(step)}")
+
+        sb.append("${name(step)}${extra(step)}")
+
+        printer.println(sb.toString())
     }
 
     override fun showEnd(step: AbstractStep, depth: Int) {
@@ -76,14 +86,18 @@ class Detail(printer: MessagePrinter, options: Map<String,String>): Plain(printe
             return
         }
 
+        val sb = StringBuilder()
+
         if (depth == 1) {
-            printer.print(t_end)
+            sb.append(t_end)
         } else {
-            printer.print(t_indent.repeat(depth-1))
-            printer.print(t_tee)
+            sb.append(t_indent.repeat(depth-1))
+            sb.append(t_tee)
         }
 
-        printer.println("${name(step)}${extra(step)} (ends)")
+        sb.append("${name(step)}${extra(step)} (ends)")
+
+        printer.println(sb.toString())
     }
 
     override fun showDocument(step: AbstractStep, port: String, depth: Int, document: XProcDocument) {
@@ -126,9 +140,11 @@ class Detail(printer: MessagePrinter, options: Map<String,String>): Plain(printe
             }
         }
 
-        printer.print(t_indent.repeat(depth-1))
-        printer.print(t_indent)
-        printer.println("${t_dots} ${name(step)}.${port} ${t_arrow} ${type}")
+        val sb = StringBuilder()
+        sb.append(t_indent.repeat(depth-1))
+        sb.append(t_indent)
+        sb.append("${t_dots} ${name(step)}.${port} ${t_arrow} ${type}")
+        printer.println(sb.toString())
     }
 
     override fun name(step: AbstractStep): String {

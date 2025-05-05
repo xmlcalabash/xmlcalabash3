@@ -21,6 +21,7 @@ import com.xmlcalabash.util.AssertionsLevel
 import com.xmlcalabash.util.Report
 import com.xmlcalabash.util.Verbosity
 import net.sf.saxon.s9api.QName
+import org.apache.logging.log4j.kotlin.logger
 import java.net.URI
 import java.util.*
 import javax.activation.MimetypesFileTypeMap
@@ -101,7 +102,7 @@ open class CompileEnvironment(override val episode: String, override val xmlCala
             val manager = provider.create();
             for (stepType in manager.stepTypes()) {
                 if (showAssignments) {
-                    messageReporter.debug { Report(Verbosity.DEBUG, "Added available step type '$stepType'") }
+                    logger.debug { "Added available step type '$stepType'" }
                 }
                 knownAtomicSteps.add(stepType)
             }
@@ -111,7 +112,7 @@ open class CompileEnvironment(override val episode: String, override val xmlCala
         for ((ext, contentType) in _defaultContentTypes) {
             if (mimeTypes.getContentType("test.${ext}") == "application/octet-stream") {
                 if (showAssignments) {
-                    messageReporter.debug { Report(Verbosity.DEBUG, "Assigning default content type to '.${ext}' files: ${contentType}") }
+                    logger.debug { "Assigning default content type to '.${ext}' files: ${contentType}" }
                 }
                 mimeTypes.addMimeTypes("${contentType} ${ext}")
             }

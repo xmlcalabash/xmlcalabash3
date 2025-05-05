@@ -5,6 +5,7 @@ import com.xmlcalabash.api.FoProcessor
 import com.xmlcalabash.spi.PagedMediaManager
 import com.xmlcalabash.spi.PagedMediaProvider
 import net.sf.saxon.s9api.QName
+import org.apache.logging.log4j.kotlin.logger
 import java.net.URI
 
 class FopManager: PagedMediaProvider, PagedMediaManager {
@@ -19,6 +20,7 @@ class FopManager: PagedMediaProvider, PagedMediaManager {
     }
 
     override fun create(): PagedMediaManager {
+        logger.info { "Initializing Apache FOP paged media manager" }
         return this
     }
 

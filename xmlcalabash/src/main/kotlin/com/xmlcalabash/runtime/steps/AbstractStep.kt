@@ -129,7 +129,7 @@ abstract class AbstractStep(val stepConfig: XProcStepConfiguration, step: StepMo
     }
 
     open fun runStep(parent: CompoundStep) {
-        stepConfig.debug { "START ${this} (${Thread.currentThread().id})" }
+        logger.debug { "START ${this} (threadId ${Thread.currentThread().id})" }
 
         runtimeParent = parent
         stepConfig.saxonConfig.newExecutionContext(this)
@@ -182,7 +182,7 @@ abstract class AbstractStep(val stepConfig: XProcStepConfiguration, step: StepMo
             }
         } finally {
             stepConfig.saxonConfig.releaseExecutionContext()
-            stepConfig.debug { "FINSH ${this}" }
+            logger.debug { "FINSH ${this}" }
         }
     }
 

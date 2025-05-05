@@ -20,11 +20,11 @@ import net.sf.saxon.s9api.XdmArray
 import net.sf.saxon.s9api.XdmMap
 import net.sf.saxon.s9api.XdmNode
 import net.sf.saxon.s9api.XdmValue
+import org.apache.logging.log4j.kotlin.logger
 import java.util.function.Supplier
 
 open class ExpressionStep(val params: ExpressionStepParameters): AbstractAtomicStep() {
     val contextItems = mutableListOf<XProcDocument>()
-    var override: XProcDocument? = null
     val expression = params.expression
     val collection = params.collection
 
@@ -42,14 +42,14 @@ open class ExpressionStep(val params: ExpressionStepParameters): AbstractAtomicS
         stepConfig.debug { "  Context items: ${contextItems.size}" }
 
         for (item in contextItems) {
-            stepConfig.debug { "  Context item: ${item.value}" }
-        }
-
-        if (override != null) {
-            stepConfig.debug { "  Override: ${override}" }
-            receiver.output("result", override!!)
-            override = null
-            return
+            stepConfig.debug {
+                val strValue = item.value.toString()
+                if (strValue.length > 512) {
+                    "  Context item: ${strValue.substring(0, 511)}…"
+                } else {
+                    "  Context item: ${strValue}"
+                }
+            }
         }
 
         if (collection) {
@@ -124,10 +124,10 @@ open class ExpressionStep(val params: ExpressionStepParameters): AbstractAtomicS
         }
 
         if (canBeLazy) {
-            stepConfig.debug { "  expression will be lazily evaluated" }
+            logger.debug { "  expression will be lazily evaluated" }
             receiver.output("result", XProcDocument(lazy, stepConfig))
         } else {
-            stepConfig.debug { "  expression=${lazy()}" }
+            logger.debug { "  expression=${lazy()}" }
             val lazyValue = lazy()
             receiver.output("result", XProcDocument(lazyValue.value, stepConfig, lazyValue.properties))
         }
@@ -139,15 +139,11 @@ open class ExpressionStep(val params: ExpressionStepParameters): AbstractAtomicS
     }
 
     override fun toString(): String {
-        val expr = if (override != null) {
-            "value=${override!!.value}"
-        } else {
-            when (expression) {
-                is XProcSelectExpression -> "select=${expression.select}"
-                is XProcAvtExpression -> "avt=${expression.avt}"
-                    is XProcConstantExpression -> "constant=${expression.staticValue}"
-                else -> "???"
-            }
+        val expr = when (expression) {
+            is XProcSelectExpression -> "select=${expression.select}"
+            is XProcAvtExpression -> "avt=${expression.avt}"
+            is XProcConstantExpression -> "constant=${expression.staticValue}"
+            else -> "???"
         }
 
         return "cx:expression: ${expr}"

@@ -1,6 +1,7 @@
 package com.xmlcalabash.util
 
 import com.xmlcalabash.io.MessagePrinter
+import org.apache.logging.log4j.kotlin.logger
 import java.io.PrintStream
 
 class DefaultMessagePrinter(encoding: String) : MessagePrinter {
@@ -37,7 +38,11 @@ class DefaultMessagePrinter(encoding: String) : MessagePrinter {
     }
 
     private fun sanitize(message: String): String {
-        return message.replace('“', '"').replace('”', '"').replace('‘', '\'').replace('’', '\'')
+        return message.replace('“', '"')
+            .replace('”', '"')
+            .replace('‘', '\'')
+            .replace('’', '\'')
+            .replace("→", "->")
             .replace("…".toRegex(), "...")
     }
 }

@@ -16,6 +16,7 @@ import com.xmlcalabash.util.MediaClassification
 import com.xmlcalabash.util.SaxonXsdValidator
 import net.sf.saxon.s9api.ValidationMode
 import net.sf.saxon.s9api.XdmValue
+import org.apache.logging.log4j.kotlin.logger
 
 open class AtomicStep(config: XProcStepConfiguration, atomic: AtomicBuiltinStepModel): AbstractStep(config, atomic), Receiver {
     final override val params = RuntimeStepParameters(atomic.type, atomic.name, atomic.location,
@@ -47,9 +48,9 @@ open class AtomicStep(config: XProcStepConfiguration, atomic: AtomicBuiltinStepM
         }
         notReadyReason = sb.toString()
         if (notReadyReason.isEmpty()) {
-            stepConfig.debug { "WAIT4 ${this}: <nothing>" }
+            logger.debug { "WAIT4 ${this}: <nothing>" }
         } else {
-            stepConfig.debug { "WAIT4 ${this}: ${notReadyReason}" }
+            logger.debug { "WAIT4 ${this}: ${notReadyReason}" }
         }
 
         implementation.setup(stepConfig, this, params)
@@ -73,13 +74,13 @@ open class AtomicStep(config: XProcStepConfiguration, atomic: AtomicBuiltinStepM
             }
 
             if (isReady) {
-                stepConfig.debug { "READY ${this}" }
+                logger.debug { "READY ${this}" }
                 notReadyReason = reason
                 return true
             }
 
             if (notReadyReason != reason) {
-                stepConfig.debug { "NORDY ${this}: ${reason}" }
+                logger.debug { "NORDY ${this}: ${reason}" }
                 notReadyReason = reason
             }
 
@@ -90,7 +91,7 @@ open class AtomicStep(config: XProcStepConfiguration, atomic: AtomicBuiltinStepM
         synchronized(this) {
             val error = checkInputPort(port, doc, params.inputs[port])
 
-            stepConfig.debug { "RECVD ${this} input on $port ${error ?: ""}: ${inputCount[port]}" }
+            logger.debug { "RECVD ${this} input on $port ${error ?: ""}: ${inputCount[port]}" }
 
             if (error == null) {
                 if (port.startsWith("Q{")) {
@@ -136,7 +137,7 @@ open class AtomicStep(config: XProcStepConfiguration, atomic: AtomicBuiltinStepM
 
         val rpair = receiver[port]
         if (rpair == null) {
-            stepConfig.debug { "No receiver for ${port} from ${this} (in step)" }
+            logger.debug { "No receiver for ${port} from ${this} (in step)" }
             return
         }
 
@@ -168,7 +169,7 @@ open class AtomicStep(config: XProcStepConfiguration, atomic: AtomicBuiltinStepM
 
     override fun close(port: String) {
         synchronized(openPorts) {
-            stepConfig.debug { "CLOSE ${this} port ${port}: ${inputCount[port]}" }
+            logger.debug { "CLOSE ${this} port ${port}: ${inputCount[port]}" }
             openPorts.remove(port)
         }
     }

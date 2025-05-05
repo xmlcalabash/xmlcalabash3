@@ -16,6 +16,7 @@ import com.xmlcalabash.runtime.parameters.OptionStepParameters
 import com.xmlcalabash.steps.internal.ExpressionStep
 import kotlinx.coroutines.*
 import net.sf.saxon.s9api.QName
+import org.apache.logging.log4j.kotlin.logger
 import kotlin.collections.mutableMapOf
 
 abstract class CompoundStep(config: XProcStepConfiguration, compound: CompoundStepModel): AbstractStep(config, compound) {
@@ -65,11 +66,11 @@ abstract class CompoundStep(config: XProcStepConfiguration, compound: CompoundSt
         get() {
             val ready = head.readyToRun
             if (ready) {
-                stepConfig.debug { "READY ${this}" }
+                logger.debug { "READY ${this}" }
                 showedReady = true
             } else {
                 if (showedReady) {
-                    stepConfig.debug { "NORDY ${this}" }
+                    logger.debug { "NORDY ${this}" }
                     showedReady = false
                 }
             }
@@ -161,29 +162,29 @@ abstract class CompoundStep(config: XProcStepConfiguration, compound: CompoundSt
             if (threadsToUse == 1) {
                 val atomicOptionValues = mutableMapOf<QName, LazyValue>()
                 if (threadsAvailable > 0) {
-                    stepConfig.debug {
+                    logger.debug {
                         var sep = ": "
                         val sb = StringBuilder()
                         sb.append("Single threading")
                         for (step in stepsToRun) {
                             sb.append(sep).append(step.name)
-                            sep = "-> "
+                            sep = " → "
                         }
                         sb.toString()
                     }
                 }
                 runSequentialStepsExhaustively(atomicOptionValues, stepsToRun)
             } else {
-                stepConfig.debug { "Assigning ${threadsToUse}/${threadsAvailable} threads to ${childThreadGroups} thread groups" }
+                logger.debug { "Assigning ${threadsToUse}/${threadsAvailable} threads to ${childThreadGroups} thread groups" }
                 val groups = assignToThreads(threadsToUse)
                 for ((index, group) in groups.withIndex()) {
-                    stepConfig.debug {
+                    logger.debug {
                         var sep = ": "
                         val sb = StringBuilder()
                         sb.append("Thread ${index+1}")
                         for (step in group) {
                             sb.append(sep).append(step.name)
-                            sep = "-> "
+                            sep = " → "
                         }
                         sb.toString()
                     }

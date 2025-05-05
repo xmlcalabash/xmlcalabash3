@@ -5,6 +5,7 @@ import com.xmlcalabash.runtime.LazyValue
 import com.xmlcalabash.runtime.XProcStepConfiguration
 import com.xmlcalabash.runtime.model.AtomicBuiltinStepModel
 import net.sf.saxon.s9api.QName
+import org.apache.logging.log4j.kotlin.logger
 import java.time.Duration
 
 class AtomicOptionStep(config: XProcStepConfiguration, atomic: AtomicBuiltinStepModel, val externalName: QName): AtomicStep(config, atomic) {
@@ -34,10 +35,10 @@ class AtomicOptionStep(config: XProcStepConfiguration, atomic: AtomicBuiltinStep
 
     override fun runImplementation() {
         if (externalValue == null) {
-            stepConfig.debug { "  Compute option value" }
+            logger.debug { "  Compute option value" }
             super.runImplementation()
         } else {
-            stepConfig.debug { "  Option value: ${externalValue!!.value}" }
+            logger.debug { "  Option value: ${externalValue!!.value}" }
             output("result", externalValue!!)
         }
     }

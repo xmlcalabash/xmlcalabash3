@@ -20,6 +20,7 @@ import net.sf.saxon.om.NodeInfo
 import net.sf.saxon.s9api.*
 import net.sf.saxon.value.QNameValue
 import net.sf.saxon.value.StringValue
+import org.apache.logging.log4j.kotlin.logger
 import java.net.URI
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ConcurrentMap
@@ -69,7 +70,7 @@ abstract class AbstractAtomicStep(): XProcStep {
 
     final override fun input(port: String, doc: XProcDocument) {
         synchronized(this) {
-            stepConfig.debug { "RECVD ${this} input on $port" }
+            logger.debug { "RECVD ${this} input on $port" }
             if (!port.startsWith("Q{")) {
                 val list = mutableListOf<XProcDocument>()
                 list.addAll(_queues[port] ?: emptyList())
@@ -96,18 +97,35 @@ abstract class AbstractAtomicStep(): XProcStep {
 
     override fun option(name: QName, binding: LazyValue) {
         synchronized(this) {
-            stepConfig.debug { "RECVD ${this} option $name" }
+            logger.debug { "RECVD ${this} option $name" }
             _options[name] = binding
         }
     }
 
     override fun run() {
-        stepConfig.debug { "  RUNNING ${this}" }
+        logger.debug { "  RUNNING ${this}" }
         for ((name, value) in options) {
-            stepConfig.debug { "    OPT: ${name}" }
+            logger.debug {
+                val optionValue = try {
+                    if (value.value == XdmEmptySequence.getInstance()) {
+                        "()"
+                    } else {
+                        val strValue = value.value.toString()
+                        if (strValue.length > 512) {
+                            strValue.substring(0, 512) + "…"
+                        } else {
+                            strValue
+                        }
+                    }
+                } catch (ex: Exception) {
+                    "<<ERROR: ${ex.message}>>"
+                }
+
+                "    OPT: ${name}=${optionValue}"
+            }
         }
         for ((name, docs) in queues) {
-            stepConfig.debug { "    INP: ${name}: ${docs.size}" }
+            logger.debug { "    INP: ${name}: ${docs.size}" }
         }
     }
 

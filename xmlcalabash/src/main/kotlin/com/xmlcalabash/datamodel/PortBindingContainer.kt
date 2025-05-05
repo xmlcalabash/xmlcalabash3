@@ -136,7 +136,7 @@ open class PortBindingContainer(parent: XProcInstruction, stepConfig: Instructio
             var acceptsSomething = false
             for (ctype in contentTypes) {
                 acceptsSomething = acceptsSomething || ctype.inclusive
-                if (ctype.mediaType == "*" && ctype.mediaSubtype == "*" && !ctype.inclusive) {
+                if (ctype.mediaType == "*" && ctype.mediaSubtype == "*" && ctype.suffix == null && !ctype.inclusive) {
                     acceptsSomething = false
                 }
             }
