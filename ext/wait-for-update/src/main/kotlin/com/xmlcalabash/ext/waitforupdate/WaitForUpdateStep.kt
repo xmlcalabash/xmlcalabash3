@@ -7,10 +7,13 @@ import com.xmlcalabash.steps.AbstractAtomicStep
 import com.xmlcalabash.util.DurationUtils
 import com.xmlcalabash.util.UriUtils
 import net.sf.saxon.s9api.QName
+import net.sf.saxon.s9api.XdmAtomicValue
 import net.sf.saxon.value.DateTimeValue
 import java.io.File
 import java.net.URI
 import java.time.Duration
+import java.time.Instant
+import java.time.ZonedDateTime
 
 class WaitForUpdateStep(): AbstractAtomicStep() {
     companion object {
@@ -71,11 +74,7 @@ class WaitForUpdateStep(): AbstractAtomicStep() {
         val exists = response.statusCode != 404
         val etag = response.headers["etag"]?.value?.toString()
         var dtHeader = response.headers["last-modified"] ?: response.headers["date"]
-        val dt = if (dtHeader?.value is DateTimeValue) {
-            (dtHeader.value as DateTimeValue).toJavaInstant()
-        } else {
-            null
-        }
+        val dt = checkDateTime(dtHeader)
 
         if (exists) {
             stepConfig.debug { "Waiting for ${href} to update..." }
@@ -93,11 +92,7 @@ class WaitForUpdateStep(): AbstractAtomicStep() {
                         return
                     }
                     dtHeader = response.headers["last-modified"] ?: response.headers["date"]
-                    val newDt = if (dtHeader?.value is DateTimeValue) {
-                        (dtHeader.value as DateTimeValue).toJavaInstant()
-                    } else {
-                        null
-                    }
+                    val newDt = checkDateTime(dtHeader)
                     if (newDt != null && dt != null && newDt > dt) {
                         return
                     }
@@ -107,6 +102,15 @@ class WaitForUpdateStep(): AbstractAtomicStep() {
                     return
                 }
             }
+        }
+    }
+
+    private fun checkDateTime(dtValue: XdmAtomicValue?): Instant? {
+        val value = dtValue?.value ?: return null
+        when (value) {
+            is DateTimeValue -> return value.toJavaInstant()
+            is ZonedDateTime -> return value.toInstant()
+            else -> throw IllegalStateException("Unexpected date time value: ${value}")
         }
     }
 

@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<t:test expected="pass"
+        xmlns:t="http://xproc.org/ns/testsuite/3.0">
+  <t:info>
+    <t:title>wait-for-update-001</t:title>
+    <t:revision-history>
+      <t:revision>
+        <t:date>2025-05-05</t:date>
+        <t:author>
+          <t:name>Norm Tovey-Walsh</t:name>
+        </t:author>
+        <t:description xmlns="http://www.w3.org/1999/xhtml">
+          <p>Created test.</p>
+        </t:description>
+      </t:revision>
+    </t:revision-history>
+  </t:info>
+  <t:description xmlns="http://www.w3.org/1999/xhtml">
+    <p>Tests that cx:wait-for-update works. It relies on the fact that calling
+    the time-of-day service only updates every 10 seconds, so it’s highly likely
+    to have to wait a bit.</p>
+  </t:description>
+  <t:pipeline>
+<p:declare-step xmlns:p="http://www.w3.org/ns/xproc"
+                xmlns:cx="http://xmlcalabash.com/ns/extensions"
+                name="main" version="3.0">
+  <p:import href="https://xmlcalabash.com/ext/library/wait-for-update.xpl"/>
+  <p:import href="https://xmlcalabash.com/ext/library/pipeline-messages.xpl"/>
+  <p:output port="result" sequence="true"/>
+
+  <cx:wait-for-update name="wait" href="http://localhost:8246/service/time-of-day"/>
+
+  <cx:pipeline-messages p:depends="wait" level="debug"/>
+</p:declare-step>
+  </t:pipeline>
+  <t:schematron>
+    <s:schema queryBinding="xslt2"
+              xmlns:s="http://purl.oclc.org/dsdl/schematron">
+      <s:ns prefix="cx" uri="http://xmlcalabash.com/ns/extensions"/>
+      <s:pattern>
+        <s:rule context="/">
+          <s:assert test="cx:messages">The root is wrong.</s:assert>
+          <s:assert test="exists(cx:messages/cx:message
+            [@level = 'DEBUG' and starts-with(@message, 'Waiting for http:')])"
+                    >Did not find waiting message.</s:assert>
+        </s:rule>
+      </s:pattern>
+    </s:schema>
+  </t:schematron>
+</t:test>
