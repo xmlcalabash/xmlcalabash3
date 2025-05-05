@@ -27,7 +27,6 @@ import net.sf.saxon.s9api.QName
 import net.sf.saxon.s9api.XdmAtomicValue
 import net.sf.saxon.s9api.XdmValue
 import org.apache.logging.log4j.kotlin.logger
-import org.slf4j.MDC
 import java.io.BufferedReader
 import java.io.File
 import java.io.InputStreamReader
@@ -60,36 +59,24 @@ class XmlCalabashCli private constructor() {
     private fun run(args: Array<out String>) {
         builder = XmlCalabashBuilder()
         cliPrinter = DefaultMessagePrinter(XmlCalabashBuilder.DEFAULT_CONSOLE_ENCODING)
-        cliExplain = DefaultErrorExplanation(cliPrinter)
+        val cliReporter = DefaultMessageReporter(LoggingMessageReporter())
+        cliReporter.setMessagePrinter(cliPrinter)
+        cliExplain = DefaultErrorExplanation(cliReporter)
+
+        builder.setMessagePrinter(cliPrinter)
+        builder.setMessageReporter(cliReporter)
+        builder.setErrorExplanation(cliExplain)
+
         commandLine = CommandLine.parse(args)
         if (commandLine.errors.isNotEmpty()) {
             abort(cliExplain, commandLine.errors)
-        }
-
-        if (commandLine.debug == true) {
-            when (commandLine.verbosity) {
-                null -> Unit
-                Verbosity.TRACE -> MDC.put("LOG_LEVEL", "TRACE")
-                Verbosity.DEBUG -> MDC.put("LOG_LEVEL", "DEBUG")
-                Verbosity.INFO -> MDC.put("LOG_LEVEL", "INFO")
-                Verbosity.WARN -> MDC.put("LOG_LEVEL", "WARN")
-                Verbosity.ERROR -> MDC.put("LOG_LEVEL", "ERROR")
-            }
         }
 
         loadConfiguration(commandLine.config)
 
         if (commandLine.verbosity != null) {
             builder.setVerbosity(commandLine.verbosity!!)
-            if (commandLine.debug == true) {
-                when (builder.getVerbosity()) {
-                    Verbosity.TRACE -> MDC.put("LOG_LEVEL", "TRACE")
-                    Verbosity.DEBUG -> MDC.put("LOG_LEVEL", "DEBUG")
-                    Verbosity.INFO -> MDC.put("LOG_LEVEL", "INFO")
-                    Verbosity.WARN -> MDC.put("LOG_LEVEL", "WARN")
-                    Verbosity.ERROR -> MDC.put("LOG_LEVEL", "ERROR")
-                }
-            }
+            cliReporter.threshold = commandLine.verbosity!!
         }
 
         commandLine.pipe?.let { builder.setPipe(it) }
@@ -99,7 +86,9 @@ class XmlCalabashCli private constructor() {
         commandLine.tryNamespaces?.let { builder.setTryNamespaces(it) }
         commandLine.useLocationHints?.let { builder.setUseLocationHints(it) }
 
-        builder.setLicensed(builder.getLicensed() && commandLine.licensed)
+        if (builder.getLicensed() != commandLine.licensed) {
+            builder.setLicensed(builder.getLicensed() && commandLine.licensed)
+        }
 
         commandLine.debug?.let { builder.setDebug(it) }
         commandLine.debugger?.let { builder.setDebugger(it) }

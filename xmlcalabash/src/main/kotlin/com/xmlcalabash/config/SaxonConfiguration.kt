@@ -14,6 +14,7 @@ import net.sf.saxon.lib.Initializer
 import net.sf.saxon.s9api.Processor
 import net.sf.saxon.s9api.QName
 import net.sf.saxon.s9api.Xslt30Transformer
+import org.apache.logging.log4j.kotlin.logger
 import org.xml.sax.InputSource
 import java.net.URI
 import javax.xml.transform.sax.SAXSource
@@ -34,7 +35,7 @@ class SaxonConfiguration private constructor(val licensed: Boolean,
             val licensed = configuration.isLicensedFeature(Configuration.LicenseFeature.SCHEMA_VALIDATION)
             val contextManager: ExecutionContextManager = ExecutionContextImpl()
             val saxonConfiguration = SaxonConfiguration(licensed, null, emptyMap(), emptyList(), emptyMap(), emptyList(), contextManager)
-            saxonConfiguration.init(configuration)
+            saxonConfiguration.init(true, configuration)
             return saxonConfiguration
         }
 
@@ -46,7 +47,7 @@ class SaxonConfiguration private constructor(val licensed: Boolean,
                         configurers: List<Configurer>): SaxonConfiguration {
             val contextManager: ExecutionContextManager = ExecutionContextImpl()
             val saxonConfiguration = SaxonConfiguration(licensed, configurationFile, properties, schemaDocuments, initializers, configurers, contextManager)
-            saxonConfiguration.init()
+            saxonConfiguration.init(true, null)
             return saxonConfiguration
         }
     }
@@ -66,7 +67,7 @@ class SaxonConfiguration private constructor(val licensed: Boolean,
         schemaDocuments.addAll(initialSchemaDocuments)
     }
 
-    private fun init(suppliedConfiguration: Configuration? = null) {
+    private fun init(showLoadingMessage: Boolean, suppliedConfiguration: Configuration?) {
         _configuration = suppliedConfiguration
             ?: if (saxonConfigurationFile == null) {
                 if (licensed) {
@@ -75,6 +76,9 @@ class SaxonConfiguration private constructor(val licensed: Boolean,
                     Configuration()
                 }
             } else {
+                if (showLoadingMessage) {
+                    logger.info { "Loading Saxon configuration file ${saxonConfigurationFile}" }
+                }
                 val source = SAXSource(InputSource(saxonConfigurationFile.toString()))
                 Configuration.readConfiguration(source)
             }
@@ -139,7 +143,7 @@ class SaxonConfiguration private constructor(val licensed: Boolean,
         newConfig.inheritedFunctionLibraries.addAll(functionLibraries)
         newConfig.pipelineExtensionFunctions.addAll(pipelineExtensionFunctions)
         newConfig.environment = environment
-        newConfig.init()
+        newConfig.init(false, null)
 
         newConfig.configuration.namePool = configuration.namePool
         newConfig.configuration.documentNumberAllocator = configuration.documentNumberAllocator

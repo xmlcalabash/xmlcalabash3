@@ -11,8 +11,7 @@ import net.sf.saxon.s9api.XdmValue
  *
  * This slightly awkward construction is necessary because we don't want to evaluate
  * options that aren't used and we can't construct an XProcConstantExpression at
- * runtime. Perhaps a better solution would be to resolve the conflict between
- * StepConfiguration and RuntimeStepConfiguration, but we'll do this kludge for now.
+ * runtime.
  */
 class LazyValue private constructor(val context: DocumentContext, config: StepConfiguration) {
     private var expression: XProcExpression? = null

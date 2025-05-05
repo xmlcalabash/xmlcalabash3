@@ -2,14 +2,12 @@ package com.xmlcalabash.config
 
 import com.xmlcalabash.datamodel.DeclareStepInstruction
 import com.xmlcalabash.datamodel.DocumentContext
-import com.xmlcalabash.util.TypeUtils
-import com.xmlcalabash.namespace.Ns
 import com.xmlcalabash.util.Report
+import com.xmlcalabash.util.TypeUtils
 import com.xmlcalabash.util.Verbosity
 import net.sf.saxon.s9api.QName
 import net.sf.saxon.s9api.SequenceType
 import net.sf.saxon.s9api.ValidationMode
-import net.sf.saxon.s9api.XPathCompiler
 
 open class StepConfiguration(val saxonConfig: SaxonConfiguration,
                              val context: DocumentContext,

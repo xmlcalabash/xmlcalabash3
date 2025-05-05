@@ -12,6 +12,7 @@ import com.xmlcalabash.util.MediaClassification
 import com.xmlcalabash.util.SaxonXsdValidator
 import com.xmlcalabash.util.Verbosity
 import net.sf.saxon.s9api.*
+import org.apache.logging.log4j.kotlin.logger
 import java.time.Duration
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ConcurrentMap
@@ -63,9 +64,9 @@ class CompoundStepHead(config: XProcStepConfiguration, val parent: CompoundStep,
 
         notReadyReason = sb.toString()
         if (notReadyReason.isEmpty()) {
-            stepConfig.debug { "WAIT4 ${this}: <nothing>" }
+            logger.debug { "WAIT4 ${this}: <nothing>" }
         } else {
-            stepConfig.debug { "WAIT4 ${this}: ${notReadyReason}" }
+            logger.debug { "WAIT4 ${this}: ${notReadyReason}" }
         }
     }
 
@@ -89,13 +90,13 @@ class CompoundStepHead(config: XProcStepConfiguration, val parent: CompoundStep,
             }
 
             if (isReady) {
-                stepConfig.debug { "READY ${this}: ${reason}" }
+                logger.debug { "READY ${this}: ${reason}" }
                 notReadyReason = reason
                 return true
             }
 
             if (notReadyReason != reason) {
-                stepConfig.debug { "NORDY ${this}: ${reason}" }
+                logger.debug { "NORDY ${this}: ${reason}" }
                 notReadyReason = reason
             }
             return false
@@ -125,7 +126,7 @@ class CompoundStepHead(config: XProcStepConfiguration, val parent: CompoundStep,
 
     override fun input(port: String, doc: XProcDocument) {
         synchronized(this) {
-            stepConfig.debug { "RECVD ${this} input on $port" }
+            logger.debug { "RECVD ${this} input on $port" }
 
             // N.B. inputs and outputs are swapped in the head
             if (port.startsWith("Q{")) {
@@ -166,7 +167,7 @@ class CompoundStepHead(config: XProcStepConfiguration, val parent: CompoundStep,
 
     override fun close(port: String) {
         synchronized(openPorts) {
-            stepConfig.debug { "CLOSE ${this} port ${port} ${_cache[port]?.size}" }
+            logger.debug { "CLOSE ${this} port ${port} ${_cache[port]?.size}" }
             openPorts.remove(port)
         }
     }
@@ -286,7 +287,7 @@ class CompoundStepHead(config: XProcStepConfiguration, val parent: CompoundStep,
                         || ((type == NsP.forEach || type == NsP.viewport) && port == "current")) {
                         // ignore
                     } else {
-                        stepConfig.debug { "No receiver for ${port} from ${this} (in head)" }
+                        logger.debug { "No receiver for ${port} from ${this} (in head)" }
                     }
                 }
             } else {

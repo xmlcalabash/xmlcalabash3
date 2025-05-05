@@ -25,4 +25,7 @@
     <appender-ref ref="STDERR"/>
     <appender-ref ref="FILE"/>
   </root>
+
+  <!-- I don't (usually) care about messages from the Apache HTTP client libraries -->
+  <logger name="org.apache.hc.client5.http" level="WARN"/>
 </configuration>

@@ -6,6 +6,7 @@ import com.xmlcalabash.namespace.NsCx
 import com.xmlcalabash.runtime.XProcStepConfiguration
 import com.xmlcalabash.runtime.model.FootModel
 import com.xmlcalabash.runtime.parameters.RuntimeStepParameters
+import org.apache.logging.log4j.kotlin.logger
 import java.time.Duration
 
 class CompoundStepFoot(config: XProcStepConfiguration, val parent: CompoundStep, step: FootModel): AbstractStep(config, step, NsCx.foot, "${step.name}/foot") {
@@ -21,7 +22,7 @@ class CompoundStepFoot(config: XProcStepConfiguration, val parent: CompoundStep,
     override val readyToRun: Boolean = true
 
     override fun input(port: String, doc: XProcDocument) {
-        stepConfig.debug { "RECVD ${this} input on $port" }
+        logger.debug { "RECVD ${this} input on $port" }
 
         // N.B. inputs to a foot are outputs for the compound step
         checkOutputPort(port, doc, params.inputs[port])
@@ -47,7 +48,7 @@ class CompoundStepFoot(config: XProcStepConfiguration, val parent: CompoundStep,
 
         val rpair = receiver[port]
         if (rpair == null) {
-            stepConfig.debug { "No receiver for ${port} from ${this} (in foot)" }
+            logger.debug { "No receiver for ${port} from ${this} (in foot)" }
             return
         }
 
@@ -63,7 +64,7 @@ class CompoundStepFoot(config: XProcStepConfiguration, val parent: CompoundStep,
     }
 
     override fun close(port: String) {
-        stepConfig.debug { "CLOSE ${this} port ${port}" }
+        logger.debug { "CLOSE ${this} port ${port}" }
     }
 
     override fun instantiate() {

@@ -143,8 +143,8 @@ option will automatically disable it. (But you can force it to be on with the
 <title>Configuring the logging back end</title>
 
 <para>XML Calabash uses the “logback classic” backend by default. The configuration
-file that ships with XML Calabash only sends messages to the console and it uses 
-a “turboFilter” to dynamically control the log level.</para>
+file that ships with XML Calabash only sends warning and error messages to the console.
+</para>
 
 <para>If you want to quickly configure XML Calabash to save log messages to a file,
 simply point to a logback configuration that is configured accordingly. For example,
@@ -156,7 +156,7 @@ the configuration in <xref linkend="logback-file"/>.</para>
 ><xi:include href="../examples/xml/logback.xml" parse="text"/></programlisting>
 </figure>
 
-<para>This configuration doesn’t offer dynamic control of the log level. It 
+<para>This configuration
 sends warning and error messages to the console and <emphasis>all</emphasis> messages
 to the log file (<filename>/tmp/xmlcalabash.log</filename> in this example).</para>
 

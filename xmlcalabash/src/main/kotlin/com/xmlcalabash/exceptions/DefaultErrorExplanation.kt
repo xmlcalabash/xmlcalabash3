@@ -1,5 +1,6 @@
 package com.xmlcalabash.exceptions
 
+import com.xmlcalabash.api.MessageReporter
 import com.xmlcalabash.datamodel.Location
 import com.xmlcalabash.documents.XProcBinaryDocument
 import com.xmlcalabash.documents.XProcDocument
@@ -11,7 +12,9 @@ import com.xmlcalabash.namespace.NsErr
 import com.xmlcalabash.namespace.NsXvrl
 import com.xmlcalabash.util.InternalDocumentResolver
 import com.xmlcalabash.util.MediaClassification
+import com.xmlcalabash.util.Report
 import com.xmlcalabash.util.S9Api
+import com.xmlcalabash.util.Verbosity
 import net.sf.saxon.s9api.*
 import org.xml.sax.InputSource
 import java.io.BufferedReader
@@ -21,7 +24,7 @@ import java.io.InputStreamReader
 import java.nio.charset.StandardCharsets
 import javax.xml.transform.sax.SAXSource
 
-class DefaultErrorExplanation(val printer: MessagePrinter): ErrorExplanation {
+class DefaultErrorExplanation(val reporter: MessageReporter): ErrorExplanation {
     var showStackTrace = true
 
     companion object {
@@ -75,9 +78,9 @@ class DefaultErrorExplanation(val printer: MessagePrinter): ErrorExplanation {
 
         val sb = StringBuilder()
         if (error.location != Location.NULL) {
-            sb.append("Fatal ${error.code} at ${error.location}")
+            sb.append("${error.code} at ${error.location}")
         } else {
-            sb.append("Fatal ${error.code}")
+            sb.append("${error.code}")
         }
 
         if (errorMessage == null) {
@@ -110,15 +113,15 @@ class DefaultErrorExplanation(val printer: MessagePrinter): ErrorExplanation {
     }
 
     override fun report(error: XProcError) {
-        printer.println(message(error, true))
+        reporter.error { Report(Verbosity.ERROR,  message(error, true), error.location) }
         if (showStackTrace && error.stackTrace.isNotEmpty()) {
-            printer.println("Stack trace:")
+            reporter.error { Report(Verbosity.ERROR, "Stack trace:", Location.NULL) }
             var count = error.stackTrace.size
             for (frame in error.stackTrace) {
                 if (frame.stepName.startsWith('!')) {
-                    printer.println("\t[${count}] <${frame.stepType}>")
+                    reporter.error { Report(Verbosity.ERROR, "\t[${count}] <${frame.stepType}>", Location.NULL) }
                 } else {
-                    printer.println("\t[${count}] <${frame.stepType} name=\"${frame.stepName}\">")
+                    reporter.error { Report(Verbosity.ERROR, "\t[${count}] <${frame.stepType} name=\"${frame.stepName}\">", Location.NULL) }
                 }
                 count--
             }
@@ -131,7 +134,7 @@ class DefaultErrorExplanation(val printer: MessagePrinter): ErrorExplanation {
     }
 
     override fun reportExplanation(error: XProcError) {
-        printer.println(explanation(error))
+        reporter.error { Report(Verbosity.ERROR, explanation(error), error.location) }
     }
 
     private fun template(code: QName, variant: Int, count: Int): ErrorExplanationTemplate {
@@ -337,7 +340,7 @@ class DefaultErrorExplanation(val printer: MessagePrinter): ErrorExplanation {
             writer.set(Ns.omitXmlDeclaration, "true")
             writer.set(Ns.indent, "true")
             writer.write()
-            message = baos.toString(printer.encoding)
+            message = baos.toString(reporter.messagePrinter.encoding)
         }
 
         if (message == null) {
@@ -371,7 +374,7 @@ class DefaultErrorExplanation(val printer: MessagePrinter): ErrorExplanation {
         val baos = ByteArrayOutputStream()
         val writer = DocumentWriter(XProcDocument.ofText(xmlResult.xdmNode, doc.context), baos)
         writer.set(Ns.method, "text")
-        writer.set(Ns.encoding, printer.encoding)
+        writer.set(Ns.encoding, reporter.messagePrinter.encoding)
         writer.write()
         val text = baos.toString(StandardCharsets.UTF_8)
         return text

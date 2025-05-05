@@ -2,7 +2,6 @@ package com.xmlcalabash.io
 
 import com.xmlcalabash.XmlCalabashConfiguration
 import com.xmlcalabash.config.StepConfiguration
-import com.xmlcalabash.config.XProcEnvironment
 import com.xmlcalabash.documents.DocumentProperties
 import com.xmlcalabash.documents.XProcBinaryDocument
 import com.xmlcalabash.documents.XProcDocument

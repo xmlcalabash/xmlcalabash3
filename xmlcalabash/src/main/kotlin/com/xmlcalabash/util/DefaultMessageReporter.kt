@@ -29,6 +29,8 @@ class DefaultMessageReporter(nextReporter: MessageReporter? = null): NopMessageR
                         prefix.append(reified.location.columnNumber).append(":")
                     }
                     prefix.append(" ")
+                } else {
+                    prefix.append(": ")
                 }
             } else if (reified.severity != Verbosity.INFO) {
                 prefix.append(": ")

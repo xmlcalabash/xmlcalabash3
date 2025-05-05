@@ -5,6 +5,7 @@ import com.xmlcalabash.api.FoProcessor
 import com.xmlcalabash.spi.PagedMediaManager
 import com.xmlcalabash.spi.PagedMediaProvider
 import net.sf.saxon.s9api.QName
+import org.apache.logging.log4j.kotlin.logger
 import java.net.URI
 import java.util.regex.Pattern
 
@@ -25,6 +26,7 @@ class AhManager: PagedMediaProvider, PagedMediaManager {
     }
 
     override fun create(): PagedMediaManager {
+        logger.info { "Initializing AntennaHouse paged media manager" }
         return this
     }
 
