@@ -38,11 +38,11 @@ open class ExpressionStep(val params: ExpressionStepParameters): AbstractAtomicS
         // Expression steps are unusual in that source may not exist
         contextItems.addAll(queues["source"] ?: emptyList())
 
-        stepConfig.debug { "  Expression: ${params.expression}" }
-        stepConfig.debug { "  Context items: ${contextItems.size}" }
+        logger.debug { "  Expression: ${params.expression}" }
+        logger.debug { "  Context items: ${contextItems.size}" }
 
         for (item in contextItems) {
-            stepConfig.debug {
+            logger.debug {
                 val strValue = item.value.toString()
                 if (strValue.length > 512) {
                     "  Context item: ${strValue.substring(0, 511)}…"
@@ -69,11 +69,11 @@ open class ExpressionStep(val params: ExpressionStepParameters): AbstractAtomicS
             if (name in options) {
                 val value = options[name]!!.value
                 stepConfig.typeUtils.checkType(name, value, option.asType, option.values)
-                stepConfig.debug { "  ${name} = ${value}" }
+                logger.debug { "  ${name} = ${value}" }
                 expression.setBinding(name, value)
             } else {
                 val value = option.staticValue!!.evaluate(stepConfig)
-                stepConfig.debug { "  ${name} = ${value}" }
+                logger.debug { "  ${name} = ${value}" }
                 expression.setBinding(name, value)
             }
         }

@@ -146,6 +146,8 @@ class XmlCalabashCli private constructor() {
         stepConfig = xprocParser.builder.stepConfig
         cliExplain = stepConfig.errorExplanation
 
+        logVersion()
+
         if (commandLine.help || (commandLine.command == "run" && commandLine.pipeline == null && commandLine.step == null)) {
             help()
             return
@@ -414,8 +416,8 @@ class XmlCalabashCli private constructor() {
     private fun loadConfiguration(commandLineConfig: File?) {
         val configLocations = mutableListOf<File>()
         commandLineConfig?.let { configLocations.add(it) }
-        configLocations.add(File(UriUtils.path(UriUtils.resolve(".xmlcalabash3"))))
-        configLocations.add(File(UriUtils.path(UriUtils.resolve(".xmlcalabash3"))))
+        configLocations.add(File(UriUtils.path(UriUtils.resolve(UriUtils.cwdAsUri(),".xmlcalabash3")!!)))
+        configLocations.add(File(UriUtils.path(UriUtils.resolve(UriUtils.homeAsUri(), ".xmlcalabash3")!!)))
         for (config in configLocations) {
             if (config.exists() && config.isFile) {
                 val loader = ConfigurationLoader(builder)
@@ -476,16 +478,7 @@ class XmlCalabashCli private constructor() {
 
     private fun version() {
         val proc = stepConfig.processor
-        val license = proc.underlyingConfiguration.isLicensedFeature(Configuration.LicenseFeature.SCHEMA_VALIDATION)
-                || proc.underlyingConfiguration.isLicensedFeature(Configuration.LicenseFeature.PROFESSIONAL_EDITION)
-        var edition = proc.saxonEdition
-        if (!license) {
-            if (javaClassExists("com.saxonica.config.EnterpriseConfiguration")) {
-                edition = "EE"
-            } else if (javaClassExists("com.saxonica.config.ProfessionalConfiguration")) {
-                edition = "PE"
-            }
-        }
+        val edition = actualSaxonEdition()
 
         val totThreads = 2.coerceAtLeast(Runtime.getRuntime().availableProcessors())
         val maxThreads = totThreads.coerceAtMost(stepConfig.xmlCalabashConfig.maxThreadCount)
@@ -506,13 +499,7 @@ class XmlCalabashCli private constructor() {
                 println("DEPENDENCY_${name}=${version}")
             }
         } else {
-            val dateParser = SimpleDateFormat("yyyy-MM-dd")
-            val dateInstant = dateParser.parse(XmlCalabashBuildConfig.BUILD_DATE).toInstant()
-            val date = LocalDateTime.ofInstant(dateInstant, ZoneId.systemDefault())
-            val dateFormatter = DateTimeFormatter.ofPattern("dd LLLL yyyy")
-
-            stepConfig.messagePrinter.print("${XmlCalabashBuildConfig.PRODUCT_NAME} version ${XmlCalabashBuildConfig.VERSION} ")
-            stepConfig.messagePrinter.println("(build ${XmlCalabashBuildConfig.BUILD_ID}, ${dateFormatter.format(date)})")
+            stepConfig.messagePrinter.println(versionLine())
             stepConfig.messagePrinter.print("Running with Saxon ${proc.saxonEdition} version ${proc.saxonProductVersion}")
 
             if (totThreads == maxThreads) {
@@ -529,6 +516,71 @@ class XmlCalabashCli private constructor() {
                 }
             }
         }
+    }
+
+    private fun logVersion() {
+        val proc = stepConfig.processor
+        val edition = actualSaxonEdition()
+
+        logger.debug { versionLine() }
+        logger.debug { saxonVersionLine() }
+
+        if (edition != proc.saxonEdition) {
+            logger.debug {
+                if (xmlCalabash.config.licensed) {
+                    "Saxon ${edition} is available; perhaps a license wasn't found?"
+                } else {
+                    "Saxon ${edition} is available, but the license is explicitly disabled."
+                }
+            }
+        }
+    }
+
+    private fun versionLine(): String {
+        val sb = StringBuilder()
+        sb.append("${XmlCalabashBuildConfig.PRODUCT_NAME} version ${XmlCalabashBuildConfig.VERSION} ")
+        sb.append("(build ${XmlCalabashBuildConfig.BUILD_ID}, ${formattedDate()})")
+        return sb.toString()
+    }
+
+    private fun saxonVersionLine(): String {
+        val proc = stepConfig.processor
+
+        val totThreads = 2.coerceAtLeast(Runtime.getRuntime().availableProcessors())
+        val maxThreads = totThreads.coerceAtMost(stepConfig.xmlCalabashConfig.maxThreadCount)
+
+        val sb = StringBuilder()
+        sb.append("Running with Saxon ${proc.saxonEdition} version ${proc.saxonProductVersion}")
+        if (totThreads == maxThreads) {
+            sb.append(" using ${totThreads} threads")
+        } else {
+            sb.append(" using at most ${maxThreads} of ${totThreads} available threads")
+        }
+
+        return sb.toString()
+    }
+
+    private fun formattedDate(): String {
+        val dateParser = SimpleDateFormat("yyyy-MM-dd")
+        val dateInstant = dateParser.parse(XmlCalabashBuildConfig.BUILD_DATE).toInstant()
+        val date = LocalDateTime.ofInstant(dateInstant, ZoneId.systemDefault())
+        val dateFormatter = DateTimeFormatter.ofPattern("dd LLLL yyyy")
+        return dateFormatter.format(date)
+    }
+
+    private fun actualSaxonEdition(): String {
+        val proc = stepConfig.processor
+        val license = proc.underlyingConfiguration.isLicensedFeature(Configuration.LicenseFeature.SCHEMA_VALIDATION)
+                || proc.underlyingConfiguration.isLicensedFeature(Configuration.LicenseFeature.PROFESSIONAL_EDITION)
+        var edition = proc.saxonEdition
+        if (!license) {
+            if (javaClassExists("com.saxonica.config.EnterpriseConfiguration")) {
+                edition = "EE"
+            } else if (javaClassExists("com.saxonica.config.ProfessionalConfiguration")) {
+                edition = "PE"
+            }
+        }
+        return edition
     }
 
     private fun javaClassExists(klass: String): Boolean {
