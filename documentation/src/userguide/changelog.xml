@@ -13,6 +13,38 @@ See the commits and pull requests on
 finer detail.</para>
 
 <revhistory>
+<revision xml:id="r300-alpha32">
+<revnumber>3.0.0-alpha32</revnumber>
+<date>2025-05-05</date>
+<revdescription>
+<itemizedlist>
+<listitem><para>Significant refactoring of message and logging systems.</para>
+<para>There’s more separation between things that are logged through the
+message reporter and things that are only logged to the underlying Java logger.
+The intent is that things only relevant to debugging XML Calabash go only to the
+logger. Things that might be relevant to debugging a pipeline go to both places.
+</para>
+<para>One exception is that details about how the application is configured go
+only to the underlying Java logger. This is necessary because we haven’t
+configured a message reporter before we’ve configured the application!</para>
+<para>The default <link linkend="logback-file">logback.xml configuration</link>
+file has been simplified. It no longer uses dynamic configuration. Use a
+different configuration file to change the level.
+</para>
+<para>The error explanation implementation has been changed so that it also uses
+the message reporter, rather than writing directly to stderr.</para>
+</listitem>
+<listitem>
+<para>Multithreaded execution complicates the task the visualizer is trying to
+perform. The “detail” visualizer has been updated.</para>
+</listitem>
+<listitem>
+<para>Fixed a few bugs in the <tag>cx:wait-for-update</tag> step; it didn’t work reliably
+for HTTP URIs.</para>
+</listitem>
+</itemizedlist>
+</revdescription>
+</revision>
 <revision xml:id="r300-alpha31">
 <revnumber>3.0.0-alpha31</revnumber>
 <date>2025-05-03</date>
