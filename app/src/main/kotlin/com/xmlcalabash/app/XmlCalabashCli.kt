@@ -76,8 +76,8 @@ class XmlCalabashCli private constructor() {
 
         if (commandLine.verbosity != null) {
             builder.setVerbosity(commandLine.verbosity!!)
-            cliReporter.threshold = commandLine.verbosity!!
         }
+        cliReporter.threshold = builder.getVerbosity()
 
         commandLine.pipe?.let { builder.setPipe(it) }
         commandLine.trace?.let { builder.setTrace(it) }
