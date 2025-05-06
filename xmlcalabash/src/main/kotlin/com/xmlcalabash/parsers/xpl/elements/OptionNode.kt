@@ -41,7 +41,7 @@ class OptionNode(parent: AnyNode, node: XdmNode, val name: QName, val select: St
                             val typeUtils = TypeUtils(stepConfig)
                             typeUtils.xpathPromote(value, asType!!.itemType.typeName)
                         } catch (ex: Exception) {
-                            throw stepConfig.exception(XProcError.xsValueDoesNotSatisfyType(value.toString(), TypeUtils.sequenceTypeToString(asType!!)), ex)
+                            throw stepConfig.exception(XProcError.xdBadType(value.toString(), TypeUtils.sequenceTypeToString(asType!!)), ex)
                         }
                     }
                 }

@@ -21,11 +21,11 @@ class StaticOptionDetails(val stepConfig: StepConfiguration, val name: QName, va
                     val castValue = stepConfig.typeUtils.xpathPromote(value, asType.itemType.typeName)
                     return override(castValue)
                 } catch (ex: Exception) {
-                    throw stepConfig.exception(XProcError.xsValueDoesNotSatisfyType(value.toString(), TypeUtils.sequenceTypeToString(asType)), ex)
+                    throw stepConfig.exception(XProcError.xdBadType(value.toString(), TypeUtils.sequenceTypeToString(asType)), ex)
                 }
             }
 
-            throw stepConfig.exception(XProcError.xsValueDoesNotSatisfyType(value.toString(), TypeUtils.sequenceTypeToString(asType)))
+            throw stepConfig.exception(XProcError.xdBadType(value.toString(), TypeUtils.sequenceTypeToString(asType)))
         }
 
         if (values.isNotEmpty()) {
