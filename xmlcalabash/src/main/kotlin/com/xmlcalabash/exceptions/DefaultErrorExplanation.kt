@@ -113,15 +113,15 @@ class DefaultErrorExplanation(val reporter: MessageReporter): ErrorExplanation {
     }
 
     override fun report(error: XProcError) {
-        reporter.error { Report(Verbosity.ERROR,  message(error, true), error.location) }
+        reporter.error { Report(Verbosity.ERROR,  message(error, true)) }
         if (showStackTrace && error.stackTrace.isNotEmpty()) {
-            reporter.error { Report(Verbosity.ERROR, "Stack trace:", Location.NULL) }
+            reporter.error { Report(Verbosity.ERROR, "Stack trace:") }
             var count = error.stackTrace.size
             for (frame in error.stackTrace) {
                 if (frame.stepName.startsWith('!')) {
-                    reporter.error { Report(Verbosity.ERROR, "\t[${count}] <${frame.stepType}>", Location.NULL) }
+                    reporter.error { Report(Verbosity.ERROR, "\t[${count}] <${frame.stepType}>") }
                 } else {
-                    reporter.error { Report(Verbosity.ERROR, "\t[${count}] <${frame.stepType} name=\"${frame.stepName}\">", Location.NULL) }
+                    reporter.error { Report(Verbosity.ERROR, "\t[${count}] <${frame.stepType} name=\"${frame.stepName}\">") }
                 }
                 count--
             }

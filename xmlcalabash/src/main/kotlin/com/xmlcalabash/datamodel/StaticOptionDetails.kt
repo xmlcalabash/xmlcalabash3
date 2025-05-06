@@ -2,6 +2,7 @@ package com.xmlcalabash.datamodel
 
 import com.xmlcalabash.config.StepConfiguration
 import com.xmlcalabash.exceptions.XProcError
+import com.xmlcalabash.namespace.NsXs
 import com.xmlcalabash.util.TypeUtils
 import net.sf.saxon.s9api.QName
 import net.sf.saxon.s9api.SequenceType
@@ -15,7 +16,16 @@ class StaticOptionDetails(val stepConfig: StepConfiguration, val name: QName, va
 
     internal fun override(value: XdmValue) {
         if (!asType.matches(value)) {
-            throw stepConfig.exception(XProcError.xsValueDoesNotSatisfyType(value.toString(), TypeUtils.sequenceTypeToString(asType)))
+            if (value is XdmAtomicValue && value.primitiveTypeName == NsXs.untypedAtomic && asType.itemType != NsXs.untypedAtomic) {
+                try {
+                    val castValue = stepConfig.typeUtils.xpathPromote(value, asType.itemType.typeName)
+                    return override(castValue)
+                } catch (ex: Exception) {
+                    throw stepConfig.exception(XProcError.xdBadType(value.toString(), TypeUtils.sequenceTypeToString(asType)), ex)
+                }
+            }
+
+            throw stepConfig.exception(XProcError.xdBadType(value.toString(), TypeUtils.sequenceTypeToString(asType)))
         }
 
         if (values.isNotEmpty()) {
