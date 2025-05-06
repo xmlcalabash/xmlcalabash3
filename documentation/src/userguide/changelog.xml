@@ -13,6 +13,40 @@ See the commits and pull requests on
 finer detail.</para>
 
 <revhistory>
+<revision xml:id="r300-alpha33">
+<revnumber>3.0.0-alpha32</revnumber>
+<date>2025-05-06</date>
+<revdescription>
+<itemizedlist>
+<listitem><para>Fixed <ghissue number="450"/>. Make sure that options passed on the
+command line are promoted as required. (So “true” can be used for an <code>xs:boolean</code> value.)
+Also changed the error code used for option values that don’t match (or can’t
+be promoted to) the correct type. They now raise <code>err:XD0036</code> instead of
+<code>err:XS0077</code> which is really about attribute values not option values.
+</para></listitem>
+<listitem><para>Fixed <ghissue number="447"/>. Make sure the default verbosity is “info”,
+not “warn”. (This error was introduced while tinkering with the logging code; it was probably
+never released.)
+</para></listitem>
+<listitem><para>Fixed <ghissue number="441"/>. Restore loading <code>~/.xmlcalabash3</code>
+as the default configuration file if no configuration is given explicitly and if
+<code>./.xmlcalabash3</code> doesn’t exist.
+(In alpha31 or alpha32, the code to load <code>~/.xmlcalabash3</code> was lost, now it’s back.)
+</para></listitem>
+<listitem><para>Disabled standard Java logging to <code>stderr</code>. This
+seems a bit odd, but XML Calabash has its own error reporter (necessary so that
+pipelines and integrators can capture the error messages). That reporter sends
+all messages to the standard Java logging system. That’s necessary so that it’s
+possible to capture lower level debug messages to a file without sending them
+all to the console. But it means that if an error occurs, the reporter prints
+the error message and then the underlying Java logging system prints it again,
+in a slightly different format. That’s going to be both confusing and annoying,
+so by default no Java log messages are printed.
+</para></listitem>
+</itemizedlist>
+</revdescription>
+</revision>
+
 <revision xml:id="r300-alpha32">
 <revnumber>3.0.0-alpha32</revnumber>
 <date>2025-05-05</date>
