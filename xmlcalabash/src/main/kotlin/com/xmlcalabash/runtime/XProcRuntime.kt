@@ -14,6 +14,7 @@ import net.sf.saxon.s9api.Axis
 import net.sf.saxon.s9api.XdmDestination
 import net.sf.saxon.s9api.XdmNodeKind
 import org.xml.sax.InputSource
+import org.xmlresolver.ResolverFeature
 import javax.xml.transform.sax.SAXSource
 
 class XProcRuntime private constructor(internal val start: DeclareStepInstruction, internal val config: XProcStepConfiguration) {
@@ -44,7 +45,11 @@ class XProcRuntime private constructor(internal val start: DeclareStepInstructio
                                     } else {
                                         val uri = UriUtils.resolve(element.baseURI, href).toString()
                                         config.debug { "Adding catalog: ${uri}" }
-                                        config.environment.documentManager.resolverConfiguration.addCatalog(uri)
+                                        val rconfig = config.documentManager.resolver.configuration
+                                        val addnlCatalogs = mutableListOf<String>()
+                                        addnlCatalogs.addAll(rconfig.getFeature(ResolverFeature.CATALOG_ADDITIONS))
+                                        addnlCatalogs.add(uri)
+                                        rconfig.setFeature(ResolverFeature.CATALOG_ADDITIONS, addnlCatalogs)
                                     }
                                 }
                                 NsCx.importSchema -> {

@@ -24,12 +24,12 @@ class XProcSelectExpression private constructor(stepConfig: StepConfiguration, v
         return select(stepConfig, select, asType, collection, values)
     }
 
-    override fun xevaluate(config: StepConfiguration): () -> XdmValue {
-        return { evaluate(config) }
+    override fun xevaluate(stepConfig: StepConfiguration): () -> XdmValue {
+        return { evaluate(stepConfig) }
     }
 
-    override fun evaluate(config: StepConfiguration): XdmValue {
-        val compiler = config.newXPathCompiler()
+    override fun evaluate(stepConfig: StepConfiguration): XdmValue {
+        val compiler = stepConfig.newXPathCompiler()
 
         // Hack
         val uri = stepConfig.baseUri // stepConfig, not config!
@@ -55,22 +55,22 @@ class XProcSelectExpression private constructor(stepConfig: StepConfiguration, v
             throw ex
         }
 
-        val sconfig = config.saxonConfig.configuration
+        val sconfig = stepConfig.saxonConfig.configuration
         val defaultCollectionUri = sconfig.defaultCollection
         val collectionFinder = XProcCollectionFinder(defaultCollection, selector.underlyingXPathContext.collectionFinder)
         selector.underlyingXPathContext.collectionFinder = collectionFinder
-        selector.resourceResolver = config.environment.documentManager
+        selector.resourceResolver = stepConfig.documentManager
         sconfig.defaultCollection = XProcCollectionFinder.DEFAULT
 
         for (name in variableRefs) {
             if (name in staticVariableBindings) {
-                selector.setVariable(name, staticVariableBindings[name]!!.evaluate(config))
+                selector.setVariable(name, staticVariableBindings[name]!!.evaluate(stepConfig))
             } else if (name in variableBindings) {
                 selector.setVariable(name, variableBindings[name]!!)
             }
         }
 
-        setupExecutionContext(config, selector)
+        setupExecutionContext(stepConfig, selector)
 
         val result = try {
             selector.evaluate()
@@ -84,7 +84,7 @@ class XProcSelectExpression private constructor(stepConfig: StepConfiguration, v
 
         if (asType !== SequenceType.ANY || values.isNotEmpty()) {
             try {
-                return config.typeUtils.checkType(null, result, asType, values)
+                return stepConfig.typeUtils.checkType(null, result, asType, values)
             } catch (ex: XProcException) {
                 if (ex.error.code == NsErr.xd(36) && asType.underlyingSequenceType.primaryType == BuiltInAtomicType.QNAME) {
                     throw ex.error.with(NsErr.xd(61)).exception()
