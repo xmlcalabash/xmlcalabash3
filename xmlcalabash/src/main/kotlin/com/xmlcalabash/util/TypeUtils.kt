@@ -326,7 +326,7 @@ class TypeUtils(val context: DocumentContext) {
             val st = parser.parseSequenceType(asExpr, icontext)
             return SequenceType.fromUnderlyingSequenceType(context.processor, st)
         } catch (ex: XPathException) {
-            throw context.exception(XProcError.Companion.xsInvalidSequenceType(asExpr))
+            throw context.exception(XProcError.Companion.xsInvalidSequenceType(asExpr), ex)
         }
     }
 
