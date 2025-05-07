@@ -37,7 +37,6 @@ open class RunStep(config: XProcStepConfiguration, compound: CompoundStepModel):
                 val source = cache["!source"]!!.first().value as XdmNode
                 parser.parse(source)
             } catch (ex: Exception) {
-                ex.printStackTrace()
                 throw stepConfig.exception(XProcError.xcNotAPipeline(), ex)
             }
 

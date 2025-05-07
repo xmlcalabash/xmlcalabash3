@@ -1288,9 +1288,9 @@ It is a dynamic error if the assert-valid option on p:validate-with-json-schema
 is true and the input document is not valid.
 
 XC0200
-Input is not a pipeline.
+The pipeline could not be compiled.
 It is a dynamic error if the pipeline input to the p:run step is not a valid
-pipeline.
+pipeline or if there are errors in any of its static options.
 
 XC0201/1
 Cannot uncompress to “$1”.

@@ -69,7 +69,7 @@ class XplDocument(val builder: PipelineBuilder, val xml: XdmNode) {
                                 && parseBoolean(node.getAttributeValue(Ns.static))) {
                                 try {
                                     val name = tree.stepConfig.typeUtils.parseQName(node.getAttributeValue(Ns.name))
-                                    var defaultValue = node.getAttributeValue(Ns.select) ?: "()"
+                                    val defaultValue = node.getAttributeValue(Ns.select) ?: "()"
                                     OptionNode(tree, node, name, defaultValue)
                                 } catch (ex: Exception) {
                                     ElementNode(tree, node)
