@@ -18,69 +18,31 @@ import org.apache.logging.log4j.kotlin.logger
 import org.xml.sax.EntityResolver
 import org.xml.sax.InputSource
 import org.xml.sax.ext.EntityResolver2
+import org.xmlresolver.ResolverConfiguration
 import org.xmlresolver.ResolverConstants
 import org.xmlresolver.ResourceRequestImpl
 import org.xmlresolver.XMLResolver
-import org.xmlresolver.XMLResolverConfiguration
 import org.xmlresolver.sources.ResolverSAXSource
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.net.URI
 import javax.xml.transform.Source
+import javax.xml.transform.URIResolver
 import javax.xml.transform.sax.SAXSource
 import javax.xml.transform.stream.StreamSource
 
-open class DocumentManager(val xmlCalabasConfiguration: XmlCalabashConfiguration): EntityResolver, EntityResolver2, ResourceResolver, ModuleURIResolver {
-    constructor(manager: DocumentManager): this(manager.xmlCalabasConfiguration) {
+open class DocumentManager(val xmlCalabashConfiguration: XmlCalabashConfiguration, val resolver: XMLResolver): EntityResolver, EntityResolver2, URIResolver, ResourceResolver, ModuleURIResolver {
+    constructor(xmlCalabashConfiguration: XmlCalabashConfiguration): this(xmlCalabashConfiguration, XMLResolver())
+
+    constructor(manager: DocumentManager): this(manager.xmlCalabashConfiguration, manager.resolver) {
         prefixMap.putAll(manager.prefixMap)
         prefixList.addAll(manager.prefixList)
         _cache.putAll(manager._cache)
-        _resolver = manager._resolver
-        _resolverConfiguration = manager._resolverConfiguration
     }
 
     private val prefixMap = mutableMapOf<String, DocumentResolver>()
     private val prefixList = mutableListOf<String>()
     private val _cache = mutableMapOf<URI, MutableMap<MediaType,XProcDocument>>()
-
-    private var _resolver: XMLResolver? = null
-    private var _resolverConfiguration = XMLResolverConfiguration()
-
-    private var _userEntityResolver: EntityResolver? = null
-    private var _userResourceResolver: ResourceResolver? = null
-    private var _userModuleURIResolver: ModuleURIResolver? = null
-
-    val resolverConfiguration: XMLResolverConfiguration
-        get() = _resolverConfiguration
-
-    val resolver: XMLResolver
-        get() {
-            if (_resolver == null) {
-                _resolver = XMLResolver(resolverConfiguration)
-            }
-            return _resolver!!
-        }
-
-    fun getEntityResolver(): EntityResolver? {
-        return _userEntityResolver
-    }
-    fun setEntityResolver(resolver: EntityResolver?) {
-        _userEntityResolver = resolver
-    }
-
-    fun getResourceResolver(): ResourceResolver? {
-        return _userResourceResolver
-    }
-    fun setResourceResolver(resolver: ResourceResolver?) {
-        _userResourceResolver = resolver
-    }
-
-    fun getModuleURIResolver(): ModuleURIResolver? {
-        return _userModuleURIResolver
-    }
-    fun setModuleURIResolver(resolver: ModuleURIResolver?) {
-        _userModuleURIResolver = resolver
-    }
 
     fun registerPrefix(prefix: String, resolver: DocumentResolver) {
         prefixMap[prefix] = resolver
@@ -106,11 +68,7 @@ open class DocumentManager(val xmlCalabasConfiguration: XmlCalabashConfiguration
     }
 
     fun lookup(href: URI, baseUri: URI? = null): URI {
-        if (_userEntityResolver != null || _userResourceResolver != null || _userModuleURIResolver != null) {
-            throw XProcError.xiLookupIsNotPossible().exception()
-        }
-
-        val req = if (baseUri == null) {
+            val req = if (baseUri == null) {
             resolver.getRequest("${href}")
         } else {
             resolver.getRequest("${href}", "${baseUri}")
@@ -181,7 +139,7 @@ open class DocumentManager(val xmlCalabasConfiguration: XmlCalabashConfiguration
     }
 
     fun getCached(href: URI): XProcDocument? {
-        val contentType = MediaType.parse(xmlCalabasConfiguration.mimetypesFileTypeMap.getContentType(href.toString()))
+        val contentType = MediaType.parse(xmlCalabashConfiguration.mimetypesFileTypeMap.getContentType(href.toString()))
         return getCached(href, contentType)
     }
 
@@ -288,23 +246,10 @@ open class DocumentManager(val xmlCalabasConfiguration: XmlCalabashConfiguration
     }
 
     override fun resolveEntity(name: String?, publicId: String?, baseURI: String?, systemId: String?): InputSource {
-        if (_userEntityResolver != null && _userEntityResolver is EntityResolver2) {
-            val source = (_userEntityResolver as EntityResolver2).resolveEntity(name, publicId, baseURI, systemId)
-            if (source != null) {
-                return source
-            }
-        }
         return resolver.entityResolver2.resolveEntity(name, publicId, baseURI, systemId)
     }
 
     override fun resolveEntity(publicId: String?, systemId: String?): InputSource {
-        if (_userEntityResolver != null) {
-            val source = _userEntityResolver!!.resolveEntity(publicId, systemId)
-            if (source != null) {
-                return source
-            }
-        }
-
         if (systemId != null) {
             val source = inputFromCache(URI(systemId))
             if (source != null) {
@@ -316,25 +261,12 @@ open class DocumentManager(val xmlCalabasConfiguration: XmlCalabashConfiguration
     }
 
     override fun getExternalSubset(name: String?, baseURI: String?): InputSource {
-        if (_userEntityResolver != null && _userEntityResolver is EntityResolver2) {
-            val source = (_userEntityResolver as EntityResolver2).getExternalSubset(name, baseURI)
-            if (source != null) {
-                return source
-            }
-        }
         return resolver.entityResolver2.getExternalSubset(name, baseURI)
     }
 
     override fun resolve(saxonRequest: net.sf.saxon.lib.ResourceRequest?): Source? {
         if (saxonRequest == null) {
             return null
-        }
-
-        if (_userResourceResolver != null) {
-            val source = _userResourceResolver!!.resolve(saxonRequest)
-            if (source != null) {
-                return source
-            }
         }
 
         if (saxonRequest.uri != null) {
@@ -346,7 +278,7 @@ open class DocumentManager(val xmlCalabasConfiguration: XmlCalabashConfiguration
             }
         }
 
-        val request = ResourceRequestImpl(resolverConfiguration, saxonRequest.nature, saxonRequest.purpose)
+        val request = ResourceRequestImpl(resolver.configuration, saxonRequest.nature, saxonRequest.purpose)
         request.uri = saxonRequest.uri
         request.baseURI = saxonRequest.baseUri
         request.entityName = saxonRequest.entityName
@@ -361,42 +293,59 @@ open class DocumentManager(val xmlCalabasConfiguration: XmlCalabashConfiguration
     }
 
     override fun resolve(moduleURI: String?, baseURI: String?, locations: Array<out String>?): Array<StreamSource>? {
-        if (_userModuleURIResolver != null) {
-            val streams = _userModuleURIResolver!!.resolve(moduleURI, baseURI, locations)
-            if (streams != null) {
-                return streams
-            }
-        }
-
-        val href = if (moduleURI == null) {
-            if (baseURI == null) {
-                return null
-            }
-            URI(baseURI)
-        } else {
-            if (baseURI == null) {
-                URI(moduleURI)
-            } else {
-                UriUtils.resolve(URI(baseURI), moduleURI)!!
-            }
-        }
+        val href = constructUri(moduleURI, baseURI) ?: return null
 
         val inputSource = inputFromCache(href)
-        if (inputSource == null) {
-            val request = ResourceRequestImpl(resolverConfiguration, ResolverConstants.SCHEMA_NATURE, ResolverConstants.VALIDATION_PURPOSE)
-            request.uri = moduleURI
-            request.baseURI = baseURI
-
-            val resp = resolver.resolve(request)
-            if (resp.inputStream != null) {
-                val source = StreamSource(resp.inputStream, href.toString())
-                return arrayOf(source)
-            }
-
-            return null
+        if (inputSource != null) {
+            return arrayOf(StreamSource(inputSource.byteStream, href.toString()))
         }
 
-        val source = StreamSource(inputSource.byteStream, href.toString())
-        return arrayOf(source)
+        val request = ResourceRequestImpl(resolver.configuration, ResolverConstants.SCHEMA_NATURE, ResolverConstants.VALIDATION_PURPOSE)
+        request.uri = moduleURI
+        request.baseURI = baseURI
+
+        val resp = resolver.resolve(request)
+        if (resp.inputStream != null) {
+            val source = StreamSource(resp.inputStream, href.toString())
+            return arrayOf(source)
+        }
+
+        return null
+    }
+
+    override fun resolve(href: String?, baseURI: String?): Source? {
+        val uri = constructUri(href, baseURI) ?: return null
+
+        val inputSource = inputFromCache(uri)
+        if (inputSource != null) {
+            return StreamSource(inputSource.byteStream, uri.toString())
+        }
+
+        val request = ResourceRequestImpl(resolver.configuration, ResolverConstants.SCHEMA_NATURE, ResolverConstants.VALIDATION_PURPOSE)
+        request.uri = uri.toString()
+        request.baseURI = baseURI
+
+        val resp = resolver.resolve(request)
+        if (resp.inputStream != null) {
+            return StreamSource(resp.inputStream, uri.toString())
+        }
+
+        return null
+    }
+
+    private fun constructUri(href: String?, baseURI: String?): URI? {
+        return if (href == null) {
+            if (baseURI == null) {
+                null
+            } else {
+                URI(baseURI)
+            }
+        } else {
+            if (baseURI == null) {
+                URI(href)
+            } else {
+                UriUtils.resolve(URI(baseURI), href)
+            }
+        }
     }
 }

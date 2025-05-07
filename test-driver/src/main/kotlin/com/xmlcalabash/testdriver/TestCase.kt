@@ -18,6 +18,7 @@ import net.sf.saxon.s9api.*
 import net.sf.saxon.type.BuiltInAtomicType
 import org.apache.logging.log4j.kotlin.logger
 import org.xml.sax.InputSource
+import org.xmlresolver.ResolverFeature
 import java.io.*
 import java.nio.charset.StandardCharsets
 import java.nio.file.Files
@@ -146,10 +147,17 @@ class TestCase(val xmlCalabash: XmlCalabash, val testOptions: TestOptions, val t
             val runtime = decl.runtime()
 
             for (catalog in catalogs) {
-                val stream = ByteArrayInputStream(catalog.toByteArray(StandardCharsets.UTF_8))
-                val source = InputSource(stream)
-                source.systemId = testFile.absolutePath
-                runtime.environment.documentManager.resolverConfiguration.addCatalog(testFile.toURI(), source)
+                val tempfile = File.createTempFile("xmlcalabash-test", ".xml")
+                tempfile.deleteOnExit()
+                val printStream = PrintStream(tempfile.outputStream())
+                printStream.println(catalog)
+                printStream.close()
+
+                val rconfig = runtime.environment.documentManager.resolver.configuration
+                val addnlCatalogs = mutableListOf<String>()
+                addnlCatalogs.addAll(rconfig.getFeature(ResolverFeature.CATALOG_ADDITIONS))
+                addnlCatalogs.add(tempfile.absolutePath)
+                rconfig.setFeature(ResolverFeature.CATALOG_ADDITIONS, addnlCatalogs)
             }
 
             val pipeline = runtime.executable()
