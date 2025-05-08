@@ -62,6 +62,7 @@ class CommandLine private constructor(val args: Array<out String>) {
     private var _debugger: Boolean? = null
     private var _visualizer: String? = null
     private val _visualizerOptions = mutableMapOf<String,String>()
+    private var _stacktrace = false
     private var _verbosity: Verbosity? = null
     private var _explainErrors = false
     private var _assertions: AssertionsLevel? = null
@@ -121,6 +122,10 @@ class CommandLine private constructor(val args: Array<out String>) {
     /** Enable debugging output? */
     val debug: Boolean?
         get() = _debug
+
+    /** Print a stack (step) trace on error? */
+    val stacktrace: Boolean
+        get() = _stacktrace
 
     /** How chatty shall we be? */
     val verbosity: Verbosity?
@@ -258,6 +263,7 @@ class CommandLine private constructor(val args: Array<out String>) {
         ArgumentDescription("--trace", listOf(), ArgumentType.FILE) { it -> _trace = File(it) },
         ArgumentDescription("--nogo", listOf(), ArgumentType.BOOLEAN, "true") { it -> _nogo = it == "true" },
         ArgumentDescription("--trace-documents", listOf("--trace-docs"), ArgumentType.DIRECTORY) { it -> _traceDocuments = File(it) },
+        ArgumentDescription("--stacktrace", listOf("--stack-trace"), ArgumentType.BOOLEAN, "true") { it -> _stacktrace = it == "true" },
         ArgumentDescription("--verbosity", listOf("-V"),
             ArgumentType.STRING, "info", listOf("trace", "debug", "progress", "info", "warn", "error")) { it ->
             _verbosity = when(it) {

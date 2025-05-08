@@ -184,6 +184,7 @@ open class XProcError protected constructor(val code: QName, val variant: Int, e
         fun xdBadType(value: String, type: ItemType) = dynamic(Pair(36,2), value, type)
         fun xdBadType(name: QName, value: String, type: String) = dynamic(Pair(36,3), name, value, type)
         fun xdBadType(message: String) = dynamic(Pair(36,4), message)
+        fun xdBadTypeEmpty(type: String) = dynamic(Pair(36,5), type)
         fun xdBadInputContentType(port: String, type: String) = dynamic(38, port, type)
         fun xdUnsupportedCharset(charset: String) = dynamic(39, charset)
         fun xdBadBase64Input() = dynamic(40)
@@ -517,11 +518,15 @@ open class XProcError protected constructor(val code: QName, val variant: Int, e
         if (code == NsErr.xd(36)) {
             val detail0 = details[0].toString()
             val detail1 = details[1].toString()
-            return xsValueDoesNotSatisfyType(detail0, detail1)
+            val error = xsValueDoesNotSatisfyType(detail0, detail1)
+            error._throwable = throwable
+            return error
         }
 
         if (code == NsErr.xd(69)) {
-            return xsUnboundPrefix(details[0].toString())
+            val error = xsUnboundPrefix(details[0].toString())
+            error._throwable = throwable
+            return error
         }
 
         return this
@@ -568,6 +573,7 @@ open class XProcError protected constructor(val code: QName, val variant: Int, e
 
     fun at(doc: XProcDocument): XProcError {
         val error = XProcError(this, location, Location(doc.baseURI))
+        error._throwable = throwable
         error._moreDetails.addAll(moreDetails)
         return error
     }
@@ -592,6 +598,7 @@ open class XProcError protected constructor(val code: QName, val variant: Int, e
 
     fun with(newCode: QName): XProcError {
         val error = XProcError(newCode, 1, location, inputLocation, *details)
+        error._throwable = throwable
         error._moreDetails.addAll(moreDetails)
         return error
     }

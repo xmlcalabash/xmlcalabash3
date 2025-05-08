@@ -5,6 +5,7 @@ import com.xmlcalabash.util.TypeUtils
 import com.xmlcalabash.namespace.Ns
 import net.sf.saxon.s9api.QName
 import net.sf.saxon.s9api.SequenceType
+import net.sf.saxon.s9api.XdmEmptySequence
 import net.sf.saxon.s9api.XdmNode
 
 class OptionNode(parent: AnyNode, node: XdmNode, val name: QName, val select: String): ElementNode(parent, node) {
@@ -41,6 +42,9 @@ class OptionNode(parent: AnyNode, node: XdmNode, val name: QName, val select: St
                             val typeUtils = TypeUtils(stepConfig)
                             typeUtils.xpathPromote(value, asType!!.itemType.typeName)
                         } catch (ex: Exception) {
+                            if (value == XdmEmptySequence.getInstance()) {
+                                throw stepConfig.exception(XProcError.xdBadTypeEmpty(TypeUtils.sequenceTypeToString(asType!!)), ex)
+                            }
                             throw stepConfig.exception(XProcError.xdBadType(value.toString(), TypeUtils.sequenceTypeToString(asType!!)), ex)
                         }
                     }

@@ -25,7 +25,7 @@ import java.nio.charset.StandardCharsets
 import javax.xml.transform.sax.SAXSource
 
 class DefaultErrorExplanation(val reporter: MessageReporter): ErrorExplanation {
-    var showStackTrace = true
+    override var showStacktrace = false
 
     companion object {
         private var loaded = false
@@ -114,7 +114,7 @@ class DefaultErrorExplanation(val reporter: MessageReporter): ErrorExplanation {
 
     override fun report(error: XProcError) {
         reporter.error { Report(Verbosity.ERROR,  message(error, true)) }
-        if (showStackTrace && error.stackTrace.isNotEmpty()) {
+        if (showStacktrace && error.stackTrace.isNotEmpty()) {
             reporter.error { Report(Verbosity.ERROR, "Stack trace:") }
             var count = error.stackTrace.size
             for (frame in error.stackTrace) {
@@ -134,7 +134,7 @@ class DefaultErrorExplanation(val reporter: MessageReporter): ErrorExplanation {
     }
 
     override fun reportExplanation(error: XProcError) {
-        reporter.error { Report(Verbosity.ERROR, explanation(error), error.location) }
+        reporter.error { Report(Verbosity.ERROR, explanation(error), Location.NULL) }
     }
 
     private fun template(code: QName, variant: Int, count: Int): ErrorExplanationTemplate {
