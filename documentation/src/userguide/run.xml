@@ -82,6 +82,7 @@ given, the <command>run</command> command is assumed.</para>
   <arg rep="norepeat" linkend="cli-trace-documents">--trace-documents:<replaceable>output-directory</replaceable></arg>
   <sbr/>
   <arg rep="norepeat" linkend="cli-assertions">--assertions:<replaceable>level</replaceable></arg>
+  <arg rep="norepeat" linkend="cli-stacktrace">--stacktrace</arg>
   <sbr/>
   <arg rep="norepeat" linkend="cli-licensed">--licensed</arg>
   <arg rep="norepeat" linkend="cli-debug">--debug</arg>
@@ -455,6 +456,15 @@ You can configure it in the usual ways.</para>
 <listitem>
 <para>Start an interactive debugging session on the pipeline.
 See <xref linkend="debugging"/>.</para>
+</listitem>
+</varlistentry>
+
+<varlistentry xml:id="cli-stacktrace">
+  <term><option>--stacktrace</option></term>
+<listitem>
+<para>If the stacktrace option is enabled, a stack trace (really a “step trace”) will
+be printed if the pipeline fails at runtime. This trace will show the step that
+failed and its ancestors.</para>
 </listitem>
 </varlistentry>
 

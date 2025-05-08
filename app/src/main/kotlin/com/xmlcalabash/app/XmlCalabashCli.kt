@@ -79,6 +79,8 @@ class XmlCalabashCli private constructor() {
         }
         cliReporter.threshold = builder.getVerbosity()
 
+        cliExplain.showStacktrace = commandLine.stacktrace
+
         commandLine.pipe?.let { builder.setPipe(it) }
         commandLine.trace?.let { builder.setTrace(it) }
         commandLine.traceDocuments?.let { builder.setTraceDocuments(it) }
@@ -435,23 +437,7 @@ class XmlCalabashCli private constructor() {
         val verbosity = commandLine.verbosity ?: Verbosity.INFO
 
         for (error in errors) {
-            errorExplanation.report(error.error)
-
-            when (error.error.code) {
-                NsErr.xc(93) -> { // XSLT compile error
-                    // This is kind of awful
-                    val reports = error.error.details[2] as List<*>
-                    for (anyReport in reports) {
-                        val report = anyReport as Report
-                        stepConfig.xmlCalabashConfig.messageReporter.report(report.severity) { report }
-                    }
-                }
-                else -> Unit
-            }
-
-            if (commandLine.explainErrors) {
-                errorExplanation.reportExplanation(error.error)
-            }
+            explainError(errorExplanation, error)
         }
 
         if (verbosity <= Verbosity.DEBUG) {
@@ -462,6 +448,31 @@ class XmlCalabashCli private constructor() {
         }
 
         exitProcess(1)
+    }
+
+    private fun explainError(errorExplanation: ErrorExplanation, error: XProcException) {
+        errorExplanation.report(error.error)
+
+        when (error.error.code) {
+            NsErr.xc(93) -> { // XSLT compile error
+                // This is kind of awful
+                val reports = error.error.details[2] as List<*>
+                for (anyReport in reports) {
+                    val report = anyReport as Report
+                    stepConfig.xmlCalabashConfig.messageReporter.report(report.severity) { report }
+                }
+            }
+            else -> Unit
+        }
+
+        if (commandLine.explainErrors) {
+            errorExplanation.reportExplanation(error.error)
+        }
+
+        if (error.cause is XProcException) {
+            cliPrinter.println("Caused by:")
+            explainError(errorExplanation, error.cause as XProcException)
+        }
     }
 
     private fun help() {

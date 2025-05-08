@@ -116,6 +116,12 @@ Invalid type: “$1”.
 It is a dynamic error if the supplied or defaulted value of a variable or option
 cannot be converted to the required type.
 
+XD0036/5
+An empty sequence cannot be converted to the type “$1”.
+It is a dynamic error if the supplied or defaulted value of a variable or option
+cannot be converted to the required type. The empty sequence can only be converted
+to a type that is optional ($1?) or may be repeated zero or more times ($1*).
+
 XD0038
 Input with content type “$2” not allowed on port “$1”.
 It is a dynamic error if an input document arrives on a port and it does not

@@ -762,7 +762,7 @@ class TypeUtils(val context: DocumentContext) {
         if (type.namespaceUri != NsXs.namespace) {
             throw context.exception(XProcError.Companion.xiImpossible("Attempt to cast to non-xs type"))
         }
-        if (value.underlyingValue !is AtomicValue) {
+        if (value.underlyingValue !is AtomicValue && value != XdmEmptySequence.getInstance()) {
             throw context.exception(XProcError.Companion.xiImpossible("Attempt to promote non-atomic: ${value}"))
         }
 
