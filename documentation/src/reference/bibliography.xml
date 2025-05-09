@@ -28,9 +28,21 @@ Internet Engineering Task Force. April, 1992.</bibliomixed>
 
 <bibliomixed xml:id="rfc2104"><abbrev>RFC 2104</abbrev>
 <citetitle xlink:href="https://doi.org/10.17487/RFC2104">RFC 2104:
-HMAC: Keyed-Hashing for Message Authentication.</citetitle>
+HMAC: Keyed-Hashing for Message Authentication</citetitle>.
 H. Krawczyk, M. Bellare, and R. Canetti, editors.
 Internet Engineering Task Force. February, 1997.</bibliomixed>
+
+<bibliomixed xml:id="rfc6902"><abbrev>RFC 6902</abbrev>
+<citetitle xlink:href="https://doi.org/10.17487/RFC6902">RFC 6902:
+JavaScript Object Notation (JSON) Patch</citetitle>.
+P. Bryan and M. Nottingham, editors.
+Internet Engineering Task Force. April, 2013.</bibliomixed>
+
+<bibliomixed xml:id="rfc7386"><abbrev>RFC 7386</abbrev>
+<citetitle xlink:href="https://doi.org/10.17487/RFC6902">RFC 7386:
+JSON Merge Patch</citetitle>.
+P. Hoffman and J. Snell, editors.
+Internet Engineering Task Force. October, 2014.</bibliomixed>
 
 <bibliomixed xml:id="fips180-4"><abbrev>FIPS 180-4</abbrev>
 <citetitle xlink:href="https://csrc.nist.gov/pubs/fips/180-4/upd1/final">FIPS 180-4:

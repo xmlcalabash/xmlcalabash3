@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<t:test expected="pass"
+        xmlns:t="http://xproc.org/ns/testsuite/3.0">
+  <t:info>
+    <t:title>json-patch-002</t:title>
+    <t:revision-history>
+      <t:revision>
+        <t:date>2025-05-09</t:date>
+        <t:author>
+          <t:name>Norm Tovey-Walsh</t:name>
+        </t:author>
+        <t:description xmlns="http://www.w3.org/1999/xhtml">
+          <p>Created test.</p>
+        </t:description>
+      </t:revision>
+    </t:revision-history>
+  </t:info>
+  <t:description xmlns="http://www.w3.org/1999/xhtml">
+    <p>Example test from RFC 6092.</p>
+  </t:description>
+  <t:pipeline>
+<p:declare-step xmlns:p="http://www.w3.org/ns/xproc"
+                xmlns:cx="http://xmlcalabash.com/ns/extensions"
+                name="main" version="3.0" expand-text="false">
+  <p:import href="https://xmlcalabash.com/ext/library/json-patch.xpl"/>
+  <p:output port="result"/>
+
+  <cx:json-patch cx:expand-text="false">
+    <p:with-input>
+      <p:inline content-type="application/json">{ "foo": ["bar", "baz"]}</p:inline>
+    </p:with-input>
+    <p:with-input port="patch">
+      <p:inline content-type="application/json">
+        [
+          { "op": "add", "path": "/foo/1", "value": "qux" }
+        ]
+      </p:inline>
+    </p:with-input>
+  </cx:json-patch>
+
+  <p:cast-content-type content-type="application/xml"/>
+</p:declare-step>
+  </t:pipeline>
+  <t:schematron>
+    <s:schema queryBinding="xslt2"
+              xmlns:s="http://purl.oclc.org/dsdl/schematron">
+      <s:ns prefix="fn" uri="http://www.w3.org/2005/xpath-functions"/>
+      <s:pattern>
+        <s:rule context="/">
+          <s:assert test="fn:map">The root is not map.</s:assert>
+          <s:assert test="count(fn:map/*) = 1">Wrong number of keys.</s:assert>
+          <s:assert test="exists(fn:map/fn:array[@key='foo'])">foo isn’t an array</s:assert>
+          <s:assert test="fn:map/fn:array[@key='foo']/fn:string[1] = 'bar'">foo[1] != bar</s:assert>
+          <s:assert test="fn:map/fn:array[@key='foo']/fn:string[2] = 'qux'">foo[2] != bar</s:assert>
+          <s:assert test="fn:map/fn:array[@key='foo']/fn:string[3] = 'baz'">foo[3] != bar</s:assert>
+        </s:rule>
+      </s:pattern>
+    </s:schema>
+  </t:schematron>
+</t:test>

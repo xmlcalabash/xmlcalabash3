@@ -156,6 +156,7 @@ buildConfig {
                   "jena",
                   "jeuclidCore",
                   "jing",
+                  "jsonPatch",
                   "jsonSchemaValidator",
                   "markupBlitz",
                   "nineml",
