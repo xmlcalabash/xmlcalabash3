@@ -87,6 +87,7 @@ dependencies {
   implementation(project(":ext:unique-id"))
   implementation(project(":ext:wait-for-update"))
   implementation(project(":ext:xmlunit"))
+  implementation(project(":ext:json-patch"))
   implementation(project(":ext:xpath"))
 
   implementation("org.nineml:coffeesacks:${dep_nineml}")

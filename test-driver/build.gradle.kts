@@ -49,6 +49,7 @@ dependencies {
   implementation(project(":ext:selenium"))
   implementation(project(":ext:ebnf-convert"))
   implementation(project(":ext:trang"))
+  implementation(project(":ext:json-patch"))
 
   implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0")
 

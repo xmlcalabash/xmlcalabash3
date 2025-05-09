@@ -13,6 +13,8 @@
 <xi:include href="cx-ditaa.xml"/>
 <xi:include href="cx-ebnf-convert.xml"/>
 <xi:include href="cx-epubcheck.xml"/>
+<xi:include href="cx-json-diff.xml"/>
+<xi:include href="cx-json-patch.xml"/>
 <xi:include href="cx-javascript.xml"/>
 <xi:include href="cx-markup-blitz.xml"/>
 <xi:include href="cx-mathml-to-svg.xml"/>
