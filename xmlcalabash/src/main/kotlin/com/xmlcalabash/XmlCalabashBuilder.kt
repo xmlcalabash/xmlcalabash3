@@ -26,7 +26,21 @@ import java.io.File
 import java.io.IOException
 import java.net.URI
 import java.nio.charset.Charset
-import javax.activation.MimetypesFileTypeMap
+
+/**
+ * The builder for constructing an XML Calabash configuration.
+ *
+ * There's an unfortunate chicken-and-egg problem here. The builder can configure the [DocumentManager] (this
+ * allows you to provide your own [DocumentManager] with, perhaps your own [org.xmlresolver.XMLResolver]).
+ * But it's also possible (and useful) to be able to configure mime type mappings through the builder.
+ * In particular, these may be provided by the [com.xmlcalabash.config.ConfigurationLoader].
+ *
+ * So the builder needs the document manager and the document manager is configured through the builder.
+ * And many users will not need or want to provide a custom [DocumentManager]. So the workaround is that
+ * calls to set mimetype mappings are cached by the builder until build time. At build time, the [DocumentManager]
+ * is resolved (either it was provided or it's constructed) and those mappings are applied to
+ * the [DocumentManager.mimetypesFileTypeMap].
+ */
 
 class XmlCalabashBuilder {
     companion object {
@@ -39,13 +53,16 @@ class XmlCalabashBuilder {
     }
 
     private var saxonConfiguration: SaxonConfiguration? = null
-    private val config = XConfig()
+    private val config = BuiltConfiguration()
 
     internal var _mpt: Double = 0.99999998
     val mpt: Double
         get() = _mpt
 
+    internal val mimetypesCache = mutableMapOf<String,MutableSet<String>>()
     private val uninitializedFormatters = mutableSetOf<URI>()
+    private val initializerClasses = mutableListOf<Pair<String,Boolean>>()
+    private val configurers = mutableListOf<Configurer>()
 
     init {
         for (provider in PagedMediaServiceProvider.providers()) {
@@ -56,7 +73,7 @@ class XmlCalabashBuilder {
 
         for (provider in ConfigurerServiceProvider.providers()) {
             val configurer = provider.create()
-            config._configurers.add(configurer)
+            configurers.add(configurer)
         }
     }
 
@@ -174,11 +191,17 @@ class XmlCalabashBuilder {
         return this
     }
 
-    fun getMimetypesFileTypeMap() = config.mimetypesFileTypeMap
-    fun setMimetypesFileTypeMap(typemap: MimetypesFileTypeMap): XmlCalabashBuilder {
-        logger.debug { "setMimetypesFileTypeMap ${typemap}" }
-        config._mimetypesFileTypeMap = typemap
-        return this
+    /**
+     * Add mapping from mime types to filename extensions.
+     *
+     * These mappings will be applied to the [DocumentManager.mimetypesFileTypeMap] at build time.
+     * The extensions should not include the leading ".": `listOf("txt", "text")` not
+     * `listOf(".txt", ".text")`.
+     */
+    fun addMimeType(contentType: String, extensions: List<String>) {
+        val ext = mimetypesCache[contentType] ?: mutableSetOf()
+        ext.addAll(extensions)
+        mimetypesCache[contentType] = ext
     }
 
     fun getErrorExplanation() = config.errorExplanation
@@ -452,30 +475,30 @@ class XmlCalabashBuilder {
 
     fun addInitializer(className: String, ignoreErrors: Boolean = false): XmlCalabashBuilder {
         logger.debug { "addInitializer ${className}" }
-        config._initializerClasses.add(Pair(className, ignoreErrors))
+        initializerClasses.add(Pair(className, ignoreErrors))
         return this
     }
 
     fun build(): XmlCalabash {
-        val config = this.config.copy()
+        val config = commonBuild()
 
         val initializers = mutableMapOf<String, Boolean>()
-        for (pair in config.initializerClasses) {
+        for (pair in initializerClasses) {
             initializers[pair.first] = pair.second
         }
 
-        val saxonConfiguration = SaxonConfiguration.newInstance(config.licensed, config.saxonConfigurationFile?.toURI(), config.saxonConfigurationProperties, config.xmlSchemaDocuments, initializers, config.configurers)
+        val saxonConfiguration = SaxonConfiguration.newInstance(config.licensed, config.saxonConfigurationFile?.toURI(), config.saxonConfigurationProperties, config.xmlSchemaDocuments, initializers, configurers)
         config._saxonConfiguration = saxonConfiguration
         return init(config)
     }
 
     fun build(configuration: Configuration): XmlCalabash {
-        val config = this.config.copy()
+        val config = commonBuild()
 
         if (config.saxonConfigurationFile != null
             || config.saxonConfigurationProperties.isNotEmpty()
             || config.xmlSchemaDocuments.isNotEmpty()
-            || config.initializerClasses.isNotEmpty()) {
+            || initializerClasses.isNotEmpty()) {
                 throw XProcError.xiNoConfigurationAllowed().exception()
             }
 
@@ -484,11 +507,27 @@ class XmlCalabashBuilder {
         return init(config)
     }
 
-    private fun init(config: XConfig): XmlCalabash {
+    private fun commonBuild(): BuiltConfiguration {
+        for (configurer in configurers) {
+            logger.debug { "Configuring with ${configurer}"}
+            configurer.configure(this)
+        }
+
+        val config = this.config.copy()
+        for ((contentType, extensions) in mimetypesCache) {
+            val ext = extensions.joinToString(" ")
+            logger.debug { "Assigning content type: ${contentType} to ${ext}" }
+            config.documentManager.mimetypesFileTypeMap.addMimeTypes("${contentType} ${ext}")
+        }
+
+        return config
+    }
+
+    private fun init(config: BuiltConfiguration): XmlCalabash {
+        mimetypesCache.clear()
         this.config._messagePrinter = null
         this.config._messageReporter = null
         this.config._documentManager = null
-        this.config._mimetypesFileTypeMap = null
         this.config._errorExplanation = null
 
         if (config.xmlSchemaDocuments.isNotEmpty()
@@ -507,11 +546,10 @@ class XmlCalabashBuilder {
         return XmlCalabash(config)
     }
 
-    inner class XConfig(): XmlCalabashConfiguration {
+    inner class BuiltConfiguration(): XmlCalabashConfiguration {
         lateinit internal var _saxonConfiguration: SaxonConfiguration
         internal var _messagePrinter: MessagePrinter? = null
         internal var _messageReporter: MessageReporter? = null
-        internal var _mimetypesFileTypeMap: MimetypesFileTypeMap? = null
         internal var _errorExplanation: ErrorExplanation? = null
         internal var _documentManager: DocumentManager? = null
 
@@ -549,8 +587,6 @@ class XmlCalabashBuilder {
         internal var _visualizerProperties = mutableMapOf<String,String>()
         internal val _xmlCatalogs = mutableListOf<URI>()
         internal val _xmlSchemaDocuments = mutableListOf<URI>()
-        internal val _initializerClasses = mutableListOf<Pair<String,Boolean>>()
-        internal val _configurers = mutableListOf<Configurer>()
 
         override val saxonConfiguration: SaxonConfiguration
             get() { return _saxonConfiguration }
@@ -573,14 +609,6 @@ class XmlCalabashBuilder {
                 return _messageReporter!!
             }
 
-        override val mimetypesFileTypeMap: MimetypesFileTypeMap
-            get() {
-                if (_mimetypesFileTypeMap == null) {
-                    _mimetypesFileTypeMap = MimetypesFileTypeMap()
-                }
-                return _mimetypesFileTypeMap!!
-            }
-
         override val errorExplanation: ErrorExplanation
             get() {
                 if (_errorExplanation == null) {
@@ -592,7 +620,7 @@ class XmlCalabashBuilder {
         override val documentManager: DocumentManager
             get() {
                 if (_documentManager == null) {
-                    _documentManager = DocumentManager(this)
+                    _documentManager = DocumentManager()
                 }
                 return _documentManager!!
             }
@@ -663,19 +691,14 @@ class XmlCalabashBuilder {
             get() = _xmlCatalogs
         override val xmlSchemaDocuments: List<URI>
             get() = _xmlSchemaDocuments
-        override val initializerClasses: List<Pair<String, Boolean>>
-            get() = _initializerClasses
-        override val configurers: List<Configurer>
-            get() = _configurers
 
-        internal fun copy(): XConfig {
-            val config = XConfig()
+        internal fun copy(): BuiltConfiguration {
+            val config = BuiltConfiguration()
             // Not touching saxonConfiguration on purpose!
             config._messagePrinter = _messagePrinter
             config._messageReporter = _messageReporter
             config._documentManager = documentManager
             config._errorExplanation = errorExplanation
-            config._mimetypesFileTypeMap = mimetypesFileTypeMap
             config._assertions = _assertions
             config._consoleEncoding = _consoleEncoding
             config._debug = _debug
@@ -709,8 +732,6 @@ class XmlCalabashBuilder {
             config._visualizerProperties.putAll(_visualizerProperties)
             config._xmlCatalogs.addAll(_xmlCatalogs)
             config._xmlSchemaDocuments.addAll(_xmlSchemaDocuments)
-            config._initializerClasses.addAll(_initializerClasses)
-            config._configurers.addAll(_configurers)
 
             return config
         }

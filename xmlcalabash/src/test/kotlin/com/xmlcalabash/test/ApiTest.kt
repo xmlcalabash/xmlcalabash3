@@ -4,6 +4,7 @@ import com.xmlcalabash.XmlCalabash
 import com.xmlcalabash.XmlCalabashBuilder
 import com.xmlcalabash.api.MessageReporter
 import com.xmlcalabash.documents.XProcDocument
+import com.xmlcalabash.io.DocumentManager
 import com.xmlcalabash.io.MediaType
 import com.xmlcalabash.io.MessagePrinter
 import com.xmlcalabash.util.BufferingReceiver
@@ -17,6 +18,7 @@ import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.fail
 import org.junit.jupiter.api.Test
 import org.xml.sax.InputSource
+import org.xmlresolver.XMLResolver
 import java.io.*
 import java.nio.charset.StandardCharsets
 import javax.xml.transform.sax.SAXSource
@@ -74,6 +76,34 @@ class ApiTest {
         val result = receiver.outputs["result"]!!.first().value
         Assertions.assertEquals("<doc/>", result.toString())
     }
+
+    @Test
+    fun runIdentityWithCustomDocumentManager() {
+        val xmlcalabashBuilder = XmlCalabashBuilder()
+        
+        val resolver = XMLResolver()
+        val manager = DocumentManager(resolver)
+        xmlcalabashBuilder.setDocumentManager(manager)
+
+        val xmlcalabash = xmlcalabashBuilder.build()
+        processor = xmlcalabash.saxonConfiguration.processor
+
+        val parser = xmlcalabash.newXProcParser()
+        val declareStep = parser.parse(anIdentityPipeline())
+        val runtime = declareStep.runtime()
+        val pipeline = runtime.executable()
+
+        val receiver = BufferingReceiver()
+        pipeline.receiver = receiver
+
+        pipeline.input("source", XProcDocument.ofXml(parseString("<doc/>"), pipeline.config, MediaType.XML))
+
+        pipeline.run()
+
+        val result = receiver.outputs["result"]!!.first().value
+        Assertions.assertEquals("<doc/>", result.toString())
+    }
+
 
     @Test
     fun runXslt() {

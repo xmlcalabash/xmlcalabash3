@@ -33,7 +33,6 @@ interface XmlCalabashConfiguration {
     val messageBufferSize: Int
     val messagePrinter: MessagePrinter
     val messageReporter: MessageReporter
-    val mimetypesFileTypeMap: MimetypesFileTypeMap
     val other: Map<QName, List<Map<QName, String>>>
     val pagedMediaCssProcessors: List<URI>
     val pagedMediaManagers: List<PagedMediaManager>
@@ -56,6 +55,4 @@ interface XmlCalabashConfiguration {
     val visualizerProperties: Map<String,String>
     val xmlCatalogs: List<URI>
     val xmlSchemaDocuments: List<URI>
-    val initializerClasses: List<Pair<String,Boolean>>
-    val configurers: List<Configurer>
 }

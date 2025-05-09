@@ -131,7 +131,8 @@ class DirectoryListStep(): FileStep(NsP.directoryList) {
 
             return entry
         } else {
-            val ctype = overrideContentType ?: MediaType.parse(stepConfig.environment.mimeTypes.getContentType(dir))
+            val ctype = overrideContentType
+                ?: MediaType.parse(stepConfig.documentManager.mimetypesFileTypeMap.getContentType(dir))
             return DirectoryFile(dir, include, ctype)
         }
     }

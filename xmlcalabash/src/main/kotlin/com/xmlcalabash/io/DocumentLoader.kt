@@ -160,7 +160,7 @@ class DocumentLoader(val stepConfig: StepConfiguration,
         mediaType = if (documentProperties.has(Ns.contentType)) {
             MediaType.parse(documentProperties[Ns.contentType]!!.underlyingValue.stringValue)
         } else {
-            val fileMediaType = stepConfig.environment.mimeTypes.getContentType(absURI.toString())
+            val fileMediaType = stepConfig.documentManager.mimetypesFileTypeMap.getContentType(absURI.toString())
             MediaType.parse(fileMediaType)
         }
 

@@ -1,11 +1,9 @@
 package com.xmlcalabash.spi
 
-import com.xmlcalabash.XmlCalabash
+import com.xmlcalabash.XmlCalabashBuilder
 import net.sf.saxon.Configuration
-import javax.activation.MimetypesFileTypeMap
 
 interface Configurer {
-    fun configure(xmlcalabash: XmlCalabash)
+    fun configure(builder: XmlCalabashBuilder)
     fun configureSaxon(config: Configuration)
-    fun configureContentTypes(contentTypes: MutableMap<String, String>, mimeTypes: MimetypesFileTypeMap)
 }

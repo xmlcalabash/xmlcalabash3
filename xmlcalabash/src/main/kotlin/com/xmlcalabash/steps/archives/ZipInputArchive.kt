@@ -31,7 +31,7 @@ open class ZipInputArchive(stepConfig: StepConfiguration, doc: XProcBinaryDocume
             val archiveEntry = XArchiveEntry(stepConfig, entry.name, entry, this)
             val amap = mutableMapOf<QName, String>(
                 Ns.name to entry.name,
-                Ns.contentType to "${MediaType.parse(stepConfig.environment.mimeTypes.getContentType(entry.name))}",
+                Ns.contentType to "${MediaType.parse(stepConfig.documentManager.mimetypesFileTypeMap.getContentType(entry.name))}",
                 NsCx.size to entry.size.toString()
             )
             if (entry.unixMode != 0) {
