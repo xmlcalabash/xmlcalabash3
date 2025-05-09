@@ -17,6 +17,7 @@ import net.sf.saxon.s9api.QName
 import net.sf.saxon.s9api.SequenceType
 import net.sf.saxon.s9api.XdmAtomicValue
 import net.sf.saxon.s9api.XdmNode
+import net.sf.saxon.type.StringConverter.StringToUntypedAtomic
 import net.sf.saxon.type.Untyped
 import java.net.URI
 
@@ -1037,7 +1038,9 @@ class XplParser internal constructor(val builder: PipelineBuilder) {
                                 if (atomic.expandText == true) {
                                     atomic.withOption(name, XProcExpression.shortcut(atomic.stepConfig, value))
                                 } else {
-                                    atomic.withOption(name, XProcExpression.constant(atomic.stepConfig, XdmAtomicValue(value)))
+                                    // Attribute values are untyped so that "true" will cast to true() etc.
+                                    val untypedValue = StringToUntypedAtomic().convert(XdmAtomicValue(value).underlyingValue)
+                                    atomic.withOption(name, XProcExpression.constant(atomic.stepConfig, XdmAtomicValue.wrap(untypedValue)))
                                 }
                             }
                         }
