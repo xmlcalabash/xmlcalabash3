@@ -1,6 +1,5 @@
 package com.xmlcalabash.io
 
-import com.xmlcalabash.XmlCalabashConfiguration
 import com.xmlcalabash.config.StepConfiguration
 import com.xmlcalabash.documents.DocumentProperties
 import com.xmlcalabash.documents.XProcBinaryDocument
@@ -18,7 +17,6 @@ import org.apache.logging.log4j.kotlin.logger
 import org.xml.sax.EntityResolver
 import org.xml.sax.InputSource
 import org.xml.sax.ext.EntityResolver2
-import org.xmlresolver.ResolverConfiguration
 import org.xmlresolver.ResolverConstants
 import org.xmlresolver.ResourceRequestImpl
 import org.xmlresolver.XMLResolver
@@ -26,23 +24,29 @@ import org.xmlresolver.sources.ResolverSAXSource
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.net.URI
+import javax.activation.MimetypesFileTypeMap
 import javax.xml.transform.Source
 import javax.xml.transform.URIResolver
 import javax.xml.transform.sax.SAXSource
 import javax.xml.transform.stream.StreamSource
 
-open class DocumentManager(val xmlCalabashConfiguration: XmlCalabashConfiguration, val resolver: XMLResolver): EntityResolver, EntityResolver2, URIResolver, ResourceResolver, ModuleURIResolver {
-    constructor(xmlCalabashConfiguration: XmlCalabashConfiguration): this(xmlCalabashConfiguration, XMLResolver())
+open class DocumentManager(val resolver: XMLResolver): EntityResolver, EntityResolver2, URIResolver, ResourceResolver, ModuleURIResolver {
+    constructor(): this(XMLResolver())
 
-    constructor(manager: DocumentManager): this(manager.xmlCalabashConfiguration, manager.resolver) {
+    constructor(manager: DocumentManager): this(manager.resolver) {
         prefixMap.putAll(manager.prefixMap)
         prefixList.addAll(manager.prefixList)
         _cache.putAll(manager._cache)
+        _mimetypesFileTypeMap = manager._mimetypesFileTypeMap
     }
 
     private val prefixMap = mutableMapOf<String, DocumentResolver>()
     private val prefixList = mutableListOf<String>()
     private val _cache = mutableMapOf<URI, MutableMap<MediaType,XProcDocument>>()
+
+    private var _mimetypesFileTypeMap = MimetypesFileTypeMap()
+    val mimetypesFileTypeMap: MimetypesFileTypeMap
+        get() = _mimetypesFileTypeMap
 
     fun registerPrefix(prefix: String, resolver: DocumentResolver) {
         prefixMap[prefix] = resolver
@@ -139,7 +143,7 @@ open class DocumentManager(val xmlCalabashConfiguration: XmlCalabashConfiguratio
     }
 
     fun getCached(href: URI): XProcDocument? {
-        val contentType = MediaType.parse(xmlCalabashConfiguration.mimetypesFileTypeMap.getContentType(href.toString()))
+        val contentType = MediaType.parse(mimetypesFileTypeMap.getContentType(href.toString()))
         return getCached(href, contentType)
     }
 

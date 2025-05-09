@@ -41,7 +41,7 @@ class FileInfoStep(): FileStep(NsP.fileInfo) {
             }
         }
         if (!override) {
-            contentType = MediaType.parse(stepConfig.environment.mimeTypes.getContentType(file))
+            contentType = MediaType.parse(stepConfig.documentManager.mimetypesFileTypeMap.getContentType(file))
         }
 
         val atts = if (file.isDirectory) {

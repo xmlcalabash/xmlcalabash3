@@ -6,6 +6,7 @@ import com.xmlcalabash.api.MessageReporter;
 import com.xmlcalabash.config.ConfigurationLoader;
 import com.xmlcalabash.datamodel.DeclareStepInstruction;
 import com.xmlcalabash.documents.XProcDocument;
+import com.xmlcalabash.io.DocumentManager;
 import com.xmlcalabash.io.MediaType;
 import com.xmlcalabash.io.MessagePrinter;
 import com.xmlcalabash.parsers.xpl.XplParser;
@@ -21,6 +22,7 @@ import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.xml.sax.InputSource;
+import org.xmlresolver.XMLResolver;
 
 import javax.xml.transform.sax.SAXSource;
 import java.io.*;
@@ -75,6 +77,32 @@ public class JavaApiTest {
     @Test
     public void runIdentity() {
         XmlCalabash xmlCalabash = setupXmlCalabash();
+
+        XplParser parser = xmlCalabash.newXProcParser();
+        DeclareStepInstruction declareStep = parser.parse(anIdentityPipeline());
+        XProcRuntime runtime = declareStep.runtime();
+        XProcPipeline pipeline = runtime.executable();
+
+        BufferingReceiver receiver = new BufferingReceiver();
+        pipeline.setReceiver(receiver);
+
+        pipeline.input("source", XProcDocument.Companion.ofXml(parseString("<doc/>"), pipeline.getConfig(), MediaType.Companion.getXML()));
+        pipeline.run();
+
+        XdmValue result = receiver.getOutputs().get("result").get(0).getValue();
+        Assertions.assertEquals("<doc/>", result.toString());
+    }
+
+    @Test
+    public void runIdentityWithCustomDocumentManager() {
+        XmlCalabashBuilder builder = new XmlCalabashBuilder();
+
+        XMLResolver resolver = new XMLResolver();
+        DocumentManager manager = new DocumentManager(resolver);
+        builder.setDocumentManager(manager);
+
+        XmlCalabash xmlCalabash = builder.build();
+        processor = xmlCalabash.getSaxonConfiguration().getProcessor();
 
         XplParser parser = xmlCalabash.newXProcParser();
         DeclareStepInstruction declareStep = parser.parse(anIdentityPipeline());

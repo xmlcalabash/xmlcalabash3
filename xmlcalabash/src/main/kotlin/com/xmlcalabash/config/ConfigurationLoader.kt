@@ -285,7 +285,7 @@ class ConfigurationLoader(val builder: XmlCalabashBuilder) {
         checkAttributes(node, listOf(Ns.contentType, _extensions))
         val ctype = node.getAttributeValue(Ns.contentType)!!
         val ext = node.getAttributeValue(_extensions)!!
-        builder.getMimetypesFileTypeMap().addMimeTypes("${ctype} ${ext}")
+        builder.addMimeType(ctype, ext.split("\\s+".toRegex()))
     }
 
     private fun parseSendmail(node: XdmNode) {

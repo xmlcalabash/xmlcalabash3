@@ -88,7 +88,6 @@ open class CompileEnvironment(override val episode: String, override val xmlCala
     override val messagePrinter: MessagePrinter = xmlCalabash.config.messagePrinter
     override val messageReporter: MessageReporter = xmlCalabash.config.messageReporter
     override val monitors: MutableList<Monitor> = mutableListOf()
-    override val mimeTypes: MimetypesFileTypeMap = xmlCalabash.config.mimetypesFileTypeMap
     override val documentManager: DocumentManager = xmlCalabash.config.documentManager
     override val errorExplanation: ErrorExplanation = xmlCalabash.config.errorExplanation
     override val proxies: Map<String, String> = emptyMap()
@@ -110,16 +109,12 @@ open class CompileEnvironment(override val episode: String, override val xmlCala
         }
 
         for ((ext, contentType) in _defaultContentTypes) {
-            if (mimeTypes.getContentType("test.${ext}") == "application/octet-stream") {
+            if (documentManager.mimetypesFileTypeMap.getContentType("test.${ext}") == "application/octet-stream") {
                 if (showAssignments) {
-                    logger.debug { "Assigning default content type to '.${ext}' files: ${contentType}" }
+                    logger.debug { "Assigning default content type: ${contentType} to ${ext}" }
                 }
-                mimeTypes.addMimeTypes("${contentType} ${ext}")
+                documentManager.mimetypesFileTypeMap.addMimeTypes("${contentType} ${ext}")
             }
-        }
-
-        for (configurer in xmlCalabash.configurers) {
-            configurer.configureContentTypes(_defaultContentTypes, mimeTypes)
         }
 
         for (provider in DocumentResolverServiceProvider.providers()) {

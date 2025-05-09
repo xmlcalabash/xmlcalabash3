@@ -59,7 +59,7 @@ class ImportFunctionsInstruction(parent: XProcInstruction?, stepConfig: Instruct
         }
 
         val ctype = if (contentType == null) {
-            MediaType.parse(stepConfig.mimeTypes.getContentType(href.toString()))
+            MediaType.parse(stepConfig.documentManager.mimetypesFileTypeMap.getContentType(href.toString()))
         } else {
             contentType!!
         }

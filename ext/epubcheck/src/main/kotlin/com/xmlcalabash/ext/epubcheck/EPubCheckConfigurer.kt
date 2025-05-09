@@ -1,29 +1,17 @@
 package com.xmlcalabash.ext.epubcheck
 
-import com.xmlcalabash.XmlCalabash
+import com.xmlcalabash.XmlCalabashBuilder
 import com.xmlcalabash.spi.Configurer
 import com.xmlcalabash.spi.ConfigurerProvider
 import net.sf.saxon.Configuration
-import org.apache.logging.log4j.kotlin.logger
-import javax.activation.MimetypesFileTypeMap
 
 class EPubCheckConfigurer(): Configurer, ConfigurerProvider {
-    override fun configure(xmlcalabash: XmlCalabash) {
-        // nop
+    override fun configure(builder: XmlCalabashBuilder) {
+        builder.addMimeType("application/epub+zip", listOf("epub"))
     }
 
     override fun configureSaxon(config: Configuration) {
         // nop
-    }
-
-    override fun configureContentTypes(contentTypes: MutableMap<String, String>, mimeTypes: MimetypesFileTypeMap) {
-        val ext = "epub"
-        val contentType = "application/epub+zip"
-        contentTypes[ext] = contentType
-        if (mimeTypes.getContentType("test.${ext}") == "application/octet-stream") {
-            logger.trace { "Assigning default content type to '.${ext}' files: ${contentType}" }
-            mimeTypes.addMimeTypes("${contentType} ${ext}")
-        }
     }
 
     override fun create(): Configurer {

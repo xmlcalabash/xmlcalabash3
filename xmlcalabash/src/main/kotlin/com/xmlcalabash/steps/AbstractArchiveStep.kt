@@ -61,10 +61,9 @@ abstract class AbstractArchiveStep(): AbstractAtomicStep() {
         for (pair in overrideContentTypes) {
             if (pair.first.toRegex().find(name) != null) {
                 return pair.second
-                break
             }
         }
-        return MediaType.parse(stepConfig.environment.mimeTypes.getContentType(name))
+        return MediaType.parse(stepConfig.documentManager.mimetypesFileTypeMap.getContentType(name))
     }
 
     protected fun selectFormat(contentType: MediaType, defaultFormat: QName?): QName {

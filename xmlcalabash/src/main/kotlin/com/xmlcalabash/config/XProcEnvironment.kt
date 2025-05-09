@@ -35,7 +35,6 @@ interface XProcEnvironment {
     val messagePrinter: MessagePrinter
     val monitors: MutableList<Monitor>
     val documentManager: DocumentManager
-    val mimeTypes: MimetypesFileTypeMap
     val errorExplanation: ErrorExplanation
     val messageReporter: MessageReporter
     val proxies: Map<String, String>
