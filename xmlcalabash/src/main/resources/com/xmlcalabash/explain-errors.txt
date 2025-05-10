@@ -271,10 +271,17 @@ Path (“$1”) and base URI (“$2”) have different schemes.
 It is a dynamic error if the relative path has a scheme that differs from the
 scheme of the base URI.
 
-XD0079
+XD0079/1
 Invalid content type: “$1”.
 It is a dynamic error if a supplied content-type is not a valid media type of
 the form “type/subtype+ext” or “type/subtype”.
+
+XD0079/2
+Cannot use content type shortcut “$1” here, use “$2”.
+Content type shorcuts (xml, json, etc.) can represent more than one specific
+content type. They can be used for inputs, but on ouputs, a single, specific
+content type must be provided. For “$1”, a common choice is “$2” but in some
+cases, a more specific $1 content type might be preferable.
 
 XD0080
 Cannot resolve path (“$1”) with a non-hierarchical base URI: “$2”.
