@@ -34,7 +34,7 @@ open class Report constructor(val severity: Verbosity, val message: String) {
         _cause = cause
     }
 
-    constructor(severity: Verbosity, stepConfig: StepConfiguration, message: Message): this(severity, message.stringValue) {
+    constructor(severity: Verbosity, stepConfig: StepConfiguration, message: Message): this(severity, message.toString()) {
         _location = stepConfig.location
         _inputLocation = Location(message.location)
         message.location.publicId?.let { _extraDetail[Ns.publicIdentifier] = it }
