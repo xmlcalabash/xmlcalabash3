@@ -216,7 +216,8 @@ open class XProcError protected constructor(val code: QName, val variant: Int, e
         fun xdUrifyDifferentDrives(filepath: String, basedir: String) = dynamic(75, filepath, basedir)
         fun xdUrifyMixedDrivesAndAuthorities(filepath: String, basedir: String) = dynamic(76, filepath, basedir)
         fun xdUrifyDifferentSchemes(filepath: String, basedir: String) = dynamic(77, filepath, basedir)
-        fun xdInvalidContentType(value: String) = dynamic(79, value)
+        fun xdInvalidContentType(value: String) = dynamic(Pair(79, 1), value)
+        fun xdInvalidContentTypeShortcut(value: String, correct: String) = dynamic(Pair(79, 2), value, correct)
         fun xdUrifyNonhierarchicalBase(filepath: String, basedir: String) = dynamic(80, filepath, basedir)
         fun xdInvalidExpression(expression: String) = dynamic(83, expression)
 

@@ -290,7 +290,16 @@ abstract class AbstractAtomicStep(): XProcStep {
         if (value == XdmEmptySequence.getInstance()) {
             return default
         }
-        return MediaType.parse(value.underlyingValue.stringValue)
+        val ctype = value.underlyingValue.stringValue
+        when (ctype) {
+            "xml" -> throw XProcError.xdInvalidContentTypeShortcut(ctype, "application/xml").exception()
+            "html" -> throw XProcError.xdInvalidContentTypeShortcut(ctype, "text/html").exception()
+            "text" -> throw XProcError.xdInvalidContentTypeShortcut(ctype, "text/plain").exception()
+            "json" -> throw XProcError.xdInvalidContentTypeShortcut(ctype, "application/json").exception()
+            "yaml" -> throw XProcError.xdInvalidContentTypeShortcut(ctype, "application/yaml").exception()
+            "any" -> throw XProcError.xdInvalidContentTypeShortcut(ctype, "application/octet-stream").exception()
+            else -> return MediaType.parse(value.underlyingValue.stringValue)
+        }
     }
 
     fun wildcardMediaTypeBinding(name: QName, default: MediaType = MediaType.ANY): MediaType {

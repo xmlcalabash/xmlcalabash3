@@ -7,6 +7,7 @@ import com.xmlcalabash.config.StepConfiguration
 import com.xmlcalabash.documents.DocumentProperties
 import com.xmlcalabash.documents.XProcDocument
 import com.xmlcalabash.exceptions.XProcError
+import com.xmlcalabash.exceptions.XProcException
 import com.xmlcalabash.namespace.Ns
 import com.xmlcalabash.namespace.NsCx
 import com.xmlcalabash.spi.ContentTypeLoader
@@ -23,6 +24,7 @@ import nu.validator.htmlparser.dom.HtmlDocumentBuilder
 import org.xml.sax.ErrorHandler
 import org.xml.sax.InputSource
 import org.xml.sax.SAXParseException
+import org.yaml.snakeyaml.error.MarkedYAMLException
 import java.io.*
 import java.net.URI
 import java.nio.ByteBuffer
@@ -109,8 +111,12 @@ class DocumentLoader(val stepConfig: StepConfiguration,
         if (absURI.scheme == "file") {
             try {
                 return loadFile()
-            } catch (ex: IOException) {
-                throw stepConfig.exception(XProcError.xdDoesNotExist(UriUtils.path(absURI), ex.message ?: "???"), ex)
+            } catch (ex: Exception) {
+                when (ex) {
+                    is FileNotFoundException -> throw stepConfig.exception(XProcError.xdDoesNotExist(UriUtils.path(absURI), ex.message ?: "???"), ex)
+                    is IOException -> throw stepConfig.exception(XProcError.xdIsNotReadable(UriUtils.path(absURI), ex.message ?: "???"), ex)
+                    else -> throw ex
+                }
             }
         }
 
