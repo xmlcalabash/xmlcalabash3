@@ -18,7 +18,7 @@
 <!-- This is a horrifically cheap-and-cheerful stylesheet for processing
      stylized changelogs from DocBook to HTML. -->
 
-<xsl:output method="xml" encoding="utf-8" indent="yes"/>
+<xsl:output method="xml" encoding="utf-8" indent="no"/>
 
 <xsl:param name="version" as="xs:string" required="yes"/>
 

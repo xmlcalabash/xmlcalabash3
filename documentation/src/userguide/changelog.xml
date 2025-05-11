@@ -13,8 +13,60 @@ See the commits and pull requests on
 finer detail.</para>
 
 <revhistory>
+<revision xml:id="r300-beta1">
+<revnumber>3.0.0-beta1</revnumber>
+<date>2025-05-11</date>
+<revdescription>
+<para>If I’m going to get a couple of betas out in May, I best get started, eh?</para>
+<itemizedlist>
+<listitem><para>Fixed <ghissue number="466"/>. The <tag>xsl:message</tag>s
+from stylesheets run with <tag>p:xslt</tag> are output at “info” level. (They were
+accidentally getting discarded in the last few alphas.)
+</para></listitem>
+<listitem><para>Fixed <ghissue number="462"/>. Make sure that option shortcut values
+are stored as untyped atomic values so that they can be promoted to the appropriate
+type.
+</para></listitem>
+<listitem><para>Fixed <ghissue number="460"/>. Refactored build and configuration APIs.
+</para></listitem>
+<listitem><para>Fixed <ghissue number="456"/>. Removed some debugging code that always printed
+a JVM stack trace when <tag>p:run</tag> failed.
+</para></listitem>
+<listitem><para>Fixed <ghissue number="455"/>. Refactored the <code>DocumentManager</code> API.
+</para></listitem>
+<listitem><para>Added <tag>cx:jsonpath</tag> and <tag>cx:find</tag> extension steps.
+</para></listitem>
+<listitem><para>Added <tag>cx:json-diff</tag> and <tag>cx:json-patch</tag> extension
+steps.
+</para></listitem>
+<listitem><para>Made a number of improvements to error reporting.</para>
+<orderedlist>
+<listitem><para>Improved error messages for documents that can’t be parsed. (Previously,
+“file not found” would be reported in some circumstances.)
+</para></listitem>
+<listitem><para>Improved error message when content type shortcuts are used in
+inappropriate places.
+</para></listitem>
+<listitem><para>Fixed a bug where the underlying cause of an exception sometimes
+got lost in nested exceptions. When a pipeline fails, the error report now
+includes the chain of causes.
+</para></listitem>
+<listitem><para>Clarified the error message for the special case of empty sequence
+in a type conversion error.
+</para></listitem>
+<listitem><para>Added a <option>--stacktrace</option>
+option to enable stack (step) traces in errors (and disabled them by default).
+</para></listitem>
+<listitem><para>Improved the formatting of error explanations when
+the <option>--explain</option> option is used.
+</para></listitem>
+</orderedlist>
+</listitem>
+</itemizedlist>
+</revdescription>
+</revision>
 <revision xml:id="r300-alpha33">
-<revnumber>3.0.0-alpha32</revnumber>
+<revnumber>3.0.0-alpha33</revnumber>
 <date>2025-05-06</date>
 <revdescription>
 <itemizedlist>

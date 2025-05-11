@@ -6,7 +6,7 @@
                 expand-text="yes"
                 version="3.0">
 
-<xsl:output method="text" encoding="utf-8" indent="yes"/>
+<xsl:output method="text" encoding="utf-8" indent="no"/>
 <xsl:strip-space elements="h:div h:body h:ul h:li"/>
 
 <xsl:template match="/">
@@ -26,13 +26,19 @@
   <xsl:value-of select="replace(., '&#10;', ' ')"/>
 </xsl:template>
 
-<xsl:template match="h:ul">
+<xsl:template match="h:ul|h:ol">
   <xsl:apply-templates/>
   <xsl:text>&#10;&#10;</xsl:text>
 </xsl:template>
 
 <xsl:template match="h:ul/h:li">
   <xsl:text>{count(preceding-sibling::h:li)+1}. </xsl:text>
+  <xsl:apply-templates/>
+  <xsl:text>&#10;</xsl:text>
+</xsl:template>
+
+<xsl:template match="h:ol/h:li">
+  <xsl:text>* </xsl:text>
   <xsl:apply-templates/>
   <xsl:text>&#10;</xsl:text>
 </xsl:template>
