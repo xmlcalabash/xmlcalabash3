@@ -44,6 +44,12 @@ JSON Merge Patch</citetitle>.
 P. Hoffman and J. Snell, editors.
 Internet Engineering Task Force. October, 2014.</bibliomixed>
 
+<bibliomixed xml:id="rfc9535"><abbrev>RFC 9535</abbrev>
+<citetitle xlink:href="https://doi.org/10.17487/RFC9535">RFC 9535:
+JSONPath: Query Expressions for JSON</citetitle>.
+S. Gössner, G. Normington, and C. Bormann, editors.
+Internet Engineering Task Force. February, 2024.</bibliomixed>
+
 <bibliomixed xml:id="fips180-4"><abbrev>FIPS 180-4</abbrev>
 <citetitle xlink:href="https://csrc.nist.gov/pubs/fips/180-4/upd1/final">FIPS 180-4:
 Secure Hash Standard (SHS)</citetitle>.
