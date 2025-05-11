@@ -1504,6 +1504,24 @@ Unresolved from inputs: “$1”.
 cxerr:XC0036
 Input and output formats are the same: “$1”.
 
+cxerr:XC0037
+Unrecognized cx:jsonpath option: “$1”.
+
+cxerr:XC0038
+Unparsable cx:jsonpath result. (This shouldn’t happen, please report an issue.)
+
+cxerr:XC0039
+Invalid JSONPath expression: “$1”.
+
+cxerr:XC0040
+Invalid regular expression: “$1”.
+
+cxerr:XC0041
+Invalid XPath expression: “$1”.
+
+cxerr:XC0042
+At most one of grep, jsonpath, or xpath may be provided.
+
 cxerr:XI0001
 Pipeline has no “$1” output port.
 Cannot save the output from a port that doesn’t exist.

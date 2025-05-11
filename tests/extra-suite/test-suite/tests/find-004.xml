@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<t:test expected="pass"
+        xmlns:t="http://xproc.org/ns/testsuite/3.0">
+  <t:info>
+    <t:title>find-004</t:title>
+    <t:revision-history>
+      <t:revision>
+        <t:date>2025-05-11</t:date>
+        <t:author>
+          <t:name>Norm Tovey-Walsh</t:name>
+        </t:author>
+        <t:description xmlns="http://www.w3.org/1999/xhtml">
+          <p>Created test.</p>
+        </t:description>
+      </t:revision>
+    </t:revision-history>
+  </t:info>
+  <t:description xmlns="http://www.w3.org/1999/xhtml">
+    <p>Tests cx:find with a grep query that won’t find any files.</p>
+  </t:description>
+  <t:pipeline>
+<p:declare-step xmlns:p="http://www.w3.org/ns/xproc"
+                xmlns:cx="http://xmlcalabash.com/ns/extensions"
+                name="main" version="3.0" expand-text="false">
+  <p:import href="https://xmlcalabash.com/ext/library/find.xpl"/>
+  <p:output port="result"/>
+
+  <cx:find path="../documents/find" grep="SPOON!"/>
+</p:declare-step>
+  </t:pipeline>
+  <t:schematron>
+    <s:schema queryBinding="xslt2"
+              xmlns:s="http://purl.oclc.org/dsdl/schematron">
+      <s:ns prefix="c" uri="http://www.w3.org/ns/xproc-step"/>
+      <s:pattern>
+        <s:rule context="/">
+          <s:assert test="c:directory">The root isn’t a directory.</s:assert>
+        </s:rule>
+      </s:pattern>
+      <s:pattern>
+        <s:rule context="/c:directory">
+          <s:assert test="ends-with(@xml:base, '/documents/find/')">Wrong path.</s:assert>
+          <s:assert test="count(c:file) = 0">Wrong number of files in find/</s:assert>
+          <s:assert test="count(c:directory) = 0">Wrong number of directories in find/</s:assert>
+        </s:rule>
+      </s:pattern>
+    </s:schema>
+  </t:schematron>
+</t:test>

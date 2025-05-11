@@ -1,0 +1,79 @@
+<refentry xmlns:p="http://www.w3.org/ns/xproc"
+          xmlns:e="http://www.w3.org/1999/XSL/Spec/ElementSyntax"
+          xmlns:cxerr="http://xmlcalabash.com/ns/error"
+          xmlns:xi="http://www.w3.org/2001/XInclude"
+          xmlns:xlink="http://www.w3.org/1999/xlink"
+          xmlns="http://docbook.org/ns/docbook"
+          xml:id="cx-find">
+<?db filename="cx-find"?>
+<refnamediv>
+  <refname>cx:find</refname>
+  <refpurpose>Searches for matching files</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv>
+<refsection role="introduction">
+<title>Introduction</title>
+<para>This step is the <tag>p:directory-list</tag> step with the added ability to
+filter files from the list based on whether their content matches an expression.
+</para>
+</refsection>
+
+<refsection role="step-declaration">
+<title>Step declaration</title>
+<xi:include href="../../../../ext/find/src/main/resources/com/xmlcalabash/ext/find.xpl"
+            xpointer="xpath(/*/*[@type='cx:find'])"/>
+<?import find.xpl?>
+</refsection>
+
+<refsection role="errors">
+<title>Errors</title>
+<para>Errors from the entry body are summarized here.</para>
+</refsection>
+</refsynopsisdiv>
+
+<refsection>
+<title>Description</title>
+
+<para>This step works just like <tag>p:directory-list</tag> except that it defaults to
+an unbounded depth and the resulting
+list of files is filtered through a <option>grep</option>, <option>jsonpath</option>,
+or <option>xpath</option> query option. At most one query option can be provided.
+<error code="cxerr:XC0042">It is a <glossterm>dynamic error</glossterm> if more than
+one query option is provided.</error></para>
+
+<refsection>
+<title>Grep queries</title>
+<para>A <option>grep</option> query is a list of regular expressions. In a grep query, each file
+is read line-by-line and each line is tested against each regular expression (using the standard
+XPath function
+<code>matches($line, $expression)</code>). The file remains
+in the list if any expression is matched on any line.
+<error code="cxerr:XC0040">It is a <glossterm>dynamic error</glossterm> if 
+any of the regular expressions is not valid.</error></para>
+</refsection>
+
+<refsection>
+<title>JSONPath queries</title>
+<para>A <option>jsonpath</option> query is a list of JSONPath expressions. In a
+JSONPath query, each file is read as a JSON document. If the file isn’t a valid
+JSON document, it is removed from the list. If it is valid, it is tested against
+each JSONPath expression. The file remains in the list if any expression returns
+a non-null result.
+<error code="cxerr:XC0039">It is a <glossterm>dynamic error</glossterm> if 
+any of the JSONPath expressions is not valid.</error></para>
+</refsection>
+
+<refsection>
+<title>XPath queries</title>
+<para>An <option>xpath</option> query is a list of XPath expressions. In an
+XPath query, each file is read as an XML document. If the file isn’t well-formed
+XML, it is removed from the list. If it is XML, it is tested against
+each XPath expression. The file remains in the list if any expression returns
+an effective boolean value of true.
+<error code="cxerr:XC0041">It is a <glossterm>dynamic error</glossterm> if 
+any of the XPath expressions is not valid.</error></para>
+</refsection>
+
+</refsection>
+</refentry>

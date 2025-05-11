@@ -1,0 +1,87 @@
+<refentry xmlns:p="http://www.w3.org/ns/xproc"
+          xmlns:e="http://www.w3.org/1999/XSL/Spec/ElementSyntax"
+          xmlns:cxerr="http://xmlcalabash.com/ns/error"
+          xmlns:xi="http://www.w3.org/2001/XInclude"
+          xmlns:xlink="http://www.w3.org/1999/xlink"
+          xmlns="http://docbook.org/ns/docbook"
+          xml:id="cx-jsonpath">
+<?db filename="cx-jsonpath"?>
+<refnamediv>
+  <refname>cx:jsonpath</refname>
+  <refpurpose>Queries a JSON document with JSONPath</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv>
+<refsection role="introduction">
+<title>Introduction</title>
+<para>This step evaluates JSONPath (<biblioref linkend="rfc9535"/>) queries against
+JSON documents. The query result is returned.
+</para>
+</refsection>
+
+<refsection role="step-declaration">
+<title>Step declaration</title>
+<xi:include href="../../../../ext/jsonpath/src/main/resources/com/xmlcalabash/ext/jsonpath.xpl"
+            xpointer="xpath(/*/*[@type='cx:jsonpath'])"/>
+<?import jsonpath.xpl?>
+</refsection>
+
+<refsection role="errors">
+<title>Errors</title>
+<para>Errors from the entry body are summarized here.</para>
+</refsection>
+</refsynopsisdiv>
+
+<refsection>
+<title>Description</title>
+
+<para>The <option>query</option> provided is evaluated against the <port>source</port>
+document. The resulting JSON is returned on the <port>result</port> port. This step
+uses version <?version DEPENDENCY_jsonPath?> of the
+<link xlink:href="https://github.com/json-path/JsonPath">com.jayway.jsonpath</link>
+implementation of JSONPath.
+<error code="cxerr:XC0039">It is a <glossterm>dynamic error</glossterm> if the JSONPath
+expression is invalid.</error></para>
+
+<para>The parameters show in <xref linkend="tbl-jsonpath-options"/> are supported.
+A parameter is enabled if its effective boolean value is true.</para>
+
+<table xml:id="tbl-jsonpath-options">
+<title>JSONPath options</title>
+<tgroup cols="2">
+<thead>
+<row>
+  <entry>Parameter</entry>
+  <entry>Explanation</entry>
+</row>
+</thead>
+<tbody>
+<row>
+  <entry><code>as-path-list</code></entry>
+  <entry>Return paths instead of values</entry>
+</row>
+<row>
+  <entry><code>default-path-leaf-to-null</code></entry>
+  <entry>Return null for missing leaves</entry>
+</row>
+<row>
+  <entry><code>always-return-list</code></entry>
+  <entry>Return a list even when the path is definite</entry>
+</row>
+<row>
+  <entry><code>suppress-exceptions</code></entry>
+  <entry>Return an empty list or null instead of raising an error</entry>
+</row>
+<row>
+  <entry><code>require-properties</code></entry>
+  <entry>Requires properties in an indefinite path</entry>
+</row>
+</tbody>
+</tgroup>
+</table>
+
+<para><error code="cxerr:XC0037">It is a <glossterm>dynamic error</glossterm> if the parameter
+provided has an unrecognized name.</error></para>
+
+</refsection>
+</refentry>

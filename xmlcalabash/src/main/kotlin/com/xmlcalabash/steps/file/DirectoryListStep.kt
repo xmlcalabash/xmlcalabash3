@@ -12,7 +12,7 @@ import com.xmlcalabash.util.Urify
 import java.io.File
 import java.nio.file.Files
 
-class DirectoryListStep(): FileStep(NsP.directoryList) {
+open class DirectoryListStep(): FileStep(NsP.directoryList) {
     private lateinit var rootPath: String
     private var detailed = false
     private val includeFilters = mutableListOf<String>()
@@ -65,7 +65,7 @@ class DirectoryListStep(): FileStep(NsP.directoryList) {
 
         val builder = SaxonTreeBuilder(stepConfig)
         builder.startDocument(dir.toURI())
-        val hierarchy = directoryList(dir, depth, true)
+        val hierarchy = matchingFiles(dir, depth)
         directoryList(builder, hierarchy)
         builder.endDocument()
         val list = builder.result
@@ -73,7 +73,11 @@ class DirectoryListStep(): FileStep(NsP.directoryList) {
         receiver.output("result", XProcDocument.ofXml(list, stepConfig))
     }
 
-    private fun directoryList(dir: File, depth: Int, root: Boolean = false): DirectoryEntry {
+    protected open fun matchingFiles(dir: File, depth: Int): DirectoryEntry {
+        return directoryList(dir, depth, true)
+    }
+
+    protected open fun directoryList(dir: File, depth: Int, root: Boolean = false): DirectoryEntry {
         var include = true
         var overrideContentType: MediaType? = null
         if (!root && (includeFilters.isNotEmpty() || excludeFilters.isNotEmpty() || overrideContentTypes.isNotEmpty())) {
@@ -137,7 +141,7 @@ class DirectoryListStep(): FileStep(NsP.directoryList) {
         }
     }
 
-    private fun directoryList(builder: SaxonTreeBuilder, entry: DirectoryEntry, parent: DirectoryDir? = null) {
+    protected open fun directoryList(builder: SaxonTreeBuilder, entry: DirectoryEntry, parent: DirectoryDir? = null) {
         val atts = if (entry is DirectoryFile) {
             fileAttributes(entry.file, detailed, entry.contentType, parent?.file)
         } else {
@@ -162,19 +166,4 @@ class DirectoryListStep(): FileStep(NsP.directoryList) {
 
         builder.addEndElement()
     }
-
-    internal abstract class DirectoryEntry(val file: File, var include: Boolean = false) {
-        override fun toString(): String {
-            return file.toString()
-        }
-    }
-
-    internal class DirectoryDir(file: File, include: Boolean): DirectoryEntry(file, include) {
-        val entries = mutableListOf<DirectoryEntry>()
-        override fun toString(): String {
-            return "${file} (${entries.size})"
-        }
-    }
-
-    internal class DirectoryFile(file: File, include: Boolean, val contentType: MediaType): DirectoryEntry(file, include)
 }

@@ -426,6 +426,12 @@ open class XProcError protected constructor(val code: QName, val variant: Int, e
         fun xcxTrangUnsupportedXmlFormat() = xstep(34)
         fun xcxTrangUnresolvedInput(resolved: String) = xstep(35, resolved)
         fun xcxTrangIdenticalFormats(format: String) = xstep(36, format)
+        fun xcxUnrecognizedJsonPathOption(option: QName) = xstep(37, option)
+        fun xcxUnparsableJsonPathResult() = xstep(38)
+        fun xcxBadJsonPath(jsonpath: String) = xstep(39, jsonpath)
+        fun xcxBadRegexInFind(regex: String) = xstep(40, regex)
+        fun xcxBadXPathInFind(xpath: String) = xstep(41, xpath)
+        fun xcxAtMostOneQuery() = xstep(42)
 
         fun xiNoSuchOutputPort(port: String)= internal(1, port)
         fun xiImpossibleNodeType(type: XdmNodeKind) = internal(2, type)

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<t:test expected="fail" code="cxerr:XC0040"
+        xmlns:cxerr="http://xmlcalabash.com/ns/error"
+        xmlns:t="http://xproc.org/ns/testsuite/3.0">
+  <t:info>
+    <t:title>find-004</t:title>
+    <t:revision-history>
+      <t:revision>
+        <t:date>2025-05-11</t:date>
+        <t:author>
+          <t:name>Norm Tovey-Walsh</t:name>
+        </t:author>
+        <t:description xmlns="http://www.w3.org/1999/xhtml">
+          <p>Created test.</p>
+        </t:description>
+      </t:revision>
+    </t:revision-history>
+  </t:info>
+  <t:description xmlns="http://www.w3.org/1999/xhtml">
+    <p>Tests cx:find with a grep query that won’t find any files.</p>
+  </t:description>
+  <t:pipeline>
+<p:declare-step xmlns:p="http://www.w3.org/ns/xproc"
+                xmlns:cx="http://xmlcalabash.com/ns/extensions"
+                name="main" version="3.0" expand-text="false">
+  <p:import href="https://xmlcalabash.com/ext/library/find.xpl"/>
+  <p:output port="result"/>
+
+  <cx:find path="../documents/find" grep="\Uisn't a thing"/>
+</p:declare-step>
+  </t:pipeline>
+</t:test>

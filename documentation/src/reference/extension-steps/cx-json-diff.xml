@@ -25,10 +25,12 @@
 <?import json-patch.xpl?>
 </refsection>
 
+<!--
 <refsection role="errors">
 <title>Errors</title>
 <para>Errors from the entry body are summarized here.</para>
 </refsection>
+-->
 </refsynopsisdiv>
 
 <refsection>
