@@ -6,8 +6,13 @@ import com.xmlcalabash.io.DocumentWriter
 import com.xmlcalabash.runtime.api.RuntimePort
 import com.xmlcalabash.util.DefaultOutputReceiver
 import net.sf.saxon.s9api.Processor
+import net.sf.saxon.s9api.QName
+import net.sf.saxon.s9api.XdmAtomicValue
+import net.sf.saxon.s9api.XdmValue
+import net.sf.saxon.type.StringConverter
 import org.apache.logging.log4j.kotlin.logger
 import java.io.FileOutputStream
+import kotlin.collections.get
 
 class FileOutputReceiver(xmlCalabash: XmlCalabash,
                          processor: Processor,
@@ -45,7 +50,16 @@ class FileOutputReceiver(xmlCalabash: XmlCalabash,
 
                 FileOutputStream(outfile)
             }
-            DocumentWriter(document, fos).write()
+
+            val contentType = document.contentType
+            val externalSerialization = mutableMapOf<QName, XdmValue>()
+            val configProps = xmlCalabash.config.serialization[contentType] ?: emptyMap()
+            for ((name, value) in configProps) {
+                val untypedValue = StringConverter.StringToUntypedAtomic().convert(XdmAtomicValue(value).underlyingValue)
+                externalSerialization[name] = XdmAtomicValue.wrap(untypedValue)
+            }
+
+            DocumentWriter(document, fos, externalSerialization).write()
             fos.close()
         } else {
             if (stdout != null) {
