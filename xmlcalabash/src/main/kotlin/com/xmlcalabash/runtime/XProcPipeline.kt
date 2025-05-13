@@ -88,7 +88,7 @@ class XProcPipeline internal constructor(runtime: XProcRuntime, pipeline: Compou
         }
         setOptions.add(name)
 
-        try {
+        val typedValue = try {
             config.typeUtils.checkType(name, value.value, option.asType, config.inscopeNamespaces, option.values)
         } catch (_: Exception) {
             throw XProcError.xdBadType(value.value.toString(), TypeUtils.sequenceTypeToString(option.asType)).exception()
@@ -96,7 +96,7 @@ class XProcPipeline internal constructor(runtime: XProcRuntime, pipeline: Compou
 
         for (step in runnable.runnables.filterIsInstance<AtomicOptionStep>()) {
             if (step.externalName == name) {
-                step.externalValue = value
+                step.externalValue = value.with(typedValue)
                 return
             }
         }
