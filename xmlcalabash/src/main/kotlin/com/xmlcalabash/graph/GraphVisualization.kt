@@ -314,7 +314,7 @@ class GraphVisualization private constructor(val graph: Graph, private val filen
 
             val href = if (model.step is AtomicDocumentStepInstruction) {
                 try {
-                    model.step.staticOptions[Ns.href]?.staticValue.toString()
+                    model.step.staticOptions[Ns.href]?.staticValue?.toString()
                 } catch (ex: Exception) {
                     null
                 }
