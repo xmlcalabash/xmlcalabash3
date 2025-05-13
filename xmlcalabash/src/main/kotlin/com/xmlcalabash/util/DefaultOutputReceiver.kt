@@ -8,6 +8,10 @@ import com.xmlcalabash.runtime.XProcStepConfiguration
 import com.xmlcalabash.runtime.api.Receiver
 import com.xmlcalabash.runtime.api.RuntimePort
 import net.sf.saxon.s9api.Processor
+import net.sf.saxon.s9api.QName
+import net.sf.saxon.s9api.XdmAtomicValue
+import net.sf.saxon.s9api.XdmValue
+import net.sf.saxon.type.StringConverter
 import org.apache.logging.log4j.kotlin.logger
 
 open class DefaultOutputReceiver(val xmlCalabash: XmlCalabash,
@@ -40,7 +44,14 @@ open class DefaultOutputReceiver(val xmlCalabash: XmlCalabash,
 
     fun write(port: String, document: XProcDocument, position: Int, total: Int) {
         val contentType = document.contentType
-        val writer = DocumentWriter(document, System.out)
+
+        val externalSerialization = mutableMapOf<QName, XdmValue>()
+        val configProps = xmlCalabash.config.serialization[contentType] ?: emptyMap()
+        for ((name, value) in configProps) {
+            val untypedValue = StringConverter.StringToUntypedAtomic().convert(XdmAtomicValue(value).underlyingValue)
+            externalSerialization[name] = XdmAtomicValue.wrap(untypedValue)
+        }
+        val writer = DocumentWriter(document, System.out, externalSerialization)
 
         val runtimePort = outputManifold[port]
         val decorate = writingToTerminal && (runtimePort?.sequence == true || ports.size > 1)
