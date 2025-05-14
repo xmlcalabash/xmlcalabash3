@@ -1,0 +1,65 @@
+<t:test expected="pass" features="selenium"
+        xmlns:t="http://xproc.org/ns/testsuite/3.0">
+  <t:info>
+    <t:title>selenium-017</t:title>
+    <t:revision-history>
+      <t:revision>
+        <t:date>2025-02-09</t:date>
+        <t:author>
+          <t:name>Norm Tovey-Walsh</t:name>
+        </t:author>
+        <t:description xmlns="http://www.w3.org/1999/xhtml">
+          <p>Created test.</p>
+        </t:description>
+      </t:revision>
+    </t:revision-history>
+  </t:info>
+  <t:description xmlns="http://www.w3.org/1999/xhtml">
+    <p>Tests reading window properties.</p>
+  </t:description>
+  <t:pipeline>
+<p:declare-step xmlns:p="http://www.w3.org/ns/xproc"
+                xmlns:cx="http://xmlcalabash.com/ns/extensions"
+                name="main" version="3.0">
+  <p:import href="https://xmlcalabash.com/ext/library/selenium.xpl"/>
+  <p:output port="result" sequence="true"/>
+
+  <cx:selenium>
+    <p:with-option name="arguments" select="('--headless')"/>
+    <p:with-input>
+      <script version='0.2' page='http://localhost:8246/apps/counter.html'>
+        <set name='width' type='window' param='width'/>
+        <set name='height' type='window' param='height'/>
+        <set name='x' type='window' param='x'/>
+        <set name='y' type='window' param='y'/>
+        <output name='width'/>
+        <output name='height'/>
+        <output name='x'/>
+        <output name='y'/>
+      </script>
+    </p:with-input>
+  </cx:selenium>
+  <p:for-each>
+    <p:wrap-sequence wrapper="window"/>
+  </p:for-each>
+  <p:wrap-sequence wrapper="wrapper"/>
+</p:declare-step>
+  </t:pipeline>
+  <t:schematron>
+    <s:schema queryBinding="xslt2"
+              xmlns:s="http://purl.oclc.org/dsdl/schematron">
+      <s:ns prefix="h" uri="http://www.w3.org/1999/xhtml"/>
+      <s:ns prefix="xs" uri="http://www.w3.org/2001/XMLSchema"/>
+      <s:pattern>
+        <s:rule context="/">
+          <s:assert test="wrapper">The result isn’t a wrapper.</s:assert>
+          <s:assert test="count(wrapper/window) = 4">The wrong number of window properties were returned.</s:assert>
+          <s:assert test="xs:integer(wrapper/window[1]) gt 0">Width too narrow</s:assert>
+          <s:assert test="xs:integer(wrapper/window[2]) gt 0">Height too short</s:assert>
+          <s:assert test="xs:integer(wrapper/window[3]) ge 0">X position is negative</s:assert>
+          <s:assert test="xs:integer(wrapper/window[4]) ge 0">Y position is negative</s:assert>
+        </s:rule>
+      </s:pattern>
+    </s:schema>
+  </t:schematron>
+</t:test>
