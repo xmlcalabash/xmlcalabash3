@@ -4,7 +4,7 @@
            version="3.0">
 
 <p:declare-step type="cx:selenium">
-  <p:input port="source" content-types="text"/>
+  <p:input port="source" content-types="text xml"/>
   <p:output port="result" sequence="true"/>
   <p:option name="browser" as="xs:string?"/>
   <p:option name="capabilities" as="map(xs:QName, item())?"/>

@@ -9,6 +9,7 @@ import com.xmlcalabash.namespace.Ns
 import com.xmlcalabash.namespace.NsHtml
 import com.xmlcalabash.steps.AbstractAtomicStep
 import com.xmlcalabash.util.DurationUtils
+import com.xmlcalabash.util.MediaClassification
 import com.xmlcalabash.util.S9Api
 import com.xmlcalabash.util.SaxonTreeBuilder
 import com.xmlcalabash.util.UriUtils
@@ -50,10 +51,11 @@ import java.time.Instant
 import java.util.Date
 import javax.xml.transform.sax.SAXSource
 import kotlin.collections.iterator
+import kotlin.math.min
 
 class SeleniumStep(): AbstractAtomicStep() {
     companion object {
-        val ns = NamespaceUri.of("https://xmlcalabash.com/ext/ns/selenium")
+        val ns: NamespaceUri = NamespaceUri.of("https://xmlcalabash.com/ext/ns/selenium")
         val selenium = QName(ns, "x:selenium")
 
         val _all = QName(NamespaceUri.NULL, "all")
@@ -97,7 +99,7 @@ class SeleniumStep(): AbstractAtomicStep() {
         val _xpath = QName(NamespaceUri.NULL, "xpath")
     }
 
-    private val keymap = mapOf<String, Keys>(
+    private val keymap = mapOf(
         "ADD" to Keys.ADD,
         "ALT" to Keys.ALT,
         "ARROW_DOWN" to Keys.ARROW_DOWN,
@@ -187,8 +189,13 @@ class SeleniumStep(): AbstractAtomicStep() {
         }
 
         val source = queues["source"]!!.first()
-        val text = (source.value as XdmNode).underlyingValue.stringValue
-        val script = S9Api.documentElement(parseSource(text))
+        val script = if (source.contentClassification == MediaClassification.TEXT) {
+            val text = (source.value as XdmNode).underlyingValue.stringValue
+            S9Api.documentElement(parseSource(text))
+        } else {
+            // TODO: validate the XML!
+            S9Api.documentElement(source.value as XdmNode)
+        }
 
         loadSubroutines(script)
 
@@ -211,11 +218,7 @@ class SeleniumStep(): AbstractAtomicStep() {
             reqBrowser
         } else {
             val propBrowser = System.getProperty("com.xmlcalabash.selenium.browser")
-            if (propBrowser != null) {
-                propBrowser
-            } else {
-                "firefox" // Have to pick something!
-            }
+            propBrowser ?: "firefox" // Have to pick something!
         }
 
         driver = when (browser) {
@@ -287,7 +290,7 @@ class SeleniumStep(): AbstractAtomicStep() {
     private fun interpretSingle(statement: XdmNode) {
         val actions = Actions(driver)
         interpretAction(statement, actions)
-        actions.build().perform();
+        actions.build().perform()
     }
 
     private fun interpretAction(statement: XdmNode, actions: Actions) {
@@ -314,20 +317,20 @@ class SeleniumStep(): AbstractAtomicStep() {
     }
 
     private fun interpretFindElement(element: XdmNode) {
-        var name = element.getAttributeValue(Ns.name)!!
+        val name = element.getAttributeValue(Ns.name)!!
         val find = element.getAttributeValue(_string)!!
         val type = element.getAttributeValue(_type)!!
-        val wait_attr = element.getAttributeValue(_wait)
-        val pause_attr = element.getAttributeValue(_pause)
+        val waitAttr = element.getAttributeValue(_wait)
+        val pauseAttr = element.getAttributeValue(_pause)
 
-        val wait = if (wait_attr != null || pause_attr != null) {
-            DurationUtils.parseDuration(stepConfig, wait_attr ?: "PT30S")
+        val wait = if (waitAttr != null || pauseAttr != null) {
+            DurationUtils.parseDuration(stepConfig, waitAttr ?: "PT30S")
         } else {
             null
         }
 
-        val pause = if (wait_attr != null || pause_attr != null) {
-            DurationUtils.parseDuration(stepConfig, pause_attr ?: "PT0.25S")
+        val pause = if (waitAttr != null || pauseAttr != null) {
+            DurationUtils.parseDuration(stepConfig, pauseAttr ?: "PT0.25S")
         } else {
             null
         }
@@ -370,7 +373,7 @@ class SeleniumStep(): AbstractAtomicStep() {
     }
 
     private fun interpretFindAllElements(element: XdmNode) {
-        var name = element.getAttributeValue(Ns.name)!!
+        val name = element.getAttributeValue(Ns.name)!!
         val find = element.getAttributeValue(_string)!!
         val type = element.getAttributeValue(_type)!!
 
@@ -399,7 +402,7 @@ class SeleniumStep(): AbstractAtomicStep() {
     }
 
     private fun interpretSet(element: XdmNode) {
-        var name = element.getAttributeValue(Ns.name)!!
+        val name = element.getAttributeValue(Ns.name)!!
         val type = element.getAttributeValue(Ns.type)!!
 
         val value = when (type) {
@@ -451,7 +454,7 @@ class SeleniumStep(): AbstractAtomicStep() {
     }
 
     private fun interpretCookie(element: XdmNode) {
-        var name = element.getAttributeValue(Ns.name)!!
+        val name = element.getAttributeValue(Ns.name)!!
         val value = element.getAttributeValue(Ns.value)!!
         val path = element.getAttributeValue(Ns.path) ?: "/"
         val duration = element.getAttributeValue(Ns.duration)
@@ -478,8 +481,8 @@ class SeleniumStep(): AbstractAtomicStep() {
         if (text == null) {
             val baos = ByteArrayOutputStream()
             val writer = DocumentWriter(XProcDocument.ofXml(element, stepConfig), baos)
-            writer.set(Ns.method, "text")
-            writer.set(Ns.encoding, "utf-8")
+            writer[Ns.method] = "text"
+            writer[Ns.encoding] = "utf-8"
             writer.write()
             text = baos.toString(StandardCharsets.UTF_8)
         }
@@ -586,12 +589,12 @@ class SeleniumStep(): AbstractAtomicStep() {
         for (element in result.elements) {
             actions.moveToElement(element)
             if (element.tagName.lowercase() == "input") {
-                actions.click();
+                actions.click()
             }
         }
     }
 
-    private fun interpretRelease(release: XdmNode, actions: Actions) {
+    private fun interpretRelease(@Suppress("UNUSED_PARAMETER") release: XdmNode, actions: Actions) {
         actions.release()
     }
 
@@ -601,7 +604,7 @@ class SeleniumStep(): AbstractAtomicStep() {
         actions.pause(duration)
     }
 
-    private fun interpretWait(wait: XdmNode) {
+    private fun interpretWait(@Suppress("UNUSED_PARAMETER") wait: XdmNode) {
         var state = driver.executeScript("return document.readyState;")?.toString()
         while (state != "complete") {
             Thread.sleep(100)
@@ -609,8 +612,8 @@ class SeleniumStep(): AbstractAtomicStep() {
         }
     }
 
-    private fun interpretRefresh(refresh: XdmNode) {
-        driver.navigate().refresh();
+    private fun interpretRefresh(@Suppress("UNUSED_PARAMETER") refresh: XdmNode) {
+        driver.navigate().refresh()
     }
 
     private fun interpretOutput(output: XdmNode) {
@@ -835,7 +838,7 @@ class SeleniumStep(): AbstractAtomicStep() {
 
     private fun nodeFor(markup: String): XdmNode {
         val endpos = if (markup.indexOf(" ") > 0) {
-            Math.min(markup.indexOf(">"), markup.indexOf(" "))
+            min(markup.indexOf(">"), markup.indexOf(" "))
         } else {
             markup.indexOf(">")
         }
@@ -843,11 +846,11 @@ class SeleniumStep(): AbstractAtomicStep() {
 
         val wholeDocument = tagname == NsHtml.html
 
-        // If we're only going to parse a bit of the page, make sure we setup the
+        // If we're only going to parse a bit of the page, make sure we set up the
         // input so that the parser will work out the correct encoding.
         val stream = if (!wholeDocument) {
             // Try to special case tables...
-            var sb = StringBuilder()
+            val sb = StringBuilder()
             sb.append("<html><head><meta charset='UTF-8'>")
 
             when (tagname.localName) {
@@ -859,8 +862,7 @@ class SeleniumStep(): AbstractAtomicStep() {
 
             sb.append(markup)
 
-            var preamble = sb.toString()
-            ByteArrayInputStream(preamble.toByteArray(StandardCharsets.UTF_8))
+            ByteArrayInputStream(sb.toString().toByteArray(StandardCharsets.UTF_8))
         } else {
             ByteArrayInputStream(markup.toByteArray(StandardCharsets.UTF_8))
         }
@@ -910,7 +912,7 @@ class SeleniumStep(): AbstractAtomicStep() {
             failure.getTree(tree)
             throw stepConfig.exception(XProcError.xcxSeleniumInvalidScript(tree.tree.asXML().toString()))
         } else {
-            val walker = doc.result.getArborist()
+            val walker = doc.result.arborist
             walker.getTree(doc.getAdapter(tree))
         }
 

@@ -1,0 +1,198 @@
+start = script
+
+script =
+    element script {
+        attribute version { "0.2" },
+        attribute page { xsd:anyURI },
+        statement+
+    }
+
+statement = call | click | close | cookie | drag | find | if | key | message | move
+            | navigate | output | pause | perform | refresh | release
+            | send | set | scroll | subroutine | until | wait | while
+
+duration =  xsd:integer
+            | xsd:token { pattern = "P\d+(\.\d+)?D" }
+            | xsd:token { pattern = "P(\d+(\.\d+)?D)?T(\d+(\.\d+)?H)?(\d+(\.\d+)?M)?(\d+(\.\d+)?S)?" }
+
+call = _call | _gosub
+
+_call =
+    element call {
+        attribute name { text }
+    }
+
+_gosub =
+    element call {
+        attribute name { text }
+    }
+
+click =
+    element click {
+        attribute type { "click" | "doubleclick" | "click-hold" },
+        attribute name { text }?
+    }
+
+close =
+    element close {
+        empty
+    }
+
+cookie =
+    element cookie {
+        attribute name { text },
+        attribute value { text },
+        attribute path { text }?,
+        attribute duration { text }?,
+        empty
+    }
+
+drag =
+    element drag {
+        attribute from { text },
+        attribute to { text },
+        empty
+    }
+
+find =
+    element find {
+        attribute all { "all" }?,
+        attribute name { text },
+        attribute type { "name" | "selector" | "id" | "tag" | "class" | "xpath"
+                         | "link-text" | "partial-link-text" },
+        attribute \string { text },
+        attribute wait { duration }?,
+        attribute pause { duration }?,
+        empty
+    }
+
+if =
+    element if {
+        attribute test { text },
+        statement+
+    }
+
+key = 
+    element key {
+        attribute direction { "up" | "down" },
+        (attribute name { "ADD" | "ALT" | "ARROW_DOWN" | "ARROW_LEFT" | "ARROW_RIGHT" | "ARROW_UP"
+                          | "BACK_SPACE" | "CANCEL" | "CLEAR" | "COMMAND" | "CONTROL" | "DECIMAL"
+                          | "DELETE" | "DIVIDE" | "DOWN" | "END" | "ENTER" | "EQUALS" | "ESCAPE"
+                          | "F1" | "F2" | "F3" | "F4" | "F5" | "F6"
+                          | "F7" | "F8" | "F9" | "F10" | "F11" | "F12"
+                          | "HELP" | "HOME" | "INSERT"
+                          | "LEFT" | "LEFT_ALT" | "LEFT_CONTROL" | "LEFT_SHIFT" | "META"
+                          | "MULTIPLY" | "NULL" | "NUMPAD0" | "NUMPAD1" | "NUMPAD2" | "NUMPAD3"
+                          | "NUMPAD4" | "NUMPAD5" | "NUMPAD6" | "NUMPAD7" | "NUMPAD8" | "NUMPAD9"
+                          | "PAGE_DOWN" | "PAGE_UP" | "PAUSE" | "RETURN" | "RIGHT"
+                          | "SEPARATOR" | "SHIFT" | "SPACE" | "SUBTRACT" | "TAB" | "UP" }
+         | attribute char { text }),
+        empty
+    }
+
+message =
+    element message {
+        attribute select { text },
+        empty
+    }
+
+move =
+    element move {
+        attribute to { text },
+        empty
+    }
+
+navigate =
+    element navigate {
+        (attribute direction { "forward" | "back" | "backwards" }
+         | attribute to { xsd:anyURI }),
+        empty
+    }
+
+output =
+    element output {
+        attribute \string { text }?,
+        attribute type { text }?,
+        attribute name { text }?,
+        text
+    }
+
+pause =
+    element pause {
+        attribute duration { duration },
+        empty
+    }
+
+perform =
+    element perform {
+        statement+
+    }
+
+refresh =
+    element refresh {
+        empty
+    }
+
+release =
+    element release {
+        empty
+    }
+
+scroll =
+    element scroll {
+        (attribute to { text }
+         | (attribute from { text }?,
+            attribute delta-x { xsd:integer },
+            attribute delta-y { xsd:integer })),
+        empty
+    }
+
+send =
+    element send {
+        attribute \string { text }?,
+        attribute name { text }?,
+        text
+    }
+
+set =
+    element set {
+        attribute name { text },
+        ((attribute type { "cookie" },
+          attribute cookie { text })
+         |(attribute type { "element" },
+           attribute from { text },
+           attribute property { text })
+         |(attribute type { "page" },
+           attribute param { text })
+         |(attribute type { "string" },
+           attribute \string { text })
+         |(attribute type { "xpath" },
+           attribute xpath { text })
+         |(attribute type { "window" },
+           attribute param { "width" | "height" | "x" | "y" })
+        ),
+        empty
+    }
+
+subroutine =
+    element subroutine {
+        attribute name { text },
+        statement+
+    }
+
+until =
+    element until {
+        attribute test { text },
+        statement+
+    }
+
+wait =
+    element wait {
+        empty
+    }
+
+while =
+    element while {
+        attribute test { text },
+        statement+
+    }
