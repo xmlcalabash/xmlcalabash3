@@ -87,7 +87,7 @@ open class XProcError protected constructor(val code: QName, val variant: Int, e
         fun xsNoSteps() = static(15)
         fun xsRequiredAndDefaulted(name: QName) = static(17, name)
         fun xsMissingRequiredOption(name: QName) = static(18, name)
-        fun xsPortNotReadable(step: String) = static(Pair(22, 1), step)
+        fun xsPortNotReadable(port: String) = static(Pair(22, 1), port)
         fun xsPortNotReadable(step: String, port: String) = static(Pair(22, 2), step, port)
         fun xsOutputPortNotReadable(step: String, port: String) = static(Pair(22, 3), step, port)
         fun xsStepTypeInNoNamespace(type: QName) = static(Pair(25,1), type)
