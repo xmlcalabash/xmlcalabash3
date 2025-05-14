@@ -345,7 +345,7 @@ If an option is required, it is a static error to invoke the step without
 specifying a value for that option.
 
 XS0022/1
-Attempt to connect to port on unknown or out-of-scope step: “$1”.
+Attempt to connect to unknown port “$1”.
 In all cases except when the p:pipe is within an p:output of a compound step, it
 is a static error if the port identified by the p:pipe is not in the readable
 ports of the step that contains the p:pipe.

@@ -115,7 +115,7 @@ class PipeInstruction(parent: XProcInstruction): ConnectionInstruction(parent, N
             if (port == null) {
                 throw stepConfig.exception(XProcError.xsNoPortPortNotReadable())
             } else {
-                throw stepConfig.exception(XProcError.xsPortNotReadable(port!!))
+                throw stepConfig.exception(XProcError.xsPortNotReadable(_step ?: "", port!!))
             }
         } else {
             _port = fromPort.port
