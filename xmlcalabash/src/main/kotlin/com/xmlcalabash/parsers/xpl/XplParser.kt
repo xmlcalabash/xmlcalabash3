@@ -20,6 +20,7 @@ import net.sf.saxon.s9api.XdmNode
 import net.sf.saxon.type.StringConverter.StringToUntypedAtomic
 import net.sf.saxon.type.Untyped
 import java.net.URI
+import javax.xml.transform.Source
 
 class XplParser internal constructor(val builder: PipelineBuilder) {
     private val manager = XplDocumentManager(builder)
@@ -39,6 +40,26 @@ class XplParser internal constructor(val builder: PipelineBuilder) {
 
     fun parse(uri: URI): DeclareStepInstruction {
         return parse(uri, null)
+    }
+
+    fun parse(uri: URI, stepName: String?): DeclareStepInstruction {
+        val stepContainer = parseUri(uri)
+
+        if (errors.isNotEmpty()) {
+            throw errors.first()
+        }
+
+        return pipelineForContainer(stepContainer, stepName)
+    }
+
+    fun parse(source: Source): DeclareStepInstruction {
+        return parse(source, null);
+    }
+
+    fun parse(source: Source, stepName: String?): DeclareStepInstruction {
+        val builder = builder.stepConfig.processor.newDocumentBuilder()
+        val xml = builder.build(source)
+        return parse(xml, stepName)
     }
 
     fun parse(xml: XdmNode): DeclareStepInstruction {
@@ -61,16 +82,6 @@ class XplParser internal constructor(val builder: PipelineBuilder) {
         }
 
         parsedUris[uri] = stepContainer
-
-        if (errors.isNotEmpty()) {
-            throw errors.first()
-        }
-
-        return pipelineForContainer(stepContainer, stepName)
-    }
-
-    fun parse(uri: URI, stepName: String?): DeclareStepInstruction {
-        val stepContainer = parseUri(uri)
 
         if (errors.isNotEmpty()) {
             throw errors.first()
