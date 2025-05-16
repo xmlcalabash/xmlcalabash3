@@ -22,6 +22,7 @@ import net.sf.saxon.Configuration
 import net.sf.saxon.s9api.QName
 import net.sf.saxon.s9api.ValidationMode
 import org.apache.logging.log4j.kotlin.logger
+import org.xmlresolver.ResolverFeature
 import java.io.File
 import java.io.IOException
 import java.net.URI
@@ -488,6 +489,7 @@ class XmlCalabashBuilder {
         }
 
         val saxonConfiguration = SaxonConfiguration.newInstance(config.licensed, config.saxonConfigurationFile?.toURI(), config.saxonConfigurationProperties, config.xmlSchemaDocuments, initializers, configurers)
+        saxonConfiguration.configuration.resourceResolver = config._documentManager
         config._saxonConfiguration = saxonConfiguration
         return init(config)
     }
@@ -732,6 +734,14 @@ class XmlCalabashBuilder {
             config._visualizerProperties.putAll(_visualizerProperties)
             config._xmlCatalogs.addAll(_xmlCatalogs)
             config._xmlSchemaDocuments.addAll(_xmlSchemaDocuments)
+
+            val xmlconfig = config.documentManager.resolver.configuration
+            val catlist = mutableListOf<String>()
+            catlist.addAll(xmlconfig.getFeature(ResolverFeature.CATALOG_FILES))
+            for (cat in config.xmlCatalogs) {
+                catlist.add(cat.toString())
+            }
+            xmlconfig.setFeature(ResolverFeature.CATALOG_FILES, catlist)
 
             return config
         }

@@ -147,6 +147,7 @@ class SaxonConfiguration private constructor(val licensed: Boolean,
 
         newConfig.configuration.namePool = configuration.namePool
         newConfig.configuration.documentNumberAllocator = configuration.documentNumberAllocator
+        newConfig.configuration.resourceResolver = configuration.resourceResolver
 
         newConfig._processor = Processor(newConfig.configuration)
         newConfig.configureProcessor(newConfig._processor)
