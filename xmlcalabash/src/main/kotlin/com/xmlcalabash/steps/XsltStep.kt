@@ -105,7 +105,20 @@ open class XsltStep(): AbstractAtomicStep() {
     override fun reset() {
         super.reset()
         sources.clear()
-        stylesheet = XProcDocument.ofEmpty(stepConfig)
+
+        parameters.clear()
+        staticParameters.clear()
+        globalContextItem = null
+        populateDefaultCollection = false
+        initialMode = null
+        templateName = null
+        outputBaseUri = null
+        version = null
+        goesBang = null
+        terminationError = null
+        forceEmptyGlobalContextItem = false
+        primaryDestination = null
+        primaryOutputProperties.clear()
     }
 
     private fun xslt30() {
