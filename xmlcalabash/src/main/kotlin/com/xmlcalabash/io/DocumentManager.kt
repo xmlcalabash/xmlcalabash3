@@ -249,11 +249,11 @@ open class DocumentManager(val resolver: XMLResolver): EntityResolver, EntityRes
         return null
     }
 
-    override fun resolveEntity(name: String?, publicId: String?, baseURI: String?, systemId: String?): InputSource {
+    override fun resolveEntity(name: String?, publicId: String?, baseURI: String?, systemId: String?): InputSource? {
         return resolver.entityResolver2.resolveEntity(name, publicId, baseURI, systemId)
     }
 
-    override fun resolveEntity(publicId: String?, systemId: String?): InputSource {
+    override fun resolveEntity(publicId: String?, systemId: String?): InputSource? {
         if (systemId != null) {
             val source = inputFromCache(URI(systemId))
             if (source != null) {
@@ -264,7 +264,7 @@ open class DocumentManager(val resolver: XMLResolver): EntityResolver, EntityRes
         return resolver.entityResolver2.resolveEntity(publicId, systemId)
     }
 
-    override fun getExternalSubset(name: String?, baseURI: String?): InputSource {
+    override fun getExternalSubset(name: String?, baseURI: String?): InputSource? {
         return resolver.entityResolver2.getExternalSubset(name, baseURI)
     }
 
