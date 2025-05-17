@@ -9,16 +9,23 @@ import com.xmlcalabash.io.DocumentWriter
 import com.xmlcalabash.namespace.Ns
 import com.xmlcalabash.namespace.NsXml
 import com.xmlcalabash.runtime.XProcStepConfiguration
+import net.sf.saxon.om.AttributeInfo
+import net.sf.saxon.om.AttributeMap
+import net.sf.saxon.om.EmptyAttributeMap
+import net.sf.saxon.om.FingerprintedQName
+import net.sf.saxon.om.NameOfNode
 import net.sf.saxon.s9api.*
 import net.sf.saxon.serialize.SerializationProperties
 import net.sf.saxon.str.UnicodeBuilder
 import net.sf.saxon.str.UnicodeString
+import net.sf.saxon.type.BuiltInAtomicType
 import org.xml.sax.InputSource
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.net.URI
 import java.net.URISyntaxException
 import java.nio.charset.StandardCharsets
+import javax.management.Query.attr
 
 class S9Api {
     companion object {
@@ -116,7 +123,7 @@ class S9Api {
             }
         }
 
-        fun adjustBaseUri(xml: XdmNode, baseUri: URI?): XdmNode {
+        fun adjustBaseUri(xml: XdmNode, baseUri: URI?, setXmlBase: Boolean? = false): XdmNode {
             if (baseUri == null) {
                 return xml
             }
@@ -131,10 +138,10 @@ class S9Api {
             }
 
             val dbase = checkNode.baseURI
-            if (dbase == null || baseUri.toString() != dbase.toString()) {
+            if (dbase == null || baseUri.toString() != dbase.toString() || setXmlBase == true) {
                 val builder = SaxonTreeBuilder(xml.processor)
                 builder.startDocument(baseUri)
-                adjustBaseUri(xml, baseUri, builder)
+                adjustBaseUri(xml, baseUri, builder, setXmlBase == true)
                 builder.endDocument()
                 return builder.result
             }
@@ -142,19 +149,36 @@ class S9Api {
             return xml
         }
 
-        private fun adjustBaseUri(xml: XdmNode, baseUri: URI, builder: SaxonTreeBuilder) {
+        private fun adjustBaseUri(xml: XdmNode, baseUri: URI, builder: SaxonTreeBuilder, setXmlBase: Boolean) {
             when (xml.nodeKind) {
                 XdmNodeKind.DOCUMENT -> {
                     for (child in xml.axisIterator(Axis.CHILD)) {
-                        adjustBaseUri(child, baseUri, builder)
+                        adjustBaseUri(child, baseUri, builder, setXmlBase)
                     }
                 }
                 XdmNodeKind.ELEMENT -> {
                     val xmlBase = xml.getAttributeValue(NsXml.base)
                     val adjBaseUri = UriUtils.resolve(baseUri, xmlBase)!!
-                    builder.addStartElement(xml, adjBaseUri)
+
+                    if (setXmlBase && xml.getAttributeValue(NsXml.base) == null) {
+                        var attributes: AttributeMap = EmptyAttributeMap.getInstance()
+                        val allAttributes = xml.underlyingNode.attributes()
+                        for (child in xml.axisIterator(Axis.ATTRIBUTE)) {
+                            val name = NameOfNode.makeName(child.underlyingNode)
+                            val attr = allAttributes.get(name)
+                            attributes = attributes.put(attr)
+                        }
+                        val fqBase = FingerprintedQName("xml", NsXml.namespace, "base")
+                        val baseAi = AttributeInfo(fqBase, BuiltInAtomicType.ANY_URI,
+                            adjBaseUri.toString(), xml.underlyingNode.saveLocation(), 0)
+                        attributes = attributes.put(baseAi)
+                        builder.addStartElement(xml.nodeName, attributes, adjBaseUri)
+                    } else {
+                        builder.addStartElement(xml, adjBaseUri)
+                    }
+
                     for (child in xml.axisIterator(Axis.CHILD)) {
-                        adjustBaseUri(child, baseUri, builder)
+                        adjustBaseUri(child, baseUri, builder, false)
                     }
                     builder.addEndElement()
                 }
