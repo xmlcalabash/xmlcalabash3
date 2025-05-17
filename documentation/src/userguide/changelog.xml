@@ -13,6 +13,43 @@ See the commits and pull requests on
 finer detail.</para>
 
 <revhistory>
+<revision xml:id="r300-beta2">
+<revnumber>3.0.0-beta2</revnumber>
+<date>2025-05-17</date>
+<revdescription>
+<itemizedlist>
+<listitem><para>Fixed <ghissue number="488"/>. Make sure that the document manager
+is used as the resource resolver for step processing.
+</para></listitem>
+<listitem><para>Fixed <ghissue number="485"/>. Make sure that the global context item,
+and other properties, are correctly reset when <tag>p:xslt</tag> is used in a loop.
+</para></listitem>
+<listitem><para>Fixed <ghissue number="483"/>. Support constructing a pipeline
+from a <code>java.xml.transform.Source</code>.
+</para></listitem>
+<listitem><para>Support XML input to the <tag>cx:selenium</tag> step.
+Also did some IDE-directed code cleanup in the step itself. There’s a (currently
+undocumented) RELAX NG grammar for the XML input. It’s possibly a bit sketchy.
+And the step doesn’t validate the input.
+</para></listitem>
+<listitem><para>Fixed <ghissue number="478"/>. Improved the error message associated
+with attempts to connect to an unknown port.
+</para></listitem>
+<listitem><para>Fixed <ghissue number="476"/>. Make sure that options are set to
+their typed values.
+</para></listitem>
+<listitem><para>Fixed <ghissue number="474"/>. Apply serialization properties specified
+in the configuration file.
+</para></listitem>
+<listitem><para>Fixed <ghissue number="472"/>. Fixed a bug where “null” would sometimes
+appear in the graph visualization.
+</para></listitem>
+<listitem><para>Fixed <ghissue number="321"/> (again). Updated the XInclude processor
+to 5.4.0 to correct a bug where nested base URIs were not correctly preserved.
+</para></listitem>
+</itemizedlist>
+</revdescription>
+</revision>
 <revision xml:id="r300-beta1">
 <revnumber>3.0.0-beta1</revnumber>
 <date>2025-05-11</date>
