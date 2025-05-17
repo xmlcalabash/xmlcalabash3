@@ -57,7 +57,7 @@ class RenameStep(): AbstractAtomicStep(), ProcessMatchingNodes {
         }
 
         var amap = nonMatchingAttributes
-        var nsmap = node.underlyingNode.allNamespaces
+        val nsmap = node.underlyingNode.allNamespaces
         for (attr in matchingAttributes.asList()) {
             var prefix = newName.prefix
             val uri = newName.namespaceUri

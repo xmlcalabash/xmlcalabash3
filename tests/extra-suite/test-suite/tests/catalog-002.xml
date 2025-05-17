@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<t:test expected="pass"
+        xmlns:t="http://xproc.org/ns/testsuite/3.0">
+  <t:info>
+    <t:title>catalog-002</t:title>
+    <t:revision-history>
+      <t:revision>
+        <t:date>2025-05-17</t:date>
+        <t:author>
+          <t:name>Norm Tovey-Walsh</t:name>
+        </t:author>
+        <t:description xmlns="http://www.w3.org/1999/xhtml">
+          <p>Created test.</p>
+        </t:description>
+      </t:revision>
+    </t:revision-history>
+  </t:info>
+  <t:catalog src="../documents/sample-catalog.xml"/>
+  <t:description xmlns="http://www.w3.org/1999/xhtml">
+    <p>Make sure that the catalog configuration is available to parsers, etc.</p>
+  </t:description>
+  <t:pipeline>
+<p:declare-step xmlns:p="http://www.w3.org/ns/xproc"
+                xmlns:cx="http://xmlcalabash.com/ns/extensions"
+                name="main" version="3.0">
+  <p:output port="result" sequence="true"/>
+
+  <p:xslt>
+    <p:with-input port="source" href="../documents/catalog-sample.xml"/>
+    <p:with-input port="stylesheet" href="../documents/identity.xsl"/>
+  </p:xslt>
+</p:declare-step>
+  </t:pipeline>
+  <t:schematron>
+    <s:schema queryBinding="xslt2"
+              xmlns:s="http://purl.oclc.org/dsdl/schematron">
+      <s:pattern>
+        <s:rule context="/">
+          <s:assert test="sample">The root is wrong.</s:assert>
+        </s:rule>
+      </s:pattern>
+    </s:schema>
+  </t:schematron>
+</t:test>

@@ -566,9 +566,9 @@ class TestCase(val xmlCalabash: XmlCalabash, val testOptions: TestOptions, val t
             builder.isLineNumbering = true
             val fn = catalog.baseURI.resolve(catalog.getAttributeValue(SRC))
             val xml = builder.build(SAXSource(InputSource(fn.toString())))
-            rootElement(xml).toString()
+            rootElement(xml, true).toString()
         } else {
-            rootElement(catalog).toString()
+            rootElement(catalog, true).toString()
         }
 
         catalogs.add(xml)
@@ -645,7 +645,7 @@ class TestCase(val xmlCalabash: XmlCalabash, val testOptions: TestOptions, val t
         return Date.from(Instant.from(accessor))
     }
 
-    private fun rootElement(parent: XdmNode): XdmNode {
+    private fun rootElement(parent: XdmNode, setXmlBase: Boolean? = false): XdmNode {
         var elem: XdmNode? = null
         for (node in parent.axisIterator(Axis.CHILD)) {
             if (node.nodeKind == XdmNodeKind.ELEMENT) {
@@ -660,7 +660,7 @@ class TestCase(val xmlCalabash: XmlCalabash, val testOptions: TestOptions, val t
             throw RuntimeException("Configuration error: failed to find element in ${parent.nodeName}")
         }
 
-        elem = S9Api.adjustBaseUri(elem, parent.baseURI)
+        elem = S9Api.adjustBaseUri(elem, parent.baseURI, setXmlBase)
 
         return elem
     }
