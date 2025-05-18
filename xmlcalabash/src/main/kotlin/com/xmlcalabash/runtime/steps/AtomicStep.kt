@@ -189,7 +189,7 @@ open class AtomicStep(config: XProcStepConfiguration, atomic: AtomicBuiltinStepM
         }
 
         if (inputErrors.isNotEmpty()) {
-            throw inputErrors.first().exception()
+            throw stepConfig.exception(inputErrors.first())
         }
 
         synchronized(openPorts) {

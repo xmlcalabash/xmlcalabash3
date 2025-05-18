@@ -84,7 +84,7 @@ abstract class CompoundStep(config: XProcStepConfiguration, compound: CompoundSt
         runnableProviders[compound.head] = { head }
         runnableProviders[compound.foot] = { foot }
         for (step in compound.steps) {
-            val stepRunnable = step.runnable(config)
+            val stepRunnable = step.runnable(step.stepConfig)
             runnableProviders[step] = stepRunnable
         }
     }
