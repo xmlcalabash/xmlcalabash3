@@ -253,7 +253,17 @@ class XmlCalabashCli private constructor() {
                 null
             }
 
-            for ((port, uris) in commandLine.inputs) {
+            if ("*anonymous" in commandLine.inputs && pipeline.inputManifold.size != 1) {
+                throw XProcError.xiCliPortNameRequired("input").exception()
+            }
+
+            for ((portName, uris) in commandLine.inputs) {
+                val port = if (portName == "*anonymous") {
+                    pipeline.inputManifold.keys.first()
+                } else {
+                    portName
+                }
+
                 for (pair in uris) {
                     if (pair.first == CommandLine.STDIO_URI) {
                         pipeline.input(port, stdin!!)
@@ -272,7 +282,19 @@ class XmlCalabashCli private constructor() {
                 commandLine._outputs[implicitStdout] = OutputFilename(CommandLine.STDIO_NAME)
             }
 
-            for ((port, output) in commandLine.outputs) {
+            if ("*anonymous" in commandLine.outputs && pipeline.outputManifold.size != 1) {
+                throw XProcError.xiCliPortNameRequired("output").exception()
+            }
+
+            val realOutputs = mutableMapOf<String, OutputFilename>()
+            for ((portName, output) in commandLine.outputs) {
+                val port = if (portName == "*anonymous") {
+                    pipeline.outputManifold.keys.first()
+                } else {
+                    portName
+                }
+                realOutputs[port] = output
+
                 if (!pipeline.outputManifold.containsKey(port)) {
                     throw XProcError.xiNoSuchOutputPort(port).exception()
                 }
@@ -291,7 +313,7 @@ class XmlCalabashCli private constructor() {
                 }
             }
 
-            pipeline.receiver = FileOutputReceiver(xmlCalabash, stepConfig.processor, pipeline.outputManifold, commandLine.outputs, explicitStdout ?: implicitStdout)
+            pipeline.receiver = FileOutputReceiver(xmlCalabash, stepConfig.processor, pipeline.outputManifold, realOutputs, explicitStdout ?: implicitStdout)
             tstart = System.nanoTime()
             pipeline.run()
             tend = System.nanoTime()
