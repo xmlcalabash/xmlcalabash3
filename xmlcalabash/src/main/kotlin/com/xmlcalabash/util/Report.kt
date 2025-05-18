@@ -9,7 +9,7 @@ import net.sf.saxon.s9api.QName
 import net.sf.saxon.s9api.XmlProcessingError
 import net.sf.saxon.trans.XPathException
 
-open class Report constructor(val severity: Verbosity, val message: String) {
+open class Report(val severity: Verbosity, val message: String) {
     constructor(severity: Verbosity, message: String, location: Location): this(severity, message) {
         _location = location
     }
@@ -80,5 +80,9 @@ open class Report constructor(val severity: Verbosity, val message: String) {
 
     internal fun addDetail(detail: QName, value: String) {
         _extraDetail[detail] = value
+    }
+
+    override fun toString(): String {
+        return message
     }
 }

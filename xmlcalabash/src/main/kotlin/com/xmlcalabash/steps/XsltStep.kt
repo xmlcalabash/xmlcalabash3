@@ -204,7 +204,26 @@ open class XsltStep(): AbstractAtomicStep() {
                 else -> throw stepConfig.exception(XProcError.xcXsltRuntimeError(sae.message!!))
             }
 
-            throw stepConfig.exception(XProcError.xcXsltCompileError(sae.message!!, sae, errorReporter.errorMessages))
+            val message = if (errorReporter.errorMessages.isNotEmpty()) {
+                val error = errorReporter.errorMessages.first()
+                val sb = StringBuilder()
+                if (error.inputLocation.baseUri != null) {
+                    sb.append(error.inputLocation.baseUri)
+                    if (error.inputLocation.lineNumber > 0) {
+                        sb.append(":").append(error.inputLocation.lineNumber)
+                        if (error.inputLocation.columnNumber > 0) {
+                            sb.append(":").append(error.inputLocation.columnNumber)
+                        }
+                    }
+                    sb.append(": ")
+                }
+                sb.append(error.message)
+                sb.toString()
+            } else {
+                sae.message ?: "(no message)"
+            }
+
+            throw stepConfig.exception(XProcError.xcXsltCompileError(message, sae, errorReporter.errorMessages))
         }
 
         val transformer = exec.load30()
@@ -314,18 +333,6 @@ open class XsltStep(): AbstractAtomicStep() {
         if (version != "3.0" && document != null && document.value != XdmEmptySequence.getInstance()) {
             transformer.setGlobalContextItem(document.value as XdmItem)
         }
-
-        /*
-        if (defaulted.contains(Ns.globalContextItem)) {
-            if (sources.size == 1) {
-                transformer.setGlobalContextItem(sources.first().value as XdmItem)
-            }
-        } else {
-            if (globalContextItem!!.value != XdmEmptySequence.getInstance()) {
-                transformer.setGlobalContextItem(globalContextItem!!.value as XdmItem)
-            }
-        }
-         */
 
         try {
             if (templateName != null) {
