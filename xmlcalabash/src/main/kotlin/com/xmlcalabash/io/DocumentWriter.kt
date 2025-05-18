@@ -32,7 +32,6 @@ class DocumentWriter(val doc: XProcDocument,
     val serializationParameters: Map<QName, XdmValue>
         get() = _params
     init {
-        _params.putAll(externalSerialization)
         val inputMap = doc.properties.getSerialization()
         for (key in inputMap.keySet()) {
             val value = inputMap.get(key)
@@ -44,6 +43,7 @@ class DocumentWriter(val doc: XProcDocument,
             }
             _params[qkey] = value
         }
+        _params.putAll(externalSerialization)
     }
 
     operator fun get(name: QName): XdmValue? {
