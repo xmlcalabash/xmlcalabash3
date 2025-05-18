@@ -13,6 +13,36 @@ See the commits and pull requests on
 finer detail.</para>
 
 <revhistory>
+<revision xml:id="r300-beta3">
+<revnumber>3.0.0-beta3</revnumber>
+<date>2025-05-18</date>
+<revdescription>
+<para>I wasn’t really planning to do another release today, but there are some nice
+usability improvements in here and releases are cheap…</para>
+<itemizedlist>
+<listitem><para>Fixed <ghissue number="504"/>. Improved the error messages reported
+when stylesheet compilation fails for a <tag>p:xslt</tag> step.
+</para></listitem>
+<listitem><para>Fixed <ghissue number="498"/>. Allow the port name to be omitted for
+input and output ports on the command line if the pipeline has only a single such port.
+</para></listitem>
+<listitem><para>Fixed <ghissue number="499"/>. Fixed a bug where the serialization
+option on the <tag>p:store</tag> step was not taking precedence.
+</para></listitem>
+<listitem><para>Fixed <ghissue number="497"/>. If you attempt to process a stylesheet
+without passing an initial template name, and if the input is not a node, it will often
+silently fail. Output a debug message warning of this fact.
+</para></listitem>
+<listitem><para>Fixed <ghissue number="496"/>. Improved the error message associated with
+a <tag>p:pipe</tag> as a child of <tag>p:input</tag>.
+</para></listitem>
+<listitem><para>Fixed <ghissue number="493"/>. Fixed the error location for dynamic
+errors in atomic steps. (Previously, the location of the containing compound step
+was always reported.)
+</para></listitem>
+</itemizedlist>
+</revdescription>
+</revision>
 <revision xml:id="r300-beta2">
 <revnumber>3.0.0-beta2</revnumber>
 <date>2025-05-17</date>
