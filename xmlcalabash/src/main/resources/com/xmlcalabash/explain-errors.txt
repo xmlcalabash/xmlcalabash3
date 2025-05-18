@@ -1656,6 +1656,9 @@ Command line option malformed: “$2” ($1).
 cxerr:XI0206
 Duplicate output file: “$1”.
 
+cxerr:XI0207
+Pipeline has more than one $1; port name required on command line.
+
 cxerr:XI0213
 Static options cannot be provided after the pipeline has been compiled: “$1”.
 

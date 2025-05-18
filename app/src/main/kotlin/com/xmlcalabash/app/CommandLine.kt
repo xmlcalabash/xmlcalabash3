@@ -414,9 +414,12 @@ class CommandLine private constructor(val args: Array<out String>) {
         }
     }
 
-    private fun split(arg: String, type: String): Pair<String, String> {
+    private fun split(arg: String, type: String, defaultName: String? = null): Pair<String, String> {
         val pos = arg.indexOf("=")
         if (pos <= 0) {
+            if (defaultName != null) {
+                return Pair(defaultName, arg)
+            }
             throw XProcError.xiCliMalformedOption(type, arg).exception()
         }
         return Pair(arg.substring(0, pos).trim(), arg.substring(pos + 1).trim())
@@ -424,7 +427,7 @@ class CommandLine private constructor(val args: Array<out String>) {
 
     private fun parseInput(arg: String) {
         // -i:contentType@port=path
-        val (portspec, href) = split(arg, "input")
+        val (portspec, href) = split(arg, "input", "*anonymous")
         var port = portspec
         var contentType = MediaType.ANY
         if (portspec.contains("@")) {
@@ -445,7 +448,7 @@ class CommandLine private constructor(val args: Array<out String>) {
 
     private fun parseOutput(arg: String) {
         // -i:port=path
-        val (port, filename) = split(arg, "output")
+        val (port, filename) = split(arg, "output", "*anonymous")
         if (_outputs.containsKey(port)) {
             throw XProcError.xiCliDuplicateOutputFile(filename).exception()
         }

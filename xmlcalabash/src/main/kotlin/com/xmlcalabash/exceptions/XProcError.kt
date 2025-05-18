@@ -479,6 +479,7 @@ open class XProcError protected constructor(val code: QName, val variant: Int, e
         fun xiCliMoreThanOnePipeline(first: String, second: String) = internal(204, first, second)
         fun xiCliMalformedOption(type: String, opt: String) = internal(205, type, opt)
         fun xiCliDuplicateOutputFile(filename: String) = internal(206, filename)
+        fun xiCliPortNameRequired(type: String) = internal(207, type)
 
         fun xiTooLateForStaticOptions(name: QName) = internal(213, name)
         fun xiCliDuplicateNamespace(prefix: String) = internal(214, prefix)
