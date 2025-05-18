@@ -992,9 +992,9 @@ It is a dynamic error if as a consequence of changing or removing the namespace
 of an attribute the attribute's name is not unique on the respective element.
 
 XC0093
-Failed to compile stylesheet: $1 ($2).
+Failed to compile stylesheet: $1.
 It is a dynamic error if a static error occurs during the static analysis of the
-XSLT stylesheet.
+XSLT stylesheet. (Underlying exception was: $2)
 
 XC0094/1
 Only XML, HTML, and text documents can be used with XSLT 2.0.
