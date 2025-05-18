@@ -74,7 +74,7 @@ error</glossterm> if the page URI does not match at least one of the whitelist e
 
 </refsection>
 
-<refsection>
+<refsection xml:id="selenium-scripting">
 <title>The scripting language</title>
 
 <para>A <tag>cx:selenium</tag> script begins with a version declaration,

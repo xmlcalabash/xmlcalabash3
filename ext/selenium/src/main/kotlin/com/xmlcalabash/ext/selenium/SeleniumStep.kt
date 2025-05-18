@@ -180,6 +180,7 @@ class SeleniumStep(): AbstractAtomicStep() {
         for (wlist in config) {
             val list = wlist[_whitelist] ?: ""
             for (regex in list.split("\\s+".toRegex())) {
+                stepConfig.debug { "Selenium whitelist: ${regex}" }
                 whitelist.add(Regex(regex))
             }
         }
@@ -960,8 +961,10 @@ class SeleniumStep(): AbstractAtomicStep() {
 
         for (regex in whitelist) {
             if (regex.matches(uri)) {
+                stepConfig.debug { "Selenium whitelisted: ${uri}" }
                 return
             }
+            stepConfig.debug { "Selenium blacklisted: ${uri}" }
         }
 
         throw stepConfig.exception(XProcError.xcxSeleniumNotWhitelisted(uri))
