@@ -146,6 +146,7 @@ open class XProcError protected constructor(val code: QName, val variant: Int, e
         fun xsInvalidElement(name: QName) = static(Pair(100,1), name)
         fun xsInvalidImplicitInline(name: QName) = static(Pair(100,2), name)
         fun xsInvalidAttribute(name: QName) = static(Pair(100, 3), name)
+        fun xsInvalidXProcElement(name: QName) = static(Pair(100,4), name)
         fun xsInvalidValues(value: String) = static(101, value)
         fun xsDifferentPrimaryOutputs() = static(102)
         fun xsUnknownFunctionMediaType(type: String) = static(104, type)
