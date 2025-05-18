@@ -1117,6 +1117,9 @@ class XplParser internal constructor(val builder: PipelineBuilder) {
 
                         if (instruction is PortBindingContainer) {
                             if (explicitBinding && implicitInline != null) {
+                                if (child.node.nodeName.namespaceUri == NsP.namespace) {
+                                    throw XProcError.xsInvalidXProcElement(child.node.nodeName).at(node.node).exception()
+                                }
                                 throw XProcError.xsInvalidImplicitInline(implicitInline).at(node.node).exception()
                             }
 

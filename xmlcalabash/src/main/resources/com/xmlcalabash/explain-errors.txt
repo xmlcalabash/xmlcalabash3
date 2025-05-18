@@ -622,6 +622,10 @@ XS0100/3
 Invalid attribute: “$1”.
 It is a static error if the pipeline document does not conform to the grammar for pipeline documents.
 
+XS0100/4
+Invalid element: “$1” is not allowed here.
+It is a static error if the pipeline document does not conform to the grammar for pipeline documents.
+
 XS0101
 Invalid values: “$1”.
 It is a static error if the values list is not an XPath sequence of atomic values.
