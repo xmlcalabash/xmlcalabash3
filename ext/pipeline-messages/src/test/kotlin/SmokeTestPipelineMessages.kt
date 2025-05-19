@@ -19,8 +19,7 @@ class SmokeTestPipelineMessages {
         val calabash = xbuilder.build()
         val parser = calabash.newXProcParser()
         val decl = parser.parse(pipeline)
-        val runtime = decl.runtime()
-        val exec = runtime.executable()
+        val exec = decl.getExecutable()
 
         val receiver = BufferingReceiver()
         try {

@@ -11,8 +11,7 @@ class SmokeTestUniqueId {
         val calabash = XmlCalabash.newInstance()
         val parser = calabash.newXProcParser()
         val decl = parser.parse(File("src/test/resources/pipe.xpl").toURI())
-        val runtime = decl.runtime()
-        val exec = runtime.executable()
+        val exec = decl.getExecutable()
 
         val receiver = BufferingReceiver()
         exec.receiver = receiver
