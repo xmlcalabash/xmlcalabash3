@@ -75,13 +75,16 @@ open class CompileEnvironment(override val episode: String, override val xmlCala
         "xml" to "application/xml",
         "xpl" to "application/xproc+xml",
         "xq" to "application/xquery",
+        "xql" to "application/xquery",
+        "xqm" to "application/xquery",
+        "xquery" to "application/xquery",
         "xqy" to "application/xquery",
         "xsd" to "application/xsd+xml",
         "xsl" to "application/xslt+xml",
         "xslt" to "application/xslt+xml",
         "xz" to "application/xz",
-        "yml" to "application/x-yaml",
         "yaml" to "application/x-yaml",
+        "yml" to "application/x-yaml",
         "zip" to "application/zip")
     override val contentTypes = _defaultContentTypes
 
