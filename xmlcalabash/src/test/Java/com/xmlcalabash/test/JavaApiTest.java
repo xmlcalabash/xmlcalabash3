@@ -80,8 +80,7 @@ public class JavaApiTest {
 
         XplParser parser = xmlCalabash.newXProcParser();
         DeclareStepInstruction declareStep = parser.parse(anIdentityPipeline());
-        XProcRuntime runtime = declareStep.runtime();
-        XProcPipeline pipeline = runtime.executable();
+        XProcPipeline pipeline = declareStep.getExecutable();
 
         BufferingReceiver receiver = new BufferingReceiver();
         pipeline.setReceiver(receiver);

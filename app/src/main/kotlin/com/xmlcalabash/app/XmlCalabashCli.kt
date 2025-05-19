@@ -176,8 +176,7 @@ class XmlCalabashCli private constructor() {
                 constructWrapper(type)
             }
 
-            val runtime = declstep.runtime()
-            val pipeline = runtime.executable()
+            val pipeline = declstep.getExecutable()
 
             var explicitStdin: String? = null
             for ((port, uris) in commandLine.inputs) {
@@ -214,7 +213,7 @@ class XmlCalabashCli private constructor() {
             }
 
             if (commandLine.pipelineGraphs != null) {
-                val description = runtime.description()
+                val description = pipeline.runtime.description()
                 val vis = VisualizerOutput(xmlCalabash, description, commandLine.pipelineGraphs!!)
                 if (xmlCalabash.config.graphviz == null) {
                     logger.warn { "Cannot create SVG, graphviz is not configured"}

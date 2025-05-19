@@ -15,8 +15,7 @@ class SmokeTestRR {
         val calabash = XmlCalabash.newInstance()
         val parser = calabash.newXProcParser()
         val decl = parser.parse(pipeline)
-        val runtime = decl.runtime()
-        val exec = runtime.executable()
+        val exec = decl.getExecutable()
 
         if (href != null) {
             exec.option(QName("href"), XProcDocument.ofText(href, decl.stepConfig))
