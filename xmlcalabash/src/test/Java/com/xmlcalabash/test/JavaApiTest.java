@@ -12,12 +12,22 @@ import com.xmlcalabash.io.MessagePrinter;
 import com.xmlcalabash.parsers.xpl.XplParser;
 import com.xmlcalabash.runtime.XProcPipeline;
 import com.xmlcalabash.runtime.XProcRuntime;
+import com.xmlcalabash.spi.Configurer;
 import com.xmlcalabash.util.BufferingReceiver;
 import com.xmlcalabash.util.Report;
 import com.xmlcalabash.util.UriUtils;
 import com.xmlcalabash.util.Verbosity;
 import kotlin.jvm.functions.Function0;
+import net.sf.saxon.Configuration;
+import net.sf.saxon.expr.XPathContext;
+import net.sf.saxon.lib.ExtensionFunctionCall;
+import net.sf.saxon.lib.ExtensionFunctionDefinition;
+import net.sf.saxon.om.Sequence;
+import net.sf.saxon.om.StructuredQName;
 import net.sf.saxon.s9api.*;
+import net.sf.saxon.trans.XPathException;
+import net.sf.saxon.value.BooleanValue;
+import net.sf.saxon.value.SequenceType;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -27,7 +37,6 @@ import org.xmlresolver.XMLResolver;
 import javax.xml.transform.sax.SAXSource;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -62,6 +71,14 @@ public class JavaApiTest {
     private XdmNode anXsltPipeline() {
         try {
             return parseStream(new FileInputStream(new File("src/test/resources/xslt.xpl")));
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
+        }
+    }
+
+    private XdmNode anExtensionPipeline() {
+        try {
+            return parseStream(new FileInputStream(new File("src/test/resources/extension.xpl")));
         } catch (IOException ex) {
             throw new RuntimeException(ex);
         }
@@ -241,6 +258,29 @@ public class JavaApiTest {
         Assertions.assertEquals("<doc/>", result.toString());
     }
 
+    @Test
+    public void runXsltWithACustomFunction() {
+        XmlCalabashBuilder builder = new XmlCalabashBuilder();
+        builder.addConfigurer(new MyConfigurer());
+        XmlCalabash xmlCalabash = builder.build();
+
+        processor = xmlCalabash.getSaxonConfiguration().getProcessor();
+
+        XplParser parser = xmlCalabash.newXProcParser();
+        DeclareStepInstruction declareStep = parser.parse(anExtensionPipeline());
+        XProcRuntime runtime = declareStep.runtime();
+        XProcPipeline pipeline = runtime.executable();
+
+        BufferingReceiver receiver = new BufferingReceiver();
+        pipeline.setReceiver(receiver);
+
+        pipeline.input("source", XProcDocument.Companion.ofXml(parseString("<doc/>"), pipeline.getConfig(), MediaType.Companion.getXML()));
+        pipeline.run();
+
+        XdmValue result = receiver.getOutputs().get("result").get(0).getValue();
+        Assertions.assertEquals("<doc extension-function=\"true\"/>", result.toString());
+    }
+
 
     private static class MyMessagePrinter implements MessagePrinter {
         private String _encoding = "UTF-8";
@@ -340,4 +380,64 @@ public class JavaApiTest {
             }
         }
     }
+
+    private static class MyConfigurer implements Configurer {
+        private ExtensionFunctionDefinition func = new TestFunction();
+        public MyConfigurer() {
+            // nop
+        }
+
+        @Override
+        public void configure(@NotNull XmlCalabashBuilder builder) {
+            // nop
+        }
+
+        @Override
+        public void configureSaxon(@NotNull Configuration config) {
+            config.registerExtensionFunction(func);
+        }
+    }
+
+    private static class TestFunction extends ExtensionFunctionDefinition {
+        private static final StructuredQName qname = new StructuredQName("test", "http://example.com/", "test");
+
+        @Override
+        public StructuredQName getFunctionQName() {
+            return qname;
+        }
+
+        @Override
+        public int getMinimumNumberOfArguments() {
+            return 0;
+        }
+
+        @Override
+        public int getMaximumNumberOfArguments() {
+            return 0;
+        }
+
+        @Override
+        public SequenceType[] getArgumentTypes() {
+            return new SequenceType[0];
+        }
+
+        @Override
+        public SequenceType getResultType(SequenceType[] sequenceTypes) {
+            return SequenceType.SINGLE_BOOLEAN;
+        }
+
+        @Override
+        public ExtensionFunctionCall makeCallExpression() {
+            return new TestFunction.ActualFunctionCall();
+        }
+
+        private static class ActualFunctionCall extends ExtensionFunctionCall {
+
+            @Override
+            public Sequence call(XPathContext xPathContext, Sequence[] sequences) throws XPathException {
+                return BooleanValue.TRUE;
+            }
+        }
+    }
+
 }
