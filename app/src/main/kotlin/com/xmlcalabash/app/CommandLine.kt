@@ -52,8 +52,8 @@ class CommandLine private constructor(val args: Array<out String>) {
         }
     }
 
-    private val validCommands = listOf("version", "run", "help")
-    private var _command: String = "run"
+    private val validCommands = listOf("version", "run", "help", "info")
+    private var _command: String? = null
     private var _config: File? = null
     private var _pipelineGraphs: String? = null
     private var _licensed = true
@@ -83,6 +83,7 @@ class CommandLine private constructor(val args: Array<out String>) {
     private var _tryNamespaces: Boolean? = null
     private val _xmlCatalogs = mutableListOf<URI>()
     private var _nogo = false
+    private var _mimetypeExtension: String? = null
 
     /** The command.
      *
@@ -90,7 +91,7 @@ class CommandLine private constructor(val args: Array<out String>) {
      * if no explicit command is provided.
      */
     val command: String
-        get() = _command
+        get() = _command ?: "run"
 
     /** The configuration file specified. */
     val config: File?
@@ -241,6 +242,10 @@ class CommandLine private constructor(val args: Array<out String>) {
     val nogo: Boolean
         get() = _nogo
 
+    /** The extension to check if the `info mimetype` command is used. */
+    val mimetypeExtension: String?
+        get() = _mimetypeExtension
+
     private val arguments = listOf(
         ArgumentDescription("--input", listOf("-i"), ArgumentType.STRING) { it -> parseInput(it) },
         ArgumentDescription("--output", listOf("-o"), ArgumentType.STRING) { it -> parseOutput(it) },
@@ -380,8 +385,9 @@ class CommandLine private constructor(val args: Array<out String>) {
                     if (_pipeline != null) {
                         _errors.add(XProcError.xiCliMoreThanOnePipeline(_pipeline.toString(), opt).exception())
                     } else {
-                        if (opt in validCommands) {
-                            _command = opt
+                        val cmd = isCommand(opt)
+                        if (cmd != null) {
+                            _command = cmd
                         } else {
                             try {
                                 _pipeline = parseFile(opt)
@@ -412,6 +418,33 @@ class CommandLine private constructor(val args: Array<out String>) {
                 _namespaces[prefix] = namespace
             }
         }
+    }
+
+    private fun isCommand(opt: String): String? {
+        if (_command == null) {
+            if (opt == "version") {
+                return "info-version"
+            }
+            if (opt in validCommands) {
+                return opt
+            }
+        }
+
+        if (_command == "info") {
+            when (opt) {
+                "version" -> return "info-version"
+                "mimetype" -> return "info-mimetype"
+                "mimetypes" -> return "info-mimetypes"
+                else -> return null
+            }
+        }
+
+        if (_mimetypeExtension == null &&  _command == "info-mimetype") {
+            _mimetypeExtension = opt
+            return _command
+        }
+
+        return null
     }
 
     private fun split(arg: String, type: String, defaultName: String? = null): Pair<String, String> {

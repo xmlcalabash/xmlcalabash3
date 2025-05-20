@@ -33,7 +33,7 @@ extensive features for managing dependencies. In the short term, it’s just a b
 have a license for Saxon PE or Saxon EE, it makes sense to swap out the Saxon HE
 library that ships with XML Calabash for PE or EE.</para>
 <para>To save you the trouble of constructing and managing a large classpath, the
-alpha distribution of XML Calabash is configured with a hack. Simply
+distribution of XML Calabash is configured with a hack. Simply
 delete the <filename>Saxon-HE-<?version DEPENDENCY_saxon?>.jar</filename> file from the
 <filename class="directory">lib</filename> directory and copy in your PE or EE jar instead. You
 <emphasis>must</emphasis> use a <?version DEPENDENCY_saxon?> jar file for this purpose!
@@ -53,7 +53,7 @@ by your own script.</para>
 
 <para>XML Calabash has a command driven command-line interface. It supports
 three commands: <command linkend="run-run">run</command>, to run a pipeline;
-<command linkend="run-version">version</command>, to print the version, and
+<command linkend="run-info">info</command>, to print diagnostic information, and
 <command linkend="run-help">help</command> to display help. If no command is
 given, the <command>run</command> command is assumed.</para>
 
@@ -653,18 +653,26 @@ dissimilar to the preceding section. If help is requested, all of the other
 command line arguments are ignored.</para>
 </section>
 
-<section xml:id="run-version">
-<title>The <literal>version</literal> command</title>
+<section xml:id="run-info">
+<title>The <literal>info</literal> command</title>
+
+<para xml:id="run-version">(There used to be a <literal>version</literal> command; it’s been generalized
+into the <literal>info</literal> command; “<literal>version</literal>” still works as a command, it’s
+a synonym for “<literal>info version</literal>”.</para>
+
+<section xml:id="run-info-version">
+<title>The <literal>info version</literal> command</title>
 
 <cmdsynopsis>
   <command>xmlcalabash</command>
+  <arg choice="plain">info</arg>
   <arg choice="plain">version</arg>
   <arg rep="norepeat" linkend="cli-verbosity">--verbosity:<replaceable>verbosity</replaceable></arg>
 </cmdsynopsis>
 
 <para>Displays the XML Calabash version and the version of Saxon:</para>
 
-<screen><userinput><prompt>$</prompt> xmlcalabash version</userinput>
+<screen><userinput><prompt>$</prompt> xmlcalabash info version</userinput>
 <computeroutput>XML Calabash version <?version?> (build <?version build-id?>, <?version build-date display?>)
 Running with Saxon <?version saxon-edition?> version <?dep saxon?> using at most 1 of 12 available threads</computeroutput></screen>
 
@@ -674,7 +682,7 @@ is requested, the version summary will include details about third party
 dependencies such as the HTML parser and XML resolver. In this case, the output
 is formatted in a way that can more easily be parsed, for example by a shell script.</para>
 
-<screen><userinput><prompt>$</prompt> xmlcalabash --debug</userinput>
+<screen><userinput><prompt>$</prompt> xmlcalabash info version --debug</userinput>
 <computeroutput>PRODUCT_NAME=XML Calabash
 VERSION=<?version VERSION?>
 BUILD_DATE=<?version BUILD_DATE?>
@@ -707,5 +715,61 @@ DEPENDENCY_xmlResolver=<?version DEPENDENCY_xmlResolver?></computeroutput></scre
 the processor <emphasis>expected</emphasis>. The versions actually used are controlled by what appears on 
 the classpath at runtime.</para>
 </important>
+</section>
+<section xml:id="run-info-mimetypes">
+<title>The <literal>info mimtypes</literal> command</title>
+
+<cmdsynopsis>
+  <command>xmlcalabash</command>
+  <arg choice="plain">info</arg>
+  <arg choice="plain">mimetypes</arg>
+</cmdsynopsis>
+
+<para>Displays the MIME types that have been registered by default, by the user’s configuration
+file, and by extension steps. There may be additional mime types defined by Java using a
+<link xlink:href="https://docs.oracle.com/javase/7/docs/api/javax/activation/MimetypesFileTypeMap.html"
+>.mime.types</link> file or other mechanism. The underlying mapping doesn’t provide any API for enumerating
+the mappings, so there’s no
+way to list all of them.</para>
+
+<screen><userinput><prompt>$</prompt> xmlcalabash info mimetypes</userinput>
+<computeroutput>Filename extension/content type mappings defined by XML Calabash:
+	.7z is application/x-7z-compressed
+	.a is application/x-archive
+	.arj is application/x-arj
+	.bmp is image/bmp
+	.bz2 is application/bzip2
+	…
+	.yaml is application/x-yaml
+	.yml is application/x-yaml
+	.zip is application/zip
+Additional mappings may have been defined in the JVM, for example with a .mime.types file.
+See <link xlink:href="https://docs.oracle.com/javase/7/docs/api/javax/activation/MimetypesFileTypeMap.html"/>
+Use the 'info mimetype &lt;ext&gt;' command to query the content type of a particular &lt;ext&gt;.</computeroutput></screen>
+
+</section>
+<section xml:id="run-info-mimetype">
+<title>The <literal>info mimtype</literal> command</title>
+
+<cmdsynopsis>
+  <command>xmlcalabash</command>
+  <arg choice="plain">info</arg>
+  <arg choice="plain">mimetype</arg>
+  <arg choice="plain"><replaceable>extension</replaceable></arg>
+</cmdsynopsis>
+
+<para>Returns information about the content type of files (or URIs) that end with
+.<replaceable>extension</replaceable>.</para>
+
+<screen><userinput><prompt>$</prompt> xmlcalabash info mimetype xslt</userinput>
+<computeroutput>Filename extension/content type mapping:
+	.xslt is application/xslt+xml</computeroutput></screen>
+
+<para>The query is against all of the defined mimetypes, both those defined by XML Calabash
+and those defined by Java using a
+<link xlink:href="https://docs.oracle.com/javase/7/docs/api/javax/activation/MimetypesFileTypeMap.html"
+>.mime.types</link> file or other mechanism.</para>
+
+</section>
 </section>
 </chapter>

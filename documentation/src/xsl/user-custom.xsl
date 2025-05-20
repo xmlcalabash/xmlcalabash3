@@ -152,6 +152,10 @@
         <xsl:sequence select="$formatted/node()"/>
       </xsl:when>
 
+      <xsl:when test="starts-with($tagname, 'xsl:')">
+        <xsl:sequence select="$formatted/node()"/>
+      </xsl:when>
+
       <xsl:when test="exists($target)">
         <a href="#{$link-to}">
           <xsl:sequence select="$formatted/node()"/>
