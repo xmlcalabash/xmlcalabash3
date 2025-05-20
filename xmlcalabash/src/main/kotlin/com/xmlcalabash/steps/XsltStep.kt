@@ -338,9 +338,6 @@ open class XsltStep(): AbstractAtomicStep() {
             if (templateName != null) {
                 transformer.callTemplate(templateName!!, primaryDestination)
             } else {
-                if (inputSelection !is XdmNode) {
-                    stepConfig.debug { "Attempting to apply templates to a value that isn't a node" }
-                }
                 transformer.applyTemplates(inputSelection, primaryDestination)
             }
         } catch (ex: SaxonApiException) {
