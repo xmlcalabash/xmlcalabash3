@@ -13,6 +13,31 @@ See the commits and pull requests on
 finer detail.</para>
 
 <revhistory>
+<revision xml:id="r300-beta4">
+<revnumber>3.0.0-beta4</revnumber>
+<date>2025-05-20</date>
+<revdescription>
+<itemizedlist>
+<listitem><para>Fixed <ghissue number="515"/>. Allow (API) users to add custom
+Saxon configurers with <classname>XmlCalabashBuilder</classname>.
+</para></listitem>
+<listitem><para>Fixed <ghissue number="513"/>. Reverted
+<link linkend="iss-497">the fix</link> that added a warning message about
+non-node inputs to <tag>p:xslt</tag>. It was unreliable.
+</para></listitem>
+<listitem><para>Fixed <ghissue number="509"/>. Added an
+<link linkend="run-info">info</link> command that can display information about
+the known mimetypes.
+</para></listitem>
+<listitem><para>Fixed <ghissue number="508"/>. Added
+<filename class="extension">.xqm</filename>,
+<filename class="extension">.xquery</filename>, and
+<filename class="extension">.xql</filename> as standard filename
+extensions for <literal>application/xquery</literal> files.
+</para></listitem>
+</itemizedlist>
+</revdescription>
+</revision>
 <revision xml:id="r300-beta3">
 <revnumber>3.0.0-beta3</revnumber>
 <date>2025-05-18</date>
@@ -29,7 +54,7 @@ input and output ports on the command line if the pipeline has only a single suc
 <listitem><para>Fixed <ghissue number="499"/>. Fixed a bug where the serialization
 option on the <tag>p:store</tag> step was not taking precedence.
 </para></listitem>
-<listitem><para>Fixed <ghissue number="497"/>. If you attempt to process a stylesheet
+<listitem xml:id="iss-497"><para>Fixed <ghissue number="497"/>. If you attempt to process a stylesheet
 without passing an initial template name, and if the input is not a node, it will often
 silently fail. Output a debug message warning of this fact.
 </para></listitem>
