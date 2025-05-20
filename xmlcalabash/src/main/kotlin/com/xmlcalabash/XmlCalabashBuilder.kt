@@ -102,6 +102,14 @@ class XmlCalabashBuilder {
         return this
     }
 
+    fun getConfigurers(): List<Configurer> {
+        return configurers.toList()
+    }
+    fun addConfigurer(configurer: Configurer): XmlCalabashBuilder {
+        configurers.add(configurer)
+        return this
+    }
+
     fun getDebug() = config._debug
     fun setDebug(debug: Boolean): XmlCalabashBuilder {
         logger.debug { "setDebug ${debug}" }
