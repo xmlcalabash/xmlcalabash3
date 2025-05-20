@@ -2,9 +2,11 @@ Usage: [command] [options] pipeline.xpl optname=value…
 
 Where command is:
 
+  run                  To run a pipeline (the default if no command is given)
   help                 To display this summary
-  version              To display information about the version and configuration
-  run                  To run a pipeline
+  info version         To display information about the version and configuration
+  info mimetypes       To display information about mimetype mappings
+  info mimetype ext    To display the mimetype of file.ext files (or URIs)
 
 And some of the frequently used options are:
 

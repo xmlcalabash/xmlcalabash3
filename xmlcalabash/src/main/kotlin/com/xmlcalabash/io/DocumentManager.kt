@@ -8,6 +8,7 @@ import com.xmlcalabash.exceptions.XProcError
 import com.xmlcalabash.namespace.NsCx
 import com.xmlcalabash.spi.DocumentResolver
 import com.xmlcalabash.tracing.TraceListener
+import com.xmlcalabash.util.MemoMimetypesFileTypeMap
 import com.xmlcalabash.util.UriUtils
 import net.sf.saxon.lib.ModuleURIResolver
 import net.sf.saxon.lib.ResourceResolver
@@ -44,7 +45,7 @@ open class DocumentManager(val resolver: XMLResolver): EntityResolver, EntityRes
     private val prefixList = mutableListOf<String>()
     private val _cache = mutableMapOf<URI, MutableMap<MediaType,XProcDocument>>()
 
-    private var _mimetypesFileTypeMap = MimetypesFileTypeMap()
+    private var _mimetypesFileTypeMap = MemoMimetypesFileTypeMap()
     val mimetypesFileTypeMap: MimetypesFileTypeMap
         get() = _mimetypesFileTypeMap
 

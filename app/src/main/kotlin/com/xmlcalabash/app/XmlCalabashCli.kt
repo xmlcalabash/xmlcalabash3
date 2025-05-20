@@ -155,9 +155,20 @@ class XmlCalabashCli private constructor() {
             return
         }
 
-        if (commandLine.command == "version") {
-            version()
-            return
+        when (commandLine.command) {
+            "info-version" -> {
+                version()
+                return
+            }
+            "info-mimetype" -> {
+                showMimetype(commandLine.mimetypeExtension)
+                return
+            }
+            "info-mimetypes" -> {
+                showMimetypes()
+                return
+            }
+            else -> Unit
         }
 
         var tstart: Long = 0
@@ -546,6 +557,37 @@ class XmlCalabashCli private constructor() {
                 } else {
                     println("(You appear to have ${edition} but the license is explicitly disabled.)")
                 }
+            }
+        }
+    }
+
+    private fun showMimetype(extension: String?) {
+        println("Filename extension/content type mapping:")
+
+        val types = xmlCalabash.config.documentManager.mimetypesFileTypeMap
+        if (extension == null) {
+            println("\tdefault content type is ${types.getContentType("default")}")
+            return
+        }
+
+        val dotlessExt = extension.trimStart('.')
+        val ctype = types.getContentType("file.${dotlessExt}")
+        println("\t.${dotlessExt} is ${ctype}")
+    }
+
+    private fun showMimetypes() {
+        val types = xmlCalabash.config.documentManager.mimetypesFileTypeMap
+        if (types is MemoMimetypesFileTypeMap) {
+            val extensions = types.extensionMap.keys.sorted()
+            if (extensions.isNotEmpty()) {
+                println("Filename extension/content type mappings defined by XML Calabash:")
+                for (ext in extensions) {
+                    val ctype = types.extensionMap[ext]!!
+                    println("\t.${ext} is ${ctype}")
+                }
+                println("Additional mappings may have been defined in the JVM, for example with a .mime.types file.")
+                println("See https://docs.oracle.com/javase/7/docs/api/javax/activation/MimetypesFileTypeMap.html")
+                println("Use the 'info mimetype <ext>' command to query the content type of a particular <ext>.")
             }
         }
     }

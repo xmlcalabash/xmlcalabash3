@@ -35,6 +35,7 @@ val collectionManagerRelease by configurations.dependencyScope("collectionManage
 
 val dep_slf4j = project.findProperty("slf4j").toString()
 val dep_nineml = project.findProperty("nineml").toString()
+val dep_activation = project.findProperty("activation").toString()
 
 dependencies {
   xmlcalabashRelease(project(mapOf("path" to ":xmlcalabash",
@@ -94,6 +95,7 @@ dependencies {
 
   implementation("org.nineml:coffeesacks:${dep_nineml}")
   implementation("org.slf4j:slf4j-api:${dep_slf4j}")
+  implementation("javax.activation:activation:${dep_activation}") // For mimetype mapping
 }
 
 val xmlcalabashJar = configurations.resolvable("xmlcalabashJar") {
