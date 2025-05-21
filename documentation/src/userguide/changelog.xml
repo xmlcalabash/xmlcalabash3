@@ -13,6 +13,24 @@ See the commits and pull requests on
 finer detail.</para>
 
 <revhistory>
+<revision xml:id="r300-beta5">
+<revnumber>3.0.0-beta5</revnumber>
+<date>2025-05-21</date>
+<revdescription>
+<itemizedlist>
+<listitem><para>Fixed <ghissue number="521"/>. Make sure that static options
+are evalated with the correct context.
+</para></listitem>
+<listitem><para>Fixed <ghissue number="519"/>. Handle the case where the only
+command given is “info”.
+</para></listitem>
+<listitem><para>Re-re-fixed <ghissue number="321"/>. Once again, the problem
+was in the XInclude processor, now bumped to version 5.4.1. This time I wrote
+a fairly extensive test case to “prove” it works correctly.
+</para></listitem>
+</itemizedlist>
+</revdescription>
+</revision>
 <revision xml:id="r300-beta4">
 <revnumber>3.0.0-beta4</revnumber>
 <date>2025-05-20</date>
