@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<t:test expected="pass"
+        xmlns:t="http://xproc.org/ns/testsuite/3.0">
+  <t:info>
+    <t:title>xinclude-001</t:title>
+    <t:revision-history>
+      <t:revision>
+        <t:date>2025-05-21</t:date>
+        <t:author>
+          <t:name>Norm Tovey-Walsh</t:name>
+        </t:author>
+        <t:description xmlns="http://www.w3.org/1999/xhtml">
+          <p>Created test.</p>
+        </t:description>
+      </t:revision>
+    </t:revision-history>
+  </t:info>
+  <t:description xmlns="http://www.w3.org/1999/xhtml">
+    <p>Hopefully, a test that finally, once and for all, really and truly this time,
+    demonstrates that
+    <link xlink:href="https://github.com/xmlcalabash/xmlcalabash3/issues/321"
+          xmlns:xlink="http://www.w3.org/1999/xlink">issue #321</link>
+    is resolved.</p>
+  </t:description>
+  <t:pipeline>
+<p:declare-step xmlns:p="http://www.w3.org/ns/xproc"
+                xmlns:cx="http://xmlcalabash.com/ns/extensions"
+                name="main" version="3.0" expand-text="false">
+  <p:output port="result"/>
+
+  <p:xinclude>
+    <p:with-input href="../documents/xinclude-321.xml"/>
+  </p:xinclude>
+  <p:add-xml-base relative="false"/>
+</p:declare-step>
+  </t:pipeline>
+  <t:schematron>
+    <s:schema queryBinding="xslt2"
+              xmlns:s="http://purl.oclc.org/dsdl/schematron">
+      <s:ns prefix="c" uri="http://www.w3.org/ns/xproc-step"/>
+      <s:pattern>
+        <s:rule context="/">
+          <s:assert test="top-level">The root isn’t top-level.</s:assert>
+        </s:rule>
+      </s:pattern>
+      <s:pattern>
+        <s:rule context="top-level">
+          <s:assert test="ends-with(base-uri(.), '/documents/xinclude-321.xml')"
+                    >Wrong top-level base URI</s:assert>
+          <s:assert test="second-level">There’s no second level.</s:assert>
+          <s:assert test="top">There are no top elements.</s:assert>
+          <s:assert test="empty(top[not(ends-with(base-uri(.), '/documents/xinclude-321.xml'))])"
+                    >Wrong base URI on top element(s).</s:assert>
+        </s:rule>
+      </s:pattern>
+      <s:pattern>
+        <s:rule context="second-level">
+          <s:assert test="ends-with(base-uri(.), '/documents/subdir/second-level.xml')"
+                    >Wrong second-level base URI</s:assert>
+          <s:assert test="example">There’s no example element.</s:assert>
+          <s:assert test="third-level">There’s no third level.</s:assert>
+          <s:assert test="second">There are no second elements.</s:assert>
+          <s:assert test="empty(second[not(ends-with(base-uri(.), '/documents/subdir/second-level.xml'))])"
+                    >Wrong base URI on second element(s).</s:assert>
+          <s:assert test="empty(.//example[base-uri(.) != 'http://example.com/path'])"
+                    >Wrong example base URI.</s:assert>
+        </s:rule>
+      </s:pattern>
+      <s:pattern>
+        <s:rule context="third-level">
+          <s:assert test="ends-with(base-uri(.), '/documents/subdir/subdir/third-level.xml')"
+                    >Wrong third-level base URI</s:assert>
+          <s:assert test="fourth-level">There’s no fourth level.</s:assert>
+          <s:assert test="third">There are no third elements.</s:assert>
+          <s:assert test="empty(third[not(ends-with(base-uri(.), '/subdir/subdir/third-level.xml'))])"
+                    >Wrong base URI on third element(s).</s:assert>
+        </s:rule>
+      </s:pattern>
+      <s:pattern>
+        <s:rule context="fourth-level">
+          <s:assert test="ends-with(base-uri(.), '/documents/subdir/subdir/fourth-level.xml')"
+                    >Wrong fourth-level base URI</s:assert>
+          <s:assert test="fourth">There are no third elements.</s:assert>
+          <s:assert test="empty(fourth[not(ends-with(base-uri(.), '/subdir/subdir/fourth-level.xml'))])"
+                    >Wrong base URI on fourth element(s).</s:assert>
+        </s:rule>
+      </s:pattern>
+    </s:schema>
+  </t:schematron>
+</t:test>
