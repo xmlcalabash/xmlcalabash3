@@ -168,6 +168,12 @@ class XmlCalabashCli private constructor() {
                 showMimetypes()
                 return
             }
+            "info" -> {
+                stepConfig.messagePrinter.println("The 'info' subcommands are 'version', 'mimetypes', or 'mimetype'.")
+                stepConfig.messagePrinter.println("")
+                help()
+                return
+            }
             else -> Unit
         }
 
