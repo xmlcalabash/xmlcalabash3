@@ -21,8 +21,9 @@ class PipelineStep(config: XProcStepConfiguration, compound: CompoundStepModel):
             }
 
             if (step.externalName in staticOptions) {
-                val value = staticOptions[step.externalName]!!.staticValue.evaluate(stepConfig)
-                val document = XProcDocument.ofValue(value, stepConfig, MediaType.OCTET_STREAM, DocumentProperties())
+                val details = staticOptions[step.externalName]!!
+                val value = details.staticValue.evaluate(details.stepConfig)
+                val document = XProcDocument.ofValue(value, details.stepConfig, MediaType.OCTET_STREAM, DocumentProperties())
                 step.externalValue = document
             } else if (step.externalName in head.options) {
                 val list = head.options[step.externalName]!!

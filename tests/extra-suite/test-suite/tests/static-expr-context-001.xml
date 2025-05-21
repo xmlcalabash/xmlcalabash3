@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<t:test expected="pass"
+        xmlns:t="http://xproc.org/ns/testsuite/3.0">
+  <t:info>
+    <t:title>static-expr-context-001</t:title>
+    <t:revision-history>
+      <t:revision>
+        <t:date>2025-05-21</t:date>
+        <t:author>
+          <t:name>Norm Tovey-Walsh</t:name>
+        </t:author>
+        <t:description xmlns="http://www.w3.org/1999/xhtml">
+          <p>Created test. Adapted from a test provided by George Bina. Thank you, George!</p>
+        </t:description>
+      </t:revision>
+    </t:revision-history>
+  </t:info>
+  <t:description xmlns="http://www.w3.org/1999/xhtml">
+    <p>Make sure that static expressions are evaluated with the correct context.</p>
+  </t:description>
+  <t:pipeline src="../pipelines/test/test.xpl"/>
+  <t:schematron>
+    <s:schema queryBinding="xslt2"
+              xmlns:s="http://purl.oclc.org/dsdl/schematron">
+      <s:ns prefix="c" uri="http://www.w3.org/ns/xproc-step"/>
+      <s:pattern>
+        <s:rule context="/">
+          <s:assert test="c:result">The root isn’t a c:result.</s:assert>
+          <s:assert test="ends-with(c:result, 'pipelines/test/test.xml')">Wrong base URI.</s:assert>
+        </s:rule>
+      </s:pattern>
+    </s:schema>
+  </t:schematron>
+</t:test>
