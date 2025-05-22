@@ -340,13 +340,13 @@ class DocumentConverter(val stepConfig: StepConfiguration,
                 val htmlBuilder = HtmlDocumentBuilder(XmlViolationPolicy.ALTER_INFOSET)
                 val html = htmlBuilder.parse(stream)
                 val builder = doc.context.processor.newDocumentBuilder()
+                builder.isLineNumbering = true
 
                 if (doc.baseURI != null && doc.baseURI.toString().isNotEmpty()) {
                     builder.baseURI = doc.baseURI!!
                 }
 
                 val xdm = builder.build(DOMSource(html))
-                builder.isLineNumbering = true
                 return doc.with(xdm).with(contentType, true)
             }
 
