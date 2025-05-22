@@ -22,6 +22,7 @@ class InvisibleXmlNineML(stepConfig: XProcStepConfiguration): InvisibleXmlImpl(s
         }
 
         val builder = stepConfig.processor.newDocumentBuilder()
+        builder.isLineNumbering = true
         val bch = builder.newBuildingContentHandler()
         doc.getTree(bch)
         val tree = bch.documentNode

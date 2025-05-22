@@ -58,6 +58,7 @@ class XplParser internal constructor(val builder: PipelineBuilder) {
 
     fun parse(source: Source, stepName: String?): DeclareStepInstruction {
         val builder = builder.stepConfig.processor.newDocumentBuilder()
+        builder.isLineNumbering = true
         val xml = builder.build(source)
         return parse(xml, stepName)
     }

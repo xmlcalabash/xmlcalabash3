@@ -218,6 +218,7 @@ class VisualizerOutput(val xmlCalabash: XmlCalabash, val description: XProcDescr
 
         val source = SAXSource(InputSource(svgFile.absolutePath))
         val builder = description.stepConfig.processor.newDocumentBuilder()
+        builder.isLineNumbering = true
         val xml = builder.build(source)
 
         transform(xsltExec, xml, "${path}${basename}.html",
