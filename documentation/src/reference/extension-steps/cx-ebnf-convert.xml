@@ -22,7 +22,7 @@
 
 <refsection role="step-declaration">
 <title>Step declaration</title>
-<xi:include href="../../../../ext/ebnf-convert/src/main/resources/com/xmlcalabash/ext/ebnf-convert.xpl"
+<xi:include href="../../../../xmlcalabash/src/main/resources/com/xmlcalabash/ext/ebnf-convert.xpl"
             xpointer="xpath(/*/*[@type='cx:ebnf-convert'])"/>
 <?import ebnf-convert.xpl?>
 </refsection>
@@ -102,20 +102,6 @@ error</glossterm> if the grammar conversion fails.</error>
 If you are getting XML Calabash from Maven, you will also need to include
 the extension dependency:</para>
 
-<itemizedlist spacing="compact">
-<listitem>
-<para><literal>com.xmlcalabash:ebnf-convert:<?version?></literal></para>
-</listitem>
-</itemizedlist>
-
-<para>The following third-party dependencies will also be included transitively:</para>
-
-<itemizedlist spacing="compact">
-<listitem>
-<para><literal>de.bottlecaps.ebnf-convert:ebnf-convert-lib:<?dep ebnfConvert?></literal></para>
-</listitem>
-</itemizedlist>
-
+<?dependencies ebnf-convert?>
 </refsection>
-
 </refentry>

@@ -62,6 +62,7 @@ class DocumentConverter(val stepConfig: StepConfiguration,
     fun convert(): XProcDocument {
         if (converters == null) {
             val list = mutableListOf<ContentTypeConverter>()
+            list.add(RdfConverter()) // Built in so we don't need to find it...
             for (provider in ContentTypeConverterServiceProvider.providers()) {
                 list.add(provider.create())
             }

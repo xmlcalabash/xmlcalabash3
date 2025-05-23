@@ -20,7 +20,7 @@ MathML to SVG.</para>
 
 <refsection role="step-declaration">
 <title>Step declaration</title>
-<xi:include href="../../../../ext/diagramming/src/main/resources/com/xmlcalabash/ext/diagramming.xpl"
+<xi:include href="../../../../xmlcalabash/src/main/resources/com/xmlcalabash/ext/diagramming.xpl"
             xpointer="xpath(/*/*[@type='cx:mathml-to-svg'])"/>
 <?import diagramming.xpl?>
 </refsection>
@@ -35,7 +35,7 @@ MathML to SVG.</para>
 
 <note>
 <para>The actual implementation used is
-version <?version DEPENDENCY_jeuclidCore?> of
+version <?dep de.rototor.jeuclid:jeuclid-core?> of
 a <link xlink:href="https://github.com/rototor/jeuclid">modern fork</link> of
 JEuclid that supports recent versions of Java and the underlying
 <link xlink:href="https://xmlgraphics.apache.org/batik/">Batik</link> libraries.</para>
@@ -70,6 +70,11 @@ render the equation directly, as (possibly) shown in <xref linkend="fig.mathml"/
 </figure>
 </refsection>
 
-<xi:include href="diagramming-depends.xml"/>
-
+<refsection>
+<title>Dependencies</title>
+<para>This step is included in the XML Calabash application.
+If you are getting XML Calabash from Maven, you will also need to include
+the additional dependency:</para>
+<?dependencies mathml-to-svg?>
+</refsection>
 </refentry>

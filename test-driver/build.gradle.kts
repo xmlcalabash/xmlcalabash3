@@ -2,7 +2,7 @@ import java.io.PrintStream
 import com.xmlcalabash.build.XmlCalabashBuildExtension
 
 plugins {
-  id("buildlogic.kotlin-library-conventions")
+  id("buildlogic.kotlin-application-conventions")
   id("com.xmlcalabash.build.xmlcalabash-build")
 }
 
@@ -21,39 +21,18 @@ val testrunner by configurations.creating {
   extendsFrom(configurations["runtimeClasspath"])
 }
 
-dependencies {
-  implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0")
-  implementation(project(":xmlcalabash"))
-  // WTF? Why is this necessary?
-  implementation(files("build/classes/kotlin/main"))
-  implementation(files("lib"))
+val dep_drewnoakesExtractor = project.findProperty("drewnoakesExtractor").toString()
+val dep_jaxbapi = project.findProperty("jaxbapi").toString()
+val dep_pdfbox = project.findProperty("pdfbox").toString()
 
-  implementation(project(":ext:asciidoctor"))
-  implementation(project(":ext:cache"))
-  implementation(project(":ext:collection-manager"))
-  implementation(project(":ext:diagramming"))
-  implementation(project(":ext:ebnf-convert"))
-  implementation(project(":ext:epubcheck"))
-  implementation(project(":ext:find"))
-  implementation(project(":ext:json-patch"))
-  implementation(project(":ext:jsonpath"))
-  implementation(project(":ext:markup-blitz"))
-  implementation(project(":ext:metadata-extractor"))
-  implementation(project(":ext:pipeline-messages"))
+dependencies {
+  implementation(project(":xmlcalabash"))
+  testrunner(project(":test-driver"))
   implementation(project(":ext:polyglot"))
-  implementation(project(":ext:railroad"))
-  implementation(project(":ext:rdf"))
-  implementation(project(":ext:selenium"))
-  implementation(project(":ext:trang"))
-  implementation(project(":ext:unique-id"))
-  implementation(project(":ext:wait-for-update"))
-  implementation(project(":ext:xmlunit"))
-  implementation(project(":ext:xpath"))
   implementation(project(":paged-media:antenna-house"))
   implementation(project(":paged-media:fop"))
   implementation(project(":paged-media:prince"))
   implementation(project(":paged-media:weasyprint"))
-  implementation(project(":send-mail"))
 
   transformation ("net.sf.saxon:Saxon-HE:${saxonVersion}")
 }
@@ -194,5 +173,12 @@ tasks.register("copy-extra") {
       into(layout.buildDirectory.dir("test-report"))
       from(layout.projectDirectory.file("src/js"))
     }
+  }
+}
+
+tasks.register("helloWorld") {
+  doLast {
+    println("Building with Java version ${System.getProperty("java.version")}")
+    testrunner.forEach { println(it) }
   }
 }

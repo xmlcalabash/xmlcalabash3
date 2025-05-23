@@ -18,7 +18,7 @@
 
 <refsection role="step-declaration">
 <title>Step declaration</title>
-<xi:include href="../../../../ext/wait-for-update/src/main/resources/com/xmlcalabash/ext/wait-for-update.xpl"
+<xi:include href="../../../../xmlcalabash/src/main/resources/com/xmlcalabash/ext/wait-for-update.xpl"
             xpointer="xpath(/*/*[@type='cx:wait-for-update'])"/>
 <?import wait-for-update.xpl?>
 </refsection>

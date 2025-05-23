@@ -49,8 +49,8 @@ if the source document cannot be parsed by the provided grammar.</error>
   <para>The default Invisible XML implementation in XML Calabash is
   <link xlink:href="https://nineml.org/">NineML</link>. It is also possible to use
   <link xlink:href="https://github.com/GuntherRademacher/markup-blitz">Markup Blitz</link>.
-  In order to use Markup Blitz, you must put the Markup Blitz jar file
-  (<filename>markup-blitz-<?dep markupBlitz?>.jar</filename>) on your class path.
+  In order to use Markup Blitz, you must include the <tag>cx:markup-blitz</tag>
+  dependencies on your class path.
   </para>
 
 <refsection>

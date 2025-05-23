@@ -18,7 +18,7 @@
 
 <refsection role="step-declaration">
 <title>Step declaration</title>
-<xi:include href="../../../../ext/unique-id/src/main/resources/com/xmlcalabash/ext/unique-id.xpl"
+<xi:include href="../../../../xmlcalabash/src/main/resources/com/xmlcalabash/ext/unique-id.xpl"
             xpointer="xpath(/*/*[@type='cx:unique-id'])"/>
 <?import unique-id.xpl?>
 </refsection>

@@ -21,7 +21,7 @@
 
 <refsection role="step-declaration">
 <title>Step declaration</title>
-<xi:include href="../../../../ext/xmlunit/src/main/resources/com/xmlcalabash/ext/xmlunit.xpl"
+<xi:include href="../../../../xmlcalabash/src/main/resources/com/xmlcalabash/ext/xmlunit.xpl"
             xpointer="xpath(/*/*[@type='cx:xmlunit'])"/>
 <?import xmlunit.xpl?>
 </refsection>
@@ -36,7 +36,7 @@
 <title>Description</title>
 
 <para>The <tag>cx:xmlunit</tag> step compares two XML (or HTML) documents for similarity or
-identity with XMLUnit version <?version DEPENDENCY_xmlunit?>. XMLUnit is very flexible, the
+identity with XMLUnit version <?dep org.xmlunit:xmlunit-core?>. XMLUnit is very flexible, the
 <tag>cx:xmlunit</tag> step attempts to support many of the options, but there are some
 gaps.</para>
 
@@ -84,21 +84,9 @@ cannot be instantiated.</error></para>
 <title>Dependencies</title>
 <para>This step is included in the XML Calabash application.
 If you are getting XML Calabash from Maven, you will also need to include
-the extension dependency:</para>
+the additional dependency:</para>
 
-<itemizedlist spacing="compact">
-<listitem>
-<para><literal>com.xmlcalabash:xmlunit:<?version?></literal></para>
-</listitem>
-</itemizedlist>
-
-<para>The following third-party dependencies will also be included transitively:</para>
-
-<itemizedlist spacing="compact">
-<listitem>
-<para><literal>org.xmlunit:xmlunit-core:<?dep xmlunit?></literal></para>
-</listitem>
-</itemizedlist>
+<?dependencies xmlunit?>
 </refsection>
 </refentry>
 

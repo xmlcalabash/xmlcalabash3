@@ -18,7 +18,7 @@ This step gives the pipeline access to those messages.</para>
 
 <refsection role="step-declaration">
 <title>Step declaration</title>
-<xi:include href="../../../../ext/pipeline-messages/src/main/resources/com/xmlcalabash/ext/pipeline-messages.xpl"
+<xi:include href="../../../../xmlcalabash/src/main/resources/com/xmlcalabash/ext/pipeline-messages.xpl"
             xpointer="xpath(/*/*[@type='cx:pipeline-messages'])"/>
 <?import pipeline-messages.xpl?>
 </refsection>

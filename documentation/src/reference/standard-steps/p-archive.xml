@@ -99,7 +99,7 @@
 <title>Supported formats</title>
 
 <para>The following formats are supported using the Apache Commons
-Compress™ library version <?dep commonsCompress?>.</para>
+Compress™ library version <?dep org.apache.commons:commons-compress?>.</para>
 
 <informaltable pgwide="1">
 <tgroup cols="6">

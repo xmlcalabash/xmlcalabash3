@@ -21,7 +21,7 @@ EPUBCheck</link> validator to check the conformance of EPUB files.
 
 <refsection role="step-declaration">
 <title>Step declaration</title>
-<xi:include href="../../../../ext/epubcheck/src/main/resources/com/xmlcalabash/ext/epubcheck.xpl"
+<xi:include href="../../../../xmlcalabash/src/main/resources/com/xmlcalabash/ext/epubcheck.xpl"
             xpointer="xpath(/*/*[@type='cx:epubcheck'])"/>
 <?import epubcheck.xpl?>
 </refsection>
@@ -58,7 +58,8 @@ the extension “<filename class="extension">epub</filename>” to the MIME type
 
 <variablelist>
 <varlistentry>
-<term><link xlink:href="https://central.sonatype.com/artifact/org.w3c/epubcheck">epubcheck</link>, version <?version DEPENDENCY_epubcheck?></term>
+<term><link xlink:href="https://central.sonatype.com/artifact/org.w3c/epubcheck">epubcheck</link>,
+version <?dep org.w3c:epubcheck?></term>
 <listitem>
 <para>The underlying EPUBCheck library.</para>
 </listitem>
@@ -70,20 +71,8 @@ the extension “<filename class="extension">epub</filename>” to the MIME type
 <title>Dependencies</title>
 <para>This step is included in the XML Calabash application.
 If you are getting XML Calabash from Maven, you will also need to include
-the extension dependency:</para>
+these additional dependencies:</para>
 
-<itemizedlist spacing="compact">
-<listitem>
-<para><literal>com.xmlcalabash:epubcheck:<?version?></literal></para>
-</listitem>
-</itemizedlist>
-
-<para>The following third-party dependencies will also be included transitively:</para>
-
-<itemizedlist spacing="compact">
-<listitem>
-<para><literal>org.w3c:epubcheck:<?dep epubcheck?></literal></para>
-</listitem>
-</itemizedlist>
+<?dependencies epubcheck?>
 </refsection>
 </refentry>

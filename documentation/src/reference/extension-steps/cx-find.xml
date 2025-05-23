@@ -21,7 +21,7 @@ filter files from the list based on whether their content matches an expression.
 
 <refsection role="step-declaration">
 <title>Step declaration</title>
-<xi:include href="../../../../ext/find/src/main/resources/com/xmlcalabash/ext/find.xpl"
+<xi:include href="../../../../xmlcalabash/src/main/resources/com/xmlcalabash/ext/find.xpl"
             xpointer="xpath(/*/*[@type='cx:find'])"/>
 <?import find.xpl?>
 </refsection>

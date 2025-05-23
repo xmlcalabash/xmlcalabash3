@@ -17,7 +17,7 @@ a single application on a local machine is ever likely to
 need.</para>
 
 <para>XML Calabash tries to offer the best of both worlds. It uses the
-SLF4J logging framework (version <?dep slf4j?>) with the “logback
+SLF4J logging framework (version <?dep org.slf4j:slf4j-api?>) with the “logback
 classic” back end. (Other backends can be used, SLF4J supports the
 full logging ecosystem.) All of the messages that XML Calabash produces are
 sent to the logger.

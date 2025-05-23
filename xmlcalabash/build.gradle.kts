@@ -1,4 +1,5 @@
 import com.xmlcalabash.build.XmlCalabashBuildExtension
+import com.xmlcalabash.build.ExternalDependencies
 
 import org.jetbrains.dokka.DokkaConfiguration.Visibility
 import org.jetbrains.dokka.gradle.DokkaTask
@@ -25,100 +26,19 @@ plugins {
   id("signing")
 }
 
+val xmlbuild = the<XmlCalabashBuildExtension>()
+
 configurations.forEach {
   it.exclude("com.sun.xml.ibind.jaxp")
   it.exclude("isorelax")
   it.exclude("relaxngDatatype")
-  it.exclude("net.sf.saxon.Saxon-HE")
+  it.exclude("net.sf.saxon")
 }
-
-// If you add to this list, update BuildConfig as well!
-val dep_activation = project.findProperty("activation").toString()
-val dep_brotliDec = project.findProperty("brotliDec").toString()
-val dep_commonsCodec = project.findProperty("commonsCodec").toString()
-val dep_commonsCompress = project.findProperty("commonsCompress").toString()
-val dep_ditaa = project.findProperty("ditaa").toString()
-val dep_drewnoakesExtractor = project.findProperty("drewnoakesExtractor").toString()
-val dep_epubcheck = project.findProperty("epubcheck").toString()
-val dep_flexmarkAll = project.findProperty("flexmarkAll").toString()
-val dep_graalvmJS = project.findProperty("graalvmJS").toString()
-val dep_htmlparser = project.findProperty("htmlparser").toString()
-val dep_httpClient = project.findProperty("httpClient").toString()
-val dep_jacksonDataformat = project.findProperty("jacksonDataformat").toString()
-val dep_jaxbapi = project.findProperty("jaxbapi").toString()
-val dep_jeuclid = project.findProperty("jeuclidCore").toString()
-val dep_jing = project.findProperty("jing").toString()
-val dep_jsonSchemaValidator = project.findProperty("jsonSchemaValidator").toString()
-val dep_markupBlitz = project.findProperty("markupBlitz").toString()
-val dep_pdfbox = project.findProperty("pdfbox").toString()
-val dep_plantuml = project.findProperty("plantUml").toString()
-val dep_rr = project.findProperty("rr").toString()
-val dep_schxslt2 = project.findProperty("schxslt2").toString()
-val dep_sinclude = project.findProperty("sinclude").toString()
-val dep_slf4j = project.findProperty("slf4j").toString()
-val dep_tukaaniXz = project.findProperty("tukaaniXz").toString()
-val dep_uuidCreator = project.findProperty("uuidCreator").toString()
-val dep_xerces = project.findProperty("xercesImpl").toString()
-val dep_xmlResolver = project.findProperty("xmlResolver").toString()
-val dep_blitz = project.findProperty("markupBlitz").toString()
-val dep_nineml = project.findProperty("nineml").toString()
 
 dependencies {
-  // Compile with Markup Blitz but only ship NineML
-  // Is that the right answer?
-  compileOnly("de.bottlecaps:markup-blitz:${dep_blitz}")
-  implementation("org.nineml:coffeegrinder:${dep_nineml}")
-  implementation("org.nineml:coffeefilter:${dep_nineml}")
-
-  implementation("org.jetbrains.kotlin:kotlin-stdlib:2.1.20")
-  implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2")
-  implementation("org.jetbrains.kotlin:kotlin-reflect:2.1.20")
-
   // implementation("name.dmaus.schxslt:schxslt:${dep_schxslt}")
   // The SchXslt2 transpiler is included in our resources
-
-  implementation("nu.validator:htmlparser:${dep_htmlparser}")
-  implementation("commons-codec:commons-codec:${dep_commonsCodec}")
-
-  implementation("org.apache.commons:commons-compress:${dep_commonsCompress}")
-  implementation("org.brotli:dec:${dep_brotliDec}")
-  implementation("org.tukaani:xz:${dep_tukaaniXz}")
-
-  implementation("javax.activation:activation:${dep_activation}") // For mimetype mapping
-  implementation("com.nwalsh:sinclude:${dep_sinclude}") {
-    exclude(group="net.sf.saxon", module="Saxon-HE")
-  }
-  implementation("com.vladsch.flexmark:flexmark-all:${dep_flexmarkAll}")
-  implementation("com.github.f4b6a3:uuid-creator:${dep_uuidCreator}")
-  implementation("org.relaxng:jing:${dep_jing}") {
-    exclude(group="net.sf.saxon", module="Saxon-HE")
-  }
-  implementation("xerces:xercesImpl:${dep_xerces}")
-  implementation("com.networknt:json-schema-validator:${dep_jsonSchemaValidator}")
-  //implementation("org.graalvm.polyglot:js:${dep_graalvmJS}")
-  implementation("org.xmlresolver:xmlresolver:${dep_xmlResolver}")
-
-  // I was using log4j but httpclient5 uses slf4j.
-  // Could I get httpclient5 to use log4j? Maybe. ¯\_(ツ)_/¯
-  // But I got tired of trying to figure it out so I did this instead.
-  implementation("org.slf4j:slf4j-api:${dep_slf4j}")
-  implementation("ch.qos.logback:logback-classic:1.5.13")
-  implementation("org.apache.logging.log4j:log4j-to-slf4j:2.23.1")
-
-  implementation("org.apache.httpcomponents.client5:httpclient5:${dep_httpClient}")
-
-  implementation("org.jline:jline-terminal:3.28.0")
-  implementation("org.jline:jline-terminal-jni:3.28.0")
-  implementation("org.jline:jline-reader:3.28.0")
-
-  implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:${dep_jacksonDataformat}")
-  implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-toml:${dep_jacksonDataformat}")
-  implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-csv:${dep_jacksonDataformat}")
-
-  implementation(files("lib/"))
 }
-
-val xmlbuild = the<XmlCalabashBuildExtension>()
 
 buildConfig {
   className("XmlCalabashBuildConfig")
@@ -134,53 +54,21 @@ buildConfig {
   buildConfigField("BUILD_ID", xmlbuild.buildId())
   buildConfigField("SCHXSLT2", project.findProperty("schxslt2").toString())
 
+  val depends = mutableSetOf<String>()
+  for ((_, depList) in ExternalDependencies.steps) {
+    depends.addAll(depList)
+  }
+
   val sb = StringBuilder()
   sb.append("mapOf(\n")
-  sb.append("  \"saxon\" to \"${project.findProperty("saxonVersion").toString()}\",\n")
-  arrayOf<String>("activation",
-                  "asciidoctorj",
-                  "asciidoctorjPdf",
-                  "brotliDec",
-                  "commonsCodec",
-                  "commonsCompress",
-                  "ditaa",
-                  "drewnoakesExtractor",
-                  "ebnfConvert",
-                  "epubcheck",
-                  "flexmarkAll",
-                  "fop",
-                  "graalvmJS",
-                  "htmlparser",
-                  "httpClient",
-                  "jaxbapi",
-                  "jena",
-                  "jeuclidCore",
-                  "jing",
-                  "jsonPath",
-                  "jsonPatch",
-                  "jsonSchemaValidator",
-                  "markupBlitz",
-                  "nineml",
-                  "pdfbox",
-                  "plantUml",
-                  "rr",
-                  "schxslt2",
-                  "semargl",
-                  "selenium",
-                  "sinclude",
-                  "slf4j",
-                  "tukaaniXz",
-                  "uuidCreator",
-                  "xercesImpl",
-                  "xmlResolver",
-                  "xmlunit"
-  ).forEach { dep ->
-    sb.append("  \"").append(dep).append("\" to ")
-    sb.append("\"").append(project.findProperty(dep).toString()).append("\"")
-    if (dep != "xmlunit") {
-      sb.append(",")
-    }
-    sb.append("\n")
+  sb.append("  \"net.sf.saxon:Saxon-HE\" to \"${project.findProperty("saxonVersion").toString()}\"")
+  for (dep in depends) {
+    sb.append(",\n")
+    val colon = dep.lastIndexOf(":")
+    val pkg = dep.substring(0, colon)
+    val version = dep.substring(colon+1)
+    sb.append("  \"").append(pkg).append("\" to ")
+    sb.append("\"").append(version).append("\"")
   }
   sb.append(")\n")
   
@@ -284,4 +172,3 @@ publishing {
 signing {
   sign(publishing.publications["mavenXmlCalabash"])
 }
-

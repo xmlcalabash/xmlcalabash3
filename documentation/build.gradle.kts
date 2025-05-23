@@ -1,4 +1,5 @@
 import com.xmlcalabash.build.XmlCalabashBuildExtension
+import com.xmlcalabash.build.ExternalDependencies
 
 import java.net.URI
 import java.net.URL
@@ -80,15 +81,10 @@ dependencies {
   documentation(project(":app", "runtimeElements"))
   documentation(project(":xmlcalabash", "runtimeElements"))
 
-  documentation(project(":send-mail", "runtimeElements"))
   documentation(project(":paged-media:antenna-house", "runtimeElements"))
   documentation(project(":paged-media:prince", "runtimeElements"))
   documentation(project(":paged-media:weasyprint", "runtimeElements"))
   documentation(project(":paged-media:fop", "runtimeElements"))
-  documentation(project(":ext:unique-id", "runtimeElements"))
-  documentation(project(":ext:metadata-extractor", "runtimeElements"))
-  documentation(project(":ext:railroad", "runtimeElements"))
-  documentation(project(":ext:rdf", "runtimeElements"))
 
   deltaxml(fileTree("dir" to layout.projectDirectory.dir("lib"),
                     "include" to "*.jar"))
@@ -145,6 +141,48 @@ val xmlCalabashVersion = tasks.register<JavaExec>("xmlCalabashVersion") {
   }
 }
 
+val xmlCalabashBuildInfo = tasks.register("xmlCalabashBuildInfo") {
+  outputs.file(layout.buildDirectory.file("build-info.xml"))
+
+  doLast {
+    PrintStream(layout.buildDirectory.file("build-info.xml").get().asFile).use { stream ->
+      stream.println("<build-info>");
+      stream.println("<product-name>${xmlbuild.productName.get()}</product-name>")
+      stream.println("<version>${xmlbuild.version.get()}</version>")
+      stream.println("<build-date>${xmlbuild.buildDate.get()}</build-date>")
+      stream.println("<build-id>${xmlbuild.buildId()}</build-id>")
+      stream.println("<vendor-name>${xmlbuild.vendorName.get()}</vendor-name>")
+      stream.println("<vendor-uri>${xmlbuild.vendorUri.get()}</vendor-uri>")
+      stream.println("<saxon-version>${saxonVersion}</saxon-version>")
+      stream.println("<ref-version>${refVersion}</ref-version>")
+      stream.println("<guide-version>${guideVersion}</guide-version>")
+      stream.println("<docbook-version>${project.properties["docbookVersion"]}</docbook-version>")
+      stream.println("<xslTNG-version>${project.properties["xslTNGversion"]}</xslTNG-version>")
+      stream.println("<dependencies>")
+
+      for ((step, deps) in ExternalDependencies.steps) {
+        stream.println("  <${step}>")
+
+        // These are special
+        if (step == "xmlcalabash") {
+          stream.println("    <depends-on version=\"1.3.1\">name.dmaus.schxslt:schxslt2</depends-on>")
+          stream.println("    <depends-on version=\"${saxonVersion}\">net.sf.saxon:Saxon-HE</depends-on>")
+        }
+
+        for (dep in deps) {
+          val colon = dep.lastIndexOf(":")
+          val pkg = dep.substring(0, colon)
+          val version = dep.substring(colon+1)
+          stream.println("    <depends-on version=\"${version}\">${pkg}</depends-on>")
+        }
+        stream.println("  </${step}>")
+      }
+      stream.println("</dependencies>")
+      stream.println("</build-info>");
+    }
+  }
+}
+
 // ============================================================
 
 val rngArchiveManifestSchema = tasks.register<RelaxNGTranslateTask>("rngArchiveManifestSchema") {
@@ -180,14 +218,7 @@ val xincludeReference = tasks.register<SaxonXsltTask>("xincludeReference") {
   inputs.dir(layout.buildDirectory.dir("examples"))
   inputs.dir(layout.projectDirectory.dir("src/reference"))
   inputs.dir(layout.projectDirectory.dir("src/examples"))
-  inputs.file(layout.projectDirectory.file("../xmlcalabash/src/main/resources/com/xmlcalabash/library.xpl"))
-  inputs.file(layout.projectDirectory.file(
-                  "../ext/unique-id/src/main/resources/com/xmlcalabash/ext/unique-id.xpl"))
-  inputs.file(layout.projectDirectory.file(
-                  "../ext/metadata-extractor/src/main/resources/com/xmlcalabash/ext/metadata-extractor.xpl"))
-  inputs.file(layout.projectDirectory.file(
-                  "../ext/railroad/src/main/resources/com/xmlcalabash/ext/railroad.xpl"))
-
+  inputs.dir(layout.projectDirectory.dir("../xmlcalabash/src/main/resources/com/xmlcalabash"))
   input(layout.projectDirectory.file("src/reference/reference.xml"))
   stylesheet(layout.projectDirectory.file("src/xsl/xinclude.xsl"))
   output(layout.buildDirectory.file("refbuild/reference.xml").get())
@@ -231,6 +262,7 @@ val reference = tasks.register<SaxonXsltTask>("reference") {
   dependsOn("copyReferenceResources")
   dependsOn("validateReference")
   dependsOn("xmlCalabashVersion")
+  dependsOn("xmlCalabashBuildInfo")
 
   inputs.file(layout.buildDirectory.file("version.json"))
   inputs.dir(layout.projectDirectory.dir("src/xsl"))
@@ -369,6 +401,7 @@ val userguide = tasks.register<SaxonXsltTask>("userguide") {
   dependsOn("copyUserguideResources")
   dependsOn("validateUserguide")
   dependsOn("xmlCalabashVersion")
+  dependsOn("xmlCalabashBuildInfo")
   finalizedBy(tasks.named("changelog"))
 
   inputs.file(layout.buildDirectory.file("version.json"))
@@ -397,6 +430,7 @@ val userguide = tasks.register<SaxonXsltTask>("userguide") {
 tasks.register<SaxonXsltTask>("changelog_html") {
   dependsOn("validateUserguide")
   dependsOn("xmlCalabashVersion")
+  dependsOn("xmlCalabashBuildInfo")
 
   inputs.file(layout.buildDirectory.file("version.json"))
   inputs.file(layout.projectDirectory.file("tools/changelog.xsl"))

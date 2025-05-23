@@ -545,7 +545,7 @@ class XmlCalabashCli private constructor() {
             println("MAX_THREADS=${totThreads}")
             for (name in deplist) {
                 val version = XmlCalabashBuildConfig.DEPENDENCIES[name]!!
-                println("DEPENDENCY_${name}=${version}")
+                println("${name}=${version}")
             }
         } else {
             stepConfig.messagePrinter.println(versionLine())

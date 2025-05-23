@@ -32,7 +32,7 @@
   <link rel="shortcut icon" href="img/icon.png" />
 </xsl:template>
 
-<xsl:variable name="VERSION" select="parse-json(unparsed-text('../../build/version.json'))"/>
+<xsl:variable name="BUILDINFO" select="doc('../../build/build-info.xml')/build-info"/>
 
 <xsl:param name="chunk-exclude"
            select="('self::db:partintro',
@@ -116,12 +116,21 @@
   </a>
 </xsl:template>
 
-<xsl:template match="processing-instruction('version')">
+<xsl:template match="processing-instruction('version')" as="xs:string">
   <xsl:variable name="ver"
                 select="if (normalize-space(.) = '')
-                        then 'VERSION'
+                        then 'version'
                         else normalize-space(.)"/>
 
+  <xsl:choose>
+    <xsl:when test="$BUILDINFO/*[local-name(.) = $ver]">
+      <xsl:sequence select="$BUILDINFO/*[local-name(.) = $ver]/string()"/>
+    </xsl:when>
+    <xsl:when test="$ver = 'build-date display'">
+      <xsl:sequence select="format-date(xs:date($BUILDINFO/build-date), '[D01] [MNn,*-3] [Y0001]')"/>
+    </xsl:when>
+
+<!--
   <xsl:choose>
     <xsl:when test="map:contains($VERSION, $ver)">
       <xsl:value-of select="map:get($VERSION, $ver)"/>
@@ -132,24 +141,56 @@
     <xsl:when test="lower-case($ver) = 'build-date display'">
       <xsl:value-of select="format-date(xs:date(map:get($VERSION, 'BUILD_DATE')), '[D01] [MNn,*-3] [Y0001]')"/>
     </xsl:when>
+-->
+
     <xsl:otherwise>
       <xsl:message select="'Unrecognized version: ' || $ver"/>
-      <xsl:value-of select="'UNKNOWN'"/>
+      <xsl:sequence select="'UNKNOWN'"/>
     </xsl:otherwise>
   </xsl:choose>
 </xsl:template>
 
 <xsl:template match="processing-instruction('dep')" as="xs:string">
   <xsl:variable name="dep" select="normalize-space(.)"/>
-  <xsl:variable name="value" select="map:get($VERSION, 'DEPENDENCY_' || $dep)"/>
 
   <xsl:choose>
-    <xsl:when test="empty($value)">
-      <xsl:message select="'Unrecognized dependency: ' || $dep"/>
-      <xsl:sequence select="'UNRECOGNIZED'"/>
+    <xsl:when test="$BUILDINFO//depends-on[. = $dep]">
+      <xsl:sequence select="($BUILDINFO//depends-on[. = $dep])[1]/@version/string()"/>
     </xsl:when>
     <xsl:otherwise>
-      <xsl:sequence select="string($value)"/>
+      <xsl:message select="'Unrecognized dependency: ' || $dep"/>
+      <xsl:sequence select="'UNRECOGNIZED'"/>
+    </xsl:otherwise>
+  </xsl:choose>
+</xsl:template>
+
+<xsl:template match="processing-instruction('dependencies')">
+  <xsl:variable name="step" select="normalize-space(.)"/>
+  <xsl:choose>
+    <xsl:when test="$step = ''">
+      <xsl:for-each select="$BUILDINFO/dependencies/xmlcalabash/depends-on">
+        <xsl:sort select="."/>
+        <xsl:value-of select=". || '=' || @version"/>
+        <xsl:if test="position() lt last()">
+          <xsl:text>&#10;</xsl:text>
+        </xsl:if>
+      </xsl:for-each>
+    </xsl:when>
+    <xsl:when test="$BUILDINFO/dependencies/*[local-name(.) = $step]">
+      <ul>
+        <xsl:for-each select="$BUILDINFO/dependencies/*[local-name(.) = $step]/depends-on">
+          <xsl:sort select="."/>
+          <li>
+            <code class="literal">
+              <xsl:value-of select=". || ':' || @version"/>
+            </code>
+          </li>
+        </xsl:for-each>
+      </ul>
+    </xsl:when>
+    <xsl:otherwise>
+      <xsl:message select="'Unknown step:', $step"/>
+      <xsl:text>UNKNOWN</xsl:text>
     </xsl:otherwise>
   </xsl:choose>
 </xsl:template>

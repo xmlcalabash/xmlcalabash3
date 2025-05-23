@@ -15,7 +15,8 @@ configurations.forEach {
   it.exclude("net.sf.saxon.Saxon-HE")
 }
 
-val dep_graalvmJS = project.findProperty("graalvmJS").toString()
+// Also update ExternalDependencies!!!
+val dep_graalvmJS = "23.1.5"
 
 dependencies {
   implementation(project(":xmlcalabash"))

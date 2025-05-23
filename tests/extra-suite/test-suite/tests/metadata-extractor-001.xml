@@ -26,7 +26,7 @@
       <p:import href="https://xmlcalabash.com/ext/library/metadata-extractor.xpl"/>
       <p:output port="result"/>
       <cx:metadata-extractor>
-        <p:with-input href="../../../../ext/metadata-extractor/src/test/resources/amaryllis.jpg"/>
+        <p:with-input href="../../../../xmlcalabash/src/test/resources/cx-metadata-extractor/amaryllis.jpg"/>
       </cx:metadata-extractor>
     </p:declare-step>
   </t:pipeline>

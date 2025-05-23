@@ -189,7 +189,7 @@ The possible compression methods are
 <orderedlist>
 <listitem>
 <para>Support for the 7z format requires the
-<package>org.tukaani:xz:<?dep tukaaniXz?></package> package on the classpath.</para>
+<package>org.tukaani:xz:<?dep org.tukaani:xz?></package> package on the classpath.</para>
 </listitem>
 <listitem>
 <para>The <tag class="attribute">cx:mode-string</tag> attribute contains a string representation

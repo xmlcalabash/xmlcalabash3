@@ -8,9 +8,5 @@ open class IdentityStep(): AbstractAtomicStep() {
         }
     }
 
-    override fun reset() {
-        super.reset()
-    }
-
     override fun toString(): String = "p:identity"
 }

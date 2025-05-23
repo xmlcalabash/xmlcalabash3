@@ -21,7 +21,7 @@ with <link xlink:href="https://relaxng.org/jclark/trang.html">Trang</link>.
 
 <refsection role="step-declaration">
 <title>Step declaration</title>
-<xi:include href="../../../../ext/trang/src/main/resources/com/xmlcalabash/ext/trang.xpl"
+<xi:include href="../../../../xmlcalabash/src/main/resources/com/xmlcalabash/ext/trang.xpl"
             xpointer="xpath(/*/*[@type='cx:trang'])"/>
 <?import trang.xpl?>
 </refsection>

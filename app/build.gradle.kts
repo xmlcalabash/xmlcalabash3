@@ -1,3 +1,4 @@
+import com.xmlcalabash.build.ExternalDependencies
 import com.xmlcalabash.build.XmlCalabashBuildExtension
 import org.jetbrains.dokka.DokkaConfiguration.Visibility
 import org.jetbrains.dokka.base.DokkaBase
@@ -17,31 +18,27 @@ plugins {
   id("buildlogic.kotlin-application-conventions")
   id("com.xmlcalabash.build.xmlcalabash-build")
   id("org.jetbrains.dokka") version "1.9.20"
+  application
 }
 
+val xmlbuild = the<XmlCalabashBuildExtension>()
+
 val xmlcalabashRelease by configurations.dependencyScope("xmlcalabashRelease")
-val sendmailRelease by configurations.dependencyScope("sendmailRelease")
 val weasyprintRelease by configurations.dependencyScope("weasyprintRelease")
 val princeRelease by configurations.dependencyScope("princeRelease")
 val antennahouseRelease by configurations.dependencyScope("antennahouseRelease")
 val fopRelease by configurations.dependencyScope("fopRelease")
-val uniqueidRelease by configurations.dependencyScope("uniqueidRelease")
-val metadataextractorRelease by configurations.dependencyScope("metadataextractorRelease")
-val cacheRelease by configurations.dependencyScope("cacheRelease")
-val xpathRelease by configurations.dependencyScope("xpathRelease")
-val pipelineMessagesRelease by configurations.dependencyScope("pipelineMessagesRelease")
-val waitForUpdateRelease by configurations.dependencyScope("waitforUpdateRelease")
-val collectionManagerRelease by configurations.dependencyScope("collectionManagerRelease")
 
-val dep_slf4j = project.findProperty("slf4j").toString()
-val dep_nineml = project.findProperty("nineml").toString()
 val dep_activation = project.findProperty("activation").toString()
+val dep_drewnoakesExtractor = project.findProperty("drewnoakesExtractor").toString()
+val dep_jaxbapi = project.findProperty("jaxbapi").toString()
+val dep_nineml = project.findProperty("nineml").toString()
+val dep_pdfbox = project.findProperty("pdfbox").toString()
+val dep_slf4j = project.findProperty("slf4j").toString()
 
 dependencies {
   xmlcalabashRelease(project(mapOf("path" to ":xmlcalabash",
                                    "configuration" to "releaseArtifacts")))
-  sendmailRelease(project(mapOf("path" to ":send-mail",
-                                "configuration" to "releaseArtifacts")))
   weasyprintRelease(project(mapOf("path" to ":paged-media:weasyprint",
                                   "configuration" to "releaseArtifacts")))
   princeRelease(project(mapOf("path" to ":paged-media:prince",
@@ -50,59 +47,17 @@ dependencies {
                                     "configuration" to "releaseArtifacts")))
   fopRelease(project(mapOf("path" to ":paged-media:fop",
                            "configuration" to "releaseArtifacts")))
-  uniqueidRelease(project(mapOf("path" to ":ext:unique-id",
-                                "configuration" to "releaseArtifacts")))
-  metadataextractorRelease(project(mapOf("path" to ":ext:metadata-extractor",
-                                         "configuration" to "releaseArtifacts")))
-  cacheRelease(project(mapOf("path" to ":ext:cache",
-                             "configuration" to "releaseArtifacts")))
-  xpathRelease(project(mapOf("path" to ":ext:xpath",
-                             "configuration" to "releaseArtifacts")))
-  pipelineMessagesRelease(project(mapOf("path" to ":ext:pipeline-messages",
-                                        "configuration" to "releaseArtifacts")))
-  waitForUpdateRelease(project(mapOf("path" to ":ext:wait-for-update",
-                                     "configuration" to "releaseArtifacts")))
-  collectionManagerRelease(project(mapOf("path" to ":ext:collection-manager",
-                                         "configuration" to "releaseArtifacts")))
 
   implementation(project(":xmlcalabash"))
-  implementation(project(":ext:asciidoctor"))
-  implementation(project(":ext:cache"))
-  implementation(project(":ext:collection-manager"))
-  implementation(project(":ext:diagramming"))
-  implementation(project(":ext:ebnf-convert"))
-  implementation(project(":ext:epubcheck"))
-  implementation(project(":ext:find"))
-  implementation(project(":ext:json-patch"))
-  implementation(project(":ext:jsonpath"))
-  implementation(project(":ext:markup-blitz"))
-  implementation(project(":ext:metadata-extractor"))
-  implementation(project(":ext:pipeline-messages"))
   //implementation(project(":ext:polyglot")) // No, it requires Java 17
-  implementation(project(":ext:railroad"))
-  implementation(project(":ext:rdf"))
-  implementation(project(":ext:selenium"))
-  implementation(project(":ext:trang"))
-  implementation(project(":ext:unique-id"))
-  implementation(project(":ext:wait-for-update"))
-  implementation(project(":ext:xmlunit"))
-  implementation(project(":ext:xpath"))
-  implementation(project(":paged-media:antenna-house"))
-  implementation(project(":paged-media:fop"))
-  implementation(project(":paged-media:prince"))
-  implementation(project(":paged-media:weasyprint"))
-  implementation(project(":send-mail"))
-
-  implementation("org.nineml:coffeesacks:${dep_nineml}")
-  implementation("org.slf4j:slf4j-api:${dep_slf4j}")
-  implementation("javax.activation:activation:${dep_activation}") // For mimetype mapping
+  //implementation(project(":paged-media:antenna-house"))
+  //implementation(project(":paged-media:fop"))
+  //implementation(project(":paged-media:prince"))
+  //implementation(project(":paged-media:weasyprint"))
 }
 
 val xmlcalabashJar = configurations.resolvable("xmlcalabashJar") {
   extendsFrom(xmlcalabashRelease)
-}
-val sendmailJar = configurations.resolvable("sendmailJar") {
-  extendsFrom(sendmailRelease)
 }
 val weasyprintJar = configurations.resolvable("weasyprintJar") {
   extendsFrom(weasyprintRelease)
@@ -116,34 +71,11 @@ val antennahouseJar = configurations.resolvable("antennahouseJar") {
 val fopJar = configurations.resolvable("fopJar") {
   extendsFrom(fopRelease)
 }
-val uniqueidJar = configurations.resolvable("uniqueidJar") {
-  extendsFrom(uniqueidRelease)
-}
-val metadataextractorJar = configurations.resolvable("metadataextractorJar") {
-  extendsFrom(metadataextractorRelease)
-}
-val cacheJar = configurations.resolvable("cacheJar") {
-  extendsFrom(cacheRelease)
-}
-val xpathJar = configurations.resolvable("xpathJar") {
-  extendsFrom(xpathRelease)
-}
-val pipelineMessagesJar = configurations.resolvable("pipelineMessagesJar") {
-  extendsFrom(pipelineMessagesRelease)
-}
-val waitforUpdateJar = configurations.resolvable("waitforUpdateJar") {
-  extendsFrom(waitForUpdateRelease)
-}
-val collectionManagerJar = configurations.resolvable("collectionManagerJar") {
-  extendsFrom(collectionManagerRelease)
-}
 
 application {
   // Define the main class for the application.
   mainClass = "com.xmlcalabash.app.Main"
 }
-
-val xmlbuild = the<XmlCalabashBuildExtension>()
 
 tasks.withType<DokkaTaskPartial>().configureEach {
   pluginConfiguration<DokkaBase, DokkaBaseConfiguration> {
@@ -218,18 +150,10 @@ val copyScripts = tasks.register<Copy>("copyScripts") {
 
 tasks.register("stage-release") {
   inputs.files(xmlcalabashJar)
-  inputs.files(sendmailJar)
   inputs.files(weasyprintJar)
   inputs.files(princeJar)
   inputs.files(antennahouseJar)
   inputs.files(fopJar)
-  inputs.files(uniqueidJar)
-  inputs.files(metadataextractorJar)
-  inputs.files(cacheJar)
-  inputs.files(xpathJar)
-  inputs.files(pipelineMessagesJar)
-  inputs.files(waitforUpdateJar)
-  inputs.files(collectionManagerJar)
   inputs.files(copyScripts)
   dependsOn("jar")
 
@@ -264,10 +188,8 @@ tasks.register("stage-release") {
   }
 
   doLast {
-    listOf(xmlcalabashJar, sendmailJar,
-           weasyprintJar, princeJar, antennahouseJar, fopJar,
-           uniqueidJar, metadataextractorJar, cacheJar, xpathJar,
-           pipelineMessagesJar, waitforUpdateJar, collectionManagerJar).forEach { jar ->
+    listOf(xmlcalabashJar,
+           weasyprintJar, princeJar, antennahouseJar, fopJar).forEach { jar ->
       copy {
         from(jar)
         into(layout.buildDirectory.dir("stage/lib"))
@@ -285,10 +207,13 @@ tasks.register<Zip>("release") {
 
 tasks.register("helloWorld") {
   doLast {
+    println(ExternalDependencies.of(listOf("metadata-extractor", "nineml")))
+/*
     println("Building with Java version ${System.getProperty("java.version")}")
     for (jar in distClasspath()) {
       println("APP: ${jar}")
     }
+*/
   }
 }
 
