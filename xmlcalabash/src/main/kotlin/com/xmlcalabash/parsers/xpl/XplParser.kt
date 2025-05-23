@@ -372,9 +372,18 @@ class XplParser internal constructor(val builder: PipelineBuilder) {
             Ns.values to { value -> option.values = stepConfig.typeUtils.parseValues(value) },
             Ns.static to { value -> option.static = stepConfig.typeUtils.parseBoolean(value) },
             Ns.required to { value -> option.required = stepConfig.typeUtils.parseBoolean(value) },
-            Ns.select to { value -> option.select = XProcExpression.select(stepConfig, value) },
+            Ns.select to { _ -> },
             Ns.visibility to { value -> option.visibility = stepConfig.typeUtils.parseVisibility(value) }
         )
+
+        if (node.attributes.contains(Ns.select)) {
+            if (decl.stepConfig.staticBindings.contains(name)) {
+                val asType = option.asType ?: SequenceType.ANY
+                option.select = XProcExpression.constant(stepConfig, decl.stepConfig.staticBindings[name]!!, asType, option.values)
+            } else {
+                option.select = XProcExpression.select(stepConfig, node.attributes[Ns.select]!!)
+            }
+        }
 
         processAttributes(node, option, attributeMapping)
         processElements(node, option, emptyMap())

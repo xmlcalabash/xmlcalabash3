@@ -94,7 +94,7 @@ class PipelineBuilder private constructor(val stepConfig: InstructionConfigurati
             throw stepConfig.exception(XProcError.xiTooLateForStaticOptions(name))
         }
 
-        var curValue : XdmValue? = staticOptionsManager.useWhenOptions[name]
+        val curValue : XdmValue? = staticOptionsManager.useWhenOptions[name]
         if (curValue == null) {
             staticOptionsManager.useWhenValue(name, value)
         } else {
