@@ -12,127 +12,152 @@ implemented in Kotlin. It relies on the Kotlin runtime and on third party
 libraries for some functionality. In particular it was built with:
 </para>
 
+<?dependencies xmlcalabash?>
+
+<para>Broadly:</para>
+
 <variablelist>
 <varlistentry>
-<term>Saxon 12.x</term>
+<term>Saxon <?dep net.sf.saxon:Saxon-HE?></term>
 <listitem>
-<para>XML Calabash 3.x is built on top of Saxon 12.5. There is no support for
+<para>XML Calabash 3.x is built on top of Saxon 12. There is no support for
 earlier releases of Saxon. It will work with Saxon HE, but you will have to provide Saxon EE and
 an appropriate license if you want to use licensed features (like XML Schema validation).
 </para>
 </listitem>
 </varlistentry>
 <varlistentry>
-<term>brotliDec, version <?version DEPENDENCY_brotliDec?></term>
+<term>brotliDec, version <?dep org.brotli:dec?></term>
 <listitem>
 <para>To support <literal>.br</literal> archive files.
 </para>
 </listitem>
 </varlistentry>
 <varlistentry>
-<term>commonsCodec, version <?version DEPENDENCY_commonsCodec?></term>
+<term>commonsCodec, version <?dep commons-codec:commons-codec?></term>
 <listitem>
 <para>For common encoders and decoders.
 </para>
 </listitem>
 </varlistentry>
 <varlistentry>
-<term>commonsCompress, version <?version DEPENDENCY_commonsCompress?></term>
+<term>commonsCompress, version <?dep org.apache.commons:commons-compress?></term>
 <listitem>
 <para>To support processing many flavors of archive files.
 </para>
 </listitem>
 </varlistentry>
 <varlistentry>
-<term>flexmarkAll, version <?version DEPENDENCY_flexmarkAll?></term>
+<term>flexmarkAll, version <?dep com.vladsch.flexmark:flexmark-all?></term>
 <listitem>
 <para>To support MarkDown to HTML conversion.
 </para>
 </listitem>
 </varlistentry>
-<!-- The polyglot steps are not yet published
 <varlistentry>
-<term>graalvmJS, version <?version DEPENDENCY_graalvmJS?></term>
-<listitem>
-<para>Used (only) by the “polyglot” steps for additional language support.
-</para>
-</listitem>
-</varlistentry>
--->
-<varlistentry>
-<term>htmlparser, version <?version DEPENDENCY_htmlparser?></term>
+<term>htmlparser, version <?dep nu.validator:htmlparser?></term>
 <listitem>
 <para>To parse HTML.
 </para>
 </listitem>
 </varlistentry>
 <varlistentry>
-<term>httpClient, version <?version DEPENDENCY_httpClient?></term>
+<term>httpClient, version <?dep org.apache.httpcomponents.client5:httpclient5?></term>
 <listitem>
 <para>To support HTTP requests.
 </para>
 </listitem>
 </varlistentry>
 <varlistentry>
-<term>jing, version <?version DEPENDENCY_jing?></term>
+<term>jing, version <?dep org.relaxng:jing?></term>
 <listitem>
 <para>To support RELAX NG and NVDL validation.
 </para>
 </listitem>
 </varlistentry>
 <varlistentry>
-<term>jsonSchemaValidator, version <?version DEPENDENCY_jsonSchemaValidator?></term>
+<term>jsonSchemaValidator, version <?dep com.networknt:json-schema-validator?></term>
 <listitem>
 <para>To support JSON schema validation.
 </para>
 </listitem>
 </varlistentry>
 <varlistentry>
-<term>SchXslt2, version <?version DEPENDENCY_schxslt2?></term>
+<term>SchXslt2, version <?dep name.dmaus.schxslt:schxslt2?></term>
 <listitem>
 <para>To support Schematron.
 </para>
 </listitem>
 </varlistentry>
 <varlistentry>
-<term>sinclude, version <?version DEPENDENCY_sinclude?></term>
+<term>sinclude, version <?dep com.nwalsh:sinclude?></term>
 <listitem>
 <para>To support XInclude.
 </para>
 </listitem>
 </varlistentry>
 <varlistentry>
-<term>slf4j, version <?version DEPENDENCY_slf4j?></term>
+<term>slf4j, version <?dep org.slf4j:slf4j-api?></term>
 <listitem>
 <para>For logging.
 </para>
 </listitem>
 </varlistentry>
 <varlistentry>
-<term>tukaaniXz, version <?version DEPENDENCY_tukaaniXz?></term>
+<term>tukaaniXz, version <?dep org.tukaani:xz?></term>
 <listitem>
 <para>To support <literal>.xz</literal> archive files.
 </para>
 </listitem>
 </varlistentry>
+<!--
 <varlistentry>
-<term>xercesImpl, version <?version DEPENDENCY_xercesImpl?></term>
+<term>xercesImpl, version <?dep ?></term>
 <listitem>
 <para>Where the Xerces XML parser is used.
 </para>
 </listitem>
 </varlistentry>
+-->
 <varlistentry>
-<term>uuidCreator, version <?version DEPENDENCY_uuidCreator?></term>
+<term>uuidCreator, version <?dep com.github.f4b6a3:uuid-creator?></term>
 <listitem>
 <para>To support UUIDs.
 </para>
 </listitem>
 </varlistentry>
 <varlistentry>
-<term>xmlResolver, version <?version DEPENDENCY_xmlResolver?></term>
+<term>XML Resolver, version <?dep org.xmlresolver:xmlresolver?></term>
 <listitem>
 <para>For XML Catalog resolution.
+</para>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>FasterXML data formats, version <?dep com.fasterxml.jackson.dataformat:jackson-dataformat-yaml?></term>
+<listitem>
+<para>For YAML and TOML support.
+</para>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>javax.activation, version <?dep javax.activation:activation?></term>
+<listitem>
+<para>For MIME type support.
+</para>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>JLine, version <?dep org.jline:jline-reader?></term>
+<listitem>
+<para>For the debugger command line.
+</para>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>NineML, version <?dep org.nineml:coffeefilter?></term>
+<listitem>
+<para>For Invisible XML support (and parsing the debugger command line).
 </para>
 </listitem>
 </varlistentry>

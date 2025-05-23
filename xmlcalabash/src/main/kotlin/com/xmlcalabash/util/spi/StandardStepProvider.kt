@@ -44,6 +44,7 @@ import com.xmlcalabash.steps.NamespaceRenameStep
 import com.xmlcalabash.steps.PackStep
 import com.xmlcalabash.steps.RenameStep
 import com.xmlcalabash.steps.ReplaceStep
+import com.xmlcalabash.steps.SendMailStep
 import com.xmlcalabash.steps.SetAttributesStep
 import com.xmlcalabash.steps.SetPropertiesStep
 import com.xmlcalabash.steps.SinkStep
@@ -69,8 +70,34 @@ import com.xmlcalabash.steps.XIncludeStep
 import com.xmlcalabash.steps.XQueryStep
 import com.xmlcalabash.steps.XslFormatterStep
 import com.xmlcalabash.steps.XsltStep
-import com.xmlcalabash.steps.extension.CacheDocument
-import com.xmlcalabash.steps.extension.UncacheDocument
+import com.xmlcalabash.steps.extension.AsciidoctorStep
+import com.xmlcalabash.steps.extension.CacheAddStep
+import com.xmlcalabash.steps.extension.CacheDeleteStep
+import com.xmlcalabash.steps.extension.CollectionManagerStep
+import com.xmlcalabash.steps.extension.DitaaStep
+import com.xmlcalabash.steps.extension.EPubCheckStep
+import com.xmlcalabash.steps.extension.EbnfConvertStep
+import com.xmlcalabash.steps.extension.FindStep
+import com.xmlcalabash.steps.extension.JsonPatchDiffStep
+import com.xmlcalabash.steps.extension.JsonPatchStep
+import com.xmlcalabash.steps.extension.JsonPathStep
+import com.xmlcalabash.steps.extension.MarkupBlitzStep
+import com.xmlcalabash.steps.extension.MathMLtoSvgStep
+import com.xmlcalabash.steps.extension.MetadataExtractorStep
+import com.xmlcalabash.steps.extension.PipelineMessagesStep
+import com.xmlcalabash.steps.extension.PlantumlStep
+import com.xmlcalabash.steps.extension.RailroadStep
+import com.xmlcalabash.steps.extension.RdfGraphStep
+import com.xmlcalabash.steps.extension.RdfMergeStep
+import com.xmlcalabash.steps.extension.RdfaStep
+import com.xmlcalabash.steps.extension.SeleniumStep
+import com.xmlcalabash.steps.extension.SparqlStep
+import com.xmlcalabash.steps.extension.TrangFilesStep
+import com.xmlcalabash.steps.extension.TrangStep
+import com.xmlcalabash.steps.extension.UniqueIdStep
+import com.xmlcalabash.steps.extension.WaitForUpdateStep
+import com.xmlcalabash.steps.extension.XPathStep
+import com.xmlcalabash.steps.extension.XmlUnitStep
 import com.xmlcalabash.steps.file.CreateTempfileStep
 import com.xmlcalabash.steps.file.DirectoryListStep
 import com.xmlcalabash.steps.file.FileCopyStep
@@ -143,6 +170,7 @@ class StandardStepProvider: AtomicStepManager, AtomicStepProvider {
         NsP.pack                to { _: StepParameters? -> PackStep() },
         NsP.rename              to { _: StepParameters? -> RenameStep() },
         NsP.replace             to { _: StepParameters? -> ReplaceStep() },
+        NsP.sendMail            to { _: StepParameters? -> SendMailStep() },
         NsP.setAttributes       to { _: StepParameters? -> SetAttributesStep() },
         NsP.setProperties       to { _: StepParameters? -> SetPropertiesStep() },
         NsP.sink                to { _: StepParameters? -> SinkStep() },
@@ -175,8 +203,35 @@ class StandardStepProvider: AtomicStepManager, AtomicStepProvider {
         NsP.xslFormatter        to { _: StepParameters? -> XslFormatterStep() },
         NsP.xslt                to { _: StepParameters? -> XsltStep() },
 
-        NsCx.cacheAddDocument   to { _: StepParameters? -> CacheDocument() },
-        NsCx.cacheRemoveDocument to { _: StepParameters? -> UncacheDocument() },
+        NsCx.asciidoctor        to { _: StepParameters? -> AsciidoctorStep() },
+        NsCx.cacheAdd           to { _: StepParameters? -> CacheAddStep() },
+        NsCx.cacheDelete        to { _: StepParameters? -> CacheDeleteStep() },
+        NsCx.collectionManager  to { _: StepParameters? -> CollectionManagerStep() },
+        NsCx.ditaa              to { _: StepParameters? -> DitaaStep() },
+        NsCx.ePubCheck          to { _: StepParameters? -> EPubCheckStep() },
+        NsCx.ebnfConvert        to { _: StepParameters? -> EbnfConvertStep() },
+        NsCx.find               to { _: StepParameters? -> FindStep() },
+        NsCx.jsonPatch          to { _: StepParameters? -> JsonPatchStep() },
+        NsCx.jsonDiff           to { _: StepParameters? -> JsonPatchDiffStep() },
+        NsCx.jsonPath           to { _: StepParameters? -> JsonPathStep() },
+        NsCx.markupBlitz        to { _: StepParameters? -> MarkupBlitzStep() },
+        NsCx.mathmlToSvg        to { _: StepParameters? -> MathMLtoSvgStep() },
+        NsCx.metadataExtractor  to { _: StepParameters? -> MetadataExtractorStep() },
+        NsCx.pipelineMessages   to { _: StepParameters? -> PipelineMessagesStep() },
+        NsCx.plantuml           to { _: StepParameters? -> PlantumlStep() },
+        NsCx.railroad           to { _: StepParameters? -> RailroadStep() },
+        NsCx.rdfGraph           to { _: StepParameters? -> RdfGraphStep() },
+        NsCx.rdfMerge           to { _: StepParameters? -> RdfMergeStep() },
+        NsCx.rdfa               to { _: StepParameters? -> RdfaStep() },
+        NsCx.selenium           to { _: StepParameters? -> SeleniumStep() },
+        NsCx.sparql             to { _: StepParameters? -> SparqlStep() },
+        NsCx.trang              to { _: StepParameters? -> TrangStep() },
+        NsCx.trangFiles         to { _: StepParameters? -> TrangFilesStep() },
+        NsCx.uniqueId           to { _: StepParameters? -> UniqueIdStep() },
+        NsCx.waitForUpdate      to { _: StepParameters? -> WaitForUpdateStep() },
+        NsCx.xpath              to { _: StepParameters? -> XPathStep() },
+        NsCx.xmlUnit            to { _: StepParameters? -> XmlUnitStep() },
+
         NsCx.guard              to { _: StepParameters? -> GuardStep() },
         NsCx.expression         to { p: StepParameters? -> ExpressionStep(p as ExpressionStepParameters) },
         NsCx.option             to { p: StepParameters? -> OptionExpressionStep(p as OptionStepParameters) },

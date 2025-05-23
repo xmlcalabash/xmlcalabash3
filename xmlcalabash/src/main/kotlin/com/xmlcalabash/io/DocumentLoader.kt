@@ -207,6 +207,7 @@ class DocumentLoader(val stepConfig: StepConfiguration,
     private fun load(uri: URI?, stream: InputStream, overrideMediaType: MediaType, charset: Charset? = null): XProcDocument {
         if (contentTypeLoaders == null) {
             val list = mutableListOf<ContentTypeLoader>()
+            list.add(RdfLoader())
             for (provider in ContentTypeLoaderServiceProvider.providers()) {
                 list.add(provider.create())
             }

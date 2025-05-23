@@ -21,7 +21,7 @@ result.
 
 <refsection role="step-declaration">
 <title>Step declaration</title>
-<xi:include href="../../../../ext/json-patch/src/main/resources/com/xmlcalabash/ext/json-patch.xpl"
+<xi:include href="../../../../xmlcalabash/src/main/resources/com/xmlcalabash/ext/json-patch.xpl"
             xpointer="xpath(/*/*[@type='cx:json-patch'])"/>
 <?import json-patch.xpl?>
 </refsection>
@@ -39,7 +39,7 @@ result.
 
 <para>This step uses the
 <link xlink:href="https://github.com/java-json-tools/json-patch">json-patch</link>
-library version <?version DEPENDENCY_jsonPatch?> to apply the JSON Patch document
+library version <?dep com.github.java-json-tools:json-patch?> to apply the JSON Patch document
 provided on the <port>patch</port> port to the <port>source</port> document.
 The resulting patched document is returned.</para>
 
@@ -51,6 +51,15 @@ JSON Merge Patch (<biblioref linkend="rfc7386"/>).</para>
 
 <para>The <tag>cx:json-diff</tag> step can be used to compute a patch between two
 JSON documents.</para>
+
+<refsection>
+<title>Dependencies</title>
+<para>This step is included in the XML Calabash application.
+If you are getting XML Calabash from Maven, you will also need to include
+the extension dependency:</para>
+
+<?dependencies json-patch?>
+</refsection>
 
 </refsection>
 </refentry>

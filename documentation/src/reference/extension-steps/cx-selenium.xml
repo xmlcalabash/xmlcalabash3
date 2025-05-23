@@ -22,7 +22,7 @@ browser. The step can drive a web browser and extract all or part of rendered pa
 
 <refsection role="step-declaration">
 <title>Step declaration</title>
-<xi:include href="../../../../ext/selenium/src/main/resources/com/xmlcalabash/ext/selenium.xpl"
+<xi:include href="../../../../xmlcalabash/src/main/resources/com/xmlcalabash/ext/selenium.xpl"
             xpointer="xpath(/*/*[@type='cx:selenium'])"/>
 <?import selenium.xpl?>
 </refsection>
@@ -863,21 +863,9 @@ a variety of statements and features.</para>
 <title>Dependencies</title>
 <para>This step is included in the XML Calabash application.
 If you are getting XML Calabash from Maven, you will also need to include
-the extension dependency:</para>
+these additional dependencies:</para>
 
-<itemizedlist spacing="compact">
-<listitem>
-<para><literal>com.xmlcalabash:selenium:<?version?></literal></para>
-</listitem>
-</itemizedlist>
-
-<para>The following third-party dependencies will also be included transitively:</para>
-
-<itemizedlist spacing="compact">
-<listitem>
-<para><literal>org.seleniumhq.selenium:selenium-java:<?dep selenium?></literal></para>
-</listitem>
-</itemizedlist>
+<?dependencies selenium?>
 </refsection>
 
 </refentry>

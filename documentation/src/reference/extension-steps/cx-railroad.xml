@@ -22,7 +22,7 @@
 
 <refsection role="step-declaration">
 <title>Step declaration</title>
-     <xi:include href="../../../../ext/railroad/src/main/resources/com/xmlcalabash/ext/railroad.xpl"
+     <xi:include href="../../../../xmlcalabash/src/main/resources/com/xmlcalabash/ext/railroad.xpl"
                  xpointer="xpath(/*/*[@type='cx:railroad'])"/>
 <?import railroad.xpl?>
 </refsection>
@@ -99,7 +99,7 @@ between 0 and 359.</error></para>
 is a <glossterm>dynamic error</glossterm> if the width is less than or equal to 0.</error>
 </para>
 
-<para>XML Calabash is built with version <?version DEPENDENCY_rr?> of the railroad
+<para>XML Calabash is built with version <?dep de.bottlecaps.rr:rr-lib?> of the railroad
 diagram generator.</para>
 </refsection>
 
@@ -169,25 +169,9 @@ rendered as shown in <xref linkend="fig.Expression.railroad"/>,
 <title>Dependencies</title>
 <para>This step is included in the XML Calabash application.
 If you are getting XML Calabash from Maven, you will also need to include
-the extension dependency:</para>
+the additional dependency:</para>
 
-<itemizedlist spacing="compact">
-<listitem>
-<para><literal>com.xmlcalabash:railroad:<?version?></literal></para>
-</listitem>
-</itemizedlist>
-
-<para>The following third-party dependencies will also be included transitively:</para>
-
-<itemizedlist spacing="compact">
-<listitem>
-<para><literal>de.bottlecaps.rr:rr-lib:<?dep rr?></literal></para>
-</listitem>
-<listitem>
-<para><literal>de.bottlecaps.ebnf-convert:ebnf-convert-lib:<?dep ebnfConvert?></literal></para>
-</listitem>
-</itemizedlist>
-
+<?dependencies railroad?>
 </refsection>
 
 </refentry>

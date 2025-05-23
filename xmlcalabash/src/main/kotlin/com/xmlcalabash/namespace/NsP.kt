@@ -90,6 +90,7 @@ object NsP {
     val run                         = QName(namespace, "p:run")
     val runInput                    = QName(namespace, "p:run-input")
     val runOption                   = QName(namespace, "p:run-option")
+    val sendMail                    = QName(namespace, "p:send-mail")
     val setAttributes               = QName(namespace, "p:set-attributes")
     val setProperties               = QName(namespace, "p:set-properties")
     val sink                        = QName(namespace, "p:sink")

@@ -6,6 +6,7 @@ import com.xmlcalabash.api.MessageReporter;
 import com.xmlcalabash.config.ConfigurationLoader;
 import com.xmlcalabash.datamodel.DeclareStepInstruction;
 import com.xmlcalabash.documents.XProcDocument;
+import com.xmlcalabash.exceptions.XProcException;
 import com.xmlcalabash.io.DocumentManager;
 import com.xmlcalabash.io.MediaType;
 import com.xmlcalabash.io.MessagePrinter;
@@ -51,6 +52,7 @@ public class JavaApiTest {
 
     private XdmNode parseStream(InputStream stream) {
         DocumentBuilder builder = processor.newDocumentBuilder();
+        builder.setLineNumbering(true);
         InputSource input = new InputSource(stream);
         input.setSystemId("http://example.com/");
         try {
@@ -60,28 +62,24 @@ public class JavaApiTest {
         }
     }
 
-    private XdmNode anIdentityPipeline() {
+    private XdmNode parseInput(String filename) {
         try {
-            return parseStream(new FileInputStream(new File("src/test/resources/identity.xpl")));
+            return parseStream(new FileInputStream(new File("src/test/resources/" + filename)));
         } catch (IOException ex) {
             throw new RuntimeException(ex);
         }
+    }
+
+    private XdmNode anIdentityPipeline() {
+        return parseInput("identity.xpl");
     }
 
     private XdmNode anXsltPipeline() {
-        try {
-            return parseStream(new FileInputStream(new File("src/test/resources/xslt.xpl")));
-        } catch (IOException ex) {
-            throw new RuntimeException(ex);
-        }
+        return parseInput("xslt.xpl");
     }
 
     private XdmNode anExtensionPipeline() {
-        try {
-            return parseStream(new FileInputStream(new File("src/test/resources/extension.xpl")));
-        } catch (IOException ex) {
-            throw new RuntimeException(ex);
-        }
+        return parseInput("extension.xpl");
     }
 
     private XmlCalabash setupXmlCalabash() {
@@ -152,6 +150,20 @@ public class JavaApiTest {
 
         XdmValue result = receiver.getOutputs().get("result").get(0).getValue();
         Assertions.assertEquals("<doc>You got some output</doc>", result.toString());
+    }
+
+    @Test
+    public void runStaticError() {
+        try {
+            XmlCalabash xmlCalabash = setupXmlCalabash();
+            XplParser parser = xmlCalabash.newXProcParser();
+            DeclareStepInstruction declareStep = parser.parse(parseInput("static-error.xpl"));
+            declareStep.runtime();
+        } catch (XProcException ex) {
+            Assertions.assertEquals("XS0107", ex.getError().getCode().getLocalName());
+            Assertions.assertEquals(10, ex.getError().getLocation().getLineNumber());
+            Assertions.assertEquals(37, ex.getError().getLocation().getColumnNumber());
+        }
     }
 
     @Test

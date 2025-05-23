@@ -1,3 +1,5 @@
+import com.xmlcalabash.build.ExternalDependencies
+
 plugins {
     id("org.jetbrains.kotlin.jvm")
 }
@@ -21,17 +23,14 @@ configurations.all {
     if (requested.group == "xml-apis" && requested.name == "xml-apis") {
       useVersion("1.4.01")
     }
-    if (requested.group == "xerces" && requested.name == "xercesImpl") {
-      useVersion(project.findProperty("xercesImpl").toString())
-    }
     if (requested.group == "org.slf4j" && requested.name == "slf4j-api") {
-      useVersion(project.findProperty("slf4j").toString())
+      useVersion(ExternalDependencies.version("org.slf4j:slf4j-api"))
     }
     if (requested.group == "org.relaxng" && (requested.name == "jing" || requested.name == "trang")) {
-      useVersion(project.findProperty("jing").toString())
+      useVersion(ExternalDependencies.version("org.relaxng:jing"))
     }
     if (requested.group == "org.xmlresolver") {
-      useVersion(project.findProperty("xmlResolver").toString())
+      useVersion(ExternalDependencies.version("org.xmlresolver:xmlresolver"))
     }
   }
 }

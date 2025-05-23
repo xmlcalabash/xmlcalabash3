@@ -79,7 +79,7 @@ but they are read-only. You cannot compress with those algorithms.</para>
 </listitem>
 <listitem>
 <para>Support for the LZMA and XZ algorithms require the
-<package>org.tukaani:xz:<?dep tukaaniXz?></package> package on the classpath.</para>
+<package>org.tukaani:xz:<?dep org.tukaani:xz?></package> package on the classpath.</para>
 </listitem>
 </orderedlist>
 </refsection>

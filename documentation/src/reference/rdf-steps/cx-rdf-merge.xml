@@ -19,7 +19,7 @@ single dataset.</para>
 
 <refsection role="step-declaration">
 <title>Step declaration</title>
-<xi:include href="../../../../ext/rdf/src/main/resources/com/xmlcalabash/ext/rdf.xpl"
+<xi:include href="../../../../xmlcalabash/src/main/resources/com/xmlcalabash/ext/rdf.xpl"
             xpointer="xpath(/*/*[@type='cx:rdf-merge'])"/>
 <?import rdf.xpl?>
 </refsection>

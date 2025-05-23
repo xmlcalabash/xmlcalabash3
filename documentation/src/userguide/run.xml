@@ -34,9 +34,9 @@ have a license for Saxon PE or Saxon EE, it makes sense to swap out the Saxon HE
 library that ships with XML Calabash for PE or EE.</para>
 <para>To save you the trouble of constructing and managing a large classpath, the
 distribution of XML Calabash is configured with a hack. Simply
-delete the <filename>Saxon-HE-<?version DEPENDENCY_saxon?>.jar</filename> file from the
+delete the <filename>Saxon-HE-<?version saxon-version?>.jar</filename> file from the
 <filename class="directory">lib</filename> directory and copy in your PE or EE jar instead. You
-<emphasis>must</emphasis> use a <?version DEPENDENCY_saxon?> jar file for this purpose!
+<emphasis>must</emphasis> use a <?version saxon-version?> jar file for this purpose!
 Be careful to make sure there’s only one Saxon jar file in the 
 <filename class="directory">lib</filename> directory. Having multiple versions of the same library on the classpath
 is an invitation for subtle and mysterious crashes.</para>
@@ -674,7 +674,7 @@ a synonym for “<literal>info version</literal>”.</para>
 
 <screen><userinput><prompt>$</prompt> xmlcalabash info version</userinput>
 <computeroutput>XML Calabash version <?version?> (build <?version build-id?>, <?version build-date display?>)
-Running with Saxon <?version saxon-edition?> version <?dep saxon?> using at most 1 of 12 available threads</computeroutput></screen>
+Running with Saxon HE version <?dep net.sf.saxon:Saxon-HE?> using at most 1 of 12 available threads</computeroutput></screen>
 
 <para>Most options are ignored when the <command>version</command> command is
 used, but if the <literal>debug</literal> level of <option>--verbosity</option>
@@ -684,31 +684,15 @@ is formatted in a way that can more easily be parsed, for example by a shell scr
 
 <screen><userinput><prompt>$</prompt> xmlcalabash info version --debug</userinput>
 <computeroutput>PRODUCT_NAME=XML Calabash
-VERSION=<?version VERSION?>
-BUILD_DATE=<?version BUILD_DATE?>
-BUILD_ID=<?version BUILD_ID?>
-SAXON_EDITION=<?version SAXON_EDITION?>
+VERSION=<?version version?>
+BUILD_DATE=<?version build-date?>
+BUILD_ID=<?version build-id?>
+SAXON_EDITION=HE
 VENDOR_NAME=Norm Tovey-Walsh
 VENDOR_URI=https://xmlcalabash.com/
 THREADS=1
 MAX_THREADS=12
-DEPENDENCY_brotliDec=<?version DEPENDENCY_brotliDec?>
-DEPENDENCY_commonsCodec=<?version DEPENDENCY_commonsCodec?>
-DEPENDENCY_commonsCompress=<?version DEPENDENCY_commonsCompress?>
-DEPENDENCY_flexmarkAll=<?version DEPENDENCY_flexmarkAll?>
-DEPENDENCY_graalvmJS=<?version DEPENDENCY_graalvmJS?>
-DEPENDENCY_htmlparser=<?version DEPENDENCY_htmlparser?>
-DEPENDENCY_httpClient=<?version DEPENDENCY_httpClient?>
-DEPENDENCY_jing=<?version DEPENDENCY_jing?>
-DEPENDENCY_jsonSchemaValidator=<?version DEPENDENCY_jsonSchemaValidator?>
-DEPENDENCY_saxon=<?version DEPENDENCY_saxon?>
-DEPENDENCY_schxslt2=<?version DEPENDENCY_schxslt2?>
-DEPENDENCY_sinclude=<?version DEPENDENCY_sinclude?>
-DEPENDENCY_slf4j=<?version DEPENDENCY_slf4j?>
-DEPENDENCY_tukaaniXz=<?version DEPENDENCY_tukaaniXz?>
-DEPENDENCY_uuidCreator=<?version DEPENDENCY_uuidCreator?>
-DEPENDENCY_xercesImpl=<?version DEPENDENCY_xercesImpl?>
-DEPENDENCY_xmlResolver=<?version DEPENDENCY_xmlResolver?></computeroutput></screen>
+<?dependencies?></computeroutput></screen>
 
 <important>
 <para>These are the <emphasis>compile-time</emphasis> dependencies, the versions that

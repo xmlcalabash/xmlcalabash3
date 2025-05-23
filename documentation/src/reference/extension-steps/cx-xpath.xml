@@ -21,7 +21,7 @@ provided on the <port>source</port> port.
 
 <refsection role="step-declaration">
 <title>Step declaration</title>
-<xi:include href="../../../../ext/xpath/src/main/resources/com/xmlcalabash/ext/xpath.xpl"
+<xi:include href="../../../../xmlcalabash/src/main/resources/com/xmlcalabash/ext/xpath.xpl"
             xpointer="xpath(/*/*[@type='cx:xpath'])"/>
 <?import xpath.xpl?>
 </refsection>

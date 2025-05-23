@@ -39,11 +39,11 @@
 -->
           <div class="docversion">
             <xsl:text>Version </xsl:text>
-            <xsl:sequence select="$VERSION?refVersion"/>
+            <xsl:sequence select="$BUILDINFO/ref-version/string()"/>
           </div>
           <div class="version">
             <xsl:text>for XML Calabash </xsl:text>
-            <span title="Build id: {$VERSION?BUILD_ID}">{$VERSION?VERSION}</span>
+            <span title="Build id: {$BUILDINFO/build-id}">{$BUILDINFO/version}</span>
           </div>
           <div class="date">
             <xsl:text>Updated: </xsl:text>

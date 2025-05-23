@@ -19,7 +19,7 @@ media file.</para>
 
 <refsection role="step-declaration">
 <title>Step declaration</title>
-<xi:include href="../../../../ext/metadata-extractor/src/main/resources/com/xmlcalabash/ext/metadata-extractor.xpl"
+<xi:include href="../../../../xmlcalabash/src/main/resources/com/xmlcalabash/ext/metadata-extractor.xpl"
             xpointer="xpath(/*/*[@type='cx:metadata-extractor'])"/>
 <?import metadata-extractor.xpl?>
 </refsection>
@@ -153,38 +153,11 @@ might return results such as those shown in <xref linkend="ex.png"/>.</para>
 <refsection>
 <title>Additional dependencies</title>
 
-<para>In addition to the <link xlink:href="dependencies">standard dependencies</link>, the
-<tag>cx:metadata-extractor</tag> step relies on these libraries:</para>
+<para>This step is included in the XML Calabash application.
+If you are getting XML Calabash from Maven, you will also need to include
+these additional dependencies:</para>
 
-<variablelist>
-<varlistentry>
-<term><link xlink:href="https://central.sonatype.com/artifact/com.drewnoakes/metadata-extractor">metadata-extractor</link>, version <?version DEPENDENCY_drewnoakesExtractor?></term>
-<listitem>
-<para>To read metadata from images and other files.</para>
-</listitem>
-</varlistentry>
-<varlistentry>
-<term><link xlink:href="https://central.sonatype.com/artifact/javax.xml.bind/jaxb-api">jaxb-api</link>, version <?version DEPENDENCY_jaxbapi?></term>
-<listitem>
-<para>Used when attempting to parse PDF bounding boxes.
-</para>
-</listitem>
-</varlistentry>
-<varlistentry>
-<term><link xlink:href="https://central.sonatype.com/artifact/org.apache.pdfbox/pdfbox">pdfbox</link>, version <?version DEPENDENCY_pdfbox?></term>
-<listitem>
-<para>Used when attempting to parse PDF files.
-</para>
-</listitem>
-</varlistentry>
-<varlistentry>
-<term><link xlink:href="https://central.sonatype.com/artifact/org.apache.pdfbox/xmpbox">xmpbox</link>, version <?version DEPENDENCY_pdfbox?></term>
-<listitem>
-<para>Used when attempting to parse XMP files.
-</para>
-</listitem>
-</varlistentry>
-</variablelist>
+<?dependencies metadata-extractor?>
+
 </refsection>
-
 </refentry>

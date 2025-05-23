@@ -137,18 +137,8 @@ release. You will also need to include the extension dependency:</para>
 </listitem>
 </itemizedlist>
 
-<para>The following third-party dependencies will also be included transitively:</para>
+<para>The following third-party dependencies will be included transitively:</para>
 
-<itemizedlist spacing="compact">
-<listitem>
-<para><literal>org.graalvm.polyglot:polyglot:<?dep graalvmJS?></literal></para>
-</listitem>
-<listitem>
-<para><literal>org.graalvm.polyglot:polyglot:js:<?dep graalvmJS?></literal></para>
-</listitem>
-<listitem>
-<para><literal>org.graalvm.polyglot:polyglot:python:<?dep graalvmJS?></literal></para>
-</listitem>
-</itemizedlist>
+<?dependencies polyglot?>
 </refsection>
 </refentry>

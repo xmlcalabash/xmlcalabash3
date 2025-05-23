@@ -87,11 +87,11 @@ Compress™ library version 1.27.1.</para>
 </listitem>
 <listitem>
 <para>Support for the Brotli algorithm requires the 
-<package>org.brotli:dec:<?dep brotliDec?></package> package on the classpath.</para>
+<package>org.brotli:dec:<?dep org.brotli:dec?></package> package on the classpath.</para>
 </listitem>
 <listitem>
 <para>Support for the LZMA and XZ algorithms require the
-<package>org.tukaani:xz:<?dep tukaaniXz?></package> package on the classpath.</para>
+<package>org.tukaani:xz:<?dep org.tukaani:xz?></package> package on the classpath.</para>
 </listitem>
 </orderedlist>
 </refsection>

@@ -20,7 +20,7 @@
 
 <refsection role="step-declaration">
 <title>Step declaration</title>
-<xi:include href="../../../../ext/json-patch/src/main/resources/com/xmlcalabash/ext/json-patch.xpl"
+<xi:include href="../../../../xmlcalabash/src/main/resources/com/xmlcalabash/ext/json-patch.xpl"
             xpointer="xpath(/*/*[@type='cx:json-diff'])"/>
 <?import json-patch.xpl?>
 </refsection>
@@ -38,12 +38,21 @@
 
 <para>This step uses the
 <link xlink:href="https://github.com/java-json-tools/json-patch">json-patch</link>
-library version <?version DEPENDENCY_jsonPatch?> to find the difference between
+library version <?dep com.github.java-json-tools:json-patch?> to find the difference between
 two JSON documents. The result is a JSON document that describes differences in a
 JSON Patch (<biblioref linkend="rfc6902"/>).</para>
 
 <para>The resulting patch can be applied with <tag>cx:json-patch</tag> to convert the source
 into the target.</para>
 
+</refsection>
+
+<refsection>
+<title>Dependencies</title>
+<para>This step is included in the XML Calabash application.
+If you are getting XML Calabash from Maven, you will also need to include
+the extension dependency:</para>
+
+<?dependencies json-diff?>
 </refsection>
 </refentry>

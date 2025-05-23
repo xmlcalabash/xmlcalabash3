@@ -5,10 +5,10 @@
 <title>Colophon</title>
 
 <para>This document was authored in
-<link xlink:href="https://docbook.org/">DocBook</link> version <?version docbookVersion?>,
+<link xlink:href="https://docbook.org/">DocBook</link> version <?version docbook-version?>,
 edited in Emacs, and transformed to HTML, PDF, and EPUB with the
 <link xlink:href="https://xsltng.docbook.org">DocBook xslTNG</link> stylesheets
-version <?version xslTNGversion?>.</para>
+version <?version xslTNG-version?>.</para>
 
 <para>Dr. Bethan Tovey-Walsh designed the cover art and
 <link linkend="ItDepends">the sticker</link> at the end of the threading chapter.

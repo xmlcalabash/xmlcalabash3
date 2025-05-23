@@ -22,7 +22,7 @@ the specified Invisible XML grammar.</para>
 
 <refsection role="step-declaration">
 <title>Step declaration</title>
-<xi:include href="../../../../ext/markup-blitz/src/main/resources/com/xmlcalabash/ext/markup-blitz.xpl"
+<xi:include href="../../../../xmlcalabash/src/main/resources/com/xmlcalabash/ext/markup-blitz.xpl"
             xpointer="xpath(/*/*[@type='cx:markup-blitz'])"/>
 <?import markup-blitz.xpl?>
 </refsection>
@@ -46,19 +46,7 @@ Markup Blitz for the <tag>p:invisible-xml</tag> step.</para>
 If you are getting XML Calabash from Maven, you will also need to include
 the extension dependency:</para>
 
-<itemizedlist spacing="compact">
-<listitem>
-<para><literal>com.xmlcalabash:markup-blitz:<?version?></literal></para>
-</listitem>
-</itemizedlist>
-
-<para>The following third-party dependencies will also be included transitively:</para>
-
-<itemizedlist spacing="compact">
-<listitem>
-<para><literal>de.bottlecaps:markup-blitz:<?dep markupBlitz?></literal></para>
-</listitem>
-</itemizedlist>
+<?dependencies markup-blitz?>
 </refsection>
 
 </refentry>

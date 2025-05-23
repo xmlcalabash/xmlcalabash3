@@ -18,7 +18,7 @@
 
 <refsection role="step-declaration">
 <title>Step declaration</title>
-<xi:include href="../../../../ext/diagramming/src/main/resources/com/xmlcalabash/ext/diagramming.xpl"
+<xi:include href="../../../../xmlcalabash/src/main/resources/com/xmlcalabash/ext/diagramming.xpl"
             xpointer="xpath(/*/*[@type='cx:plantuml'])"/>
 <?import diagramming.xpl?>
 </refsection>
@@ -137,7 +137,7 @@ must specify the format explicitly. Available formats (at the time of writing) a
 </tgroup>
 </informaltable>
 
-<para>XML Calabash uses <?version DEPENDENCY_plantUml?> of the PlantUML library.</para>
+<para>XML Calabash uses <?dep net.sourceforge.plantuml:plantuml?> of the PlantUML library.</para>
 </refsection>
 
 <refsection>
@@ -204,7 +204,13 @@ for highlighting.)</para>
 </figure>
 </refsection>
 
-<xi:include href="diagramming-depends.xml"/>
+<refsection>
+<title>Dependencies</title>
+<para>This step is included in the XML Calabash application.
+If you are getting XML Calabash from Maven, you will also need to include
+the additional dependency:</para>
+<?dependencies plantuml?>
+</refsection>
 
 </refentry>
 

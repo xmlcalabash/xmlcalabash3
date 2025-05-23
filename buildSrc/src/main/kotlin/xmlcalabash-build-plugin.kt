@@ -13,6 +13,7 @@ import org.gradle.api.artifacts.Configuration
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.provider.Property
+import org.gradle.api.provider.MapProperty
 import org.gradle.api.provider.Provider
 import org.gradle.kotlin.dsl.create
 
