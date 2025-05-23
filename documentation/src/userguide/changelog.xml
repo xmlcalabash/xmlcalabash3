@@ -13,6 +13,27 @@ See the commits and pull requests on
 finer detail.</para>
 
 <revhistory>
+<revision xml:id="r300-beta6">
+<revnumber>3.0.0-beta6</revnumber>
+<date>2025-05-23</date>
+<revdescription>
+<para>For some reason, it appears that snapshots aren’t being updated after
+they’re created. The build runs without error, and claims to publish the
+snapshot, but the files on Maven don’t get updated. I don’t know why.</para>
+<itemizedlist>
+<listitem><para>Fixed <ghissue number="527"/>. Make sure that line numbering
+is enabled for pipelines constructed from a <code>Source</code>.
+</para></listitem>
+<listitem><para>Substantial build refactoring. All of the extension steps,
+except the Polyglot steps that require Java 17 and the paged media steps that
+mostly require third party applications, are now part the main build
+instead of being subprojects. This should simplify things a bit. It did
+have a knock on effect of changing some of the documentation build. For the better,
+I hope.
+</para></listitem>
+</itemizedlist>
+</revdescription>
+</revision>
 <revision xml:id="r300-beta5">
 <revnumber>3.0.0-beta5</revnumber>
 <date>2025-05-21</date>
