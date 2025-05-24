@@ -4,6 +4,15 @@
     <t:title>selenium-009</t:title>
     <t:revision-history>
       <t:revision>
+        <t:date>2025-05-23</t:date>
+        <t:author>
+          <t:name>Norm Tovey-Walsh</t:name>
+        </t:author>
+        <t:description xmlns="http://www.w3.org/1999/xhtml">
+          <p>Added static options for web server host and port.</p>
+        </t:description>
+      </t:revision>
+      <t:revision>
         <t:date>2025-02-09</t:date>
         <t:author>
           <t:name>Norm Tovey-Walsh</t:name>
@@ -23,12 +32,13 @@
                 name="main" version="3.0">
   <p:import href="https://xmlcalabash.com/ext/library/selenium.xpl"/>
   <p:output port="result" sequence="true"/>
+  <p:option name="WHOST" select="'http://localhost:8246'" static="true"/>
 
   <cx:selenium>
     <p:with-option name="arguments" select="('--headless')"/>
     <p:with-input>
       <p:inline content-type="text/plain">script version 0.2 .
-page "http://localhost:8246/apps/find.html" .
+page "{$WHOST}/apps/find.html" .
 find $span by class = "one" .
 output $span to result.
       </p:inline>

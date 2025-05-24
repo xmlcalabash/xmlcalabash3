@@ -1,0 +1,5 @@
+This is a copy of the setup used by the XProc test suite. (I copied it because
+the XProc test suite container on Dockerhub is X86 and I don't feel like working
+out how to publish an ARM version right now.)
+
+You'll need the XProc test suite for the directories to mount...

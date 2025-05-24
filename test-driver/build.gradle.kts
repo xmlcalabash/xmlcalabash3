@@ -45,6 +45,12 @@ java {
 
 val xmlbuild = the<XmlCalabashBuildExtension>()
 
+val WHOST = project.findProperty("WHOST") ?: "http://localhost:8246"
+val SHOST = project.findProperty("SHOST") ?: "localhost"
+val SMTPPORT = project.findProperty("APIPORT") ?: "1025"
+val APIPORT = project.findProperty("APIPORT") ?: "1080"
+val DEBUG = project.findProperty("DEBUG") ?: "false"
+
 if (project.findProperty("testPattern") == null) {
   tasks.register("run-test") {
     doLast {
@@ -63,7 +69,10 @@ if (project.findProperty("testPattern") == null) {
     inputs.dir(layout.projectDirectory.dir(testDir))
     inputs.file(layout.projectDirectory.file("src/test/resources/exclusions.txt"))
 
-    args("-t:${testPattern}")
+    args("-t:${testPattern}",
+         "--debug:${DEBUG}",
+         "SHOST=${SHOST}", "SMTPPORT=${SMTPPORT}", "APIPORT=${APIPORT}",
+         "WHOST=${WHOST}")
   }
 }
 
@@ -81,7 +90,10 @@ tasks.register<JavaExec>("test-suite") {
        "--require-pass:${requirePass}",
        "--console:${consoleOutput}",
        "--dir:${layout.projectDirectory.dir("../tests/3.0-test-suite/test-suite/tests")}",
-       "--report:${layout.buildDirectory.file("test-suite-results.xml").get().asFile}")
+       "--report:${layout.buildDirectory.file("test-suite-results.xml").get().asFile}",
+       "--debug:${DEBUG}",
+       "SHOST=${SHOST}", "SMTPPORT=${SMTPPORT}", "APIPORT=${APIPORT}",
+       "WHOST=${WHOST}")
 }
 
 tasks.register<JavaExec>("extra-suite") {
@@ -98,7 +110,10 @@ tasks.register<JavaExec>("extra-suite") {
        "--require-pass:${requirePass}",
        "--console:${consoleOutput}",
        "--dir:${layout.projectDirectory.dir("../tests/extra-suite/test-suite/tests")}",
-       "--report:${layout.buildDirectory.file("extra-suite-results.xml").get().asFile}")
+       "--report:${layout.buildDirectory.file("extra-suite-results.xml").get().asFile}",
+       "--debug:${DEBUG}",
+       "SHOST=${SHOST}", "SMTPPORT=${SMTPPORT}", "APIPORT=${APIPORT}",
+       "WHOST=${WHOST}")
 }
 
 tasks.register<JavaExec>("selenium") {
@@ -115,7 +130,10 @@ tasks.register<JavaExec>("selenium") {
        "--require-pass:${requirePass}",
        "--console:${consoleOutput}",
        "--dir:${layout.projectDirectory.dir("../tests/selenium/test-suite/tests")}",
-       "--report:${layout.buildDirectory.file("selenium-results.xml").get().asFile}")
+       "--report:${layout.buildDirectory.file("selenium-results.xml").get().asFile}",
+       "--debug:${DEBUG}",
+       "SHOST=${SHOST}", "SMTPPORT=${SMTPPORT}", "APIPORT=${APIPORT}",
+       "WHOST=${WHOST}")
 }
 
 tasks.register<JavaExec>("test-report") {

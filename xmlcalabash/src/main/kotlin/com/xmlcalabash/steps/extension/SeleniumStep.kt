@@ -222,6 +222,8 @@ class SeleniumStep(): AbstractAtomicStep() {
             propBrowser ?: "firefox" // Have to pick something!
         }
 
+        stepConfig.debug { "Running with ${browser} " }
+
         driver = when (browser) {
             "firefox" -> setupFirefoxDriver()
             "chrome" -> setupChromeDriver()

@@ -2,10 +2,13 @@
                 xmlns:cx="http://xmlcalabash.com/ns/extensions"
                 xmlns:xs="http://www.w3.org/2001/XMLSchema"
                 exclude-inline-prefixes="cx xs" version="3.0">
-
 <p:output port="result"/>
 
-<p:send-mail parameters="map{'host':'localhost', 'port':1025}"
+<p:option name="SHOST" select="'localhost'" static="true"/>
+<p:option name="SMTPPORT" select="1025" static="true"/>
+<p:option name="APIPORT" select="1080" static="true"/>
+
+<p:send-mail parameters="map{'host': $SHOST, 'port': $SMTPPORT}"
              auth="map{'username':'username','password':'password'}">
   <p:with-input>
     <p:inline>

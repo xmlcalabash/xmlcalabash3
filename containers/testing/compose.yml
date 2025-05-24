@@ -1,0 +1,60 @@
+services:
+  webserver:
+    image: xmlcalabash-apache
+    container_name: webserver
+    working_dir: /src
+    volumes:
+      - ../../tests/3.0-test-suite/docker/apache2/htdocs:/usr/local/apache2/htdocs
+      - ../../tests/3.0-test-suite/docker/apache2/cache:/usr/local/apache2/cache
+      - ../../tests/3.0-test-suite/docker/apache2/cgi-bin:/usr/local/apache2/cgi-bin
+      - ../../tests/3.0-test-suite/docker/apache2/service:/usr/local/apache2/service
+      - ../../tests/3.0-test-suite/docker/apache2/conf:/usr/local/apache2/conf
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/"]
+      interval: 6s
+      timeout: 2s
+      retries: 5
+    networks:
+      - test_net
+
+  sendriasmtp:
+    image: xmlcalabash-sendria
+    container_name: smtp
+    environment:
+      - MAIL_DRIVER=smtp
+      - MAIL_HOST=127.0.0.1
+      - MAIL_PORT=1025
+      - MAIL_USERNAME=username
+      - MAIL_PASSWORD=password
+      - MAIL_ENCRYPTION=tcp
+      - MAIL_FROM_ADDRESS=nobody@example.com
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:1080/"]
+      interval: 16s
+      timeout: 8s
+      retries: 5
+    networks:
+      - test_net
+
+  tester:
+    image: xmlcalabash-testing
+    stdin_open: true # docker run -i
+    tty: true        # docker run -t
+    depends_on:
+      - webserver
+      - sendriasmtp
+    volumes:
+      - ./output:/output
+      - ../../:/sources
+      - xmlcalabash:/xmlcalabash
+      - ../../private:/private
+      - ./scripts:/scripts
+    networks:
+      - test_net
+
+volumes:
+  xmlcalabash:
+    external: true
+
+networks:
+  test_net:

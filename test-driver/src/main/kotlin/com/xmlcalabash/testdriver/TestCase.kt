@@ -137,6 +137,22 @@ class TestCase(val xmlCalabash: XmlCalabash, val testOptions: TestOptions, val t
                 parser.builder.option(name, value)
             }
 
+            if (features.contains("send-mail")) {
+                for (name in listOf(QName("SHOST"), QName("SMTPPORT"), QName("APIPORT"))) {
+                    testOptions.options[name]?.let {
+                        parser.builder.option(name, it)
+                    }
+                }
+            }
+
+            if (features.contains("p:http-request") || features.contains("webaccess") || features.contains("selenium")) {
+                for (name in listOf(QName("WHOST"))) {
+                    testOptions.options[name]?.let {
+                        parser.builder.option(name, it)
+                    }
+                }
+            }
+
             val treeBuilder = SaxonTreeBuilder(testConfig)
             treeBuilder.startDocument(pipelineXml!!.baseURI)
             treeBuilder.addSubtree(pipelineXml!!)
