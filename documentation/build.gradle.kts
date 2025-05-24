@@ -81,11 +81,6 @@ dependencies {
   documentation(project(":app", "runtimeElements"))
   documentation(project(":xmlcalabash", "runtimeElements"))
 
-  documentation(project(":paged-media:antenna-house", "runtimeElements"))
-  documentation(project(":paged-media:prince", "runtimeElements"))
-  documentation(project(":paged-media:weasyprint", "runtimeElements"))
-  documentation(project(":paged-media:fop", "runtimeElements"))
-
   deltaxml(fileTree("dir" to layout.projectDirectory.dir("lib"),
                     "include" to "*.jar"))
 }

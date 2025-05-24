@@ -1,1 +1,5 @@
 com.xmlcalabash.util.spi.StandardPagedMediaProvider
+com.xmlcalabash.steps.pagedmedia.antennahouse.AhManager
+com.xmlcalabash.steps.pagedmedia.fop.FopManager
+com.xmlcalabash.steps.pagedmedia.prince.PrinceManager
+com.xmlcalabash.steps.pagedmedia.weasyprint.WeasyprintManager

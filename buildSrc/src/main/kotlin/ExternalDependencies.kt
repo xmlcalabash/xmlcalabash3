@@ -70,6 +70,14 @@ object ExternalDependencies {
                                      "org.apache.pdfbox:xmpbox:2.0.32",
                                      "javax.xml.bind:jaxb-api:2.3.1"), // pdfbox dep for parsing XML in pdfbox
 
+      "paged-media-fop" to listOf("org.apache.xmlgraphics:fop:2.10",
+                                  "org.apache.avalon.framework:avalon-framework-api:4.3.1",
+                                  "org.apache.avalon.framework:avalon-framework-impl:4.3.1",
+                                  "javax.media:jai-core:1.1.3",
+                                  "com.sun.media:jai-codec:1.1.3"),
+
+      "paged-media-prince" to listOf("com.princexml:prince-java-wrapper:1.3.0"),
+
       "polyglot" to listOf("org.graalvm.polyglot:polyglot:23.1.5",
                            "org.graalvm.polyglot:js:23.1.5",
                            "org.graalvm.polyglot:python:23.1.5"),

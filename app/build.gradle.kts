@@ -24,10 +24,6 @@ plugins {
 val xmlbuild = the<XmlCalabashBuildExtension>()
 
 val xmlcalabashRelease by configurations.dependencyScope("xmlcalabashRelease")
-val weasyprintRelease by configurations.dependencyScope("weasyprintRelease")
-val princeRelease by configurations.dependencyScope("princeRelease")
-val antennahouseRelease by configurations.dependencyScope("antennahouseRelease")
-val fopRelease by configurations.dependencyScope("fopRelease")
 
 val dep_activation = project.findProperty("activation").toString()
 val dep_drewnoakesExtractor = project.findProperty("drewnoakesExtractor").toString()
@@ -39,37 +35,13 @@ val dep_slf4j = project.findProperty("slf4j").toString()
 dependencies {
   xmlcalabashRelease(project(mapOf("path" to ":xmlcalabash",
                                    "configuration" to "releaseArtifacts")))
-  weasyprintRelease(project(mapOf("path" to ":paged-media:weasyprint",
-                                  "configuration" to "releaseArtifacts")))
-  princeRelease(project(mapOf("path" to ":paged-media:prince",
-                              "configuration" to "releaseArtifacts")))
-  antennahouseRelease(project(mapOf("path" to ":paged-media:antenna-house",
-                                    "configuration" to "releaseArtifacts")))
-  fopRelease(project(mapOf("path" to ":paged-media:fop",
-                           "configuration" to "releaseArtifacts")))
 
   implementation(project(":xmlcalabash"))
   //implementation(project(":ext:polyglot")) // No, it requires Java 17
-  //implementation(project(":paged-media:antenna-house"))
-  //implementation(project(":paged-media:fop"))
-  //implementation(project(":paged-media:prince"))
-  //implementation(project(":paged-media:weasyprint"))
 }
 
 val xmlcalabashJar = configurations.resolvable("xmlcalabashJar") {
   extendsFrom(xmlcalabashRelease)
-}
-val weasyprintJar = configurations.resolvable("weasyprintJar") {
-  extendsFrom(weasyprintRelease)
-}
-val princeJar = configurations.resolvable("princeJar") {
-  extendsFrom(princeRelease)
-}
-val antennahouseJar = configurations.resolvable("antennahouseJar") {
-  extendsFrom(antennahouseRelease)
-}
-val fopJar = configurations.resolvable("fopJar") {
-  extendsFrom(fopRelease)
 }
 
 application {
@@ -150,10 +122,6 @@ val copyScripts = tasks.register<Copy>("copyScripts") {
 
 tasks.register("stage-release") {
   inputs.files(xmlcalabashJar)
-  inputs.files(weasyprintJar)
-  inputs.files(princeJar)
-  inputs.files(antennahouseJar)
-  inputs.files(fopJar)
   inputs.files(copyScripts)
   dependsOn("jar")
 
@@ -188,8 +156,7 @@ tasks.register("stage-release") {
   }
 
   doLast {
-    listOf(xmlcalabashJar,
-           weasyprintJar, princeJar, antennahouseJar, fopJar).forEach { jar ->
+    listOf(xmlcalabashJar).forEach { jar ->
       copy {
         from(jar)
         into(layout.buildDirectory.dir("stage/lib"))

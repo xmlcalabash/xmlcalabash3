@@ -169,48 +169,159 @@ The following configuration options are supported:</para>
 <para>In order to use the PrinceXML formatter, you must install and configure
 <link xlink:href="https://www.princexml.com/">Prince</link>.</para>
 
+<important>
+<title>Backwards incompatible change</title>
+<para>In beta7, XML Calabash switched to the Prince java wrapper
+version <?dep com.princexml:prince-java-wrapper?>. This added many options,
+changed the names of several options, and removed a few.
+</para>
+</important>
+
 <para>You can configure the formatter with
 <link xlink:href="../../userguide/current/configuration.html#cc.paged-media">a
 configuration property</link> or via the <option>parameters</option> option.
-The following configuration options are supported:</para>
+The configuration options listed in the table below are supported.</para>
+
+<note>
+<para>The underlying Prince API has “negative options”, but
+for consistency, all of the options on this step are <emphasis>positive</emphasis>.
+(To disable parallel downloads, set <literal>parallelDownloads</literal> to
+<literal>false</literal>, rather than setting <literal>noParallelDownloads</literal> to
+<literal>true</literal>).</para>
+</note>
 
 <informaltable>
 <tgroup cols="2">
 <colspec colwidth="2*"/>
-<colspec colwidth="1*"/>
+<colspec colwidth="3*"/>
 <thead>
 <row><entry>Property name</entry><entry>Type</entry></row>
 </thead>
 <tbody>
-<row><entry><literal>exePath</literal></entry><entry>string</entry></row>
+<row><entry><literal>allowAnnotate</literal></entry><entry>boolean</entry></row>
+<row><entry><literal>allowAssembly</literal></entry><entry>boolean</entry></row>
+<row><entry><literal>allowCopy</literal></entry><entry>boolean</entry></row>
+<row><entry><literal>allowCopyForAccessibility</literal></entry><entry>boolean</entry></row>
+<row><entry><literal>allowModify</literal></entry><entry>boolean</entry></row>
+<row><entry><literal>allowPrint</literal></entry><entry>boolean</entry></row>
+<row><entry><literal>artificialFonts</literal></entry><entry>boolean</entry></row>
+<row><entry><literal>attachments</literal></entry><entry>list of string</entry></row>
+<row><entry><literal>authMethods</literal></entry><entry>“<literal>basic</literal>”,
+“<literal>digest</literal>”, “<literal>ntlm</literal>”, or “<literal>negotiate</literal>”</entry></row>
+<row><entry><literal>authPassword</literal></entry><entry>string</entry></row>
+<row><entry><literal>authPreemptive</literal></entry><entry>boolean</entry></row>
+<row><entry><literal>authScheme</literal></entry><entry>“<literal>http</literal>” or
+“<literal>https</literal>”</entry></row>
+<row><entry><literal>authServer</literal></entry><entry>string</entry></row>
+<row><entry><literal>authUser</literal></entry><entry>string</entry></row>
+<row><entry><literal>authorStyle</literal></entry><entry>boolean</entry></row>
 <row><entry><literal>baseURL</literal></entry><entry>string</entry></row>
 <row><entry><literal>compress</literal></entry><entry>boolean</entry></row>
+<row><entry><literal>convertColors</literal></entry><entry>boolean</entry></row>
+<row><entry><literal>cookieJar</literal></entry><entry>string</entry></row>
+<row><entry><literal>cookies</literal></entry><entry>list of string</entry></row>
 <row><entry><literal>debug</literal></entry><entry>boolean</entry></row>
+<row><entry><literal>defaultStyle</literal></entry><entry>boolean</entry></row>
 <row><entry><literal>embedFonts</literal></entry><entry>boolean</entry></row>
 <row><entry><literal>encrypt</literal></entry><entry>boolean</entry></row>
-<row><entry><literal>keyBits</literal></entry><entry>string</entry></row>
-<row><entry><literal>userPassword</literal></entry><entry>string</entry></row>
-<row><entry><literal>ownerPassword</literal></entry><entry>string</entry></row>
-<row><entry><literal>disallowPrint</literal></entry><entry>boolean</entry></row>
-<row><entry><literal>disallowModify</literal></entry><entry>boolean</entry></row>
-<row><entry><literal>disallowCopy</literal></entry><entry>boolean</entry></row>
-<row><entry><literal>disallowAnnotate</literal></entry><entry>boolean</entry></row>
-<row><entry><literal>fileRoot</literal></entry><entry>string</entry></row>
-<row><entry><literal>html</literal></entry><entry>boolean</entry></row>
-<row><entry><literal>httpPassword</literal></entry><entry>string</entry></row>
-<row><entry><literal>httpUsername</literal></entry><entry>string</entry></row>
+<row><entry><literal>exePath</literal></entry><entry>string</entry></row>
+<row><entry><literal>failDroppedContent</literal></entry><entry>boolean</entry></row>
+<row><entry><literal>failInvalidLicense</literal></entry><entry>boolean</entry></row>
+<row><entry><literal>failMissingGlyphs</literal></entry><entry>boolean</entry></row>
+<row><entry><literal>failMissingResources</literal></entry><entry>boolean</entry></row>
+<row><entry><literal>failPdfProfileError</literal></entry><entry>boolean</entry></row>
+<row><entry><literal>failPdfTagError</literal></entry><entry>boolean</entry></row>
+<row><entry><literal>failSafe</literal></entry><entry>boolean</entry></row>
+<row><entry><literal>failStrippedTransparency</literal></entry><entry>boolean</entry></row>
+<row><entry><literal>fallbackCmykProfile</literal></entry><entry>string</entry></row>
+<row><entry><literal>forceIdentityEncoding</literal></entry><entry>boolean</entry></row>
 <row><entry><literal>httpProxy</literal></entry><entry>string</entry></row>
-<row><entry><literal>inputType</literal></entry><entry>string</entry></row>
+<row><entry><literal>httpTimeout</literal></entry><entry>string</entry></row>
+<row><entry><literal>iframes</literal></entry><entry>boolean</entry></row>
+<row><entry><literal>inputType</literal></entry><entry>“<literal>auto</literal>”,
+“<literal>html</literal>”, or “<literal>xml</literal>”</entry></row>
 <row><entry><literal>javascript</literal></entry><entry>boolean</entry></row>
+<row><entry><literal>keyBits</literal></entry><entry>40 or 128</entry></row>
+<row><entry><literal>licenseFile</literal></entry><entry>string</entry></row>
+<row><entry><literal>licenseKey</literal></entry><entry>string</entry></row>
 <row><entry><literal>log</literal></entry><entry>string</entry></row>
+<row><entry><literal>maxPasses</literal></entry><entry>string</entry></row>
+<row><entry><literal>media</literal></entry><entry>string</entry></row>
 <row><entry><literal>network</literal></entry><entry>boolean</entry></row>
-<row><entry><literal>subsetFonts</literal></entry><entry>boolean</entry></row>
-<row><entry><literal>verbose</literal></entry><entry>boolean</entry></row>
-<row><entry><literal>xinclude</literal></entry><entry>boolean</entry></row>
+<row><entry><literal>objectStreams</literal></entry><entry>boolean</entry></row>
+<row><entry><literal>ownerPassword</literal></entry><entry>string</entry></row>
+<row><entry><literal>parallelDownloads</literal></entry><entry>boolean</entry></row>
+<row><entry><literal>pdfAuthor</literal></entry><entry>string</entry></row>
+<row><entry><literal>pdfCreator</literal></entry><entry>string</entry></row>
+<row><entry><literal>pdfEventScripts</literal></entry><entry>list of string pairs</entry></row>
+<row><entry><literal>pdfForms</literal></entry><entry>boolean</entry></row>
+<row><entry><literal>pdfId</literal></entry><entry>string</entry></row>
+<row><entry><literal>pdfKeywords</literal></entry><entry>string</entry></row>
+<row><entry><literal>pdfLang</literal></entry><entry>string</entry></row>
+<row><entry><literal>pdfOutputIntent</literal></entry><entry>string</entry></row>
+<row><entry><literal>pdfProfile</literal></entry><entry>“<literal>PDF/A-1a</literal>”, 
+“<literal>PDF/A-1a+PDF/UA-1</literal>”, 
+“<literal>PDF/A-1b</literal>”, 
+“<literal>PDF/A-2a</literal>”, 
+“<literal>PDF/A-2a+PDF/UA-1</literal>”, 
+“<literal>PDF/A-2b</literal>”, 
+“<literal>PDF/A-3a</literal>”, 
+“<literal>PDF/A-3a+PDF/UA-1</literal>”, 
+“<literal>PDF/A-3b</literal>”, 
+“<literal>PDF/UA-1</literal>”, 
+“<literal>PDF/X-1a:2001</literal>”, 
+“<literal>PDF/X-1a:2003</literal>”, 
+“<literal>PDF/X-3:2002</literal>”, 
+“<literal>PDF/X-3:2003</literal>”, or
+“<literal>PDF/X-4</literal>”.
+</entry></row>
+<row><entry><literal>pdfScript</literal></entry><entry>string</entry></row>
+<row><entry><literal>pdfSubject</literal></entry><entry>string</entry></row>
+<row><entry><literal>pdfTitle</literal></entry><entry>string</entry></row>
+<row><entry><literal>redirects</literal></entry><entry>boolean</entry></row>
 <row><entry><literal>scripts</literal></entry><entry>string</entry></row>
+<row><entry><literal>sslCaCert</literal></entry><entry>string</entry></row>
+<row><entry><literal>sslCaPath</literal></entry><entry>string</entry></row>
+<row><entry><literal>sslCert</literal></entry><entry>string</entry></row>
+<row><entry><literal>sslCertType</literal></entry><entry>“<literal>pem</literal>”
+or “<literal>der</literal>”</entry></row>
+<row><entry><literal>sslKey</literal></entry><entry>string</entry></row>
+<row><entry><literal>sslKeyPassword</literal></entry><entry>string</entry></row>
+<row><entry><literal>sslKeyType</literal></entry><entry>“<literal>pem</literal>”
+or “<literal>der</literal>”</entry></row>
+<row><entry><literal>sslVerification</literal></entry><entry>“<literal>default</literal>”,
+“<literal>tlsv1</literal>”, “<literal>tlsv1.0</literal>”, “<literal>tlsv1.1</literal>”,
+“<literal>tlsv1.2</literal>”, or “<literal>tlsv1.3</literal>”</entry></row>
+<row><entry><literal>sslVersion</literal></entry><entry>string</entry></row>
+<row><entry><literal>subsetFonts</literal></entry><entry>boolean</entry></row>
+<row><entry><literal>taggedPdf</literal></entry><entry>boolean</entry></row>
+<row><entry><literal>userPassword</literal></entry><entry>string</entry></row>
+<row><entry><literal>verbose</literal></entry><entry>boolean</entry></row>
+<row><entry><literal>warnCssUnknown</literal></entry><entry>boolean</entry></row>
+<row><entry><literal>warnCssUnsupported</literal></entry><entry>boolean</entry></row>
+<row><entry><literal>xinclude</literal></entry><entry>boolean</entry></row>
+<row><entry><literal>xmlExternalEntities</literal></entry><entry>boolean</entry></row>
+<row><entry><literal>xmp</literal></entry><entry>string</entry></row>
 </tbody>
 </tgroup>
 </informaltable>
+
+<para>Properties with the type “list of string” means a single string with
+space separated values.</para>
+
+<para>The <literal>pdfEventScripts</literal> property is also a single string
+with space separated values. After splitting the string, it must consist of a sequence of
+pairs where the first item is the event type
+(“<literal>will-close</literal>”,
+“<literal>will-save</literal>”,
+“<literal>did-save</literal>”,
+“<literal>will-print</literal>”,
+“<literal>did-print</literal>”) and the second item is the script filename.</para>
+
+<para>(This business of using single strings and splitting them on white space is
+a bit of a mess. It’s motivated in part by the fact that the default values for the
+properties come from attribute values in the configuration file. If it’s problematic,
+please open an issue.)</para>
 
 <para>The <literal>exePath</literal> property is used to locate the
 <literal>prince</literal> executable. If it’s not specified, XML Calabash will
@@ -218,14 +329,6 @@ first look for the system property
 <literal>com.xmlcalabash.css.prince.exepath</literal>, and if that doesn’t
 exist, it will search the user’s <envar>PATH</envar> environment
 variable.</para>
-
-<para>The <literal>keyBits</literal>, <literal>userPassword</literal>,
-<literal>ownerPassword</literal>, <literal>disallowPrint</literal>, <literal>disallowModify</literal>,
-<literal>disallowCopy</literal>, and <literal>disallowAnnotate</literal> values are combined
-to form the encryption information.</para>
-
-<para>The <literal>scripts</literal> property is a space delimited list of scripts.
-Each script will be added to the processor.</para>
 
 <para>For more information about the properties, consult the Prince API documentation.</para>
 

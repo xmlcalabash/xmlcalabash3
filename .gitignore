@@ -5,6 +5,5 @@ build/
 /documentation/lib/
 /paged-media/**/lib/
 /test-driver/lib/
-/xmlcalabash/lib/
 saxon-license.lic
 .#*
