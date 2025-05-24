@@ -29,10 +29,6 @@ dependencies {
   implementation(project(":xmlcalabash"))
   testrunner(project(":test-driver"))
   implementation(project(":ext:polyglot"))
-  implementation(project(":paged-media:antenna-house"))
-  implementation(project(":paged-media:fop"))
-  implementation(project(":paged-media:prince"))
-  implementation(project(":paged-media:weasyprint"))
 
   transformation ("net.sf.saxon:Saxon-HE:${saxonVersion}")
 }

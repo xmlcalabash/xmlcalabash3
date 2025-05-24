@@ -38,6 +38,7 @@ configurations.forEach {
 dependencies {
   // implementation("name.dmaus.schxslt:schxslt:${dep_schxslt}")
   // The SchXslt2 transpiler is included in our resources
+  implementation(fileTree(mapOf("dir" to "lib", "include" to listOf("*.jar"))))
 }
 
 buildConfig {

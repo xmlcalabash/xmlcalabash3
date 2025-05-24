@@ -15,7 +15,9 @@ dependencies {
 
   ExternalDependencies.of(listOf("asciidoctor", "diagramming", "ebnf-convert",
                                  "epubcheck", "find", "json-patch", "jsonpath",
-                                 "markup-blitz", "metadata-extractor", "railroad", "rdf",
+                                 "markup-blitz", "metadata-extractor",
+                                 "paged-media-fop", "paged-media-prince",
+                                 "railroad", "rdf",
                                  "selenium", "send-mail", "trang", "unique-id", "xmlunit")).forEach {
     compileOnly(it) {
       exclude(group="net.sf.saxon", module="Saxon-HE")
