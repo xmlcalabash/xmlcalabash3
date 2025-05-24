@@ -1,6 +1,8 @@
 package com.xmlcalabash.testdriver
 
 import com.xmlcalabash.util.Urify
+import net.sf.saxon.s9api.QName
+import net.sf.saxon.s9api.XdmAtomicValue
 import java.io.File
 
 class Main {
@@ -26,6 +28,10 @@ class Main {
                     testOptions.outputGraph = arg.substring(8)
                 } else if (arg == "--stop-on-fail") {
                     testOptions.stopOnFirstFailed = true
+                } else if (arg == "--debug") {
+                    testOptions.debug = true
+                } else if (arg.startsWith("--debug:")) {
+                    testOptions.debug = arg.substring(8) == "true"
                 } else if (arg.startsWith("--require-pass:")) {
                     testOptions.requirePass = (arg.substring(15) == "true")
                 } else if (arg.startsWith("--report:")) {
@@ -34,9 +40,18 @@ class Main {
                     testOptions.testDirectoryList.add(arg.substring(6))
                 } else if (arg.startsWith("--console:")) {
                     testOptions.consoleOutput = (arg.substring(10) == "true")
+                } else if (!arg.startsWith("-")) {
+                    val pos = arg.indexOf('=')
+                    val name = arg.substring(0, pos)
+                    val value = arg.substring(pos + 1)
+                    testOptions.options[QName(name)] = XdmAtomicValue(value)
                 } else {
                     throw RuntimeException("Unrecognized argument: ${arg}")
                 }
+            }
+
+            if (testOptions.debug) {
+                println("Running in debug mode...")
             }
 
             // The default test suite...

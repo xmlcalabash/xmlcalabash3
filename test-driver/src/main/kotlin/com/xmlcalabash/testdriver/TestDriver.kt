@@ -125,6 +125,7 @@ class TestDriver(val testOptions: TestOptions, val exclusions: Map<String, Strin
         // licensed/unlicensed
         // eager/notEager
         val builder = XmlCalabashBuilder()
+        builder.setDebug(testOptions.debug)
 
         val eagerLicensed = builder
             .setLicensed(true)

@@ -1,9 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<t:test expected="pass"
+<t:test expected="pass" features="webaccess"
         xmlns:t="http://xproc.org/ns/testsuite/3.0">
   <t:info>
     <t:title>wait-for-update-001</t:title>
     <t:revision-history>
+      <t:revision>
+        <t:date>2025-05-23</t:date>
+        <t:author>
+          <t:name>Norm Tovey-Walsh</t:name>
+        </t:author>
+        <t:description xmlns="http://www.w3.org/1999/xhtml">
+          <p>Added static options for web server host and port.</p>
+        </t:description>
+      </t:revision>
       <t:revision>
         <t:date>2025-05-05</t:date>
         <t:author>
@@ -28,7 +37,9 @@
   <p:import href="https://xmlcalabash.com/ext/library/pipeline-messages.xpl"/>
   <p:output port="result" sequence="true"/>
 
-  <cx:wait-for-update name="wait" href="http://localhost:8246/service/time-of-day"/>
+  <p:option name="WHOST" select="'http://localhost:8246'" static="true"/>
+
+  <cx:wait-for-update name="wait" href="{$WHOST}/service/time-of-day"/>
 
   <cx:pipeline-messages p:depends="wait" level="debug"/>
 </p:declare-step>

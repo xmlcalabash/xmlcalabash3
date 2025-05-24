@@ -2,6 +2,8 @@ package com.xmlcalabash.test
 
 import com.xmlcalabash.XmlCalabash
 import com.xmlcalabash.util.BufferingReceiver
+import net.sf.saxon.s9api.QName
+import net.sf.saxon.s9api.XdmAtomicValue
 import org.json.JSONObject
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.fail
@@ -13,7 +15,8 @@ import java.net.URI
 
 class CxSendMail {
     companion object {
-        private val url = URI("http://localhost:1080/api/messages/").toURL()
+        private val smtpserver = System.getenv("SMTPSERVER") ?: "localhost"
+        private val url = URI("http://${smtpserver}:1080/api/messages/").toURL()
     }
 
     private fun clearMessages() {
@@ -49,6 +52,7 @@ class CxSendMail {
     fun testPlainText() {
         val calabash = XmlCalabash.newInstance()
         val parser = calabash.newXProcParser()
+        parser.builder.staticOptionsManager.useWhenValue(QName("SHOST"), XdmAtomicValue(smtpserver))
         val declaration = parser.parse("src/test/resources/send-mail/pipe.xpl")
 
         val exec = declaration.getExecutable()
@@ -77,6 +81,7 @@ class CxSendMail {
     fun testHTML() {
         val calabash = XmlCalabash.newInstance()
         val parser = calabash.newXProcParser()
+        parser.builder.staticOptionsManager.useWhenValue(QName("SHOST"), XdmAtomicValue(smtpserver))
         val declaration = parser.parse("src/test/resources/send-mail/pipe-html.xpl")
 
         val exec = declaration.getExecutable()
@@ -105,6 +110,7 @@ class CxSendMail {
     fun testMultipart() {
         val calabash = XmlCalabash.newInstance()
         val parser = calabash.newXProcParser()
+        parser.builder.staticOptionsManager.useWhenValue(QName("SHOST"), XdmAtomicValue(smtpserver))
         val declaration = parser.parse("src/test/resources/send-mail/pipe-mp.xpl")
 
         val exec = declaration.getExecutable()
