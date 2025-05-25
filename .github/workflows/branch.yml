@@ -140,6 +140,19 @@ jobs:
             app/build/distributions/xmlcalabash-${{ env.CI_TAG }}.zip
             ext/polyglot/build/distributions/polyglot-${{ env.CI_TAG }}.zip
 
+      # N.B. This is **only** publishing the SNAPSHOT builds on the main branch
+      - name: Publish to Sonatype
+        if: ${{ env.HAVE_ACCESS_TOKEN == 'true' && env.HAVE_SONATYPE == 'true' && env.CI_BRANCH == 'main' && contains(env.XMLCALABASH_VER, 'SNAPSHOT') }}
+        run: |
+          curl -s -o /tmp/secret.gpg ${{ secrets.GPGKEYURI }}
+          ./gradlew -PsonatypeUsername=${{ secrets.SONATYPEUSER }} \
+                  -PsonatypePassword="${{ secrets.SONATYPEPASS }}" \
+                  -Psigning.keyId="${{ secrets.SIGNKEY }}" \
+                  -Psigning.password="${{ secrets.SIGNPSW }}" \
+                  -Psigning.secretKeyRingFile=/tmp/secret.gpg \
+                  publish
+          rm -f /tmp/secret.gpg
+
       - name: Checkout www
         if: ${{ env.HAVE_WWW == 'true' && env.HAVE_ACCESS_TOKEN == 'true' && env.CI_BRANCH == 'main' && !contains(env.XMLCALABASH_VER, 'SNAPSHOT') }}
         uses: actions/checkout@v4
