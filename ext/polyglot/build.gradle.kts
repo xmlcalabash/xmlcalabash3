@@ -138,9 +138,9 @@ publishing {
         password = project.findProperty("sonatypePassword").toString()
       }
       url = if (xmlbuild.version.get().contains("SNAPSHOT")) {
-        uri("https://oss.sonatype.org/content/repositories/snapshots/")
+        uri("https://central.sonatype.com/repository/maven-snapshots/")
       } else {
-        uri("https://oss.sonatype.org/service/local/staging/deploy/maven2/")
+        uri("https://ossrh-staging-api.central.sonatype.com/service/local/")
       }
     }
   }
