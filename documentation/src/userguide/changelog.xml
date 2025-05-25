@@ -13,6 +13,30 @@ See the commits and pull requests on
 finer detail.</para>
 
 <revhistory>
+<revision xml:id="r300-beta7">
+<revnumber>3.0.0-beta7</revnumber>
+<date>2025-05-25</date>
+<revdescription>
+<para>(The beta6 release never actually got published because I forgot to tag it.)</para>
+<itemizedlist>
+<listitem><para>Fixed <ghissue number="532"/>. Make sure that user-supplied values
+for static options are used during compilation.
+</para></listitem>
+<listitem><para>Refactored the paged media steps into the main build.
+Along the way, I discovered that Prince XML has an artifact in Maven
+Central, so I switched to that API. The available options
+for the Prince XML-backed <tag>p:css-formatter</tag> step have changed; some of those changes
+are backwards incompatible.
+</para></listitem>
+<listitem><para>Restructured code and tests for running in a set of Docker containers.
+The idea is to be able to run testing and release tasks in containers so that
+there’s no “bleed through” of the local development environment.
+</para></listitem>
+<listitem><para>Moved to the new Maven Central repository using the legacy OSSRH APIs.
+</para></listitem>
+</itemizedlist>
+</revdescription>
+</revision>
 <revision xml:id="r300-beta6">
 <revnumber>3.0.0-beta6</revnumber>
 <date>2025-05-23</date>
