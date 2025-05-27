@@ -447,6 +447,7 @@ open class XProcError protected constructor(val code: QName, val variant: Int, e
         fun xiMissingConfigurationAttribute(elemName: QName, attrName: QName) = internal(Pair(26, 1), elemName, attrName)
         fun xiMissingConfigurationAttributes(elemName: QName, message: String) = internal(Pair(26, 2), elemName, message)
         fun xiForbiddenConfigurationAttributes(formatter: URI) = internal(Pair(26, 3), formatter)
+        fun xiInvalidConfigurationAttributeValue(elementName: QName, attrName: QName, value: String) = internal(Pair(26, 4), elementName, attrName, value)
         fun xiUnrecognizedConfigurationValue(elemName: QName, attrName: QName, value: String) = internal(27, elemName, attrName, value)
         fun xiUnrecognizedSaxonConfigurationProperty(key: String) = internal(28, key)
         fun xiInvalidSaxonConfigurationProperty(key: String, value: String) = internal(29, key, value)

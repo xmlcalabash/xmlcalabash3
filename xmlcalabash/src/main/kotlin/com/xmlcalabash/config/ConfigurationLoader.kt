@@ -92,9 +92,14 @@ class ConfigurationLoader(val builder: XmlCalabashBuilder) {
     }
 
     private fun parse(root: XdmNode) {
-        checkAttributes(root, listOf(), listOf(_licensed, _saxonConfiguration, _mpt,
-            _piped_io, _verbosity, _console_output_encoding,
-            Ns.validationMode, Ns.tryNamespaces, Ns.useLocationHints))
+        checkAttributes(root, listOf(), listOf(
+            _console_output_encoding, _licensed, _piped_io, _saxonConfiguration,
+            Ns.tryNamespaces, Ns.useLocationHints, Ns.validationMode,
+            _verbosity, Ns.version, _mpt))
+
+        if ((root.getAttributeValue(Ns.version) ?: "1.0") != "1.0") {
+            throw XProcError.xiInvalidConfigurationAttributeValue(root.nodeName, Ns.version, root.getAttributeValue(Ns.version)!!).exception()
+        }
 
         val saxonConfig = root.getAttributeValue(_saxonConfiguration)
         if (saxonConfig != null) {
