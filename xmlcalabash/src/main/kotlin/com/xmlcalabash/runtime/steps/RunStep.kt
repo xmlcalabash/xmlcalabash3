@@ -140,6 +140,14 @@ open class RunStep(config: XProcStepConfiguration, compound: CompoundStepModel):
         }
     }
 
+    override fun reset() {
+        super.reset()
+        // These are provided by the "atomic" run step.
+        for ((runInput, _) in runParams.inputs) {
+            head.openPorts.remove(runInput)
+        }
+    }
+
     private fun listToValue(documents: List<XProcDocument>): XdmValue {
         var value: XdmValue = XdmEmptySequence.getInstance()
         for (doc in documents) {
