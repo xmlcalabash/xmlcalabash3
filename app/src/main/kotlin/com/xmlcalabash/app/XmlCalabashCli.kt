@@ -67,119 +67,119 @@ class XmlCalabashCli private constructor() {
         builder.setMessageReporter(cliReporter)
         builder.setErrorExplanation(cliExplain)
 
-        commandLine = CommandLine.parse(args)
-        if (commandLine.errors.isNotEmpty()) {
-            abort(cliExplain, commandLine.errors)
-        }
-
-        loadConfiguration(commandLine.config)
-
-        if (commandLine.verbosity != null) {
-            builder.setVerbosity(commandLine.verbosity!!)
-        }
-        cliReporter.threshold = builder.getVerbosity()
-
-        cliExplain.showStacktrace = commandLine.stacktrace
-
-        commandLine.pipe?.let { builder.setPipe(it) }
-        commandLine.trace?.let { builder.setTrace(it) }
-        commandLine.traceDocuments?.let { builder.setTraceDocuments(it) }
-        commandLine.assertions?.let { builder.setAssertions(it) }
-        commandLine.tryNamespaces?.let { builder.setTryNamespaces(it) }
-        commandLine.useLocationHints?.let { builder.setUseLocationHints(it) }
-
-        if (builder.getLicensed() != commandLine.licensed) {
-            builder.setLicensed(builder.getLicensed() && commandLine.licensed)
-        }
-
-        commandLine.debug?.let { builder.setDebug(it) }
-        commandLine.debugger?.let { builder.setDebugger(it) }
-        when (commandLine.visualizer) {
-            null -> {
-                // If the user didn't specify one on the command line, use the one from
-                // the configuration file, unless --debugger has been specified, in which
-                // case turn it off. Debugging and visualization don't play nicely together.
-                if (builder.getDebugger()) {
-                    builder.setVisualizer("silent", emptyMap())
-                }
-            }
-            "silent", "plain", "detail" -> builder.setVisualizer(commandLine.visualizer!!, commandLine.visualizerOptions)
-            else -> {
-                cliPrinter.print("Unexpected visualizer: ${commandLine.visualizer}")
-                builder.setVisualizer("silent", emptyMap())
-            }
-        }
-
-        if (builder.getTrace() == null && builder.getTraceDocuments() != null) {
-            builder.setTrace(builder.getTraceDocuments()!!.resolve("trace.xml"))
-        }
-
-        for (uri in commandLine.xmlSchemas) {
-            builder.addXmlSchemaDocument(uri)
-        }
-
-        for (uri in commandLine.xmlCatalogs) {
-            builder.addXmlCatalog(uri)
-        }
-
-        for (name in commandLine.initializers) {
-            builder.addInitializer(name)
-        }
-
-        // It feels like this configuration should go somewhere else...but since
-        // CoffeeSacks is now bundled, try to initialize it for the user...
-        val csi = "org.nineml.coffeesacks.RegisterCoffeeSacks"
-        if (csi !in commandLine.initializers) {
-            builder.addInitializer(csi, ignoreErrors = true)
-        }
-
-        val moon = Moon.illumination()
-        if (moon > builder.mpt) {
-            if (moon > 0.99) {
-                logger.warn { "The moon is full." }
-            } else {
-                logger.warn { "The moon is ${"%3.1f".format(moon * 100.0)}% full." }
-            }
-        }
-
-        xmlCalabash = builder.build()
-
-        val xprocParser = xmlCalabash.newXProcParser()
-        stepConfig = xprocParser.builder.stepConfig
-        cliExplain = stepConfig.errorExplanation
-
-        logVersion()
-
-        if (commandLine.help || (commandLine.command == "run" && commandLine.pipeline == null && commandLine.step == null)) {
-            help()
-            return
-        }
-
-        when (commandLine.command) {
-            "info-version" -> {
-                version()
-                return
-            }
-            "info-mimetype" -> {
-                showMimetype(commandLine.mimetypeExtension)
-                return
-            }
-            "info-mimetypes" -> {
-                showMimetypes()
-                return
-            }
-            "info" -> {
-                stepConfig.messagePrinter.println("The 'info' subcommands are 'version', 'mimetypes', or 'mimetype'.")
-                stepConfig.messagePrinter.println("")
-                help()
-                return
-            }
-            else -> Unit
-        }
-
         var tstart: Long = 0
         var tend: Long = 0
         try {
+            commandLine = CommandLine.parse(args)
+            if (commandLine.errors.isNotEmpty()) {
+                abort(cliExplain, commandLine.errors)
+            }
+
+            loadConfiguration(commandLine.config)
+
+            if (commandLine.verbosity != null) {
+                builder.setVerbosity(commandLine.verbosity!!)
+            }
+            cliReporter.threshold = builder.getVerbosity()
+
+            cliExplain.showStacktrace = commandLine.stacktrace
+
+            commandLine.pipe?.let { builder.setPipe(it) }
+            commandLine.trace?.let { builder.setTrace(it) }
+            commandLine.traceDocuments?.let { builder.setTraceDocuments(it) }
+            commandLine.assertions?.let { builder.setAssertions(it) }
+            commandLine.tryNamespaces?.let { builder.setTryNamespaces(it) }
+            commandLine.useLocationHints?.let { builder.setUseLocationHints(it) }
+
+            if (builder.getLicensed() != commandLine.licensed) {
+                builder.setLicensed(builder.getLicensed() && commandLine.licensed)
+            }
+
+            commandLine.debug?.let { builder.setDebug(it) }
+            commandLine.debugger?.let { builder.setDebugger(it) }
+            when (commandLine.visualizer) {
+                null -> {
+                    // If the user didn't specify one on the command line, use the one from
+                    // the configuration file, unless --debugger has been specified, in which
+                    // case turn it off. Debugging and visualization don't play nicely together.
+                    if (builder.getDebugger()) {
+                        builder.setVisualizer("silent", emptyMap())
+                    }
+                }
+                "silent", "plain", "detail" -> builder.setVisualizer(commandLine.visualizer!!, commandLine.visualizerOptions)
+                else -> {
+                    cliPrinter.print("Unexpected visualizer: ${commandLine.visualizer}")
+                    builder.setVisualizer("silent", emptyMap())
+                }
+            }
+
+            if (builder.getTrace() == null && builder.getTraceDocuments() != null) {
+                builder.setTrace(builder.getTraceDocuments()!!.resolve("trace.xml"))
+            }
+
+            for (uri in commandLine.xmlSchemas) {
+                builder.addXmlSchemaDocument(uri)
+            }
+
+            for (uri in commandLine.xmlCatalogs) {
+                builder.addXmlCatalog(uri)
+            }
+
+            for (name in commandLine.initializers) {
+                builder.addInitializer(name)
+            }
+
+            // It feels like this configuration should go somewhere else...but since
+            // CoffeeSacks is now bundled, try to initialize it for the user...
+            val csi = "org.nineml.coffeesacks.RegisterCoffeeSacks"
+            if (csi !in commandLine.initializers) {
+                builder.addInitializer(csi, ignoreErrors = true)
+            }
+
+            val moon = Moon.illumination()
+            if (moon > builder.mpt) {
+                if (moon > 0.99) {
+                    logger.warn { "The moon is full." }
+                } else {
+                    logger.warn { "The moon is ${"%3.1f".format(moon * 100.0)}% full." }
+                }
+            }
+
+            xmlCalabash = builder.build()
+
+            val xprocParser = xmlCalabash.newXProcParser()
+            stepConfig = xprocParser.builder.stepConfig
+            cliExplain = stepConfig.errorExplanation
+
+            logVersion()
+
+            if (commandLine.help || (commandLine.command == "run" && commandLine.pipeline == null && commandLine.step == null)) {
+                help()
+                return
+            }
+
+            when (commandLine.command) {
+                "info-version" -> {
+                    version()
+                    return
+                }
+                "info-mimetype" -> {
+                    showMimetype(commandLine.mimetypeExtension)
+                    return
+                }
+                "info-mimetypes" -> {
+                    showMimetypes()
+                    return
+                }
+                "info" -> {
+                    stepConfig.messagePrinter.println("The 'info' subcommands are 'version', 'mimetypes', or 'mimetype'.")
+                    stepConfig.messagePrinter.println("")
+                    help()
+                    return
+                }
+                else -> Unit
+            }
+
             // N.B. It's illegal to shadow a static option name, so we can shove all the
             // options into the static options before we parse the pipeline. This is...odd
             // and, I expect, unsatisfactory in the long term. But I'm not going to try
