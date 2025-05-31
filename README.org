@@ -1,5 +1,5 @@
 #+TITLE: 301 Moved Permanently
 
-XML Calabash development has [[(https://codeberg.org/xmlcalabash/xmlcalabash3][moved to Codeberg]].
+XML Calabash development has [[https://codeberg.org/xmlcalabash/xmlcalabash3][moved to Codeberg]].
 
 Apologies for any inconvenience.
